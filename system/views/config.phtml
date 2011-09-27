@@ -3,10 +3,82 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title></title>
+		<link href="http://toaster2.test/system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+		<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/jquery.select-chain.js"></script>
+		<script>
+			$(function(){
+				var shopping = {};
+				shopping.saveconfig = function(){
+					var url = '<?php echo $this->form->getAction(); ?>';
+					var data = $('form[user-changed="true"]').serialize();
+					if (!data) {
+						window.console && console.log('nothing to save');
+						return false;
+					} else {
+						window.console && console.log(data);
+					}
+					
+					$.ajax({
+						url: url,
+						data: data,
+						type: 'POST',
+						dataType: 'html',
+						success: function(response){
+							$('form[user-changed="true"]').removeAttr('user-changed');
+							$('#config > ul > li > a.user-changed').removeClass('user-changed');
+							$('#save-btn').hide();
+						}
+					});
+				}
+				
+				$('#save-btn').button().hide().bind('click', shopping.saveconfig);
+				
+				$('#config').tabs({
+					select: function(event, ui){
+						$form = $(ui.panel).children('form');
+						if ($form.attr('user-changed') === true && $form.find(':submit').size() == 0) {
+							$form.append('<input type=submit />');
+						}
+					}
+				});
+				$('select[name$="country"]').each(function(){
+					var $stateField = $(this).closest('form').find('select[name$="state"]');
+					$(this).selectChain({
+						data: $(this),
+						target: $stateField,
+						url: '<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/states'
+					})
+				});
+				
+				$('form :input').change(function(){
+					var $form = $(this).closest('form');
+					if (!$form.attr('user-changed')){
+						$form.attr('user-changed', true);
+						$('#save-btn').fadeIn();
+						var currentTab = $('#config').tabs('option', 'selected');
+						$('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+					}
+				});
+			});
+			
+		</script>
+		<style>
+			a.user-changed::after {
+				content: '*'
+			}
+		</style>
     </head>
     <body>
-		<?php
-		echo $this->settingsForm;
-		?>
-    </body>
+		<div id="config">
+			<ul>
+			<?php foreach ($this->form->getSubForms() as $subform): ?>
+			<li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
+			<?php endforeach; ?>
+			</ul>
+			<?php echo $this->form; ?>
+		</div>
+		<button id="save-btn"><?php echo $this->translate('Save');?></button>
+	</body>
 </html>

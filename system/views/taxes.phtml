@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+		<link href="http://toaster2.test/system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="http://toaster2.test/system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="http://toaster2.test/system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
+		<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/jquery.select-chain.js"></script>
+		<script id="ruleTemplate" type="text/x-jquery-tmpl">
+		
+			<div class="ui-widget-content grid_12">
+				<div class="grid_1">
+					<input type="text" name="" id="" style="width: 95%" value="Rule #1"/>
+				</div>
+				<div class="grid_2">
+					<select name="rule-name" id="rule-name" style="width: 95%">
+						<?php foreach (Tools_Geo::$_defaultZones as $zoneId => $zone) :?>
+						<option value="<?php echo $zoneId;?>"><?php echo Zend_locale::getTranslation($zoneId, 'Country') ;?></option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+				<div class="grid_4" >
+					<input type="text" name="countries" id="" style="width: 30%"/>
+					<input type="text" name="states" id="" style="width: 30%"/>
+				</div>
+				<div class="ui-widget-content grid_4">	
+					<input type="text" name="tax1" id="" style="width: 30%"/>
+					<input type="text" name="tax2" id="" style="width: 30%"/>
+					<input type="text" name="tax3" id="" style="width: 30%"/>
+				</div>
+				<div class="grid_1">
+					<span>[x]</span>
+				</div>
+			</div>
+		</script>
+	</head>
+    <body>
+		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
+		<div class="seotoaster container_12"> 
+			<div id="toolbar">
+				<button id="new-rule-btn">Add new</button>
+			</div>
+			<div id="rules">
+				
+			</div>
+		</div>
+		<div id="add-rule-dialog" title="Add tax rule">
+			<label for="rule-name"></label>
+			<select name="rule-name" id="rule-name">
+				<?php foreach (Tools_Geo::$_defaultZones as $zoneId => $zone) :?>
+				<option value="<?php echo $zoneId;?>"><?php echo Zend_locale::getTranslation($zoneId, 'Country') ;?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+		<script>
+			var taxManager = {};
+			taxManager.newzone = function(){
+				$('#add-rule-dialog').dialog('open');
+			};
+			taxManager.addTaxRule = function(zoneName){
+				if (!zoneName){
+					return false;
+				}
+				
+				$.ajax({
+					url: $('#pluginUrl').val()+'/zones/',
+					type: 'POST',
+					data: {zoneCode: zoneName},
+					success: function(response){
+						console.log(response);
+					}
+				})
+			}
+			
+			$(function(){
+				var i = 0;
+				
+				// creating buttons
+				$('#new-rule-btn').button({
+					icons: {primary: 'ui-icon-plus'}
+				}).click(function(){
+					$('#ruleTemplate').tmpl({}).appendTo('#rules');
+				});
+				
+//				$('#ctrl-countries-toolbar').buttonset();
+//				$('#ctrl-states-toolbar').buttonset();
+				
+	
+				
+			});
+		</script>
+    </body>
+</html>

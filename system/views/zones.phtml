@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+		<link href="<?php echo $this->websiteUrl;?>system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
+		<script id="zoneTemplate" type="text/x-jquery-tmpl">
+			<div class="grid_12 mb10px">
+				<div>
+					<label for="">Zone Name:</label>
+					<input type="text" class="zone-name" value="${name}" placeholder="enter name for zone"/>
+				</div>
+			</div>
+			<div class="countries grid_6">
+				<div class="ui-widget-header ui-corner-top"><span class="padding5px">Countries</span><button class="clear-countries-list">clear</button></div>
+				<ul class="ui-widget-content zone-countries" style="height: 200px; overflow-y: auto;">
+				{{tmpl '#countryRowTemplate'}}
+				</ul>
+				<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
+					<button class="add-country-btn">Add Country</button>
+					<button>Add Region</button>
+				</div>
+			</div>
+			<div class="states grid_6">
+				<div class="ui-widget-header ui-corner-top"><span class="padding5px">States</span><button class="clear-states-list">clear</button></div>
+				<ul class="ui-widget-content zone-states" style="height: 200px; overflow-y: auto;">
+				{{tmpl '#stateRowTemplate'}}
+				</ul>
+				<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
+					<button class="add-state-btn">Add State</button>
+					<button>Add Region</button>
+				</div>
+			</div>
+			<div class="grid_12 mt10px">
+				<div class="ui-widget-header ui-corner-top"><span class="padding5px">Postal codes</span><button class="clear-zip-list">Clear</button></div>
+				<div class="ui-widget-content" style="height: 200px; overflow-y: auto; text-align: center">
+					<p>Put list of zip/postal codes one per line</p>
+					<textarea style="width: 96%; height: 160px; resize: none;" >${zip.join('\n')}</textarea>
+				</div>
+			</div>
+		</script>
+		<script id="tabTemplate" type="text/x-jquery-tmpl">
+			<li><a href='#${id}'>${name}</a></li>
+		</script>
+		<script id="countryRowTemplate" type="text/x-jquery-tmpl">
+			{{each countries}}
+			<li class="entry-row ui-state-active padding5px" data-code="${country}" data-name="${name}">${name}
+				{{if addAction}}
+				<span class="country-add-one ui-icon ui-icon-plusthick" style="float:right; border: 1px solid black;"></span>
+				{{else}}
+				<span class="country-remove-one ui-icon ui-icon-trash" style="float:right; border: 1px solid black;"></span>
+				{{/if}}
+			</li>
+			{{/each}}
+		</script>
+		<script id="stateRowTemplate" type="text/x-jquery-tmpl">
+			{{each states}}
+			<li class="entry-row ui-state-active padding5px" data-id="${id}">${zoneManager.countryList[country]}: ${name}
+				<span class="state-remove-one ui-icon ui-icon-trash" style="float:right; border: 1px solid black;"></span>
+			</li>
+			{{/each}}
+		</script>
+	</head>
+    <body>
+		<noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
+		JavaScript must be enabled at this point.<br/>
+		<a href="http://www.seotoaster.com/">seotoaster.com</a>
+		</noscript>
+		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
+		<div class="seotoaster container_12"> 
+			<div id="toolbar" class="padding10px">
+				<button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>
+				<button id="delete-zone-btn"><?php echo $this->translate('Delete'); ?></button>
+				<button id="save-btn" title="Hotkey: Ctrl+S" style="float:right; display:none;"><?php echo $this->translate('Save');?></button>
+			</div>
+			<div id="zones" class="ui-helper-clearfix">
+				<ul></ul>
+			</div>
+		</div>
+			
+		<div id="add-country-dialog" title="Add country">
+			<ul id="country-list" class="ui-helper-clearfix" style="height: 200px; overflow-x:hidden;overflow-y: auto;">
+			</ul>
+			<div class="ui-widget-header" style="text-align:center;">
+				<input id="country-filter" type="text" placeholder="Start typing country name here" />
+				<span class="ui-icon ui-icon-search" style="display: inline-block"></span>
+			</div>
+		</div>
+		<div id="add-state-dialog">
+			<div class="ui-widget-header">
+			Select country:
+			<select id="state-filter">
+				<option value="" selected="selected">select country</option>
+			</select>	
+			</div>
+			<ul id="state-list" class="ui-helper-clearfix" style="height: 300px; overflow-x:hidden;overflow-y: auto;">
+			</ul>
+		</div>
+		
+		<script>
+			var zoneManager = {
+				holder : $('#zones'),
+				template : $('#zoneTemplate'),
+				tabCounter : 0,
+				zones : {},
+				countryList: null,
+				statesList: null
+			};
+			zoneManager.addZone	= function(  ) {
+				var data = {
+					countries: {},
+					name: 'New zone',
+					zip: [],
+					states: {}
+				}
+				var divId = this.newRandomId();
+				var newname = 'New Zone '+zoneManager.tabCounter++;
+				this.holder.tabs('add', '#zone-'+divId, newname);
+				zoneManager.template.tmpl(data).appendTo('#zone-'+divId);
+				zoneManager.zones[divId] = data;
+			};
+			zoneManager.newRandomId = function(){
+				var id = Math.floor(Math.random()*10000);
+				if (this.zones.hasOwnProperty(id) ){
+					return this.newRandomId();
+				}
+				return id;
+			};
+			zoneManager.initZones = function( data ){
+				zoneManager.holder.tabs();
+				$.each(data, function(index, zone){
+					var newId = '#zone-'+zone.id;
+					zoneManager.holder.tabs('add', newId, zone.name);
+					$(newId).html( $('#zoneTemplate').tmpl(zone) );
+					if (zone.countries instanceof Array && zone.countries.length === 0) {
+						zone.countries = {}
+					}
+					if (zone.states instanceof Array && zone.states.length === 0) {
+						zone.states = {}
+					}
+					zoneManager.zones[zone.id] = zone;
+				});
+				zoneManager.tabCounter = zoneManager.holder.tabs('length');
+				$('#save-btn').show();
+			};
+			
+			zoneManager.run = function(){
+				if (!(this.holder instanceof jQuery)) {
+					this.holder = $(this.holder);
+				}
+				if (!(this.template instanceof jQuery)) {
+					this.template = $(this.template);
+				}
+				$.when(
+					$.getJSON('/plugin/shopping/run/getdata/type/countryList/', null, function(response){
+						zoneManager.countryList = response;
+						for (var i in response){
+							if (response.hasOwnProperty(i)){
+								$('#state-filter').append('<option value="'+i+'">'+response[i]+'</option>');
+							}
+						}
+					}),
+					$.getJSON('/plugin/shopping/run/getdata/type/statesList/', null, function(response){
+						zoneManager.statesList = response;
+					})
+				).done(function(){
+					$.ajax({
+						url: '/plugin/shopping/run/getdata/type/zones/',
+						type: 'POST',
+						dataType: 'json',
+						success: zoneManager.initZones
+					});
+				});
+			}
+			zoneManager.remove = function(){
+				var tabId = $('#zones').tabs('option', 'selected');
+				var id = zoneManager.currentTab('id');
+				delete zoneManager.zones[id];
+				$('#zones').tabs('remove', tabId);
+			};
+			zoneManager.save = function(){
+				//ajax sending for zoneManager.zones goes here
+				$.post('/plugin/shopping/run/zones/', {zones: this.zones}, function(response){
+					alert(response.done);
+				});
+			};
+			zoneManager.currentTab = function(attr){
+				var tab = this.holder.children('div.ui-tabs-panel:not(.ui-tabs-hide)');
+				if (attr) {
+					if (attr == 'id'){
+						return tab.attr('id').replace('zone-', '');
+					}
+					return tab.attr(attr);
+				}
+				return tab;
+			}
+			zoneManager.renderList = function(type){
+				var tmplId, listHolder;
+				switch (type) {
+					case 'country':
+						tmplId = '#countryRowTemplate';
+						listHolder = zoneManager.currentTab().find('ul.zone-countries');
+						break
+					case 'state':
+						tmplId = '#stateRowTemplate';
+						listHolder = zoneManager.currentTab().find('ul.zone-states');
+						break
+				}
+				listHolder.empty();
+				$(tmplId).tmpl(zoneManager.zones[zoneManager.currentTab('id')]).appendTo(listHolder);
+			};
+			zoneManager.getList = function(type){
+				switch (type){
+					case 'country':
+						return this.countryList;
+						break
+					case 'state':
+						return this.statesList;
+						break
+				}
+			};
+			zoneManager.addCountryToZone = function(code){
+				var zoneId =  this.currentTab('id');
+				if (!this.zones[zoneId].countries.hasOwnProperty(code)){
+					this.zones[zoneId].countries[code] = {
+						country: code,
+						name: this.countryList[code]
+					};
+				}
+				this.renderList('country');
+			};
+			zoneManager.removeCountryFromZone = function(code){
+				var zoneId =  this.currentTab('id');
+				if (this.zones[zoneId].countries.hasOwnProperty(code)){
+					delete this.zones[zoneId].countries[code];
+				}
+				this.renderList('country');
+			};
+			zoneManager.addStateToZone = function(id){
+				id = id.toString(); console.log(id);
+				var zoneId =  this.currentTab('id');
+				if (!this.zones[zoneId].states.hasOwnProperty(id)){
+					this.zones[zoneId].states[id] = this.statesList[id];
+				}
+				this.renderList('state');
+			};
+			zoneManager.removeStateFromZone = function(id){
+				id = id.toString();
+				var zoneId =  this.currentTab('id');
+				if (this.zones[zoneId].states.hasOwnProperty(id)){
+					delete this.zones[zoneId].states[id];
+				}
+				this.renderList('state');
+			};
+			zoneManager.updateZipForZone = function(element){
+				var zips = $(element).val().match(/^[0-9*?]{2,7}$/gm);
+				this.zones[this.currentTab('id')].zip = zips;
+			}
+			zoneManager.updateZoneName = function(element){
+				this.zones[this.currentTab('id')].name = element.val();
+				var currentTab = this.holder.tabs('option', 'selected');
+				this.holder.find('ul > li:eq('+currentTab+') span').text(element.val());
+			}
+			
+			$(function(){
+				var i = 0;
+				
+				// creating buttons
+				$('#new-zone-btn').button({
+					icons: {primary: 'ui-icon-plus'}
+				}).click(function(){ zoneManager.addZone({}) });
+				$('#delete-zone-btn').button({
+					icons: {primary: 'ui-icon-trash'}
+				}).click( zoneManager.remove );
+				$('#save-btn').button().click(function(){
+					zoneManager.save();
+				});
+				
+				// dialogs creation
+				$('#add-country-dialog').dialog({
+					modal: true,
+					autoOpen: false,
+					resizable: false,
+					height: 300,
+					width: 500,
+					close: function(event, ui){
+						$('#country-filter').val('');
+						$('#country-list > li').show();
+					},
+					open: function(event, ui){
+						var countries = [];
+						var filter = zoneManager.zones[zoneManager.currentTab('id')].countries;
+						for (var i in zoneManager.countryList){
+							if (zoneManager.countryList.hasOwnProperty(i)){
+								countries.push({country: i, name: zoneManager.countryList[i] })
+							}
+						}
+						var $list = $('#countryRowTemplate').tmpl({addAction: true, countries: countries});
+						$('#country-list').empty().html($list).find('li').each(function(){
+							if (filter.hasOwnProperty( $(this).data('code') )){
+								$(this).remove();
+							}
+						});
+					}
+				});
+				$('#add-state-dialog').dialog({
+					modal: true,
+					autoOpen: false,
+					resizable: false,
+					height: 410,
+					width: 600,
+					open: function(event, ui){
+						var filter = zoneManager.zones[zoneManager.currentTab('id')].states;
+						
+						$('#state-list').empty();
+						$('#stateRowTemplate').tmpl({states: zoneManager.statesList})
+							.find('span.state-remove-one')
+							.removeClass('state-remove-one ui-icon-trash')
+							.addClass('state-add-one ui-icon-plusthick')
+							.end().appendTo('#state-list').find('li').each(function(){
+								if (filter.hasOwnProperty( $(this).data('id') )){
+									$(this).remove();
+								}
+							});
+					}
+				});
+				
+				$('#country-filter').bind({
+					'keyup': function(){
+						var search = $(this).val().toLowerCase();
+						if (search == ''){
+							$('#country-list > li').show();
+							return $(this);
+						}
+						$('#country-list > li').each(function(){
+							var text = $(this).text().toLowerCase();
+							
+							if (text.search(search) == -1) {
+								$(this).hide();
+							} else {
+								$(this).show();
+							}
+						});
+					}
+				});
+				
+				$('button.add-country-btn').live('click', function(){
+					$('#add-country-dialog').dialog('open');
+				});
+				$('button.add-state-btn').live('click', function(){
+					$('#add-state-dialog').dialog('open');
+				});
+				
+				$('.country-add-one').live('click',function(){
+					var countryCode = $(this).closest('li').data('code');
+					zoneManager.addCountryToZone(countryCode);
+					$(this).closest('li').hide('drop', null, 150, function(){$(this).remove()});
+				});
+				
+				$('.country-remove-one').live('click', function(){
+					var countryCode = $(this).closest('li').data('code');
+					zoneManager.removeCountryFromZone(countryCode);
+				});
+				
+				$('.state-add-one').live('click', function(){
+					var stateId = $(this).closest('li').data('id');
+					zoneManager.addStateToZone(stateId);
+					$(this).closest('li').hide('drop', null, 150, function(){$(this).remove()});
+				});
+				
+				$('.state-remove-one').live('click', function(){
+					var stateId = $(this).closest('li').data('id');
+					zoneManager.removeStateFromZone(stateId);
+				});
+				
+				$('input.zone-name').live('change', function(){
+					zoneManager.updateZoneName($(this));
+				});
+				
+				$('textarea').live('change', function(){
+					zoneManager.updateZipForZone($(this));
+				});
+				
+				$('button.clear-countries-list').live('click', function(){
+					var id = zoneManager.currentTab('id');
+					zoneManager.zones[id].countries = {};
+					zoneManager.renderList('country');
+				});
+				
+				$('button.clear-states-list').live('click', function(){
+					var id = zoneManager.currentTab('id');
+					zoneManager.zones[id].states = {};
+					zoneManager.renderList('state');
+				});
+				
+				zoneManager.run();
+			});
+		</script>
+    </body>
+</html>
