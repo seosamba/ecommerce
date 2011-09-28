@@ -56,20 +56,29 @@ class Shopping extends Tools_Plugins_Abstract {
 	
 	/** 
 	 * Method renders zones screen and handling zone saving
-	 * @return html
+	 * @return html|json
+	 * @todo better response
 	 */
 	protected function zonesAction(){
 		if ($this->_request->isPost()){
 			$zonesMapper = Models_Mapper_Zone::getInstance();
+			$toRemove = $this->_request->getParam('toRemove');
+			if (is_array($toRemove) && !empty ($toRemove)){
+				$deleted = $zonesMapper->delete($toRemove);
+			}
 			$zones = $this->_request->getParam('zones');
 			if (is_array($zones) && !empty ($zones)){
-//				var_dump($zones);
+				$result = array();
 				foreach ($zones as $id => $zone) {
 					$zone = $zonesMapper->createModel($zone);
-					$zonesMapper->save($zone);
+					$result[$id] = $zonesMapper->save($zone);
 				}
 			}
-			$this->_jsonHelper->direct(array('done'=>true));
+			$this->_jsonHelper->direct(array(
+				'done'=>true,
+				'id' => $result,
+				'deleted' => isset($deleted) ? $deleted : null 
+				));
 		}
 		echo $this->_view->render('zones.phtml');
 	}

@@ -23,12 +23,14 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 			$zone->setId($result);
 		} else {
 			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $zone->getId());
-			$result = $this->getDbTable()->update($data, $where);
+			$result = (bool) $this->getDbTable()->update($data, $where);
 		}
 		
 		$this->_updateCountries($zone);
 		$this->_updateStates($zone);
 		$this->_updateZip($zone);
+		
+		return $result;
 	}
 
 	public function find($id) {
@@ -138,5 +140,14 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 		}
 		
 		return $this;
+	}
+	
+	public function delete($id) {
+		$result = array();
+		$rowset = $this->getDbTable()->find($id);
+		foreach ($rowset as $row) {
+			$result[$row->id] = $row->delete();
+		}
+		return $result;
 	}
 }

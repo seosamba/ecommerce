@@ -108,6 +108,7 @@
 				template : $('#zoneTemplate'),
 				tabCounter : 0,
 				zones : {},
+				deleted : [],
 				countryList: null,
 				statesList: null
 			};
@@ -180,13 +181,26 @@
 			zoneManager.remove = function(){
 				var tabId = $('#zones').tabs('option', 'selected');
 				var id = zoneManager.currentTab('id');
+				if (zoneManager.zones[id].hasOwnProperty('id')){
+					zoneManager.deleted.push(id);
+				}
 				delete zoneManager.zones[id];
 				$('#zones').tabs('remove', tabId);
 			};
 			zoneManager.save = function(){
 				//ajax sending for zoneManager.zones goes here
-				$.post('/plugin/shopping/run/zones/', {zones: this.zones}, function(response){
-					alert(response.done);
+				data = {
+					zones: this.zones, 
+					toRemove: this.deleted
+				};
+				$.post('/plugin/shopping/run/zones/', data, function(response){
+					for (var i in response.id){
+						if (response.id.hasOwnProperty(i)){
+							if (typeof response.id[i] == 'string' && !isNaN(response.id[i])){
+								zoneManager.zones[i].id = response.id[i];
+							}
+						}
+					}
 				});
 			};
 			zoneManager.currentTab = function(attr){
