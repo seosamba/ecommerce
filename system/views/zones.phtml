@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
         <title></title>
 		<link href="<?php echo $this->websiteUrl;?>system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
 		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
@@ -73,7 +73,7 @@
 		</noscript>
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
 		<div class="seotoaster container_12"> 
-			<div id="toolbar" class="padding10px">
+			<div id="toolbar" class="padding5px ui-widget-header">
 				<button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>
 				<button id="delete-zone-btn"><?php echo $this->translate('Delete'); ?></button>
 				<button id="save-btn" title="Hotkey: Ctrl+S" style="float:right; display:none;"><?php echo $this->translate('Save');?></button>

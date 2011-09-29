@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
         <title></title>
 		<link href="http://toaster2.test/system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
 		<link href="http://toaster2.test/system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
@@ -10,70 +10,106 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
 		<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/jquery.select-chain.js"></script>
-		<script id="ruleTemplate" type="text/x-jquery-tmpl">
-		
-			<div class="ui-widget-content grid_12">
-				<div class="grid_1">
-					<input type="text" name="" id="" style="width: 95%" value="Rule #1"/>
+		<script id="ruleTemplate" type="text/x-jquery-tmpl">	
+			<div class="grid_12 ui-widget-content ui-corner-all mt5px mb5px rule-record" style="border:2px groove #ddd; line-height:48px;">
+				{{if id}}
+				<input type="hidden" name="rule-id" value="${id}"/>
+				{{/if}}
+				<div class="grid_1" style="text-align:center;">
+					<input type="radio" name="default" {{if isDefault == 1}}checked="checked"{{/if}} />
 				</div>
-				<div class="grid_2">
-					<select name="rule-name" id="rule-name" style="width: 95%">
-						<?php foreach (Tools_Geo::$_defaultZones as $zoneId => $zone) :?>
-						<option value="<?php echo $zoneId;?>"><?php echo Zend_locale::getTranslation($zoneId, 'Country') ;?></option>
-						<?php endforeach; ?>
+				<div class="grid_4">
+					<select name="zone" style="width: 95%">
+					{{tmpl '#zoneListTemplate'}}
 					</select>
 				</div>
-				<div class="grid_4" >
-					<input type="text" name="countries" id="" style="width: 30%"/>
-					<input type="text" name="states" id="" style="width: 30%"/>
-				</div>
-				<div class="ui-widget-content grid_4">	
-					<input type="text" name="tax1" id="" style="width: 30%"/>
-					<input type="text" name="tax2" id="" style="width: 30%"/>
-					<input type="text" name="tax3" id="" style="width: 30%"/>
+				<div class="grid_6" style="white-space:nowrap;">
+					<div class="grid_4 alpha">
+						<input type="text" name="taxrate1" style="width: 85%" value="${rate1}" placeholder="0"/>%
+					</div>
+					<div class="grid_4 ">
+						<input type="text" name="taxrate2" style="width: 85%" value="${rate2}" placeholder="0"/>%
+					</div>
+					<div class="grid_4 omega">
+						<input type="text" name="taxrate3" style="width: 85%" value="${rate3}" placeholder="0"/>%						
+					</div>
 				</div>
 				<div class="grid_1">
-					<span>[x]</span>
+					<button class="delete-rule">Remove this rule</button>
 				</div>
 			</div>
+		</script>
+		<script id="zoneListTemplate" type="text/x-jquery-tmpl">
+			{{each taxManager.zones}}
+			<option value="${id}" {{if zoneId}}{{if zoneId == id}}selected{{/if}}{{/if}}>${name}</option>	
+			{{/each}}
 		</script>
 	</head>
     <body>
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
-		<div class="seotoaster container_12"> 
-			<div id="toolbar">
+		<div class="seotoaster container_12 ui-widget"> 
+			<div id="top-toolbar" class="ui-widget-header padding10px ui-corner-top">
+				<span>
+					<input type="checkbox" name="price-inc-tax" id="price-inc-tax"/>
+					<label for="price-inc-tax"><?php echo $this->translate('Show product price with tax included.'); ?></label>
+				</span>
+			</div>
+			<div class="ui-helper-clearfix ui-state-focus" style="text-align:center;">
+				<div class="grid_1">default</div>
+				<div class="grid_4"><a href="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" target="_blank" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
+				<div class="grid_6">
+					<div class="grid_4 alpha"><section>Default</section></div>
+					<div class="grid_4"><section>Alternative</section></div>
+					<div class="grid_4 omega"><section>Alternative 2</section></div>
+				</div>
+				<div class="grid_1">remove</div>
+			</div>
+			<div id="rules" class="ui-widget-content ui-helper-clearfix h500" style="overflow-x: hidden; overflow-y: auto;">
+				
+			</div>
+			<div id="bottom-toolbar" class="ui-widget-header ui-corner-bottom">
 				<button id="new-rule-btn">Add new</button>
-			</div>
-			<div id="rules">
-				
+				<button id="save-btn" style="float:right;">Save</button>
 			</div>
 		</div>
-		<div id="add-rule-dialog" title="Add tax rule">
-			<label for="rule-name"></label>
-			<select name="rule-name" id="rule-name">
-				<?php foreach (Tools_Geo::$_defaultZones as $zoneId => $zone) :?>
-				<option value="<?php echo $zoneId;?>"><?php echo Zend_locale::getTranslation($zoneId, 'Country') ;?></option>
-				<?php endforeach; ?>
-			</select>
-		</div>
+		
 		<script>
-			var taxManager = {};
-			taxManager.newzone = function(){
-				$('#add-rule-dialog').dialog('open');
+			var taxManager = {
+				zones: null
 			};
-			taxManager.addTaxRule = function(zoneName){
-				if (!zoneName){
-					return false;
-				}
-				
-				$.ajax({
-					url: $('#pluginUrl').val()+'/zones/',
-					type: 'POST',
-					data: {zoneCode: zoneName},
-					success: function(response){
-						console.log(response);
-					}
-				})
+			taxManager.setZones = function(data){
+				taxManager.zones = data;
+			}
+			taxManager.setRules = function(data){
+				$('#rules').html($('#ruleTemplate').tmpl(data));
+				$('.delete-rule').trigger('load');
+			}
+			taxManager.run = function(){
+				$.when(
+					$.getJSON('/plugin/shopping/run/getdata/type/zones/', null , taxManager.setZones)
+				).then(function(){
+					$.getJSON('/plugin/shopping/run/getdata/type/taxrules/', null, taxManager.setRules)	
+				});
+			}
+			taxManager.deleteRule = function(element){
+				$(element).closest('.rule-record').remove();
+			}
+			taxManager.save = function(){
+				var rules = [];
+				$('#rules > .rule-record').each(function(){
+					var rule = {
+						id: $(this).find('input[name="rule-id"]').val(),
+						isDefault: $(this).find('input[name="default"]:checked').size() ? 1 : 0,
+						zoneId: $(this).find('select[name="zone"]').val(),
+						rate1: $(this).find('input[name="taxrate1"]').val(),
+						rate2: $(this).find('input[name="taxrate2"]').val(),
+						rate3: $(this).find('input[name="taxrate3"]').val(),
+					};
+					
+					rules.push(rule);
+				});
+				console.log(rules);
+				$.post(window.location, {rules: rules}, function(response){$('body').append(response)});
 			}
 			
 			$(function(){
@@ -83,14 +119,24 @@
 				$('#new-rule-btn').button({
 					icons: {primary: 'ui-icon-plus'}
 				}).click(function(){
-					$('#ruleTemplate').tmpl({}).appendTo('#rules');
+					var data = {
+						idDefault: 0,
+						tax1: '',
+						tax2: '',
+						tax3: ''
+					}
+					$('#ruleTemplate').tmpl({isDefault: 0}).appendTo('#rules');
+					$('.delete-rule').trigger('load');
+				});
+				$('.delete-rule').live({
+					load: function(){$(this).button({icons: {primary: 'ui-icon-trash'}, text: false})},
+					click: function(){taxManager.deleteRule($(this));}
+				});
+				$('#save-btn').bind('click',taxManager.save).button({
+					icons: {primary: 'ui-icon-disk'}
 				});
 				
-//				$('#ctrl-countries-toolbar').buttonset();
-//				$('#ctrl-states-toolbar').buttonset();
-				
-	
-				
+				taxManager.run();
 			});
 		</script>
     </body>

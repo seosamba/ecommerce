@@ -88,6 +88,14 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return html
 	 */
 	protected function taxesAction() {
+		if ($this->_request->isPost()){
+			$taxMapper = Models_Mapper_Tax::getInstance();
+
+			foreach($this->_request->getParam('rules') as $rule){
+				var_dump($taxMapper->save($rule));
+				var_dump($rule);
+			}
+		}
 		echo $this->_view->render('taxes.phtml');
 	}
 	
@@ -118,6 +126,13 @@ class Shopping extends Tools_Plugins_Abstract {
 					$data[] = $zone->toArray();
 				}
 				break;
+			case 'taxrules':
+				$taxMapper = Models_Mapper_Tax::getInstance();
+				$rules = $taxMapper->fetchAll();
+				foreach ($rules as $rule) {
+					$data[] = $rule->toArray();
+				}
+				break;
 			default :
 				break;
 		}
@@ -125,7 +140,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	protected function demoAction(){
-		$y = new Models_DbTable_Zone();
 		if ($this->_requestedParams['filldb'] == 'state'){
 			$t = new Models_DbTable_State();
 			$t->getAdapter()->beginTransaction();
@@ -140,5 +154,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 			$t->getAdapter()->commit();
 		}
+		
+		$taxMapper = Models_Mapper_Tax::getInstance();
+		var_dump($taxMapper->fetchAll());
 	}
 }
