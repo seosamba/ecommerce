@@ -15,7 +15,7 @@ class Models_DbTable_Tax extends Zend_Db_Table_Abstract {
 	
 	protected $_referenceMap = array(
 		'Zone' => array(
-			'columns'	=> 'zone_id',
+			'columns'	=> 'zoneId',
 			'refTableClass'	=> 'Models_DbTable_Zone',
 			'refColumns'	=> 'id'
 			)

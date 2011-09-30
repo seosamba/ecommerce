@@ -35,7 +35,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	protected function configAction(){
 		$configMapper = Models_Mapper_ShoppingConfig::getInstance();
-		$config = $configMapper->getConfig();
+		$config = $configMapper->getConfigParams();
 		
 		$form = new Forms_Config();
 		$form->populate($config);
@@ -52,6 +52,18 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->form = $form;
 
 		echo $this->_view->render('config.phtml');
+	}
+	
+	protected function setConfigAction(){
+		$status = false;
+		if ($this->_request->isPost()){
+			$configMapper = Models_Mapper_ShoppingConfig::getInstance();
+			$configParams = $this->_request->getParam('config');
+			if ($configParams && is_array($configParams) && !empty ($configParams)){
+				$status = $configMapper->save($configParams);
+			}
+		}
+		$this->_jsonHelper->direct(array('done' => $status));
 	}
 	
 	/** 
@@ -90,12 +102,23 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function taxesAction() {
 		if ($this->_request->isPost()){
 			$taxMapper = Models_Mapper_Tax::getInstance();
-
-			foreach($this->_request->getParam('rules') as $rule){
-				var_dump($taxMapper->save($rule));
-				var_dump($rule);
+			$toRemove = $this->_request->getParam('toRemove');
+			if ($toRemove){
+				$taxMapper->delete($toRemove);
 			}
+			
+			$rules = $this->_request->getParam('rules');
+			if ($rules) {
+				foreach($rules as $rule){
+					$taxMapper->save($rule);
+				}
+			}
+			
+			$this->_jsonHelper->direct(array('done'=>true));
 		}
+		$configMapper = Models_Mapper_ShoppingConfig::getInstance();
+		$this->_view->priceIncTax = $configMapper->getConfigParam('showPriceIncTax');
+		
 		echo $this->_view->render('taxes.phtml');
 	}
 	

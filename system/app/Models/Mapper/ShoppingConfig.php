@@ -21,7 +21,19 @@ class Models_Mapper_ShoppingConfig extends Application_Model_Mappers_Abstract {
 		return true;
 	}
 	
-	public function getConfig() {
+	public function getConfigParams() {
 		return $this->getDbTable()->selectConfig();
+	}
+	
+	public function getConfigParam($name) {
+		if (!$name) {
+			return null;
+		}
+		
+		$row = $this->getDbTable()->find($name);
+		if ($row = $row->current()){
+			return $row->value;
+		}
+		return null;
 	}
 }

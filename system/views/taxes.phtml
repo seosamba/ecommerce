@@ -54,8 +54,8 @@
 		<div class="seotoaster container_12 ui-widget"> 
 			<div id="top-toolbar" class="ui-widget-header padding10px ui-corner-top">
 				<span>
-					<input type="checkbox" name="price-inc-tax" id="price-inc-tax"/>
-					<label for="price-inc-tax"><?php echo $this->translate('Show product price with tax included.'); ?></label>
+					<?php echo $this->formCheckbox('price-inc-tax', null, array('checked' => $this->priceIncTax));?>
+					<?php echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.')); ?>
 				</span>
 			</div>
 			<div class="ui-helper-clearfix ui-state-focus" style="text-align:center;">
@@ -96,7 +96,14 @@
 				});
 			}
 			taxManager.deleteRule = function(element){
-				$(element).closest('.rule-record').remove();
+				var container = $(element).closest('.rule-record')
+				if (container.find('input[name="rule-id"]').size()){
+					$.post('/plugin/shopping/run/taxes/', {toRemove: container.find('input[name="rule-id"]').val()}, function(){
+						container.remove();
+					});
+				} else {
+					container.remove();
+				}
 			}
 			taxManager.save = function(){
 				var rules = [];
@@ -113,7 +120,10 @@
 					rules.push(rule);
 				});
 				console.log(rules);
-				$.post(window.location, {rules: rules}, function(response){$('body').append(response)});
+				$.post(window.location, {rules: rules}, function(response){
+					$.getJSON('/plugin/shopping/run/getdata/type/taxrules/', null, taxManager.setRules);	
+				});
+				
 			}
 			
 			$(function(){
@@ -140,6 +150,11 @@
 					icons: {primary: 'ui-icon-disk'}
 				});
 				
+				$('#price-inc-tax').change(function(){
+					var flag;
+					flag = $(this).attr('checked') ? 1 : 0;
+					$.post('/plugin/shopping/run/setConfig', {config: {showPriceIncTax: flag}} ) ;
+				});
 				taxManager.run();
 			});
 		</script>
