@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Product
+ *
+ * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ */
+class Models_DbTable_Product extends Zend_Db_Table_Abstract {
+
+	protected $_name = 'shopping_products';
+	
+	protected $_dependentTables = array(
+		'Models_DbTable_Brand',
+		'Models_DbTable_ProductCategory'
+	);
+}
