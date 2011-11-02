@@ -7,29 +7,27 @@ define([
 		className: 'clearfix',
 		template: $('#listItemTemplate').template(),
 		events: {
-			"click button.item-remove": 'remove',
-			'change :input': 'updateModel'
+			"click button.item-remove": 'markToDelete',
+			'change :input': 'updateModel',
+			'change input[name^=isDefault]': 'changeDefault'
 		},
 		inputs: {},
 		updateModel: function(){
 			var data = {
-				title:				 this.inputs.title.val(),
-				priceModifierSign:	 this.inputs.priceModifierSign.val(),
-				priceModifierType:	 this.inputs.priceModifierType.val(),
-				priceModifierValue:	 this.inputs.priceModifierValue.val(),
-				weightModifierSign:  this.inputs.weightModifierSign.val(),
-				weightModifierValue: this.inputs.weightModifierValue.val(),
-				isDefault:			 this.inputs.isDefault.attr('checked') && 1
+				title:		 this.inputs.title.val(),
+				priceSign:	 this.inputs.priceModifierSign.val(),
+				priceType:	 this.inputs.priceModifierType.val(),
+				priceValue:	 this.inputs.priceModifierValue.val(),
+				weightSign:  this.inputs.weightModifierSign.val(),
+				weightValue: this.inputs.weightModifierValue.val()
 			}
-			console.log(data);
 			this.model.set(data);
 		},
 		initialize: function(){
-			this.model.bind('change', this.render, this);
+			this.model.bind('change:isDefault', this.render, this);
 			this.model.view = this;
 		},
 		render: function(){
-			console.log(this.model.toJSON());
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
 			this.inputs = {
 				title: this.$('input[name="title"]'),
@@ -37,11 +35,29 @@ define([
 				priceModifierType: this.$('select[name="priceModifierType"]'),
 				priceModifierValue: this.$('input[name="priceModifierValue"]'),
 				weightModifierSign: this.$('select[name="weightModifierSign"]'),
-				weightModifierValue: this.$('input[name="weightModifierValue"]'),
-				isDefault: this.$('input:radio[name^="isdefault"]')
+				weightModifierValue: this.$('input[name="weightModifierValue"]')
 			}
 			
 			return this;
+		},
+		markToDelete: function(){
+			this.model.set({isDefault: '0'});
+			if (this.model.isNew()){
+				this.model.collection.remove(this.model);
+			} else {
+				this.model.set({'_deleted': true});
+			}
+			this.remove();
+		},
+		changeDefault: function(){
+			var id = this.model.cid;
+			this.model.collection.map(function(selection){
+				if (selection.cid !== id){
+					selection.set({isDefault: '0'});
+				} else {
+					selection.set({isDefault: '1'});
+				}
+			})
 		}
 	});
 	return SelectionView;

@@ -7,6 +7,8 @@
 		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
 		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
 		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/smoke.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/100s.css" media="screen" rel="stylesheet" type="text/css" > 
 		<style>
 			div.box {
 				background-color: white;
@@ -40,6 +42,8 @@
 		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/jquery.masonry.min.js"></script>
 		
+		<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/smoke.min.js"></script>
+		
 		<!-- Loading "product/main.js" as a bootstrap of product module -->
 		<script data-main="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/modules/product/main.js" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require/require-dev.js"></script>
 		
@@ -62,34 +66,40 @@
 		
 		<script id="optionMainTemplate" type="text/x-jquery-tmpl">
 			<div class="option-item clearfix ui-widget-content padding5px mt5px mb5px" data-id="${id}">
-				<div class="grid_5 suffix_1">
-					<div class="grid_5"><label for="">Title</label></div>
-					<div class="grid_7"><input type="text" class="option-title" value="${title}"/></div>
+				<div class="grid_4 ">
+					<div class="grid_4"><label for="">Title</label></div>
+					<div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
 				</div>
-				<div class="grid_5">
-					<div class="grid_6">
+				<div class="grid_4">
+					<div class="grid_3">
 						<label>Type</label>
 					</div>
-					<div class="grid_6">
+					<div class="grid_9">
 						<select class="option-type-select">
 							<option value="dropdown">Dropdown Box</option>
 							<option value="radio">Radio Switch</option>
 							<option value="text">Text Field</option>
 							<option value="date">Datepicker</option>
-							<option value="file">Upload File</option>
+<!--							<option value="file">Upload File</option>-->
 						</select>
 					</div>
 				</div>
+				<div class="grid_3">
+					<label for="isTemplate">
+						<input type="checkbox" title="Add as template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
+						Add as template
+					</label>
+					<input type="text" name="templateName" style="display:none;" placeholder="Template name"/>
+				</div>
 				<div class="grid_1">
-					<button class="remove-option">X</button>
+					<button class="remove-option">x</button>
 				</div>
 				<div class="grid_12 option-content"></div>
 			</div>
 		</script>
 		
 		<script id="optionListTemplate" type="text/x-jquery-tmpl">
-		<div class="grid_12 ui-widget-content">
-			<button class="add-selection-btn">Add new selection</button>
+		<div class="ui-widget-content">
 			<div class="ui-widget-header clearfix">
 				<div class="grid_3">Title</div>
 				<div class="grid_4">Price modifier</div>
@@ -98,6 +108,10 @@
 				<div class="grid_1"></div>
 			</div>
 			<div class="option-list-holder">
+				
+			</div>
+			<div class="ui-widget-header clearfix">
+				<button class="add-selection-btn" style="float:right;">Add new selection</button>
 			</div>
 		</div>
 		</script>
@@ -108,29 +122,40 @@
 			</div>
 			<div class="grid_4">
 				<select class="option-modifier-select" name="priceModifierSign" >
-					<option value="+" {{if priceModifierSign == '+'}}selected{{/if}} >+</option>
-					<option value="-" {{if weightModifierSign == '-'}}selected{{/if}} >-</option>
+					<option value="+" {{if priceSign == '+'}}selected{{/if}} >+</option>
+					<option value="-" {{if priceSign == '-'}}selected{{/if}} >-</option>
 				</select>
-				<input type="text" name="priceModifierValue" value="${priceModifierValue}" class="option-modifier-select" placeholder="0" />
+				<input type="text" name="priceModifierValue" value="${priceValue}" class="option-modifier-select" placeholder="0" />
 				<select name="priceModifierType" class="option-modifier-select" >
-					<option value="percent" {{if priceModifierType == 'percent'}}selected{{/if}} >%</option>
-					<option value="amount" {{if priceModifierType == 'amount'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
+					<option value="percent" {{if priceType == 'percent'}}selected{{/if}} >%</option>
+					<option value="unit" {{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
 				</select>
 			</div>
 			<div class="grid_3">
 				<select name="weightModifierSign" class="option-modifier-select">
-					<option value="+" {{if weightModifierSign == '+'}}selected{{/if}} >+</option>
-					<option value="-" {{if weightModifierSign == '-'}}selected{{/if}} >-</option>
+					<option value="+" {{if weightSign == '+'}}selected{{/if}} >+</option>
+					<option value="-" {{if weightSign == '-'}}selected{{/if}} >-</option>
 				</select>
-				<input name="weightModifierValue" type="text" class="option-modifier-select" placeholder="0" value="${weightModifierValue}"/>
+				<input name="weightModifierValue" type="text" class="option-modifier-select" placeholder="0" value="${weightValue}"/>
 				<span><?php echo $this->generalConfig['weightUnit']; ?></span>
 			</div>
 			<div class="grid_1">
-				<input type="radio" name="isdefault[${_parent}]" value="${title}" {{if isDefault}}checked="checked"{{/if}}/>
+				<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
 			</div>
 			<div class="grid_1">
 				<button class="item-remove">x</button>
 			</div>
+		</script>
+		
+		<script id="productListingTemplate" type="text/x-jquery-tmpl">
+			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
+				<p class="sku">${sku}</p>
+				<img class="lazy" width="100px" src="{{if photo}}${photo}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+				{{if brand}}
+				<p class="brand">${brand.name}</p>
+				{{/if}}
+				<p class="name">${name}</p>
+			</a>
 		</script>
 	</head>
     <body>
@@ -139,15 +164,16 @@
 		<a href="http://www.seotoaster.com/">seotoaster.com</a>
 		</noscript>
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
+		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
 		
 		<div class="seotoaster container_12" style="position: relative;"> 
 			<div id="top-toolbar" class="ui-widget-header mb10px"> 
-				<span>Add a new product</span> 
-				<span>Edit a product from the list</span> 
+				<a href="#new">Add a new product</a> 
+				<a href="#list">Edit a product from list</a> 
 				<span style="float: right">Delete this product</span> 
 			</div>
 			
-			<div id="manage-product" style="display: none">
+			<div id="manage-product" style="display: none; min-height: 500px">
 			
 				<div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
 					<div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
@@ -155,6 +181,10 @@
 						<a href="javascript:;" style="float:right;" onclick="$('#image-select-dialog').hide('slide');">close</a>
 					</div>
 					<div id="image-list"></div>
+				</div>
+				
+				<div id="product-list" class="clearfix" style="display: none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
+					
 				</div>
 			
 				<ul> 
@@ -169,7 +199,7 @@
 					<div class="grid_8 alpha"> 
 						<div class="grid_4"> 
 							<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-							<div class="h150">
+							<div class="h250">
 								<img width="100%" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
 							</div>
 						</div> 
@@ -205,10 +235,10 @@
 									<li><a href="#full-description-tab">Full description</a></li>
 								</ul>
 								<div id="short-description-tab">
-								<textarea id="product-shortDescription" class="h120" data-reflection="property" placeholder="Short description"></textarea> 
+								<textarea id="product-shortDescription" class="h150" data-reflection="property" placeholder="Short description"></textarea> 
 								</div>
 								<div id="full-description-tab">
-								<textarea id="product-fullDescription" class="h120" data-reflection="property" placeholder="Full description"></textarea> 
+								<textarea id="product-fullDescription" class="h150" data-reflection="property" placeholder="Full description"></textarea> 
 								</div>
 							</div>
 						</div> 
@@ -224,7 +254,7 @@
 					</div> 
 					<div class="grid_2"> 
 						<label for="tax">Taxes</label> 
-						<select name="taxes" id="product-taxGroup" data-reflection="property" > 
+						<select name="taxes" id="product-taxClass" data-reflection="property" > 
 							<option value="0">Non taxable</option> 
 							<option value="1">Default</option> 
 							<option value="2">Alternative</option> 
@@ -243,12 +273,11 @@
 						</select>
 						<hr />
 					</div> 
-					<input type="submit" name="submit" id="submit" value="Save"/> 
 				</div> 
 
 				<div id="category-tab" class="clearfix"> 
 					<div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
-							<input type="" id="new-category" placeholder="Create new category"/>
+						<input type="" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete &quot;%cat%&quot;?"/>
 					</div>
 					
 					
@@ -281,6 +310,10 @@
 				<div id="tab5"> 
 					@todo super-mega-merchandising plugins are on thier way
 				</div> 
+
+				<div style="position: absolute; bottom: 5px; right: 5px;">
+					<input type="submit" name="submit" id="submit" value="Save"/> 
+				</div>
 			</div>
 		</div>
 		

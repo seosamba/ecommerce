@@ -34,5 +34,14 @@ class Models_Mapper_Brand extends Application_Model_Mappers_Abstract {
 		return $model;
 	}
 
-
+	public function findByName($name){
+		if (empty($name)){
+			throw new Exception('Name can\'t be empty');
+		}
+		$row = $this->getDbTable()->fetchRow( $this->getDbTable()->getAdapter()->quoteInto('name = ?', $name) );
+		if (count($row) == 0){
+			return null;
+		}
+		return new $this->_model($row->toArray());
+	}
 }

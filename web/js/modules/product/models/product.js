@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, ProductOptions){
 	
 	var Product = Backbone.Model.extend({
-		urlRoot: '/plugin/shopping/run/getdata/type/product/id/',
+		url: '/plugin/shopping/run/getdata/type/product/',
 		defaults: {
 			name: '',
 			sku: '',
@@ -16,23 +16,23 @@ define([
 			fullDescription: '',
 			enabled: true,
 			price: 0,
-			taxGroup: 1,
-			pageTemplate: 0,
-			options: null,
-			categories: []
+			taxClass: 1,
+			pageTemplate: 0
 		},
 		initialize: function (){
-			if (this.get('options') === null){
-				this.set({options: new ProductOptions});
-			} else {
-				//@todo loading optionlist from array
-			}
+			this.set({options: new ProductOptions()});
+			this.bind('change:defaultOptions', function(){
+				this.attributes.options.reset(this.get('defaultOptions'));
+			}, this);
 		},
-//		validate: function(attrs) {
-//			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
-//				alert('price must be a number');
-//			}
-//		}
+		initOptions: function() {
+			this.set({options: optList});
+		}
+		,validate: function(attrs) {
+			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
+				alert('Price must be a number, e.g: 12.95');
+			}
+		}
 	});
 	
 	return Product;

@@ -9,29 +9,33 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
 	protected $_id = null;
 	
-	private $_pageId;
+	protected $_parentId;
 	
-	private $_sku;
+	protected $_pageId;
 	
-	private $_name;
+	protected $_sku;
 	
-	private $_mpn;
+	protected $_name;
 	
-	private $_price;
+	protected $_photo;
+	
+	protected $_mpn;
+	
+	protected $_price;
 
-	private $_photo;
+	protected $_weight;
 	
-	private $_weight;
+	protected $_brand;
 	
-	private $_brand;
+	protected $_shortDescription;
 	
-	private $_shortDescription;
+	protected $_fullDescription;
 	
-	private $_fullDescription;
+	protected $_taxClass;
 	
-	private $_tax;
+	protected $_categories;
 	
-	private $_categories;
+	protected $_defaultOptions;
 	
 	public function getId() {
 		return $this->_id;
@@ -121,12 +125,12 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 		$this->_fullDescription = $_fullDescription;
 	}
 
-	public function getTax() {
-		return $this->_tax;
+	public function getTaxClass() {
+		return $this->_taxClass;
 	}
 
-	public function setTax($_tax) {
-		$this->_tax = $_tax;
+	public function setTaxClass($_tax) {
+		$this->_taxClass = $_tax;
 	}
 
 	public function getCategories() {
@@ -136,6 +140,48 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	public function setCategories($_categories) {
 		$this->_categories = $_categories;
 	}
+	
+	public function getParentId() {
+		return $this->_parentId;
+	}
 
+	public function setParentId($_parentId) {
+		$this->_parentId = $_parentId;
+	}
+		
+	public function getDefaultOptions() {
+		return $this->_defaultOptions;
+	}
+
+	public function setDefaultOptions($_defaultOptions) {
+		$this->_defaultOptions = $_defaultOptions;
+	}
+	
+	public function toArray() {
+		$vars = array();
+		$methods = get_class_methods($this);
+		$props   = get_class_vars(get_class($this));
+        foreach ($props as $key => $value) {
+			if ($this->$key instanceof Application_Model_Models_Abstract) {
+				$vars[str_replace('_', '', $key)] = $this->$key->toArray();
+			} else {
+				$method = 'get' . ucfirst($this->_normalizeOptionsKey($key));
+				if (in_array($method, $methods)) {
+					$newKey = str_replace('_', '', $key);
+					$newValue = $this->$method();
+					
+					if (is_array($newValue)){
+						foreach ($newValue as &$val){
+							if ($val instanceof Application_Model_Models_Abstract){
+								$val = &$val->toArray();
+							}
+						}
+					}
+					$vars[$newKey] = $newValue;
+				}
+			}
+        }
+        return $vars;
+	}
 
 }

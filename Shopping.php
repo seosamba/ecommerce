@@ -128,122 +128,163 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 	
 	/**
-	 * Method used to get prepopulated data from db
+	 * Method used to get data from db
 	 * for usage in AJAX scope 
 	 * @return json 
 	 */
 	protected function getdataAction(){
 		$data = array();
-		switch ( strtolower($this->_requestedParams['type']) ) {
-			case 'countrylist':
-				$data = Tools_Geo::getCountries();
-				asort($data);
-				break;
-			case 'stateslist':
-				$data = Tools_Geo::getState();
-				break;
-			case 'states':
-				$country = $this->_request->getParam('country');
-				$data = Tools_Geo::getState($country?$country:null, true);	
-				break;
-			case 'zones':
-				$zonesMapper = Models_Mapper_Zone::getInstance();
-				$zones = $zonesMapper->fetchAll();
-				$data = array();
-				foreach ($zones as $zone) {
-					$data[] = $zone->toArray();
+		if (isset($this->_requestedParams['type'])){
+			$methodName = '_'.strtolower($this->_requestedParams['type']).'RESTService';
+			if (method_exists($this, $methodName)){
+				$data = $this->$methodName();
+				if (!isset($data['error'])){
+					return $this->_jsonHelper->direct($data);
+				} else {
+					$this->_response->clearAllHeaders()->clearBody();
+					return $this->_response->setHttpResponseCode( isset($data['code']) ? intval($data['code']) : 400)
+							->setBody(json_encode($data['message']))
+							->sendResponse();
+				}
+			}
+		}
+		$this->_response->setHttpResponseCode(403)->sendResponse();
+	}
+	
+	private function _countrylistRESTService(){
+		$data = Tools_Geo::getCountries();
+		asort($data);
+		return $data;
+	}
+	
+	private function _stateslistRESTService() {
+		return Tools_Geo::getState();
+	}
+	
+	private function _statesRESTService() {
+		$country = $this->_request->getParam('country');
+		return Tools_Geo::getState($country?$country:null, true);
+	}
+	
+	private function _zonesRESTService() {
+		$zonesMapper = Models_Mapper_Zone::getInstance();
+		$zones = $zonesMapper->fetchAll();
+		$data = array();
+		foreach ($zones as $zone) {
+			$data[] = $zone->toArray();
+		}
+		return $data;
+	}
+	
+	private function _taxrulesRESTService() {
+		$taxMapper = Models_Mapper_Tax::getInstance();
+		$rules = $taxMapper->fetchAll();
+		$data = array();
+		foreach ($rules as $rule) {
+			$data[] = $rule->toArray();
+		}
+		return $data;
+	} 
+	
+	private function _brandsRESTService() {
+		$brandMapper = Models_Mapper_Brand::getInstance();
+		$data = array();
+		$where = null;
+		if ($term = $this->_request->getParam('term')){
+			$where = $brandMapper->getDbTable()->getAdapter()->quoteInto('name LIKE ?', '%'.$term.'%');
+		}
+		$brands = $brandMapper->fetchAll($where, array('name'));
+		foreach ($brands as $brand) {
+			array_push($data, $brand->toArray());
+		}
+		return $data;
+	}
+	
+	private function _categoriesRESTService() {
+		$data = array();
+		$catMapper = Models_Mapper_Category::getInstance();
+		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
+		switch (strtolower($this->_request->getMethod())){
+			case 'get':
+				if ($id) {
+					$result = $catMapper->find($id);
+					if ($result !== null){
+						$data = $result->toArray();
+					}
+				} else {
+					foreach ($catMapper->fetchAll(null, array('name')) as $cat){
+						array_push($data, $cat->toArray());
+					}
 				}
 				break;
-			case 'taxrules':
-				$taxMapper = Models_Mapper_Tax::getInstance();
-				$rules = $taxMapper->fetchAll();
-				foreach ($rules as $rule) {
-					$data[] = $rule->toArray();
+			case 'post':
+			case 'put':
+				$rawData = json_decode($this->_request->getRawBody(), true);
+				if (!empty($rawData)){
+					$result = $catMapper->save($rawData);
+				} else {
+					continue;
+				}
+				if ($result === null){
+					$data = array('error'=>true, 'message' => 'Category with such name already exists', 'code' => 400);
+				} else {
+					$data = $result->toArray();
 				}
 				break;
-			case 'brands':
-				$brandMapper = Models_Mapper_Brand::getInstance();
-				$where = null;
-				if ($term = $this->_request->getParam('term')){
-					$where = $brandMapper->getDbTable()->getAdapter()->quoteInto('name LIKE ?', '%'.$term.'%');
+			case 'delete':
+				if ($id !== false){
+					$result = $catMapper->delete($id);
+				} else {
+					$result = false;
 				}
-				$brands = $brandMapper->fetchAll($where, array('name'));
-				foreach ($brands as $brand) {
-					array_push($data, $brand->toArray());
-				}
-				break;
-			case 'categories':
-				$catMapper = Models_Mapper_Category::getInstance();
-				$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
-				switch (strtolower($this->_request->getMethod())){
-					case 'get':
-						if ($id) {
-							$result = $catMapper->find($id);
-							if ($result !== null){
-								$data = $result->toArray();
-							}
-						} else {
-							foreach ($catMapper->fetchAll(null, array('name')) as $cat){
-								array_push($data, $cat->toArray());
-							}
-						}
-						break;
-					case 'post':
-					case 'put':
-						$rawData = json_decode($this->_request->getRawBody(), true);
-						if (!empty($rawData)){
-							$result = $catMapper->save($rawData);
-						} else {
-							continue;
-						}
-						if ($result === null){
-							$data = array('error'=>true, 'message' => 'Category with such name already exists');
-						} else {
-							$data = $result->toArray();
-						}
-						break;
-					case 'delete':
-						if ($id !== false){
-							$result = $catMapper->delete($id);
-						} else {
-							$result = false;
-						}
-						$data = array('done'=>(bool)$result, 'deleted'=>$id);
-						break;
-				}
-				break;
-			default :
+				$data = array('done'=>(bool)$result, 'deleted'=>$id);
 				break;
 		}
-		$this->_jsonHelper->direct($data);
-	}
-	
-	protected function categoryAction(){
-		
+		return $data;
 	}
 
-	protected function develAction(){
-//		if ($this->_requestedParams['filldb'] == 'state'){
-//			$t = new Models_DbTable_State();
-//			$t->getAdapter()->beginTransaction();
-//			foreach (Tools_Geo::$_states as $country => $states){
-//				foreach ($states as $name => $state) {
-//					$t->insert(array(
-//						'country'	=> $country,
-//						'state'		=> $name,
-//						'name'		=> $state
-//					));
-//				}
-//			}
-//			$t->getAdapter()->commit();
-//		}
-//		
-//		$taxMapper = Models_Mapper_Tax::getInstance();
-//		var_dump($taxMapper->fetchAll());
+	protected function _productRESTService(){
+		$productMapper = Models_Mapper_Product::getInstance();
+		$method =  $this->_request->getMethod();
+		$data = array();
+		switch ($method){
+			case 'GET':
+				$id = isset ($this->_requestedParams['id']) ? $this->_requestedParams['id'] : null;
+				if ($id !== null) {
+					$product = $productMapper->find($id);
+					if ($product !== null) {
+						$data = $product->toArray();
+					}
+				} else {
+					$products = $productMapper->fetchAll();
+					foreach ($products as $product){
+						array_push($data, $product->toArray());
+					}
+				}
+				break;
+			case 'POST':
+				$srcData = Zend_Json_Decoder::decode($this->_request->getRawBody());
+				$result = $productMapper->save($srcData);
+				if ($result instanceof Models_Model_Product){
+					$data = $result->toArray();
+				} else {
+					$data = array('error' => "Can't create product");
+				}
+				break;
+			case 'PUT':
+				$srcData = json_decode($this->_request->getRawBody(), true);
+				$data = $productMapper->save($srcData);
+				break;
+			case 'DELETE':
+				
+				break;
+			default:
+				break;
+		}
 		
-
+		return $this->_jsonHelper->direct($data);
 	}
-	
+
 	protected function productAction(){
 		$this->_view->generalConfig = $this->_configMapper->getConfigParams();
 		
@@ -256,5 +297,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_view->imageDirList = $listFolders;
 		echo $this->_view->render('product.phtml');
+	}
+	
+	protected function debugAction(){
+		$мапперОпций = Models_Mapper_Product::getInstance();
+		var_dump($мапперОпций->find(1));
 	}
 }

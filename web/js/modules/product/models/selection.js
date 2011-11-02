@@ -6,12 +6,12 @@ define([
 		defaults: function(){
 			return {
 				title: '',
-				priceModifierSign: '+',
-				priceModifierType: 'percent',
-				priceModifierValue: null,
-				weightModifierSign: '+',
-				weightModifierValue: null,
-				isDefault: 0
+				priceSign: '+',
+				priceType: 'percent',
+				priceValue: null,
+				weightSign: '+',
+				weightValue: null,
+				isDefault: '0'
 			}
 		}
 	});

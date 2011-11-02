@@ -7,10 +7,11 @@
  */
 class Models_DbTable_Product extends Zend_Db_Table_Abstract {
 
-	protected $_name = 'shopping_products';
+	protected $_name = 'shopping_product';
 	
 	protected $_dependentTables = array(
 		'Models_DbTable_Brand',
-		'Models_DbTable_ProductCategory'
+		'Models_DbTable_ProductCategory',
+		'Models_DbTable_ProductOption'
 	);
 }
