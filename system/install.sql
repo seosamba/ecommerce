@@ -108,23 +108,113 @@ INSERT INTO `shopping_list_state` (`id`, `country`, `state`, `name`) VALUES
 (62, 'CA', 'QC', 'Quebec'),
 (63, 'CA', 'SK', 'Saskatchewan'),
 (64, 'CA', 'YT', 'Yukon Territory');
+
+CREATE TABLE IF NOT EXISTS `shopping_brands` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `sku` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `mpn` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `weight` decimal(8,3) DEFAULT NULL,
+  `brand_id` int(10) unsigned DEFAULT NULL,
+  `photo` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `short_description` mediumtext COLLATE utf8_unicode_ci,
+  `full_description` text COLLATE utf8_unicode_ci,
+  `price` decimal(12,4) DEFAULT NULL,
+  `tax_class` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_category` (
+  `product_id` int(10) unsigned NOT NULL,
+  `category_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_has_option` (
+  `product_id` int(10) unsigned NOT NULL,
+  `option_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`option_id`),
+  KEY `fk_shopping_product_has_shopping_product_option_shopping_prod2` (`option_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_option` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(10) unsigned NOT NULL,
+  `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `indTitle` (`title`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_option_selection` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `option_id` int(10) unsigned DEFAULT NULL,
+  `title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `priceValue` decimal(10,2) DEFAULT NULL,
+  `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `weightValue` decimal(8,3) DEFAULT NULL,
+  `isDefault` enum('1','0') COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `indTitle` (`title`),
+  KEY `fk_shopping_product_option_selection_shopping_product_option1` (`option_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_tax` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `zoneId` int(10) unsigned NOT NULL,
+  `rate1` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `rate2` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `rate3` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `isDefault` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_zone` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_zone_country` (
   `zone_id` int(11) unsigned NOT NULL,
   `country_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`zone_id`,`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_zone_state` (
   `zone_id` int(10) unsigned NOT NULL,
   `state_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`zone_id`,`state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_zone_zip` (
   `zone_id` int(11) NOT NULL,
   `zip` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`zone_id`,`zip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+ALTER TABLE `shopping_product_has_option`
+  ADD CONSTRAINT `shopping_product_has_option_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_shopping_product_has_shopping_product_option_shopping_prod1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_product_option_selection`
+  ADD CONSTRAINT `fk_shopping_product_option_selection_shopping_product_option1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
