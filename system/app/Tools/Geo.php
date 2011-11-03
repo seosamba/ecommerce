@@ -174,7 +174,7 @@ class Tools_Geo {
 			$where = $stateTable->getAdapter()->quoteInto('country = ?', $country);
 		}
 		if ($pairs) {
-			$select = $stateTable->select()->from($stateTable,array('state','name'));
+			$select = $stateTable->select()->from($stateTable,array('id','name'));
 			if ($where){
 				$select->where($where);
 			}

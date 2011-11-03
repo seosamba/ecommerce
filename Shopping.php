@@ -43,7 +43,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		$config = $this->_configMapper->getConfigParams();
 		
 		$form = new Forms_Config();
-		$form->populate($config);
 		if ($this->_request->isPost()){
 			if ($form->isValid($this->_requestedParams)){
 				foreach ($form->getValues() as $key => $subFormValues) {
@@ -54,6 +53,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				$this->_jsonHelper->direct($form->getMessages());
 			}
 		}
+		$form->populate($config);
 		$this->_view->form = $form;
 
 		echo $this->_view->render('config.phtml');

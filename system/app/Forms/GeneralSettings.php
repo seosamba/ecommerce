@@ -41,7 +41,7 @@ class Forms_GeneralSettings extends Zend_Form {
 		
 		$this->addElement('select', 'state', array(
 			'label' => 'State/Province/Region',
-			'multiOptions' => Tools_Geo::getState($this->getElement('country')->getValue())
+			'multiOptions' => Tools_Geo::getState(null, true)
 		));
 		
 		$this->addElement('text', 'zip', array(
@@ -54,7 +54,7 @@ class Forms_GeneralSettings extends Zend_Form {
 	public function setDefault($name, $value) {
 		switch ($name) {
 			case 'state':
-				$list = Tools_Geo::getState($this->getElement('country')->getValue());
+				$list = Tools_Geo::getState($this->getElement('country')->getValue(), true);
 				if (empty ($list) || !array_key_exists($value, $list)) {
 					return $this;
 				}
