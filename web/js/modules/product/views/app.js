@@ -31,7 +31,7 @@ define([
 			// pre-loading necessary data
 			Categories.bind('add', this.addCategory, this);
 			Categories.bind('reset', this.addAllCategories, this);
-			Categories.bind('reset', this.proccessCategories, this);
+//			Categories.bind('reset', this.proccessCategories, this);
 //			Categories.bind('all', this.render, this);
 			Categories.fetch();
 			
@@ -78,12 +78,7 @@ define([
 			this.model.set({categories: checkedCategories});
 		},
 		proccessCategories: function(){
-			if (this.model.has('categories')){
-				_.each(this.model.get('categories'), function(category, name){
-					var el = Categories.get(category.id).view.el;
-					$(el).find(':checkbox').attr('checked','checked');
-				});
-			}
+			
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
@@ -150,8 +145,17 @@ define([
 				});
 			}
 			//populating selected categories
-//			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
-			
+			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
+			if (this.model.has('categories')){
+				$.when(
+					Categories.fetch()
+				).then(function(){
+					_.each(this.model.get('categories'), function(category, name){
+						var el = Categories.get(category.id).view.el;
+						$(el).find(':checkbox').attr('checked','checked');
+					});	
+				});
+			}
 			
 			$('#image-list').masonry({
 				itemSelector : '.box',
