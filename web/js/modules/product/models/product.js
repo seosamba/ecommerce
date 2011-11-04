@@ -21,16 +21,23 @@ define([
 		},
 		initialize: function (){
 			this.set({options: new ProductOptions()});
+			this.bind('change:photo', this.setImage, this);
 			this.bind('change:defaultOptions', function(){
 				this.attributes.options.reset(this.get('defaultOptions'));
 			}, this);
 		},
 		initOptions: function() {
 			this.set({options: optList});
-		}
-		,validate: function(attrs) {
+		},
+		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
-				alert('Price must be a number, e.g: 12.95');
+				smoke.alert('Price must be a number, e.g: 12.95');
+			}
+		},
+		setImage: function(){
+			var photo = this.get('photo');
+			if (photo instanceof Object){
+				this.set({photo: '/media/'+photo.folder+'/product/'+photo.name});
 			}
 		}
 	});

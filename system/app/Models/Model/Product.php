@@ -7,8 +7,6 @@
  */
 class Models_Model_Product extends Application_Model_Models_Abstract {
 
-	protected $_id = null;
-	
 	protected $_parentId;
 	
 	protected $_pageId;
@@ -37,14 +35,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_defaultOptions;
 	
-	public function getId() {
-		return $this->_id;
-	}
-
-	public function setId($_id) {
-		$this->_id = $_id;
-	}
-
+	protected $_related;
+	
 	public function getPageId() {
 		return $this->_pageId;
 	}
@@ -155,6 +147,14 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
 	public function setDefaultOptions($_defaultOptions) {
 		$this->_defaultOptions = $_defaultOptions;
+	}
+	
+	public function getRelated() {
+		return $this->_related;
+	}
+
+	public function setRelated($_related) {
+		$this->_related = $_related;
 	}
 	
 	public function toArray() {

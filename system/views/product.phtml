@@ -27,13 +27,41 @@
 			#product-categories span.ui-icon {
 				display: inline-block;
 				border-radius: 4px;
+				cursor:pointer;
 			}
 			#product-categories span.ui-icon:hover {
-				background-color: #666;
+				background-color: indianred;
 				background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
 			}
 			#options-holder .option-content .option-modifier-select {
 				width: 50px;
+			}
+			#top-toolbar > a {
+				display: inline-block;
+				margin: 3px;
+				padding: 8px;
+				border: 1px solid lightGrey;
+				background-color: #E6E6E6;
+				font-weight: normal;
+				color: #555;
+				border-radius: 4px;
+			}
+			#top-toolbar > a:hover {
+				background-color: #8fd5eb;
+				color: #eee;
+			}
+			.productlisting {
+				width: 100px;
+				height: auto;
+				margin: 10px;
+				float: left;
+				border: 10px solid #fff;
+				overflow: hidden;
+				position: relative;
+				text-align: center;
+				box-shadow: 1px 1px 2px lavender;
+				cursor: default;
+				background: #fff;
 			}
 		</style>
 		
@@ -149,12 +177,12 @@
 		
 		<script id="productListingTemplate" type="text/x-jquery-tmpl">
 			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
-				<p class="sku">${sku}</p>
-				<img class="lazy" width="100px" src="{{if photo}}${photo}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-				{{if brand}}
-				<p class="brand">${brand.name}</p>
-				{{/if}}
-				<p class="name">${name}</p>
+				<img class="lazy" src="{{if photo}}${photo.replace('/small/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+				<h2>${name}</h2>
+				<div class="details">
+					<p class="sku">${sku}</p>
+					<p class="brand">${brand}</p>
+				</div>
 			</a>
 		</script>
 	</head>
@@ -170,7 +198,6 @@
 			<div id="top-toolbar" class="ui-widget-header mb10px"> 
 				<a href="#new">Add a new product</a> 
 				<a href="#list">Edit a product from list</a> 
-				<span style="float: right">Delete this product</span> 
 			</div>
 			
 			<div id="manage-product" style="display: none; min-height: 500px">
@@ -183,7 +210,7 @@
 					<div id="image-list"></div>
 				</div>
 				
-				<div id="product-list" class="clearfix" style="display: none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
+				<div id="product-list" class="clearfix" style="display: none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
 					
 				</div>
 			
@@ -267,9 +294,9 @@
 					<div class="grid_4"> 
 						<select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property"> 
 							<option value="-1" disabled="disable">Select Template</option>
-							<option value="0">Product Default</option>
-							<option value="1">Product 2 col</option>
-							<option value="2">Product - minimal</option>
+							<?php foreach ($this->templateList as $tmpl) : ?>
+							<option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
+							<?php endforeach; ?>
 						</select>
 						<hr />
 					</div> 
@@ -277,11 +304,10 @@
 
 				<div id="category-tab" class="clearfix"> 
 					<div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
-						<input type="" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete &quot;%cat%&quot;?"/>
+						<input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
 					</div>
-					
-					
-					<div id="product-categories">
+
+					<div id="product-categories" class="grid_12">
 					</div>
 					
 				</div> <!-- #category-tab --> 
@@ -303,15 +329,21 @@
 					</div>
 				</div> <!-- End Tab 3 --> 
 
-				<div id="tab4" class="clearfix"> 
-					@todo related products will come soon
+				<div id="tab4" class="clearfix">
+					<div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
+						<input type="text" id="add-related" placeholder="Start typing name, SKU or MPN" />
+					</div>
+					<div id="related-holder" class="grid_12">
+						
+					</div>
 				</div> 
 
 				<div id="tab5"> 
 					@todo super-mega-merchandising plugins are on thier way
 				</div> 
 
-				<div style="position: absolute; bottom: 5px; right: 5px;">
+				<div class="grid_12">
+					<input type="button" value="Delete" id="delete"/>
 					<input type="submit" name="submit" id="submit" value="Save"/> 
 				</div>
 			</div>

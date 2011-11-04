@@ -132,13 +132,14 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 			}
 		}
 		
+		//fetching categories
 		$categorySet = $row->findManyToManyRowset('Models_DbTable_Category','Models_DbTable_ProductCategory');
 		if ($categorySet->count()){
 			$entity->setCategories($categorySet->toArray());
 		}
 		
+		//fetching options
 		$optionSet = $row->findDependentRowset('Models_DbTable_ProductOption');
-		
 		if ($optionSet->count()) {
 			$options = array();
 			$optionMapper = Models_Mapper_Option::getInstance();
@@ -146,6 +147,12 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 				array_push($options, $optionMapper->find($optionRow->option_id));
 			}
 			$entity->setDefaultOptions($options);
+		}
+		
+		//fetching related products
+		$relatedSet = $row->findDependentRowset('Models_DbTable_ProductRelated');
+		if ($relatedSet->count()){
+			$entity->setRelated($relatedSet->toArray());
 		}
 		
 		return $entity;

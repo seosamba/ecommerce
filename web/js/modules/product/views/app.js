@@ -12,30 +12,29 @@ define([
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
 		events: {
-			"keypress input#new-category": "newCategory",
-			"click #add-new-option-btn": "newOption",
-			"click #submit": "saveProduct",
-			"change #product-image-folder": "imageChange",
-			"click div.box": "setProductImage",
-			"change [data-reflection=property]": "setProperty",
-			'click input[name^=category]': "toggleCategory"
+			'keypress input#new-category': 'newCategory',
+			'click #add-new-option-btn': 'newOption',
+			'click #submit': 'saveProduct',
+			'change #product-image-folder': 'imageChange',
+			'click div.box': 'setProductImage',
+			'change [data-reflection=property]': 'setProperty',
+			'click input[name^=category]': 'toggleCategory',
+			'click #delete': 'deleteProduct'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
+			//initializing jQueryUI elements
 			$(this.el).tabs();
 			$('#description-box').tabs();
+			$('#delete').button();
+			$('#add-related').autocomplete({
+				source: this.filterProductList,
+				minLength: 3
+			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 			
 			this.initBrandAutocomplete();
 			this.newCategoryInput = this.$('#new-category');
 			
-			// pre-loading necessary data
-			Categories.bind('add', this.addCategory, this);
-			Categories.bind('reset', this.addAllCategories, this);
-//			Categories.bind('reset', this.proccessCategories, this);
-//			Categories.bind('all', this.render, this);
-			Categories.fetch();
-			
-//			this.model.view = this;
 			
 			$(".ui-tabs-nav, .ui-tabs-nav > *" )
 				.removeClass( "ui-corner-all" )
@@ -44,21 +43,14 @@ define([
 		setModel: function (model) {
 			this.model = model;
 			this.model.bind('change', this.render, this);
-			this.model.bind('change:categories', this.proccessCategories, this);
-			this.model.view = this.app;
+//			this.model.bind('change:categories', this.proccessCategories, this);
+			this.model.view = this;
 			this.render();
-		},
-		addCategory: function(category){
-			var view = new CategoryView({model: category});
-			$('#product-categories').append(view.render().el);
-		},
-		addAllCategories: function(){
-			Categories.each(this.addCategory);
 		},
 		newCategory: function(e){
 			var name = this.newCategoryInput.val();
 			if (e.keyCode == 13 && name !== '') {
-			   Categories.create({name: name}, {
+			   appRouter.categories.create({name: name}, {
 				   success: function(model, response){
 					   $('#new-category').val('').blur();
 				   },
@@ -147,14 +139,10 @@ define([
 			//populating selected categories
 			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
 			if (this.model.has('categories')){
-				$.when(
-					Categories.fetch()
-				).then(function(){
-					_.each(this.model.get('categories'), function(category, name){
-						var el = Categories.get(category.id).view.el;
-						$(el).find(':checkbox').attr('checked','checked');
-					});	
-				});
+				_.each(this.model.get('categories'), function(category, name){
+					var el = appRouter.categories.get(category.id).view.el;
+					$(el).find(':checkbox').attr('checked','checked');
+				});	
 			}
 			
 			$('#image-list').masonry({
@@ -177,6 +165,16 @@ define([
 					appRouter.app.model.fetch({data: {id: model.id}});
 				}});			
 			}
+		},
+		deleteProduct: function(){
+			if (this.model.isNew()){
+				return false;
+			}
+			smoke.confirm('Dragons ahead! Are you sure?', function(e){
+				if (e){
+					this.model.destroy();
+				}
+			});
 		},
 		initBrandAutocomplete: function(){
 			$('#product-brand').autocomplete({
@@ -228,6 +226,27 @@ define([
 					.append( "<a>" + item.name + "</a>" )
 					.appendTo( ul );
 			};
+		},
+		filterProductList: function(request, response){
+			var list = appRouter.products.filter(function(prod){
+				var search = request.term.toLowerCase();
+				if (prod.get('name').indexOf(search) != -1) {
+					return true;
+				}
+				if (prod.get('sku').indexOf(search) != -1) {
+					return true;
+				}
+				if (prod.get('name').indexOf(search) != -1) {
+					return true;
+				}
+			});
+			response(list);
+		},
+		renderAutocomplete: function( ul, item ) {
+			return $( "<li></li>" )
+				.data( "item.autocomplete", item )
+				.append( "<a><img style='float:right' src="+item.get('photo').replace('/small/','/product/')+" /><div>" + item.get('name').toUpperCase() + "<br>SKU:" + item.get('sku') + "<br />"+item.get('brand')+"</div></a>" )
+				.appendTo( ul );
 		}
 	});
 	

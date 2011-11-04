@@ -4,8 +4,10 @@ define([
 	'modules/product/views/app',
 	'modules/product/models/product',
 	'modules/product/collections/productlist',
-	'modules/product/views/productlist'
-], function(_, Backbone, AppView, ProductModel, ProductsCollection, ProductListingView){
+	'modules/product/views/productlist',
+	'modules/product/collections/categories',
+	'modules/product/views/category'
+], function(_, Backbone, AppView, ProductModel, ProductsCollection, ProductListingView,  CategoryCollection, CategoryView){
 	var Router = Backbone.Router.extend({
 		app: null,
 		routes: {
@@ -15,13 +17,19 @@ define([
 			'list': 'productListToggle'
 		},
 		products: null,
+		categories: null,
 		initialize: function(){
 			this.app = new AppView();
 			
 			this.products = new ProductsCollection();
 			this.products.bind('reset', this.loadProducts, this);
-			this.products.fetch();
+//			this.products.fetch();
 			$('#product-list:visible').hide('slide');
+			
+			this.categories = new CategoryCollection();
+			this.categories.bind('add', this.addCategory, this);
+			this.categories.bind('reset', this.renderCategories, this);
+//			this.categories.fetch();
 		},
 		newProduct: function(){
 			$('#product-list:visible').hide('slide');
@@ -40,6 +48,14 @@ define([
 				$('#product-list').append(productView.render().el);
 			});
 		},
+		addCategory: function(category){
+			var view = new CategoryView({model: category});
+			$('#product-categories').append(view.render().el);
+		},
+		renderCategories: function(){
+			$('#product-categories').empty();
+			this.categories.each(this.addCategory, this);
+		},
 		productListToggle: function(){
 			$('#product-list').show('slide');
 		}
@@ -47,7 +63,12 @@ define([
 	
 	var initialize = function(){
 		window.appRouter = new Router;
-		Backbone.history.start();
+		$.when(
+			appRouter.products.fetch(),
+			appRouter.categories.fetch()
+		).then(function(){
+			Backbone.history.start();				
+		});
 	};
 	
 	return {

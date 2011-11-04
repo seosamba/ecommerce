@@ -288,9 +288,10 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function productAction(){
 		$this->_view->generalConfig = $this->_configMapper->getConfigParams();
 		
-		$catMapper = Models_Mapper_Category::getInstance();
-		$categoryList = $catMapper->fetchAll();
-		$this->_view->categoryList = $categoryList;
+		$templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
+		$templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
+		$this->_view->templateList = $templateList;
+		
 		$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'].$this->_websiteConfig['media']);
 		if (!empty ($listFolders)){
 			$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
@@ -300,7 +301,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 	
 	protected function debugAction(){
-		$мапперОпций = Models_Mapper_Product::getInstance();
-		var_dump($мапперОпций->find(1));
+		$layout = new Zend_Layout();
+		var_dump($layout);
 	}
 }

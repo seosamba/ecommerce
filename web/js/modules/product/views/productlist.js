@@ -5,7 +5,7 @@ define([
 	
 	var ProductView = Backbone.View.extend({
 		tagName: 'div',
-		className: 'productlisting grid_2 ui-corner-all ui-widget-content',
+		className: 'productlisting',
 		template: $('#productListingTemplate').template(),
 		events: {
 		
