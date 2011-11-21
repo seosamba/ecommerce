@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, ProductOptions){
 	
 	var Product = Backbone.Model.extend({
-		url: '/plugin/shopping/run/getdata/type/product/',
+		urlRoot: '/plugin/shopping/run/getdata/type/product/',
 		defaults: {
 			name: '',
 			sku: '',
@@ -17,21 +17,24 @@ define([
 			enabled: true,
 			price: 0,
 			taxClass: 1,
-			pageTemplate: 0
+			pageTemplate: 0,
+			related: []
 		},
 		initialize: function (){
 			this.set({options: new ProductOptions()});
 			this.bind('change:photo', this.setImage, this);
 			this.bind('change:defaultOptions', function(){
-				this.attributes.options.reset(this.get('defaultOptions'));
+				this.get('options').reset(this.get('defaultOptions'));
 			}, this);
-		},
-		initOptions: function() {
-			this.set({options: optList});
 		},
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
 				smoke.alert('Price must be a number, e.g: 12.95');
+			}
+			if (attrs.related){
+				attrs.related = _.map(attrs.related, function(rel){
+					return parseInt(rel);
+				});
 			}
 		},
 		setImage: function(){

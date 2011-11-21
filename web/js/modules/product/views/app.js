@@ -2,12 +2,12 @@ define([
 	'libs/underscore/underscore',
 	'libs/backbone/backbone',
 	'modules/product/models/product',
-	'modules/product/collections/categories',
 	'modules/product/views/category',
-	'modules/product/collections/options',
+//	'modules/product/collections/options',
 	'modules/product/models/option',
-	'modules/product/views/option'
-], function(_, Backbone, ProductModel, Categories, CategoryView, OptionCollection, ProductOption, ProductOptionView){
+	'modules/product/views/option',
+	'modules/product/views/productlist'
+], function(_, Backbone, ProductModel, CategoryView, /*OptionCollection,*/ ProductOption, ProductOptionView, ProductListView){
 	
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -18,8 +18,10 @@ define([
 			'change #product-image-folder': 'imageChange',
 			'click div.box': 'setProductImage',
 			'change [data-reflection=property]': 'setProperty',
+			'change #product-enabled': 'toggleEnabled',
 			'click input[name^=category]': 'toggleCategory',
-			'click #delete': 'deleteProduct'
+			'click #delete': 'deleteProduct',
+			'click #related-holder span.ui-icon-closethick': 'removeRelated'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
@@ -28,8 +30,9 @@ define([
 			$('#description-box').tabs();
 			$('#delete').button();
 			$('#add-related').autocomplete({
+				minLength: 3,
+				select: this.addRelated,
 				source: this.filterProductList,
-				minLength: 3
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 			
 			this.initBrandAutocomplete();
@@ -44,8 +47,12 @@ define([
 			this.model = model;
 			this.model.bind('change', this.render, this);
 //			this.model.bind('change:categories', this.proccessCategories, this);
+			this.model.bind('change:related', this.renderRelated, this);
 			this.model.view = this;
 			this.render();
+		},
+		toggleEnabled: function(){
+			this.model.set({enabled: !!this.$('#product-enabled').attr('checked')});
 		},
 		newCategory: function(e){
 			var name = this.newCategoryInput.val();
@@ -64,7 +71,7 @@ define([
 			var checkedCategories = [];
 		
 			_.each($('input[name^=category]:checked'), function(el){
-				checkedCategories.push(Categories.get( el.value ).toJSON());
+				checkedCategories.push(appRouter.categories.get( el.value ).toJSON());
 			});
 			
 			this.model.set({categories: checkedCategories});
@@ -75,7 +82,7 @@ define([
 		newOption: function(){
 			var newOption = new ProductOption();
 			var optWidget = new ProductOptionView({model: newOption});
-			this.model.attributes.options.add(newOption);
+			this.model.get('defaultOptions').add(newOption);
 			$('#options-holder').append(optWidget.render().el);
 			optWidget.addSelection();
 		},
@@ -111,6 +118,8 @@ define([
 			this.model.set(data);
 		},
 		render: function(){
+			$('#quick-preview').empty();
+
 			//setting model properties to view
 			if (this.model.has('photo')){
 				this.$('#product-image').attr('src', this.model.get('photo'));
@@ -124,10 +133,9 @@ define([
 			this.$('#product-brand').val(this.model.get('brand'));
 			this.$('#product-price').val(this.model.get('price'));
 			this.$('#product-taxClass').val(this.model.get('taxClass'));
-			this.$('#product-pageTemplate').val(this.model.get('pageTemplate'));
 			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
 			this.$('#product-fullDescription').val(this.model.get('fullDescription'));
-			
+						
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
@@ -144,6 +152,19 @@ define([
 					$(el).find(':checkbox').attr('checked','checked');
 				});	
 			}
+			//toggle enabled flag
+			if (this.model.get('enabled')){
+				this.$('#product-enabled').attr('checked', 'checked');
+			} else {
+				this.$('#product-enabled').removeAttr('checked');
+			}
+			
+			if (this.model.has('page')){
+				$('<a></a>', {href: $('#websiteUrl').val()+this.model.get('page').url, target: '_blank'})
+					.html(this.model.get('page').h1)
+					.appendTo('#quick-preview');
+				this.$('#product-pageTemplate').val(this.model.get('page').templateId);
+			} 
 			
 			$('#image-list').masonry({
 				itemSelector : '.box',
@@ -153,6 +174,14 @@ define([
 		},
 		saveProduct: function(){
 			//@todo: make messages translatable
+			if (!this.model.get('options').isEmpty()){
+				var list = this.model.get('options').toJSON();
+				this.model.set({defaultOptions: list});
+			}
+			if (!this.model.has('pageTemplate')){
+				this.model.set({pageTemplate: this.$('#product-pageTemplate').val()});
+			}
+			
 			if (this.model.isNew()){
 				this.model.save(null, {success: function(model, response){
 					smoke.alert('Product added');
@@ -167,12 +196,13 @@ define([
 			}
 		},
 		deleteProduct: function(){
-			if (this.model.isNew()){
+			var model  = this.model;
+			if (model.isNew()){
 				return false;
 			}
 			smoke.confirm('Dragons ahead! Are you sure?', function(e){
 				if (e){
-					this.model.destroy();
+					model.destroy();
 				}
 			});
 		},
@@ -230,13 +260,16 @@ define([
 		filterProductList: function(request, response){
 			var list = appRouter.products.filter(function(prod){
 				var search = request.term.toLowerCase();
-				if (prod.get('name').indexOf(search) != -1) {
+				if (!appRouter.app.model.isNew() && appRouter.app.model.get('id') === prod.get('id')){
+					return false;
+				}
+				if (prod.get('name').toLowerCase().indexOf(search) != -1) {
 					return true;
 				}
-				if (prod.get('sku').indexOf(search) != -1) {
+				if (prod.get('sku').toLowerCase().indexOf(search) != -1) {
 					return true;
 				}
-				if (prod.get('name').indexOf(search) != -1) {
+				if (prod.get('name').toLowerCase().indexOf(search) != -1) {
 					return true;
 				}
 			});
@@ -247,6 +280,29 @@ define([
 				.data( "item.autocomplete", item )
 				.append( "<a><img style='float:right' src="+item.get('photo').replace('/small/','/product/')+" /><div>" + item.get('name').toUpperCase() + "<br>SKU:" + item.get('sku') + "<br />"+item.get('brand')+"</div></a>" )
 				.appendTo( ul );
+		},
+		addRelated: function( event, ui ) {
+			var related = _(appRouter.app.model.get('related')).toArray(),
+				id	= ui.item.get('id');
+			if (related.indexOf(id) === -1){
+				related.push(id);
+				appRouter.app.model.set({related: related});
+			}
+			//return false;
+		},
+		removeRelated: function(el){
+			var id = $(el.target).closest('div.productlisting').find('a').attr('href').replace('#edit/',''),
+				related = _.without(_(this.model.get('related')).toArray(), parseInt(id));
+			this.model.set({related: related});
+		},
+		renderRelated: function(){
+			$('#related-holder').empty();
+			_(this.model.get('related')).each(function(productId){
+				var product = appRouter.products.get(parseInt(productId)),
+					view	= new ProductListView({model: product, showDelete: true});
+				
+				$('#related-holder').append(view.render().el);
+			});
 		}
 	});
 	

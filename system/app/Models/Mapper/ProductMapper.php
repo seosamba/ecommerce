@@ -5,7 +5,7 @@
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
+class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_dbTable	= 'Models_DbTable_Product';
 	
@@ -20,28 +20,19 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 	
 	public function save($model) {
 		if (!$model instanceof $this->_model){
-			if (isset($model['brand']) && !empty ($model['brand'])){
-				if (!$brand = $this->_brandMapper->findByName($model['brand'])){
-					$brand = $this->_brandMapper->save(array('name' => $model['brand']));
-				}
-				unset($model['brand']);
+			$model = new $this->_model($model);		
+		}
+		if ($model->getBrand()){
+			if (!$brand = $this->_brandMapper->findByName($model->getBrand())){
+				$brand = $this->_brandMapper->save(array('name' => $model->getBrand()));
 			}
-			if (isset($model['categories'])){
-				$categories = $model['categories'];
-				unset($model['categories']);
-			}
-			if (isset($model['options'])) {
-				$options = $model['options'];
-				unset($model['options']);
-			}
-			$model = new $this->_model($model);
-			
 		}
 		$data = array(
 			'parent_id' => $model->getParentId(),
 			'sku'	=> $model->getSku(),
 			'name' => $model->getName(),
 			'photo' => $model->getPhoto(),
+			'brand_id'  => $brand->getId(),
 			'mpn' => $model->getMpn(),
 			'weight' => $model->getWeight(),
 			'short_description'	=> $model->getShortDescription(),
@@ -49,11 +40,6 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 			'price' => $model->getPrice(),
 			'tax_class' => $model->getTaxClass()
 			);
-		
-		if (isset($brand)){
-			$model->setBrand($brand->getName());
-			$data['brand_id'] = $brand->getId();
-		}
 		
 		if ($model->getId()){
 			$data['updated_at'] = date(DATE_ATOM);
@@ -77,25 +63,33 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 			}
 		}
 		
-		if (isset($categories)) {
+		if ($model->getCategories()) {
 			$productCategoryTable = new Models_DbTable_ProductCategory();
 			$productCategoryTable->getAdapter()->beginTransaction();
 			$productCategoryTable->delete($productCategoryTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
-			foreach ($categories as $category) {
+			foreach ($model->getCategories() as $category) {
 				$productCategoryTable->insert(array(
 					'product_id' => $model->getId(),
 					'category_id' => $category['id']
 				));
 			}
 			$productCategoryTable->getAdapter()->commit();
-			$model->setCategories($categories);
 		}
 		
-		if (isset($options)){
-			$this->_proccessOptions($model, $options);
+		if ($model->getDefaultOptions()){
+			$this->_processOptions($model);
+		}
+		
+		if ($model->getRelated()){
+			$this->_processRelated($model);
 		}
 		
 		return $model;
+	}
+	
+	public function updatePageIdForProduct($model){
+		$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
+		return $this->getDbTable()->update( array('page_id' => $model->getPage()->getId()), $where);
 	}
 	
 	public function fetchAll($where = null, $order = array()) {
@@ -144,7 +138,10 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 			$options = array();
 			$optionMapper = Models_Mapper_Option::getInstance();
 			foreach ($optionSet as $optionRow) {
-				array_push($options, $optionMapper->find($optionRow->option_id));
+				$opt = $optionMapper->find($optionRow->option_id);
+				if ($opt){
+					array_push($options, $opt->toArray());
+				}
 			}
 			$entity->setDefaultOptions($options);
 		}
@@ -152,21 +149,35 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 		//fetching related products
 		$relatedSet = $row->findDependentRowset('Models_DbTable_ProductRelated');
 		if ($relatedSet->count()){
-			$entity->setRelated($relatedSet->toArray());
+			$related = array();
+			foreach ($relatedSet as $relatedRow) {
+				array_push($related, $relatedRow->related_id);
+			}
+			$entity->setRelated($related);
+		}
+		
+		//fetching product page
+		if ($row->page_id){
+			$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+			$page = $pageMapper->find($row->page_id);
+			if ($page){
+				$entity->setPage($page);
+			}
 		}
 		
 		return $entity;
 	}
 	
-	private function _proccessOptions(Models_Model_Product $model, $options){
+	private function _processOptions(Models_Model_Product $model){
 		$optionMapper = Models_Mapper_Option::getInstance();
 
 		$relationTable = new Models_DbTable_ProductOption();
 		$currentList = $relationTable->fetchAll($relationTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
+		
 		$cList = $currentList->toArray();
 		
 		$ids = array();
-		foreach ($options as $option) {
+		foreach ($model->getDefaultOptions() as $option) {
 			if ( !isset($option['title']) || empty($option['title']) ) {
 				continue;
 			} else {
@@ -193,5 +204,27 @@ class Models_Mapper_Product extends Application_Model_Mappers_Abstract {
 		}
 		
 		return $ids;
+	}
+	
+	private function _processRelated(Models_Model_Product $model){
+		$related = $model->getRelated();
+		$relatedTable = new Models_DbTable_ProductRelated();
+		
+		$where = $relatedTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+		$relatedTable->delete($where);
+		
+		foreach ($related as $id) {
+			 $relatedTable->insert(array(
+				'product_id' => $model->getId(),
+				'related_id' => intval($id)
+				));
+		}
+		
+		return $result;
+	}
+	
+	public function delete(Models_Model_Product $product){
+		$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
+		return $this->getDbTable()->delete($where);
 	}
 }

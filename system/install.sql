@@ -125,6 +125,8 @@ CREATE TABLE IF NOT EXISTS `shopping_categories` (
 CREATE TABLE IF NOT EXISTS `shopping_product` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
+  `page_id` int(10) unsigned NOT NULL,
+  `enabled` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
   `sku` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `mpn` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -153,6 +155,14 @@ CREATE TABLE IF NOT EXISTS `shopping_product_has_option` (
   KEY `fk_shopping_product_has_shopping_product_option_shopping_prod2` (`option_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_product_has_related` (
+  `product_id` int(10) unsigned NOT NULL,
+  `related_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`related_id`),
+  KEY `fk_shopping_product1` (`related_id`),
+  KEY `fk_shopping_product2` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(10) unsigned NOT NULL,
@@ -175,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option_selection` (
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`),
   KEY `fk_shopping_product_option_selection_shopping_product_option1` (`option_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_tax` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -213,8 +223,11 @@ CREATE TABLE IF NOT EXISTS `shopping_zone_zip` (
 
 
 ALTER TABLE `shopping_product_has_option`
-  ADD CONSTRAINT `shopping_product_has_option_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_shopping_product_has_shopping_product_option_shopping_prod1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `shopping_product_has_option_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `shopping_product_has_option_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_product_has_related`
+  ADD CONSTRAINT `fk_shopping_product1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `shopping_product_option_selection`
   ADD CONSTRAINT `fk_shopping_product_option_selection_shopping_product_option1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;

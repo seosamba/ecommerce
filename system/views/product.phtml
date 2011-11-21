@@ -24,12 +24,12 @@
 				float:left;
 				margin: 3px 2px;
 			}
-			#product-categories span.ui-icon {
+			.toolbar span.ui-icon {
 				display: inline-block;
 				border-radius: 4px;
 				cursor:pointer;
 			}
-			#product-categories span.ui-icon:hover {
+			.toolbar span.ui-icon:hover {
 				background-color: indianred;
 				background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
 			}
@@ -54,13 +54,14 @@
 				width: 100px;
 				height: auto;
 				margin: 10px;
+				padding: 5px;
 				float: left;
-				border: 10px solid #fff;
+				border: 4px solid #666;
+				border-radius: 0 15px;
 				overflow: hidden;
 				position: relative;
 				text-align: center;
-				box-shadow: 1px 1px 2px lavender;
-				cursor: default;
+				cursor: pointer;
 				background: #fff;
 			}
 		</style>
@@ -78,8 +79,7 @@
 		<script id="categoryTemplate" type="text/x-jquery-tmpl">
 			<input type="checkbox" name="category[]" value="${id}"/>
 			<span class="category-editable">${name}</span>
-			<div class="category-toolbar" style="display:inline;">
-				<span class="ui-icon" style="display:none;"></span>
+			<div class="toolbar" style="display:inline;">
 				<span class="ui-icon ui-icon-closethick">Delete</span>
 			</div>
 		</script>
@@ -176,6 +176,11 @@
 		</script>
 		
 		<script id="productListingTemplate" type="text/x-jquery-tmpl">
+			{{if showDelete}}
+			<div class="toolbar" style="position: absolute;right: 0;top: 0;">
+				<span class="ui-icon ui-icon-closethick">Delete</span>
+			</div>
+			{{/if}}
 			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
 				<img class="lazy" src="{{if photo}}${photo.replace('/small/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
 				<h2>${name}</h2>
@@ -300,6 +305,9 @@
 						</select>
 						<hr />
 					</div> 
+					<div class="grid_4">
+						<div id="quick-preview"></div>
+					</div>
 				</div> 
 
 				<div id="category-tab" class="clearfix"> 

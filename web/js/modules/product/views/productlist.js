@@ -15,7 +15,11 @@ define([
 			this.model.view = this;
 		},
 		render: function(){
-			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
+			var data = this.model.toJSON();
+			if (this.options.hasOwnProperty('showDelete')){
+				data['showDelete'] = this.options.showDelete;
+			}
+			$(this.el).html($.tmpl(this.template, data));
 			return this;
 		}
 	});

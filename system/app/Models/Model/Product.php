@@ -9,7 +9,9 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
 	protected $_parentId;
 	
-	protected $_pageId;
+	protected $_page;
+	
+	protected $_enabled;
 	
 	protected $_sku;
 	
@@ -37,12 +39,12 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_related;
 	
-	public function getPageId() {
-		return $this->_pageId;
+	public function getPage() {
+		return $this->_page;
 	}
 
-	public function setPageId($_pageId) {
-		$this->_pageId = $_pageId;
+	public function setPage($_page) {
+		$this->_page = $_page;
 	}
 
 	public function getSku() {
@@ -155,6 +157,14 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
 	public function setRelated($_related) {
 		$this->_related = $_related;
+	}
+	
+	public function getEnabled() {
+		return $this->_enabled;
+	}
+
+	public function setEnabled($_enabled) {
+		$this->_enabled = $_enabled;
 	}
 	
 	public function toArray() {

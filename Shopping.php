@@ -11,6 +11,9 @@ set_include_path(implode(PATH_SEPARATOR, array(
 )));
 
 class Shopping extends Tools_Plugins_Abstract {
+	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
+	const PRODUCT_CATEGORY_URL	= 'product-pages';
+
 	/**
 	 * json helper for sending well-formated json response
 	 * @var Object 
@@ -244,7 +247,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	protected function _productRESTService(){
-		$productMapper = Models_Mapper_Product::getInstance();
+		$productMapper = Models_Mapper_ProductMapper::getInstance();
 		$method =  $this->_request->getMethod();
 		$data = array();
 		switch ($method){
@@ -264,25 +267,128 @@ class Shopping extends Tools_Plugins_Abstract {
 				break;
 			case 'POST':
 				$srcData = Zend_Json_Decoder::decode($this->_request->getRawBody());
-				$result = $productMapper->save($srcData);
-				if ($result instanceof Models_Model_Product){
-					$data = $result->toArray();
+				$newProduct = $productMapper->save($srcData);
+				if ($newProduct instanceof Models_Model_Product){
+					$page = $this->_savePageForProduct($newProduct, $srcData['pageTemplate']);
+					$newProduct->setPage($page);
+					$productMapper->updatePageIdForProduct($newProduct);
+					
+					$data = $newProduct->toArray(); 
 				} else {
-					$data = array('error' => "Can't create product");
+					$data = array(
+						'error' => true,
+						'code'	=> 404,
+						'message' => "Can't create product"
+						);
 				}
 				break;
 			case 'PUT':
 				$srcData = json_decode($this->_request->getRawBody(), true);
-				$data = $productMapper->save($srcData);
+				$product = $productMapper->save($srcData);
+				if (!$product->getPage()){
+					$page = $this->_savePageForProduct($product, $srcData['pageTemplate']);
+					$product->setPage($page);
+					$productMapper->updatePageIdForProduct($product);
+				} else {
+					$page = new Application_Model_Models_Page($product->getPage());
+					$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+					
+					if (isset($srcData['pageTemplate']) && $srcData['pageTemplate'] !== $page->getTemplateId()){
+						$page->setTemplateId($srcData['pageTemplate']);
+					}
+					if((bool)$page->getDraft() !== (bool)$product->getEnabled()){
+						$page->setDraft($product->getEnabled());
+					}
+					
+					if ($pageMapper->save($page)){
+						$product->setPage($page);
+					}
+				}
+				$data = $product->toArray();
 				break;
 			case 'DELETE':
-				
+				$uri = trim($this->_request->getRequestUri(), '/\ ');
+				$uri = substr($uri, strrpos($uri, '/'));
+				$id = filter_var($uri, FILTER_SANITIZE_NUMBER_INT);
+				if ($product = $productMapper->find($id)) {
+					if (!$productMapper->delete($product)){
+						$data = array(
+							'error' => true,
+							'code' => 404,
+							'message' => 'Can not delete product #'.$id
+						);
+					}
+				} else {
+					$data = array(
+						'code'		=> 404,
+						'message'	=> 'Requested product not found'
+						);
+				}
 				break;
 			default:
 				break;
 		}
 		
-		return $this->_jsonHelper->direct($data);
+		return $data;
+	}
+	
+	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
+		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
+		if (!$prodCatPage){
+			$prodCatPage = new Application_Model_Models_Page(array(
+				'h1Tag'			=> self::PRODUCT_CATEGORY_NAME,
+				'headerTitle'	=> self::PRODUCT_CATEGORY_NAME,
+				'url'			=> self::PRODUCT_CATEGORY_URL,
+				'navName'		=> self::PRODUCT_CATEGORY_NAME,
+				'metaDescription'	=> '',
+				'teaserText'	=> '',
+				'templateId'	=> $templateId ? $templateId : 'default',
+				'parentId'		=> 0,
+				'system'		=> 0,
+				'is404page'		=> 0,
+				'protected'		=> 0,
+				'memLanding'	=> 0,
+				'siloId'		=> 0,
+				'lastUpdate'	=> date(DATE_ATOM),
+				'showInMenu'	=> 1,
+				'targetedKey'	=> self::PRODUCT_CATEGORY_NAME
+			));
+			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
+		}
+		$page = new Application_Model_Models_Page();
+		$uniqName = trim(implode('-', array($product->getName(), $product->getSku(), $product->getBrand())), '/');
+		$uniqName = preg_replace('/[@!.:;\'"`$%?&()*|\s\/\\\]/','-', $uniqName);
+
+		$page->setTemplateId($templateId ? $templateId : 'default' );
+		$page->setParentId($prodCatPage->getId());
+		$page->setUrl($uniqName);
+        $page->setNavName($product->getName().'-'.$product->getSku());
+        $page->setMetaDescription(strip_tags($product->getShortDescription()));
+		$page->setMetaKeywords('');
+		$page->setHeaderTitle($uniqName);
+		$page->setH1($uniqName);
+		$page->setUrl($uniqName.'.html');
+		$page->setTeaserText(strip_tags($product->getShortDescription()));
+		$page->setLastUpdate(date(DATE_ATOM));
+		$page->setIs404page(0);
+		$page->setShowInMenu(1);
+		$page->setSiloId(0);
+		$page->setTargetedKey(self::PRODUCT_CATEGORY_NAME);
+		$page->setProtected(0);
+		$page->setSystem(0);
+		$page->setDraft($product->getEnabled());
+		$page->setMemLanding(0);
+		$page->setNews(0);
+		
+		$id = $pageMapper->save($page);
+		
+		if($id) {
+			$page->setId($id);
+		} else {
+			return null;
+		}
+		return $page;
 	}
 
 	protected function productAction(){
@@ -301,7 +407,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 	
 	protected function debugAction(){
-		$layout = new Zend_Layout();
-		var_dump($layout);
+
 	}
 }
