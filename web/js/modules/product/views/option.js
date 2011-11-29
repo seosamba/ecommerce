@@ -19,7 +19,7 @@ define([
 			this.model.bind('change', this.render, this);
 			this.model.view = this;
 			
-			if (this.model.has('selection')){
+			if (this.model.has('selection') && this.model.get('selection') instanceof Backbone.Collection){
 				this.model.get('selection').bind('add', this.renderSelection, this);
 				this.model.get('selection').bind('reset', this.renderAllSelections, this);
 				this.model.get('selection').bind('remove', this.render, this);

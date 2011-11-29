@@ -8,7 +8,7 @@ define([
 	'modules/product/views/option',
 	'modules/product/views/productlist'
 ], function(_, Backbone, ProductModel, CategoryView, /*OptionCollection,*/ ProductOption, ProductOptionView, ProductListView){
-	
+
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
 		events: {
@@ -34,11 +34,11 @@ define([
 				select: this.addRelated,
 				source: this.filterProductList,
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
-			
+
 			this.initBrandAutocomplete();
 			this.newCategoryInput = this.$('#new-category');
-			
-			
+
+
 			$(".ui-tabs-nav, .ui-tabs-nav > *" )
 				.removeClass( "ui-corner-all" )
 				.addClass( "ui-corner-top" );
@@ -46,7 +46,6 @@ define([
 		setModel: function (model) {
 			this.model = model;
 			this.model.bind('change', this.render, this);
-//			this.model.bind('change:categories', this.proccessCategories, this);
 			this.model.bind('change:related', this.renderRelated, this);
 			this.model.view = this;
 			this.render();
@@ -70,15 +69,12 @@ define([
 		},
 		toggleCategory: function(e){
 			var checkedCategories = [];
-		
+
 			_.each($('input[name^=category]:checked'), function(el){
 				checkedCategories.push(appRouter.categories.get( el.value ).toJSON());
 			});
-			
+
 			this.model.set({categories: checkedCategories});
-		},
-		proccessCategories: function(){
-			
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
@@ -136,11 +132,10 @@ define([
 			this.$('#product-taxClass').val(this.model.get('taxClass'));
 			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
 			this.$('#product-fullDescription').val(this.model.get('fullDescription'));
-						
+
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
-				console.log(this.model.get('options'));
 				this.model.get('options').each(function(option){
 					var optWidget = new ProductOptionView({model: option});
 					$('#options-holder').append(optWidget.render().el);
@@ -152,7 +147,7 @@ define([
 				_.each(this.model.get('categories'), function(category, name){
 					var el = appRouter.categories.get(category.id).view.el;
 					$(el).find(':checkbox').attr('checked','checked');
-				});	
+				});
 			}
 			//toggle enabled flag
 			if (this.model.get('enabled')){
@@ -160,7 +155,7 @@ define([
 			} else {
 				this.$('#product-enabled').removeAttr('checked');
 			}
-			
+
 			if (this.model.has('page')){
 				$('<a></a>', {href: $('#websiteUrl').val()+this.model.get('page').url, target: '_blank'})
 					.html(this.model.get('page').h1)
@@ -169,7 +164,7 @@ define([
 			} else {
 				this.$('#product-pageTemplate').val('-1');
 			}
-			
+
 			$('#image-list').masonry({
 				itemSelector : '.box',
 				columnWidth : 120
@@ -187,18 +182,18 @@ define([
 				templateId = templateId !== '-1' ? templateId : 'default';
 				this.model.set({pageTemplate: templateId});
 			}
-			
+
 			if (this.model.isNew()){
 				this.model.save(null, {success: function(model, response){
 					smoke.alert('Product added');
 					appRouter.products.add(model);
 					appRouter.navigate('edit/'+model.id, true);
-				}});			
+				}});
 			} else {
 				this.model.save(null, {success: function(model, response){
 					smoke.alert('Product saved');
 					appRouter.app.model.fetch({data: {id: model.id}});
-				}});			
+				}});
 			}
 		},
 		deleteProduct: function(){
@@ -229,13 +224,13 @@ define([
 					if ( elem.data('xhrCache') === undefined){
 						elem.data('xhrCache', xhrCache);
 					} else {
-						xhrCache = elem.data('xhrCache');					
+						xhrCache = elem.data('xhrCache');
 					}
 
 					if ( elem.data('lastXhr') === undefined){
 						elem.data('lastXhr', lastXhr);
 					} else {
-						lastXhr = elem.data('lastXhr');					
+						lastXhr = elem.data('lastXhr');
 					}
 
 					var term = request.term ;
@@ -293,12 +288,12 @@ define([
 				.data( "item.autocomplete", item )
 				.append( "<a><img style='float:right' src="+
 					(item.has('photo')?item.get('photo').replace('/small/','/product/'):'/system/images/noimage.png')
-					+" /><div>" 
-					+ item.get('name').toUpperCase() 
-					+ "<br>SKU:" 
-					+ item.get('sku') 
+					+" /><div>"
+					+ item.get('name').toUpperCase()
+					+ "<br>SKU:"
+					+ item.get('sku')
 					+ "<br />"
-					+item.get('brand')+"</div></a>" 
+					+item.get('brand')+"</div></a>"
 				).appendTo( ul );
 		},
 		addRelated: function( event, ui ) {
@@ -320,11 +315,11 @@ define([
 			_(this.model.get('related')).each(function(productId){
 				var product = appRouter.products.get(parseInt(productId)),
 					view	= new ProductListView({model: product, showDelete: true});
-				
+
 				$('#related-holder').append(view.render().el);
 			});
 		}
 	});
-	
+
 	return AppView;
 });
