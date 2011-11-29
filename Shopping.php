@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Shopping
+ * Ecommerce plugin for SEOTOASTER 2.0
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
@@ -16,12 +16,15 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/**
 	 * json helper for sending well-formated json response
-	 * @var Object 
+	 * @var Zend_Controller_Action_Helper_Json
 	 */
 	protected $_jsonHelper;
 	
 	private $_websiteConfig;
-	
+
+    /**
+     * @var Models_Mapper_ShoppingConfig
+     */
 	private $_configMapper = null;
 	
 	public function  __construct($options, $seotoasterData) {
@@ -41,6 +44,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	
 	/** 
 	 * Method renders shopping config screen and handling config saving.
+     * @return html
 	 */
 	protected function configAction(){
 		$config = $this->_configMapper->getConfigParams();
@@ -296,10 +300,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					if (isset($srcData['pageTemplate']) && $srcData['pageTemplate'] !== $page->getTemplateId()){
 						$page->setTemplateId($srcData['pageTemplate']);
 					}
-					if((bool)$page->getDraft() !== (bool)$product->getEnabled()){
-						$page->setDraft($product->getEnabled());
-					}
 					
+					$page->setDraft((bool)$product->getEnabled()?'0':'1');
+										
 					if ($pageMapper->save($page)){
 						$product->setPage($page);
 					}
@@ -320,6 +323,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					}
 				} else {
 					$data = array(
+						'error'		=> true,
 						'code'		=> 404,
 						'message'	=> 'Requested product not found'
 						);
@@ -357,17 +361,19 @@ class Shopping extends Tools_Plugins_Abstract {
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
 		}
 		$page = new Application_Model_Models_Page();
-		$uniqName = trim(implode('-', array($product->getName(), $product->getSku(), $product->getBrand())), '/');
-		$uniqName = preg_replace('/[@!.:;\'"`$%?&()*|\s\/\\\]/','-', $uniqName);
+		
+		$uniqName = implode('-', array($product->getName(), $product->getSku(), $product->getBrand()));
+		$uniqName = preg_replace('/[@!.:;=\'"`~#$%?&()*|\s\/\\\]{1,}/','-', $uniqName);
+		$uniqName = trim($uniqName, '-');
 
 		$page->setTemplateId($templateId ? $templateId : 'default' );
 		$page->setParentId($prodCatPage->getId());
 		$page->setUrl($uniqName);
-        $page->setNavName($product->getName().'-'.$product->getSku());
+        $page->setNavName($product->getName().($product->getSku()?'-'.$product->getSku():''));
         $page->setMetaDescription(strip_tags($product->getShortDescription()));
 		$page->setMetaKeywords('');
 		$page->setHeaderTitle($uniqName);
-		$page->setH1($uniqName);
+		$page->setH1($product->getName());
 		$page->setUrl($uniqName.'.html');
 		$page->setTeaserText(strip_tags($product->getShortDescription()));
 		$page->setLastUpdate(date(DATE_ATOM));
@@ -377,7 +383,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$page->setTargetedKey(self::PRODUCT_CATEGORY_NAME);
 		$page->setProtected(0);
 		$page->setSystem(0);
-		$page->setDraft($product->getEnabled());
+		$page->setDraft((bool)$product->getEnabled()?'0':'1');
 		$page->setMemLanding(0);
 		$page->setNews(0);
 		
@@ -408,5 +414,32 @@ class Shopping extends Tools_Plugins_Abstract {
 	
 	protected function debugAction(){
 
+	}
+	
+	protected function _makeOptionProduct() {
+		$productMapper = Models_Mapper_ProductMapper::getInstance();
+		if (!isset($this->_options[1]) || empty($this->_options[1])){
+			return '<b>Not method name supplied</b>';
+		}
+		$product = $productMapper->fetchAll(array('page_id = ?' => $this->_seotoasterData['id']));
+		if (empty($product)) {
+			return '<b>Oops! Product not found.</b>';
+		}
+		$product = reset($product);
+		
+		$methodName = '_getProduct'. ucfirst(strtolower($this->_options[1])).'ForPage';
+		if (method_exists($this, $methodName)){
+			return $this->$methodName($product);
+		}
+		
+		return '<blink>What, '.$this->_options[1].'?</blink>';
+	}
+	
+	protected function _getProductNameForPage(Models_Model_Product $product){
+		return '<span class="fn">'.$product->getName().'</span>';
+	}
+	
+	protected function _getProductPriceForPage(Models_Model_Product $product){
+		return '<span class="price">'.number_format($product->getPrice(),2,'.','').'</span>';
 	}
 }

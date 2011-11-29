@@ -22,14 +22,15 @@ define([
 			this.app = new AppView();
 			
 			this.products = new ProductsCollection();
+			this.products.bind('add', this.renderProductView, this);
 			this.products.bind('reset', this.loadProducts, this);
-//			this.products.fetch();
-			$('#product-list:visible').hide('slide');
+
+			$('#product-list').hide();
+			$('#manage-product').show();
 			
 			this.categories = new CategoryCollection();
 			this.categories.bind('add', this.addCategory, this);
 			this.categories.bind('reset', this.renderCategories, this);
-//			this.categories.fetch();
 		},
 		newProduct: function(){
 			$('#product-list:visible').hide('slide');
@@ -41,12 +42,13 @@ define([
 			product.fetch({data: {id: productId}});
 			this.app.setModel(product);
 		},
-		loadProducts: function(){
+		loadProducts: function(productsCollection){
 			$('#product-list').empty();
-			this.products.each(function(product){
-				var productView = new ProductListingView({model: product});
-				$('#product-list').append(productView.render().el);
-			});
+			productsCollection.each(this.renderProductView);
+		},
+		renderProductView: function(product){
+			var productView = new ProductListingView({model: product});
+			$('#product-list').append(productView.render().el);
 		},
 		addCategory: function(category){
 			var view = new CategoryView({model: category});

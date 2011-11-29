@@ -32,7 +32,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'sku'	=> $model->getSku(),
 			'name' => $model->getName(),
 			'photo' => $model->getPhoto(),
-			'brand_id'  => $brand->getId(),
+			'brand_id'  => isset($brand)?$brand->getId():null,
 			'mpn' => $model->getMpn(),
 			'weight' => $model->getWeight(),
 			'short_description'	=> $model->getShortDescription(),
@@ -114,6 +114,14 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$row = $result->current();
 		
 		return $this->_toModel($row);
+	}
+	
+	public function findByPageId($id) {
+		$products = $this->fetchAll(array('page_id = ?' => $id));
+		if (!empty ($products)){
+			return $products[0];
+		}
+		return null;
 	}
 
 	private function _toModel(Zend_Db_Table_Row_Abstract $row){
@@ -220,7 +228,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				));
 		}
 		
-		return $result;
 	}
 	
 	public function delete(Models_Model_Product $product){
