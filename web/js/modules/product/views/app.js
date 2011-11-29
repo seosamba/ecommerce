@@ -32,7 +32,7 @@ define([
 			$('#add-related').autocomplete({
 				minLength: 3,
 				select: this.addRelated,
-				source: this.filterProductList,
+				source: this.filterProductList
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 
 			this.initBrandAutocomplete();
@@ -136,6 +136,7 @@ define([
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
+				console.log(this.model.get('options'));
 				this.model.get('options').each(function(option){
 					var optWidget = new ProductOptionView({model: option});
 					$('#options-holder').append(optWidget.render().el);
@@ -164,7 +165,6 @@ define([
 			} else {
 				this.$('#product-pageTemplate').val('-1');
 			}
-
 			$('#image-list').masonry({
 				itemSelector : '.box',
 				columnWidth : 120
@@ -289,11 +289,11 @@ define([
 				.append( "<a><img style='float:right' src="+
 					(item.has('photo')?item.get('photo').replace('/small/','/product/'):'/system/images/noimage.png')
 					+" /><div>"
-					+ item.get('name').toUpperCase()
-					+ "<br>SKU:"
-					+ item.get('sku')
+					+ item.get('name').toUpperCase() 
+					+ "<br>SKU:" 
+					+ item.get('sku') 
 					+ "<br />"
-					+item.get('brand')+"</div></a>"
+					+item.get('brand')+"</div></a>" 
 				).appendTo( ul );
 		},
 		addRelated: function( event, ui ) {
