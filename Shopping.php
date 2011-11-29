@@ -415,31 +415,5 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function debugAction(){
 
 	}
-	
-	protected function _makeOptionProduct() {
-		$productMapper = Models_Mapper_ProductMapper::getInstance();
-		if (!isset($this->_options[1]) || empty($this->_options[1])){
-			return '<b>Not method name supplied</b>';
-		}
-		$product = $productMapper->fetchAll(array('page_id = ?' => $this->_seotoasterData['id']));
-		if (empty($product)) {
-			return '<b>Oops! Product not found.</b>';
-		}
-		$product = reset($product);
-		
-		$methodName = '_getProduct'. ucfirst(strtolower($this->_options[1])).'ForPage';
-		if (method_exists($this, $methodName)){
-			return $this->$methodName($product);
-		}
-		
-		return '<blink>What, '.$this->_options[1].'?</blink>';
-	}
-	
-	protected function _getProductNameForPage(Models_Model_Product $product){
-		return '<span class="fn">'.$product->getName().'</span>';
-	}
-	
-	protected function _getProductPriceForPage(Models_Model_Product $product){
-		return '<span class="price">'.number_format($product->getPrice(),2,'.','').'</span>';
-	}
+
 }
