@@ -14,10 +14,9 @@ define([
 			brand: '',
 			shortDescription: '',
 			fullDescription: '',
-			enabled: true,
+			enabled: 1,
 			price: 0,
 			taxClass: 1,
-			pageTemplate: 0,
 			related: []
 		},
 		initialize: function (){

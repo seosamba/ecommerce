@@ -34,7 +34,15 @@ define([
 				$(this.el).find('div.option-content').html($.tmpl(this.optionListTemplate, this.model));
 				this.renderAllSelections();
 			}
-			
+			this.$('button.item-remove,button.remove-option').button({
+				icons: {
+                primary: 'ui-icon-closethick'
+				},
+				text: false
+			}).find('span.ui-button-text').css({padding: '0'});
+			this.$('button.add-selection-btn').button({
+				icons: { primary: 'ui-icon-plus' }
+			});
 			return this;
 		},
 		typeChange: function(e){
