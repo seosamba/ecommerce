@@ -8,19 +8,19 @@
 class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_dbTable	= 'Models_DbTable_Product';
-	
+
 	protected $_model	= 'Models_Model_Product';
-	
+
 	protected $_brandMapper = null;
-	
+
 	public function __construct() {
 		$this->_brandMapper = Models_Mapper_Brand::getInstance();
 	}
 
-	
+
 	public function save($model) {
 		if (!$model instanceof $this->_model){
-			$model = new $this->_model($model);		
+			$model = new $this->_model($model);
 		}
 		if ($model->getBrand()){
 			if (!$brand = $this->_brandMapper->findByName($model->getBrand())){
@@ -40,7 +40,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'price' => $model->getPrice(),
 			'tax_class' => $model->getTaxClass()
 			);
-		
+
 		if ($model->getId()){
 			$data['updated_at'] = date(DATE_ATOM);
 			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
@@ -62,7 +62,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				$model->setId($id);
 			}
 		}
-		
+
 		if ($model->getCategories()) {
 			$productCategoryTable = new Models_DbTable_ProductCategory();
 			$productCategoryTable->getAdapter()->beginTransaction();
@@ -75,23 +75,24 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 			$productCategoryTable->getAdapter()->commit();
 		}
-		
+
 		if ($model->getDefaultOptions()){
 			$this->_processOptions($model);
 		}
-		
+
 		if ($model->getRelated()){
 			$this->_processRelated($model);
 		}
-		
+
+		$model->notifyObservers();
 		return $model;
 	}
-	
+
 	public function updatePageIdForProduct($model){
 		$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
 		return $this->getDbTable()->update( array('page_id' => $model->getPage()->getId()), $where);
 	}
-	
+
 	public function fetchAll($where = null, $order = array()) {
 		$entities = array();
 		$resultSet = $this->getDbTable()->fetchAll($where, $order);
@@ -100,7 +101,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 		foreach ($resultSet as $row) {
 			$entity = $this->_toModel($row);
-			
+
 			array_push($entities, $entity);
 		}
 		return $entities;
@@ -112,26 +113,26 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			return null;
 		}
 		$row = $result->current();
-		
+
 		return $this->_toModel($row);
 	}
 
 	private function _toModel(Zend_Db_Table_Row_Abstract $row){
 		$entity = new $this->_model($row->toArray());
-		
+
 		if ($row->brand_id){
 			$brandRow = $row->findDependentRowset('Models_DbTable_Brand');
 			if ($brandRow->count()){
 				$entity->setBrand($brandRow->current()->name);
 			}
 		}
-		
+
 		//fetching categories
 		$categorySet = $row->findManyToManyRowset('Models_DbTable_Category','Models_DbTable_ProductCategory');
 		if ($categorySet->count()){
 			$entity->setCategories($categorySet->toArray());
 		}
-		
+
 		//fetching options
 		$optionSet = $row->findDependentRowset('Models_DbTable_ProductOption');
 		if ($optionSet->count()) {
@@ -145,7 +146,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 			$entity->setDefaultOptions($options);
 		}
-		
+
 		//fetching related products
 		$relatedSet = $row->findDependentRowset('Models_DbTable_ProductRelated');
 		if ($relatedSet->count()){
@@ -155,7 +156,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 			$entity->setRelated($related);
 		}
-		
+
 		//fetching product page
 		if ($row->page_id){
 			$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
@@ -164,18 +165,18 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				$entity->setPage($page);
 			}
 		}
-		
+
 		return $entity;
 	}
-	
+
 	private function _processOptions(Models_Model_Product $model){
 		$optionMapper = Models_Mapper_Option::getInstance();
 
 		$relationTable = new Models_DbTable_ProductOption();
 		$currentList = $relationTable->fetchAll($relationTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
-		
+
 		$cList = $currentList->toArray();
-		
+
 		$ids = array();
 		foreach ($model->getDefaultOptions() as $option) {
 			if ( !isset($option['title']) || empty($option['title']) ) {
@@ -185,44 +186,44 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 			array_push($ids, $result->getId());
 		}
-		
+
 		foreach ($currentList as $row) {
 			if (!in_array($row->option_id, $ids)){
 				$row->delete();
 			}
 		}
-		
+
 		foreach ($ids as $optionId){
 			$row = $relationTable->find($model->getId(), $optionId);
 			if (!$row->count()){
 				$row = $relationTable->createRow(array(
-					'product_id' => $model->getId(), 
+					'product_id' => $model->getId(),
 					'option_id'	 => $optionId
 					));
 				$row->save();
 			}
 		}
-		
+
 		return $ids;
 	}
-	
+
 	private function _processRelated(Models_Model_Product $model){
 		$related = $model->getRelated();
 		$relatedTable = new Models_DbTable_ProductRelated();
-		
+
 		$where = $relatedTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
 		$relatedTable->delete($where);
-		
+
 		foreach ($related as $id) {
 			 $relatedTable->insert(array(
 				'product_id' => $model->getId(),
 				'related_id' => intval($id)
 				));
 		}
-		
+
 		return $result;
 	}
-	
+
 	public function delete(Models_Model_Product $product){
 		$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
 		return $this->getDbTable()->delete($where);

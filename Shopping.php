@@ -38,7 +38,22 @@ class Shopping extends Tools_Plugins_Abstract {
 			return $dispatchersResult;
 		}
 	}
-	
+
+    public static function getTabContent() {
+        $translator = Zend_Registry::get('Zend_Translate');
+        $view       = new Zend_View(array(
+            'scriptPath' => dirname(__FILE__) . '/system/views'
+        ));
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $view->websiteUrl = $websiteHelper->getUrl();
+        return array(
+            'title'   => '<span id="products">' . $translator->translate('Products') . '</span>',
+            'content' => $view->render('uitab.phtml')
+        );
+        unset($translator);
+        unset($view);
+    }
+
 	/** 
 	 * Method renders shopping config screen and handling config saving.
 	 */

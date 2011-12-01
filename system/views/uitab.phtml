@@ -1,0 +1,29 @@
+<div>
+    <select name="product-category" multiple class="pselect">
+        <option>one</option>
+        <option>two</option>
+    </select>
+    <select name="product-brand" multiple class="pselect">
+
+    </select>
+
+</div>
+<script src="<?php echo $this->websiteUrl; ?>system/js/external/chosen/chosen.jquery.js" type="text/javascript"></script>
+<link rel="stylesheet" href="<?php echo $this->websiteUrl; ?>system/js/external/chosen/chosen.css" type="text/css">
+<style>
+   .pselect {
+       width: 200px;
+   }
+</style>
+<script type="text/javascript" charset="utf-8">
+    $(function() {
+        $("select.pselect").chosen();
+        $("select.pselect").chosen({allow_single_deselect:true});
+
+        $('#products').click(function() {
+            $('div.above-editor-links').removeClass('grid_8').addClass('grid_5');
+            $(this).parents('div').removeClass('grid_4').addClass('grid_7');
+            $('#tabs-frag-3').addClass('h450');
+        })
+    })
+</script>
