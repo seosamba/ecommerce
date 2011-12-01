@@ -5,7 +5,7 @@
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
+class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_model = 'Models_Model_Option';
 	
@@ -22,8 +22,9 @@ class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
 		}
 		
 		$data = array(
-			'title' => $model->getTitle(),
-			'type'	=> $model->getType()
+			'title'     => $model->getTitle(),
+			'type'	    => $model->getType(),
+            'parentId'  => $model->getParentId()
 		);
 		
 		if ($model->getId()){
@@ -33,7 +34,7 @@ class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
 			$id = $this->getDbTable()->insert($data);
 			$model->setId($id);
 		}
-		
+
 		if ($model->getSelection()){
 			$this->_proccessSelection($model);
 		}
@@ -62,6 +63,10 @@ class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
 				$model->setSelection($selections->toArray());
 			}
 		}
+
+        if ($model->getParentId()){
+
+        }
 		
 		return $model;
 	}

@@ -21,7 +21,9 @@ define([
 			'change #product-enabled': 'toggleEnabled',
 			'click input[name^=category]': 'toggleCategory',
 			'click #delete': 'deleteProduct',
-			'click #related-holder span.ui-icon-closethick': 'removeRelated'
+			'click #related-holder span.ui-icon-closethick': 'removeRelated',
+            'change #product-brand': 'setBrand',
+            'keypress input#new-brand': 'newBrand'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
@@ -35,7 +37,7 @@ define([
 				source: this.filterProductList
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 
-			this.initBrandAutocomplete();
+//			this.initBrandAutocomplete();
 			this.newCategoryInput = this.$('#new-category');
 
 
@@ -127,7 +129,7 @@ define([
 			this.$('#product-sku').val(this.model.get('sku'));
 			this.$('#product-mpn').val(this.model.get('mpn'));
 			this.$('#product-weight').val(this.model.get('weight'));
-			this.$('#product-brand').val(this.model.get('brand'));
+			this.$('#product-brand').val(this.model.get('brand')).trigger('change');
 			this.$('#product-price').val(this.model.get('price'));
 			this.$('#product-taxClass').val(this.model.get('taxClass'));
 			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
@@ -175,6 +177,7 @@ define([
 			//@todo: make messages translatable
 			if (!this.model.get('options').isEmpty()){
 				var list = this.model.get('options').toJSON();
+                console.log(list);
 				this.model.set({defaultOptions: list});
 			}
 			if (!this.model.has('pageTemplate')){
@@ -318,7 +321,37 @@ define([
 
 				$('#related-holder').append(view.render().el);
 			});
-		}
+		},
+        setBrand: function(e){
+            var el = $(e.target);
+            var url = el.find('option:eq('+e.target.options.selectedIndex+')').data('url');
+            if (url){
+                $('label[for=product-brand] > a').attr('href', $('#websiteUrl').val()+url);
+            } else {
+                $('label[for=product-brand] > a').attr('href', 'javascript:;');
+            }
+            this.model.set({brand: el.val()});
+        },
+        newBrand: function(e){
+            var newBrand = this.$('#new-brand').val();
+            if (e.keyCode === 13 && newBrand !== '') {
+                var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
+                if (!_.include(current, newBrand.toLowerCase())){
+                    appRouter.brands.create({
+                        'name': newBrand
+                    }, {success: function(model){
+                        $('#product-brand').val(model.get('name')).trigger('change').focus();
+                    }});
+                } else {
+                    var brand = appRouter.brands.find(function(item){
+                        return item.get('name').toLowerCase() == newBrand.toLowerCase();
+                    });
+                    $('#product-brand').val(brand.get('name')).trigger('change').focus();
+                }
+
+                this.$('#new-brand').val('');
+            }
+        }
 	});
 
 	return AppView;

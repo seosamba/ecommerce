@@ -194,16 +194,38 @@ class Shopping extends Tools_Plugins_Abstract {
 	} 
 	
 	private function _brandsRESTService() {
-		$brandMapper = Models_Mapper_Brand::getInstance();
-		$data = array();
-		$where = null;
-		if ($term = $this->_request->getParam('term')){
-			$where = $brandMapper->getDbTable()->getAdapter()->quoteInto('name LIKE ?', '%'.$term.'%');
-		}
-		$brands = $brandMapper->fetchAll($where, array('name'));
-		foreach ($brands as $brand) {
-			array_push($data, $brand->toArray());
-		}
+		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll();
+
+        $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+        $pagesUrls = $pageMapper->fetchAllUrls();
+
+        $data = array();
+        switch (strtolower($this->_request->getMethod())){
+            default:
+            case 'get':
+                foreach ($brandsList as $brand) {
+                    $item = $brand->toArray();
+                    if (in_array(strtolower($brand->getName()).'.html', $pagesUrls)){
+                        $item['url'] = strtolower($brand->getName()).'.html';
+                    }
+                    array_push($data, $item);
+                }
+                break;
+            case 'post':
+                $postData = json_decode($this->_request->getRawBody(), true);
+                if (!empty($postData)){
+                    $brand = Models_Mapper_Brand::getInstance()->save($postData);
+                    if ($brand instanceof Models_Model_Brand){
+                        $data = $brand->toArray();
+                    }
+                } else {
+                    $data = array(
+                        'error' => true,
+                        'message' => 'No data provided'
+                    );
+                }
+                break;
+        }
 		return $data;
 	}
 	
@@ -397,13 +419,16 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $page;
 	}
 
-	protected function productAction(){
+	/**
+     * @var $pageMapper Application_Model_Mappers_PageMapper
+     */
+    protected function productAction(){
 		$this->_view->generalConfig = $this->_configMapper->getConfigParams();
 		
 		$templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
 		$templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
 		$this->_view->templateList = $templateList;
-		
+
 		$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'].$this->_websiteConfig['media']);
 		if (!empty ($listFolders)){
 			$listFolders = array('select folder') + array_combine($listFolders, $listFolders);

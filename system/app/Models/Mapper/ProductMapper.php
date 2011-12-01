@@ -144,7 +144,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$optionSet = $row->findDependentRowset('Models_DbTable_ProductOption');
 		if ($optionSet->count()) {
 			$options = array();
-			$optionMapper = Models_Mapper_Option::getInstance();
+			$optionMapper = Models_Mapper_OptionMapper::getInstance();
 			foreach ($optionSet as $optionRow) {
 				$opt = $optionMapper->find($optionRow->option_id);
 				if ($opt){
@@ -177,19 +177,26 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	}
 	
 	private function _processOptions(Models_Model_Product $model){
-		$optionMapper = Models_Mapper_Option::getInstance();
+		$optionMapper = Models_Mapper_OptionMapper::getInstance();
 
 		$relationTable = new Models_DbTable_ProductOption();
 		$currentList = $relationTable->fetchAll($relationTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
-		
-		$cList = $currentList->toArray();
 		
 		$ids = array();
 		foreach ($model->getDefaultOptions() as $option) {
 			if ( !isset($option['title']) || empty($option['title']) ) {
 				continue;
 			} else {
-				$result = $optionMapper->save($option);
+                if (isset($option['isTemplate']) && $option['isTemplate'] === true){
+                    $template = $optionMapper->save( array(
+                        'title'     => isset($option['templateName']) && !empty($option['templateName']) ? $option['templateName'] : 'template-'.$option['title'],
+                        'type'      => $option['type'],
+                        'parentId'  => '0'
+                    ) );
+                    $option['parentId'] = $template->getId();
+                    unset($template);
+                }
+                $result = $optionMapper->save($option);
 			}
 			array_push($ids, $result->getId());
 		}
