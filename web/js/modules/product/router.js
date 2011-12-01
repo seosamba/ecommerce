@@ -6,8 +6,10 @@ define([
 	'modules/product/collections/productlist',
 	'modules/product/views/productlist',
 	'modules/product/collections/categories',
-	'modules/product/views/category'
-], function(_, Backbone, AppView, ProductModel, ProductsCollection, ProductListingView,  CategoryCollection, CategoryView){
+	'modules/product/views/category',
+    'modules/product/collections/brands'
+], function(_, Backbone, AppView, ProductModel, ProductsCollection, ProductListingView,
+            CategoryCollection, CategoryView, BrandsCollection){
 	var Router = Backbone.Router.extend({
 		app: null,
 		routes: {
@@ -18,18 +20,23 @@ define([
 		},
 		products: null,
 		categories: null,
+        brands: null,
 		initialize: function(){
 			this.app = new AppView();
 			
 			this.products = new ProductsCollection();
+			this.products.bind('add', this.renderProductView, this);
 			this.products.bind('reset', this.loadProducts, this);
-//			this.products.fetch();
-			$('#product-list:visible').hide('slide');
+
+			$('#product-list').hide();
+			$('#manage-product').show();
 			
 			this.categories = new CategoryCollection();
 			this.categories.bind('add', this.addCategory, this);
 			this.categories.bind('reset', this.renderCategories, this);
-//			this.categories.fetch();
+
+            this.brands = new BrandsCollection();
+            this.brands.bind('all', this.renderBrands, this);
 		},
 		newProduct: function(){
 			$('#product-list:visible').hide('slide');
@@ -41,12 +48,13 @@ define([
 			product.fetch({data: {id: productId}});
 			this.app.setModel(product);
 		},
-		loadProducts: function(){
+		loadProducts: function(productsCollection){
 			$('#product-list').empty();
-			this.products.each(function(product){
-				var productView = new ProductListingView({model: product});
-				$('#product-list').append(productView.render().el);
-			});
+			productsCollection.each(this.renderProductView);
+		},
+		renderProductView: function(product){
+			var productView = new ProductListingView({model: product});
+			$('#product-list').append(productView.render().el);
 		},
 		addCategory: function(category){
 			var view = new CategoryView({model: category});
@@ -55,7 +63,14 @@ define([
 		renderCategories: function(){
 			$('#product-categories').empty();
 			this.categories.each(this.addCategory, this);
-		},
+        },
+        addBrand: function(brand) {
+            $.tmpl("<option value='${name}' {{if url}}data-url='${url}'{{/if}}>${name}</option>", brand.toJSON()).appendTo('#product-brand');
+        },
+        renderBrands: function(){
+            $('#product-brand').empty();
+            this.brands.each(this.addBrand, this);
+        },
 		productListToggle: function(){
 			$('#product-list').show('slide');
 		}
@@ -65,7 +80,8 @@ define([
 		window.appRouter = new Router;
 		$.when(
 			appRouter.products.fetch(),
-			appRouter.categories.fetch()
+			appRouter.categories.fetch(),
+            appRouter.brands.fetch()
 		).then(function(){
 			Backbone.history.start();				
 		});

@@ -13,13 +13,14 @@ define([
 			'click .add-selection-btn': 'addSelection',
 			'change select.option-type-select': 'typeChange',
 			'change input.option-title': 'titleChange',
-			'change input[name=isTemplate]': 'toggleIsTemplate'
+			'change input[name=isTemplate]': 'toggleIsTemplate',
+			'change input[name=templateName]': 'templateNameChange'
 		},
 		initialize: function(){
-			this.model.bind('change', this.render, this);
+			this.model.bind('change:type', this.render, this);
 			this.model.view = this;
 			
-			if (this.model.has('selection')){
+			if (this.model.has('selection') && this.model.get('selection') instanceof Backbone.Collection){
 				this.model.get('selection').bind('add', this.renderSelection, this);
 				this.model.get('selection').bind('reset', this.renderAllSelections, this);
 				this.model.get('selection').bind('remove', this.render, this);
@@ -28,14 +29,28 @@ define([
 		},
 		render: function(){
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
-			$(this.el).find('select.option-type-select').val(this.model.get('type'));
-			
-			if (this.model.get('type') == 'dropdown' || this.model.get('type') == 'radio'){
-				$(this.el).find('div.option-content').html($.tmpl(this.optionListTemplate, this.model));
-				this.renderAllSelections();
-			}
-			
-			return this;
+            $(this.el).find('select.option-type-select').val(this.model.get('type'));
+
+            if (this.model.get('type') == 'dropdown' || this.model.get('type') == 'radio'){
+                $(this.el).find('div.option-content').html($.tmpl(this.optionListTemplate, this.model));
+                this.renderAllSelections();
+            }
+            this.$('button.item-remove,button.remove-option').button({
+				icons: {
+                primary: 'ui-icon-closethick'
+				},
+				text: false
+			}).find('span.ui-button-text').css({padding: '0'});
+            this.$('button.add-selection-btn').button({
+				icons: { primary: 'ui-icon-plus' }
+			});
+            if (this.model.get('parentId') === '0') {
+                this.$('input[name=templateName]').val('').hide();
+            } else {
+                this.$('input[name=isTemplate]').attr('checked', 'checked');
+                this.$('input[name=templateName]').val(this.model.get('templateName')).show();
+            }
+            return this;
 		},
 		typeChange: function(e){
 			var type = e.target.value;
@@ -65,8 +80,18 @@ define([
 			}
 		},
 		toggleIsTemplate: function(e){
-			$(e.target).closest('div').find('input[name=templateName]').toggle();
+			var $tplNameInput = $(e.target).closest('div').find('input[name=templateName]');
+            if (e.target.checked) {
+                this.model.set({isTemplate: true});
+                $tplNameInput.show();
+            } else {
+                this.model.unset('isTemplate');
+                $tplNameInput.hide();
+            }
 		},
+        templateNameChange: function(e){
+            this.model.set({templateName: e.target.value});
+        },
 		kill: function(){
 			this.model.collection.remove(this.model);
 			this.remove();

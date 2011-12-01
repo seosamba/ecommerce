@@ -5,24 +5,26 @@
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
-	
+class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
+
 	protected $_model = 'Models_Model_Option';
 	
 	protected $_dbTable = 'Models_DbTable_Option';
-	
+
+    /**
+     * Method saves model to DB
+     * @param $model Models_Model_Option
+     * @return Models_Model_Option
+     */
 	public function save($model){
 		if (! $model instanceof  $this->_model){
-			if (isset($model['selection']) && !empty ($model['selection'])){
-				$selection = $model['selection'];
-				unset ($model['selection']);
-			}
 			$model = new $this->_model($model);
 		}
 		
 		$data = array(
-			'title' => $model->getTitle(),
-			'type'	=> $model->getType()
+			'title'     => $model->getTitle(),
+			'type'	    => $model->getType(),
+            'parentId'  => $model->getParentId()
 		);
 		
 		if ($model->getId()){
@@ -32,9 +34,9 @@ class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
 			$id = $this->getDbTable()->insert($data);
 			$model->setId($id);
 		}
-		
-		if (isset($selection)){
-			$this->_proccessSelection($model->getId(), $selection);
+
+		if ($model->getSelection()){
+			$this->_proccessSelection($model);
 		}
 		
 		return $model;
@@ -61,17 +63,22 @@ class Models_Mapper_Option extends Application_Model_Mappers_Abstract {
 				$model->setSelection($selections->toArray());
 			}
 		}
+
+        if ($model->getParentId()){
+
+        }
 		
 		return $model;
 	}
 
-	public function _proccessSelection($modelId, array $selectionList){
+	private function _proccessSelection(Models_Model_Option $model){
 		$selectionTable = new Models_DbTable_Selection();
 		$selectionTable->getAdapter()->beginTransaction();
-		
+
+        $selectionList = $model->getSelection();
 		foreach ($selectionList as $item) {
 			$data = array(
-				'option_id'		=> $modelId,
+				'option_id'		=> $model->getId(),
 				'title'			=> $item['title'],
 				'priceSign'		=> $item['priceSign'],
 				'priceValue'	=> $item['priceValue'],

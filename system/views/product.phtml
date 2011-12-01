@@ -36,19 +36,14 @@
 			#options-holder .option-content .option-modifier-select {
 				width: 50px;
 			}
-			#top-toolbar > a {
-				display: inline-block;
-				margin: 3px;
-				padding: 8px;
-				border: 1px solid lightGrey;
-				background-color: #E6E6E6;
-				font-weight: normal;
-				color: #555;
-				border-radius: 4px;
+			a.nav-links {
+				color: #f3f3f3;
+                border-bottom: 1px #1e90ff dotted;
+                font-weight: normal;
+                font-size: 14px;
 			}
-			#top-toolbar > a:hover {
-				background-color: #8fd5eb;
-				color: #eee;
+			a.nav-links:hover {
+				color: #1e90ff;
 			}
 			.productlisting {
 				width: 100px;
@@ -114,10 +109,10 @@
 				</div>
 				<div class="grid_3">
 					<label for="isTemplate">
-						<input type="checkbox" title="Add as template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
-						Add as template
+						<input type="checkbox" title="This is template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
+						This is template?
 					</label>
-					<input type="text" name="templateName" style="display:none;" placeholder="Template name"/>
+					<input type="text" name="templateName" placeholder="Template name"/>
 				</div>
 				<div class="grid_1">
 					<button class="remove-option">x</button>
@@ -200,12 +195,7 @@
 		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
 		
 		<div class="seotoaster container_12" style="position: relative;"> 
-			<div id="top-toolbar" class="ui-widget-header mb10px"> 
-				<a href="#new">Add a new product</a> 
-				<a href="#list">Edit a product from list</a> 
-			</div>
-			
-			<div id="manage-product" style="display: none; min-height: 500px">
+			<div id="manage-product" style="display: none; min-height: 500px;">
 			
 				<div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
 					<div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
@@ -219,20 +209,22 @@
 					
 				</div>
 			
-				<ul> 
-					<li><a href="#tab1">Main Info</a></li> 
-					<li><a href="#category-tab">Categories</a></li> 
-					<li><a href="#options-tab">Options</a></li> 
-					<li><a href="#tab4">Related Products</a></li> 
-					<li><a href="#tab5">Marketing</a></li> 
-				</ul> 
+				<ul>
+					<li><a href="#tab1">Main Info</a></li>
+                    <li><a href="#category-tab">Categories</a></li>
+                    <li><a href="#options-tab">Options</a></li>
+                    <li><a href="#tab4">Related Products</a></li>
+                    <li><a href="#tab5">Marketing</a></li>
+                    <a href="#new" class="nav-links">New product</a>
+                    <a href="#list" class="nav-links">Edit product</a>
+                </ul>
 				<!--------- MAIN INFO --------------> 
 				<div id="tab1" class="clearfix"> 
 					<div class="grid_8 alpha"> 
 						<div class="grid_4"> 
 							<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-							<div class="h250">
-								<img width="100%" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
+							<div style="height: 130px; background: white; text-align: center; vertical-align: middle;">
+								<img style="height: 100%;" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
 							</div>
 						</div> 
 						<div class="grid_8"> 
@@ -253,13 +245,20 @@
 							<label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label> 
 							<input type="text" id="product-weight" data-reflection="property" placeholder="0.00"> 
 						</div> 
-						<div class="clear"></div> 
-						<div class="grid_8"> 
-							<label for="product-brand">Brand</label> 
-							<input type="text" id="product-brand" data-reflection="property" placeholder="brand name" /> 
-							<a href="javascript:;" style="font-size: 80%;float: right;">view brand landing page</a>
+						<div class="clear"></div>
+                        <div class="grid_8">
+                            <label for="product-brand">Brand&nbsp;<a href="javascript:;" style="font-size: 80%">visit brand landing page</a></label>
+                        </div>
+                        <div class="grid_4">
+<!--							<input type="text" id="product-brand" data-reflection="property" placeholder="brand name" /> -->
+                            <select name="product-brand" id="product-brand">
+                            </select>
 						</div>
-						<div class="clear"></div> 
+                        <div class="grid_4">
+                            <input type="text" name="" id="new-brand" placeholder="or create new">
+                        </div>
+						<div class="clear"></div>
+
 						<div class="grid_12 mt5px"> 
 							<div id="description-box">
 								<ul>
@@ -296,8 +295,11 @@
 					<div class=" grid_4"> 
 					<hr /> 
 					</div> 
-					<div class="grid_4"> 
-						<select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property"> 
+					<div class="grid_4">
+                        <label for="product-pageTemplate">Select a product page template</label>
+					</div>
+					<div class="grid_4">
+						<select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
 							<option value="-1" disabled="disable">Select Template</option>
 							<?php foreach ($this->templateList as $tmpl) : ?>
 							<option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>

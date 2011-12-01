@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Shopping
+ * Ecommerce plugin for SEOTOASTER 2.0
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
@@ -16,12 +16,15 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/**
 	 * json helper for sending well-formated json response
-	 * @var Object 
+	 * @var Zend_Controller_Action_Helper_Json
 	 */
 	protected $_jsonHelper;
 	
 	private $_websiteConfig;
-	
+
+    /**
+     * @var Models_Mapper_ShoppingConfig
+     */
 	private $_configMapper = null;
 	
 	public function  __construct($options, $seotoasterData) {
@@ -56,6 +59,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/** 
 	 * Method renders shopping config screen and handling config saving.
+     * @return html
 	 */
 	protected function configAction(){
 		$config = $this->_configMapper->getConfigParams();
@@ -205,16 +209,38 @@ class Shopping extends Tools_Plugins_Abstract {
 	} 
 	
 	private function _brandsRESTService() {
-		$brandMapper = Models_Mapper_Brand::getInstance();
-		$data = array();
-		$where = null;
-		if ($term = $this->_request->getParam('term')){
-			$where = $brandMapper->getDbTable()->getAdapter()->quoteInto('name LIKE ?', '%'.$term.'%');
-		}
-		$brands = $brandMapper->fetchAll($where, array('name'));
-		foreach ($brands as $brand) {
-			array_push($data, $brand->toArray());
-		}
+		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll();
+
+        $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+        $pagesUrls = $pageMapper->fetchAllUrls();
+
+        $data = array();
+        switch (strtolower($this->_request->getMethod())){
+            default:
+            case 'get':
+                foreach ($brandsList as $brand) {
+                    $item = $brand->toArray();
+                    if (in_array(strtolower($brand->getName()).'.html', $pagesUrls)){
+                        $item['url'] = strtolower($brand->getName()).'.html';
+                    }
+                    array_push($data, $item);
+                }
+                break;
+            case 'post':
+                $postData = json_decode($this->_request->getRawBody(), true);
+                if (!empty($postData)){
+                    $brand = Models_Mapper_Brand::getInstance()->save($postData);
+                    if ($brand instanceof Models_Model_Brand){
+                        $data = $brand->toArray();
+                    }
+                } else {
+                    $data = array(
+                        'error' => true,
+                        'message' => 'No data provided'
+                    );
+                }
+                break;
+        }
 		return $data;
 	}
 	
@@ -311,10 +337,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					if (isset($srcData['pageTemplate']) && $srcData['pageTemplate'] !== $page->getTemplateId()){
 						$page->setTemplateId($srcData['pageTemplate']);
 					}
-					if((bool)$page->getDraft() !== (bool)$product->getEnabled()){
-						$page->setDraft($product->getEnabled());
-					}
 					
+					$page->setDraft((bool)$product->getEnabled()?'0':'1');
+										
 					if ($pageMapper->save($page)){
 						$product->setPage($page);
 					}
@@ -335,6 +360,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					}
 				} else {
 					$data = array(
+						'error'		=> true,
 						'code'		=> 404,
 						'message'	=> 'Requested product not found'
 						);
@@ -372,17 +398,19 @@ class Shopping extends Tools_Plugins_Abstract {
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
 		}
 		$page = new Application_Model_Models_Page();
-		$uniqName = trim(implode('-', array($product->getName(), $product->getSku(), $product->getBrand())), '/');
-		$uniqName = preg_replace('/[@!.:;\'"`$%?&()*|\s\/\\\]/','-', $uniqName);
+		
+		$uniqName = implode('-', array($product->getName(), $product->getSku(), $product->getBrand()));
+		$uniqName = preg_replace('/[@!.:;=\'"`~#$%?&()*|\s\/\\\]{1,}/','-', $uniqName);
+		$uniqName = trim($uniqName, '-');
 
 		$page->setTemplateId($templateId ? $templateId : 'default' );
 		$page->setParentId($prodCatPage->getId());
 		$page->setUrl($uniqName);
-        $page->setNavName($product->getName().'-'.$product->getSku());
+        $page->setNavName($product->getName().($product->getSku()?'-'.$product->getSku():''));
         $page->setMetaDescription(strip_tags($product->getShortDescription()));
 		$page->setMetaKeywords('');
 		$page->setHeaderTitle($uniqName);
-		$page->setH1($uniqName);
+		$page->setH1($product->getName());
 		$page->setUrl($uniqName.'.html');
 		$page->setTeaserText(strip_tags($product->getShortDescription()));
 		$page->setLastUpdate(date(DATE_ATOM));
@@ -392,7 +420,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$page->setTargetedKey(self::PRODUCT_CATEGORY_NAME);
 		$page->setProtected(0);
 		$page->setSystem(0);
-		$page->setDraft($product->getEnabled());
+		$page->setDraft((bool)$product->getEnabled()?'0':'1');
 		$page->setMemLanding(0);
 		$page->setNews(0);
 		
@@ -406,13 +434,16 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $page;
 	}
 
-	protected function productAction(){
+	/**
+     * @var $pageMapper Application_Model_Mappers_PageMapper
+     */
+    protected function productAction(){
 		$this->_view->generalConfig = $this->_configMapper->getConfigParams();
 		
 		$templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
 		$templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
 		$this->_view->templateList = $templateList;
-		
+
 		$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'].$this->_websiteConfig['media']);
 		if (!empty ($listFolders)){
 			$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
@@ -424,4 +455,5 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function debugAction(){
 
 	}
+
 }

@@ -1,0 +1,7 @@
+<?php foreach ($this->categories as $category): ?>
+    <?php if (isset($category['url'])): ?>
+<a href="<?php echo $this->websiteUrl.$category['name'].'.html';?>"><?php echo $category['name'];?></a>
+    <?php else: ?>
+<span><?php echo $category['name'];?></span>
+    <?php endif; ?>
+<?php endforeach; ?>

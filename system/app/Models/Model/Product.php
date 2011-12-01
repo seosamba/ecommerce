@@ -35,7 +35,7 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_categories;
 	
-	protected $_defaultOptions;
+	protected $_defaultOptions = array();
 	
 	protected $_related;
 	

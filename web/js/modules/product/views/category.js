@@ -5,7 +5,7 @@ define([
 	
 	var CategoryView = Backbone.View.extend({
 		tagName: 'div',
-		className: 'category-widget ui-corner-all ui-widget-content',
+		className: 'category-widget',
 		template: $('#categoryTemplate').template(),
 		nameInput: null,
 		events: {

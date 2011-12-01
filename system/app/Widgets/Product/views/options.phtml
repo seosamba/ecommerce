@@ -1,0 +1,31 @@
+<div class="product-options-listing" data-productId="<?php echo $this->product->getId();?>">
+<?php foreach ($this->product->getDefaultOptions() as $option): ?>
+    <div class="product-option" data-type="<?php echo $option['type'];?>">
+        <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
+        <label for="product-option-<?php echo $option['title'];?>"><?php echo $option['title'];?></label>
+        <select name="product-option-<?php echo $option['title'];?>">
+        <?php foreach ($option['selection'] as $item) :?>
+                <?php var_dump($item); ?>
+            <option value="<?php echo $item['id'];?>" <?php echo $item['isDefault'] === '1' ? 'selected' : ''; ?> ><?php echo $item['title'];?></option>
+        <?php endforeach; ?>
+        </select>
+        <?php elseif ($option['type'] === Models_Model_Option::TYPE_RADIO): ?>
+            <?php foreach ($option['selection'] as $item): ?>
+            <div class="option-item">
+            <input type="radio"
+                   name="product-option-<?php echo $option['title'];?>"
+                   id="product-option-<?php echo $option['title'].'-'.$item['id'];?>"
+                   value="<?php echo $item['id']; ?>" <?php echo $item['isDefault'] === '1' ? 'checked' : ''; ?> />
+            <label for="product-option-<?php echo $option['title'].'-'.$item['id'];?>"><?php echo $item['title']; ?></label>
+            </div>
+            <?php endforeach;?>
+        <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXT): ?>
+        <label for="product-option-<?php echo $option['title'];?>"><?php echo $option['title'];?></label>
+        <input type="text" name="product-option-<?php echo $option['title'];?>" id="">
+        <?php elseif ($option['type'] === Models_Model_Option::TYPE_DATE): ?>
+        <label for="product-option-<?php echo $option['title'];?>"><?php echo $option['title'];?></label>
+        <input type="date" name="product-option-<?php echo $option['title'];?>" onmouseover="if (window.jQuery && jQuery.ui) $(this).datepicker() ;" id="">
+        <?php endif; ?>
+    </div>
+<?php endforeach; ?>
+</div>
