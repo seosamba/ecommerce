@@ -12,7 +12,7 @@ require.config({
 
 require(
 	[
-	'modules/product/app',
+	'modules/product/application',
 	'order!libs/underscore/underscore-dev',
 	'order!libs/backbone/backbone-dev'
 	],

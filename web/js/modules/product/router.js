@@ -41,6 +41,7 @@ define([
 		newProduct: function(){
 			$('#product-list:visible').hide('slide');
 			this.app.setModel(new ProductModel());
+            this.app.render();
 		},
 		editProduct: function(productId){
 			$('#product-list:visible').hide('slide');
@@ -69,7 +70,7 @@ define([
         },
         renderBrands: function(){
             $('#product-brand').empty();
-            this.brands.each(this.addBrand, this);
+            _(this.brands.sortBy(function(brand){ return brand.get('name').toLowerCase();})).each(this.addBrand, this);
         },
 		productListToggle: function(){
 			$('#product-list').show('slide');

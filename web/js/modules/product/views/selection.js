@@ -24,7 +24,7 @@ define([
 			this.model.set(data);
 		},
 		initialize: function(){
-			this.model.bind('change:isDefault', this.render, this);
+//			this.model.bind('change:isDefault', this.render, this);
 			this.model.view = this;
 		},
 		render: function(){

@@ -18,7 +18,7 @@
 				border: 1px solid #ccc;
 			}
 			div.box:hover {
-				box-shadow: 0px 0px 3px #3C78A7; 
+				box-shadow: 0 0 3px #3C78A7;
 			}
 			#product-categories .category-widget {
 				float:left;
@@ -46,19 +46,31 @@
 				color: #1e90ff;
 			}
 			.productlisting {
-				width: 100px;
-				height: auto;
-				margin: 10px;
-				padding: 5px;
-				float: left;
-				border: 4px solid #666;
-				border-radius: 0 15px;
-				overflow: hidden;
-				position: relative;
-				text-align: center;
-				cursor: pointer;
-				background: #fff;
+                width: 84px;
+                height: auto;
+                margin: 5px;
+                padding: 2px;
+                float: left;
+                border: 1px solid lavender;
+                border-radius: 2px;
+                overflow: hidden;
+                position: relative;
+                text-align: center;
+                cursor: pointer;
+                background: #fff;
+                font-size: 10px;
 			}
+            .productlisting .details {
+                margin-top: 2px;
+                background: #eee;
+                width: 84px;
+            }
+            input.highlight {
+                border-color: #cd5c5c !important;
+            }
+            #manage-product > .ui-tabs-panel {
+                height: 400px;
+            }
 		</style>
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -88,9 +100,9 @@
 		</script>
 		
 		<script id="optionMainTemplate" type="text/x-jquery-tmpl">
-			<div class="option-item clearfix ui-widget-content padding5px mt5px mb5px" data-id="${id}">
+			<div class="option-item clearfix ui-widget-content padding5px mt5px mb5px" >
 				<div class="grid_4 ">
-					<div class="grid_4"><label for="">Title</label></div>
+					<div class="grid_4"><label>Title</label></div>
 					<div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
 				</div>
 				<div class="grid_4">
@@ -177,12 +189,12 @@
 			</div>
 			{{/if}}
 			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
-				<img class="lazy" src="{{if photo}}${photo.replace('/small/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-				<h2>${name}</h2>
-				<div class="details">
-					<p class="sku">${sku}</p>
-					<p class="brand">${brand}</p>
-				</div>
+                <div class="details">
+                    <p class="brand">${brand}</p>
+                    <p class="sku">${sku}</p>
+                </div>
+                <img class="lazy" src="{{if photo}}${photo.replace('/small/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+                ${name}
 			</a>
 		</script>
 	</head>
@@ -195,12 +207,12 @@
 		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
 		
 		<div class="seotoaster container_12" style="position: relative;"> 
-			<div id="manage-product" style="display: none; min-height: 500px;">
+			<div id="manage-product">
 			
-				<div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
+				<div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
 					<div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
-						<span style="float:left">select image for product</span>
-						<a href="javascript:;" style="float:right;" onclick="$('#image-select-dialog').hide('slide');">close</a>
+                        <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');">&lt; back</a>
+                        <span style="margin-left: 30%">select image for product</span>
 					</div>
 					<div id="image-list"></div>
 				</div>
@@ -247,11 +259,11 @@
 						</div> 
 						<div class="clear"></div>
                         <div class="grid_8">
-                            <label for="product-brand">Brand&nbsp;<a href="javascript:;" style="font-size: 80%">visit brand landing page</a></label>
+                            <label for="product-brand">Brand&nbsp;<a href="javascript:;" target="_blank" style="font-size: 80%">visit brand landing page</a></label>
                         </div>
                         <div class="grid_4">
 <!--							<input type="text" id="product-brand" data-reflection="property" placeholder="brand name" /> -->
-                            <select name="product-brand" id="product-brand">
+                            <select name="product-brand" id="product-brand" data-reflection="property">
                             </select>
 						</div>
                         <div class="grid_4">
@@ -332,10 +344,8 @@
 							<option value=""></option>
 						</select>-->
 					</div>
-					<div id="options-holder" class="clearfix">
-						<div class="" id="option-holder">
-							
-						</div>
+					<div id="options-holder" class="clearfix h350" style="overflow-y: scroll;">
+
 					</div>
 				</div> <!-- End Tab 3 --> 
 
@@ -353,6 +363,7 @@
 				</div> 
 
 				<div class="grid_12">
+                    <hr />
 					<input type="button" value="Delete" id="delete"/>
 					<input type="submit" name="submit" id="submit" value="Save"/> 
 				</div>
