@@ -37,7 +37,6 @@ define([
 				source: this.filterProductList
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 
-//			this.initBrandAutocomplete();
 			this.newCategoryInput = this.$('#new-category');
 
 
@@ -48,9 +47,7 @@ define([
 		setModel: function (model) {
 			this.model = model;
 			this.model.bind('change', this.render, this);
-			this.model.bind('change:related', this.renderRelated, this);
 			this.model.view = this;
-			this.render();
 		},
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
@@ -117,7 +114,8 @@ define([
 			this.model.set(data);
 		},
 		render: function(){
-			$('#quick-preview').empty();
+            console.log('render');
+            $('#quick-preview').empty();
 
 			//setting model properties to view
 			if (this.model.has('photo')){
@@ -138,13 +136,16 @@ define([
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
-				console.log(this.model.get('options'));
 				this.model.get('options').each(function(option){
 					var optWidget = new ProductOptionView({model: option});
 					$('#options-holder').append(optWidget.render().el);
 				});
 			}
-			//populating selected categories
+
+            //render related products
+            this.renderRelated();
+
+            //populating selected categories
 			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
 			if (this.model.has('categories')){
 				_.each(this.model.get('categories'), function(category, name){
@@ -175,16 +176,28 @@ define([
 		},
 		saveProduct: function(){
 			//@todo: make messages translatable
+            if (!this.validateProduct()) {
+                smoke.alert('Missing some required fields');
+                return false;
+            }
 			if (!this.model.get('options').isEmpty()){
 				var list = this.model.get('options').toJSON();
-                console.log(list);
 				this.model.set({defaultOptions: list});
 			}
 			if (!this.model.has('pageTemplate')){
 				var templateId = this.$('#product-pageTemplate').val();
-				templateId = templateId !== '-1' ? templateId : 'default';
-				this.model.set({pageTemplate: templateId});
+				if (templateId !== '-1') {
+                    this.model.set({pageTemplate: templateId});
+                } else {
+                    smoke.alert('Please, select product page template before saving');
+                    this.$('#product-pageTemplate').focus();
+                    return false;
+                }
 			}
+
+            if ($('#new-brand').val()){
+                this.addNewBrand($('#new-brand').val()).$('#new-brand').val('');
+            }
 
 			if (this.model.isNew()){
 				this.model.save(null, {success: function(model, response){
@@ -217,57 +230,37 @@ define([
 				}
 			});
 		},
-		initBrandAutocomplete: function(){
-			$('#product-brand').autocomplete({
-				minLength: 2,
-				source: function (request, response){
-					var elem = $('#product-brand'),
-						xhrCache = {},
-						lastXhr;
-					if ( elem.data('xhrCache') === undefined){
-						elem.data('xhrCache', xhrCache);
-					} else {
-						xhrCache = elem.data('xhrCache');
-					}
+        validateProduct: function(){
+            var error   = false,
+                name    = trim(this.model.get('name')),
+                sku     = trim(this.model.get('sku')),
+                price   = trim(this.model.get('price')),
+                brand   = trim(this.model.get('brand'));
 
-					if ( elem.data('lastXhr') === undefined){
-						elem.data('lastXhr', lastXhr);
-					} else {
-						lastXhr = elem.data('lastXhr');
-					}
 
-					var term = request.term ;
+            if (name === ''){
+                this.$('#product-name').addClass('highlight');
+                error = true || error;
+            } else {
+                this.$('#product-name').removeClass('highlight');
+            }
 
-					if (xhrCache === undefined) {
-						xhrCache = {};
-						elem.data('xhrCache', xhrCache);
-					}
+            if (sku === ''){
+                this.$('#product-sku').addClass('highlight');
+                error = true || error;
+            } else {
+                this.$('#product-sku').removeClass('highlight');
+            }
 
-					if ( term in xhrCache ){
-						response(xhrCache[term]);
-						return;
-					}
-					lastXhr = $.getJSON($('#websiteUrl').val()+'/plugin/shopping/run/getdata/type/brands/', request, function(data, status, xhr){
-						xhrCache[ term ] = data;
-						if ( xhr === lastXhr ){
-							response(data);
-						}
-					});
+            if (price === ''){
+                this.$('#product-price').addClass('highlight');
+                error = true || error;
+            } else {
+                this.$('#product-price').removeClass('highlight');
+            }
 
-				},
-				select: function( event, ui ) {
-					$('#product-brand').val(ui.item.name)
-						.data('brandId', ui.item.id)
-						.trigger('change');
-					return false;
-				}
-			}).data( "autocomplete" )._renderItem = function( ul, item ) {
-				return $( "<li></li>" )
-					.data( "item.autocomplete", item )
-					.append( "<a>" + item.name + "</a>" )
-					.appendTo( ul );
-			};
-		},
+            return !error;
+        },
 		filterProductList: function(request, response){
 			var list = appRouter.products.filter(function(prod){
 				var search = request.term.toLowerCase();
@@ -289,14 +282,9 @@ define([
 		renderAutocomplete: function( ul, item ) {
 			return $( "<li></li>" )
 				.data( "item.autocomplete", item )
-				.append( "<a><img style='float:right' src="+
-					(item.has('photo')?item.get('photo').replace('/small/','/product/'):'/system/images/noimage.png')
-					+" /><div>"
-					+ item.get('name').toUpperCase() 
-					+ "<br>SKU:" 
-					+ item.get('sku') 
-					+ "<br />"
-					+item.get('brand')+"</div></a>" 
+				.append( "<a><img style='float:right' src=" +
+                (item.has('photo')?item.get('photo').replace('/small/','/product/'):'/system/images/noimage.png') +
+                " /><div>" + item.get('name').toUpperCase() + "<br>SKU:" + item.get('sku') + "<br />" +item.get('brand')+"</div></a>"
 				).appendTo( ul );
 		},
 		addRelated: function( event, ui ) {
@@ -313,15 +301,18 @@ define([
 				related = _.without(_(this.model.get('related')).toArray(), parseInt(id));
 			this.model.set({related: related});
 		},
-		renderRelated: function(){
-			$('#related-holder').empty();
-			_(this.model.get('related')).each(function(productId){
-				var product = appRouter.products.get(parseInt(productId)),
-					view	= new ProductListView({model: product, showDelete: true});
+		renderRelated: function() {
+            $('#related-holder').empty();
+            if (this.model.has('related')) {
+                _(this.model.get('related')).each(function (productId) {
+                    var product = appRouter.products.get(parseInt(productId)),
+                        view = new ProductListView({model:product, showDelete:true});
 
-				$('#related-holder').append(view.render().el);
-			});
-		},
+                    $('#related-holder').append(view.render().el);
+                });
+            }
+            return false;
+        },
         setBrand: function(e){
             var el = $(e.target);
             var url = el.find('option:eq('+e.target.options.selectedIndex+')').data('url');
@@ -330,27 +321,31 @@ define([
             } else {
                 $('label[for=product-brand] > a').attr('href', 'javascript:;');
             }
-            this.model.set({brand: el.val()});
+//            this.model.set({brand: el.val()});
         },
         newBrand: function(e){
             var newBrand = this.$('#new-brand').val();
             if (e.keyCode === 13 && newBrand !== '') {
                 var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
-                if (!_.include(current, newBrand.toLowerCase())){
-                    appRouter.brands.create({
-                        'name': newBrand
-                    }, {success: function(model){
-                        $('#product-brand').val(model.get('name')).trigger('change').focus();
-                    }});
-                } else {
-                    var brand = appRouter.brands.find(function(item){
-                        return item.get('name').toLowerCase() == newBrand.toLowerCase();
-                    });
-                    $('#product-brand').val(brand.get('name')).trigger('change').focus();
-                }
-
-                this.$('#new-brand').val('');
+                this.addNewBrand(newBrand)
+                    .$('#new-brand').val('');
+                this.$('#product-brand').focus();
             }
+            return this;
+        },
+        addNewBrand: function(newBrand){
+            newBrand = trim(newBrand);
+            var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
+            if (!_.include(current, newBrand.toLowerCase())){
+                appRouter.brands.add({name: newBrand});
+            } else {
+                var brand = appRouter.brands.find(function(item){
+                    return item.get('name').toLowerCase() == newBrand.toLowerCase();
+                });
+                newBrand = brand.get('name');
+            }
+            appRouter.app.model.set({brand: newBrand});
+            return this;
         }
 	});
 

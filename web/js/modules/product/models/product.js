@@ -10,17 +10,19 @@ define([
 			name: '',
 			sku: '',
 			mpn: '',
-			weight: 0,
 			brand: '',
 			shortDescription: '',
 			fullDescription: '',
 			enabled: 1,
-			price: 0,
 			taxClass: 1,
-			related: []
+			related: [],
+            photo: null
 		},
 		initialize: function (){
 			this.set({options: new ProductOptions()});
+            this.bind('error', function(model, error) {
+                smoke.alert(error);
+            });
 			this.bind('change:photo', this.setImage, this);
 			this.bind('change:defaultOptions', function(){
 				this.get('options').reset(this.get('defaultOptions'));
@@ -28,7 +30,7 @@ define([
 		},
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
-				smoke.alert('Price must be a number, e.g: 12.95');
+				return 'Price must be a number, e.g: 12.95';
 			}
 			if (attrs.related){
 				attrs.related = _.map(attrs.related, function(rel){
