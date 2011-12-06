@@ -6,9 +6,8 @@
 	<div id="template-selector">
 		<?php if(isset($this->productTemplates) && !empty($this->productTemplates)): ?>
 			<select id="templates" class="templates" style="width: 400px; margin: 3px;" data-placeholder="Select a product listing template...">
-<!--				<option value=""></option>-->
 				<?php foreach($this->productTemplates as $template): ?>
-					<option value="<?php echo $template->getId(); ?>"><?php echo $template->getName(); ?></option>
+					<option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
 				<?php endforeach; ?>
 			</select>
 		<?php else: ?>
@@ -114,13 +113,12 @@
 		})
 
 		$('.currproduct').live('click', function() {
-			var template = $('#templates').val();
-			console.log(template);
-//			if(template == '') {
-//				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
-//				return false;
-//			}
-			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ':' + template + '}');
+			var tpl = $('#templates').val();
+			if(tpl == '') {
+				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
+				return false;
+			}
+			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ':' + tpl + '}');
 		});
 
 		$('.pselect').chosen().change(filter);
@@ -144,10 +142,11 @@
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', function(response) {
             if(response.length) {
 				$.each(response, function() {
-					var productItem = '';
+					var productItem  = '';
+					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '"><div class="details">' +
 						'<p class="brand">' + this.brand + '</p><p class="sku">' + this.sku + '</p></div>' +
-						'<img src="' + this.photo + '" alt="' + this.name + '">' + this.name + '</a></div>';
+						'<img src="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a></div>';
 					$('#product-products').append(productItem);
 				});
 			}
@@ -165,9 +164,10 @@
 				$('#product-products').html('');
 				$.each(response, function() {
 					var productItem = '';
+					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '"><div class="details">' +
 						'<p class="brand">' + this.brand + '</p><p class="sku">' + this.sku + '</p></div>' +
-						'<img src="' + this.photo + '" alt="' + this.name + '">' + this.name + '</a></div>';
+						'<img src="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a></div>';
 					$('#product-products').append(productItem);
 				});
 			}
