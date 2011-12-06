@@ -326,7 +326,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				break;
 			case 'POST':
 				$srcData = Zend_Json_Decoder::decode($this->_request->getRawBody());
-                $isUniq = $productMapper->fetchAll(array('sku = ?' => intval($srcData['sku'])));
+                $isUniq = $productMapper->fetchAll(array('sku = ?' => $srcData['sku']));
                 if (!empty($isUniq)){
                     return array(
                         'error' => true,
