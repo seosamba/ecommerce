@@ -63,6 +63,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 
     private function _renderEditproduct(){
+        if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
+             return false;
+        }
         $html = sprintf('<a href="javascript:;" data-url="%splugin/shopping/run/product#edit/%d" class="tpopup">%s</a>',
             $this->_websiteHelper->getUrl(),
             $this->_product->getId(),
@@ -78,9 +81,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	private function _renderPhoto() {
 		$photoSrc = $this->_product->getPhoto();
 		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
-			$photoSrc = str_replace('/product/', '/'.$this->_options[0].'/', $photoSrc);
-		}
-		return '<img src="'.$photoSrc.'"/>';
+            $photoSrc = str_replace('/', '/'.$this->_options[0].'/', $photoSrc);
+        } else {
+            $photoSrc = str_replace('/', '/product/', $photoSrc);
+        }
+        return $this->_websiteHelper->getUrl() .'media/' . $photoSrc;
 	}
 	
 	private function _renderPrice() {
@@ -135,9 +140,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
     private function _renderCategories() {
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
         $categories = $this->_product->getCategories();
-        foreach ($categories as &$category) {
-            if ($url = $pageMapper->findByUrl($category['name'].'.html')){
-                $category['url'] = $url;
+        if (!empty($categories)){
+            foreach ($categories as &$category) {
+                if ($url = $pageMapper->findByUrl($category['name'].'.html')){
+                    $category['url'] = $url;
+                }
             }
         }
         $this->_view->categories = $categories;

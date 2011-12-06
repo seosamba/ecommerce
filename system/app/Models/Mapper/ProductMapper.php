@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Product
+ * ProductMapper
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
@@ -10,7 +10,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	protected $_dbTable	= 'Models_DbTable_Product';
 	
 	protected $_model	= 'Models_Model_Product';
-	
+
+    /**
+     * @var #M#C\Models_Mapper_Brand.getInstance|null|?
+     */
 	protected $_brandMapper = null;
 	
 	public function __construct() {
@@ -44,20 +47,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		if ($model->getId()){
 			$data['updated_at'] = date(DATE_ATOM);
 			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
-			try {
-				$result = $this->getDbTable()->update($data, $where);
-			} catch (Exception $e) {
-				error_log($e->getMessage());
-				return null;
-			}
+			$result = $this->getDbTable()->update($data, $where);
 		} else {
 			$data['created_at'] = date(DATE_ATOM);
-			try{
-				$id = $this->getDbTable()->insert($data);
-			} catch (Exception $e){
-				error_log($e->getMessage());
-				return null;
-			}
+			$id = $this->getDbTable()->insert($data);
 			if ($id){
 				$model->setId($id);
 			}
@@ -124,10 +117,15 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		return null;
 	}
 
+    /**
+     * @var Models_Model_Product $entity
+     * @param Zend_Db_Table_Row_Abstract $row
+     * @return mixed
+     */
 	private function _toModel(Zend_Db_Table_Row_Abstract $row){
 		$entity = new $this->_model($row->toArray());
-		
-		if ($row->brand_id){
+
+        if ($row->brand_id){
 			$brandRow = $row->findDependentRowset('Models_DbTable_Brand');
 			if ($brandRow->count()){
 				$entity->setBrand($brandRow->current()->name);
@@ -236,9 +234,33 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 		
 	}
-	
+
+    /**
+     * Delete product from database and remove brand if no more products present
+     * @param Models_Model_Product $product
+     * @return boolean true on success, false on failure
+     */
 	public function delete(Models_Model_Product $product){
-		$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
-		return $this->getDbTable()->delete($where);
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
+
+		$status = $this->getDbTable()->delete($where);
+
+        if ($status) {
+            $brand = $this->_brandMapper->findByName($product->getBrand());
+            if ($brand) {
+                $prodList = $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('brand_id = ?', $brand->getId()));
+                if (empty($prodList)){
+                    $this->_brandMapper->delete($brand);
+                }
+            }
+            // removing page
+            if ($product->getPage()){
+                Application_Model_Mappers_PageMapper::getInstance()->delete($product->getPage());
+            }
+
+            return true;
+        } else {
+            return false;
+        }
 	}
 }

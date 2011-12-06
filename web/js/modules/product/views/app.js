@@ -22,8 +22,8 @@ define([
 			'click input[name^=category]': 'toggleCategory',
 			'click #delete': 'deleteProduct',
 			'click #related-holder span.ui-icon-closethick': 'removeRelated',
-            'change #product-brand': 'setBrand',
-            'keypress input#new-brand': 'newBrand'
+            'keypress input#new-brand': 'newBrand',
+            'click a#brandlanding-link': 'gotoBrandPage'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
@@ -102,11 +102,11 @@ define([
 			});
 		},
 		setProductImage: function(e){
-			var src = $(e.currentTarget).find('img').attr('src');
-			this.$('#image-select-dialog').hide('slide');
-			this.$('#product-image-folder').val(0);
-			this.model.set({photo: src});
-		},
+			var imgName = $(e.currentTarget).find('img').data('name');
+            var fldrName = this.$('#product-image-folder').val();
+			this.model.set({photo: fldrName+'/'+imgName });
+            this.$('#image-select-dialog').hide('slide');
+        },
 		setProperty: function(e){
 			var propName = e.currentTarget.id.replace('product-', '');
 			var data = {};
@@ -117,9 +117,16 @@ define([
             console.log('render');
             $('#quick-preview').empty();
 
+            //hiding delete button if product is new
+            if (!this.model.isNew()){
+                $('#delete').show();
+            } else {
+                $('#delete').hide();
+            }
+
 			//setting model properties to view
 			if (this.model.has('photo')){
-				this.$('#product-image').attr('src', this.model.get('photo'));
+				this.$('#product-image').attr('src', this.websiteUrl+'media/'+this.model.get('photo').replace('/', '/small/'));
 			} else {
 				this.$('#product-image').attr('src', this.websiteUrl+'system/images/noimage.png');
 			}
@@ -160,13 +167,17 @@ define([
 				this.$('#product-enabled').removeAttr('checked');
 			}
 
-			if (this.model.has('page')){
-				$('<a></a>', {href: $('#websiteUrl').val()+this.model.get('page').url, target: '_blank'})
-					.html(this.model.get('page').h1)
-					.appendTo('#quick-preview');
-				this.$('#product-pageTemplate').val(this.model.get('page').templateId);
+			if (this.model.has('pageTemplate')){
+				this.$('#product-pageTemplate').val(this.model.get('pageTemplate'));
 			} else {
-				this.$('#product-pageTemplate').val('-1');
+                if (this.model.has('page')){
+                    $('<a></a>', {href: $('#websiteUrl').val()+this.model.get('page').url, target: '_blank'})
+                        .html(this.model.get('page').h1)
+                        .appendTo('#quick-preview');
+                    this.$('#product-pageTemplate').val(this.model.get('page').templateId);
+                } else {
+                    this.$('#product-pageTemplate').val('-1');
+                }
 			}
 			$('#image-list').masonry({
 				itemSelector : '.box',
@@ -204,18 +215,21 @@ define([
 					smoke.alert('Product added');
 					appRouter.products.add(model);
 					appRouter.navigate('edit/'+model.id, true);
-				}});
+				}, error: this.processSaveError});
 			} else {
 				this.model.save(null, {success: function(model, response){
 					smoke.alert('Product saved');
 					appRouter.app.model.fetch({data: {id: model.id}});
-				}});
+				}, error: this.processSaveError});
 			}
 		},
+        processSaveError: function(model, response){
+            smoke.alert(response.responseText);
+        },
 		deleteProduct: function(){
 			var model  = this.model;
 			if (model.isNew()){
-				$('#product-name').focus();
+				smoke.alert('Product is not saved yet');
 				return false;
 			}
 			smoke.confirm('Dragons ahead! Are you sure?', function(e){
@@ -223,8 +237,9 @@ define([
 					model.destroy({
 						success: function(){
 							appRouter.products.fetch().done(function(){
-								appRouter.navigate('list', true);
-							});
+                                appRouter.brands.fetch()
+                                appRouter.navigate('list', true);
+                            });
 						}
 					});
 				}
@@ -313,16 +328,6 @@ define([
             }
             return false;
         },
-        setBrand: function(e){
-            var el = $(e.target);
-            var url = el.find('option:eq('+e.target.options.selectedIndex+')').data('url');
-            if (url){
-                $('label[for=product-brand] > a').attr('href', $('#websiteUrl').val()+url);
-            } else {
-                $('label[for=product-brand] > a').attr('href', 'javascript:;');
-            }
-//            this.model.set({brand: el.val()});
-        },
         newBrand: function(e){
             var newBrand = this.$('#new-brand').val();
             if (e.keyCode === 13 && newBrand !== '') {
@@ -346,6 +351,18 @@ define([
             }
             appRouter.app.model.set({brand: newBrand});
             return this;
+        },
+        gotoBrandPage: function(e){
+            e.preventDefault();
+            var el    = $(e.target),
+                msg   = el.data('msg'),
+                brand = appRouter.brands.find(function(item){ return item.get('name') === $('#product-brand').val() });
+            if (brand && brand.has('url')) {
+                window.open(this.websiteUrl+brand.get('url'),'_blank');
+            } else {
+                console.log(msg);
+                smoke.alert(_.template(msg, brand.toJSON()));
+            }
         }
 	});
 

@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `parent_id` int(10) unsigned DEFAULT NULL,
   `page_id` int(10) unsigned NOT NULL,
   `enabled` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
-  `sku` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sku` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `mpn` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
   `weight` decimal(8,3) DEFAULT NULL,
@@ -140,7 +140,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `tax_class` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sku` (`sku`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_product_category` (

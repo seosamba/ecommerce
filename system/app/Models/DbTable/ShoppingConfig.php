@@ -23,7 +23,7 @@ class Models_DbTable_ShoppingConfig extends Zend_Db_Table_Abstract {
 		} else {
 			$row->value = $value;
 		}
-		
+
 		return $row->save();
 	}
 

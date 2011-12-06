@@ -16,6 +16,7 @@ define([
 		},
 		render: function(){
 			var data = this.model.toJSON();
+            data.websiteUrl = $('#websiteUrl').val();
 			if (this.options.hasOwnProperty('showDelete')){
 				data['showDelete'] = this.options.showDelete;
 			}
