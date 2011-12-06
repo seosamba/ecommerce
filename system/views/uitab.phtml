@@ -1,29 +1,176 @@
-<div>
-    <select name="product-category" multiple class="pselect">
-        <option>one</option>
-        <option>two</option>
-    </select>
-    <select name="product-brand" multiple class="pselect">
+<?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
+<div id="back"></div>
+<div style="margin-left: 15px;">
 
-    </select>
+	<!-- Product listing selector -->
+	<div id="template-selector">
+		<?php if(isset($this->productTemplates) && !empty($this->productTemplates)): ?>
+			<select id="templates" class="templates" style="width: 400px; margin: 3px;" data-placeholder="Select a product listing template...">
+<!--				<option value=""></option>-->
+				<?php foreach($this->productTemplates as $template): ?>
+					<option value="<?php echo $template->getId(); ?>"><?php echo $template->getName(); ?></option>
+				<?php endforeach; ?>
+			</select>
+		<?php else: ?>
+			<h3><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
+		<?php endif; ?>
+	</div>
 
+	<!-- Filtering -->
+	<div id="filters">
+		<select name="product-categories" id="categories" multiple class="pselect ui-corner-all" data-placeholder="Select categories..."></select>
+	    <select name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="Select brands..."></select>
+	</div>
+	<!-- Ordering -->
+	<div id="order">
+		<input type="checkbox" value="sname" />Name
+		<input type="checkbox" value="sprice" />Price
+		<input type="checkbox" value="sbrand" />Brand
+	</div>
+
+	<div id="product-products"></div>
 </div>
-<script src="<?php echo $this->websiteUrl; ?>system/js/external/chosen/chosen.jquery.js" type="text/javascript"></script>
-<link rel="stylesheet" href="<?php echo $this->websiteUrl; ?>system/js/external/chosen/chosen.css" type="text/css">
-<style>
-   .pselect {
-       width: 200px;
-   }
+
+<style type="text/css">
+	.chzn-container-multi {
+		margin: 10px 3px;
+	}
+
+	select.pselect {
+		width: 310px;
+	}
+
+	#back {
+		position: absolute;
+		height: 465px;
+		background: #eee;
+		bottom: 0;
+		left: 0;
+		width: 20px;
+	}
+
+	#back:hover {
+		background: #bbb;
+	}
+
+	#product-products {
+		overflow: hidden;
+		background: #fff;
+	}
+	.productlisting {
+		width: 84px;
+		height: auto;
+		margin: 5px;
+		padding: 2px;
+		float: left;
+		border: 1px solid lavender;
+		border-radius: 2px;
+		overflow: hidden;
+		position: relative;
+		text-align: center;
+		cursor: pointer;
+		background: #fff;
+		font-size: 10px;
+	}
+	.productlisting .details {
+		margin-top: 2px;
+		background: #eee;
+		width: 84px;
+	}
+	.productlisting a {
+		overflow: hidden;
+	}
 </style>
+<?php echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
 <script type="text/javascript" charset="utf-8">
     $(function() {
-        $("select.pselect").chosen();
-        $("select.pselect").chosen({allow_single_deselect:true});
+	    $('.pselect').chosen();
+	    $('.templates').chosen();
 
         $('#products').click(function() {
-            $('div.above-editor-links').removeClass('grid_8').addClass('grid_5');
-            $(this).parents('div').removeClass('grid_4').addClass('grid_7');
-            $('#tabs-frag-3').addClass('h450');
+			$('#product-products').html('');
+			$('#back').show();
+			$('.above-editor-links').switchClass('grid_8', 'grid_3');
+			$('#tabs').switchClass('grid_4', 'grid_9');
+			$('tr.mceFirst').hide();
+			$('#tabs-frag-3').addClass('h450');
+			$('table#content_tbl').width('230px');
+			loadStoreData('categories');
+			loadStoreData('brands');
+			loadProducts();
+
+	        //adding corner all to chosen
+			$('ul.chzn-choices').removeClass('ui-corner-top').addClass('ui-corner-all');
+
         })
-    })
+
+		$('#back').click(function() {
+			$('.above-editor-links').switchClass('grid_5', 'grid_8');
+			$('#tabs').switchClass('grid_7', 'grid_4');
+			$('#product-products').html('');
+			$(this).hide();
+			$('tr.mceFirst').show();
+			$('#tabs').tabs('select', 0);
+		})
+
+		$('.currproduct').live('click', function() {
+			var template = $('#templates').val();
+			console.log(template);
+//			if(template == '') {
+//				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
+//				return false;
+//			}
+			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ':' + template + '}');
+		});
+
+		$('.pselect').chosen().change(filter);
+
+    });
+
+	function loadStoreData(type) {
+		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/' + type, function(response) {
+            if(response.length && !($('#' + type + ' option').length)) {
+				$.each(response, function() {
+					$('#' + type).append(
+						$('<option></option>').val((type == 'categories') ? this.id : this.name).text(this.name)
+					);
+				});
+				$('.pselect').trigger("liszt:updated");
+			}
+        })
+	}
+
+	function loadProducts() {
+		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', function(response) {
+            if(response.length) {
+				$.each(response, function() {
+					var productItem = '';
+					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '"><div class="details">' +
+						'<p class="brand">' + this.brand + '</p><p class="sku">' + this.sku + '</p></div>' +
+						'<img src="' + this.photo + '" alt="' + this.name + '">' + this.name + '</a></div>';
+					$('#product-products').append(productItem);
+				});
+			}
+        })
+	}
+
+	function filter() {
+		var categories = $('#categories').val();
+		var brands     = $('#brands').val();
+		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', {
+			fcat   : categories,
+			fbrand : brands
+		}, function(response) {
+			if(response.length) {
+				$('#product-products').html('');
+				$.each(response, function() {
+					var productItem = '';
+					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '"><div class="details">' +
+						'<p class="brand">' + this.brand + '</p><p class="sku">' + this.sku + '</p></div>' +
+						'<img src="' + this.photo + '" alt="' + this.name + '">' + this.name + '</a></div>';
+					$('#product-products').append(productItem);
+				});
+			}
+		})
+	}
 </script>

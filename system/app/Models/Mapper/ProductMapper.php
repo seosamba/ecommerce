@@ -238,6 +238,34 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 	}
 
+	public function findByCategories(array $categories) {
+		$products         = array();
+		$filteredProducts = array();
+		$catDbTable       = new Models_DbTable_Category();
+		if(!empty($categories)) {
+			foreach($categories as $cId) {
+				$catRow         = $catDbTable->find($cId)->current();
+			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductCategory');
+				foreach($productsRowset as $productRow) {
+					$productModel = new $this->_model($productRow->toArray());
+					if ($productRow->brand_id){
+						$brandRow = $productRow->findDependentRowset('Models_DbTable_Brand');
+						if ($brandRow->count()){
+							$productModel->setBrand($brandRow->current()->name);
+						}
+					}
+					$modelHash = md5($productModel->getId());
+					if(!array_key_exists($modelHash, $products)) {
+						$products[$modelHash] = $productModel;
+					}
+				}
+				$filteredProducts = (empty($filteredProducts)) ? $products : array_intersect_key($filteredProducts, $products);
+				$products = array();
+			}
+		}
+		return array_values($filteredProducts);
+	}
+
 	public function delete(Models_Model_Product $product){
 		$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
 		return $this->getDbTable()->delete($where);

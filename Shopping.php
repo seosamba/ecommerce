@@ -19,14 +19,14 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @var Zend_Controller_Action_Helper_Json
 	 */
 	protected $_jsonHelper;
-	
+
 	private $_websiteConfig;
 
     /**
      * @var Models_Mapper_ShoppingConfig
      */
 	private $_configMapper = null;
-	
+
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
 		$this->_view->setScriptPath(__DIR__ . '/system/views/');
@@ -34,7 +34,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_websiteConfig	= Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
 	}
-	
+
 	public function run($requestedParams = array()) {
 		$dispatchersResult = parent::run($requestedParams);
 		if($dispatchersResult) {
@@ -49,6 +49,9 @@ class Shopping extends Tools_Plugins_Abstract {
         ));
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
         $view->websiteUrl = $websiteHelper->getUrl();
+
+	    //getting product listing templates
+	    $view->productTemplates = Application_Model_Mappers_TemplateMapper::getInstance()->findByType(Application_Model_Models_Template::TYPE_LISTING);
         return array(
             'title'   => '<span id="products">' . $translator->translate('Products') . '</span>',
             'content' => $view->render('uitab.phtml')
@@ -57,13 +60,13 @@ class Shopping extends Tools_Plugins_Abstract {
         unset($view);
     }
 
-	/** 
+	/**
 	 * Method renders shopping config screen and handling config saving.
      * @return html
 	 */
 	protected function configAction(){
 		$config = $this->_configMapper->getConfigParams();
-		
+
 		$form = new Forms_Config();
 		if ($this->_request->isPost()){
 			if ($form->isValid($this->_requestedParams)){
@@ -80,7 +83,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		echo $this->_view->render('config.phtml');
 	}
-	
+
 	protected function setConfigAction(){
 		$status = false;
 		if ($this->_request->isPost()){
@@ -92,8 +95,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
-	
-	/** 
+
+	/**
 	 * Method renders zones screen and handling zone saving
 	 * @return html|json
 	 * @todo better response
@@ -116,12 +119,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_jsonHelper->direct(array(
 				'done'=>true,
 				'id' => $result,
-				'deleted' => isset($deleted) ? $deleted : null 
+				'deleted' => isset($deleted) ? $deleted : null
 				));
 		}
 		echo $this->_view->render('zones.phtml');
 	}
-	
+
 	/**
 	 * Method renders tax configuration screen and handling tax saving
 	 * @return html
@@ -133,26 +136,26 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($toRemove){
 				$taxMapper->delete($toRemove);
 			}
-			
+
 			$rules = $this->_request->getParam('rules');
 			if ($rules) {
 				foreach($rules as $rule){
 					$taxMapper->save($rule);
 				}
 			}
-			
+
 			$this->_jsonHelper->direct(array('done'=>true));
 		}
 		$configMapper = Models_Mapper_ShoppingConfig::getInstance();
 		$this->_view->priceIncTax = $configMapper->getConfigParam('showPriceIncTax');
-		
+
 		echo $this->_view->render('taxes.phtml');
 	}
-	
+
 	/**
 	 * Method used to get data from db
-	 * for usage in AJAX scope 
-	 * @return json 
+	 * for usage in AJAX scope
+	 * @return json
 	 */
 	protected function getdataAction(){
 		$data = array();
@@ -172,22 +175,22 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_response->setHttpResponseCode(403)->sendResponse();
 	}
-	
+
 	private function _countrylistRESTService(){
 		$data = Tools_Geo::getCountries();
 		asort($data);
 		return $data;
 	}
-	
+
 	private function _stateslistRESTService() {
 		return Tools_Geo::getState();
 	}
-	
+
 	private function _statesRESTService() {
 		$country = $this->_request->getParam('country');
 		return Tools_Geo::getState($country?$country:null, true);
 	}
-	
+
 	private function _zonesRESTService() {
 		$zonesMapper = Models_Mapper_Zone::getInstance();
 		$zones = $zonesMapper->fetchAll();
@@ -197,7 +200,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		return $data;
 	}
-	
+
 	private function _taxrulesRESTService() {
 		$taxMapper = Models_Mapper_Tax::getInstance();
 		$rules = $taxMapper->fetchAll();
@@ -206,8 +209,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$data[] = $rule->toArray();
 		}
 		return $data;
-	} 
-	
+	}
+
 	private function _brandsRESTService() {
 		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll();
 
@@ -243,7 +246,7 @@ class Shopping extends Tools_Plugins_Abstract {
         }
 		return $data;
 	}
-	
+
 	private function _categoriesRESTService() {
 		$data = array();
 		$catMapper = Models_Mapper_Category::getInstance();
@@ -295,13 +298,25 @@ class Shopping extends Tools_Plugins_Abstract {
 			case 'GET':
 				$id = isset ($this->_requestedParams['id']) ? $this->_requestedParams['id'] : null;
 				if ($id !== null) {
-					$product = $productMapper->find($id);
+					$product              = $productMapper->find($id);
 					if ($product !== null) {
 						$data = $product->toArray();
 					}
 				} else {
-					$products = $productMapper->fetchAll();
-					foreach ($products as $product){
+					$filter['categories'] = isset($this->_requestedParams['fcat']) ? $this->_requestedParams['fcat'] : null;
+					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
+					if(is_array($filter['categories']) && !empty($filter['categories'])) {
+						$products = $productMapper->findByCategories($filter['categories']) ;
+					}
+					else {
+						$products = $productMapper->fetchAll();
+					}
+					foreach ($products as $product) {
+						if(is_array($filter['brands']) && !empty($filter['brands'])) {
+							if(!in_array($product->getBrand(), $filter['brands'])) {
+								continue;
+							}
+						}
 						array_push($data, $product->toArray());
 					}
 				}
@@ -313,8 +328,8 @@ class Shopping extends Tools_Plugins_Abstract {
 					$page = $this->_savePageForProduct($newProduct, $srcData['pageTemplate']);
 					$newProduct->setPage($page);
 					$productMapper->updatePageIdForProduct($newProduct);
-					
-					$data = $newProduct->toArray(); 
+
+					$data = $newProduct->toArray();
 				} else {
 					$data = array(
 						'error' => true,
@@ -333,13 +348,13 @@ class Shopping extends Tools_Plugins_Abstract {
 				} else {
 					$page = new Application_Model_Models_Page($product->getPage());
 					$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-					
+
 					if (isset($srcData['pageTemplate']) && $srcData['pageTemplate'] !== $page->getTemplateId()){
 						$page->setTemplateId($srcData['pageTemplate']);
 					}
-					
+
 					$page->setDraft((bool)$product->getEnabled()?'0':'1');
-										
+
 					if ($pageMapper->save($page)){
 						$product->setPage($page);
 					}
@@ -369,10 +384,10 @@ class Shopping extends Tools_Plugins_Abstract {
 			default:
 				break;
 		}
-		
+
 		return $data;
 	}
-	
+
 	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
 		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
 		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
@@ -398,7 +413,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
 		}
 		$page = new Application_Model_Models_Page();
-		
+
 		$uniqName = implode('-', array($product->getName(), $product->getSku(), $product->getBrand()));
 		$uniqName = preg_replace('/[@!.:;=\'"`~#$%?&()*|\s\/\\\]{1,}/','-', $uniqName);
 		$uniqName = trim($uniqName, '-');
@@ -423,9 +438,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		$page->setDraft((bool)$product->getEnabled()?'0':'1');
 		$page->setMemLanding(0);
 		$page->setNews(0);
-		
+
 		$id = $pageMapper->save($page);
-		
+
 		if($id) {
 			$page->setId($id);
 		} else {
@@ -439,7 +454,7 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     protected function productAction(){
 		$this->_view->generalConfig = $this->_configMapper->getConfigParams();
-		
+
 		$templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
 		$templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
 		$this->_view->templateList = $templateList;
@@ -451,7 +466,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->imageDirList = $listFolders;
 		echo $this->_view->render('product.phtml');
 	}
-	
+
 	protected function debugAction(){
 
 	}
