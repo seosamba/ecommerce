@@ -84,7 +84,7 @@
 <script type="text/javascript" charset="utf-8">
     $(function() {
 	    $('.pselect').chosen();
-	    $('.templates').chosen();
+	    $('.templates').chosen({allow_single_deselect: true});
 
         $('#products').click(function() {
 			$('#product-products').html('');
@@ -118,7 +118,7 @@
 				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
 				return false;
 			}
-			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ':' + tpl + '}');
+			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((tpl) ? ':' + tpl : '') + '}');
 		});
 
 		$('.pselect').chosen().change(filter);
