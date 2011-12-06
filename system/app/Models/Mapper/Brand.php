@@ -34,6 +34,11 @@ class Models_Mapper_Brand extends Application_Model_Mappers_Abstract {
 		return $model;
 	}
 
+    /**
+     * @param $name
+     * @return null|Models_Model_Brand
+     * @throws Exception
+     */
 	public function findByName($name){
 		if (empty($name)){
 			throw new Exception('Name can\'t be empty');
@@ -44,4 +49,8 @@ class Models_Mapper_Brand extends Application_Model_Mappers_Abstract {
 		}
 		return new $this->_model($row->toArray());
 	}
+
+    public function delete(Models_Model_Brand $model) {
+        return $this->getDbTable()->delete($this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId()));
+    }
 }

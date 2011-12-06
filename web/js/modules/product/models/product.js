@@ -23,7 +23,6 @@ define([
             this.bind('error', function(model, error) {
                 smoke.alert(error);
             });
-			this.bind('change:photo', this.setImage, this);
 			this.bind('change:defaultOptions', function(){
 				this.get('options').reset(this.get('defaultOptions'));
 			}, this);
@@ -36,12 +35,6 @@ define([
 				attrs.related = _.map(attrs.related, function(rel){
 					return parseInt(rel);
 				});
-			}
-		},
-		setImage: function(){
-			var photo = this.get('photo');
-			if (photo instanceof Object){
-				this.set({photo: '/media/'+photo.folder+'/product/'+photo.name});
 			}
 		}
 	});

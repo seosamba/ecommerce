@@ -45,25 +45,45 @@
 			a.nav-links:hover {
 				color: #1e90ff;
 			}
-			.productlisting {
-                width: 84px;
-                height: auto;
+			div.productlisting {
+                width: 91px;
+                height: 160px;
                 margin: 5px;
-                padding: 2px;
+                /*padding: 2px;*/
                 float: left;
-                border: 1px solid lavender;
-                border-radius: 2px;
+                border: 2px solid lavender;
+                border-radius: 3px 8px;
                 overflow: hidden;
                 position: relative;
                 text-align: center;
                 cursor: pointer;
                 background: #fff;
-                font-size: 10px;
+                font-size: 11pt;
 			}
-            .productlisting .details {
-                margin-top: 2px;
-                background: #eee;
-                width: 84px;
+            p.brand {
+                padding: 2px 0px;
+                background-color: lavender;
+                margin-bottom: 1px;
+                font-weight:bold;
+            }
+            p.sku{
+                text-align: right;
+                font-size: 8pt;
+                border-top: 1px dashed #eee;
+                padding: 4px 0px;
+                margin-top: 4px;
+                color: #7C7C7C;
+                position: absolute;
+                bottom: 0px;
+                right: 2px;
+                width: 100%;
+                height: 8pt;
+                overflow: hidden;
+                background-color:#fff;
+            }
+            div.productlisting img{
+                max-height: 80px;
+                padding: 4px 0px;
             }
             input.highlight {
                 border-color: #cd5c5c !important;
@@ -189,13 +209,11 @@
 			</div>
 			{{/if}}
 			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
-                <div class="details">
-                    <p class="brand">${brand}</p>
-                    <p class="sku">${sku}</p>
-                </div>
-                <img class="lazy" src="{{if photo}}${photo.replace('/small/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+                <p class="brand">${brand}</p>
+                <img class="lazy" src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
                 ${name}
-			</a>
+                <p class="sku">${sku}</p>
+            </a>
 		</script>
 	</head>
     <body>
@@ -206,7 +224,10 @@
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
 		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
 		
-		<div class="seotoaster container_12" style="position: relative;"> 
+		<div class="seotoaster container_12" style="position: relative;">
+            <div id="product-list" class="clearfix" style="display: none; overflow-y: auto; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
+            </div>
+
 			<div id="manage-product">
 			
 				<div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
@@ -217,9 +238,7 @@
 					<div id="image-list"></div>
 				</div>
 				
-				<div id="product-list" class="clearfix" style="display: none; padding: 5px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
-					
-				</div>
+
 			
 				<ul>
 					<li><a href="#tab1">Main Info</a></li>
@@ -259,7 +278,7 @@
 						</div> 
 						<div class="clear"></div>
                         <div class="grid_8">
-                            <label for="product-brand">Brand&nbsp;<a href="javascript:;" target="_blank" style="font-size: 80%">visit brand landing page</a></label>
+                            <label for="product-brand">Brand&nbsp;<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet." style="font-size: 80%">visit brand landing page</a></label>
                         </div>
                         <div class="grid_4">
 <!--							<input type="text" id="product-brand" data-reflection="property" placeholder="brand name" /> -->

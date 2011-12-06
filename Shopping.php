@@ -1,25 +1,28 @@
 <?php
-
-/**
- * Ecommerce plugin for SEOTOASTER 2.0
- *
- * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
- */
 set_include_path(implode(PATH_SEPARATOR, array(
     realpath(__DIR__ . '/system/app'),
     get_include_path(),
 )));
 
+/**
+ * Ecommerce plugin for SEOTOASTER 2.0
+ * @todo Authorization check
+ * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ * @see http://www.seotoaster.com
+ */
 class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
 	const PRODUCT_CATEGORY_URL	= 'product-pages';
 
 	/**
-	 * json helper for sending well-formated json response
-	 * @var Zend_Controller_Action_Helper_Json
+	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
 	protected $_jsonHelper;
 
+
+    /**
+     * @var array
+     */
 	private $_websiteConfig;
 
     /**
@@ -323,7 +326,22 @@ class Shopping extends Tools_Plugins_Abstract {
 				break;
 			case 'POST':
 				$srcData = Zend_Json_Decoder::decode($this->_request->getRawBody());
-				$newProduct = $productMapper->save($srcData);
+                $isUniq = $productMapper->fetchAll(array('sku = ?' => intval($srcData['sku'])));
+                if (!empty($isUniq)){
+                    return array(
+                        'error' => true,
+                        'message' => 'You already have a product with this SKU'
+                    );
+                }
+                try {
+                    $newProduct = $productMapper->save($srcData);
+                } catch (Exception $e){
+                    error_log($e->getMessage());
+                    return array(
+                        'error' => true,
+                        'message' => "Can't save product"
+                    );
+                }
 				if ($newProduct instanceof Models_Model_Product){
 					$page = $this->_savePageForProduct($newProduct, $srcData['pageTemplate']);
 					$newProduct->setPage($page);
@@ -336,6 +354,7 @@ class Shopping extends Tools_Plugins_Abstract {
 						'code'	=> 404,
 						'message' => "Can't create product"
 						);
+					$data = $newProduct->toArray();
 				}
 				break;
 			case 'PUT':
@@ -413,20 +432,26 @@ class Shopping extends Tools_Plugins_Abstract {
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
 		}
 		$page = new Application_Model_Models_Page();
-
 		$uniqName = implode('-', array($product->getName(), $product->getSku(), $product->getBrand()));
 		$uniqName = preg_replace('/[@!.:;=\'"`~#$%?&()*|\s\/\\\]{1,}/','-', $uniqName);
 		$uniqName = trim($uniqName, '-');
-
+		$uniqName = array_map(function($str){
+            $filter = new Zend_Filter_PregReplace(array(
+                   'match'   => '/[^\w\d]+/',
+                   'replace' => '-'
+                ));
+            return trim($filter->filter($str), ' -');
+            }
+            , array($product->getName(), $product->getSku(), $product->getBrand()));
+		$uniqName = implode('-', $uniqName);
 		$page->setTemplateId($templateId ? $templateId : 'default' );
 		$page->setParentId($prodCatPage->getId());
-		$page->setUrl($uniqName);
-        $page->setNavName($product->getName().($product->getSku()?'-'.$product->getSku():''));
+		$page->setNavName($product->getName().($product->getSku()?' - '.$product->getSku():''));
         $page->setMetaDescription(strip_tags($product->getShortDescription()));
 		$page->setMetaKeywords('');
 		$page->setHeaderTitle($uniqName);
 		$page->setH1($product->getName());
-		$page->setUrl($uniqName.'.html');
+		$page->setUrl(strtolower($uniqName).'.html');
 		$page->setTeaserText(strip_tags($product->getShortDescription()));
 		$page->setLastUpdate(date(DATE_ATOM));
 		$page->setIs404page(0);
@@ -443,6 +468,22 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		if($id) {
 			$page->setId($id);
+            //setting product photo as page preview
+            if ($product->getPhoto() != null){
+                $miscConfig = Zend_Registry::get('misc');
+                $savePath = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'];
+                $existingFiles = preg_grep('~^'.strtolower($uniqName).'\.(png|jpg|gif)$~i', Tools_Filesystem_Tools::scanDirectory($savePath, false, false));
+                if  (!empty($existingFiles)){
+                    foreach ($existingFiles as $file) {
+                        Tools_Filesystem_Tools::deleteFile($savePath.$file);
+                    }
+                }
+                $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . str_replace('/', '/small/' , $product->getPhoto());
+                $pagePreviewImg = $savePath.strtolower($uniqName).'.'.pathinfo($productImg, PATHINFO_EXTENSION);
+                if (copy($productImg, $pagePreviewImg)) {
+                    Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, null, true);
+                }
+            }
 		} else {
 			return null;
 		}
@@ -450,6 +491,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
+     * Method renders product management screen
      * @var $pageMapper Application_Model_Mappers_PageMapper
      */
     protected function productAction(){
@@ -470,5 +512,4 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function debugAction(){
 
 	}
-
 }
