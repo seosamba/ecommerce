@@ -23,7 +23,8 @@ define([
 			'click #delete': 'deleteProduct',
 			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
-            'click a#brandlanding-link': 'gotoBrandPage'
+            'click a#brandlanding-link': 'gotoBrandPage',
+            'keyup #product-list-search': 'filterProductList'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
@@ -34,7 +35,7 @@ define([
 			$('#add-related').autocomplete({
 				minLength: 3,
 				select: this.addRelated,
-				source: this.filterProductList
+				source: this.relatedAutocomplete
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 
 			this.newCategoryInput = this.$('#new-category');
@@ -51,7 +52,6 @@ define([
 		},
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
-			console.log(this.model.get('enabled'));
 		},
 		newCategory: function(e){
 			var name = this.newCategoryInput.val();
@@ -276,29 +276,20 @@ define([
 
             return !error;
         },
-		filterProductList: function(request, response){
-			var list = appRouter.products.filter(function(prod){
-				var search = request.term.toLowerCase();
-				if (!appRouter.app.model.isNew() && appRouter.app.model.get('id') === prod.get('id')){
-					return false;
-				}
-				if (prod.get('name').toLowerCase().indexOf(search) != -1) {
-					return true;
-				}
-				if (prod.get('sku').toLowerCase().indexOf(search) != -1) {
-					return true;
-				}
-				if (prod.get('name').toLowerCase().indexOf(search) != -1) {
-					return true;
-				}
-			});
+		relatedAutocomplete: function(request, response){
+			var list = appRouter.products.search(request.term.toLowerCase()).filter(function(prod){
+                var id = prod.get('id'),
+                    model = appRouter.app.model;
+                return (model.get('id') !== prod.get('id') && !_(model.get('related')).include(prod.get('id'))) ;
+            });
+
 			response(list);
 		},
 		renderAutocomplete: function( ul, item ) {
 			return $( "<li></li>" )
 				.data( "item.autocomplete", item )
-				.append( "<a><img style='float:right' src=" +
-                (item.has('photo')?item.get('photo').replace('/small/','/product/'):'/system/images/noimage.png') +
+				.append( "<a><img style='float:right;max-width: 80px' src=" +
+                (item.has('photo')?'/media/'+item.get('photo').replace('/','/product/'):'/system/images/noimage.png') +
                 " /><div>" + item.get('name').toUpperCase() + "<br>SKU:" + item.get('sku') + "<br />" +item.get('brand')+"</div></a>"
 				).appendTo( ul );
 		},
@@ -360,8 +351,18 @@ define([
             if (brand && brand.has('url')) {
                 window.open(this.websiteUrl+brand.get('url'),'_blank');
             } else {
-                console.log(msg);
                 smoke.alert(_.template(msg, brand.toJSON()));
+            }
+        },
+        filterProductList: function(e){
+            var search = e.target.value.toLowerCase();
+            if (search.length){
+                $('#product-list-holder > .productlisting:visible').hide();
+                appRouter.products.search(search).map(function(prod){
+                    $(prod.view.el).show();
+                });
+            } else {
+                $('#product-list-holder > .productlisting').show();
             }
         }
 	});

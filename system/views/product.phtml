@@ -225,170 +225,173 @@
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
 		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
 		
-		<div class="seotoaster container_12" style="position: relative;">
-            <div id="product-list" class="clearfix" style="display: none; overflow-y: auto; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
+        <div id="manage-product" class="seotoaster container_12" style="padding: 0;">
+            <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
+                <div class="clearfix ui-widget-header">
+                    <div class="grid_1 prefix_3">
+                        <label for="product-list-search">Search</label>
+                    </div>
+                    <div class="grid_5 suffix_3">
+                        <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku or mpn" />
+                    </div>
+                </div>
+                <div id="product-list-holder" class="h500" style="overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
             </div>
 
-			<div id="manage-product" style="padding: 0;">
-			
-				<div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
-					<div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
-                        <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');">&lt; back</a>
-                        <span style="margin-left: 30%">select image for product</span>
-					</div>
-					<div id="image-list"></div>
-				</div>
-				
+            <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
+                <div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
+                    <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');">&lt; back</a>
+                    <span style="margin-left: 30%">select image for product</span>
+                </div>
+                <div id="image-list"></div>
+            </div>
 
-			
-				<ul style="border-radius: 0;">
-					<li><a href="#tab1">Main Info</a></li>
-                    <li><a href="#category-tab">Categories</a></li>
-                    <li><a href="#options-tab">Options</a></li>
-                    <li><a href="#tab4">Related Products</a></li>
-                    <li><a href="#tab5">Marketing</a></li>
-                    <a href="#new" class="nav-links">New product</a>
-                    <a href="#list" class="nav-links">Edit product</a>
-                </ul>
-				<!--------- MAIN INFO --------------> 
-				<div id="tab1" class="clearfix"> 
-					<div class="grid_8 alpha"> 
-						<div class="grid_4"> 
-							<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-							<div style="height: 130px; background: white; text-align: center; vertical-align: middle;">
-								<img style="height: 100%;" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
-							</div>
-						</div> 
-						<div class="grid_8"> 
-							<label for="product-name">Product Name</label> 
-						</div> 
-						<div class="grid_8"> 
-							<input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" /> 
-						</div> 
-						<div class="grid_2"> 
-							<label for="product-sku">SKU</label> 
-							<input type="text" id="product-sku" data-reflection="property" placeholder="item id" /> 
-						</div> 
-						<div class="grid_3"> 
-							<label for="product-mpn">MPN</label> 
-							<input type="text" id="product-mpn" data-reflection="property" placeholder="manufacturer partnumber" /> 
-						</div> 
-						<div class="grid_3"> 
-							<label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label> 
-							<input type="text" id="product-weight" data-reflection="property" placeholder="0.00"> 
-						</div> 
-						<div class="clear"></div>
-                        <div class="grid_8">
-                            <label for="product-brand">Brand&nbsp;<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet." style="font-size: 80%">visit brand landing page</a></label>
+            <ul>
+                <li><a href="#tab1">Main Info</a></li>
+                <li><a href="#category-tab">Categories</a></li>
+                <li><a href="#options-tab">Options</a></li>
+                <li><a href="#tab4">Related Products</a></li>
+                <li><a href="#tab5">Marketing</a></li>
+                <a href="#new" class="nav-links">New product</a>
+                <a href="#list" class="nav-links">Edit product</a>
+            </ul>
+            <!--------- MAIN INFO -------------->
+            <div id="tab1" class="clearfix">
+                <div class="grid_8 alpha">
+                    <div class="grid_4">
+                        <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
+                        <div style="height: 130px; background: white; text-align: center; vertical-align: middle;">
+                            <img style="height: 100%;" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
                         </div>
-                        <div class="grid_4">
-<!--							<input type="text" id="product-brand" data-reflection="property" placeholder="brand name" /> -->
-                            <select name="product-brand" id="product-brand" data-reflection="property">
-                            </select>
-						</div>
-                        <div class="grid_4">
-                            <input type="text" name="" id="new-brand" placeholder="or create new">
+                    </div>
+                    <div class="grid_8">
+                        <label for="product-name">Product Name</label>
+                    </div>
+                    <div class="grid_8">
+                        <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
+                    </div>
+                    <div class="grid_2">
+                        <label for="product-sku">SKU</label>
+                        <input type="text" id="product-sku" data-reflection="property" placeholder="item id" />
+                    </div>
+                    <div class="grid_3">
+                        <label for="product-mpn">MPN</label>
+                        <input type="text" id="product-mpn" data-reflection="property" placeholder="manufacturer partnumber" />
+                    </div>
+                    <div class="grid_3">
+                        <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
+                        <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
+                    </div>
+                    <div class="clear"></div>
+                    <div class="grid_8">
+                        <label for="product-brand">Brand&nbsp;<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet." style="font-size: 80%">visit brand landing page</a></label>
+                    </div>
+                    <div class="grid_4">
+                        <select name="product-brand" id="product-brand" data-reflection="property">
+                        </select>
+                    </div>
+                    <div class="grid_4">
+                        <input type="text" name="" id="new-brand" placeholder="or create new">
+                    </div>
+                    <div class="clear"></div>
+
+                    <div class="grid_12 mt5px">
+                        <div id="description-box">
+                            <ul>
+                                <li><a href="#short-description-tab">Short description</a></li>
+                                <li><a href="#full-description-tab">Full description</a></li>
+                            </ul>
+                            <div id="short-description-tab">
+                            <textarea id="product-shortDescription" class="h150" data-reflection="property" placeholder="Short description"></textarea>
+                            </div>
+                            <div id="full-description-tab">
+                            <textarea id="product-fullDescription" class="h150" data-reflection="property" placeholder="Full description"></textarea>
+                            </div>
                         </div>
-						<div class="clear"></div>
-
-						<div class="grid_12 mt5px"> 
-							<div id="description-box">
-								<ul>
-									<li><a href="#short-description-tab">Short description</a></li>
-									<li><a href="#full-description-tab">Full description</a></li>
-								</ul>
-								<div id="short-description-tab">
-								<textarea id="product-shortDescription" class="h150" data-reflection="property" placeholder="Short description"></textarea> 
-								</div>
-								<div id="full-description-tab">
-								<textarea id="product-fullDescription" class="h150" data-reflection="property" placeholder="Full description"></textarea> 
-								</div>
-							</div>
-						</div> 
-					</div> 
-					<!--End grid_8--> 
-					<div class=" grid_4"> 
-						<label for="product-enabled"><input type="checkbox" id="product-enabled" />This product is enabled</label>
-					<hr /> 
-					</div> 
-					<div class="grid_2"> 
-						<label for="product-price">Price (in <?php echo $this->generalConfig['currency']; ?>)</label> 
-						<input type="text" id="product-price" data-reflection="property" placeholder="0.00"/> 
-					</div> 
-					<div class="grid_2"> 
-						<label for="tax">Taxes</label> 
-						<select name="taxes" id="product-taxClass" data-reflection="property" > 
-							<option value="0">Non taxable</option> 
-							<option value="1">Default</option> 
-							<option value="2">Alternative</option> 
-							<option value="3">Alternative 2</option> 
-						</select> 
-					</div> 
-					<div class=" grid_4"> 
-					<hr /> 
-					</div> 
-					<div class="grid_4">
-                        <label for="product-pageTemplate">Select a product page template</label>
-					</div>
-					<div class="grid_4">
-						<select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
-							<option value="-1" disabled="disable">Select Template</option>
-							<?php foreach ($this->templateList as $tmpl) : ?>
-							<option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
-							<?php endforeach; ?>
-						</select>
-						<hr />
-					</div> 
-					<div class="grid_4">
-						<div id="quick-preview"></div>
-					</div>
-				</div> 
-
-				<div id="category-tab" class="clearfix"> 
-					<div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
-						<input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
-					</div>
-
-					<div id="product-categories" class="grid_12">
-					</div>
-					
-				</div> <!-- #category-tab --> 
-
-				<div id="options-tab" class="clearfix"> 
-					<div>
-						<button id="add-new-option-btn">Create new option</button>
-<!--						<span>or use existing</span>
-						<select name="option-list" id="option-list">
-							<option value=""></option>
-							<option value=""></option>
-							<option value=""></option>
-						</select>-->
-					</div>
-					<div id="options-holder" class="clearfix h350" style="overflow-y: scroll;">
-
-					</div>
-				</div> <!-- End Tab 3 --> 
-
-				<div id="tab4" class="clearfix">
-					<div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
-						<input type="text" id="add-related" placeholder="Start typing name, SKU or MPN" />
-					</div>
-					<div id="related-holder" class="grid_12">
-						
-					</div>
-				</div> 
-
-				<div id="tab5"> 
-					@todo super-mega-merchandising plugins are on thier way
-				</div> 
-
-				<div class="grid_12">
+                    </div>
+                </div>
+                <!--End grid_8-->
+                <div class=" grid_4">
+                    <label for="product-enabled"><input type="checkbox" id="product-enabled" />This product is enabled</label>
+                <hr />
+                </div>
+                <div class="grid_2">
+                    <label for="product-price">Price (in <?php echo $this->generalConfig['currency']; ?>)</label>
+                    <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
+                </div>
+                <div class="grid_2">
+                    <label for="tax">Taxes</label>
+                    <select name="taxes" id="product-taxClass" data-reflection="property" >
+                        <option value="0">Non taxable</option>
+                        <option value="1">Default</option>
+                        <option value="2">Alternative</option>
+                        <option value="3">Alternative 2</option>
+                    </select>
+                </div>
+                <div class=" grid_4">
+                <hr />
+                </div>
+                <div class="grid_4">
+                    <label for="product-pageTemplate">Select a product page template</label>
+                </div>
+                <div class="grid_4">
+                    <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
+                        <option value="-1" disabled="disable">Select Template</option>
+                        <?php foreach ($this->templateList as $tmpl) : ?>
+                        <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
+                        <?php endforeach; ?>
+                    </select>
                     <hr />
-					<input type="button" value="Delete" id="delete"/>
-					<input type="submit" name="submit" id="submit" value="Save"/> 
-				</div>
-			</div>
-		</div>
-		
+                </div>
+                <div class="grid_4">
+                    <div id="quick-preview"></div>
+                </div>
+            </div>
+
+            <div id="category-tab" class="clearfix">
+                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
+                    <input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
+                </div>
+
+                <div id="product-categories" class="grid_12">
+                </div>
+
+            </div> <!-- #category-tab -->
+
+            <div id="options-tab" class="clearfix">
+                <div>
+                    <button id="add-new-option-btn">Create new option</button>
+<!--						<span>or use existing</span>
+                    <select name="option-list" id="option-list">
+                        <option value=""></option>
+                        <option value=""></option>
+                        <option value=""></option>
+                    </select>-->
+                </div>
+                <div id="options-holder" class="clearfix h350" style="overflow-y: scroll;">
+
+                </div>
+            </div> <!-- End Tab 3 -->
+
+            <div id="tab4" class="clearfix">
+                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
+                    <input type="text" id="add-related" placeholder="Start typing name, SKU or MPN" />
+                </div>
+                <div id="related-holder" class="grid_12">
+
+                </div>
+            </div>
+
+            <div id="tab5">
+                @todo super-mega-merchandising plugins are on thier way
+            </div>
+
+            <div class="grid_12">
+                <hr />
+                <input type="button" value="Delete" id="delete"/>
+                <input type="submit" name="submit" id="submit" value="Save"/>
+            </div>
+        </div>
+
     </body>
 </html>

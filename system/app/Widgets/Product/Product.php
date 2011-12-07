@@ -91,7 +91,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
             return $parser->parse();
         }
 
-        throw new Exceptions_SeotoasterWidgetException('Template doesn\'t exist');
+        throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
     }
 
     private function _renderEditproduct(){
