@@ -6,29 +6,37 @@
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Widgets_Product_Product extends Widgets_Abstract {
+
+    const TYPE_PRODUCTLISTING = 'productlisting';
 	
-	protected $_productMapper;
+	/**
+     * @var Models_Mapper_ProductMapper Product Mapper
+     */
+    protected $_productMapper;
 
     /**
-     * Contains payment config
-     * @var array
+     * @var array Contains payment config
      */
 	protected $_shoppingConfig;
 
     /**
-	 * Product instance
-	 * @var Models_Model_Product
+	 * @var Models_Model_Product Product instance
 	 */
 	protected $_product = null;
 
+    /**
+     * @var null|string Type of widget
+     */
+    private $_type = null;
 
 
 	protected function  _init() {
 		parent::_init();
 		if (empty($this->_options)){
-			throw new Exceptions_SeotoasterException('No options provided');
+			throw new Exceptions_SeotoasterWidgetException('No options provided');
 		}
         $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+        $this->_configHelper  = Zend_Controller_Action_HelperBroker::getExistingHelper('config');
 
 		$this->_view = new Zend_View(array(
 			'scriptPath' => dirname(__FILE__) . '/views'
@@ -39,8 +47,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		if (is_numeric($this->_options[0])){
 			$this->_product = $this->_productMapper->find(intval($this->_options[0]));
-			$this->_type = $this->_options[1];
-			array_splice($this->_options, 0, 2);
+			$this->_type = self::TYPE_PRODUCTLISTING;
+			array_shift($this->_options);
 		} else {
 			$this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
 			$this->_type = $this->_options[0];
@@ -50,9 +58,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     protected function _load() {
-        if ($this->_product === null) {
-            return '<!--Product doesn\'t exist-->';
+        if ($this->_product === null || $this->_type === null) {
+            return "<!--Product doesn't exist or wrong options provided-->";
         }
+
         $this->_view->product = $this->_product;
 
         $methodName = '_render'.ucfirst(strtolower($this->_type));
@@ -61,6 +70,29 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		}
 		return '<b>Method '. $this->_type .' doesn\'t exist</b>';
 	}
+
+    private function _renderProductlisting(){
+        if (!isset($this->_options[0]) || empty($this->_options[0])){
+            throw new Exceptions_SeotoasterWidgetException('No template specified');
+        }
+
+        $template = Application_Model_Mappers_TemplateMapper::getInstance()->findByName($this->_options[0]);
+        if ($template !== null) {
+            $themeConfig = Zend_Registry::get('theme');
+            $parserOptions = array(
+                'websiteUrl'   => $this->_websiteHelper->getUrl(),
+                'websitePath'  => $this->_websiteHelper->getPath(),
+                'currentTheme' => $this->_configHelper->getConfig('currentTheme'),
+                'themePath'    => $themeConfig['path']
+            );
+            unset($themeConfig);
+
+            $parser = new Tools_Content_Parser($template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
+            return $parser->parse();
+        }
+
+        throw new Exceptions_SeotoasterWidgetException('Template doesn\'t exist');
+    }
 
     private function _renderEditproduct(){
         if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
