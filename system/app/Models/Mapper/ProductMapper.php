@@ -256,7 +256,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 						$products[$modelHash] = $productModel;
 					}
 				}
-				$filteredProducts = (empty($filteredProducts)) ? $products : array_intersect_key($filteredProducts, $products);
+				$filteredProducts = (empty($filteredProducts)) ? $products : array_intersect_key($products, $filteredProducts);
 				$products = array();
 			}
 		}
