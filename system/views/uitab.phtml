@@ -155,7 +155,7 @@
 			//brands filter
 			shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
 			//ordering
-			shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '');
+			shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
 
 			$('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
 		})
