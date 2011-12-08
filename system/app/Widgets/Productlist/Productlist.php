@@ -59,6 +59,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					}
 				}
 			}
+			else {
+				$products = $this->_productMapper->fetchAll();
+			}
 
 			if(!empty($products)) {
 				$parsedListing = '';
