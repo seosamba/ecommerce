@@ -50,12 +50,12 @@ define([
 			this.app.setModel(product);
 		},
 		loadProducts: function(productsCollection){
-			$('#product-list').empty();
+			$('#product-list-holder').empty();
 			productsCollection.each(this.renderProductView);
 		},
 		renderProductView: function(product){
 			var productView = new ProductListingView({model: product});
-			$('#product-list').append(productView.render().el);
+			$('#product-list-holder').append(productView.render().el);
 		},
 		addCategory: function(category){
 			var view = new CategoryView({model: category});
