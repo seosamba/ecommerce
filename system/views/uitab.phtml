@@ -1,11 +1,10 @@
 <?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
 <div class="container_12">
 	<!-- Product listing selector -->
-	<h4 class="grid_12"><?php echo $this->translate('Create a list'); ?></h4>
-	<div id="template-selector" class="grid_12 mt10px">
+	<div id="template-selector" class="grid_12 mt10px mb5px">
 		<?php if(isset($this->productTemplates) && !empty($this->productTemplates)): ?>
 			<select id="templates" class="templates" style="width:260px;margin: 3px;float:left;" data-placeholder="Select a product listing template...">
-				<option value=""></option>
+				<option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
 				<?php foreach($this->productTemplates as $template): ?>
 					<option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
 				<?php endforeach; ?>
@@ -17,10 +16,10 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-categories" id="categories" multiple class="pselect ui-corner-all" data-placeholder="Select categories..."></select>
+		<select style="width: 205px;float:left;" name="product-categories" id="categories" multiple class="pselect ui-corner-all" data-placeholder="Filter by categories..."></select>
 	</div>
 	<div class="grid_4">
-		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="Select brands..."></select>
+		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="Filter by brands..."></select>
 	</div>
 
 	<!-- Ordering -->
@@ -31,10 +30,8 @@
 			<option value="brand">Brand</option>
 		</select>
 	</div>
-	<div class="grid_12" style="text-align: right">
-		<a href="javascript:;" id="btn-create">Create a list</a>
-	</div>
-	<h4 class="grid_12"><?php echo $this->translate('Or select individual'); ?></h4>
+	<a href="javascript:;" id="btn-create" class="grid_6 mt5px"><?php echo $this->translate('Create an automated product listing'); ?></a>
+	<span class="grid_6 mt20px"><?php echo $this->translate('And / or insert individual items'); ?></span>
 	<div style="clear: both;"></div>
 	<div id="product-products" class="mt10px"></div>
 </div>
@@ -58,9 +55,9 @@
 		height: 300px;
 	}
 	div.productlisting {
-        width: 14%;
+        width: 15%;
         height: 120px;
-        margin: 5px;
+        margin: 3px;
         /*padding: 2px;*/
         float: left;
         border: 2px solid lavender;
@@ -103,25 +100,7 @@
 <script type="text/javascript" charset="utf-8">
     $(function() {
 	    $('.pselect').chosen();
-	    $('.templates').chosen({allow_single_deselect: true});
 	    $('#btn-create').button();
-
-        $('#products').click(function() {
-			$('#product-products').html('');
-			$('#back').show();
-			$('.above-editor-links').switchClass('grid_8', 'grid_3');
-			$('#tabs').switchClass('grid_4', 'grid_9');
-			$('tr.mceFirst').hide();
-			$('#tabs-frag-3').addClass('h450');
-			$('table#content_tbl').width('230px');
-			loadStoreData('categories');
-			loadStoreData('brands');
-			loadProducts();
-
-	        //adding corner all to chosen
-			$('ul.chzn-choices').removeClass('ui-corner-top').addClass('ui-corner-all');
-
-        })
 
 		$('.ui-tabs-nav-item a').click(function() {
 			var childs = $(this).find('span#products');
@@ -130,6 +109,24 @@
 				$('#tabs').switchClass('grid_7', 'grid_4');
 				$('#product-products').html('');
 				$('tr.mceFirst').show();
+			}
+			else {
+				$('#product-products').html('');
+				$('.above-editor-links').switchClass('grid_8', 'grid_3');
+				$('#tabs').switchClass('grid_4', 'grid_9');
+
+		        //hiding mce controls
+		        $('tr.mceFirst').hide();
+				$('#tabs-frag-3').addClass('h450');
+				$('table#content_tbl').width('230px');
+
+		        //loading store data
+		        loadStoreData('categories');
+				loadStoreData('brands');
+				loadProducts();
+
+		        //little chosen plugin make up
+				$('ul.chzn-choices').removeClass('ui-corner-top').addClass('ui-corner-all');
 			}
 		})
 
