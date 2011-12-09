@@ -7,6 +7,8 @@ define([
 	var ProductOptionView = Backbone.View.extend({
 		template: $('#optionMainTemplate').template(),
 		optionListTemplate: $('#optionListTemplate').template(),
+        tagName: 'div',
+        className: 'option-wrapper clearfix mt5px mb5px',
 
 		events: {
 			'click button.remove-option': 'kill',
@@ -35,20 +37,19 @@ define([
                 $(this.el).find('div.option-content').html($.tmpl(this.optionListTemplate, this.model));
                 this.renderAllSelections();
             }
-            this.$('button.item-remove,button.remove-option').button({
-				icons: {
-                primary: 'ui-icon-closethick'
-				},
+            this.$('button.remove-option').button({
+				icons: { primary: 'ui-icon-closethick' },
 				text: false
-			}).find('span.ui-button-text').css({padding: '0'});
-            this.$('button.add-selection-btn').button({
-				icons: { primary: 'ui-icon-plus' }
 			});
-            if (this.model.get('parentId') === '0') {
-                this.$('input[name=templateName]').val('').hide();
-            } else {
+            this.$('button.add-selection-btn').button({
+                icons: { primary: 'ui-icon-plus' }
+            });
+            if (this.model.has('isTemplate')){
                 this.$('input[name=isTemplate]').attr('checked', 'checked');
-                this.$('input[name=templateName]').val(this.model.get('templateName')).show();
+                this.$('input[name=templateName]').show();
+            } else {
+                this.$('input[name=isTemplate]').removeAttr('checked');
+                this.$('input[name=templateName]').hide();
             }
             return this;
 		},

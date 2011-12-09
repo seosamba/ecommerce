@@ -50,7 +50,7 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		}
 		
 		$result = $this->getDbTable()->find($id);
-		if(0 == count($result)) {
+		if(0 === count($result)) {
 			return null;
 		}
 		$row = $result->current();
@@ -64,10 +64,6 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 
-        if ($model->getParentId()){
-
-        }
-		
 		return $model;
 	}
 
@@ -101,4 +97,27 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		
 		return $selectionTable->getAdapter()->commit();
 	}
+
+    public function fetchAll($where = null, $order = array(), $objects = true) {
+        $entries = array();
+        $resultSet = $this->getDbTable()->fetchAll($where, $order);
+        if(null === $resultSet) {
+            return null;
+        }
+        foreach ($resultSet as $row) {
+            $model = new $this->_model($row->toArray());
+
+            if ($model->getType() === $model::TYPE_DROPDOWN || $model->getType() === $model::TYPE_RADIO) {
+                $selections = $row->findDependentRowset('Models_DbTable_Selection');
+                if ($selections->count()){
+                    $model->setSelection($selections->toArray());
+                }
+            }
+
+            array_push($entries, $objects ? $model : $model->toArray());
+        }
+        return $entries;
+    }
+
+
 }

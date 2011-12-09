@@ -8,15 +8,23 @@ define([
 		url: '/plugin/shopping/run/getdata/type/product/',
 		initialize: function(){
 		},
-        search: function(search) {
-            search = search.toLowerCase();
+        /**
+         * Returns set of product that has given term in custom fields
+         * @param term Search term
+         * @param fields list of product properties to search in
+         */
+        search: function(term, fields) {
+            term = term.toLowerCase();
+
+            if (!fields) {
+                fields = ['name', 'sku', 'mpn'];
+            }
+
             return this.filter(function(prod){
-                if (prod.get('name').toLowerCase().indexOf(search) != -1 ||
-                    prod.get('sku').toLowerCase().indexOf(search) != -1 ||
-                    prod.get('mpn').toLowerCase().indexOf(search) != -1 ) {
-                    return true;
-                } else {
-                    return false;
+                for (var i in fields){
+                    if (prod.has(fields[i]) && _.isString(prod.get(fields[i])) && prod.get(fields[i]).toLowerCase().indexOf(term) != -1 ) {
+                        return true;
+                    }
                 }
             });
         }
