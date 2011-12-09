@@ -244,13 +244,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				$catRow         = $catDbTable->find($cId)->current();
 			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductCategory');
 				foreach($productsRowset as $productRow) {
-					$productModel = new $this->_model($productRow->toArray());
-					if ($productRow->brand_id){
-						$brandRow = $productRow->findDependentRowset('Models_DbTable_Brand');
-						if ($brandRow->count()){
-							$productModel->setBrand($brandRow->current()->name);
-						}
-					}
+					$productModel = $this->_toModel($productRow);
 					$modelHash = md5($productModel->getId());
 					if(!array_key_exists($modelHash, $products)) {
 						$products[$modelHash] = $productModel;
@@ -261,6 +255,21 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 		return array_values($filteredProducts);
+	}
+
+	public function findByBrands(array $brands) {
+		$products     = array();
+		$brandDbTable = new Models_DbTable_Brand();
+		foreach($brands as $brand) {
+		 	$brandModel =  $this->_brandMapper->findByName($brand);
+			if($brandModel) {
+				$brandProducts = $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('brand_id = ?', $brandModel->getId()));
+				if(is_array($brandProducts)) {
+					$products = array_merge($products, $brandProducts);
+				}
+			}
+		}
+		return $products;
 	}
 
     /**

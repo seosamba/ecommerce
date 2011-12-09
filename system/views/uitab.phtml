@@ -132,7 +132,7 @@
 
 		$('.currproduct').live('click', function() {
 			var tpl = $('#templates').val();
-			if(tpl == '') {
+			if(tpl == 0) {
 				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
 				return false;
 			}
@@ -141,7 +141,7 @@
 
 		$('#btn-create').live('click', function() {
 			var shortCode = '{$productlist:';
-			if($('#templates').val() == '') {
+			if($('#templates').val() == 0) {
 				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
 				return false;
 			}
