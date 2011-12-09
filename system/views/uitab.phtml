@@ -31,12 +31,18 @@
 		</select>
 	</div>
 	<a href="javascript:;" id="btn-create" class="grid_6 mt5px"><?php echo $this->translate('Create an automated product listing'); ?></a>
-	<span class="grid_6 mt20px"><?php echo $this->translate('And / or insert individual items'); ?></span>
+	<span class="grid_6 mt20px"><?php echo $this->translate('And/or click on items to insert one by one'); ?></span>
 	<div style="clear: both;"></div>
 	<div id="product-products" class="mt10px"></div>
 </div>
 
 <style type="text/css">
+	#btn-create {
+		background: #ffa500;
+		color: #f5f5f5;
+		font-weight: bold;
+	}
+
 	#prod-perpage {
 		width: 120px;
 	}
