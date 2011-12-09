@@ -92,6 +92,13 @@
             #manage-product > .ui-tabs-panel {
                 height: 400px;
             }
+            #manage-product .ui-tabs-panel {
+                padding: 10px;
+            }
+            #options-holder > div.option-wrapper {
+                border: 2px #666 solid;
+                background: url('/system/images/bg-strip.png');
+            }
 		</style>
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -121,41 +128,42 @@
 		</script>
 		
 		<script id="optionMainTemplate" type="text/x-jquery-tmpl">
-			<div class="option-item clearfix ui-widget-content padding5px mt5px mb5px" >
-				<div class="grid_4 ">
-					<div class="grid_4"><label>Title</label></div>
-					<div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
-				</div>
-				<div class="grid_4">
-					<div class="grid_3">
-						<label>Type</label>
-					</div>
-					<div class="grid_9">
-						<select class="option-type-select">
-							<option value="dropdown">Dropdown Box</option>
-							<option value="radio">Radio Switch</option>
-							<option value="text">Text Field</option>
-							<option value="date">Datepicker</option>
+            <div class="grid_4 ">
+                <div class="grid_4"><label>Title</label></div>
+                <div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
+            </div>
+            <div class="grid_4">
+                <div class="grid_3">
+                    <label>Type</label>
+                </div>
+                <div class="grid_9">
+                    <select class="option-type-select">
+                        <option value="dropdown">Dropdown Box</option>
+                        <option value="radio">Radio Switch</option>
+                        <option value="text">Text Field</option>
+                        <option value="date">Datepicker</option>
 <!--							<option value="file">Upload File</option>-->
-						</select>
-					</div>
-				</div>
-				<div class="grid_3">
-					<label for="isTemplate">
-						<input type="checkbox" title="This is template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
-						This is template?
-					</label>
-					<input type="text" name="templateName" placeholder="Template name"/>
-				</div>
-				<div class="grid_1">
-					<button class="remove-option">x</button>
-				</div>
-				<div class="grid_12 option-content"></div>
-			</div>
+                    </select>
+                </div>
+            </div>
+            <div class="grid_3">
+                {{if id}}
+                &nbsp;
+                {{else}}
+                <label for="isTemplate">
+                    <input type="checkbox" title="Add as template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
+                    Add as template?
+                </label>
+                <input type="text" name="templateName" placeholder="Template name" />
+                {{/if}}
+            </div>
+            <div class="grid_1">
+                <button class="remove-option">x</button>
+            </div>
+            <div class="grid_12 option-content"></div>
 		</script>
 		
 		<script id="optionListTemplate" type="text/x-jquery-tmpl">
-		<div class="ui-widget-content">
 			<div class="ui-widget-header clearfix">
 				<div class="grid_3">Title</div>
 				<div class="grid_4">Price modifier</div>
@@ -166,10 +174,9 @@
 			<div class="option-list-holder">
 				
 			</div>
-			<div class="ui-widget-header clearfix">
+			<div class="clearfix" style="border-top: 1px #666 solid;">
 				<button class="add-selection-btn" style="float:right;">Add new selection</button>
 			</div>
-		</div>
 		</script>
 		
 		<script id="listItemTemplate" type="text/x-jquery-tmpl">
@@ -216,6 +223,17 @@
                 <p class="sku">${sku}</p>
             </a>
 		</script>
+        <script>
+            /**
+             * applying main UI elements
+             */
+            $(function(){
+                $('#manage-product,#description-box').tabs();
+                $(".ui-tabs-nav, .ui-tabs-nav > *" )
+                    .removeClass( "ui-corner-all" )
+                    .addClass( "ui-corner-top" );
+            });
+        </script>
 	</head>
     <body>
 		<noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
@@ -361,12 +379,10 @@
             <div id="options-tab" class="clearfix">
                 <div>
                     <button id="add-new-option-btn">Create new option</button>
-<!--						<span>or use existing</span>
-                    <select name="option-list" id="option-list">
-                        <option value=""></option>
-                        <option value=""></option>
-                        <option value=""></option>
-                    </select>-->
+                    <span>or</span>
+                    <select name="option-library" id="option-library" style="width: 250px;">
+                        <option value="-1" disabled="disabled">select from library</option>
+                    </select>
                 </div>
                 <div id="options-holder" class="clearfix h350" style="overflow-y: scroll;">
 

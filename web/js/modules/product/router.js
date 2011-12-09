@@ -23,7 +23,7 @@ define([
         brands: null,
 		initialize: function(){
 			this.app = new AppView();
-			
+
 			this.products = new ProductsCollection();
 			this.products.bind('add', this.renderProductView, this);
 			this.products.bind('reset', this.loadProducts, this);

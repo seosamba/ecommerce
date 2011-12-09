@@ -37,7 +37,10 @@ define([
 				weightModifierSign: this.$('select[name="weightModifierSign"]'),
 				weightModifierValue: this.$('input[name="weightModifierValue"]')
 			}
-			
+            this.$('button.item-remove').button({
+                icons: { primary: 'ui-icon-closethick' },
+                text: false
+            });
 			return this;
 		},
 		markToDelete: function(){

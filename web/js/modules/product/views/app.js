@@ -24,13 +24,14 @@ define([
 			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
             'click a#brandlanding-link': 'gotoBrandPage',
-            'keyup #product-list-search': 'filterProductList'
+            'keyup #product-list-search': 'filterProductList',
+            'mouseover #option-library': 'fetchOptionLibrary'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
 			//initializing jQueryUI elements
-			$(this.el).tabs();
-			$('#description-box').tabs();
+//			$(this.el).tabs();
+//			$('#description-box').tabs();
 			$('#delete,#add-new-option-btn').button();
 			$('#add-related').autocomplete({
 				minLength: 3,
@@ -39,11 +40,6 @@ define([
 			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 
 			this.newCategoryInput = this.$('#new-category');
-
-
-			$(".ui-tabs-nav, .ui-tabs-nav > *" )
-				.removeClass( "ui-corner-all" )
-				.addClass( "ui-corner-top" );
 		},
 		setModel: function (model) {
 			this.model = model;
@@ -358,11 +354,29 @@ define([
             var search = e.target.value.toLowerCase();
             if (search.length){
                 $('#product-list-holder > .productlisting:visible').hide();
-                appRouter.products.search(search).map(function(prod){
+                appRouter.products.search(search, ['name', 'brand', 'sku', 'mpn']).map(function(prod){
                     $(prod.view.el).show();
                 });
             } else {
                 $('#product-list-holder > .productlisting').show();
+            }
+        },
+        fetchOptionLibrary: function(){
+            if (!appRouter.hasOwnProperty('optionLibrary')){
+                var optionsLibrary = Backbone.Collection.extend({
+                    url: this.websiteUrl + 'plugin/shopping/run/getdata/type/options/',
+                    model: ProductOption,
+                    initialize: function(){
+                        this.bind('reset', function(collection){
+                            $('#option-library').html('<option value="-1" disabled="disabled">select from library</option>');
+                            collection.each(function(item){
+                                $.tmpl("<option value='${id}' >${title}</option>", item.toJSON()).appendTo('#option-library');
+                            })
+                        }, this);
+                    }
+                });
+                appRouter.optionLibrary = new optionsLibrary();
+                appRouter.optionLibrary.fetch();
             }
         }
 	});

@@ -407,6 +407,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+    protected function _optionsRESTService(){
+        $optionMapper = Models_Mapper_OptionMapper::getInstance();
+        return $optionMapper->fetchAll(array('parentId = ?' => 0), null, false);
+    }
+
 	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
 		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
 		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
