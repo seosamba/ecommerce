@@ -110,7 +110,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		return $this->_product->getName();
 	}
 	
-	private function _renderPhoto() {
+	private function _renderPhotourl() {
 		$photoSrc = $this->_product->getPhoto();
 		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
             $photoSrc = str_replace('/', '/'.$this->_options[0].'/', $photoSrc);
