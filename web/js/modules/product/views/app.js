@@ -45,6 +45,7 @@ define([
 			this.model = model;
 			this.model.bind('change', this.render, this);
 			this.model.view = this;
+            this.model.trigger('change');
 		},
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
@@ -146,7 +147,7 @@ define([
 			}
 
             //render related products
-            this.renderRelated();
+//            this.renderRelated();
 
             //populating selected categories
 			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
@@ -166,15 +167,16 @@ define([
 			if (this.model.has('pageTemplate')){
 				this.$('#product-pageTemplate').val(this.model.get('pageTemplate'));
 			} else {
-                if (this.model.has('page')){
-                    $('<a></a>', {href: $('#websiteUrl').val()+this.model.get('page').url, target: '_blank'})
-                        .html(this.model.get('page').h1)
-                        .appendTo('#quick-preview');
-                    this.$('#product-pageTemplate').val(this.model.get('page').templateId);
-                } else {
-                    this.$('#product-pageTemplate').val('-1');
-                }
+                this.$('#product-pageTemplate').val('-1');
 			}
+
+            if (this.model.has('page')){
+                $('<a></a>', {href: $('#websiteUrl').val()+this.model.get('page').url, target: '_blank'})
+                    .html(this.model.get('page').h1)
+                    .appendTo('#quick-preview');
+                this.$('#product-pageTemplate').val(this.model.get('page').templateId);
+            }
+
 			$('#image-list').masonry({
 				itemSelector : '.box',
 				columnWidth : 120
@@ -208,14 +210,14 @@ define([
 
 			if (this.model.isNew()){
 				this.model.save(null, {success: function(model, response){
-					smoke.alert('Product added');
 					appRouter.products.add(model);
-					appRouter.navigate('edit/'+model.id, true);
-				}, error: this.processSaveError});
+                    appRouter.navigate('edit/'+model.id, true);
+                    smoke.alert('Product added');
+                }, error: this.processSaveError});
 			} else {
 				this.model.save(null, {success: function(model, response){
 					smoke.alert('Product saved');
-					appRouter.app.model.fetch({data: {id: model.id}});
+//					appRouter.app.model.fetch({data: {id: model.id}});
 				}, error: this.processSaveError});
 			}
 		},

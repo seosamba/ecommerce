@@ -24,13 +24,9 @@ define([
 		initialize: function(){
 			this.app = new AppView();
 
-			this.products = new ProductsCollection();
-			this.products.bind('add', this.renderProductView, this);
-			this.products.bind('reset', this.loadProducts, this);
-
 			$('#product-list').hide();
 			$('#manage-product').show();
-			
+
 			this.categories = new CategoryCollection();
 			this.categories.bind('add', this.addCategory, this);
 			this.categories.bind('reset', this.renderCategories, this);
@@ -41,13 +37,17 @@ define([
 		newProduct: function(){
 			$('#product-list:visible').hide('slide');
 			this.app.setModel(new ProductModel());
-            this.app.render();
 		},
 		editProduct: function(productId){
 			$('#product-list:visible').hide('slide');
-			var product = new ProductModel();
-			product.fetch({data: {id: productId}});
-			this.app.setModel(product);
+            if (this.products === null) {
+                var product = new ProductModel();
+                product.fetch({data: {id: productId}});
+                this.app.setModel(product);
+            } else {
+                this.app.setModel(this.products.get(productId));
+
+            }
 		},
 		loadProducts: function(productsCollection){
 			$('#product-list-holder').empty();
@@ -73,21 +73,31 @@ define([
             _(this.brands.sortBy(function(brand){ return brand.get('name').toLowerCase();})).each(this.addBrand, this);
         },
 		productListToggle: function(){
-			$('#product-list').show('slide');
-		}
+            if (this.products === null) {
+                this.initProductlist();
+            }
+            $('#product-list').show('slide');
+		},
+        initProductlist: function() {
+            this.products = new ProductsCollection();
+            this.products.bind('add', this.renderProductView, this);
+            this.products.bind('reset', this.loadProducts, this);
+
+            return this.products.fetch();
+        }
 	});
-	
+
 	var initialize = function(){
 		window.appRouter = new Router;
 		$.when(
-			appRouter.products.fetch(),
+//			appRouter.products.fetch(),
 			appRouter.categories.fetch(),
             appRouter.brands.fetch()
 		).then(function(){
-			Backbone.history.start();				
+			Backbone.history.start();
 		});
 	};
-	
+
 	return {
 		initialize: initialize
 	};
