@@ -184,7 +184,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     private function _renderRelated() {
-        $where = $this->_productMapper->getDbTable()->select()->where('id IN (?)', $this->_product->getRelated());
+        $ids = $this->_product->getRelated();
+        if (empty($ids)){
+            return null;
+        }
+        $where = $this->_productMapper->getDbTable()->select()->where('id IN (?)', $ids);
         $related = $this->_productMapper->fetchAll($where);
         var_dump($this->_options);
         if ($related !== null) {
