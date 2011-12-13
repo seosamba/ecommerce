@@ -14,6 +14,7 @@ define([
 		events: {
 			'keypress input#new-category': 'newCategory',
 			'click #add-new-option-btn': 'newOption',
+            'change select#option-library': 'addOption',
 			'click #submit': 'saveProduct',
 			'change #product-image-folder': 'imageChange',
 			'click div.box': 'setProductImage',
@@ -79,12 +80,28 @@ define([
 			$('#options-holder').append(optWidget.render().el);
 			optWidget.addSelection();
 		},
+        addOption: function(){
+            var optId = this.$('#option-library').val();
+            if (optId > 0 ){
+                var option = appRouter.optionLibrary.get(optId);
+                    newOption = new ProductOption({
+                        title: option.get('title'),
+                        parentId: option.get('id'),
+                        type: option.get('type')
+                    });
+                console.log(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
+                newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
+                this.model.get('options').add(newOption);
+                this.model.trigger('change');
+            }
+            $('#option-library').val('-1');
+        },
 		imageChange: function(e){
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;
-			}
-			$.post('/backend/backend_media/getdirectorycontent', {folder: folder}, function(response){
+            }
+            $.post('/backend/backend_media/getdirectorycontent', {folder: folder}, function(response){
 				var $box = $('#image-list');
 				$box.empty();
 				if (response.hasOwnProperty('imageList') && response.imageList.length ){
@@ -97,12 +114,13 @@ define([
 				}
 				$('#image-select-dialog').show('slide');
 			});
-		},
-		setProductImage: function(e){
-			var imgName = $(e.currentTarget).find('img').data('name');
+        },
+        setProductImage: function(e){
+            var imgName = $(e.currentTarget).find('img').data('name');
             var fldrName = this.$('#product-image-folder').val();
-			this.model.set({photo: fldrName+'/'+imgName });
+            this.model.set({photo: fldrName+'/'+imgName });
             this.$('#image-select-dialog').hide('slide');
+            this.$('#product-image-folder').val('0');
         },
 		setProperty: function(e){
 			var propName = e.currentTarget.id.replace('product-', '');
@@ -140,6 +158,7 @@ define([
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
+                console.log(this.model.get('options'));
 				this.model.get('options').each(function(option){
 					var optWidget = new ProductOptionView({model: option});
 					$('#options-holder').append(optWidget.render().el);
