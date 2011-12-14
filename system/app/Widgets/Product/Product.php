@@ -110,7 +110,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		return $this->_product->getName();
 	}
 	
-	private function _renderPhoto() {
+	private function _renderPhotourl() {
 		$photoSrc = $this->_product->getPhoto();
 		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
             $photoSrc = str_replace('/', '/'.$this->_options[0].'/', $photoSrc);
@@ -184,7 +184,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     private function _renderRelated() {
-        $where = $this->_productMapper->getDbTable()->select()->where('id IN (?)', $this->_product->getRelated());
+        $ids = $this->_product->getRelated();
+        if (empty($ids)){
+            return null;
+        }
+        $where = $this->_productMapper->getDbTable()->select()->where('id IN (?)', $ids);
         $related = $this->_productMapper->fetchAll($where);
         var_dump($this->_options);
         if ($related !== null) {

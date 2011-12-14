@@ -68,9 +68,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$productCategoryTable->getAdapter()->commit();
 		}
 
-		if ($model->getDefaultOptions()){
-			$this->_processOptions($model);
-		}
+		$this->_processOptions($model);
 
 		if ($model->getRelated()){
 			$this->_processRelated($model);
@@ -180,7 +178,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$relationTable = new Models_DbTable_ProductOption();
 		$currentList = $relationTable->fetchAll($relationTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
 
-		$ids = array();
+		$options = array();
+        $validIds = array();
 		foreach ($model->getDefaultOptions() as $option) {
 			if ( !isset($option['title']) || empty($option['title']) ) {
 				continue;
@@ -189,23 +188,25 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                     $template = $optionMapper->save( array(
                         'title'     => isset($option['templateName']) && !empty($option['templateName']) ? $option['templateName'] : 'template-'.$option['title'],
                         'type'      => $option['type'],
-                        'parentId'  => '0'
+                        'parentId'  => '0',
+                        'selection' => $option['selection']
                     ) );
                     $option['parentId'] = $template->getId();
                     unset($template);
                 }
                 $result = $optionMapper->save($option);
 			}
-			array_push($ids, $result->getId());
+			array_push($options, $result);
+			array_push($validIds, $result->getId());
 		}
 
 		foreach ($currentList as $row) {
-			if (!in_array($row->option_id, $ids)){
+			if (!in_array($row->option_id, $validIds)){
 				$row->delete();
 			}
 		}
 
-		foreach ($ids as $optionId){
+		foreach ($validIds as $optionId){
 			$row = $relationTable->find($model->getId(), $optionId);
 			if (!$row->count()){
 				$row = $relationTable->createRow(array(
@@ -216,7 +217,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 
-		return $ids;
+        $model->setDefaultOptions($options);
+		return $options;
 	}
 
 	private function _processRelated(Models_Model_Product $model){

@@ -23,10 +23,17 @@ define([
             this.bind('error', function(model, error) {
                 smoke.alert(error);
             });
-			this.bind('change:defaultOptions', function(){
-				this.get('options').reset(this.get('defaultOptions'));
-			}, this);
-		},
+            if (this.has('defaultOptions')){
+                this.get('options').reset(this.get('defaultOptions'));
+            }
+            this.bind('change:defaultOptions', function(){
+                this.get('options').reset(this.get('defaultOptions'));
+            }, this);
+
+            if (this.has('related') && this.get('related').length){
+                this.set({related: _(this.get('related')).map(function(id){ return parseInt(id);}) });
+            }
+        },
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
 				return 'Price must be a number, e.g: 12.95';

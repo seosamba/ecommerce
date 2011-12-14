@@ -32,7 +32,6 @@ define([
 		render: function(){
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
             $(this.el).find('select.option-type-select').val(this.model.get('type'));
-
             if (this.model.get('type') == 'dropdown' || this.model.get('type') == 'radio'){
                 $(this.el).find('div.option-content').html($.tmpl(this.optionListTemplate, this.model));
                 this.renderAllSelections();
