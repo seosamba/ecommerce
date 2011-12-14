@@ -29,6 +29,10 @@ define([
             this.bind('change:defaultOptions', function(){
                 this.get('options').reset(this.get('defaultOptions'));
             }, this);
+
+            if (this.has('related') && this.get('related').length){
+                this.set({related: _(this.get('related')).map(function(id){ return parseInt(id);}) });
+            }
         },
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){

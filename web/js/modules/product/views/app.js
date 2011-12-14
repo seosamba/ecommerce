@@ -30,9 +30,6 @@ define([
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
-			//initializing jQueryUI elements
-//			$(this.el).tabs();
-//			$('#description-box').tabs();
 			$('#delete,#add-new-option-btn').button();
 			$('#add-related').autocomplete({
 				minLength: 3,
@@ -44,8 +41,8 @@ define([
 		},
 		setModel: function (model) {
 			this.model = model;
-			this.model.bind('change', this.render, this);
-			this.model.view = this;
+            this.model.view = this;
+            this.model.bind('change', this.render, this);
             this.model.trigger('change');
 		},
 		toggleEnabled: function(e){
@@ -129,7 +126,7 @@ define([
 			this.model.set(data);
 		},
 		render: function(){
-            console.log('render');
+            console.log('render', this.model.changedAttributes());
             $('#quick-preview').empty();
 
             //hiding delete button if product is new
@@ -149,7 +146,7 @@ define([
 			this.$('#product-sku').val(this.model.get('sku'));
 			this.$('#product-mpn').val(this.model.get('mpn'));
 			this.$('#product-weight').val(this.model.get('weight'));
-			this.$('#product-brand').val(this.model.get('brand')).trigger('change');
+			this.$('#product-brand').val(this.model.get('brand'));
 			this.$('#product-price').val(this.model.get('price'));
 			this.$('#product-taxClass').val(this.model.get('taxClass'));
 			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
@@ -158,7 +155,6 @@ define([
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
-                console.log(this.model.get('options'));
 				this.model.get('options').each(function(option){
 					var optWidget = new ProductOptionView({model: option});
 					$('#options-holder').append(optWidget.render().el);
@@ -166,7 +162,7 @@ define([
 			}
 
             //render related products
-//            this.renderRelated();
+            this.renderRelated();
 
             //populating selected categories
 			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
@@ -208,10 +204,11 @@ define([
                 smoke.alert('Missing some required fields');
                 return false;
             }
-			if (!this.model.get('options').isEmpty()){
-				var list = this.model.get('options').toJSON();
-				this.model.set({defaultOptions: list});
-			}
+
+            if (this.model.has('options')){
+			    this.model.set({defaultOptions: this.model.get('options').toJSON()});
+            }
+
 			if (!this.model.has('pageTemplate')){
 				var templateId = this.$('#product-pageTemplate').val();
 				if (templateId !== '-1') {
@@ -229,14 +226,19 @@ define([
 
 			if (this.model.isNew()){
 				this.model.save(null, {success: function(model, response){
-					appRouter.products.add(model);
+                    if (appRouter.products === null) {
+                        appRouter.initProductlist().fetch().done(
+                            appRouter.products.add(model)
+                        )
+                    } else {
+                        appRouter.products.add(model);
+                    }
                     appRouter.navigate('edit/'+model.id, true);
                     smoke.alert('Product added');
                 }, error: this.processSaveError});
 			} else {
 				this.model.save(null, {success: function(model, response){
 					smoke.alert('Product saved');
-//					appRouter.app.model.fetch({data: {id: model.id}});
 				}, error: this.processSaveError});
 			}
 		},
@@ -326,11 +328,14 @@ define([
 		},
 		renderRelated: function() {
             $('#related-holder').empty();
-            if (this.model.has('related')) {
-                _(this.model.get('related')).each(function (productId) {
-                    var product = appRouter.products.get(parseInt(productId)),
-                        view = new ProductListView({model:product, showDelete:true});
 
+            if (this.model.has('related') && this.model.get('related').length) {
+                var relateds = this.model.get('related');
+                if (appRouter.products === null) {
+                    appRouter.initProductlist().fetch({async: false})
+                }
+                _(relateds).each(function (pid) {
+                    var view = new ProductListView({model:appRouter.products.get(pid), showDelete:true});
                     $('#related-holder').append(view.render().el);
                 });
             }

@@ -74,16 +74,18 @@ define([
         },
 		productListToggle: function(){
             if (this.products === null) {
-                this.initProductlist();
+                this.initProductlist().fetch();
             }
             $('#product-list').show('slide');
 		},
         initProductlist: function() {
-            this.products = new ProductsCollection();
-            this.products.bind('add', this.renderProductView, this);
-            this.products.bind('reset', this.loadProducts, this);
+            if (this.products === null) {
+                this.products = new ProductsCollection();
+                this.products.bind('add', this.renderProductView, this);
+                this.products.bind('reset', this.loadProducts, this);
+            }
 
-            return this.products.fetch();
+            return this.products;
         }
 	});
 
