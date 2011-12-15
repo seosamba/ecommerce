@@ -247,7 +247,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductCategory');
 				foreach($productsRowset as $productRow) {
 					$productModel = $this->_toModel($productRow);
-					$modelHash = md5($productModel->getId());
+					$modelHash    = md5($productModel->getId());
 					if(!array_key_exists($modelHash, $products)) {
 						$products[$modelHash] = $productModel;
 					}
@@ -260,8 +260,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	}
 
 	public function findByBrands(array $brands) {
-		$products     = array();
-		$brandDbTable = new Models_DbTable_Brand();
+		$products = array();
 		foreach($brands as $brand) {
 		 	$brandModel =  $this->_brandMapper->findByName($brand);
 			if($brandModel) {
