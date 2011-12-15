@@ -32,7 +32,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
-		$this->_view->setScriptPath(__DIR__ . '/system/views/');
+		$this->_view->setUseStreamWrapper(true)->setScriptPath(__DIR__ . '/system/views/');
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig	= Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
