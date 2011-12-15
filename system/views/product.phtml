@@ -113,8 +113,9 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
+		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js"></script>
-		
+
 		<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/smoke.min.js"></script>
 		
 		<!-- Loading "product/main.js" as a bootstrap of product module -->
@@ -227,7 +228,7 @@
 			{{/if}}
 			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
                 <p class="brand">${brand}</p>
-                <img class="lazy" src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+                <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
                 ${name}
                 <p class="sku">${sku}</p>
             </a>
@@ -269,7 +270,7 @@
                         <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku or mpn" />
                     </div>
                 </div>
-                <div id="product-list-holder" class="h500" style="overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+                <div id="product-list-holder" class="h500" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
             </div>
 
             <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">

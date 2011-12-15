@@ -21,6 +21,10 @@ define([
 				data['showDelete'] = this.options.showDelete;
 			}
 			$(this.el).html($.tmpl(this.template, data));
+            this.$('img.lazy').lazyload({
+                container: $('#product-list-holder'),
+                effect: 'fadeIn'
+            });
 			return this;
 		}
 	});

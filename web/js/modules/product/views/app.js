@@ -126,7 +126,7 @@ define([
 			this.model.set(data);
 		},
 		render: function(){
-            console.log('render', this.model.changedAttributes());
+            console.log('render app.js', this.model.changedAttributes());
             $('#quick-preview').empty();
 
             //hiding delete button if product is new
@@ -386,6 +386,7 @@ define([
             } else {
                 $('#product-list-holder > .productlisting').show();
             }
+            $('#product-list-holder').trigger('scroll');
         },
         fetchOptionLibrary: function(){
             if (!appRouter.hasOwnProperty('optionLibrary')){

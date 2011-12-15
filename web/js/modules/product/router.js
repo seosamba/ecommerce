@@ -74,9 +74,13 @@ define([
         },
 		productListToggle: function(){
             if (this.products === null) {
-                this.initProductlist().fetch();
+                this.initProductlist().fetch({async: false});
+                $('#product-list').show('slide');
+                $('#product-list-holder').trigger('scroll');
+            } else {
+                $('#product-list').show('slide');
             }
-            $('#product-list').show('slide');
+
 		},
         initProductlist: function() {
             if (this.products === null) {
