@@ -29,6 +29,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	protected $_template        = null;
 
+	protected $_orderSequence   = array();
+
 	public function _init() {
 		parent::_init();
 		if (empty($this->_options)){
@@ -40,7 +42,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_websiteHelper    = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 	    $this->_configHelper     = Zend_Controller_Action_HelperBroker::getExistingHelper('config');
 	    $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
-		$this->_config           = Zend_Registry::get('theme');
+		$this->_themeConfig      = Zend_Registry::get('theme');
 		$this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
 
 	}
@@ -100,7 +102,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					if(empty($products)) {
 						$products = $this->_productMapper->fetchAll();
 					}
-					$products = $this->_sort($products, $optData['values']);
+					$this->_orderSequence = $optData['values'];
+					$products             = $this->_sort($products);
 				break;
 			}
 		}
@@ -127,22 +130,35 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		);
 	}
 
-	private function _sort($products, $terms) {
+	private function _sort($products) {
 		uasort($products, array($this, '_sortingCallback'));
 		return $products;
 	}
 
 	private function _sortingCallback($productOne, $productTwo) {
-		$brandCmp = strcasecmp($productOne->getBrand(), $productTwo->getBrand());
-		if($brandCmp !== 0) {
-			return $brandCmp;
+		if($this->_orderSequence) {
+			$compareResult = 0;
+			foreach($this->_orderSequence as $orderTerm) {
+				$getter = 'get' . ucfirst($orderTerm);
+				if(!method_exists($productOne, $getter) || !method_exists($productTwo, $getter)) {
+					continue;
+				}
+				$productOneTerm = $productOne->$getter();
+				$productTwoTerm = $productTwo->$getter();
+				if(is_integer($productOneTerm) && is_integer($productTwoTerm)) {
+					$compareResult = ($productOneTerm - $productTwoTerm) ? ($productOneTerm - $productTwoTerm) / abs($productOneTerm - $productTwoTerm) : 0;
+					if($compareResult !== 0) {
+						return $compareResult;
+					}
+				}
+				else {
+					$compareResult = strcasecmp($productOneTerm, $productTwoTerm);
+					if($compareResult !== 0) {
+						return $compareResult;
+					}
+				}
+			}
+			return $compareResult;
 		}
-    	$nameCmp  = strcasecmp($productOne->getName(), $productTwo->getName());
-		if($nameCmp !== 0) {
-			return $nameCmp;
-		}
-		$priceOne = $productOne->getPrice();
-		$priceTwo = $productTwo->getPrice();
-		return ($priceOne - $priceTwo) ? ($priceOne - $priceTwo) / abs($priceOne - $priceTwo) : 0;
 	}
 }
