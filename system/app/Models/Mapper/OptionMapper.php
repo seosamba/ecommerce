@@ -43,28 +43,26 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 	}
 	
 	public function find($id) {
-		if (is_array($id) && !empty ($id)){
-			foreach ($id as $i) {
-				$this->find($i);
-			}
-		}
-		
 		$result = $this->getDbTable()->find($id);
 		if(0 === count($result)) {
 			return null;
 		}
-		$row = $result->current();
-		$model = new $this->_model($row->toArray());
-		
-		if ($model->getType() === $model::TYPE_DROPDOWN || $model->getType() === $model::TYPE_RADIO) {
-//			$selections = $row->findDependentRowset('Models_DbTable_Selection', 'Models_DbTable_OptionSelection');
-			$selections = $row->findDependentRowset('Models_DbTable_Selection');
-			if ($selections->count()){
-				$model->setSelection($selections->toArray());
-			}
-		}
+        $models = array();
+        foreach ($result as $row) {
+            $model = new $this->_model($row->toArray());
 
-		return $model;
+            if ($model->getType() === $model::TYPE_DROPDOWN || $model->getType() === $model::TYPE_RADIO) {
+                //			$selections = $row->findDependentRowset('Models_DbTable_Selection', 'Models_DbTable_OptionSelection');
+                $selections = $row->findDependentRowset('Models_DbTable_Selection');
+                if ($selections->count()){
+                    $model->setSelection($selections->toArray());
+                }
+            }
+
+            array_push($models, $model);
+        }
+
+		return $models;
 	}
 
 	private function _proccessSelection(Models_Model_Option $model){
