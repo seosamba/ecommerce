@@ -86,8 +86,8 @@
                 background-color:#fff;
             }
 
-            input.highlight {
-                border-color: #cd5c5c !important;
+            .highlight {
+                border: 1px solid #cd5c5c !important;
             }
             #manage-product > .ui-tabs-panel {
                 height: 400px;
@@ -110,7 +110,7 @@
             }
 		</style>
 		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js"></script>
@@ -228,7 +228,11 @@
 			{{/if}}
 			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
                 <p class="brand">${brand}</p>
+                {{if showDelete}}
+                <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+                {{else}}
                 <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+                {{/if}}
                 ${name}
                 <p class="sku">${sku}</p>
             </a>
@@ -278,7 +282,7 @@
                     <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');">&lt; back</a>
                     <span style="margin-left: 30%">select image for product</span>
                 </div>
-                <div id="image-list"></div>
+                <div id="image-list" style="height: 400px !important; overflow-x: hidden; overflow-y: auto;"></div>
             </div>
 
             <ul>
@@ -296,7 +300,7 @@
                 <div class="grid_8 alpha">
                     <div class="grid_4">
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-                        <div style="height: 130px; background: white; text-align: center; vertical-align: middle;">
+                        <div id="product-image-holder" style="height: 130px; background: white; text-align: center; vertical-align: middle;">
                             <img style="height: 100%; max-width: 190px;" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
                         </div>
                     </div>

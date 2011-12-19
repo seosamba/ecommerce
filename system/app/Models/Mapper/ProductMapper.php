@@ -139,15 +139,12 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		//fetching options
 		$optionSet = $row->findDependentRowset('Models_DbTable_ProductOption');
 		if ($optionSet->count()) {
-			$options = array();
-			$optionMapper = Models_Mapper_OptionMapper::getInstance();
-			foreach ($optionSet as $optionRow) {
-				$opt = $optionMapper->find($optionRow->option_id);
-				if ($opt){
-					array_push($options, $opt->toArray());
-				}
-			}
-			$entity->setDefaultOptions($options);
+            $ids = array();
+            foreach ($optionSet as $optionRow) {
+                array_push($ids, $optionRow->option_id);
+            }
+			$entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->find($ids, true));
+            unset($ids);
 		}
 
 		//fetching related products
@@ -284,11 +281,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$status = $this->getDbTable()->delete($where);
 
         if ($status) {
-            $brand = $this->_brandMapper->findByName($product->getBrand());
-            if ($brand) {
-                $prodList = $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('brand_id = ?', $brand->getId()));
-                if (empty($prodList)){
-                    $this->_brandMapper->delete($brand);
+            if ($product->getBrand()){
+                $brand = $this->_brandMapper->findByName($product->getBrand());
+                if ($brand) {
+                    $prodList = $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('brand_id = ?', $brand->getId()));
+                    if (empty($prodList)){
+                        $this->_brandMapper->delete($brand);
+                    }
                 }
             }
             // removing page

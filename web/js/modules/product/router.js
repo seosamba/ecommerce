@@ -69,18 +69,18 @@ define([
             $.tmpl("<option value='${name}' {{if url}}data-url='${url}'{{/if}}>${name}</option>", brand.toJSON()).appendTo('#product-brand');
         },
         renderBrands: function(){
-            $('#product-brand').empty();
+            $('#product-brand').html('<option value="-1" disabled>Select a brand</option>');
             _(this.brands.sortBy(function(brand){ return brand.get('name').toLowerCase();})).each(this.addBrand, this);
+            $('#product-brand > option:first').attr('disabled', true);
         },
 		productListToggle: function(){
             if (this.products === null) {
                 this.initProductlist().fetch({async: false});
                 $('#product-list').show('slide');
-                $('#product-list-holder').trigger('scroll');
             } else {
                 $('#product-list').show('slide');
             }
-
+            $('#product-list-holder').trigger('scroll');
 		},
         initProductlist: function() {
             if (this.products === null) {

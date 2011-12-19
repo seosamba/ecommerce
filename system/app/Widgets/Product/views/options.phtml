@@ -1,30 +1,28 @@
-<div class="product-options-listing" data-productId="<?php echo $this->product->getId();?>">
+<div class="product-options-listing" data-productId="<?php echo  $this->product->getId();?>">
 <?php foreach ($this->product->getDefaultOptions() as $option): ?>
-    <div class="product-option" data-type="<?php echo $option['type'];?>">
+    <?php $uniqName = 'product-'.$this->product->getId().'-option-'.$option['id']; ?>
+    <?php
+    if (($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) && !empty($option['selection'])){
+        $options = array();
+        $defaultId = null;
+        foreach ($option['selection'] as $item) {
+            $options[$item['id']] = $item['title'];
+            if ($item['isDefault']) $defaultId = $item['id'];
+        }
+    }
+    ?>
+    <div class="product-option option-<?php echo  $option['type'];?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
+        <label for="<?php echo $uniqName; ?>" ><?php echo $option['title'];?></label>
         <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
-        <label for="product-option-<?php echo $option['title'];?>"><?php echo $option['title'];?></label>
-        <select name="product-option-<?php echo $option['title'];?>">
-        <?php foreach ($option['selection'] as $item) :?>
-                <?php var_dump($item); ?>
-            <option value="<?php echo $item['id'];?>" <?php echo $item['isDefault'] === '1' ? 'selected' : ''; ?> ><?php echo $item['title'];?></option>
-        <?php endforeach; ?>
-        </select>
+        <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_RADIO): ?>
-            <?php foreach ($option['selection'] as $item): ?>
-            <div class="option-item">
-            <input type="radio"
-                   name="product-option-<?php echo $option['title'];?>"
-                   id="product-option-<?php echo $option['title'].'-'.$item['id'];?>"
-                   value="<?php echo $item['id']; ?>" <?php echo $item['isDefault'] === '1' ? 'checked' : ''; ?> />
-            <label for="product-option-<?php echo $option['title'].'-'.$item['id'];?>"><?php echo $item['title']; ?></label>
-            </div>
-            <?php endforeach;?>
+        <div>
+        <?php echo  $this->formRadio($uniqName, $defaultId, null, $options); ?>
+        </div>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXT): ?>
-        <label for="product-option-<?php echo $option['title'];?>"><?php echo $option['title'];?></label>
-        <input type="text" name="product-option-<?php echo $option['title'];?>" id="">
+        <input type="text" name="<?php echo  $uniqName;?>" id="" />
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_DATE): ?>
-        <label for="product-option-<?php echo $option['title'];?>"><?php echo $option['title'];?></label>
-        <input type="date" name="product-option-<?php echo $option['title'];?>" onmouseover="if (window.jQuery && jQuery.ui) $(this).datepicker() ;" id="">
+        <input type="date" name="<?php echo  $uniqName;?>" onmouseover="if (window.jQuery && jQuery.ui) $(this).datepicker() ;" id="" />
         <?php endif; ?>
     </div>
 <?php endforeach; ?>

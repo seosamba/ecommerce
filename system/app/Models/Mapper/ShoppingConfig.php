@@ -20,11 +20,20 @@ class Models_Mapper_ShoppingConfig extends Application_Model_Mappers_Abstract {
 		
 		return true;
 	}
-	
+
+    /**
+     * Fetch all shopping config params as array
+     * @return array
+     */
 	public function getConfigParams() {
 		return $this->getDbTable()->selectConfig();
 	}
-	
+
+    /**
+     * Fetch from shopping config parameter by given name
+     * @param $name Name of parameter
+     * @return null|string Value of parameter
+     */
 	public function getConfigParam($name) {
 		if (!$name) {
 			return null;

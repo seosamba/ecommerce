@@ -431,21 +431,18 @@ class Shopping extends Tools_Plugins_Abstract {
 				'teaserText'	=> '',
 				'templateId'	=> $templateId ? $templateId : 'default',
 				'parentId'		=> 0,
-				'system'		=> 0,
+				'system'		=> 1,
 				'is404page'		=> 0,
 				'protected'		=> 0,
 				'memLanding'	=> 0,
 				'siloId'		=> 0,
 				'lastUpdate'	=> date(DATE_ATOM),
-				'showInMenu'	=> 1,
+				'showInMenu'	=> 0,
 				'targetedKey'	=> self::PRODUCT_CATEGORY_NAME
 			));
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
 		}
 		$page = new Application_Model_Models_Page();
-		$uniqName = implode('-', array($product->getName(), $product->getSku(), $product->getBrand()));
-		$uniqName = preg_replace('/[@!.:;=\'"`~#$%?&()*|\s\/\\\]{1,}/','-', $uniqName);
-		$uniqName = trim($uniqName, '-');
 		$uniqName = array_map(function($str){
             $filter = new Zend_Filter_PregReplace(array(
                    'match'   => '/[^\w\d]+/',
@@ -453,7 +450,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 ));
             return trim($filter->filter($str), ' -');
             }
-            , array($product->getName(), $product->getSku(), $product->getBrand()));
+            , array( $product->getBrand(), $product->getName(), $product->getSku() ));
 		$uniqName = implode('-', $uniqName);
 		$page->setTemplateId($templateId ? $templateId : 'default' );
 		$page->setParentId($prodCatPage->getId());
@@ -523,4 +520,20 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function debugAction(){
 
 	}
+
+    /**
+     * for test purposes only
+     * @todo remove it
+     */
+    protected function _makeOptionCart(){
+        return '<div style="border: 1px dashed red;">This is dummy cart widget<br />But nothing here yet<hr /><a href="#">go to cart</a></div>';
+    }
+
+    /**
+     * for test purposes only
+     * @todo remove it
+     */
+    protected function _makeOptionAddtocart(){
+        return '<div style="border: 1px dashed red;"><button>ADD TO CART</button></div>';
+    }
 }

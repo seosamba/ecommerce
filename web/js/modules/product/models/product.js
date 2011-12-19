@@ -10,7 +10,7 @@ define([
 			name: '',
 			sku: '',
 			mpn: '',
-			brand: '',
+			brand: null,
 			shortDescription: '',
 			fullDescription: '',
 			enabled: 1,

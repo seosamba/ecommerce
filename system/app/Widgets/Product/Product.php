@@ -59,6 +59,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     protected function _load() {
         if ($this->_product === null || $this->_type === null) {
+            if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
+                 return "<b>Product doesn't exist or wrong options provided</b>";
+            }
             return "<!--Product doesn't exist or wrong options provided-->";
         }
 
