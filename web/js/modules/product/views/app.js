@@ -146,7 +146,11 @@ define([
 			this.$('#product-sku').val(this.model.get('sku'));
 			this.$('#product-mpn').val(this.model.get('mpn'));
 			this.$('#product-weight').val(this.model.get('weight'));
-            this.model.has('brand') && this.$('#product-brand').val(this.model.get('brand'));
+            if (this.model.has('brand')){
+                this.$('#product-brand').val(this.model.get('brand'));
+            } else {
+                this.$('#product-brand').val(-1);
+            }
 			this.$('#product-price').val(this.model.get('price'));
 			this.$('#product-taxClass').val(this.model.get('taxClass'));
 			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
@@ -358,7 +362,7 @@ define([
             return false;
         },
         newBrand: function(e){
-            var newBrand = this.$('#new-brand').val();
+            var newBrand = trim(this.$('#new-brand').val());
             if (e.keyCode === 13 && newBrand !== '') {
                 var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
                 this.addNewBrand(newBrand)
