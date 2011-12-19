@@ -50,8 +50,8 @@ class Shopping extends Tools_Plugins_Abstract {
         $view       = new Zend_View(array(
             'scriptPath' => dirname(__FILE__) . '/system/views'
         ));
-        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $view->websiteUrl = $websiteHelper->getUrl();
+        $websiteHelper    = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+	    $view->websiteUrl = $websiteHelper->getUrl();
 
 	    //getting product listing templates
 	    $view->productTemplates = Application_Model_Mappers_TemplateMapper::getInstance()->findByType(Application_Model_Models_Template::TYPE_LISTING);
@@ -295,8 +295,9 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	protected function _productRESTService(){
 		$productMapper = Models_Mapper_ProductMapper::getInstance();
-		$method =  $this->_request->getMethod();
-		$data = array();
+		$method        =  $this->_request->getMethod();
+		$data          = array();
+		$cacheHelper   = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
 		switch ($method){
 			case 'GET':
 				$id = isset ($this->_requestedParams['id']) ? $this->_requestedParams['id'] : null;
@@ -308,19 +309,24 @@ class Shopping extends Tools_Plugins_Abstract {
 				} else {
 					$filter['categories'] = isset($this->_requestedParams['fcat']) ? $this->_requestedParams['fcat'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
-					if(is_array($filter['categories']) && !empty($filter['categories'])) {
-						$products = $productMapper->findByCategories($filter['categories']) ;
-					}
-					else {
-						$products = $productMapper->fetchAll();
-					}
-					foreach ($products as $product) {
-						if(is_array($filter['brands']) && !empty($filter['brands'])) {
-							if(!in_array($product->getBrand(), $filter['brands'])) {
-								continue;
-							}
+					$cacheKey             = md5($filter['categories'] . $filter['brands']);
+					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
+						$data = array();
+						if(is_array($filter['categories']) && !empty($filter['categories'])) {
+							$products = $productMapper->findByCategories($filter['categories']) ;
 						}
-						array_push($data, $product->toArray());
+						else {
+							$products = $productMapper->fetchAll();
+						}
+						foreach ($products as $product) {
+							if(is_array($filter['brands']) && !empty($filter['brands'])) {
+								if(!in_array($product->getBrand(), $filter['brands'])) {
+									continue;
+								}
+							}
+							array_push($data, $product->toArray());
+						}
+						$cacheHelper->save($cacheKey, $data, 'store_', array(), Helpers_Action_Cache::CACHE_NORMAL);
 					}
 				}
 				break;
