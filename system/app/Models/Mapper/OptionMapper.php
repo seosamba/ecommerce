@@ -42,7 +42,7 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		return $model;
 	}
 	
-	public function find($id) {
+	public function find($id, $array = false) {
 		$result = $this->getDbTable()->find($id);
 		if(0 === count($result)) {
 			return null;
@@ -59,7 +59,7 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
                 }
             }
 
-            array_push($models, $model);
+            array_push($models, $array ? $model->toArray() : $model );
         }
 
 		return $models;

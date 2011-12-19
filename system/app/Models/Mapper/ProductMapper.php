@@ -143,7 +143,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             foreach ($optionSet as $optionRow) {
                 array_push($ids, $optionRow->option_id);
             }
-			$entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->find($ids));
+			$entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->find($ids, true));
             unset($ids);
 		}
 

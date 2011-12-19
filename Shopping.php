@@ -425,13 +425,13 @@ class Shopping extends Tools_Plugins_Abstract {
 				'teaserText'	=> '',
 				'templateId'	=> $templateId ? $templateId : 'default',
 				'parentId'		=> 0,
-				'system'		=> 0,
+				'system'		=> 1,
 				'is404page'		=> 0,
 				'protected'		=> 0,
 				'memLanding'	=> 0,
 				'siloId'		=> 0,
 				'lastUpdate'	=> date(DATE_ATOM),
-				'showInMenu'	=> 1,
+				'showInMenu'	=> 0,
 				'targetedKey'	=> self::PRODUCT_CATEGORY_NAME
 			));
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
