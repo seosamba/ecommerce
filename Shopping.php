@@ -437,9 +437,6 @@ class Shopping extends Tools_Plugins_Abstract {
 			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
 		}
 		$page = new Application_Model_Models_Page();
-		$uniqName = implode('-', array($product->getName(), $product->getSku(), $product->getBrand()));
-		$uniqName = preg_replace('/[@!.:;=\'"`~#$%?&()*|\s\/\\\]{1,}/','-', $uniqName);
-		$uniqName = trim($uniqName, '-');
 		$uniqName = array_map(function($str){
             $filter = new Zend_Filter_PregReplace(array(
                    'match'   => '/[^\w\d]+/',
@@ -447,7 +444,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 ));
             return trim($filter->filter($str), ' -');
             }
-            , array($product->getName(), $product->getSku(), $product->getBrand()));
+            , array( $product->getBrand(), $product->getName(), $product->getSku() ));
 		$uniqName = implode('-', $uniqName);
 		$page->setTemplateId($templateId ? $templateId : 'default' );
 		$page->setParentId($prodCatPage->getId());

@@ -86,8 +86,8 @@
                 background-color:#fff;
             }
 
-            input.highlight {
-                border-color: #cd5c5c !important;
+            .highlight {
+                border: 1px solid #cd5c5c !important;
             }
             #manage-product > .ui-tabs-panel {
                 height: 400px;
@@ -300,7 +300,7 @@
                 <div class="grid_8 alpha">
                     <div class="grid_4">
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-                        <div style="height: 130px; background: white; text-align: center; vertical-align: middle;">
+                        <div id="product-image-holder" style="height: 130px; background: white; text-align: center; vertical-align: middle;">
                             <img style="height: 100%; max-width: 190px;" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
                         </div>
                     </div>

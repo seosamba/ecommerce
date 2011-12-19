@@ -146,7 +146,7 @@ define([
 			this.$('#product-sku').val(this.model.get('sku'));
 			this.$('#product-mpn').val(this.model.get('mpn'));
 			this.$('#product-weight').val(this.model.get('weight'));
-			this.$('#product-brand').val(this.model.get('brand'));
+            this.model.has('brand') && this.$('#product-brand').val(this.model.get('brand'));
 			this.$('#product-price').val(this.model.get('price'));
 			this.$('#product-taxClass').val(this.model.get('taxClass'));
 			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
@@ -265,32 +265,48 @@ define([
 			});
 		},
         validateProduct: function(){
-            var error   = false,
-                name    = trim(this.model.get('name')),
-                sku     = trim(this.model.get('sku')),
-                price   = trim(this.model.get('price')),
-                brand   = trim(this.model.get('brand'));
+            var error   = false;
 
-
-            if (name === ''){
+            if (!this.model.has('name') || trim(this.model.get('name')) === ''){
                 this.$('#product-name').addClass('highlight');
                 error = true || error;
             } else {
                 this.$('#product-name').removeClass('highlight');
             }
 
-            if (sku === ''){
+            if (!this.model.has('sku') || trim(this.model.get('sku')) === ''){
                 this.$('#product-sku').addClass('highlight');
                 error = true || error;
             } else {
                 this.$('#product-sku').removeClass('highlight');
             }
 
-            if (price === ''){
+            if (!this.model.has('price')){
                 this.$('#product-price').addClass('highlight');
                 error = true || error;
             } else {
                 this.$('#product-price').removeClass('highlight');
+            }
+
+            if (!this.model.has('brand') && trim($('#new-brand').val()) === '') {
+                this.$('#product-brand').addClass('highlight');
+                error = true || error;
+            } else {
+                this.$('#product-brand').removeClass('highlight');
+            }
+
+            if (!this.model.has('photo')) {
+                this.$('#product-image-holder').addClass('highlight');
+                error = true || error;
+            } else {
+                this.$('#product-image-holder').removeClass('highlight');
+            }
+
+            if (!this.model.has('shortDescription') || trim(this.model.get('shortDescription')) === ''){
+                this.$('#product-shortDescription').addClass('highlight');
+                error = true || error;
+            } else {
+                this.$('#product-shortDescription').removeClass('highlight');
             }
 
             return !error;
