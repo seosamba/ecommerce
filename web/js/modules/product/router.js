@@ -77,11 +77,10 @@ define([
             if (this.products === null) {
                 this.initProductlist().fetch({async: false});
                 $('#product-list').show('slide');
-                $('#product-list-holder').trigger('scroll');
             } else {
                 $('#product-list').show('slide');
             }
-
+            $('#product-list-holder').trigger('scroll');
 		},
         initProductlist: function() {
             if (this.products === null) {
