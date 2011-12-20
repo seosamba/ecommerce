@@ -1,4 +1,4 @@
-	<?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
+<?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
 <div class="container_12">
 	<!-- Product listing selector -->
 	<div id="template-selector" class="grid_12 mt10px mb5px">
@@ -102,7 +102,9 @@
         background-color:#fff;
     }
 </style>
-<?php echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
+<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
+<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js'); ?>
+<?php echo $this->headScript(); ?>
 <script type="text/javascript" charset="utf-8">
     $(function() {
 	    $('.pselect').chosen();
@@ -145,7 +147,9 @@
 			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((tpl) ? ':' + tpl : '') + '}');
 		});
 
-		$('#btn-create').live('click', function() {
+
+
+	    $('#btn-create').live('click', function() {
 			var shortCode = '{$productlist:';
 			if($('#templates').val() == 0) {
 				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
@@ -164,10 +168,10 @@
 		})
 
 	    $('.pselect').chosen().change(filter);
-
     });
 
 	function loadStoreData(type) {
+
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/' + type, function(response) {
             if(response.length && !($('#' + type + ' option').length)) {
 				$.each(response, function() {
@@ -188,9 +192,13 @@
 					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
 						'<p class="brand">' + this.brand + '</p>' +
-						'<img src="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a><p class="sku">' + this.sku + '</p></div>';
+						'<img class="lazy" src="" data-original="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a><p class="sku">' + this.sku + '</p></div>';
 					$('#product-products').append(productItem);
 				});
+	            $('img.lazy').lazyload({
+                    container: $('#product-products'),
+                    effect: 'fadeIn'
+                });
 			}
         })
 	}
@@ -209,9 +217,13 @@
 					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '"><div class="details">' +
 						'<p class="brand">' + this.brand + '</p><p class="sku">' + this.sku + '</p></div>' +
-						'<img src="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a></div>';
+						'<img class="lazy" src="" data-original="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a></div>';
 					$('#product-products').append(productItem);
 				});
+				$('img.lazy').lazyload({
+                    container: $('#product-products'),
+                    effect: 'fadeIn'
+                });
 			}
 			else {
 				$('#product-products').html('');
