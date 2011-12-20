@@ -11,14 +11,15 @@
 		<link href="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/100s.css" media="screen" rel="stylesheet" type="text/css" > 
 		<style>
 			div.box {
-				background-color: white;
-				margin: 3px 0;
-				padding: 3px;
-				cursor: pointer;
-				border: 1px solid #ccc;
+                background-color: white;
+                margin: 3px 0;
+                padding: 5px 5px 0;
+                cursor: pointer;
+                border: 1px solid whiteSmoke;
+                height: auto;
 			}
 			div.box:hover {
-				box-shadow: 0 0 3px #3C78A7;
+				box-shadow: 0 0 3px lightseagreen;
 			}
 			#product-categories .category-widget {
 				float:left;
@@ -277,12 +278,12 @@
                 <div id="product-list-holder" class="h500" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
             </div>
 
-            <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #eee;">
+            <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
                 <div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
                     <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');">&lt; back</a>
                     <span style="margin-left: 30%">select image for product</span>
                 </div>
-                <div id="image-list" style="height: 400px !important; overflow-x: hidden; overflow-y: auto;"></div>
+                <div id="image-list" style="height: 470px !important; overflow-x: hidden; overflow-y: auto;"></div>
             </div>
 
             <ul>

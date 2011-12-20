@@ -198,9 +198,9 @@ define([
 
 			$('#image-list').masonry({
 				itemSelector : '.box',
-				columnWidth : 120
+				columnWidth : 118
 			});
-			$(this.el).show();
+//			$(this.el).show();
 		},
 		saveProduct: function(){
 			//@todo: make messages translatable
