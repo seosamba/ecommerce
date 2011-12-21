@@ -17,7 +17,7 @@ class Tools_ShoppingCart {
         if ($this->_session === null){
             $this->_session = new Zend_Session_Namespace($this->_websiteHelper->getUrl().'cart');
         }
-        $this->_content = new SplObjectStorage();
+        
         $this->_load();
     }
 
