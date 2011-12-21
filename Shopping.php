@@ -309,7 +309,9 @@ class Shopping extends Tools_Plugins_Abstract {
 				} else {
 					$filter['categories'] = isset($this->_requestedParams['fcat']) ? $this->_requestedParams['fcat'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
-					$cacheKey             = md5($filter['categories'] . $filter['brands']);
+					$categoryPart         = (is_array($filter['categories']) && !empty($filter['categories'])) ? implode('.', $filter['categories']) : 'allcategories';
+					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
+					$cacheKey             = $categoryPart . $brandPart;
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
 						$data = array();
 						if(is_array($filter['categories']) && !empty($filter['categories'])) {

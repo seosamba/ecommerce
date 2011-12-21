@@ -27,9 +27,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	protected $_themeConfig     = null;
 
-	protected $_template        = null;
+	protected $_templateContent = null;
 
 	protected $_orderSequence   = array();
+
+	protected $_parser          = null;
 
 	public function _init() {
 		parent::_init();
@@ -44,35 +46,44 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	    $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_themeConfig      = Zend_Registry::get('theme');
 		$this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
-
 	}
 
 	public function _load() {
-		$this->_template = Application_Model_Mappers_TemplateMapper::getInstance()->findByName(array_shift($this->_options));
-		if($this->_template === null) {
+		$template = Application_Model_Mappers_TemplateMapper::getInstance()->findByName(array_shift($this->_options));
+		if($template === null) {
 			throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
 		}
-		$products = $this->_prepareProducts();
+
+		$products = $this->_loadProducts();
 		if(!empty($products)) {
+			$this->_templateContent = $template->getContent();
+			$this->_parser   = new Tools_Content_Parser(
+				$this->_templateContent,
+				null,
+				array(
+		            'websiteUrl'   => $this->_websiteHelper->getUrl(),
+		            'websitePath'  => $this->_websiteHelper->getPath(),
+		            'currentTheme' => $this->_configHelper->getConfig('currentTheme'),
+		            'themePath'    => $this->_themeConfig['path']
+		        )
+			);
 			array_walk($products, array($this, '_parsingCallback'));
 			return $this->_renderedContent;
 		}
 		return '';
 	}
 
+	private function _loadProducts() {
+		$cacheKey = 'productsList' . implode('.', $this->_options);
+		if(($products = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET)) === null) {
+			$products = $this->_prepareProducts();
+		}
+		return $products;
+	}
+
 	private function _parsingCallback($product) {
-		$parser = new Tools_Content_Parser(
-			$this->_template->getContent(),
-			$product->getPage()->toArray(),
-			array(
-	            'websiteUrl'   => $this->_websiteHelper->getUrl(),
-	            'websitePath'  => $this->_websiteHelper->getPath(),
-	            'currentTheme' => $this->_configHelper->getConfig('currentTheme'),
-	            'themePath'    => $this->_themeConfig['path']
-	        )
-		);
-		$this->_renderedContent .= $parser->parse();
-		unset($parser);
+		//$this->_renderedContent .= $this->_parser->setPageData($product->getPage()->toArray())->parse();
+		//$this->_parser->setContent($this->_templateContent);
 	}
 
 	private function _prepareProducts() {
