@@ -320,8 +320,8 @@ class Shopping extends Tools_Plugins_Abstract {
 						else {
 							$products = $productMapper->fetchAll();
 						}
-						if(is_array($filter['brands']) && !empty($filter['brands'])) {
-							foreach ($products as $product) {
+						foreach ($products as $product) {
+							if(is_array($filter['brands']) && !empty($filter['brands'])) {
 								if(!in_array($product->getBrand(), $filter['brands'])) {
 									continue;
 								}
