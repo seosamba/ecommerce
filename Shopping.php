@@ -215,7 +215,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	private function _brandsRESTService() {
-		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll();
+		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll(null, array('name'));
 
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
         $pagesUrls = $pageMapper->fetchAllUrls();
@@ -320,8 +320,8 @@ class Shopping extends Tools_Plugins_Abstract {
 						else {
 							$products = $productMapper->fetchAll();
 						}
-						foreach ($products as $product) {
-							if(is_array($filter['brands']) && !empty($filter['brands'])) {
+						if(is_array($filter['brands']) && !empty($filter['brands'])) {
+							foreach ($products as $product) {
 								if(!in_array($product->getBrand(), $filter['brands'])) {
 									continue;
 								}

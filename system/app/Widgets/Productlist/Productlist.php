@@ -33,6 +33,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	protected $_parser          = null;
 
+	protected $_entityParser   = null;
+
 	public function _init() {
 		parent::_init();
 		if (empty($this->_options)){
@@ -46,6 +48,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	    $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_themeConfig      = Zend_Registry::get('theme');
 		$this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
+		$this->_entityParser     = new Tools_Content_EntityParser();
 	}
 
 	public function _load() {
@@ -57,7 +60,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$products = $this->_loadProducts();
 		if(!empty($products)) {
 			$this->_templateContent = $template->getContent();
-			$this->_parser   = new Tools_Content_Parser(
+			$this->_parser          = new Tools_Content_Parser(
 				$this->_templateContent,
 				null,
 				array(
@@ -82,8 +85,35 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	}
 
 	private function _parsingCallback($product) {
-		//$this->_renderedContent .= $this->_parser->setPageData($product->getPage()->toArray())->parse();
-		//$this->_parser->setContent($this->_templateContent);
+		$productPhotoData = explode('/', $product->getPhoto());
+
+		$this->_entityParser->setDictionary(array(
+			'$product:name'              => $product->getName(),
+			'$product:photourl'          => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/product/' . $productPhotoData[1],
+			'$product:photourl:small'    => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/small/' . $productPhotoData[1],
+			'$product:photourl:medium'   => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/medium/' . $productPhotoData[1],
+			'$product:photourl:large'    => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/large/' . $productPhotoData[1],
+			'$product:photourl:original' => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/original/' . $productPhotoData[1],
+			'$product:url'               => $product->getPage()->getUrl(),
+			'$product:price'             => $product->getPrice(),
+			'$product:brand'             => $product->getBrand(),
+			'$product:weight'            => $product->getWeight(),
+			'$product:mpn'               => $product->getMpn(),
+			'$product:sku'               => $product->getSku(),
+			'$product:description:short' => $product->getShortDescription(),
+			'$product:description'       => $product->getShortDescription(),
+			'$product:description:full'  => $product->getFullDescription(),
+			'$product:options'           => $this->_renderProductWidgetOption('options', $product->getPage()->toArray()),
+			'$product:editproduct'       => $this->_renderProductWidgetOption('editproduct', $product->getPage()->toArray())
+		));
+        $this->_renderedContent .= $this->_entityParser->parse($this->_templateContent);
+	}
+
+	private function _renderProductWidgetOption($option, $data) {
+        $widget  = Tools_Factory_WidgetFactory::createWidget('product', array('options'), $data);
+		$content = $widget->render();
+		unset($widget);
+		return $content;
 	}
 
 	private function _prepareProducts() {
