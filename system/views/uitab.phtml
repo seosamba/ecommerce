@@ -184,8 +184,10 @@
 	}
 
 	function loadProducts() {
+		smoke.signal('<img src="/system/images/loading.gif" />');
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', function(response) {
             if(response.length) {
+	            $('.smoke-base').hide();
 				$.each(response, function() {
 					var productItem  = '';
 					var photoDetails = this.photo.split('/');
