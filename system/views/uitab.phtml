@@ -170,8 +170,9 @@
     });
 
 	function loadStoreData(type) {
-
+		smoke.signal('<img src="/system/images/loading.gif" />');
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/' + type, function(response) {
+			$('.smoke-base').hide();
             if(response.length && !($('#' + type + ' option').length)) {
 				$.each(response, function() {
 					$('#' + type).append(
@@ -184,11 +185,9 @@
 	}
 
 	function loadProducts() {
-		smoke.signal('<img src="/system/images/loading.gif" />');
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', function(response) {
             if(response.length) {
-	            $('.smoke-base').hide();
-				$.each(response, function() {
+            $.each(response, function() {
 					var productItem  = '';
 					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
@@ -207,10 +206,12 @@
 	function filter() {
 		var categories = $('#categories').val();
 		var brands     = $('#brands').val();
+		smoke.signal('<img src="/system/images/loading.gif" />');
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', {
 			fcat   : categories,
 			fbrand : brands
 		}, function(response) {
+			$('.smoke-base').hide();
 			if(response.length) {
 				$('#product-products').html('');
 				$.each(response, function() {
