@@ -109,6 +109,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
         return  $html;
     }
 
+    private function _renderId(){
+        return $this->_product->getId();
+    }
+
     private function _renderName() {
 		return $this->_product->getName();
 	}
