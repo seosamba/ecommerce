@@ -133,8 +133,17 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			Zend_Locale::getLocaleToTerritory($this->_shoppingConfig['country']),
 			$this->_shoppingConfig['currency']
 		);
-				
-		return $currency->toCurrency($this->_product->getPrice());
+
+        if (empty($this->_options)){
+            return $currency->toCurrency($this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice());
+        } else {
+            $pluginName = strtolower($this->_options[0]);
+            $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
+            if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
+                return Tools_Factory_PluginFactory::createPlugin($plugin->getName(), array('price', $this->_product->getId()), $this->_toasterOptions)->run();
+            }
+        }
+
 	}
 	
 	private function _renderBrand() {

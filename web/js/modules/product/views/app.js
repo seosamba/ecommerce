@@ -26,7 +26,8 @@ define([
             'keypress input#new-brand': 'newBrand',
             'click a#brandlanding-link': 'gotoBrandPage',
             'keyup #product-list-search': 'filterProductList',
-            'mouseover #option-library': 'fetchOptionLibrary'
+            'mouseover #option-library': 'fetchOptionLibrary',
+            'submit form.binded-plugin': 'formSubmit'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
@@ -44,6 +45,7 @@ define([
             this.model.view = this;
             this.model.bind('change', this.render, this);
             this.model.trigger('change');
+            $('#manage-product').tabs("select" , 0);
 		},
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
@@ -127,6 +129,10 @@ define([
 		},
 		render: function(){
             console.log('render app.js', this.model.changedAttributes());
+            $("#manage-product").tabs( "option", "ajaxOptions",
+                { data: {productId: this.model.get('id') } }
+            );
+
             $('#quick-preview').empty();
 
             //hiding delete button if product is new
@@ -205,7 +211,9 @@ define([
 		saveProduct: function(){
 			//@todo: make messages translatable
             if (!this.validateProduct()) {
-                smoke.alert('Missing some required fields');
+                smoke.alert('Missing some required fields', {}, function(){
+                    $('#manage-product').tabs("select" , 0);
+                });
                 return false;
             }
 
@@ -425,6 +433,21 @@ define([
                 appRouter.optionLibrary = new optionsLibrary();
                 appRouter.optionLibrary.fetch();
             }
+        },
+        formSubmit: function(event) {
+            var $form = $(event.target);
+            $.ajax({
+                url: $form.attr('action'),
+                type: $form.attr('method'),
+                data: $form.serialize(),
+                success: function(response) {
+                    //@todo: add callback support
+                    smoke.alert(response);
+                }
+            });
+
+
+            return false;
         }
 	});
 

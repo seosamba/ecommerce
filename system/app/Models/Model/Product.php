@@ -23,6 +23,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_price;
 
+    protected $_currentPrice = null;
+
 	protected $_weight;
 	
 	protected $_brand;
@@ -38,8 +40,13 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	protected $_defaultOptions = array();
 	
 	protected $_related;
-	
-	public function getPage() {
+
+    public function  __construct(array $options = null) {
+        parent::__construct($options);
+        $this->notifyObservers();
+    }
+
+    public function getPage() {
 		return $this->_page;
 	}
 
@@ -79,7 +86,15 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 		$this->_price = $_price;
 	}
 
-	public function getPhoto() {
+    public function setCurrentPrice($price) {
+        $this->_currentPrice = $price;
+    }
+
+    public function getCurrentPrice() {
+        return $this->_currentPrice;
+    }
+
+    public function getPhoto() {
 		return $this->_photo;
 	}
 
