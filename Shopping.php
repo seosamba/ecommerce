@@ -516,6 +516,14 @@ class Shopping extends Tools_Plugins_Abstract {
 			$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
 		}
 		$this->_view->imageDirList = $listFolders;
+
+        $this->_view->plugins = array();
+        foreach (Tools_Plugins_Tools::getEnabledPlugins() as $plugin){
+            if ($plugin->getTag() === 'ecommerce') {
+                array_push($this->_view->plugins, $plugin->getName());
+            }
+        }
+
 		echo $this->_view->render('product.phtml');
 	}
 

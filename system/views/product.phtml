@@ -291,7 +291,9 @@
                 <li><a href="#category-tab">Categories</a></li>
                 <li><a href="#options-tab">Options</a></li>
                 <li><a href="#tab4">Related Products</a></li>
-                <li><a href="#tab5">Marketing</a></li>
+                <?php foreach ($this->plugins as $plugin) : ?>
+                <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.ucfirst($plugin));?></a></li>
+                <?php endforeach; ?>
                 <a href="#new" class="nav-links">New product</a>
                 <a href="#list" class="nav-links">Edit product</a>
                 <span class="close" style="float:right; cursor:pointer;" onclick="top.$('.__tpopup').dialog('close');"><?= $this->translate('Close'); ?></span>
@@ -323,7 +325,6 @@
                         <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
                         <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
                     </div>
-                    <div class="clear"></div>
                     <div class="grid_8">
                         <label for="product-brand">Brand&nbsp;<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet." style="font-size: 80%">visit brand landing page</a></label>
                     </div>
@@ -419,10 +420,6 @@
                 <div id="related-holder" class="grid_12">
 
                 </div>
-            </div>
-
-            <div id="tab5">
-                @todo super-mega-merchandising plugins are on thier way
             </div>
 
             <div class="grid_12">
