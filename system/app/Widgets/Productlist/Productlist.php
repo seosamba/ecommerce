@@ -56,7 +56,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		if($template === null) {
 			throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
 		}
-
 		$products = $this->_loadProducts();
 		if(!empty($products)) {
 			$this->_templateContent = $template->getContent();
@@ -86,7 +85,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	private function _parsingCallback($product) {
 		$productPhotoData = explode('/', $product->getPhoto());
-
 		$this->_entityParser->setDictionary(array(
 			'$product:name'              => $product->getName(),
 			'$product:photourl'          => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/product/' . $productPhotoData[1],
