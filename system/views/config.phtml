@@ -71,6 +71,17 @@
 			a.user-changed::after {
 				content: '*'
 			}
+            .ui-tabs#config .ui-tabs-panel {
+                padding: 10px 10px 10px 15px;
+                background: #DAE8ED;
+            }
+            #config .ui-tabs-nav li.ui-tabs-selected {
+                background: #DAE8ED;
+            }
+            button#save-btn {
+                float: right;
+                margin: 0 20px 10px;
+            }
 		</style>
     </head>
     <body>
@@ -81,7 +92,7 @@
 			<?php endforeach; ?>
 			</ul>
 			<?php echo $this->form; ?>
-		</div>
-		<button id="save-btn"><?php echo $this->translate('Save');?></button>
+            <button id="save-btn"><?php echo $this->translate('Save');?></button>
+        </div>
 	</body>
 </html>
