@@ -11,7 +11,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
 		<script id="zoneTemplate" type="text/x-jquery-tmpl">
-			<div class="grid_12 mb10px">
+			<div class="grid_6 suffix_6 mb10px">
 				<div>
 					<label for="">Zone Name:</label>
 					<input type="text" class="zone-name" value="${name}" placeholder="enter name for zone"/>
@@ -19,7 +19,7 @@
 			</div>
 			<div class="countries grid_6">
 				<div class="ui-widget-header ui-corner-top"><span class="padding5px">Countries</span><button class="clear-countries-list">clear</button></div>
-				<ul class="ui-widget-content zone-countries" style="height: 200px; overflow-y: auto;">
+				<ul class="ui-widget-content zone-countries" style="height: 140px; overflow-y: auto; background:#fff; margin:0;">
 				{{tmpl '#countryRowTemplate'}}
 				</ul>
 				<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
@@ -29,7 +29,7 @@
 			</div>
 			<div class="states grid_6">
 				<div class="ui-widget-header ui-corner-top"><span class="padding5px">States</span><button class="clear-states-list">clear</button></div>
-				<ul class="ui-widget-content zone-states" style="height: 200px; overflow-y: auto;">
+				<ul class="ui-widget-content zone-states" style="height: 140px; overflow-y: auto; background:#fff; margin:0;">
 				{{tmpl '#stateRowTemplate'}}
 				</ul>
 				<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
@@ -38,10 +38,9 @@
 				</div>
 			</div>
 			<div class="grid_12 mt10px">
-				<div class="ui-widget-header ui-corner-top"><span class="padding5px">Postal codes</span><button class="clear-zip-list">Clear</button></div>
-				<div class="ui-widget-content" style="height: 200px; overflow-y: auto; text-align: center">
-					<p>Put list of zip/postal codes one per line</p>
-					<textarea style="width: 96%; height: 160px; resize: none;" >${zip.join('\n')}</textarea>
+                <div class="ui-widget-header ui-corner-top"><span class="padding5px">Postal codes</span><button class="clear-zip-list">Clear</button><span style="font-weight:normal; margin-left:160px;">Put list of zip/postal codes one per line</span></div>
+                    <div class="ui-widget-content" style="height: 180px; overflow-y: auto; text-align: center">
+                    <textarea style="width: 99%; height: 160px; resize: none;" >${zip.join('\n')}</textarea>
 				</div>
 			</div>
 		</script>
@@ -66,6 +65,15 @@
 			</li>
 			{{/each}}
 		</script>
+        <style>
+        #zones.ui-tabs .ui-tabs-panel {
+            padding: 10px 5px;
+            overflow: hidden;
+        }
+        #add-country-dialog {
+            padding: 0;
+        }
+        </style>
 	</head>
     <body>
 		<noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
@@ -74,32 +82,32 @@
 		</noscript>
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
 		<div class="seotoaster container_12"> 
-			<div id="toolbar" class="padding5px ui-widget-header">
+			<div id="toolbar" class="padding5px ui-widget-header" style="height: 30px;">
 				<button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>
 				<button id="delete-zone-btn"><?php echo $this->translate('Delete'); ?></button>
 				<button id="save-btn" title="Hotkey: Ctrl+S" style="float:right; display:none;"><?php echo $this->translate('Save');?></button>
 			</div>
-			<div id="zones" class="ui-helper-clearfix">
+            <div id="zones" class="ui-helper-clearfix h530" style="overflow: hidden;">
 				<ul></ul>
 			</div>
 		</div>
 			
 		<div id="add-country-dialog" title="Add country">
-			<ul id="country-list" class="ui-helper-clearfix" style="height: 200px; overflow-x:hidden;overflow-y: auto;">
+            <ul id="country-list" class="ui-helper-clearfix" style="height: 200px; overflow-x:hidden;overflow-y: auto; background: lavender;">
 			</ul>
-			<div class="ui-widget-header" style="text-align:center;">
-				<input id="country-filter" type="text" placeholder="Start typing country name here" />
+            <div class="ui-widget-header padding5px" style="text-align:center;">
+                <input id="country-filter" type="text" placeholder="Start typing country name here" size="30" />
 				<span class="ui-icon ui-icon-search" style="display: inline-block"></span>
 			</div>
 		</div>
-		<div id="add-state-dialog">
-			<div class="ui-widget-header">
+        <div id="add-state-dialog" style="margin-top: -5px; padding: 0;">
+            <div class="ui-widget-header padding5px">
 			Select country:
 			<select id="state-filter">
 				<option value="" selected="selected">select country</option>
 			</select>	
 			</div>
-			<ul id="state-list" class="ui-helper-clearfix" style="height: 300px; overflow-x:hidden;overflow-y: auto;">
+            <ul id="state-list" class="ui-helper-clearfix" style="height: 300px; overflow-x:hidden;overflow-y: auto; background: lavender;">
 			</ul>
 		</div>
 		
