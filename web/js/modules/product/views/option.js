@@ -40,9 +40,6 @@ define([
 				icons: { primary: 'ui-icon-closethick' },
 				text: false
 			});
-            this.$('button.add-selection-btn').button({
-                icons: { primary: 'ui-icon-plus' }
-            });
             if (this.model.has('isTemplate')){
                 this.$('input[name=isTemplate]').attr('checked', 'checked');
                 this.$('input[name=templateName]').show();

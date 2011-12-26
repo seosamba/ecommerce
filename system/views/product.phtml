@@ -23,37 +23,60 @@
 			}
 			#product-categories .category-widget {
 				float:left;
-				margin: 3px 2px;
+                margin: 3px 10px 3px 0;
 			}
+            #product-categories .category-widget .toolbar {
+                margin: -1px 0 0 3px;
+            }
 			.toolbar span.ui-icon {
 				display: inline-block;
 				border-radius: 4px;
 				cursor:pointer;
 			}
-			.toolbar span.ui-icon:hover {
-				background-color: indianred;
-				background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
-			}
+            .toolbar span.ui-icon:hover, .ui-widget.ui-button.remove-option:hover .ui-icon, .ui-widget.ui-button.item-remove:hover .ui-icon {
+                background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
+            }
+            .ui-widget.ui-button.remove-option .ui-icon, .ui-widget.ui-button.item-remove .ui-icon {
+                background-image: url(/system/uithemes/seotoasterui/images/ui-icons_222222_256x240.png);
+             }
 			#options-holder .option-content .option-modifier-select {
 				width: 50px;
 			}
-			a.nav-links {
-				color: #f3f3f3;
-                border-bottom: 1px #1e90ff dotted;
+            #product-image-holder {
+                height: 130px;
+                background: white;
+                text-align: center;
+                vertical-align: middle;
+                border: 1px solid #BDE6F1;
+                border-radius: 3px 3px 3px 3px;
+                -moz-border-radius: 3px 3px 3px 3px;
+                -webkit-border-radius: 3px 3px 3px 3px;
+            }
+            #product-image-holder img { max-height: 130px; max-width: 190px; height:auto; width:auto; }
+            a.nav-links.first {
+                margin-left: 175px;
+            }
+            a.nav-links {
+                color:#e7e7e7;
                 font-weight: normal;
-                font-size: 14px;
+                line-height:24px;
 			}
 			a.nav-links:hover {
-				color: #1e90ff;
+                border-bottom:1px dotted #e7e7e7;
 			}
 			div.productlisting {
                 width: 11%;
+                border: 1px solid #fff;
                 height: 150px;
                 margin: 5px;
                 /*padding: 2px;*/
                 float: left;
-                border: 2px solid lavender;
-                border-radius: 3px 8px;
+                border-radius: 3px;
+                -moz-border-radius: 3px;
+                -webkit-border-radius: 3px;
+                box-shadow: 0 0 4px #bbbbbb;
+                -moz-box-shadow: 0 0 4px #bbbbbb;
+                -webkit-box-shadow: 0 0 4px #bbbbbb;
                 overflow: hidden;
                 position: relative;
                 text-align: center;
@@ -69,7 +92,6 @@
                 padding: 2px 0px;
                 background-color: lavender;
                 margin-bottom: 1px;
-                font-weight:bold;
             }
             p.sku{
                 text-align: right;
@@ -86,7 +108,19 @@
                 overflow: hidden;
                 background-color:#fff;
             }
-
+            input#delete {
+                padding: 3px 16px 4px !important;
+                display: none;
+                float: left;
+                margin-left: 5px;
+            }
+            #manage-product>.ui-tabs-nav li.ui-tabs-selected, #manage-product>.ui-tabs-panel {
+                background: #DAE8ED;
+            }
+            #short-description-tab, #full-description-tab {
+                padding: 7px 0;
+                text-align: center;
+            }
             .highlight {
                 border: 1px solid #cd5c5c !important;
             }
@@ -94,11 +128,24 @@
                 height: 400px;
             }
             #manage-product .ui-tabs-panel {
-                padding: 10px;
+                padding: 10px 0;
             }
             #options-holder > div.option-wrapper {
-                border: 2px #666 solid;
+                padding: 7px 0 0;
+                border: 1px solid #DDDDDD;
+                border-radius: 3px 3px 3px 3px;
+                -moz-border-radius: 3px 3px 3px 3px;
+                -webkit-border-radius: 3px 3px 3px 3px;
                 background: url('/system/images/bg-strip.png');
+            }
+            .ui-widget.ui-button.remove-option, .ui-widget.ui-button.item-remove {
+                background: none;
+                border:none;
+                box-shadow: none;
+                -moz-box-shadow: none;
+                -webkit-box-shadow: none;
+                min-width: 10px;
+                overflow: visible;
             }
             #ajax_msg {
                 line-height: 50px;
@@ -140,11 +187,11 @@
 		
 		<script id="optionMainTemplate" type="text/x-jquery-tmpl">
             <div class="grid_4 ">
-                <div class="grid_4"><label>Title</label></div>
-                <div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
+                <div class="grid_3"><label>Title</label></div>
+                <div class="grid_9"><input type="text" class="option-title" value="${title}"/></div>
             </div>
             <div class="grid_4">
-                <div class="grid_3">
+                <div class="grid_3 mt5px">
                     <label>Type</label>
                 </div>
                 <div class="grid_9">
@@ -157,7 +204,7 @@
                     </select>
                 </div>
             </div>
-            <div class="grid_3">
+            <div class="grid_3 mt5px">
                 {{if id}}
                 &nbsp;
                 {{else}}
@@ -169,32 +216,33 @@
                 {{/if}}
             </div>
             <div class="grid_1">
-                <button class="remove-option">x</button>
+                <button class="remove-option">Delete option</button>
             </div>
-            <div class="grid_12 option-content"></div>
+            <div class="clear"></div>
+            <div class="option-content mt5px"></div>
 		</script>
 		
 		<script id="optionListTemplate" type="text/x-jquery-tmpl">
 			<div class="ui-widget-header clearfix">
-				<div class="grid_3">Title</div>
-				<div class="grid_4">Price modifier</div>
+				<div class="grid_4">Title</div>
+				<div class="grid_3">Price modifier</div>
 				<div class="grid_3">Weight modifier</div>
 				<div class="grid_1">Dflt</div>
 				<div class="grid_1"></div>
 			</div>
-			<div class="option-list-holder">
+			<div class="option-list-holder mt5px">
 				
 			</div>
-			<div class="clearfix" style="border-top: 1px #666 solid;">
-				<button class="add-selection-btn" style="float:right;">Add new selection</button>
+			<div class="clearfix grid_12 mt5px mb10px">
+				<a class="add-selection-btn" href="javascript:;" style="float:right;">Add new selection</a>
 			</div>
 		</script>
 		
 		<script id="listItemTemplate" type="text/x-jquery-tmpl">
-			<div class="grid_3">
+			<div class="grid_4">
 				<input type="text" name="title" data-role="title" value="${title}" />
 			</div>
-			<div class="grid_4">
+			<div class="grid_3">
 				<select class="option-modifier-select" name="priceModifierSign" >
 					<option value="+" {{if priceSign == '+'}}selected{{/if}} >+</option>
 					<option value="-" {{if priceSign == '-'}}selected{{/if}} >-</option>
@@ -213,11 +261,11 @@
 				<input name="weightModifierValue" type="text" class="option-modifier-select" placeholder="0" value="${weightValue}"/>
 				<span><?php echo $this->generalConfig['weightUnit']; ?></span>
 			</div>
-			<div class="grid_1">
+			<div class="grid_1 mt10px">
 				<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
 			</div>
 			<div class="grid_1">
-				<button class="item-remove">x</button>
+				<button class="item-remove">Delete item</button>
 			</div>
 		</script>
 		
@@ -234,7 +282,7 @@
                 {{else}}
                 <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
                 {{/if}}
-                ${name}
+                <p class="name">${name}</p>
                 <p class="sku">${sku}</p>
             </a>
 		</script>
@@ -268,7 +316,7 @@
         <div id="manage-product" class="seotoaster container_12" style="padding: 0;">
             <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
                 <div class="clearfix ui-widget-header">
-                    <div class="grid_1 prefix_3">
+                    <div class="grid_1 prefix_3 mt5px">
                         <label for="product-list-search">Search</label>
                     </div>
                     <div class="grid_5 suffix_3">
@@ -285,6 +333,7 @@
                 </div>
                 <div id="image-list" style="height: 470px !important; overflow-x: hidden; overflow-y: auto;"></div>
             </div>
+            <div class="closebutton"><span class="close" onclick="top.$('.__tpopup').dialog('close');"><?= $this->translate('Close'); ?></span></div>
 
             <ul>
                 <li><a href="#tab1">Main Info</a></li>
@@ -294,23 +343,22 @@
                 <?php foreach ($this->plugins as $plugin) : ?>
                 <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.ucfirst($plugin));?></a></li>
                 <?php endforeach; ?>
-                <a href="#new" class="nav-links">New product</a>
+                <a href="#new" class="nav-links first">New product</a>&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="#list" class="nav-links">Edit product</a>
-                <span class="close" style="float:right; cursor:pointer;" onclick="top.$('.__tpopup').dialog('close');"><?php echo $this->translate('Close'); ?></span>
             </ul>
             <!--------- MAIN INFO -------------->
             <div id="tab1" class="clearfix">
-                <div class="grid_8 alpha">
+                <div class="grid_8">
                     <div class="grid_4">
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-                        <div id="product-image-holder" style="height: 130px; background: white; text-align: center; vertical-align: middle;">
-                            <img style="height: 100%; max-width: 190px;" id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
+                        <div id="product-image-holder">
+                            <img id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
                         </div>
                     </div>
                     <div class="grid_8">
                         <label for="product-name">Product Name</label>
-                    </div>
-                    <div class="grid_8">
+<!--                    </div>-->
+<!--                    <div class="grid_8">-->
                         <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
                     </div>
                     <div class="grid_2">
@@ -326,7 +374,7 @@
                         <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
                     </div>
                     <div class="grid_8">
-                        <label for="product-brand">Brand&nbsp;<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet." style="font-size: 80%">visit brand landing page</a></label>
+                        <label for="product-brand">Brand&nbsp;(<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet.">visit brand landing page</a>)</label>
                     </div>
                     <div class="grid_4">
                         <select name="product-brand" id="product-brand" data-reflection="property">
@@ -344,18 +392,17 @@
                                 <li><a href="#full-description-tab">Full description</a></li>
                             </ul>
                             <div id="short-description-tab">
-                            <textarea id="product-shortDescription" class="h150" data-reflection="property" placeholder="Short description"></textarea>
+                            <textarea id="product-shortDescription" class="h170" data-reflection="property" placeholder="Short description"></textarea>
                             </div>
                             <div id="full-description-tab">
-                            <textarea id="product-fullDescription" class="h150" data-reflection="property" placeholder="Full description"></textarea>
+                            <textarea id="product-fullDescription" class="h170" data-reflection="property" placeholder="Full description"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!--End grid_8-->
-                <div class=" grid_4">
-                    <label for="product-enabled"><input type="checkbox" id="product-enabled" />This product is enabled</label>
-                <hr />
+                <div class="grid_4" style="margin-bottom: 32px;">
+                    <label for="product-enabled"><input type="checkbox" id="product-enabled" style="margin-right:5px;"/>This product is enabled</label>
                 </div>
                 <div class="grid_2">
                     <label for="product-price">Price (in <?php echo $this->generalConfig['currency']; ?>)</label>
@@ -370,51 +417,45 @@
                         <option value="3">Alternative 2</option>
                     </select>
                 </div>
-                <div class=" grid_4">
-                <hr />
-                </div>
                 <div class="grid_4">
                     <label for="product-pageTemplate">Select a product page template</label>
-                </div>
-                <div class="grid_4">
                     <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
                         <option value="-1" disabled="disable">Select Template</option>
                         <?php foreach ($this->templateList as $tmpl) : ?>
                         <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
                         <?php endforeach; ?>
                     </select>
-                    <hr />
                 </div>
-                <div class="grid_4">
+                <div class="grid_4 mt5px">
                     <div id="quick-preview"></div>
                 </div>
             </div>
 
             <div id="category-tab" class="clearfix">
-                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
+                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
                     <input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
                 </div>
 
-                <div id="product-categories" class="grid_12">
+                <div id="product-categories" class="grid_12 h350" style="overflow-y: auto;">
                 </div>
 
             </div> <!-- #category-tab -->
 
             <div id="options-tab" class="clearfix">
-                <div>
+                <div class="grid_6 prefix_3 suffix_3 mb5px" style="text-align:center;">
                     <button id="add-new-option-btn">Create new option</button>
-                    <span>or</span>
-                    <select name="option-library" id="option-library" style="width: 250px;">
+                    or
+                    <select name="option-library" id="option-library" style="width: 240px;">
                         <option value="-1" disabled="disabled">select from library</option>
                     </select>
                 </div>
-                <div id="options-holder" class="clearfix h350" style="overflow-y: scroll;">
+                <div id="options-holder" class="clearfix h350 grid_12" style="overflow-y: auto;">
 
                 </div>
             </div> <!-- End Tab 3 -->
 
             <div id="tab4" class="clearfix">
-                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center; box-shadow: 0 10px 15px -10px #999;">
+                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
                     <input type="text" id="add-related" placeholder="Start typing name, SKU or MPN" />
                 </div>
                 <div id="related-holder" class="grid_12">
@@ -422,9 +463,8 @@
                 </div>
             </div>
 
-            <div class="grid_12">
-                <hr />
-                <input type="button" value="Delete" id="delete"/>
+            <div class="grid_12 mb10px">
+                <input type="button" value="Delete" id="delete" style="display: none;"/>
                 <input type="submit" name="submit" id="submit" value="Save"/>
             </div>
         </div>
