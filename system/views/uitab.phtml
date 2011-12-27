@@ -36,12 +36,6 @@
 </div>
 
 <style type="text/css">
-	#btn-create {
-		background: #ffa500;
-		color: #f5f5f5;
-		font-weight: bold;
-	}
-
 	#prod-perpage {
 		width: 120px;
 	}
@@ -56,17 +50,21 @@
 
 	#product-products {
 		overflow-y: auto;
-		background: #fff;
-		height: 300px;
+		height: 310px;
 	}
 	div.productlisting {
         width: 15%;
-        height: 120px;
-        margin: 3px;
+        height: 140px;
+        margin: 4px 0.6%;
         /*padding: 2px;*/
         float: left;
-        border: 2px solid lavender;
-        border-radius: 3px 8px;
+        border: 1px solid #fff;
+        box-shadow: 0 0 4px #BBBBBB;
+        -moz-box-shadow: 0 0 4px #BBBBBB;
+        -webkit-box-shadow: 0 0 4px #BBBBBB;
+        border-radius: 3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
         overflow: hidden;
         position: relative;
         text-align: center;
@@ -75,7 +73,7 @@
         font-size: 9pt;
     }
 	div.productlisting img {
-		max-height: 60px;
+		max-height: 80px;
 		display: block;
 		margin: 1px auto;
 	}
@@ -83,12 +81,11 @@
         padding: 2px 0px;
         background-color: lavender;
         margin-bottom: 1px;
-        font-weight:bold;
     }
     p.sku{
         text-align: right;
         font-size: 8pt;
-        border-top: 1px dashed #eee;
+        border-top: 1px dotted #ccc;
         padding: 4px 0px;
         margin-top: 4px;
         color: #7C7C7C;
@@ -126,6 +123,7 @@
 		        $('tr.mceFirst').hide();
 				$('#tabs-frag-3').addClass('h450');
 				$('table#content_tbl').width('230px');
+                $('table#content_tbl').height('475px');
 
 		        //loading store data
 		        loadStoreData('categories');
@@ -192,7 +190,7 @@
 					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
 						'<p class="brand">' + this.brand + '</p>' +
-						'<img class="lazy" src="" data-original="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '">' + this.name + '</a><p class="sku">' + this.sku + '</p></div>';
+                        '<img class="lazy" src="" data-original="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
 					$('#product-products').append(productItem);
 				});
 	            $('img.lazy').lazyload({
