@@ -26,6 +26,11 @@ class Models_Mapper_Tax extends Application_Model_Mappers_Abstract{
 		return true;
 	}
 
+	public function findByZoneId($zoneId) {
+		$where = $this->getDbTable()->getAdapter()->quoteInto('zoneId=?', $zoneId);
+		return $this->_findWhere($where);
+	}
+
 	public function delete($id) {
 		if (is_array($id)){
 			foreach ($id as $_id){

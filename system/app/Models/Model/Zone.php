@@ -70,7 +70,7 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 				$this->addZip($zip);
 			}
 		} elseif (is_string($_zip)){
-			$this->addZip($zip);
+			$this->addZip($_zip);
 		}
 		return $this;
 	}
