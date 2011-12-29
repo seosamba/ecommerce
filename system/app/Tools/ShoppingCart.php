@@ -111,8 +111,10 @@ class Tools_ShoppingCart {
 				}
 				if($zoneId) {
 					$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
-					$rateMethodName = 'getRate' . $taxClass;
-					return ($item->getPrice() /100) * $tax->$rateMethodName();
+					if($tax !== null) {
+						$rateMethodName = 'getRate' . $taxClass;
+						return ($item->getPrice() /100) * $tax->$rateMethodName();
+					}
 				}
 			}
 		}
