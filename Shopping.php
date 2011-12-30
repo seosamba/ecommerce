@@ -30,8 +30,22 @@ class Shopping extends Tools_Plugins_Abstract {
      */
 	private $_configMapper = null;
 
+    /**
+     * @var array List of actions that should be secured
+     */
+    protected $_securedActions = array(
+        Tools_Security_Acl::ROLE_ADMIN => array(
+            'config',
+            'setConfig',
+            'taxes',
+            'zones',
+            'product'
+        )
+    );
+
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
+
 		$this->_view->setScriptPath(__DIR__ . '/system/views/');
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig	= Zend_Registry::get('website');
@@ -527,23 +541,5 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_view->render('product.phtml');
 	}
 
-	protected function debugAction(){
 
-	}
-
-    /**
-     * for test purposes only
-     * @todo remove it
-     */
-    protected function _makeOptionCart(){
-        return '<div style="border: 1px dashed red;">This is dummy cart widget<br />But nothing here yet<hr /><a href="#">go to cart</a></div>';
-    }
-
-    /**
-     * for test purposes only
-     * @todo remove it
-     */
-    protected function _makeOptionAddtocart(){
-        return '<div style="border: 1px dashed red;"><button>ADD TO CART</button></div>';
-    }
 }
