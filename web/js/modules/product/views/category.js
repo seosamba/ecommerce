@@ -11,8 +11,8 @@ define([
 		events: {
 			"click span.ui-icon-closethick": "kill",
 			"dblclick span.category-editable": "edit",
-			"keypress span.category-editable": "updateOnEnterPressed",
-			"blur span.category-editable": "disableEdit"
+			"keypress span.category-editable": "preventLineBreak",
+			"blur span.category-editable": "save"
 		},
 		initialize: function(){
 			this.model.bind('change', this.render, this);
@@ -36,20 +36,19 @@ define([
 			}, {ok:"Do it", cancel:"No way"});	
 		},
 		edit: function(){
-			this.nameInput.attr('contenteditable', true).focus();
+            this.buffer = this.nameInput.text();
+            this.nameInput.attr('contenteditable', true).css({border: '1px solid #999'}).focus();
 		},
-		disableEdit: function(){
-			this.nameInput.removeAttr('contenteditable');
-		},
-		updateOnEnterPressed: function(e){
+		preventLineBreak: function(e){
 			if (e.keyCode == 13) {
-				this.save();
 				return false;
 			}
 		},
 		save: function(){
-			this.model.save({name: this.nameInput.text()});
-			this.disableEdit();
+            if (this.buffer !== this.nameInput.text()){
+                this.model.save({name: this.nameInput.text()});
+            }
+            this.nameInput.css({border: 'none'}).removeAttr('contenteditable');
 		}
 		
 	});

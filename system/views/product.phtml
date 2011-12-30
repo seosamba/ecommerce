@@ -25,6 +25,9 @@
 				float:left;
                 margin: 3px 10px 3px 0;
 			}
+            #product-categories .category-widget span {
+                cursor: pointer;
+            }
             #product-categories .category-widget .toolbar {
                 margin: -1px 0 0 3px;
             }
@@ -171,7 +174,7 @@
 		
 		<script id="categoryTemplate" type="text/x-jquery-tmpl">
 			<input type="checkbox" name="category[]" value="${id}"/>
-			<span class="category-editable">${name}</span>
+			<span class="category-editable" title="Click to edit">${name}</span>
 			<div class="toolbar" style="display:inline;">
 				<span class="ui-icon ui-icon-closethick">Delete</span>
 			</div>
