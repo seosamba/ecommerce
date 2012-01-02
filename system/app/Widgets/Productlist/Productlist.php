@@ -88,6 +88,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_entityParser->setDictionary(array(
 			'$product:name'              => $product->getName(),
 			'$product:photourl'          => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/product/' . $productPhotoData[1],
+			'$product:photourl:product'  => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/product/' . $productPhotoData[1],
 			'$product:photourl:small'    => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/small/' . $productPhotoData[1],
 			'$product:photourl:medium'   => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/medium/' . $productPhotoData[1],
 			'$product:photourl:large'    => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/large/' . $productPhotoData[1],
