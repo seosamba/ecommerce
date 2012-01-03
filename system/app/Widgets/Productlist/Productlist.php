@@ -94,7 +94,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'$product:photourl:large'    => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/large/' . $productPhotoData[1],
 			'$product:photourl:original' => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia() . $productPhotoData[0] . '/original/' . $productPhotoData[1],
 			'$product:url'               => $product->getPage()->getUrl(),
-			'$product:price'             => $product->getPrice(),
+			'$product:price'             => $this->_renderProductWidgetOption('price', $product->getPage()->toArray()),
 			'$product:brand'             => $product->getBrand(),
 			'$product:weight'            => $product->getWeight(),
 			'$product:mpn'               => $product->getMpn(),
@@ -109,7 +109,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	}
 
 	private function _renderProductWidgetOption($option, $data) {
-        $widget  = Tools_Factory_WidgetFactory::createWidget('product', array('options'), $data);
+        if (!is_array($option)){
+            $option = (array) $option;
+        }
+        $widget  = Tools_Factory_WidgetFactory::createWidget('product', $option, $data);
 		$content = $widget->render();
 		unset($widget);
 		return $content;
