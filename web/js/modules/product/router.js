@@ -19,6 +19,7 @@ define([
 			'list': 'productListToggle'
 		},
 		products: null,
+        productListHolder: $('#product-list-holder'),
 		categories: null,
         brands: null,
 		initialize: function(){
@@ -35,7 +36,7 @@ define([
             this.brands.bind('all', this.renderBrands, this);
 		},
 		newProduct: function(){
-			$('#product-list:visible').hide('slide');
+			this.productListHolder.hide('slide');
 			this.app.setModel(new ProductModel());
 		},
 		editProduct: function(productId){
@@ -50,12 +51,12 @@ define([
             }
 		},
 		loadProducts: function(productsCollection){
-			$('#product-list-holder').empty();
-			productsCollection.each(this.renderProductView);
+			this.productListHolder.empty();
+			productsCollection.each(this.renderProductView, this);
 		},
 		renderProductView: function(product){
 			var productView = new ProductListingView({model: product});
-			$('#product-list-holder').append(productView.render().el);
+			this.productListHolder.append(productView.render().el);
 		},
 		addCategory: function(category){
 			var view = new CategoryView({model: category});
@@ -75,12 +76,12 @@ define([
         },
 		productListToggle: function(){
             if (this.products === null) {
-                this.initProductlist().fetch({async: false});
-                $('#product-list').show('slide');
+                this.initProductlist().fetch().done(
+                    function(){ $('#product-list').show('slide').find('#product-list-holder').trigger('scroll'); }
+                );
             } else {
                 $('#product-list').show('slide');
             }
-            $('#product-list-holder').trigger('scroll');
 		},
         initProductlist: function() {
             if (this.products === null) {
@@ -96,7 +97,6 @@ define([
 	var initialize = function(){
 		window.appRouter = new Router;
 		$.when(
-//			appRouter.products.fetch(),
 			appRouter.categories.fetch(),
             appRouter.brands.fetch()
 		).then(function(){
