@@ -177,7 +177,7 @@
 	}
 
 	function loadProducts() {
-		smoke.signal('<img src="/system/images/loading.gif" />');
+		smoke.signal('<img src="/system/images/loading.gif" />', 30000);
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', function(response) {
             if(response.length) {
 	            $('.smoke-base').remove();
