@@ -340,7 +340,15 @@ class Shopping extends Tools_Plugins_Abstract {
 									continue;
 								}
 							}
-							array_push($data, $product->toArray());
+                            //cleanup unnecessary values
+                            $product->setPage(array(
+                                'id'         => $product->getPage()->getId(),
+                                'url'        => $product->getPage()->getUrl(),
+                                'h1'         => $product->getPage()->getH1(),
+                                'templateId' => $product->getPage()->getTemplateId(),
+                            ));
+
+                            array_push($data, $product->toArray());
 						}
 						$cacheHelper->save($cacheKey, $data, 'store_', array(), Helpers_Action_Cache::CACHE_NORMAL);
 					}
