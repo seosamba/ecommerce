@@ -24,7 +24,7 @@ class Forms_DisplaySettings extends Zend_Form {
         $plugins = Tools_Plugins_Tools::getEnabledPlugins();
         $list = array();
         foreach ($plugins as $plugin) {
-            var_dump(method_exists($plugin, ''));
+//            @todo: add some check if it's a cart plugin
             $list[$plugin->getName()] = $plugin->getName();
         }
 

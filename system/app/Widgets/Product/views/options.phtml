@@ -7,6 +7,9 @@
         $defaultId = null;
         foreach ($option['selection'] as $item) {
             $options[$item['id']] = $item['title'];
+            if ($item['priceValue']){
+                $options[$item['id']] .=' ('.$item['priceSign'].($item['priceType'] === 'unit'?$this->currency($item['priceValue']):$item['priceValue'].'%').')';
+            }
             if ($item['isDefault']) $defaultId = $item['id'];
         }
     }
