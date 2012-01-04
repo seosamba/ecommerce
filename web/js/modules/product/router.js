@@ -75,12 +75,13 @@ define([
             $('#product-brand > option:first').attr('disabled', true);
         },
 		productListToggle: function(){
+            var callback = function(){ $('#product-list').show('slide').find('#product-list-holder').trigger('scroll'); }
             if (this.products === null) {
                 this.initProductlist().fetch().done(
-                    function(){ $('#product-list').show('slide').find('#product-list-holder').trigger('scroll'); }
+                    callback
                 );
             } else {
-                $('#product-list').show('slide');
+                callback();
             }
 		},
         initProductlist: function() {
