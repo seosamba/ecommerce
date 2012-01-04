@@ -34,7 +34,7 @@ class Shopping extends Tools_Plugins_Abstract {
      * @var array List of actions that should be secured
      */
     protected $_securedActions = array(
-        Tools_Security_Acl::ROLE_ADMIN => array(
+        Tools_Security_Acl::ROLE_SUPERADMIN => array(
             'config',
             'setConfig',
             'taxes',

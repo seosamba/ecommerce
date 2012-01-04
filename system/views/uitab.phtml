@@ -25,9 +25,9 @@
 	<!-- Ordering -->
 	<div id="order" class="grid_4">
 		<select style="width: 205px;float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="Sort by...">
-			<option value="name">Name</option>
-			<option value="price">Price</option>
-			<option value="brand">Brand</option>
+			<option value="name"><?php echo $this->translate('Name'); ?></option>
+			<option value="price"><?php echo $this->translate('Price'); ?></option>
+			<option value="brand"><?php echo $this->translate('Brand'); ?></option>
 		</select>
 	</div>
 	<div style="clear: both;"></div>
@@ -43,10 +43,6 @@
 	.chzn-container-multi {
 		margin: 5px 3px;
 	}
-
-	/*select.pselect {*/
-		/*width: 244px;*/
-	/*}*/
 
 	#product-products {
 		overflow-y: auto;
@@ -100,12 +96,12 @@
 </style>
 <?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
 <?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js'); ?>
+<?php $this->headScript()->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/underscore/underscore-min.js'); ?>
 <?php echo $this->headScript(); ?>
 <script type="text/javascript" charset="utf-8">
     $(function() {
 	    $('.pselect').chosen();
 	    $('#btn-create').button();
-
 		$('.ui-tabs-nav-item a').click(function() {
 			var childs = $(this).find('span#products');
 			if(!childs.length) {
@@ -168,9 +164,7 @@
     });
 
 	function loadStoreData(type) {
-		smoke.signal('<img src="/system/images/loading.gif" />');
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/' + type, function(response) {
-			$('.smoke-base').hide();
             if(response.length && !($('#' + type + ' option').length)) {
 				$.each(response, function() {
 					$('#' + type).append(
@@ -183,9 +177,11 @@
 	}
 
 	function loadProducts() {
+		smoke.signal('<img src="/system/images/loading.gif" />');
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product', function(response) {
             if(response.length) {
-            $.each(response, function() {
+	            $('.smoke-base').remove();
+                $.each(response, function() {
 					var productItem  = '';
 					var photoDetails = this.photo.split('/');
 					productItem     += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
