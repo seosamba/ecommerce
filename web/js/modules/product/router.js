@@ -36,7 +36,7 @@ define([
             this.brands.bind('all', this.renderBrands, this);
 		},
 		newProduct: function(){
-			this.productListHolder.hide('slide');
+			$('#product-list:visible').hide('slide');
 			this.app.setModel(new ProductModel());
 		},
 		editProduct: function(productId){
