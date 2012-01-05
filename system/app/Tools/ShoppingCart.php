@@ -1,9 +1,16 @@
 <?php
 /**
  * ShoppingCart
+ *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Tools_ShoppingCart {
+
+	const ZONETYPE_ZIP          = 'zip';
+
+	const ZONETYPE_STATE        = 'state';
+
+	const ZONETYPE_COUNTRY      = 'country';
 
     protected static $_instance = null;
 
@@ -17,7 +24,6 @@ class Tools_ShoppingCart {
         if ($this->_session === null){
             $this->_session = new Zend_Session_Namespace($this->_websiteHelper->getUrl().'cart');
         }
-        
         $this->_load();
     }
 
@@ -37,18 +43,6 @@ class Tools_ShoppingCart {
         return self::$_instance;
     }
 
-    private function _load() {
-        if (isset($this->_session->cartContent)) {
-            $this->_content = unserialize($this->_session->cartContent);
-        }
-
-        return $this;
-    }
-
-    private function _save() {
-        $this->_session->cartContent = serialize($this->_content);
-    }
-
     public function setContent($content) {
         $this->_content = $content;
     }
@@ -57,16 +51,16 @@ class Tools_ShoppingCart {
         return $this->_content;
     }
 
-    public function add(Models_Model_Product $item) {
+    public function add(Models_Model_Product $item, $options) {
 	    if(!$item instanceof Models_Model_Product)  {
 		    throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
 	    }
-	    $itemKey = $this->_generateStorageKey($item);
+	    $itemKey = $this->_generateStorageKey($item, $options);
 	    if(!array_key_exists($itemKey, $this->_content)) {
 		    $itemTax = $this->_calculateTax($item);
 		    $this->_content[$itemKey] = array(
 			    'qty'      => 1,
-			    'options'  => $item->getDefaultOptions(),
+			    'options'  => $options,
 			    'item'     => $item,
 			    'tax'      => $itemTax,
 			    'taxPrice' => $item->getPrice() + $itemTax
@@ -79,50 +73,8 @@ class Tools_ShoppingCart {
 	    $this->_save();
     }
 
-	private function _calculateTax(Models_Model_Product $item) {
-		if(($taxClass = $item->getTaxClass()) != 0) {
-			$zoneId  = false;
-			$zones   = Models_Mapper_Zone::getInstance()->fetchAll();
-			if(is_array($zones) && !empty($zones)) {
-				foreach($zones as $zone) {
-					$zips = $zone->getZip();
-					if(is_array($zips) && !empty($zips)) {
-						if(in_array($this->_shoppingConfig['zip'], $zips)) {
-							$zoneId = $zone->getId();
-							break;
-						}
-					}
-					$states = $zone->getStates();
-					if(is_array($states) && !empty($states)) {
-						foreach($states as $state) {
-							if($state['id'] == $this->_shoppingConfig['state']) {
-								$zoneId = $zone->getId();
-								break;
-							}
-						}
-					}
-					$countries = $zone->getCountries(true);
-					if(is_array($countries) && !empty($countries)) {
-						if(in_array($this->_shoppingConfig['country'], $countries)) {
-							$zoneId = $zone->getId();
-							break;
-						}
-					}
-				}
-				if($zoneId) {
-					$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
-					if($tax !== null) {
-						$rateMethodName = 'getRate' . $taxClass;
-						return ($item->getPrice() /100) * $tax->$rateMethodName();
-					}
-				}
-			}
-		}
-		return 0;
-	}
-
-	public function getStorageKey($item) {
-		return $this->_generateStorageKey($item);
+	public function getStorageKey($item, $options = array()) {
+		return $this->_generateStorageKey($item, $options);
 	}
 
 	public function calculate() {
@@ -142,12 +94,8 @@ class Tools_ShoppingCart {
 		return $summary;
 	}
 
-	private function _generateStorageKey($item) {
-		return substr(md5($item->getName() . $item->getSku() . $item->getDefaultOptions()), 0, 10);
-	}
-
-    public function remove($item, $complete = true) {
-		$storageKey = $this->_generateStorageKey($item);
+    public function remove($storageKey, $complete = true) {
+		//$storageKey = $this->_generateStorageKey($item);
 	    if(array_key_exists($storageKey, $this->_content)) {
 			if($complete) {
 		        unset($this->_content[$storageKey]);
@@ -163,12 +111,10 @@ class Tools_ShoppingCart {
 	    return false;
     }
 
-	public function updateQty($item, $newQty) {
-		$storageKey = $this->_generateStorageKey($item);
+	public function updateQty($storageKey, $newQty) {
 		if(array_key_exists($storageKey, $this->_content)) {
 			$cartItem        = $this->_content[$storageKey];
-			$oldQty          = $cartItem['qty'];
-			$cartItem['qty'] = $oldQty + ($newQty - $oldQty);
+			$cartItem['qty'] = $cartItem['qty'] + ($newQty - $cartItem['qty']);
 			if($cartItem['qty'] <= 0) {
 				unset($this->_content[$storageKey]);
 			}
@@ -185,4 +131,94 @@ class Tools_ShoppingCart {
 		$this->_session->cartContent = null;
 	}
 
+	private function _load() {
+        if (isset($this->_session->cartContent)) {
+            $this->_content = unserialize($this->_session->cartContent);
+        }
+
+        return $this;
+    }
+
+    private function _save() {
+        $this->_session->cartContent = serialize($this->_content);
+    }
+
+	private function _calculateTax(Models_Model_Product $item) {
+		if(($taxClass = $item->getTaxClass()) != 0) {
+			$zoneId = $this->_getZoneId();
+			if($zoneId) {
+				$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
+				if($tax !== null) {
+					$rateMethodName = 'getRate' . $taxClass;
+					return ($item->getPrice() /100) * $tax->$rateMethodName();
+				}
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Tries to find zone id using all zone types (zip, state, country)
+	 *
+	 * @return int
+	 */
+	private function _getZoneId() {
+		$zones = Models_Mapper_Zone::getInstance()->fetchAll();
+		if(is_array($zones) && !empty($zones)) {
+			foreach($zones as $zone) {
+				$zoneIdByZip     = $this->_getZoneIdByType($zone, self::ZONETYPE_ZIP);
+				if($zoneIdByZip) {
+					return $zoneIdByZip;
+				}
+				$zoneIdByState   = $this->_getZoneIdByType($zone, self::ZONETYPE_STATE);
+				if($zoneIdByState) {
+					return $zoneIdByState;
+				}
+				$zoneIdByCountry = $this->_getZoneIdByType($zone, self::ZONETYPE_COUNTRY);
+				if($zoneIdByCountry) {
+					return $zoneIdByCountry;
+				}
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Gives zone id by type such as: zip, state, country
+	 *
+	 * @param Models_Model_Zone $zone
+	 * @param string $type
+	 * @return int
+	 */
+	private function _getZoneIdByType(Models_Model_Zone $zone, $type = self::ZONETYPE_ZIP) {
+		$zoneParts = array();
+		switch($type) {
+			case self::ZONETYPE_ZIP:
+				$zoneParts = $zone->getZip();
+			break;
+			case self::ZONETYPE_STATE:
+				$zoneParts = $zone->getStates();
+			break;
+			case self::ZONETYPE_COUNTRY:
+				$zoneParts = $zone->getCountries(true);
+			break;
+		}
+		if(is_array($zoneParts) && !empty($zoneParts)) {
+			if($type == self::ZONETYPE_STATE) {
+				foreach($zoneParts as $zonePart) {
+					if($zonePart['id'] == $this->_shoppingConfig['state']) {
+						return $zone->getId();
+					}
+				}
+			}
+			if(in_array($this->_shoppingConfig[$type], $zoneParts)) {
+				return $zone->getId();
+			}
+		}
+		return 0;
+	}
+
+	private function _generateStorageKey($item, $options = array()) {
+		return substr(md5($item->getName() . $item->getSku() . http_build_query($options)), 0, 10);
+	}
 }
