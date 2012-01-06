@@ -47,7 +47,6 @@ define([
                 this.app.setModel(product);
             } else {
                 this.app.setModel(this.products.get(productId));
-
             }
 		},
 		loadProducts: function(productsCollection){

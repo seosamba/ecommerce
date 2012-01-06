@@ -440,9 +440,12 @@ define([
                 url: $form.attr('action'),
                 type: $form.attr('method'),
                 data: $form.serialize(),
+                dataType: 'json',
                 success: function(response) {
-                    //@todo: add callback support
-                    smoke.alert(response);
+                    console.log(response);
+                    if (response.hasOwnProperty('result')) {
+                        smoke.alert(response.result);
+                    }
                 }
             });
 
