@@ -1,12 +1,6 @@
 <?php
-set_include_path(implode(PATH_SEPARATOR, array(
-    realpath(__DIR__ . '/system/app'),
-    get_include_path(),
-)));
-
 /**
  * Ecommerce plugin for SEOTOASTER 2.0
- * @todo Authorization check
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  * @see http://www.seotoaster.com
  */
