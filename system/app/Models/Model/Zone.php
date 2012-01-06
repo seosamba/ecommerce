@@ -9,8 +9,8 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 	protected $_id;
 	protected $_name;
 	protected $_countries = array();
-	protected $_states = array();
-	protected $_zip = array();
+	protected $_states    = array();
+	protected $_zip       = array();
 
 	
 	public function getId() {
