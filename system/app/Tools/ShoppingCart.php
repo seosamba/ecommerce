@@ -57,13 +57,18 @@ class Tools_ShoppingCart {
 	    }
 	    $itemKey = $this->_generateStorageKey($item, $options);
 	    if(!array_key_exists($itemKey, $this->_content)) {
-		    $itemTax = $this->_calculateTax($item);
+		    $itemTax   = $this->_calculateTax($item);
+		    $modifiers = $this->_getModifiers($item, $options);
+		    $itemPrice = $this->_calculateItemPrice($item, $modifiers, $itemTax);
 		    $this->_content[$itemKey] = array(
-			    'qty'      => 1,
-			    'options'  => $options,
-			    'item'     => $item,
-			    'tax'      => $itemTax,
-			    'taxPrice' => $item->getPrice() + $itemTax
+			    'qty'       => 1,
+			    'options'   => $options,
+			    'modifiers' => $modifiers,
+			    'item'      => $item,
+			    'price'     => $itemPrice,
+			    'weight'    => $this->_calculateItemWeight($item, $modifiers),
+			    'tax'       => $itemTax,
+			    'taxPrice'  => $itemPrice + $itemTax
 		    );
 	    }
 	    else {
@@ -72,6 +77,27 @@ class Tools_ShoppingCart {
 
 	    $this->_save();
     }
+
+	private function _calculateItemWeight(Models_Model_Product $item, $modifiers) {
+		$weight = $item->getWeight();
+		if(!empty($modifiers)) {
+			foreach($modifiers as $modifier) {
+				$weight = (($modifier['weightSign'] == '+') ? $weight + $modifier['weightValue'] : $weight - $modifier['weightValue']);
+			}
+		}
+		return $weight;
+	}
+
+	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $tax = 0) {
+		$price = $item->getPrice();
+		if(!empty($modifiers)) {
+			foreach($modifiers as $modifier) {
+				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($price / 100) * $modifier['priceValue']);
+				$price    = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
+            }
+		}
+		return $price;
+	}
 
 	public function getStorageKey($item, $options = array()) {
 		return $this->_generateStorageKey($item, $options);
@@ -86,7 +112,7 @@ class Tools_ShoppingCart {
 		);
 		if(is_array($this->_content) && !empty($this->_content)) {
 			foreach($this->_content as $storageKey => $cartItem) {
-				$summary['subTotal'] += $cartItem['item']->getPrice() * $cartItem['qty'];
+				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
 			$summary['total'] = $summary['subTotal'] + $summary['totalTax'];
@@ -95,7 +121,6 @@ class Tools_ShoppingCart {
 	}
 
     public function remove($storageKey, $complete = true) {
-		//$storageKey = $this->_generateStorageKey($item);
 	    if(array_key_exists($storageKey, $this->_content)) {
 			if($complete) {
 		        unset($this->_content[$storageKey]);
@@ -127,6 +152,16 @@ class Tools_ShoppingCart {
 		return false;
 	}
 
+	public function calculateCartWeight() {
+		$totalWeight = 0;
+		if(is_array($this->_content) && !empty($this->_content)) {
+			foreach($this->_content as $cartItem) {
+				$totalWeight += $cartItem['weight'] * $cartItem['qty'];
+			}
+		}
+		return $totalWeight;
+	}
+
 	public function clean() {
 		$this->_session->cartContent = null;
 	}
@@ -135,7 +170,6 @@ class Tools_ShoppingCart {
         if (isset($this->_session->cartContent)) {
             $this->_content = unserialize($this->_session->cartContent);
         }
-
         return $this;
     }
 
@@ -220,5 +254,30 @@ class Tools_ShoppingCart {
 
 	private function _generateStorageKey($item, $options = array()) {
 		return substr(md5($item->getName() . $item->getSku() . http_build_query($options)), 0, 10);
+	}
+
+	private function _getModifiers(Models_Model_Product $item, $options = array()) {
+		$modifiers = array();
+		if(!empty($options)) {
+			$defaultOptions = $item->getDefaultOptions();
+			foreach($defaultOptions as $defaultOption) {
+				foreach($options as $optionId => $selectionId) {
+					if($defaultOption['id'] != $optionId) {
+						continue;
+					}
+					$defaultSelections = $defaultOption['selection'];
+					if(empty($defaultSelections)) {
+						return array();
+					}
+					foreach($defaultSelections as $defaultSelection) {
+						if($defaultSelection['id'] != $selectionId) {
+							continue;
+						}
+						$modifiers[$defaultOption['title']] = $defaultSelection;
+					}
+				}
+			}
+		}
+		return $modifiers;
 	}
 }
