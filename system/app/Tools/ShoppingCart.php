@@ -21,6 +21,7 @@ class Tools_ShoppingCart {
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
         $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
         if ($this->_session === null){
             $this->_session = new Zend_Session_Namespace($this->_websiteHelper->getUrl().'cart');
         }
@@ -51,6 +52,14 @@ class Tools_ShoppingCart {
         return $this->_content;
     }
 
+	public function findSidById($id) {
+		foreach($this->_content as $sid => $itemData) {
+			if(isset($itemData['id']) && $itemData['id'] == $id) {
+				return $sid;
+			}
+		}
+	}
+
     public function add(Models_Model_Product $item, $options) {
 	    if(!$item instanceof Models_Model_Product)  {
 		    throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
@@ -61,14 +70,20 @@ class Tools_ShoppingCart {
 		    $modifiers = $this->_getModifiers($item, $options);
 		    $itemPrice = $this->_calculateItemPrice($item, $modifiers, $itemTax);
 		    $this->_content[$itemKey] = array(
-			    'qty'       => 1,
-			    'options'   => $options,
-			    'modifiers' => $modifiers,
-			    'item'      => $item,
-			    'price'     => $itemPrice,
-			    'weight'    => $this->_calculateItemWeight($item, $modifiers),
-			    'tax'       => $itemTax,
-			    'taxPrice'  => $itemPrice + $itemTax
+			    'qty'         => 1,
+			    'photo'       => $item->getPhoto(),
+			    'name'        => $item->getName(),
+			    'description' => Tools_Text_Tools::cutText($item->getShortDescription(), 100),
+			    'sid'         => $itemKey,
+			    'options'     => $options,
+			    'modifiers'   => $modifiers,
+			    'id'          => $item->getId(),
+			    'item'        => $item,
+			    'price'       => $itemPrice,
+			    'weight'      => $this->_calculateItemWeight($item, $modifiers),
+			    'tax'         => $itemTax,
+			    'taxPrice'    => $itemPrice + $itemTax,
+			    'taxIncluded' => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false
 		    );
 	    }
 	    else {
@@ -101,6 +116,10 @@ class Tools_ShoppingCart {
 
 	public function getStorageKey($item, $options = array()) {
 		return $this->_generateStorageKey($item, $options);
+	}
+
+	public function find($sid) {
+		return (array_key_exists($sid, $this->_content)) ? $this->_content[$sid] : null;
 	}
 
 	public function calculate() {
