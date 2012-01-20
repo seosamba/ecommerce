@@ -60,7 +60,7 @@ class Tools_ShoppingCart {
 		}
 	}
 
-    public function add(Models_Model_Product $item, $options) {
+    public function add(Models_Model_Product $item, $options, $qty = 1) {
 	    if(!$item instanceof Models_Model_Product)  {
 		    throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
 	    }
@@ -70,7 +70,7 @@ class Tools_ShoppingCart {
 		    $modifiers = $this->_getModifiers($item, $options);
 		    $itemPrice = $this->_calculateItemPrice($item, $modifiers, $itemTax);
 		    $this->_content[$itemKey] = array(
-			    'qty'         => 1,
+			    'qty'         => $qty,
 			    'photo'       => $item->getPhoto(),
 			    'name'        => $item->getName(),
 			    'description' => Tools_Text_Tools::cutText($item->getShortDescription(), 100),
@@ -87,7 +87,7 @@ class Tools_ShoppingCart {
 		    );
 	    }
 	    else {
-		    $this->_content[$itemKey]['qty']++;
+		    $this->_content[$itemKey]['qty'] += $qty;
 	    }
 
 	    $this->_save();
