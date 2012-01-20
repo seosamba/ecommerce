@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+		<link href="<?php echo $this->websiteUrl;?>system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
+		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" > 
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+        <script>
+			(function($){
+				$(function() {
+					$('.fieldset-content').hide();
+
+					var shipping = {};
+					shipping.saveSettings = function() {
+						console.log('saving');
+					};
+
+					$('input[name=shippingType]').on('click', function() {
+						$('.fieldset-content').hide();
+						$(this).parent().next().slideDown();
+					});
+
+
+				});
+			})(jQuery);
+			
+		</script>
+		<style type="text/css">
+			#shipping-notice {
+				width: 300px;
+				height: 45px;
+			}
+			.shipping-peramount {
+				overflow: hidden;
+				width: 150px;
+			}
+			.incolumn {
+				width: 60px !important;
+				text-align: right;
+				padding: 2px;
+			}
+			.shipping-peramount label {
+				float: left;
+				margin-right: 10px;
+			}
+		</style>
+    </head>
+    <body>
+		<div id="shipping-config" class="seotoaster">
+			<div class="header" style="overflow:hidden;">
+				<div class="closebutton">
+					<span class="help"><?php echo $this->translate('Help'); ?></span>
+					<span class="close"><?php echo $this->translate('Close'); ?></span>
+				</div>
+				<?php echo $this->translate('Shipping configuration'); ?>
+			</div>
+			<div>
+				<span><?php echo $this->translate('General options');?></span>
+				<span><?php echo $this->translate('Shipping options');?></span>
+				<?php echo $this->form; ?>
+			</div>
+		</div>
+	</body>
+</html>

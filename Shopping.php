@@ -95,6 +95,16 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_view->render('config.phtml');
 	}
 
+	protected function shippingAction() {
+		$form           = new Forms_Shipping();
+		$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+		$this->_view->currencySign = $shoppingConfig['currency'];
+		$this->_view->weightUnits  = $shoppingConfig['weightUnit'];
+		$this->_view->form         = $form;
+		$this->_view->subforms     = $form->getSubForms();
+		echo $this->_view->render('shipping.phtml');
+	}
+
 	protected function setConfigAction(){
 		$status = false;
 		if ($this->_request->isPost()){
