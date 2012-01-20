@@ -33,7 +33,8 @@ class Shopping extends Tools_Plugins_Abstract {
             'setConfig',
             'taxes',
             'zones',
-            'product'
+            'product',
+	        'shipping'
         )
     );
 
