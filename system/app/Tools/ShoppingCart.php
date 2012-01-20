@@ -46,7 +46,13 @@ class Tools_ShoppingCart {
 
     public function setContent($content) {
         $this->_content = $content;
+	    return $this;
     }
+
+	public function save() {
+		$this->_save();
+		return $this;
+	}
 
     public function getContent() {
         return $this->_content;
