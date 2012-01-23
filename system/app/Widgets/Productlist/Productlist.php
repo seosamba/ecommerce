@@ -99,6 +99,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'$product:weight'            => $product->getWeight(),
 			'$product:mpn'               => $product->getMpn(),
 			'$product:sku'               => $product->getSku(),
+			'$product:id'                => $product->getId(),
 			'$product:description:short' => $product->getShortDescription(),
 			'$product:description'       => $product->getShortDescription(),
 			'$product:description:full'  => $product->getFullDescription(),

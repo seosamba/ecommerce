@@ -41,6 +41,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		$this->_view = new Zend_View(array(
 			'scriptPath' => dirname(__FILE__) . '/views'
 		));
+		$this->_view->setHelperPath(APPLICATION_PATH . '/views/helpers/');
+		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
