@@ -74,6 +74,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 			for($i = 0; $i <= $productsCount; $i++) {
 				$product = $products[$i];
+				if(!$product instanceof Models_Model_Product) {
+					continue;
+				}
 				$productPhotoData = explode('/', $product->getPhoto());
 				$photoUrlPart     = $this->_mediaPath . $productPhotoData[0];
 				$shortDesc        = $product->getShortDescription();
