@@ -69,6 +69,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			//array_walk($products, array($this, '_parsingCallback'));
 
 			$productsCount = sizeof($products)-1;
+			if(!$productsCount) {
+				return 'Pfff...';
+			}
 			for($i = 0; $i <= $productsCount; $i++) {
 				$product = $products[$i];
 				$productPhotoData = explode('/', $product->getPhoto());
@@ -101,7 +104,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 
 			var_dump(round(microtime(1) - $start, 4));
-
 
 			//var_dump(time() - $start);die();
 			return $this->_renderedContent;
