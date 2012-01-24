@@ -68,11 +68,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 			//array_walk($products, array($this, '_parsingCallback'));
 
-			$productsCount = sizeof($products)-1;
+			$productsCount = sizeof($products);
 			if(!$productsCount) {
 				return 'Pfff...';
 			}
-			for($i = 0; $i <= $productsCount; $i++) {
+			for($i = 0; $i <= $productsCount-1; $i++) {
 				$product = $products[$i];
 				if(!$product instanceof Models_Model_Product) {
 					continue;
