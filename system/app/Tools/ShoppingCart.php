@@ -1,6 +1,6 @@
 <?php
 /**
- * ShoppingCart
+ * Shopping cart storage
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
@@ -17,6 +17,8 @@ class Tools_ShoppingCart {
     private $_content           = array();
 
     private $_session           = null;
+
+	private $_filterId          = 0;
 
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
@@ -58,23 +60,58 @@ class Tools_ShoppingCart {
         return $this->_content;
     }
 
+	/**
+	 * Tries to find storage ID using real product item ID
+	 *
+	 * @param $id integer Real product id
+	 * @return bool|string
+	 */
 	public function findSidById($id) {
-		foreach($this->_content as $sid => $itemData) {
-			if(isset($itemData['id']) && $itemData['id'] == $id) {
-				return $sid;
-			}
+		$item = $this->find($id);
+		if(is_array($item) && isset($item['sid'])) {
+			return $item['sid'];
 		}
+		return false;
 	}
 
-    public function add(Models_Model_Product $item, $options, $qty = 1) {
+	/**
+	 * Search by storage id through the storage and returns an appropriate product
+	 *
+	 * @param $sid string
+	 * @return array|null
+	 */
+	public function findBySid($sid) {
+		return (array_key_exists($sid, $this->_content)) ? $this->_content[$sid] : null;
+	}
+
+	/**
+	 * Search for the product in storage by its real id
+	 *
+	 * @param $id integer
+	 * @return mixed
+	 */
+	public function find($id) {
+		$this->_filterId = $id;
+		return array_shift(array_filter($this->_content, array($this, '_filterCallback')));
+	}
+
+	/**
+	 * Add an item to the storage
+	 *
+	 * @param Models_Model_Product $item
+	 * @param $options array of toaster products optionsId => selectionId
+	 * @param int $qty Items quantity
+	 * @throws Exceptions_SeotoasterPluginException
+	 */
+    public function add(Models_Model_Product $item, $options = array(), $qty = 1) {
 	    if(!$item instanceof Models_Model_Product)  {
 		    throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
 	    }
 	    $itemKey = $this->_generateStorageKey($item, $options);
 	    if(!array_key_exists($itemKey, $this->_content)) {
 		    $itemTax   = $this->_calculateTax($item);
-		    $modifiers = $this->_getModifiers($item, $options);
-		    $itemPrice = $this->_calculateItemPrice($item, $modifiers, $itemTax);
+		    $options   = $this->_parseOptions($item, $options);
+		    $itemPrice = $this->_calculateItemPrice($item, $options, $itemTax);
 		    $this->_content[$itemKey] = array(
 			    'qty'         => $qty,
 			    'photo'       => $item->getPhoto(),
@@ -83,11 +120,10 @@ class Tools_ShoppingCart {
 			    'description' => Tools_Text_Tools::cutText($item->getShortDescription(), 100),
 			    'sid'         => $itemKey,
 			    'options'     => $options,
-			    'modifiers'   => $modifiers,
 			    'id'          => $item->getId(),
 			    'item'        => $item,
 			    'price'       => $itemPrice,
-			    'weight'      => $this->_calculateItemWeight($item, $modifiers),
+			    'weight'      => $this->_calculateItemWeight($item, $options),
 			    'tax'         => $itemTax,
 			    'taxPrice'    => $itemPrice + $itemTax,
 			    'taxIncluded' => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false
@@ -96,7 +132,7 @@ class Tools_ShoppingCart {
 	    else {
 		    $this->_content[$itemKey]['qty'] += $qty;
 	    }
-
+	    unset($item);
 	    $this->_save();
     }
 
@@ -110,7 +146,7 @@ class Tools_ShoppingCart {
 		return $weight;
 	}
 
-	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $tax = 0) {
+	private function _calculateItemPrice(Models_Model_Product $item, $modifiers) {
 		$price = $item->getPrice();
 		if(!empty($modifiers)) {
 			foreach($modifiers as $modifier) {
@@ -125,36 +161,40 @@ class Tools_ShoppingCart {
 		return $this->_generateStorageKey($item, $options);
 	}
 
-	public function find($sid) {
-		return (array_key_exists($sid, $this->_content)) ? $this->_content[$sid] : null;
-	}
-
 	public function calculate() {
-		$summary = array(
-			'subTotal' => 0,
-			'totalTax' => 0,
-			'shipping' => 0,
-			'total'    => 0
-		);
+		$summary = array('subTotal' => 0, 'totalTax' => 0, 'shipping' => 0, 'total' => 0);
 		if(is_array($this->_content) && !empty($this->_content)) {
 			foreach($this->_content as $storageKey => $cartItem) {
 				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
-			$summary['total'] = $summary['subTotal'] + $summary['totalTax'];
+			$summary['total']    = $summary['subTotal'] + $summary['totalTax'];
+			$summary['shipping'] = 0;
 		}
 		return $summary;
 	}
 
-    public function remove($storageKey, $complete = true) {
+	/**
+	 * Remove item from the storage
+	 *
+	 * @param string|Models_Model_Product $item
+	 * @param boolean $complete Remove completely or just decrease item qty
+	 * @return boolean
+	 * @throws Exceptions_SeotoasterException
+	 */
+    public function remove($item, $complete = true) {
+	    if(is_string($item)) {
+		    $storageKey = $item;
+	    } else if($item instanceof Models_Model_Product) {
+		    $storageKey = $this->findSidById($item->getId());
+	    } else {
+		    throw new Exceptions_SeotoasterException('Shopping cart storage key or Models_Model_Product object expected.');
+	    }
 	    if(array_key_exists($storageKey, $this->_content)) {
 			if($complete) {
 		        unset($this->_content[$storageKey]);
-			}
-		    else {
-			    $cartItem = $this->_content[$storageKey];
-			    $cartItem['qty']--;
-			    $this->_content[$storageKey] = $cartItem;
+			} else {
+			    $this->_content[$storageKey]['qty']--;
 		    }
 			$this->_save();
 			return true;
@@ -162,15 +202,26 @@ class Tools_ShoppingCart {
 	    return false;
     }
 
-	public function updateQty($storageKey, $newQty) {
+	/**
+	 * Recount item qty
+	 *
+	 * @param string|Models_Model_Product $item
+	 * @param integer $newQty
+	 * @return boolean
+	 * @throws Exceptions_SeotoasterException
+	 */
+	public function updateQty($item, $newQty) {
+		if(is_string($item)) {
+		    $storageKey = $item;
+	    } else if($item instanceof Models_Model_Product) {
+		    $storageKey = $this->findSidById($item->getId());
+	    } else {
+		    throw new Exceptions_SeotoasterException('Shopping cart storage key or Models_Model_Product object expected.');
+	    }
 		if(array_key_exists($storageKey, $this->_content)) {
-			$cartItem        = $this->_content[$storageKey];
-			$cartItem['qty'] = $cartItem['qty'] + ($newQty - $cartItem['qty']);
-			if($cartItem['qty'] <= 0) {
+			$this->_content[$storageKey]['qty'] += ($newQty - $this->_content[$storageKey]['qty']);
+			if($this->_content[$storageKey]['qty'] <= 0) {
 				unset($this->_content[$storageKey]);
-			}
-			else {
-				$this->_content[$storageKey] = $cartItem;
 			}
 			$this->_save();
 			return true;
@@ -282,7 +333,7 @@ class Tools_ShoppingCart {
 		return substr(md5($item->getName() . $item->getSku() . http_build_query($options)), 0, 10);
 	}
 
-	private function _getModifiers(Models_Model_Product $item, $options = array()) {
+	private function _parseOptions(Models_Model_Product $item, $options = array()) {
 		$modifiers = array();
 		if(!empty($options)) {
 			$defaultOptions = $item->getDefaultOptions();
@@ -305,5 +356,9 @@ class Tools_ShoppingCart {
 			}
 		}
 		return $modifiers;
+	}
+
+	private function _filterCallback($item) {
+		return (isset($item['id']) && $item['id'] == $this->_filterId);
 	}
 }
