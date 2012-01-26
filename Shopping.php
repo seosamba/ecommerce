@@ -13,7 +13,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	protected $_jsonHelper;
 
-
     /**
      * @var array
      */
@@ -46,6 +45,18 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_websiteConfig	= Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
 	}
+
+    public function beforeController(){
+        if (!Zend_Registry::isRegistered('Zend_Currency')){
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
+            $currency = new Zend_Currency(
+                Zend_Locale::getLocaleToTerritory($shoppingConfig['country']),
+                $shoppingConfig['currency']
+            );
+            Zend_Registry::set('Zend_Currency', $currency);
+        }
+    }
 
 	public function run($requestedParams = array()) {
 		$dispatchersResult = parent::run($requestedParams);

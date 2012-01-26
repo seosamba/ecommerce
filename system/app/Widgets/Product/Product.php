@@ -29,6 +29,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
      */
     private $_type = null;
 
+    /**
+     * @var null|Zend_Currency Zend_Currency holder
+     */
+    private $_currency = null;
 
 	protected function  _init() {
 		parent::_init();
@@ -57,6 +61,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			array_shift($this->_options);
 		}
 
+        //initializing Zend Currency for future use
+        if ($this->_currency === null){
+            $this->_currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
+        }
     }
 
     protected function _load() {
@@ -130,14 +138,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPrice() {
-
-		$currency = new Zend_Currency(
-			Zend_Locale::getLocaleToTerritory($this->_shoppingConfig['country']),
-			$this->_shoppingConfig['currency']
-		);
-
         if (empty($this->_options)){
-            return $currency->toCurrency($this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice());
+            return $this->_currency->toCurrency($this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice());
         } else {
             $pluginName = strtolower($this->_options[0]);
             $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);

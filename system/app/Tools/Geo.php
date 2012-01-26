@@ -158,6 +158,7 @@ class Tools_Geo {
 		if (isset($countries['SU'])) {
 			unset ($countries['SU']);	
 		}
+        asort($countries);
 		return $countries;
 	}
 	
