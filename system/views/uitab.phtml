@@ -134,7 +134,7 @@
 		$('.currproduct').live('click', function() {
 			var tpl = $('#templates').val();
 			if(tpl == 0) {
-				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
+				showMessage('Product template is missing. Please select a product listing template', true);
 				return false;
 			}
 			$('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((tpl) ? ':' + tpl : '') + '}');
@@ -145,7 +145,7 @@
 	    $('#btn-create').live('click', function() {
 			var shortCode = '{$productlist:';
 			if($('#templates').val() == 0) {
-				showModalMessage('Product template is missing', 'Please select a product listing template', null, true);
+				showMessage('Product template is missing. Please select a product listing template', true);
 				return false;
 			}
 			//listing template
