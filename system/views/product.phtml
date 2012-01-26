@@ -25,6 +25,7 @@
 				float:left;
                 margin: 3px 10px 3px 0;
 				border: 2px solid white;
+                min-width: 19%;
 				padding: 5px;
 				border-radius: 3px;
 				background: url("/system/images/bg-strip.png") repeat 0px 0 transparent;
@@ -38,13 +39,20 @@
             #product-categories .category-widget .toolbar {
                 margin: -1px 0 0 3px;
             }
-			.toolbar span.ui-icon {
+            .category-widget span.ui-icon {
 				display: inline-block;
 				border-radius: 4px;
 				cursor:pointer;
+                vertical-align: bottom;
 			}
-            .toolbar span.ui-icon:hover, .ui-widget.ui-button.remove-option:hover .ui-icon, .ui-widget.ui-button.item-remove:hover .ui-icon {
+            .category-widget .category-editable {
+                vertical-align:top;
+            }
+            .category-widget span.ui-icon:hover, .ui-widget.ui-button.remove-option:hover .ui-icon, .ui-widget.ui-button.item-remove:hover .ui-icon {
                 background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
+            }
+            .ui-widget.ui-button.remove-option:hover .ui-icon, .ui-widget.ui-button.item-remove:hover .ui-icon {
+                background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
             }
             .ui-widget.ui-button.remove-option .ui-icon, .ui-widget.ui-button.item-remove .ui-icon {
                 background-image: url(/system/uithemes/seotoasterui/images/ui-icons_222222_256x240.png);
@@ -54,6 +62,7 @@
 			}
             #product-image-holder {
                 height: 130px;
+                width: 195px;
                 background: white;
                 text-align: center;
                 vertical-align: middle;
@@ -106,7 +115,7 @@
             p.sku{
                 text-align: right;
                 font-size: 8pt;
-                border-top: 1px dashed #eee;
+                border-top: 1px dotted #eee;
                 padding: 4px 0px;
                 margin-top: 4px;
                 color: #7C7C7C;
@@ -118,6 +127,10 @@
                 overflow: hidden;
                 background-color:#fff;
             }
+            .add-selection-btn .ui-button-text {
+                padding: 5px 10px 4px;
+            }
+            .add-selection-btn .ui-icon {display:none;}
             input#delete {
                 padding: 3px 16px 4px !important;
                 display: none;
@@ -135,7 +148,7 @@
                 border: 1px solid #cd5c5c !important;
             }
             #manage-product > .ui-tabs-panel {
-                height: 400px;
+                height: 410px;
             }
             #manage-product .ui-tabs-panel {
                 padding: 10px 0;
@@ -156,6 +169,9 @@
                 -webkit-box-shadow: none;
                 min-width: 10px;
                 overflow: visible;
+            }
+            #image-list {
+                height:460px !important;
             }
             #ajax_msg {
                 line-height: 50px;
@@ -182,9 +198,7 @@
 		<script id="categoryTemplate" type="text/x-jquery-tmpl">
 			<input type="checkbox" name="category[]" value="${id}"/>
 			<span class="category-editable" title="Click to edit">${name}</span>
-			<div class="toolbar" style="display:inline;">
-				<span class="ui-icon ui-icon-closethick">Delete</span>
-			</div>
+			<span class="ui-icon ui-icon-closethick">Delete</span>
 		</script>
 		
 		<script id="imgTemplate" type="text/x-jquery-tmpl">
@@ -197,7 +211,7 @@
 		
 		<script id="optionMainTemplate" type="text/x-jquery-tmpl">
             <div class="grid_4 ">
-                <div class="grid_3"><label>Title</label></div>
+                <div class="grid_3 mt5px"><label>Title</label></div>
                 <div class="grid_9"><input type="text" class="option-title" value="${title}"/></div>
             </div>
             <div class="grid_4">
@@ -219,7 +233,7 @@
                 &nbsp;
                 {{else}}
                 <label for="isTemplate">
-                    <input type="checkbox" title="Add as template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
+                    <input type="checkbox" title="Add as template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} style="margin-right: 5px;" />
                     Add as template?
                 </label>
                 <input type="text" name="templateName" placeholder="Template name" />
@@ -330,10 +344,10 @@
                         <label for="product-list-search">Search</label>
                     </div>
                     <div class="grid_5 suffix_3">
-                        <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku or mpn" />
+                        <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku or mpn" style="margin-top: 2px;" />
                     </div>
                 </div>
-                <div id="product-list-holder" class="h500" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+                <div id="product-list-holder" class="h465" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
             </div>
 
             <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
@@ -341,7 +355,7 @@
                     <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');">&lt; back</a>
                     <span style="margin-left: 30%">select image for product</span>
                 </div>
-                <div id="image-list" style="height: 470px !important; overflow-x: hidden; overflow-y: auto;"></div>
+                <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
             </div>
             <div class="closebutton"><span class="close" onclick="top.$('.__tpopup').dialog('close');"><?= $this->translate('Close'); ?></span></div>
 

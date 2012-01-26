@@ -51,9 +51,9 @@
 			{{each countries}}
 			<li class="entry-row ui-state-active padding5px" data-code="${country}" data-name="${name}">${name}
 				{{if addAction}}
-				<span class="country-add-one ui-icon ui-icon-plusthick" style="float:right; border: 1px solid black;"></span>
+				<span class="country-add-one ui-icon ui-icon-plusthick"></span>
 				{{else}}
-				<span class="country-remove-one ui-icon ui-icon-trash" style="float:right; border: 1px solid black;"></span>
+				<span class="country-remove-one ui-icon ui-icon-trash"></span>
 				{{/if}}
 			</li>
 			{{/each}}
@@ -61,7 +61,7 @@
 		<script id="stateRowTemplate" type="text/x-jquery-tmpl">
 			{{each states}}
 			<li class="entry-row ui-state-active padding5px" data-id="${id}">${zoneManager.countryList[country]}: ${name}
-				<span class="state-remove-one ui-icon ui-icon-trash" style="float:right; border: 1px solid black;"></span>
+				<span class="state-remove-one ui-icon ui-icon-trash"></span>
 			</li>
 			{{/each}}
 		</script>
@@ -69,9 +69,42 @@
         #zones.ui-tabs .ui-tabs-panel {
             padding: 10px 5px;
             overflow: hidden;
+            background: #DAE8ED;
+        }
+        #zones .ui-tabs-nav li.ui-tabs-selected {
+            background: #DAE8ED;
         }
         #add-country-dialog {
             padding: 0;
+        }
+        .country-add-one.ui-icon, .country-remove-one.ui-icon, .state-remove-one.ui-icon, .ui-icon.state-add-one {float:right;}
+        .country-add-one.ui-icon:hover, .country-remove-one.ui-icon:hover, .state-remove-one.ui-icon:hover, .ui-icon.state-add-one:hover {background-image: url("/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png");}
+        #new-zone-btn {
+          border-radius: 4px 4px 0 0;
+          -moz-border-radius: 4px 4px 0 0;
+          -webkit-border-radius: 4px 4px 0 0;
+          min-width: 0;
+          border: 1px solid #D3D3D3;
+          border-bottom: none;
+          text-shadow: none;
+          color: #7c7c7c;
+          font-weight: normal;
+          position: relative;
+          top:1px;
+          box-shadow: none;
+          -moz-box-shadow: none;
+          -webkit-box-shadow: none;
+          background: none repeat scroll 0 0 #DEDEDE;
+          vertical-align:top;
+        }
+        #new-zone-btn:hover {
+          color: #444;
+        }
+        #new-zone-btn .ui-button-text {
+         padding: 3px 10px 3px 26px;
+         font-size: 11pt;
+          line-height: 1.3em;
+         font-family: tahoma,geneva,verdana,sans-serif;
         }
         </style>
 	</head>
@@ -81,14 +114,13 @@
 		<a href="http://www.seotoaster.com/">seotoaster.com</a>
 		</noscript>
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
-		<div class="seotoaster container_12"> 
-			<div id="toolbar" class="padding5px ui-widget-header" style="height: 30px;">
-				<button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>
-				<button id="delete-zone-btn"><?php echo $this->translate('Delete'); ?></button>
-				<button id="save-btn" title="Hotkey: Ctrl+S" style="float:right; display:none;"><?php echo $this->translate('Save');?></button>
-			</div>
+        <div class="seotoaster container_12 rounded3px">
             <div id="zones" class="ui-helper-clearfix h530" style="overflow: hidden;">
-				<ul></ul>
+                <ul><button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button></ul>
+			</div>
+            <div id="toolbar" class="ui-widget-header" style="height: 30px; background:none; border:none; padding: 0 5px 10px;">
+                <button id="delete-zone-btn" style="margin-left:10px;"><?php echo $this->translate('Delete'); ?></button>
+                <button id="save-btn" style="margin-right:10px;" title="Hotkey: Ctrl+S" style="float:right; display:none;"><?php echo $this->translate('Save');?></button>
 			</div>
 		</div>
 			
@@ -298,9 +330,7 @@
 				$('#new-zone-btn').button({
 					icons: {primary: 'ui-icon-plus'}
 				}).click(function(){ zoneManager.addZone({}) });
-				$('#delete-zone-btn').button({
-					icons: {primary: 'ui-icon-trash'}
-				}).click( zoneManager.remove );
+				$('#delete-zone-btn').button().click( zoneManager.remove );
 				$('#save-btn').button().click(function(){
 					zoneManager.save();
 				});
