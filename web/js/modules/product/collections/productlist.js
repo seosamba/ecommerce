@@ -22,8 +22,14 @@ define([
 
             return this.filter(function(prod){
                 for (var i in fields){
-                    if (prod.has(fields[i]) && _.isString(prod.get(fields[i])) && prod.get(fields[i]).toLowerCase().indexOf(term) != -1 ) {
-                        return true;
+                    if (prod.has(fields[i])) {
+                        if(_.isArray(prod.get(fields[i]))) {
+                            var categories = _.pluck(prod.get('categories'),'name');
+                            return _.any(categories, function(cat){ return cat.toLowerCase().indexOf(term) !== -1 });
+                        }
+                        if(_.isString(prod.get(fields[i])) && prod.get(fields[i]).toLowerCase().indexOf(term) !== -1 ) {
+                            return true;
+                        }
                     }
                 }
             });
