@@ -238,11 +238,7 @@ define([
 
 			if (this.model.isNew()){
 				this.model.save(null, {success: function(model, response){
-                    if (appRouter.products === null) {
-                        appRouter.initProductlist().fetch().done(
-                            appRouter.products.add(model)
-                        )
-                    } else {
+                    if (appRouter.products !== null) {
                         appRouter.products.add(model);
                     }
                     appRouter.navigate('edit/'+model.id, true);
@@ -267,10 +263,8 @@ define([
 				if (e){
 					model.destroy({
 						success: function(){
-							appRouter.products.fetch().done(function(){
-                                appRouter.brands.fetch()
-                                appRouter.navigate('list', true);
-                            });
+                            appRouter.brands.fetch()
+                            appRouter.navigate('new', true);
 						}
 					});
 				}

@@ -366,7 +366,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                             array_push($data, $product->toArray());
 						}
-						$cacheHelper->save($cacheKey, $data, 'store_', array(), Helpers_Action_Cache::CACHE_NORMAL);
+						$cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
 					}
 				}
 				break;
@@ -445,10 +445,15 @@ class Shopping extends Tools_Plugins_Abstract {
 						'message'	=> 'Requested product not found'
 						);
 				}
+
 				break;
 			default:
 				break;
 		}
+
+        if (!$this->_request->isGet()){
+            $cacheHelper->clean(null, null, array('productlist'));
+        }
 
 		return $data;
 	}

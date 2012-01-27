@@ -12,6 +12,7 @@ define([
 		},
 		initialize: function(){
 			this.model.bind('change', this.render, this);
+            this.model.bind('remove', this.remove, this);
 			this.model.view = this;
 		},
 		render: function(){
