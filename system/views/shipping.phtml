@@ -7,9 +7,12 @@
 		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" >
 		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" >
 		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" >
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	    <link href="http://www.seotoaster2.dev/system/js/external/smoke/smoke.css" media="screen" rel="stylesheet" type="text/css" >
+	    	    <link href="http://www.seotoaster2.dev/system/js/external/smoke/themes/toaster.css" media="screen" rel="stylesheet" type="text/css" >
+	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 	    <script src="<?php echo $this->websiteUrl;?>system/js/internal/system.js"></script>
+	    <script type="text/javascript" src="http://www.seotoaster2.dev/system/js/external/smoke/smoke.min.js"></script>
 	    <script>
             (function($){
                 $(function() {
@@ -36,7 +39,7 @@
                 </div>
                 <?php echo $this->translate('Shipping configuration'); ?>
             </div>
-			<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" id="saveconfig" method="post" enctype="multipart/form-data">
+			<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
 			    <div class="grid_6">
 		            <fieldset class="grid_12"><legend>General Options</legend>
 		                <label>Notice for users:</label>
