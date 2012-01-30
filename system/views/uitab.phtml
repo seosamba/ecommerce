@@ -174,16 +174,18 @@
 	                        	uiTab.parseCategoriesAndBrands(response, dataType);
                             break;
                             case 'product':
-	                            uiTab.parseProducts(response);
-								$('.productlisting:last-child').waypoint(function() {
-									$(this).waypoint('remove');
-									utab.offset += 30;
-									uiTab.loadStoreData('product')
-								},
-								{
-									context: '#product-products',
-									offset : '65%'
-								});
+	                            uiTab.parseProducts(response, filter);
+								if(typeof filter == 'undefined' || !filter) {
+		                            $('.productlisting:last-child').waypoint(function() {
+										$(this).waypoint('remove');
+										utab.offset += 30;
+										uiTab.loadStoreData('product')
+									},
+									{
+										context: '#product-products',
+										offset : '95%'
+									});
+								}
                             break;
                         }
                         $('.pselect').trigger("liszt:updated");
@@ -213,9 +215,11 @@
                    );
                });
 		    },
-		    parseProducts: function(productsResponse) {
+		    parseProducts: function(productsResponse, filter) {
 			    var productsContainer = $('#product-products');
-			    //$(productsContainer).empty();
+			    if(typeof filter != 'undefined' && filter) {
+					$(productsContainer).empty();
+			    }
                 $.each(productsResponse, function() {
                     var productItem  = '';
                     var photoDetails = this.photo.split('/');
