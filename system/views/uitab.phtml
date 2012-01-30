@@ -109,7 +109,12 @@
 			    $('.ui-tabs-nav-item a').click(this.launch);
 			    $(document).on('click', '.currproduct', this.insertSingleProduct)
 			        .on('click', '#btn-create', this.insertList);
-			    $('.pselect').chosen().change(function() {uiTab.loadStoreData('product', true)});
+			    $('.pselect').chosen().change(function() {
+					if(!$('#categories').val() && !$('#brands').val()) {
+						uiTab.offset = 0;
+					}
+				    uiTab.loadStoreData('product', true)
+			    });
 		    },
 		    launch: function() {
 			    $('#product-products').html('');
@@ -174,8 +179,9 @@
 	                        	uiTab.parseCategoriesAndBrands(response, dataType);
                             break;
                             case 'product':
+	                            //console.log(!$('#categories').val(), !$('#brands').val());
 	                            uiTab.parseProducts(response, filter);
-								if(typeof filter == 'undefined' || !filter) {
+								if(!$('#categories').val() && !$('#brands').val()) {
 		                            $('.productlisting:last-child').waypoint(function() {
 										$(this).waypoint('remove');
 										utab.offset += 30;
