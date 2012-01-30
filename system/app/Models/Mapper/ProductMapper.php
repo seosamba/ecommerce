@@ -83,9 +83,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		return $this->getDbTable()->update( array('page_id' => $model->getPage()->getId()), $where);
 	}
 
-	public function fetchAll($where = null, $order = array()) {
+	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null) {
 		$entities = array();
-		$resultSet = $this->getDbTable()->fetchAll($where, $order);
+		$resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
 		if(null === $resultSet) {
 			return null;
 		}

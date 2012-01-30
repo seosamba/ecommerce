@@ -7,7 +7,7 @@
 class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
 	const PRODUCT_CATEGORY_URL	= 'product-pages';
-
+	const PRODUCT_DEFAULT_LIMIT = 30;
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -337,18 +337,21 @@ class Shopping extends Tools_Plugins_Abstract {
 						$data = $product->toArray();
 					}
 				} else {
+					$offset = isset($this->_requestedParams['offset']) ? $this->_requestedParams['offset'] : 0;
+					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
+
 					$filter['categories'] = isset($this->_requestedParams['fcat']) ? $this->_requestedParams['fcat'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
 					$categoryPart         = (is_array($filter['categories']) && !empty($filter['categories'])) ? implode('.', $filter['categories']) : 'allcategories';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
-					$cacheKey             = $categoryPart . $brandPart;
+					$cacheKey             = $categoryPart . $brandPart . $offset . $limit;
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
 						$data = array();
 						if(is_array($filter['categories']) && !empty($filter['categories'])) {
 							$products = $productMapper->findByCategories($filter['categories']) ;
 						}
 						else {
-							$products = $productMapper->fetchAll();
+							$products = $productMapper->fetchAll(null, array(), $offset, $limit);
 						}
 						foreach ($products as $product) {
 							if(is_array($filter['brands']) && !empty($filter['brands'])) {
