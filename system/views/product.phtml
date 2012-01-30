@@ -350,7 +350,7 @@
 		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
 		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
 		<div id="ajax_msg" class="smoke">
-            <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /> Loading...
+            <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /><?php echo $this->translate('Loading');?>...
 		</div>
         <div id="manage-product" class="seotoaster container_12" style="padding: 0;">
             <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
@@ -359,7 +359,7 @@
                         <label for="product-list-search">Search</label>
                     </div>
                     <div class="grid_5 suffix_3">
-                        <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku or mpn" style="margin-top: 2px;" />
+                        <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags" style="margin-top: 2px;" />
                     </div>
                 </div>
                 <div id="product-list-holder" class="h465" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>

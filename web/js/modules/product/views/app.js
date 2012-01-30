@@ -402,7 +402,7 @@ define([
             var search = e.target.value.toLowerCase();
             if (search.length){
                 $('#product-list-holder > .productlisting:visible').hide();
-                appRouter.products.search(search, ['name', 'brand', 'sku', 'mpn']).map(function(prod){
+                appRouter.products.search(search, ['name', 'brand', 'sku', 'mpn', 'categories']).map(function(prod){
                     $(prod.view.el).show();
                 });
             } else {
