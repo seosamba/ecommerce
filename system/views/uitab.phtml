@@ -195,6 +195,8 @@
                             break;
                         }
                         $('.pselect').trigger("liszt:updated");
+                    } else if(typeof filter != 'undefined' && filter) {
+	                    $('#product-products').empty();
                     }
 					hideSpinner();
                 });
@@ -223,8 +225,8 @@
 		    },
 		    parseProducts: function(productsResponse, filter) {
 			    var productsContainer = $('#product-products');
-			    if(typeof filter != 'undefined' && filter) {
-					$(productsContainer).empty();
+			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
+				    $(productsContainer).empty();
 			    }
                 $.each(productsResponse, function() {
                     var productItem  = '';
