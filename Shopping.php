@@ -352,25 +352,31 @@ class Shopping extends Tools_Plugins_Abstract {
 							$products = $productMapper->findByCategories($filter['categories']) ;
 						}
 						else {
-							$products = $productMapper->fetchAll(null, array(), $offset, $limit);
-						}
-						foreach ($products as $product) {
 							if(is_array($filter['brands']) && !empty($filter['brands'])) {
-								if(!in_array($product->getBrand(), $filter['brands'])) {
-									continue;
-								}
+								$products = $productMapper->fetchAll(null, array());
+							} else {
+								$products = $productMapper->fetchAll(null, array(), $offset, $limit);
 							}
-                            //cleanup unnecessary values
-                            $product->setPage(array(
-                                'id'         => $product->getPage()->getId(),
-                                'url'        => $product->getPage()->getUrl(),
-                                'h1'         => $product->getPage()->getH1(),
-                                'templateId' => $product->getPage()->getTemplateId(),
-                            ));
-
-                            array_push($data, $product->toArray());
 						}
-						$cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
+						if(!empty($products)) {
+							foreach ($products as $product) {
+								if(is_array($filter['brands']) && !empty($filter['brands'])) {
+									if(!in_array($product->getBrand(), $filter['brands'])) {
+										continue;
+									}
+								}
+	                            //cleanup unnecessary values
+	                            $product->setPage(array(
+	                                'id'         => $product->getPage()->getId(),
+	                                'url'        => $product->getPage()->getUrl(),
+	                                'h1'         => $product->getPage()->getH1(),
+	                                'templateId' => $product->getPage()->getTemplateId(),
+	                            ));
+
+	                            array_push($data, $product->toArray());
+							}
+							$cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
+						}
 					}
 				}
 				break;
