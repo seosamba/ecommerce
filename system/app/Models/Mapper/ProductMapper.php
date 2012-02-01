@@ -277,8 +277,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
      */
 	public function delete(Models_Model_Product $product){
         $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
-        return true;
-		$status = $this->getDbTable()->delete($where);
+
+        $status = $this->getDbTable()->delete($where);
 
         if ((bool) $status) {
             if ($product->getBrand()){
