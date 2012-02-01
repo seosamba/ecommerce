@@ -5,9 +5,35 @@ define([
 ], function(_, Backbone, ProductModel){
 	var ProductList = Backbone.Collection.extend({
 		model: ProductModel,
-		url: '/plugin/shopping/run/getdata/type/product/',
+//		url: '/plugin/shopping/run/getdata/type/product/',
+		urlOriginal: '/plugin/shopping/run/getdata/type/product/',
+        paginator: {
+            limit: 32,
+            offset: 0,
+            last: false
+        },
+        url: function() {
+            if (!_.isEmpty(this.paginator)){
+                return this.urlOriginal + 'offset/'+this.paginator.offset+'/limit/'+this.paginator.limit;
+            }
+            return this.urlOriginal;
+        },
 		initialize: function(){
 		},
+        load: function(callbacks) {
+            if (!this.paginator.last) {
+                var list = this;
+
+                _.isFunction(callbacks) && (callbacks = [callbacks]);
+
+                return this.fetch({add: true}).done( function(data){
+                    list.paginator.offset += list.paginator.limit;
+                    if (data.length < list.paginator.limit){
+                        list.paginator.last = true;
+                    }
+                } ).done(callbacks);
+            }
+        },
         /**
          * Returns set of product that has given term in custom fields
          * @param term Search term

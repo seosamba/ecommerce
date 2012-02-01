@@ -202,6 +202,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					$this->_response->clearAllHeaders()->clearBody();
 					return $this->_response->setHttpResponseCode( isset($data['code']) ? intval($data['code']) : 400)
 							->setBody(json_encode($data['message']))
+                            ->setHeader('Content-Type', 'application/json', true)
 							->sendResponse();
 				}
 			}
@@ -430,17 +431,24 @@ class Shopping extends Tools_Plugins_Abstract {
 				$data = $product->toArray();
 				break;
 			case 'DELETE':
-				$uri = trim($this->_request->getRequestUri(), '/\ ');
-				$uri = substr($uri, strrpos($uri, '/'));
-				$id = filter_var($uri, FILTER_SANITIZE_NUMBER_INT);
-				if ($product = $productMapper->find($id)) {
-					if (!$productMapper->delete($product)){
-						$data = array(
-							'error' => true,
-							'code' => 404,
-							'message' => 'Can not delete product #'.$id
-						);
+				preg_match_all('~product/(.*)$~', $this->_request->getRequestUri(), $uri);
+
+				$ids = filter_var_array(explode('/', $uri[1][0]), FILTER_VALIDATE_INT);
+                $ids = array_filter(array_unique($ids), function($id) {return (!empty($id) && is_numeric($id)); } );
+
+				if (!empty($ids) && null !== ($products = $productMapper->fetchAll(array('id IN(?)' => $ids))) ) {
+                    $result = array();
+                    foreach ($products as $product){
+                        $result[$product->getId()] = $productMapper->delete($product);
+                        unset($product);
 					}
+                    if (!empty($result)){
+                        $data = in_array(false, $result) ? array(
+                            'error' => true,
+                            'code' => 409,
+                            'message' => $result
+                        ) : $result;
+                    }
 				} else {
 					$data = array(
 						'error'		=> true,

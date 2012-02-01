@@ -3,12 +3,15 @@
     <head>
         <meta charset="utf-8">
         <title>Manage product</title>
-		<link href="<?php echo $this->websiteUrl;?>system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/smoke.css" media="screen" rel="stylesheet" type="text/css" >
-		<link href="<?php echo $this->websiteUrl;?>system/js/external/smoke/themes/toaster.css" media="screen" rel="stylesheet" type="text/css" >
+        <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
+                ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
+                ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
+                ->appendStylesheet($this->websiteUrl . 'system/css/seotoaster.css')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/smoke.css')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css'); ?>
+        <?php echo $this->headLink(); ?>
+
 		<style>
 			div.box {
                 background-color: white;
@@ -28,7 +31,7 @@
                 min-width: 19%;
 				padding: 5px;
 				border-radius: 3px;
-				background: url("/system/images/bg-strip.png") repeat 0px 0 transparent;
+				background: url("/system/images/bg-strip.png") repeat 0 0 transparent;
 				color: #5C5C5C;
 				font-weight: normal;
 				border-image: initial;
@@ -125,13 +128,18 @@
                 cursor: pointer;
                 background: #fff;
                 font-size: 11pt;
-			}
+            }
             div.productlisting img{
                 max-height: 80px;
-                padding: 4px 0px;
+                padding: 4px 0;
+            }
+            div.productlisting input.delete-marker {
+                position: absolute;
+                bottom: 0;
+                left: 0;
             }
             p.brand {
-                padding: 2px 0px;
+                padding: 2px 0;
                 background-color: lavender;
                 margin-bottom: 1px;
             }
@@ -139,11 +147,11 @@
                 text-align: right;
                 font-size: 8pt;
                 border-top: 1px dotted #eee;
-                padding: 4px 0px;
+                padding: 4px 0;
                 margin-top: 4px;
                 color: #7C7C7C;
                 position: absolute;
-                bottom: 0px;
+                bottom: 0;
                 right: 2px;
                 width: 100%;
                 height: 8pt;
@@ -205,19 +213,21 @@
                 width: 100%;
                 z-index: 5000;
             }
-		</style>
-		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
-		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
-		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js"></script>
-		<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js"></script>
+        </style>
 
-		<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/smoke/smoke.min.js"></script>
-		
-		<!-- Loading "product/main.js" as a bootstrap of product module -->
-		<script data-main="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/modules/product/main.js" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require/require-dev.js"></script>
-		
+        <?php
+            $this->headScript()->setAllowArbitraryAttributes(true)
+                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js')
+                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js')
+                    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+                    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
+                    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js')
+                    ->appendFile($this->websiteUrl.'system/js/external/smoke/smoke.min.js')
+                    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require-dev.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/product/main.js'))
+                    ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
+            echo $this->headScript();
+        ?>
+
 		<script id="categoryTemplate" type="text/x-jquery-tmpl">
 			<input type="checkbox" name="category[]" value="${id}"/>
 			<span class="category-editable" title="Click to edit">${name}</span>
@@ -331,8 +341,12 @@
                 {{/if}}
                 <p class="name">${name}</p>
                 <p class="sku">${sku}</p>
+                {{if showDelete}}
+                {{else}}
+                <input class="delete-marker" type=checkbox {{if toDelete}}checked="checked"{{/if}}>
+                {{/if}}
             </a>
-		</script>
+        </script>
         <script>
             /**
              * applying main UI elements
@@ -342,10 +356,10 @@
                 $(".ui-tabs-nav, .ui-tabs-nav > *" )
                     .removeClass( "ui-corner-all" )
                     .addClass( "ui-corner-top" );
-                $('#ajax_msg').ajaxStart(function(){
-                    $(this).show();
-                }).ajaxStop(function(){
-                    $(this).hide();
+                $('#ajax_msg').on({
+                    ajaxStart: function(){ $(this).show(); },
+                    ajaxStop:  function(){ $(this).hide(); },
+                    ajaxError: function(){ $(this).hide(); }
                 });
             });
         </script>
@@ -360,17 +374,22 @@
 		<div id="ajax_msg" class="smoke">
             <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /><?php echo $this->translate('Loading');?>...
 		</div>
-        <div id="manage-product" class="seotoaster container_12" style="padding: 0;">
-            <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: #fff;">
+        <div id="manage-product" class="seotoaster container_12 h520" style="padding: 0;">
+            <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: #fff;">
                 <div class="clearfix ui-widget-header">
                     <div class="grid_1 prefix_3 mt5px">
                         <label for="product-list-search">Search</label>
                     </div>
-                    <div class="grid_5 suffix_3">
+                    <div class="grid_5 suffix_1">
                         <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags" style="margin-top: 2px;" />
                     </div>
+                    <div class="grid_2 mt5px" style="text-align:center;">
+                        <label>
+                            <a id="massdelete" href="javascript:;" >[ delete selected ]</a>
+                        </label>
+                    </div>
                 </div>
-                <div id="product-list-holder" class="h465" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+                <div id="product-list-holder" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
             </div>
 
             <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
@@ -380,7 +399,7 @@
                 </div>
                 <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
             </div>
-            <div class="closebutton"><span class="close" onclick="top.$('.__tpopup').dialog('close');"><?= $this->translate('Close'); ?></span></div>
+            <div class="closebutton"><span class="close" onclick="top.$('.__tpopup').dialog('close');"><?php echo $this->translate('Close'); ?></span></div>
 
             <ul>
                 <li><a href="#tab1"><?php echo $this->translate('Main Info'); ?></a></li>
@@ -503,7 +522,7 @@
 
             <div id="tab4" class="clearfix">
                 <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
-                    <input type="text" id="add-related" placeholder="Start typing name, SKU or MPN" />
+<!--                    <input type="text" id="add-related" placeholder="Start typing name, SKU or MPN" />-->
                 </div>
                 <div id="related-holder" class="grid_12">
 

@@ -27,16 +27,17 @@ define([
             'click a#brandlanding-link': 'gotoBrandPage',
             'keyup #product-list-search': 'filterProductList',
             'mouseover #option-library': 'fetchOptionLibrary',
-            'submit form.binded-plugin': 'formSubmit'
+            'submit form.binded-plugin': 'formSubmit',
+            'click #massdelete': 'massDelete'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
 			$('#delete,#add-new-option-btn').button();
-			$('#add-related').autocomplete({
-				minLength: 3,
-				select: this.addRelated,
-				source: this.relatedAutocomplete
-			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
+//			$('#add-related').autocomplete({
+//				minLength: 3,
+//				select: this.addRelated,
+//				source: this.relatedAutocomplete
+//			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
 
 			this.newCategoryInput = this.$('#new-category');
 		},
@@ -88,7 +89,6 @@ define([
                         parentId: option.get('id'),
                         type: option.get('type')
                     });
-                console.log(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 this.model.get('options').add(newOption);
                 this.model.trigger('change');
@@ -206,7 +206,6 @@ define([
 				itemSelector : '.box',
 				columnWidth : 118
 			});
-//			$(this.el).show();
 		},
 		saveProduct: function(){
 			//@todo: make messages translatable
@@ -262,10 +261,14 @@ define([
 			smoke.confirm('Dragons ahead! Are you sure?', function(e){
 				if (e){
 					model.destroy({
-						success: function(){
+						success: function(model, response){
                             appRouter.brands.fetch()
                             appRouter.navigate('new', true);
-						}
+						},
+                        error: function(model, response){
+                            smoke.alert('Oops! Something went wrong!');
+                            console.log($.parseJSON(response.responseText));
+                        }
 					});
 				}
 			});
@@ -318,6 +321,9 @@ define([
             return !error;
         },
 		relatedAutocomplete: function(request, response){
+            if (appRouter.products === null) {
+                return;
+            }
 			var list = appRouter.products.search(request.term.toLowerCase()).filter(function(prod){
                 var id = prod.get('id'),
                     model = appRouter.app.model;
@@ -353,11 +359,11 @@ define([
 
             if (this.model.has('related') && this.model.get('related').length) {
                 var relateds = this.model.get('related');
-                if (appRouter.products === null) {
-                    appRouter.initProductlist().fetch({async: false})
-                }
+
                 _(relateds).each(function (pid) {
-                    var view = new ProductListView({model:appRouter.products.get(pid), showDelete:true});
+                    var model = new ProductModel();
+                    model.fetch({data: {id: pid}});
+                    var view = new ProductListView({model: model, showDelete:true});
                     $('#related-holder').append(view.render().el);
                 });
             }
@@ -366,7 +372,7 @@ define([
         newBrand: function(e){
             var newBrand = trim(this.$('#new-brand').val());
             if (e.keyCode === 13 && newBrand !== '') {
-                var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
+//                var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
                 this.addNewBrand(newBrand)
                     .$('#new-brand').val('');
                 this.$('#product-brand').focus();
@@ -375,8 +381,8 @@ define([
         },
         addNewBrand: function(newBrand){
             newBrand = trim(newBrand);
-            var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
-            if (!_.include(current, newBrand.toLowerCase())){
+            var currentList = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
+            if (!_.include(currentList, newBrand.toLowerCase())){
                 appRouter.brands.add({name: newBrand});
             } else {
                 var brand = appRouter.brands.find(function(item){
@@ -399,16 +405,17 @@ define([
             }
         },
         filterProductList: function(e){
-            var search = e.target.value.toLowerCase();
+            var search = e.target.value.toLowerCase(),
+                holder = $('#product-list-holder');
             if (search.length){
                 $('#product-list-holder > .productlisting:visible').hide();
                 appRouter.products.search(search, ['name', 'brand', 'sku', 'mpn', 'categories']).map(function(prod){
                     $(prod.view.el).show();
                 });
             } else {
-                $('#product-list-holder > .productlisting').show();
+                $('.productlisting:hidden', holder).show();
             }
-            $('#product-list-holder').trigger('scroll');
+            holder.trigger('scroll');
         },
         fetchOptionLibrary: function(){
             if (!appRouter.hasOwnProperty('optionLibrary')){
@@ -428,8 +435,8 @@ define([
                 appRouter.optionLibrary.fetch();
             }
         },
-        formSubmit: function(event) {
-            var $form = $(event.target);
+        formSubmit: function(e) {
+            var $form = $(e.target);
             $.ajax({
                 url: $form.attr('action'),
                 type: $form.attr('method'),
@@ -445,6 +452,39 @@ define([
 
 
             return false;
+        },
+        massDelete: function() {
+            smoke.confirm('Oh man... Really?', function(a){
+                if (a) {
+                    var list = appRouter.products.filter(function(prod){ return prod.has('toDelete'); })
+//                  //delete products 1 per request
+//                    if (!_.isEmpty(list)){
+//                        _.each(list, function(prod){
+//                            prod.destroy({
+//                                    success: function(){},
+//                                    error: function(){}
+//                                });
+//                        });
+//                    }
+                    //delete all selected products in one query
+                    var ids = _.pluck(list, 'id');
+                    if (!_.isEmpty(ids)){
+                        $.ajax({
+                            url: appRouter.products.url + ids.join('/'),
+                            type: 'DELETE',
+                            dataType: 'json',
+                            statusCode: {
+                                409: function() {
+                                    smoke.alert("Can't remove products");
+                                }
+                            }
+                        }).done(function(){
+                            appRouter.products.remove(list);
+                            smoke.signal('Products removed', 500);
+                        });
+                    }
+                }
+            });
         }
 	});
 

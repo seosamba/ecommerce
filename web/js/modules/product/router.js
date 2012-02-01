@@ -76,9 +76,10 @@ define([
 		productListToggle: function(){
             var callback = function(){ $('#product-list').show('slide').find('#product-list-holder').trigger('scroll'); }
             if (this.products === null) {
-                this.initProductlist().fetch().done(
-                    callback
-                );
+                this.initProductlist().load().done([
+                    callback,
+                    appRouter.waypointCallback
+                ]);
             } else {
                 callback();
             }
@@ -91,6 +92,19 @@ define([
             }
 
             return this.products;
+        },
+        waypointCallback: function(){
+            var list = appRouter.products;
+            $('.productlisting:last', appRouter.productListHolder ).waypoint(function(){
+                $(this).waypoint('remove');
+//                if (!list.paginator.last){
+//                    list.load().done([
+//                        appRouter.waypointCallback,
+//                        function(){ $('#product-list-search').trigger('keyup'); }
+//                    ]);
+//                }
+                list.load([ function(){$('#product-list-search').trigger('keyup');}, appRouter.waypointCallback ]);
+            }, {context: appRouter.productListHolder, offset: 'bottom-in-view' } );
         }
 	});
 

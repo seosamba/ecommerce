@@ -8,7 +8,7 @@ define([
 		className: 'productlisting',
 		template: $('#productListingTemplate').template(),
 		events: {
-		
+		    'change input.delete-marker': 'markForDelete'
 		},
 		initialize: function(){
 			this.model.bind('change', this.render, this);
@@ -27,7 +27,14 @@ define([
                 effect: 'fadeIn'
             });
 			return this;
-		}
+		},
+        markForDelete: function(e){
+            if (e.target.checked){
+                this.model.set({toDelete: true});
+            } else {
+                this.model.has('toDelete') && this.model.unset('toDelete');
+            }
+        }
 	});
 	
 	return ProductView;

@@ -86,7 +86,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null) {
 		$entities = array();
 		$resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
-		if(null === $resultSet) {
+		if(count($resultSet) === 0) {
 			return null;
 		}
 		foreach ($resultSet as $row) {
@@ -277,10 +277,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
      */
 	public function delete(Models_Model_Product $product){
         $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
-
+        return true;
 		$status = $this->getDbTable()->delete($where);
 
-        if ($status) {
+        if ((bool) $status) {
             if ($product->getBrand()){
                 $brand = $this->_brandMapper->findByName($product->getBrand());
                 if ($brand) {
