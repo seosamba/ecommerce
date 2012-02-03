@@ -8,7 +8,7 @@ define([
 //		url: '/plugin/shopping/run/getdata/type/product/',
 		urlOriginal: '/plugin/shopping/run/getdata/type/product/',
         paginator: {
-            limit: 32,
+            limit: 3,
             offset: 0,
             last: false
         },
