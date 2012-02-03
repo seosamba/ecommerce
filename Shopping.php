@@ -340,22 +340,23 @@ class Shopping extends Tools_Plugins_Abstract {
 				} else {
 					$offset = isset($this->_requestedParams['offset']) ? $this->_requestedParams['offset'] : 0;
 					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
+					$key    = isset($this->_requestedParams['key']) ? filter_var($this->_requestedParams['key'], FILTER_SANITIZE_STRING) : null;
 
 					$filter['categories'] = isset($this->_requestedParams['fcat']) ? $this->_requestedParams['fcat'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
 					$categoryPart         = (is_array($filter['categories']) && !empty($filter['categories'])) ? implode('.', $filter['categories']) : 'allcategories';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
-					$cacheKey             = $categoryPart . $brandPart . $offset . $limit;
+					$cacheKey             = $categoryPart . $brandPart . $offset . $limit . $key;
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
 						$data = array();
 						if(is_array($filter['categories']) && !empty($filter['categories'])) {
 							$products = $productMapper->findByCategories($filter['categories']) ;
 						}
 						else {
-							if(is_array($filter['brands']) && !empty($filter['brands'])) {
+                            if(is_array($filter['brands']) && !empty($filter['brands'])) {
 								$products = $productMapper->fetchAll(null, array());
 							} else {
-								$products = $productMapper->fetchAll(null, array(), $offset, $limit);
+								$products = $productMapper->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null);
 							}
 						}
 						if(!empty($products)) {
@@ -491,7 +492,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				'navName'		=> self::PRODUCT_CATEGORY_NAME,
 				'metaDescription'	=> '',
 				'teaserText'	=> '',
-				'templateId'	=> $templateId ? $templateId : 'default',
+				'templateId'	=> Application_Model_Models_Template::ID_DEFAULT,
 				'parentId'		=> 0,
 				'system'		=> 1,
 				'is404page'		=> 0,
@@ -514,7 +515,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             , array( $product->getBrand(), $product->getName(), $product->getSku() ));
 		$uniqName = implode('-', $uniqName);
-		$page->setTemplateId($templateId ? $templateId : 'default' );
+		$page->setTemplateId($templateId ? $templateId : Application_Model_Models_Template::ID_DEFAULT );
 		$page->setParentId($prodCatPage->getId());
 		$page->setNavName($product->getName().($product->getSku()?' - '.$product->getSku():''));
         $page->setMetaDescription(strip_tags($product->getShortDescription()));
@@ -587,5 +588,15 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_view->render('product.phtml');
 	}
 
+    protected  function _indexRESTService(){
+        $cacheHelper    = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
 
+        if(($data = $cacheHelper->load('index', 'store_')) === null) {
+            $data = Models_Mapper_ProductMapper::getInstance()->buildIndex();
+
+            $cacheHelper->save('index', $data, 'store_', array('productindex'), Helpers_Action_Cache::CACHE_NORMAL);
+        }
+
+        return $data;
+    }
 }

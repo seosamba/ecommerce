@@ -12,6 +12,9 @@ define([
             offset: 0,
             last: false
         },
+        data: {
+            key: ''
+        },
         url: function() {
             if (!_.isEmpty(this.paginator)){
                 return this.urlOriginal + 'offset/'+this.paginator.offset+'/limit/'+this.paginator.limit;
@@ -19,16 +22,25 @@ define([
             return this.urlOriginal;
         },
 		initialize: function(){
+            this.bind('reset', this.resetPaginator, this);
 		},
-        load: function(callbacks) {
+        resetPaginator: function(){
+            this.paginator = {limit: 3, offset: 0, last: false};
+            return this;
+        },
+        load: function(callbacks, data) {
             if (!this.paginator.last) {
                 var list = this;
 
+                if (_.isObject(data)){
+                    this.data = _.extend(this.data, data);
+                }
+
                 _.isFunction(callbacks) && (callbacks = [callbacks]);
 
-                return this.fetch({add: true}).done( function(data){
+                return this.fetch({add: true, data: this.data}).done( function(response){
                     list.paginator.offset += list.paginator.limit;
-                    if (data.length < list.paginator.limit){
+                    if (response.length < list.paginator.limit){
                         list.paginator.last = true;
                     }
                 } ).done(callbacks);
