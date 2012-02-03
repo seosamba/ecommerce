@@ -69,7 +69,7 @@
                 background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
             }
             .ui-widget.ui-button.remove-option:hover .ui-icon, .ui-widget.ui-button.item-remove:hover .ui-icon {
-                background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
+	            background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
             }
             .ui-widget.ui-button.remove-option .ui-icon, .ui-widget.ui-button.item-remove .ui-icon {
                 background-image: url(/system/uithemes/seotoasterui/images/ui-icons_222222_256x240.png);
@@ -84,7 +84,7 @@
             }
             #product-image-holder {
                 height: 130px;
-                width: 195px;
+                width: 191px;
                 background: white;
                 text-align: center;
                 vertical-align: middle;
@@ -176,9 +176,12 @@
                 background: #DAE8ED;
             }
             #short-description-tab, #full-description-tab {
-                padding: 7px 0;
-                text-align: center;
+	            padding: 6px 5px !important;
+	            border: 1px solid #DDDDDD;
+	            border-top-width: 0;
+	            text-align: center;
             }
+
             .highlight {
                 border: 1px solid #cd5c5c !important;
             }
@@ -419,18 +422,25 @@
             <!--------- MAIN INFO -------------->
             <div id="tab1" class="clearfix">
                 <div class="grid_8">
-                    <div class="grid_4">
+	                <fieldset>
+	                <div class="grid_4" style="margin-left: 0.7%;">
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
                         <div id="product-image-holder">
                             <img id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
                         </div>
                     </div>
-                    <div class="grid_8">
+                    <div class="grid_4">
                         <label for="product-name">Product Name</label>
-<!--                    </div>-->
-<!--                    <div class="grid_8">-->
-                        <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
                     </div>
+					<div class="grid_4" style="text-align: right;">
+						<label for="product-enabled">This product is enabled</label>
+					</div>
+		            <div class="grid_7">
+			            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
+		            </div>
+					<div class="grid_1">
+						<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
+					</div>
                     <div class="grid_2">
                         <label for="product-sku">SKU</label>
                         <input type="text" id="product-sku" data-reflection="property" placeholder="item id" />
@@ -454,53 +464,54 @@
                         <input type="text" name="" id="new-brand" placeholder="or create new">
                     </div>
                     <div class="clear"></div>
+		            </fieldset>
 
-                    <div class="grid_12 mt5px">
+                    <div class="mt5px">
                         <div id="description-box">
                             <ul>
                                 <li><a href="#short-description-tab">Short description</a></li>
                                 <li><a href="#full-description-tab">Full description</a></li>
                             </ul>
                             <div id="short-description-tab">
-                            <textarea id="product-shortDescription" class="h170" data-reflection="property" placeholder="Short description"></textarea>
+                            <textarea id="product-shortDescription" class="h160" data-reflection="property" placeholder="Short description"></textarea>
                             </div>
                             <div id="full-description-tab">
-                            <textarea id="product-fullDescription" class="h170" data-reflection="property" placeholder="Full description"></textarea>
+                            <textarea id="product-fullDescription" class="h160" data-reflection="property" placeholder="Full description"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!--End grid_8-->
-                <div class="grid_4" style="margin-bottom: 32px;">
-                    <label for="product-enabled"><input type="checkbox" id="product-enabled" style="margin-right:5px;"/>This product is enabled</label>
-                </div>
-                <div class="grid_2">
-                    <label for="product-price">Price (in <?php echo $this->generalConfig['currency']; ?>)</label>
-                    <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
-                </div>
-                <div class="grid_2">
-                    <label for="tax">Taxes</label>
-                    <select name="taxes" id="product-taxClass" data-reflection="property" >
-                        <option value="0">Non taxable</option>
-                        <option value="1">Default</option>
-                        <option value="2">Alternative</option>
-                        <option value="3">Alternative 2</option>
-                    </select>
-                </div>
-                <div class="grid_4">
-                    <label for="product-pageTemplate">Select a product page template</label>
-                    <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
-                        <option value="-1" disabled="disable">Select Template</option>
-                        <?php foreach ($this->templateList as $tmpl) : ?>
-                        <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+				<div class="grid_4">
+				<fieldset>
+					<div class="grid_6 alpha">
+	                    <label for="product-price">Price (in <?php echo $this->generalConfig['currency']; ?>)</label>
+	                    <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
+	                </div>
+	                <div class="grid_6">
+	                    <label for="tax">Taxes</label>
+	                    <select name="taxes" id="product-taxClass" data-reflection="property" >
+	                        <option value="0">Non taxable</option>
+	                        <option value="1">Default</option>
+	                        <option value="2">Alternative</option>
+	                        <option value="3">Alternative 2</option>
+	                    </select>
+	                </div>
+	                <div class="grid_12 alpha">
+	                    <label for="product-pageTemplate">Select a product page template</label>
+	                    <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
+	                        <option value="-1" disabled="disable">Select Template</option>
+	                        <?php foreach ($this->templateList as $tmpl) : ?>
+	                        <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
+	                        <?php endforeach; ?>
+	                    </select>
+	                </div>
+				</fieldset>
                 <div class="grid_4 mt5px">
                     <div id="quick-preview"></div>
                 </div>
             </div>
-
+	        </div>
             <div id="category-tab" class="clearfix">
                 <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
                     <input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
