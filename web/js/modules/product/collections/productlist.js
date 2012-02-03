@@ -8,7 +8,7 @@ define([
 //		url: '/plugin/shopping/run/getdata/type/product/',
 		urlOriginal: '/plugin/shopping/run/getdata/type/product/',
         paginator: {
-            limit: 3,
+            limit: 32,
             offset: 0,
             last: false
         },
@@ -25,7 +25,7 @@ define([
             this.bind('reset', this.resetPaginator, this);
 		},
         resetPaginator: function(){
-            this.paginator = {limit: 3, offset: 0, last: false};
+            this.paginator = {limit: 32, offset: 0, last: false};
             return this;
         },
         load: function(callbacks, data) {
