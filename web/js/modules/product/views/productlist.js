@@ -7,8 +7,10 @@ define([
 		tagName: 'div',
 		className: 'productlisting',
 		template: $('#productListingTemplate').template(),
+        container: $('#product-list-holder'),
 		events: {
-		    'change input.delete-marker': 'markForDelete'
+            'click a': 'runItemAction',
+            'change input.marker': 'mark'
 		},
 		initialize: function(){
 			this.model.bind('change', this.render, this);
@@ -23,16 +25,25 @@ define([
 			}
 			$(this.el).html($.tmpl(this.template, data));
             this.$('img.lazy').lazyload({
-                container: $('#product-list-holder'),
+                container: this.container,
                 effect: 'fadeIn'
             });
 			return this;
 		},
-        markForDelete: function(e){
+        mark: function(e){
             if (e.target.checked){
-                this.model.set({toDelete: true});
+                this.model.set({marked: true});
             } else {
-                this.model.has('toDelete') && this.model.unset('toDelete');
+                this.model.has('marked') && this.model.unset('marked');
+            }
+        },
+        runItemAction: function(e){
+            var type =  this.container.data('type');
+
+            if (type === 'related'){
+                appRouter.app.addRelated(this.model.get('id'));
+                $('#product-list').hide('slide');
+                return false;
             }
         }
 	});

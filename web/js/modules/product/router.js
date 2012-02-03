@@ -15,8 +15,7 @@ define([
 		routes: {
 			'': 'newProduct',
 			'new': 'newProduct',
-			'edit/:id': 'editProduct',
-			'list': 'productListToggle'
+            'edit/:id': 'editProduct'
 		},
 		products: null,
         productListHolder: $('#product-list-holder'),
@@ -73,17 +72,6 @@ define([
             _(this.brands.sortBy(function(brand){ return brand.get('name').toLowerCase();})).each(this.addBrand, this);
             $('#product-brand > option:first').attr('disabled', true);
         },
-		productListToggle: function(){
-            var callback = function(){ $('#product-list').show('slide').find('#product-list-holder').trigger('scroll'); }
-            if (this.products === null) {
-                this.initProductlist().load().done([
-                    callback,
-                    appRouter.waypointCallback
-                ]);
-            } else {
-                callback();
-            }
-		},
         initProductlist: function() {
             if (this.products === null) {
                 this.products = new ProductsCollection();
@@ -92,19 +80,6 @@ define([
             }
 
             return this.products;
-        },
-        waypointCallback: function(){
-            var list = appRouter.products;
-            $('.productlisting:last', appRouter.productListHolder ).waypoint(function(){
-                $(this).waypoint('remove');
-//                if (!list.paginator.last){
-//                    list.load().done([
-//                        appRouter.waypointCallback,
-//                        function(){ $('#product-list-search').trigger('keyup'); }
-//                    ]);
-//                }
-                list.load([ function(){$('#product-list-search').trigger('keyup');}, appRouter.waypointCallback ]);
-            }, {context: appRouter.productListHolder, offset: 'bottom-in-view' } );
         }
 	});
 

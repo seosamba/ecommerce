@@ -12,6 +12,7 @@ define([
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
 		events: {
+            'click .show-list': 'toggleList',
 			'keypress input#new-category': 'newCategory',
 			'click #add-new-option-btn': 'newOption',
             'change select#option-library': 'addOption',
@@ -28,18 +29,11 @@ define([
             'keyup #product-list-search': 'filterProductList',
             'mouseover #option-library': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
-            'click #massdelete': 'massDelete'
+            'click #massaction': 'massAction'
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
 			$('#delete,#add-new-option-btn').button();
-//			$('#add-related').autocomplete({
-//				minLength: 3,
-//				select: this.addRelated,
-//				source: this.relatedAutocomplete
-//			}).data( "autocomplete" )._renderItem = this.renderAutocomplete;
-
-			this.newCategoryInput = this.$('#new-category');
 		},
 		setModel: function (model) {
 			this.model = model;
@@ -52,7 +46,7 @@ define([
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
 		},
 		newCategory: function(e){
-			var name = this.newCategoryInput.val();
+			var name = this.$('#new-category').val();
 			if (e.keyCode == 13 && name !== '') {
 			   appRouter.categories.create({name: name}, {
 				   success: function(model, response){
@@ -320,34 +314,13 @@ define([
 
             return !error;
         },
-		relatedAutocomplete: function(request, response){
-            if (appRouter.products === null) {
-                return;
-            }
-			var list = appRouter.products.search(request.term.toLowerCase()).filter(function(prod){
-                var id = prod.get('id'),
-                    model = appRouter.app.model;
-                return (model.get('id') !== prod.get('id') && !_(model.get('related')).include(prod.get('id'))) ;
-            });
+		addRelated: function( ids ) {
+            if (_.isNull(ids) || _.isUndefined(ids)) return false;
 
-			response(list);
-		},
-		renderAutocomplete: function( ul, item ) {
-			return $( "<li></li>" )
-				.data( "item.autocomplete", item )
-				.append( "<a><img style='float:right;max-width: 80px' src=" +
-                (item.has('photo')?'/media/'+item.get('photo').replace('/','/product/'):'/system/images/noimage.png') +
-                " /><div>" + item.get('name').toUpperCase() + "<br>SKU:" + item.get('sku') + "<br />" +item.get('brand')+"</div></a>"
-				).appendTo( ul );
-		},
-		addRelated: function( event, ui ) {
-			var related = _(appRouter.app.model.get('related')).toArray(),
-				id	= ui.item.get('id');
-			if (related.indexOf(id) === -1){
-				related.push(id);
-				appRouter.app.model.set({related: related});
-			}
-			//return false;
+            var relateds = _(appRouter.app.model.get('related')).toArray();
+                relateds = _.union(relateds, ids);
+
+            appRouter.app.model.set({related: _.without(relateds, this.model.get('id'))});
 		},
 		removeRelated: function(el){
 			var id = $(el.target).closest('div.productlisting').find('a').attr('href').replace('#edit/',''),
@@ -361,8 +334,13 @@ define([
                 var relateds = this.model.get('related');
 
                 _(relateds).each(function (pid) {
-                    var model = new ProductModel();
-                    model.fetch({data: {id: pid}});
+                    if (appRouter.products !== null){
+                        var model = appRouter.products.get(pid);
+                    }
+                    if (!model) {
+                        var model = new ProductModel();
+                        model.fetch({data: {id: pid}});
+                    }
                     var view = new ProductListView({model: model, showDelete:true});
                     $('#related-holder').append(view.render().el);
                 });
@@ -372,7 +350,6 @@ define([
         newBrand: function(e){
             var newBrand = trim(this.$('#new-brand').val());
             if (e.keyCode === 13 && newBrand !== '') {
-//                var current = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
                 this.addNewBrand(newBrand)
                     .$('#new-brand').val('');
                 this.$('#product-brand').focus();
@@ -449,42 +426,77 @@ define([
                     }
                 }
             });
+            return false;
+        },
+        massAction: function() {
+            var type = $('#product-list-holder').data('type'),
+                prodlist = appRouter.products.filter(function(prod){ return prod.has('marked'); }),
+                ids = _.pluck(prodlist, 'id');
 
+            switch (type){
+                case 'edit':
+                    this.massDelete(ids);
+                    break;
+                case 'related':
+                    this.addRelated(ids);
+                    $('#product-list').hide('slide');
+                    _.each(prodlist, function(prod){
+                        prod.unset('marked');
+                    })
+                    break;
+            }
 
             return false;
         },
-        massDelete: function() {
+        massDelete: function(ids){
             smoke.confirm('Oh man... Really?', function(a){
-                if (a) {
-                    var list = appRouter.products.filter(function(prod){ return prod.has('toDelete'); })
-//                  //delete products 1 per request
-//                    if (!_.isEmpty(list)){
-//                        _.each(list, function(prod){
-//                            prod.destroy({
-//                                    success: function(){},
-//                                    error: function(){}
-//                                });
-//                        });
-//                    }
-                    //delete all selected products in one query
-                    var ids = _.pluck(list, 'id');
-                    if (!_.isEmpty(ids)){
-                        $.ajax({
-                            url: appRouter.products.url + ids.join('/'),
-                            type: 'DELETE',
-                            dataType: 'json',
-                            statusCode: {
-                                409: function() {
-                                    smoke.alert("Can't remove products");
-                                }
+                if (a && !_.isEmpty(ids)) {
+                    $.ajax({
+                        url: appRouter.products.url() + ids.join('/'),
+                        type: 'DELETE',
+                        dataType: 'json',
+                        statusCode: {
+                            409: function() {
+                                smoke.alert("Can't remove products");
                             }
-                        }).done(function(){
-                            appRouter.products.remove(list);
-                            smoke.signal('Products removed', 500);
-                        });
-                    }
+                        }
+                    }).done(function(){
+                        appRouter.products.remove(ids);
+                        smoke.signal('Products removed', 500);
+                    });
                 }
             });
+        },
+        toggleList: function(e) {
+            e.preventDefault();
+
+            var element = $(e.target),
+                listtype = element.data('listtype');
+
+            var callback = function(){
+                $('#product-list').show('slide');
+                $('#product-list-holder').data({type: listtype}).trigger('scroll');
+                var labels = $('#massaction').data('labels');
+                $('#massaction').text(labels[listtype]);
+            }
+
+            if (appRouter.products === null) {
+                appRouter.initProductlist().load([
+                    this.waypointCallback,
+                    callback
+                ]);
+                return;
+            }
+            callback();
+        },
+        waypointCallback: function(){
+            $('.productlisting:last', '#product-list-holder').waypoint(function(){
+                $(this).waypoint('remove');
+                appRouter.products.load([
+                    function(){$('#product-list-search').trigger('keyup');},
+                    appRouter.app.waypointCallback
+                ]);
+            }, {context: '#product-list-holder', offset: 'bottom-in-view' } );
         }
 	});
 
