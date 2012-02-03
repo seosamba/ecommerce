@@ -17,21 +17,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	const OPTTYPE_ORDER         = 'order';
 
-	protected $_configHelper    = null;
-
 	protected $_websiteHelper   = null;
 
 	protected $_productMapper   = null;
 
 	protected $_renderedContent = '';
 
-	protected $_themeConfig     = null;
-
 	protected $_templateContent = null;
 
 	protected $_orderSequence   = array();
-
-	protected $_parser          = null;
 
 	protected $_entityParser   = null;
 
@@ -46,9 +40,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'scriptPath' => dirname(__FILE__) . '/views'
 		));
 		$this->_websiteHelper    = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
-	    $this->_configHelper     = Zend_Controller_Action_HelperBroker::getExistingHelper('config');
 	    $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
-		$this->_themeConfig      = Zend_Registry::get('theme');
 		$this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
 		$this->_entityParser     = new Tools_Content_EntityParser();
 		$this->_mediaPath        = $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia();
@@ -62,49 +54,40 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$products = $this->_loadProducts();
 		if(!empty($products)) {
 			$this->_templateContent = $template->getContent();
-			foreach($products as $product) {
-				$this->_parsingCallback($product);
-			}
+			$start = microtime(true);
+			array_walk($products, function($product, $key, $productsList) {
+				$currency         = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
+				$productPhotoData = explode('/', $product->getPhoto());
+				$photoUrlPart     = $productsList->getMediaPath() . $productPhotoData[0];
+				$shortDesc        = $product->getShortDescription();
+				$productsList->getEntityParser()->setDictionary(array(
+			        '$product:name'              => $product->getName(),
+                    '$product:photourl'          => $photoUrlPart . '/product/' . $productPhotoData[1],
+                    '$product:photourl:product'  => $photoUrlPart . '/product/' . $productPhotoData[1],
+                    '$product:photourl:small'    => $photoUrlPart . '/small/' . $productPhotoData[1],
+                    '$product:photourl:medium'   => $photoUrlPart . '/medium/' . $productPhotoData[1],
+                    '$product:photourl:large'    => $photoUrlPart . '/large/' . $productPhotoData[1],
+                    '$product:photourl:original' => $photoUrlPart . '/original/' . $productPhotoData[1],
+                    '$product:url'               => $product->getPage()->getUrl(),
+                    //'$product:price'             => $this->_renderProductWidgetOption(array($product->getId(), 'price'), $product->getPage()->toArray()),
+                    '$product:price'             => $currency->toCurrency((float)$product->getPrice()),
+                    '$product:brand'             => $product->getBrand(),
+                    '$product:weight'            => $product->getWeight(),
+                    '$product:mpn'               => $product->getMpn(),
+                    '$product:sku'               => $product->getSku(),
+                    '$product:id'                => $product->getId(),
+                    '$product:description:short' => $shortDesc,
+                    '$product:description'       => $shortDesc,
+                    '$product:description:full'  => $product->getFullDescription(),
+                    //'$product:options'           => $productList->_renderProductWidgetOption(array($product->getId(), 'options'), $product->getPage()->toArray()),
+                    //'$product:editproduct'       => $productList->_renderProductWidgetOption(array($product->getId(), 'editproduct'), $product->getPage()->toArray())
+		        ));
+				$productsList->setRenderedContent($productsList->getRenderedContent() . $productsList->getEntityParser()->parse($productsList->getTemplateContent()));
+			}, $this);
+
+			var_dump($start - microtime(true));
 		}
 		return $this->_renderedContent;
-		//$this->_view->productList = $this->_renderedContent;
-		//return $this->_view->render('productlist.phtml');
-	}
-
-	private function _loadProducts() {
-		$cacheKey = 'productsList' . implode('.', $this->_options);
-		if(($products = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET)) === null) {
-			$products = $this->_prepareProducts();
-		}
-		return $products;
-	}
-
-	private function _parsingCallback($product) {
-		$productPhotoData = explode('/', $product->getPhoto());
-		$photoUrlPart     = $this->_mediaPath . $productPhotoData[0];
-		$shortDesc        = $product->getShortDescription();
-		$this->_entityParser->setDictionary(array(
-			'$product:name'              => $product->getName(),
-			'$product:photourl'          => $photoUrlPart . '/product/' . $productPhotoData[1],
-			'$product:photourl:product'  => $photoUrlPart . '/product/' . $productPhotoData[1],
-			'$product:photourl:small'    => $photoUrlPart . '/small/' . $productPhotoData[1],
-			'$product:photourl:medium'   => $photoUrlPart . '/medium/' . $productPhotoData[1],
-			'$product:photourl:large'    => $photoUrlPart . '/large/' . $productPhotoData[1],
-			'$product:photourl:original' => $photoUrlPart . '/original/' . $productPhotoData[1],
-			'$product:url'               => $product->getPage()->getUrl(),
-			'$product:price'             => $this->_renderProductWidgetOption(array($product->getId(), 'price'), $product->getPage()->toArray()),
-			'$product:brand'             => $product->getBrand(),
-			'$product:weight'            => $product->getWeight(),
-			'$product:mpn'               => $product->getMpn(),
-			'$product:sku'               => $product->getSku(),
-			'$product:id'                => $product->getId(),
-			'$product:description:short' => $shortDesc,
-			'$product:description'       => $shortDesc,
-			'$product:description:full'  => $product->getFullDescription(),
-			//'$product:options'           => $this->_renderProductWidgetOption('options', $product->getPage()->toArray()),
-			//'$product:editproduct'       => $this->_renderProductWidgetOption('editproduct', $product->getPage()->toArray())
-		));
-        $this->_renderedContent .= $this->_entityParser->parse($this->_templateContent);
 	}
 
 	private function _renderProductWidgetOption($option, $data) {
@@ -117,11 +100,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		return $content;
 	}
 
-	private function _renderPrice() {
-
-	}
-
-	private function _prepareProducts() {
+	private function _loadProducts() {
 		$products = array();
 		if(empty($this->_options)) {
 			return $this->_productMapper->fetchAll(null, array(), 0, 100);
@@ -207,4 +186,32 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			return $compareResult;
 		}
 	}
+
+	public function setRenderedContent($renderedContent) {
+		$this->_renderedContent = $renderedContent;
+		return $this;
+	}
+
+	public function getRenderedContent() {
+		return $this->_renderedContent;
+	}
+
+	public function getMediaPath() {
+		return $this->_mediaPath;
+	}
+
+	public function setEntityParser($entityParser) {
+		$this->_entityParser = $entityParser;
+		return $this;
+	}
+
+	public function getEntityParser() {
+		return $this->_entityParser;
+	}
+
+	public function getTemplateContent() {
+		return $this->_templateContent;
+	}
+
+
 }
