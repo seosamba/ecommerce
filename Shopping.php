@@ -470,7 +470,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 
         if (!$this->_request->isGet()){
-            $cacheHelper->clean(null, null, array('productlist'));
+            $cacheHelper->clean(null, null, array('productlist', 'productListWidget'));
+
         }
 
 		return $data;
