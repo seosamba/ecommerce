@@ -108,12 +108,13 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	protected function shippingAction() {
-		$form           = new Forms_Shipping();
-		$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-		$this->_view->currencySign = $shoppingConfig['currency'];
-		$this->_view->weightUnits  = $shoppingConfig['weightUnit'];
-		$this->_view->form         = $form;
-		$this->_view->subforms     = $form->getSubForms();
+		if($this->_request->isPost()) {
+			$shippingData = $this->_request->getParams();
+			$this->_configMapper->save(array_map(function($param) {
+				return (is_array($param)) ? serialize($param) : $param;
+			}, $shippingData));
+			$this->_jsonHelper->direct($shippingData);
+		}
 		echo $this->_view->render('shipping.phtml');
 	}
 

@@ -8,7 +8,7 @@
 		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" >
 		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" >
 	    <link href="http://www.seotoaster2.dev/system/js/external/smoke/smoke.css" media="screen" rel="stylesheet" type="text/css" >
-	    	    <link href="http://www.seotoaster2.dev/system/js/external/smoke/themes/toaster.css" media="screen" rel="stylesheet" type="text/css" >
+	    <link href="http://www.seotoaster2.dev/system/js/external/smoke/themes/toaster.css" media="screen" rel="stylesheet" type="text/css" >
 	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 	    <script src="<?php echo $this->websiteUrl;?>system/js/internal/system.js"></script>
@@ -22,7 +22,7 @@
                     shipping.saveSettings = function() {
                         console.log('saving');
                     };
-                    $('input[name=shipping-type]').on('click', function() {
+                    $('input[name=shippingType]').on('click', function() {
                         $('.fieldset-content').hide();
                         $(this).parent().next().slideDown();
                     });
@@ -43,53 +43,46 @@
 			    <div class="grid_6">
 		            <fieldset class="grid_12"><legend>General Options</legend>
 		                <label>Notice for users:</label>
-		                <textarea style="height:60px;" id="shipping-general-notice" name="shipping-general[notice]"><?php echo $this->shippingGeneral['notice']?></textarea>
-		                <label class="grid_4">Enable:&nbsp;</label>
-		                <div class="grid_3">
-			                <input class="grid_2" type="checkbox" name="shipping-general[couponing]" disabled="disabled"/><label>Couponing?</label>
-		                </div>
-			            <div class="grid_4">
-				            <input class="grid_2" type="checkbox" name="shipping-general[gifting]" <?php echo (isset($this->shippingGeneral['gifting']) && $this->shippingGeneral['gifting']== 'on' ? 'checked="checked"' : ' ');?>/><label>Gifting?</label>
-			            </div>
+		                <textarea style="height:60px;" id="shipping-general-notice" name="shippingGeneral[notice]"><?php echo $this->shippingGeneral['notice']?></textarea>
 		            </fieldset>
 			        <fieldset class="grid_12" id="#shipping-options"><legend>Shipping Options</legend>
-			            <fieldset><legend class="option"><input type="radio" name="shipping-type" value="pickup" <?php echo ($this->shippingType=='pickup'?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
+			            <fieldset><legend class="option"><input type="radio" name="shippingType" value="pickup" <?php echo ($this->shippingType=='pickup'?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
 			                <div class="fieldset-content <?php echo ($this->shippingType=='pickup'?'active':'');?>">
 			                    <label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
 			                </div>
 			            </fieldset>
 			            <fieldset>
 				            <legend class="option">
-				                <input type="radio" name="shipping-type" value="amount" <?php echo ($this->shippingType=='amount'?' checked="checked"':'');?>/>&nbsp;Shipping per order amount
+				                <input type="radio" name="shippingType" value="amount" <?php echo ($this->shippingType=='amount'?' checked="checked"':'');?>/>&nbsp;Shipping per order amount
 			                </legend>
 				            <div class="fieldset-content <?php echo ($this->shippingType=='amount'?'active':'');?>">
 				                <div class="sh-1-col grid_4">
 			                        <label>Order amount...&nbsp;</label>
 									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shipping-amount[1][limit]" id="sh-amount-1-limit" type="text" value="<?php echo $this->shippingAmount[1]['limit'];?>" />
+					                <input class="grid_5 incolumn numonly" name="shippingAmount[1][limit]" id="sh-amount-1-limit" type="text" value="<?php echo $this->shippingAmount[1]['limit'];?>" />
 									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shipping-amount[2][limit]" id="sh-amount-2-limit" type="text" value="<?php echo $this->shippingAmount[2]['limit'];?>" />
+					                <input class="grid_5 incolumn numonly" name="shippingAmount[2][limit]" id="sh-amount-2-limit" type="text" value="<?php echo $this->shippingAmount[2]['limit'];?>" />
 									<label class="grid_5">over&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shipping-amount[3][limit]" id="sh-amount-3-limit" type="text" value="<?php echo $this->shippingAmount[3]['limit'];?>" />
+					                <input class="grid_5 incolumn numonly" name="shippingAmount[3][limit]" id="sh-amount-3-limit" type="text" value="<?php echo $this->shippingAmount[3]['limit'];?>" />
 			                    </div>
 				                <div class="sh-2-col grid_4">
 				                    <label>National</label>
-									<input class="grid_10 incolumn numonly" name="shipping-amount[1][national]" id="sh-amount-1-national" type="text" value="<?php echo $this->shippingAmount[1]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shipping-amount[2][national]" id="sh-amount-2-national" type="text" value="<?php echo $this->shippingAmount[2]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shipping-amount[3][national]" id="sh-amount-3-national" type="text" value="<?php echo $this->shippingAmount[3]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingAmount[1][national]" id="sh-amount-1-national" type="text" value="<?php echo $this->shippingAmount[1]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingAmount[2][national]" id="sh-amount-2-national" type="text" value="<?php echo $this->shippingAmount[2]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingAmount[3][national]" id="sh-amount-3-national" type="text" value="<?php echo $this->shippingAmount[3]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
 				                </div>
 
 				                <div class="sh-3-col grid_4">
 				                    <label>International</label>
-						            <input class="grid_10 incolumn numonly" name="shipping-amount[1][international]" id="sh-amount-1-international" type="text" value="<?php echo $this->shippingAmount[1]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
-					                <input class="grid_10 incolumn numonly" name="shipping-amount[2][international]" id="sh-amount-2-international" type="text" value="<?php echo $this->shippingAmount[2]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
-				                    <input class="grid_10 incolumn numonly" name="shipping-amount[3][international]" id="sh-amount-3-international" type="text" value="<?php echo $this->shippingAmount[3]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
+						            <input class="grid_10 incolumn numonly" name="shippingAmount[1][international]" id="sh-amount-1-international" type="text" value="<?php echo $this->shippingAmount[1]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
+					                <input class="grid_10 incolumn numonly" name="shippingAmount[2][international]" id="sh-amount-2-international" type="text" value="<?php echo $this->shippingAmount[2]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
+				                    <input class="grid_10 incolumn numonly" name="shippingAmount[3][international]" id="sh-amount-3-international" type="text" value="<?php echo $this->shippingAmount[3]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
 				                </div>
 				                <div style="grid_12">
 									<label class="grid_12">Free shipping for order over:</label>
-									<input class="grid_3" type="text" class="numonly" name="shipping-general[free-shipping-over]" id="sh-free-over"  value="<?php echo $this->shippingGeneral['free-shipping-over'];?>"/>
+									<input class="grid_3" type="text" class="numonly" name="shippingGeneral[freeShippingOver]" id="sh-free-over"  value="<?php echo $this->shippingGeneral['free-shipping-over'];?>"/>
 									<label class="grid_2">&nbsp;<?php echo $this->currency;?>&nbsp;for&nbsp;</label>
-									<select class="grid_3" name="shipping-general[free-shipping-options]" id="sh-free-over-options">
+									<select class="grid_3" name="shippingGeneral[freeShippingOptions]" id="sh-free-over-options">
 										   <option value="">select</option>
 										   <option value="national" <?php echo ($this->shippingGeneral['free-shipping-options']=='national'?' selected="selected"':''); ?>>National</option>
 										   <option value="international" <?php echo ($this->shippingGeneral['free-shipping-options']=='international'?' selected="selected"':''); ?>>International</option>
@@ -100,28 +93,28 @@
 			                </div>
 						</fieldset>
 						<fieldset>
-							<legend class="option"><input type="radio" name="shipping-type" value="weight" <?php echo ($this->shippingType=='weight'?' checked="checked"':'');?>/>&nbsp;Shipping per total weight</legend>
+							<legend class="option"><input type="radio" name="shippingType" value="weight" <?php echo ($this->shippingType=='weight'?' checked="checked"':'');?>/>&nbsp;Shipping per total weight</legend>
 				            <div class="fieldset-content <?php echo ($this->shippingType=='weight'?' active':'');?>">
 				                <div class="sh-1-col grid_4">
 				                    <label>Order weight...&nbsp;</label>
 									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shipping-weight[1][limit]" id="sh-weight-1-limit" type="text" value="<?php echo $this->shippingWeight[1]['limit'];?>" />
+					                <input class="grid_5 incolumn numonly" name="shippingWeight[1][limit]" id="sh-weight-1-limit" type="text" value="<?php echo $this->shippingWeight[1]['limit'];?>" />
 									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shipping-weight[2][limit]" id="sh-weight-2-limit" type="text" value="<?php echo $this->shippingWeight[2]['limit'];?>" />
+					                <input class="grid_5 incolumn numonly" name="shippingWeight[2][limit]" id="sh-weight-2-limit" type="text" value="<?php echo $this->shippingWeight[2]['limit'];?>" />
 									<label class="grid_5">over&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shipping-weight[3][limit]" id="sh-weight-3-limit" type="text" value="<?php echo $this->shippingWeight[3]['limit'];?>" />
+					                <input class="grid_5 incolumn numonly" name="shippingWeight[3][limit]" id="sh-weight-3-limit" type="text" value="<?php echo $this->shippingWeight[3]['limit'];?>" />
 				                </div>
 				                <div class="sh-2-col grid_4">
 				                    <label>National</label>
-									<input class="grid_10 incolumn numonly" name="shipping-weight[1][national]" id="sh-weight-1-national" type="text" value="<?php echo $this->shippingWeight[1]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shipping-weight[2][national]" id="sh-weight-2-national" type="text" value="<?php echo $this->shippingWeight[2]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shipping-weight[3][national]" id="sh-weight-3-national" type="text" value="<?php echo $this->shippingWeight[3]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingWeight[1][national]" id="sh-weight-1-national" type="text" value="<?php echo $this->shippingWeight[1]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingWeight[2][national]" id="sh-weight-2-national" type="text" value="<?php echo $this->shippingWeight[2]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingWeight[3][national]" id="sh-weight-3-national" type="text" value="<?php echo $this->shippingWeight[3]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
 				                </div>
 				                <div class="sh-3-col grid_4">
 				                    <label>International</label>
-									<input class="grid_10 incolumn numonly" name="shipping-weight[1][international]" id="sh-weight-1-international" type="text" value="<?php echo $this->shippingWeight[1]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shipping-weight[2][international]" id="sh-weight-2-international" type="text" value="<?php echo $this->shippingWeight[2]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shipping-weight[3][international]" id="sh-weight-3-international" type="text" value="<?php echo $this->shippingWeight[3]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingWeight[1][international]" id="sh-weight-1-international" type="text" value="<?php echo $this->shippingWeight[1]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingWeight[2][international]" id="sh-weight-2-international" type="text" value="<?php echo $this->shippingWeight[2]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
+									<input class="grid_10 incolumn numonly" name="shippingWeight[3][international]" id="sh-weight-3-international" type="text" value="<?php echo $this->shippingWeight[3]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
 				                </div>
 							</div>
 						</fieldset>
@@ -129,13 +122,13 @@
 			    </div>
 			    <div class="grid_6">
 			        <fieldset class="grid_12">
-				        <legend class="option"><input type="radio" name="shipping-type" value="external" <?php echo ($this->shippingType=='external'?' checked="checked"':'');?>/>Shipping Plugin:</legend>
+				        <legend class="option"><input type="radio" name="shippingType" value="external" <?php echo ($this->shippingType=='external'?' checked="checked"':'');?>/>Shipping Plugin:</legend>
 			            <div class="fieldset-content <?php echo ($this->shippingType=='external'?'active':'');?>">
 			                <p>
-			                    <select name="ext-shipper[name]">
+			                    <select name="shippingPlugin">
 			                        <option value="select">select</option>
-			                        <?php foreach ($this->extShippers as $shipper): ?>
-			                            <option value="<?php echo $shipper;?>" <?php echo ($shipper == $this->extShipperName? ' selected="true" ' : '') ;?>><?php echo $shipper;?></option>
+			                        <?php foreach ($this->shippingPlugins as $shippingPlugin): ?>
+			                            <option value="<?php echo $shippingPlugin;?>" <?php echo ($shippingPlugin == $this->extShipperName? ' selected="true" ' : '') ;?>><?php echo $shippingPlugin;?></option>
 			                        <?php endforeach; ?>
 			                    </select>
 			                </p>

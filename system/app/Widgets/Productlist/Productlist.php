@@ -91,7 +91,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:id'                => $product->getId(),
                 '$product:description:short' => $shortDesc,
                 '$product:description'       => $shortDesc,
-                '$product:description:full'  => $product->getFullDescription()
+                '$product:description:full'  => $product->getFullDescription(),
+				'$store:addtocart'           => '{$store:addtocart:' . $product->getId() . '}'
 			))->parse($data['templateContent']);
 		});
 		return $renderedContent;
