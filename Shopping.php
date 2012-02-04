@@ -108,6 +108,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	protected function shippingAction() {
+		$config = array_map(function($param) {
+			$unserialized = @unserialize($param);
+			return ($unserialized === 'b:0' || $unserialized !== false) ? $unserialized : $param;
+		}, $this->_configMapper->getConfigParams());
+
 		if($this->_request->isPost()) {
 			$shippingData = $this->_request->getParams();
 			$this->_configMapper->save(array_map(function($param) {
@@ -115,6 +120,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
+		$this->_view->config = $config;
 		echo $this->_view->render('shipping.phtml');
 	}
 
