@@ -220,6 +220,26 @@
                 width: 100%;
                 z-index: 5000;
             }
+            .ui-autocomplete {
+                max-height: 180px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 5px;
+                background: url('/system/images/bg-strip.png');
+                box-shadow: rgb(153, 153, 153) 0px 4px 10px;
+            }
+            /* IE 6 doesn't support max-height
+             * we use height instead, but this forces the menu to always be this tall
+             */
+            * html .ui-autocomplete {
+                height: 100px;
+            }
+            #product-list-holder > p.nothing {
+                text-align: center;
+                padding: 5px;
+                font-size: 150%;
+                margin-top: 20%;
+            }
         </style>
 
         <?php
@@ -354,6 +374,21 @@
             <input class="marker" type=checkbox {{if marked}}checked="checked"{{/if}} />
             {{/if}}
         </script>
+
+        <script id="quickPreviewTemplate" type="text/x-jquery-tmpl">
+            <fieldset style="background-image:none; background-color: white;">
+                <legend><?php echo $this->translate('Preview');?></legend>
+                <a href="{{= $('#websiteUrl').val() + page.url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                    <img src="/media/${photo.replace('/','/product/')}" style="float:left; padding: 15px; max-height: 120px"/>
+                    <p style="text-align:center; font-weight: bold;">${name}</p>
+                    <p class="mt10px" style="height: 160px;">${ shortDescription.length > 300 ? shortDescription.slice(0,299)+'...' : shortDescription }</p>
+                    <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; margin: 5px -10px 0;">
+                        ${price}&nbsp;${ $('#currency-unit').text() }
+                    </p>
+                </a>
+            </fieldset>
+        </script>
+
         <script>
             /**
              * applying main UI elements
@@ -363,11 +398,11 @@
                 $(".ui-tabs-nav, .ui-tabs-nav > *" )
                     .removeClass( "ui-corner-all" )
                     .addClass( "ui-corner-top" );
-                $('#ajax_msg').on({
-                    ajaxStart: function(){ $(this).show(); },
-                    ajaxStop:  function(){ $(this).hide(); },
-                    ajaxError: function(){ $(this).hide(); }
-                });
+//                $('#ajax_msg').on({
+//                    ajaxStart: function(){ console.log(arguments); $(this).show(); },
+//                    ajaxStop:  function(){ $(this).hide(); },
+//                    ajaxError: function(){ $(this).hide(); }
+//                });
             });
         </script>
 	</head>
@@ -390,13 +425,13 @@
                     <div class="grid_5 suffix_1">
                         <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags" style="margin-top: 2px;" />
                     </div>
-                    <div class="grid_2" style="text-align:center;">
+                    <div class="grid_2 mt5px" style="text-align:center;">
                         <label>
-                            <a id="massaction" class="delete-selected" href="javascript:;" data-labels='{"related": "add as related", "edit": "delete selected"}' >run mass action</a>
+                            <a id="massaction" style="color:#e6e6fa;" href="javascript:;" data-labels='{"related": "add as related", "edit": "delete selected"}' >run mass action</a>
                         </label>
                     </div>
                 </div>
-                <div id="product-list-holder" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+                <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
             </div>
 
             <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
@@ -485,7 +520,7 @@
 				<div class="grid_4">
 				<fieldset>
 					<div class="grid_6 alpha">
-	                    <label for="product-price">Price (in <?php echo $this->generalConfig['currency']; ?>)</label>
+	                    <label for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
 	                    <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
 	                </div>
 	                <div class="grid_6">
@@ -507,11 +542,9 @@
 	                    </select>
 	                </div>
 				</fieldset>
-                <div class="grid_4 mt5px">
-                    <div id="quick-preview"></div>
                 </div>
+                <div id="quick-preview" class="grid_4"></div>
             </div>
-	        </div>
             <div id="category-tab" class="clearfix">
                 <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
                     <input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
