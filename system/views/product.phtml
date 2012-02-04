@@ -213,7 +213,6 @@
             }
             #ajax_msg {
                 line-height: 50px;
-                display: none;
                 position: absolute;
                 top: 30%;
                 left:0;
@@ -251,7 +250,8 @@
                     ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js')
                     ->appendFile($this->websiteUrl.'system/js/external/smoke/smoke.min.js')
                     ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require-dev.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/product/main.js'))
-                    ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
+                    ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js')
+                    ->appendFile($this->websiteUrl . 'system/js/internal/system.js');
             echo $this->headScript();
         ?>
 
@@ -441,7 +441,7 @@
                 </div>
                 <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
             </div>
-            <div class="closebutton"><span class="close" onclick="top.$('.__tpopup').dialog('close');"><?php echo $this->translate('Close'); ?></span></div>
+            <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
 
             <ul>
                 <li><a href="#tab1"><?php echo $this->translate('Main Info'); ?></a></li>
