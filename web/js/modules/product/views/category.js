@@ -27,13 +27,11 @@ define([
 			var confirmMsg = $('#new-category').data('confirmmsg').replace('%cat%', this.model.get('name'));
 			var modelHolder = this.model;
 			
-			smoke.confirm(confirmMsg, function(e){
-				if (e){
-					modelHolder.destroy({success: function(model, response) {
-						model.view.remove();
-					}});
-				}
-			}, {ok:"Do it", cancel:"No way"});	
+			showConfirm(confirmMsg, function(){
+				modelHolder.destroy({success: function(model, response) {
+                    model.view.remove();
+                }});
+			});
 		},
 		edit: function(){
             this.buffer = this.nameInput.text();

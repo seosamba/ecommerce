@@ -64,7 +64,7 @@ define([
 					   $('#new-category').val('').blur();
 				   },
 				   error: function(model, response){
-					   smoke.alert(response.responseText);
+					   showMessage(response.responseText, true);
 				   }
 			   });
 			}
@@ -210,13 +210,14 @@ define([
 				itemSelector : '.box',
 				columnWidth : 118
 			});
+
+            $('div#ajax_msg:visible').hide('fade');
 		},
 		saveProduct: function(){
 			//@todo: make messages translatable
             if (!this.validateProduct()) {
-                smoke.alert('Missing some required fields', {}, function(){
-                    $('#manage-product').tabs("select" , 0);
-                });
+                showMessage('Missing some required fields', true);
+                $('#manage-product').tabs("select" , 0);
                 return false;
             }
 
@@ -229,7 +230,7 @@ define([
 				if (templateId !== '-1') {
                     this.model.set({pageTemplate: templateId});
                 } else {
-                    smoke.alert('Please, select product page template before saving');
+                    showMessage('Please, select product page template before saving', true);
                     this.$('#product-pageTemplate').focus();
                     return false;
                 }
@@ -245,36 +246,34 @@ define([
                         appRouter.products.add(model);
                     }
                     appRouter.navigate('edit/'+model.id, true);
-                    smoke.alert('Product added');
+                    showMessage('Product added');
                 }, error: this.processSaveError});
 			} else {
 				this.model.save(null, {success: function(model, response){
-					smoke.alert('Product saved');
+					showMessage('Product saved');
 				}, error: this.processSaveError});
 			}
 		},
         processSaveError: function(model, response){
-            smoke.alert(response.responseText);
+            showMessage(response.responseText, true);
         },
 		deleteProduct: function(){
 			var model  = this.model;
 			if (model.isNew()){
-				smoke.alert('Product is not saved yet');
+                showMessage('Product is not saved yet', true);
 				return false;
 			}
-			smoke.confirm('Dragons ahead! Are you sure?', function(e){
-				if (e){
-					model.destroy({
-						success: function(model, response){
-                            appRouter.brands.fetch()
-                            appRouter.navigate('new', true);
-						},
-                        error: function(model, response){
-                            smoke.alert('Oops! Something went wrong!');
-                            console.log($.parseJSON(response.responseText));
-                        }
-					});
-				}
+            showConfirm('Dragons ahead! Are you sure?', function(){
+                model.destroy({
+                    success: function(model, response){
+                        appRouter.brands.fetch()
+                        appRouter.navigate('new', true);
+                    },
+                    error: function(model, response){
+                        showMessage('Oops! Something went wrong!', true);
+                        console.log($.parseJSON(response.responseText));
+                    }
+                });
 			});
 		},
         validateProduct: function(){
@@ -389,7 +388,7 @@ define([
                 if (brand.has('url')){
                     window.open(this.websiteUrl+brand.get('url'),'_blank');
                 } else {
-                    smoke.alert(_.template(msg, brand.toJSON()));
+                    showMessage(_.template(msg, brand.toJSON()), true);
                 }
             }
         },
@@ -443,7 +442,7 @@ define([
                 success: function(response) {
                     console.log(response);
                     if (response.hasOwnProperty('result')) {
-                        smoke.alert(response.result);
+                        showMessage(response.result, true);
                     }
                 }
             });
@@ -470,20 +469,20 @@ define([
             return false;
         },
         massDelete: function(ids){
-            smoke.confirm('Oh man... Really?', function(a){
-                if (a && !_.isEmpty(ids)) {
+            showConfirm('Oh man... Really?', function(){
+                if (!_.isEmpty(ids)) {
                     $.ajax({
                         url: appRouter.products.url() + ids.join('/'),
                         type: 'DELETE',
                         dataType: 'json',
                         statusCode: {
                             409: function() {
-                                smoke.alert("Can't remove products");
+                                showMessage("Can't remove products", true);
                             }
                         }
                     }).done(function(){
                         appRouter.products.remove(ids);
-                        smoke.signal('Products removed', 500);
+                        showMessage('Products removed');
                     });
                 }
             });
