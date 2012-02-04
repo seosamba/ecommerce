@@ -55,6 +55,7 @@ define([
 		renderProductView: function(product){
 			var productView = new ProductListingView({model: product});
 			this.productListHolder.append(productView.render().el);
+            this.productListHolder.trigger('scroll');
 		},
 		addCategory: function(category){
 			var view = new CategoryView({model: category});

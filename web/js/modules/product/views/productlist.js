@@ -38,6 +38,9 @@ define([
             }
         },
         runItemAction: function(e){
+            if (this.container.attr('id') !== $(this.el).parent().attr('id')){
+                return false;
+            }
             var type =  this.container.data('type');
 
             if (type === 'related'){

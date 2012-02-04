@@ -26,7 +26,8 @@ define([
 			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
             'click a#brandlanding-link': 'gotoBrandPage',
-            'keyup #product-list-search': 'filterProductList',
+//            'keyup #product-list-search': 'filterProductList',
+            'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
             'click #massaction': 'massAction'
@@ -34,6 +35,18 @@ define([
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
 			$('#delete,#add-new-option-btn').button();
+            var self = this;
+            $.getJSON(this.websiteUrl + 'plugin/shopping/run/getdata/type/index', function(response){
+                $('#product-list-search').autocomplete({
+                    minLength: 2,
+                    source: response,
+                    select: function(event, ui){
+                        $('#product-list-search').val(ui.item.value);
+                        appRouter.products.reset().load(self.waypointCallback, {key: ui.item.value});
+                    }
+                });
+            });
+
 		},
 		setModel: function (model) {
 			this.model = model;
@@ -394,6 +407,12 @@ define([
             }
             holder.trigger('scroll');
         },
+        filterProducts: function(e) {
+            if (e.charCode === 13) {
+                appRouter.products.reset().load(appRouter.app.waypointCallback, {key: e.target.value});
+                $(e.target).autocomplete('close');
+            }
+        },
         fetchOptionLibrary: function(){
             if (!appRouter.hasOwnProperty('optionLibrary')){
                 var optionsLibrary = Backbone.Collection.extend({
@@ -492,10 +511,7 @@ define([
         waypointCallback: function(){
             $('.productlisting:last', '#product-list-holder').waypoint(function(){
                 $(this).waypoint('remove');
-                appRouter.products.load([
-                    function(){$('#product-list-search').trigger('keyup');},
-                    appRouter.app.waypointCallback
-                ]);
+                appRouter.products.load(appRouter.app.waypointCallback);
             }, {context: '#product-list-holder', offset: 'bottom-in-view' } );
         }
 	});

@@ -83,9 +83,29 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		return $this->getDbTable()->update( array('page_id' => $model->getPage()->getId()), $where);
 	}
 
-	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null) {
+	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null, $search = null) {
 		$entities = array();
-		$resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
+
+        if ($search === null) {
+            $resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
+        } else {
+            $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITH_FROM_PART)
+                    ->setIntegrityCheck(false);
+            $select->where('shopping_product.name LIKE ?', '%'.$search.'%')
+                    ->orWhere('shopping_product.sku LIKE ?', '%'.$search.'%')
+                    ->orWhere('shopping_product.mpn LIKE ?', '%'.$search.'%')
+                    ->join('shopping_brands', 'shopping_brands.id = shopping_product.brand_id', null)
+                    ->join('shopping_product_category', 'shopping_product_category.product_id = shopping_product.id', null)
+                    ->join('shopping_categories', 'shopping_categories.id = shopping_product_category.category_id', null)
+                    ->orWhere('shopping_brands.name LIKE ?', '%'.$search.'%')
+                    ->orWhere('shopping_categories.name LIKE ?', '%'.$search.'%')
+                    ->group('shopping_product.id')
+                    ->limit($limit, $offset)
+                    ->order($order);
+
+            $resultSet = $this->getDbTable()->fetchAll($select);
+        }
+
 		if(count($resultSet) === 0) {
 			return null;
 		}
@@ -300,4 +320,21 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             return false;
         }
 	}
+
+    public function buildIndex(){
+        $db = $this->getDbTable()->getAdapter();
+
+        $select[] = $db->select()
+                ->from('shopping_product', array('name'));
+        $select[] = $db->select()
+                ->from('shopping_product', array('sku'));
+        $select[] = $db->select()
+                ->from('shopping_product', array('mpn'));
+        $select[] = $db->select()
+                ->from('shopping_categories', array('name'));
+        $select[] = $db->select()
+                        ->from('shopping_brands', array('name'));
+
+        return $db->fetchCol($db->select()->union($select));
+    }
 }
