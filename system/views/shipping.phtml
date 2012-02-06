@@ -14,21 +14,16 @@
 	    <script src="<?php echo $this->websiteUrl;?>system/js/internal/system.js"></script>
 	    <script type="text/javascript" src="http://www.seotoaster2.dev/system/js/external/smoke/smoke.min.js"></script>
 	    <script>
-            (function($){
-                $(function() {
+            $(function() {
+                $('.fieldset-content').hide();
+
+                $('input[name=shippingType]:checked').parent().next().slideDown();
+
+                $('input[name=shippingType]').on('click', function() {
                     $('.fieldset-content').hide();
-
-                    var shipping = {};
-                    shipping.saveSettings = function() {
-                        console.log('saving');
-                    };
-
-                    $('input[name=shippingType]').on('click', function() {
-                        $('.fieldset-content').hide();
-                        $(this).parent().next().slideDown();
-                    });
+                    $(this).parent().next().slideDown();
                 });
-            })(jQuery);
+            });
         </script>
     </head>
     <body>
@@ -129,12 +124,13 @@
 			                    <select name="shippingPlugin">
 			                        <option value="select">select</option>
 			                        <?php foreach ($this->shippingPlugins as $shippingPlugin): ?>
-			                            <option value="<?php echo $shippingPlugin;?>" <?php echo ($shippingPlugin == $this->extShipperName? ' selected="true" ' : '') ;?>><?php echo $shippingPlugin;?></option>
+			                            <option value="<?php echo $shippingPlugin->getName();?>" <?php echo ($shippingPlugin->getName() == $this->config['shippingPlugin'] ? ' selected="selected" ' : '') ;?>><?php echo $shippingPlugin->getName();?></option>
 			                        <?php endforeach; ?>
 			                    </select>
 			                </p>
 			                <div id="shipper-config">
-			                    <?php echo ($this->extShipperScreen ? $this->extShipperScreen : '') ; ?>
+			                    <?php //decho ($this->extShipperScreen ? $this->extShipperScreen : '') ; ?>
+				                <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
 			                </div>
 			            </div>
 			        </fieldset>
