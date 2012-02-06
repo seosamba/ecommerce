@@ -57,10 +57,14 @@ define([
 			this.productListHolder.append(productView.render().el);
             this.productListHolder.trigger('scroll');
 		},
-		addCategory: function(category){
-			var view = new CategoryView({model: category});
-			$('#product-categories').append(view.render().el);
-		},
+		addCategory: function(category, index){
+            var view = new CategoryView({model: category});
+            if (index instanceof Backbone.Collection){
+                $('#product-categories').prepend(view.render().el);
+            } else {
+                $('#product-categories').append(view.render().el);
+            }
+        },
 		renderCategories: function(){
 			$('#product-categories').empty();
 			this.categories.each(this.addCategory, this);

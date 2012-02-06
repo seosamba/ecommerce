@@ -25,7 +25,6 @@ define([
 			'click #delete': 'deleteProduct',
 			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
-            'click a#brandlanding-link': 'gotoBrandPage',
             'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
@@ -137,6 +136,8 @@ define([
             $("#manage-product").tabs( "option", "ajaxOptions",
                 { data: {productId: this.model.get('id') } }
             );
+
+            $('#quick-preview').empty(); //clening preview content
 
             //hiding delete button if product is new
             if (!this.model.isNew()){
@@ -378,32 +379,6 @@ define([
             }
             appRouter.app.model.set({brand: newBrand});
             return this;
-        },
-        gotoBrandPage: function(e){
-            e.preventDefault();
-            var el    = $(e.target),
-                msg   = el.data('msg'),
-                brand = appRouter.brands.find(function(item){ return item.get('name') === $('#product-brand').val() });
-            if (brand) {
-                if (brand.has('url')){
-                    window.open(this.websiteUrl+brand.get('url'),'_blank');
-                } else {
-                    showMessage(_.template(msg, brand.toJSON()), true);
-                }
-            }
-        },
-        filterProductList: function(e){
-            var search = e.target.value.toLowerCase(),
-                holder = $('#product-list-holder');
-            if (search.length){
-                $('#product-list-holder > .productlisting:visible').hide();
-                appRouter.products.search(search, ['name', 'brand', 'sku', 'mpn', 'categories']).map(function(prod){
-                    $(prod.view.el).show();
-                });
-            } else {
-                $('.productlisting:hidden', holder).show();
-            }
-            holder.trigger('scroll');
         },
         filterProducts: function(e, forceRun) {
             if (e.charCode === 13 || forceRun === true) {
