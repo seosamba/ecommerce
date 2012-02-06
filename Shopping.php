@@ -120,7 +120,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
-		$this->_view->config = $config;
+		$this->_view->config          = $config;
+		$this->_view->shippingPlugins = Tools_Plugins_Tools::getEnabledPlugins();
 		echo $this->_view->render('shipping.phtml');
 	}
 

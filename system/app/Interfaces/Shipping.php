@@ -4,6 +4,6 @@
  *
  * @author Eugene I. Nezhuta <eugene@seotoaster.com>
  */
-interface Shipping {
-	public function getConfigScreen();
+interface Interfaces_Shipping {
+	public static function getConfigScreen();
 }

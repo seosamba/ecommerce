@@ -39,4 +39,12 @@ class Tools_Misc {
 		'TRY' => 'Turkish Lira'
 	);
 
+	public static function getShippingPluginContent($shippingPlugin) {
+		$className = ucfirst($shippingPlugin);
+		$method    = 'getConfigScreen';
+		if(method_exists($className, $method)) {
+			return $className::$method();
+		}
+	}
+
 }
