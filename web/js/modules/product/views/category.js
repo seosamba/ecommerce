@@ -20,7 +20,7 @@ define([
 		},
 		render: function(){
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
-			this.nameInput = $(this.el).children('span.category-editable'); 
+			this.nameInput = this.$el.children('span.category-editable');
 			return this;
 		},
 		kill: function(){

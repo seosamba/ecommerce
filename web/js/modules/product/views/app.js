@@ -23,7 +23,7 @@ define([
 			'change #product-enabled': 'toggleEnabled',
 			'click input[name^=category]': 'toggleCategory',
 			'click #delete': 'deleteProduct',
-			'click #related-holder span.ui-icon-closethick': 'removeRelated',
+//			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
@@ -327,15 +327,14 @@ define([
 		addRelated: function( ids ) {
             if (_.isNull(ids) || _.isUndefined(ids)) return false;
 
-            var relateds = _(appRouter.app.model.get('related')).toArray();
+            var relateds = _(appRouter.app.model.get('related')).map(function(id){ return parseInt(id) });
                 relateds = _.union(relateds, ids);
 
             appRouter.app.model.set({related: _.without(relateds, this.model.get('id'))});
 		},
-		removeRelated: function(el){
-			var id = $(el.target).closest('div.productlisting').find('a').attr('href').replace('#edit/',''),
-				related = _.without(_(this.model.get('related')).toArray(), parseInt(id));
-			this.model.set({related: related});
+		removeRelated: function(id){
+            var relateds = _(appRouter.app.model.get('related')).map(function(id){ return parseInt(id) });
+			this.model.set({related: _.without(relateds, parseInt(id))});
 		},
 		renderRelated: function() {
             $('#related-holder').empty();
@@ -344,6 +343,8 @@ define([
                 var relateds = this.model.get('related');
 
                 _(relateds).each(function (pid) {
+                    pid = parseInt(pid);
+
                     if (appRouter.products !== null){
                         var model = appRouter.products.get(pid);
                     }
@@ -352,7 +353,7 @@ define([
                         model.fetch({data: {id: pid}});
                     }
                     var view = new ProductListView({model: model, showDelete:true});
-                    $('#related-holder').append(view.render().el);
+                    view.render().$el.css({cursor: 'default'}).appendTo('#related-holder');
                 });
             }
             return false;

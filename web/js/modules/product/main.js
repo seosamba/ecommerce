@@ -13,8 +13,8 @@ require.config({
 require(
 	[
 	'modules/product/application',
-	'order!libs/underscore/underscore-dev',
-	'order!libs/backbone/backbone-dev'
+	'order!libs/underscore/underscore-min',
+	'order!libs/backbone/backbone-min'
 	],
 	function(App){
 		App.initialize();

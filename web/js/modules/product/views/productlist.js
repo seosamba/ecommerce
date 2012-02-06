@@ -10,7 +10,8 @@ define([
         container: $('#product-list-holder'),
 		events: {
             'click a': 'runItemAction',
-            'change input.marker': 'mark'
+            'change input.marker': 'mark',
+            'click span.ui-icon-closethick': 'removeRelated'
 		},
 		initialize: function(){
 			this.model.bind('change', this.render, this);
@@ -38,7 +39,7 @@ define([
             }
         },
         runItemAction: function(e){
-            if (this.container.attr('id') !== $(this.el).parent().attr('id')){
+            if (this.container.attr('id') !== this.$el.parent().attr('id')){
                 return false;
             }
             var type =  this.container.data('type');
@@ -48,6 +49,9 @@ define([
                 $('#product-list').hide('slide');
                 return false;
             }
+        },
+        removeRelated: function(){
+            appRouter.app.removeRelated(this.model.get('id'));
         }
 	});
 	
