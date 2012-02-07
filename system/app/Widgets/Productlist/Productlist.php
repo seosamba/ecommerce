@@ -184,7 +184,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				}
 				$productOneTerm = $productOne->$getter();
 				$productTwoTerm = $productTwo->$getter();
-				if(is_integer($productOneTerm) && is_integer($productTwoTerm)) {
+				if(is_numeric($productOneTerm) && is_numeric($productTwoTerm)) {
 					$compareResult = ($productOneTerm - $productTwoTerm) ? ($productOneTerm - $productTwoTerm) / abs($productOneTerm - $productTwoTerm) : 0;
 					if($compareResult !== 0) {
 						return $compareResult;
