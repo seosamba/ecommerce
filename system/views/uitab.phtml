@@ -236,9 +236,9 @@
 			        <?php if($this->mediaServersAllowed): ?>
 	                    srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
 	                <?php endif; ?>
-	                productItem      = '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
-                                        '<p class="brand">' + this.brand + '</p>' +
-                                        '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
+                    productItem = '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
+                                '<p class="brand">' + this.brand + '</p>' +
+                                '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
 	                $(productsContainer).append(productItem);
 	                hideSpinner();
                 });

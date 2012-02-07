@@ -268,6 +268,21 @@ class Tools_ShoppingCart {
 		return 0;
 	}
 
+	private function _calculateShipping() {
+		$shippingPrice = 0;
+		switch($this->_shoppingConfig['shippingType']) {
+			case 'amount':
+
+			break;
+			case 'weight':
+
+			break;
+			default:
+			break;
+		}
+		return $shippingPrice;
+	}
+
 	/**
 	 * Tries to find zone id using all zone types (zip, state, country)
 	 *
