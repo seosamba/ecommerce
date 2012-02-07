@@ -228,12 +228,17 @@
 			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
 				    $(productsContainer).empty();
 			    }
-                $.each(productsResponse, function() {
-                    var productItem  = '';
-                    var photoDetails = this.photo.split('/');
-                    productItem      += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
+			    //media servers
+			    var mediaServers = <?php echo Tools_Content_Tools::getMediaServers(true); ?>;
+			    var srcPart      = '<?php echo $this->websiteUrl;?>';
+			    $.each(productsResponse, function() {
+				    var srcPart = '<?php echo $this->websiteUrl;?>';
+			        <?php if($this->mediaServersAllowed): ?>
+	                    srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
+	                <?php endif; ?>
+	                productItem      = '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
                                         '<p class="brand">' + this.brand + '</p>' +
-                                        '<img class="lazy" src="" data-original="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
+                                        '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
 	                $(productsContainer).append(productItem);
 	                hideSpinner();
                 });

@@ -59,19 +59,34 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		if(empty($products)) {
 			return '<!-- Products list is empty -->';
 		}
+
+		$wesiteData  = Zend_Registry::get('website');
+		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
 		// init variables we will use in closure
 		$renderedContent = '';
 		$entityParser    = new Tools_Content_EntityParser();
 		$currency        = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
 		$data            = array(
-			'mediaPath'       => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia(),
-			'templateContent' => $template->getContent()
+			'mediaPath'           => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia(),
+			'templateContent'     => $template->getContent(),
+			'websiteUrl'          => $wesiteData['url'],
+			'domain'              => str_replace('www.', '', $wesiteData['url']),
+			'mediaServersAllowed' => $confiHelper->getConfig('mediaServers')
 		);
 		// here we go - proccessing the list
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data) {
+			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
+			if($data['mediaServersAllowed']) {
+				$mediaServer = Tools_Content_Tools::getMediaServer();
+				if($mediaServer) {
+					$data['mediaPath'] = str_replace($data['websiteUrl'], $mediaServer . '.' . $data['domain'], $data['mediaPath']);
+				}
+			}
+
 			// proccessing product photo and get some data
 			$productPhotoData = explode('/', $product->getPhoto());
 			$photoUrlPart     = $data['mediaPath'] . $productPhotoData[0];
+
 			$shortDesc        = $product->getShortDescription();
 			//setting up the entity parser
 			$renderedContent .= $entityParser->setDictionary(array(

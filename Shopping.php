@@ -70,8 +70,15 @@ class Shopping extends Tools_Plugins_Abstract {
         $view       = new Zend_View(array(
             'scriptPath' => dirname(__FILE__) . '/system/views'
         ));
-        $websiteHelper    = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-	    $view->websiteUrl = $websiteHelper->getUrl();
+        $websiteHelper             = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+	    $configHelper              = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+	    $view->websiteUrl          = $websiteHelper->getUrl();
+	    $view->mediaServersAllowed = false;
+	    if($configHelper->getConfig('mediaServers')) {
+	        $view->websiteData         = Zend_Registry::get('website');
+	        $view->domain              = str_replace('www.', '', $view->websiteData['url']);
+		    $view->mediaServersAllowed = true;
+	    }
 
 	    //getting product listing templates
 	    $view->productTemplates = Application_Model_Mappers_TemplateMapper::getInstance()->findByType(Application_Model_Models_Template::TYPE_LISTING);
