@@ -196,9 +196,9 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 					$newValue = $this->$method();
 					
 					if (is_array($newValue)){
-						foreach ($newValue as &$val){
+						foreach ($newValue as $val){
 							if ($val instanceof Application_Model_Models_Abstract){
-								$val = &$val->toArray();
+								$val = $val->toArray();
 							}
 						}
 					}

@@ -233,7 +233,7 @@
                     var photoDetails = this.photo.split('/');
                     productItem      += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
                                         '<p class="brand">' + this.brand + '</p>' +
-                                        '<img class="lazy" src="" data-original="' + '<?php echo $this->websiteUrl; ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
+                                        '<img class="lazy" src="" data-original="' + '<?php echo Tools_Content_Tools::applyMediaServers($this->websiteUrl); ?>media/' + photoDetails[0] + '/product/' + photoDetails[1] + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
 	                $(productsContainer).append(productItem);
 	                hideSpinner();
                 });
