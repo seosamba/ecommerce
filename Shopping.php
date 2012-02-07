@@ -378,8 +378,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	                            $product->setPage(array(
 	                                'id'         => $product->getPage()->getId(),
 	                                'url'        => $product->getPage()->getUrl(),
-	                                'h1'         => $product->getPage()->getH1(),
-	                                'templateId' => $product->getPage()->getTemplateId(),
+	                                'templateId' => $product->getPage()->getTemplateId()
 	                            ));
 
 	                            array_push($data, $product->toArray());
@@ -430,17 +429,22 @@ class Shopping extends Tools_Plugins_Abstract {
 					$product->setPage($page);
 					$productMapper->updatePageIdForProduct($product);
 				} else {
-					$page = new Application_Model_Models_Page($product->getPage());
-					$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+                    $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+                    $page = $pageMapper->find($srcData['page']['id']);
+                    $isModified = false;
 
 					if (isset($srcData['pageTemplate']) && $srcData['pageTemplate'] !== $page->getTemplateId()){
 						$page->setTemplateId($srcData['pageTemplate']);
+                        $isModified = true;
 					}
 
-					$page->setDraft((bool)$product->getEnabled()?'0':'1');
+                    if ($page->getDraft() !== $product->getEnabled()){
+                        $page->setDraft((bool)$product->getEnabled());
+                        $isModified = true;
+                    }
 
-					if ($pageMapper->save($page)){
-						$product->setPage($page);
+					if ($isModified){
+                        $pageMapper->save($page);
 					}
 				}
 				$data = $product->toArray();
