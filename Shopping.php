@@ -315,7 +315,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					continue;
 				}
 				if ($result === null){
-					$data = array('error'=>true, 'message' => 'Category with such name already exists', 'code' => 400);
+					$data = array('error'=>true, 'message' => 'This tag already exists', 'code' => 400);
 				} else {
 					$data = $result->toArray();
 				}
