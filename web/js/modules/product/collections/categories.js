@@ -6,12 +6,9 @@ define([
 	
 	var CategoryList = Backbone.Collection.extend({
 		model: CategoryModel,
-		url: '/plugin/shopping/run/getdata/type/categories/',
+		url: '/plugin/shopping/run/getdata/type/categories/id/',
 		exists: function(name){
 			return this.find(function(category){return category.get('name').toLowerCase() == name.toLowerCase();});
-		},
-		filterForAutocomplete: function(){
-			
 		}
 	});
 	

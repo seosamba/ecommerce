@@ -232,6 +232,9 @@
              */
             * html .ui-autocomplete {
                 height: 100px;
+                }
+            .ui-autocomplete .ui-menu-item {
+                cursor: pointer;
             }
             #product-list-holder > p.nothing {
                 text-align: center;
@@ -355,11 +358,10 @@
 		
 		<script id="productListingTemplate" type="text/x-jquery-tmpl">
 			{{if showDelete}}
-			<div class="toolbar" style="position: absolute;right: 0;top: 0;">
-				<span class="ui-icon ui-icon-closethick">Delete</span>
-			</div>
-			{{/if}}
-			<a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
+            <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
+            {{else}}
+            <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
+            {{/if}}
                 <p class="brand">${brand}</p>
                 {{if showDelete}}
                 <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
@@ -368,9 +370,9 @@
                 {{/if}}
                 <p class="name">${name}</p>
                 <p class="sku">${sku}</p>
-            </a>
             {{if showDelete}}
             {{else}}
+            </a>
             <input class="marker" type=checkbox {{if marked}}checked="checked"{{/if}} />
             {{/if}}
         </script>
@@ -489,7 +491,7 @@
                         <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
                     </div>
                     <div class="grid_8">
-                        <label for="product-brand">Brand&nbsp;(<a href="javascript:;" id="brandlanding-link" target="_blank" data-msg="You don't have page &quot;<%= name.toLowerCase() %>.html&quot; yet.">visit brand landing page</a>)</label>
+                        <label for="product-brand">Brand</label>
                     </div>
                     <div class="grid_4">
                         <select name="product-brand" id="product-brand" data-reflection="property">
@@ -524,12 +526,12 @@
 	                    <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
 	                </div>
 	                <div class="grid_6">
-	                    <label for="tax">Taxes</label>
+	                    <label for="tax"><?php echo $this->translate('Taxes');?></label>
 	                    <select name="taxes" id="product-taxClass" data-reflection="property" >
-	                        <option value="0">Non taxable</option>
-	                        <option value="1">Default</option>
-	                        <option value="2">Alternative</option>
-	                        <option value="3">Alternative 2</option>
+	                        <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
+	                        <option value="1"><?php echo $this->translate('Default');?></option>
+	                        <option value="2"><?php echo $this->translate('Alternative');?></option>
+	                        <option value="3"><?php echo $this->translate('Alternative 2');?></option>
 	                    </select>
 	                </div>
 	                <div class="grid_12 alpha">
@@ -547,7 +549,7 @@
             </div>
             <div id="category-tab" class="clearfix">
                 <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
-                    <input type="text" id="new-category" placeholder="Create new category" data-confirmMsg="Really, delete category &quot;%cat%&quot;?"/>
+                    <input type="text" id="new-category" placeholder="<?php echo $this->translate('Create new category');?>" data-confirmMsg="<?php echo $this->translate('Really, delete category &quot;%cat%&quot;?'); ?>"/>
                 </div>
 
                 <div id="product-categories" class="grid_12 h350" style="overflow-y: auto;">

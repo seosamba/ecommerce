@@ -23,9 +23,8 @@ define([
 			'change #product-enabled': 'toggleEnabled',
 			'click input[name^=category]': 'toggleCategory',
 			'click #delete': 'deleteProduct',
-			'click #related-holder span.ui-icon-closethick': 'removeRelated',
+//			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
-            'click a#brandlanding-link': 'gotoBrandPage',
             'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
@@ -137,6 +136,8 @@ define([
             $("#manage-product").tabs( "option", "ajaxOptions",
                 { data: {productId: this.model.get('id') } }
             );
+
+            $('#quick-preview').empty(); //clening preview content
 
             //hiding delete button if product is new
             if (!this.model.isNew()){
@@ -326,15 +327,14 @@ define([
 		addRelated: function( ids ) {
             if (_.isNull(ids) || _.isUndefined(ids)) return false;
 
-            var relateds = _(appRouter.app.model.get('related')).toArray();
+            var relateds = _(appRouter.app.model.get('related')).map(function(id){ return parseInt(id) });
                 relateds = _.union(relateds, ids);
 
             appRouter.app.model.set({related: _.without(relateds, this.model.get('id'))});
 		},
-		removeRelated: function(el){
-			var id = $(el.target).closest('div.productlisting').find('a').attr('href').replace('#edit/',''),
-				related = _.without(_(this.model.get('related')).toArray(), parseInt(id));
-			this.model.set({related: related});
+		removeRelated: function(id){
+            var relateds = _(appRouter.app.model.get('related')).map(function(id){ return parseInt(id) });
+			this.model.set({related: _.without(relateds, parseInt(id))});
 		},
 		renderRelated: function() {
             $('#related-holder').empty();
@@ -343,6 +343,8 @@ define([
                 var relateds = this.model.get('related');
 
                 _(relateds).each(function (pid) {
+                    pid = parseInt(pid);
+
                     if (appRouter.products !== null){
                         var model = appRouter.products.get(pid);
                     }
@@ -351,7 +353,7 @@ define([
                         model.fetch({data: {id: pid}});
                     }
                     var view = new ProductListView({model: model, showDelete:true});
-                    $('#related-holder').append(view.render().el);
+                    view.render().$el.css({cursor: 'default'}).appendTo('#related-holder');
                 });
             }
             return false;
@@ -378,32 +380,6 @@ define([
             }
             appRouter.app.model.set({brand: newBrand});
             return this;
-        },
-        gotoBrandPage: function(e){
-            e.preventDefault();
-            var el    = $(e.target),
-                msg   = el.data('msg'),
-                brand = appRouter.brands.find(function(item){ return item.get('name') === $('#product-brand').val() });
-            if (brand) {
-                if (brand.has('url')){
-                    window.open(this.websiteUrl+brand.get('url'),'_blank');
-                } else {
-                    showMessage(_.template(msg, brand.toJSON()), true);
-                }
-            }
-        },
-        filterProductList: function(e){
-            var search = e.target.value.toLowerCase(),
-                holder = $('#product-list-holder');
-            if (search.length){
-                $('#product-list-holder > .productlisting:visible').hide();
-                appRouter.products.search(search, ['name', 'brand', 'sku', 'mpn', 'categories']).map(function(prod){
-                    $(prod.view.el).show();
-                });
-            } else {
-                $('.productlisting:hidden', holder).show();
-            }
-            holder.trigger('scroll');
         },
         filterProducts: function(e, forceRun) {
             if (e.charCode === 13 || forceRun === true) {

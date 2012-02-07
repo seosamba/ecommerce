@@ -4,7 +4,7 @@ define([
 ], function(_, Backbone){
 	
 	var CategoryModel = Backbone.Model.extend({
-		url: '/plugin/shopping/run/getdata/type/categories/id/',
+		urlRoot:  $('#websiteUrl').val() + '/plugin/shopping/run/getdata/type/categories/id/',
 		defaults: function(){
 			return {
 				name: ''

@@ -54,13 +54,17 @@ define([
 		},
 		renderProductView: function(product){
 			var productView = new ProductListingView({model: product});
-			this.productListHolder.append(productView.render().el);
-            this.productListHolder.trigger('scroll');
+			this.productListHolder.append(productView.render().el).trigger('scroll');
 		},
-		addCategory: function(category){
-			var view = new CategoryView({model: category});
-			$('#product-categories').append(view.render().el);
-		},
+		addCategory: function(category, index){
+            var view = new CategoryView({model: category});
+                view.render();
+            if (index instanceof Backbone.Collection){
+                $('#product-categories').prepend(view.$el);
+            } else {
+                $('#product-categories').append(view.$el);
+            }
+        },
 		renderCategories: function(){
 			$('#product-categories').empty();
 			this.categories.each(this.addCategory, this);

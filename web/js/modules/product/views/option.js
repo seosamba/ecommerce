@@ -67,7 +67,7 @@ define([
 			if (!selection.has('_deleted')){
 				selection.set({'_parent': this.cid});
 				var view = new SelectionView({model: selection});
-				$(this.el).find('div.option-list-holder').append(view.render().el);
+				this.$el.find('div.option-list-holder').append(view.render().el);
 			}
 			
 		},
