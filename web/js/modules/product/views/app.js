@@ -23,7 +23,6 @@ define([
 			'change #product-enabled': 'toggleEnabled',
 			'click input[name^=category]': 'toggleCategory',
 			'click #delete': 'deleteProduct',
-//			'click #related-holder span.ui-icon-closethick': 'removeRelated',
             'keypress input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
@@ -32,7 +31,7 @@ define([
 		},
 		websiteUrl: $('#websiteUrl').val(),
 		initialize: function(){
-			$('#delete,#add-new-option-btn').button();
+			$('#add-new-option-btn').button();
             var self = this;
             $.getJSON(this.websiteUrl + 'plugin/shopping/run/getdata/type/index', function(response){
                 $('#product-list-search').autocomplete({

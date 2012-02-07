@@ -392,19 +392,11 @@
         </script>
 
         <script>
-            /**
-             * applying main UI elements
-             */
             $(function(){
                 $('#manage-product,#description-box').tabs();
                 $(".ui-tabs-nav, .ui-tabs-nav > *" )
                     .removeClass( "ui-corner-all" )
                     .addClass( "ui-corner-top" );
-//                $('#ajax_msg').on({
-//                    ajaxStart: function(){ console.log(arguments); $(this).show(); },
-//                    ajaxStop:  function(){ $(this).hide(); },
-//                    ajaxError: function(){ $(this).hide(); }
-//                });
             });
         </script>
 	</head>
@@ -580,7 +572,7 @@
             </div>
 
             <div class="grid_12 mb10px">
-                <input type="button" value="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;"/>
+                <a href="javascript:;" class="delete-selected" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;"><?php echo $this->translate('Delete this product'); ?></a>
                 <input type="submit" name="submit" id="submit" value="Save"/>
             </div>
         </div>
