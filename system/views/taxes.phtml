@@ -3,65 +3,87 @@
     <head>
         <meta charset="utf-8">
         <title></title>
-		<link href="http://toaster2.test/system/css/reset.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="http://toaster2.test/system/css/grid.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="http://toaster2.test/system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" > 
-		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" > 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
-		<script src="<?php echo $this->websiteUrl;?>system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js"></script>
-<!--		<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/jquery.select-chain.js"></script>-->
+        <title><?php echo $this->translate('Manage product'); ?></title>
+        <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
+                ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
+                ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
+                ->appendStylesheet($this->websiteUrl . 'system/css/seotoaster.css')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/smoke.css')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css'); ?>
+        <?php echo $this->headLink(); ?>
+        <style>
+            .taxrule {
+                border: 1px solid #666;
+                background: #e6e6fa;
+                margin: 5px 0;
+            }
+        </style>
+
+        <?php
+            $this->headScript()->setAllowArbitraryAttributes(true)
+                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js')
+                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js')
+                    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+                    ->appendFile($this->websiteUrl . 'system/js/internal/system.js')
+                    ->appendFile($this->websiteUrl.'system/js/external/smoke/smoke.min.js')
+                    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/taxes.js'));
+            echo $this->headScript();
+        ?>
+
 		<script id="ruleTemplate" type="text/x-jquery-tmpl">	
-			<div class="grid_12 ui-widget-content ui-corner-all mt5px mb5px rule-record" style="border:2px groove #ddd; line-height:48px;">
-				{{if id}}
-				<input type="hidden" name="rule-id" value="${id}"/>
-				{{/if}}
-				<div class="grid_1" style="text-align:center;">
-					<input type="radio" name="default" {{if isDefault == 1}}checked="checked"{{/if}} />
-				</div>
-				<div class="grid_4">
-					<select name="zone" style="width: 95%">
-					{{tmpl '#zoneListTemplate'}}
-					</select>
-				</div>
-				<div class="grid_6" style="white-space:nowrap;">
-					<div class="grid_4 alpha">
-						<input type="text" name="taxrate1" style="width: 85%" value="${rate1}" placeholder="0"/>%
-					</div>
-					<div class="grid_4 ">
-						<input type="text" name="taxrate2" style="width: 85%" value="${rate2}" placeholder="0"/>%
-					</div>
-					<div class="grid_4 omega">
-						<input type="text" name="taxrate3" style="width: 85%" value="${rate3}" placeholder="0"/>%						
-					</div>
-				</div>
-				<div class="grid_1">
-					<button class="delete-rule">Remove this rule</button>
-				</div>
-			</div>
+            {{if id}}
+            <input type="hidden" name="rule-id" value="${id}"/>
+            {{/if}}
+            <div class="grid_1" style="text-align:center;">
+                <input type="radio" name="default" {{if isDefault == 1}}checked="checked"{{/if}} />
+            </div>
+            <div class="grid_4">
+                <select name="zoneId" data-reflection="property" style="width: 95%">
+                <option value="-1"><?php echo $this->translate('Select zone');?></option>
+                {{tmpl '#zoneListTemplate'}}
+                </select>
+            </div>
+            <div class="grid_6" style="white-space:nowrap;">
+                <div class="grid_4 alpha">
+                    <input type="text" name="rate1" data-reflection="property" style="width: 85%" value="${rate1}" placeholder="0"/>%
+                </div>
+                <div class="grid_4 ">
+                    <input type="text" name="rate2" data-reflection="property" style="width: 85%" value="${rate2}" placeholder="0"/>%
+                </div>
+                <div class="grid_4 omega">
+                    <input type="text" name="rate3" data-reflection="property" style="width: 85%" value="${rate3}" placeholder="0"/>%
+                </div>
+            </div>
+            <div class="grid_1">
+                <a href="javascript:;" class="delete-rule">
+                    <img src="<?php echo $this->websiteUrl;?>system/images/delete.png" />
+                </a>
+            </div>
 		</script>
 		<script id="zoneListTemplate" type="text/x-jquery-tmpl">
-			{{each taxManager.zones}}
-			<option value="${id}" {{if zoneId}}{{if zoneId == id}}selected{{/if}}{{/if}}>${name}</option>	
+            {{each app.zones.toJSON()}}
+			<option value="${id}" {{if zoneId}}{{if zoneId == id}}selected{{/if}}{{/if}}>${name}</option>
 			{{/each}}
 		</script>
 	</head>
     <body>
-		<noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
-		JavaScript must be enabled at this point.<br/>
-		<a href="http://www.seotoaster.com/">seotoaster.com</a>
-		</noscript>
-		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
-		<div class="seotoaster container_12 ui-widget"> 
-			<div id="top-toolbar" class="ui-widget-header padding10px ui-corner-top">
+        <noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
+        JavaScript must be enabled at this point.<br/>
+        <a href="http://www.seotoaster.com/">seotoaster.com</a>
+        </noscript>
+        <input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
+        <input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
+		<div class="seotoaster container_12 ui-widget" id="manage-taxes">
+			<div class="ui-widget-header padding10px ui-corner-top">
 				<span>
-					<?php echo $this->formCheckbox('price-inc-tax', null, array('checked' => $this->priceIncTax));?>
+                    <?php echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );?>
 					<?php echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.')); ?>
 				</span>
+                <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
 			</div>
 			<div class="ui-helper-clearfix ui-state-focus" style="text-align:center;">
 				<div class="grid_1">default</div>
-				<div class="grid_4"><a href="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" target="_blank" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
+				<div class="grid_4"><a href="javascript:;" data-url="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" class="tpopup" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
 				<div class="grid_6">
 					<div class="grid_4 alpha"><section>Default</section></div>
 					<div class="grid_4"><section>Alternative</section></div>
@@ -69,95 +91,14 @@
 				</div>
 				<div class="grid_1">remove</div>
 			</div>
-			<div id="rules" class="ui-widget-content ui-helper-clearfix h500" style="overflow-x: hidden; overflow-y: auto;">
+			<div id="rules" class="ui-widget-content ui-helper-clearfix h450" style="overflow-x: hidden; overflow-y: auto;">
 				
 			</div>
-			<div id="bottom-toolbar" class="ui-widget-header ui-corner-bottom">
+			<div class="ui-widget-header ui-corner-bottom">
 				<button id="new-rule-btn">Add new</button>
 				<button id="save-btn" style="float:right;">Save</button>
 			</div>
 		</div>
-		
-		<script>
-			var taxManager = {
-				zones: null
-			};
-			taxManager.setZones = function(data){
-				taxManager.zones = data;
-			}
-			taxManager.setRules = function(data){
-				$('#rules').html($('#ruleTemplate').tmpl(data));
-				$('.delete-rule').trigger('load');
-			}
-			taxManager.run = function(){
-				$.when(
-					$.getJSON('/plugin/shopping/run/getdata/type/zones/', null , taxManager.setZones)
-				).then(function(){
-					$.getJSON('/plugin/shopping/run/getdata/type/taxrules/', null, taxManager.setRules)	
-				});
-			}
-			taxManager.deleteRule = function(element){
-				var container = $(element).closest('.rule-record')
-				if (container.find('input[name="rule-id"]').size()){
-					$.post('/plugin/shopping/run/taxes/', {toRemove: container.find('input[name="rule-id"]').val()}, function(){
-						container.remove();
-					});
-				} else {
-					container.remove();
-				}
-			}
-			taxManager.save = function(){
-				var rules = [];
-				$('#rules > .rule-record').each(function(){
-					var rule = {
-						id: $(this).find('input[name="rule-id"]').val(),
-						isDefault: $(this).find('input[name="default"]:checked').size() ? 1 : 0,
-						zoneId: $(this).find('select[name="zone"]').val(),
-						rate1: $(this).find('input[name="taxrate1"]').val(),
-						rate2: $(this).find('input[name="taxrate2"]').val(),
-						rate3: $(this).find('input[name="taxrate3"]').val(),
-					};
-					
-					rules.push(rule);
-				});
-				console.log(rules);
-				$.post(window.location, {rules: rules}, function(response){
-					$.getJSON('/plugin/shopping/run/getdata/type/taxrules/', null, taxManager.setRules);	
-				});
-				
-			}
-			
-			$(function(){
-				var i = 0;
-				
-				// creating buttons
-				$('#new-rule-btn').button({
-					icons: {primary: 'ui-icon-plus'}
-				}).click(function(){
-					var data = {
-						idDefault: 0,
-						tax1: '',
-						tax2: '',
-						tax3: ''
-					}
-					$('#ruleTemplate').tmpl({isDefault: 0}).appendTo('#rules');
-					$('.delete-rule').trigger('load');
-				});
-				$('.delete-rule').live({
-					load: function(){$(this).button({icons: {primary: 'ui-icon-trash'}, text: false})},
-					click: function(){taxManager.deleteRule($(this));}
-				});
-				$('#save-btn').bind('click',taxManager.save).button({
-					icons: {primary: 'ui-icon-disk'}
-				});
-				
-				$('#price-inc-tax').change(function(){
-					var flag;
-					flag = $(this).attr('checked') ? 1 : 0;
-					$.post('/plugin/shopping/run/setConfig', {config: {showPriceIncTax: flag}} ) ;
-				});
-				taxManager.run();
-			});
-		</script>
+
     </body>
 </html>

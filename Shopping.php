@@ -178,24 +178,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return html
 	 */
 	protected function taxesAction() {
-		if ($this->_request->isPost()){
-			$taxMapper = Models_Mapper_Tax::getInstance();
-			$toRemove = $this->_request->getParam('toRemove');
-			if ($toRemove){
-				$taxMapper->delete($toRemove);
-			}
-
-			$rules = $this->_request->getParam('rules');
-			if ($rules) {
-				foreach($rules as $rule){
-					$taxMapper->save($rule);
-				}
-			}
-
-			$this->_jsonHelper->direct(array('done'=>true));
-		}
-		$configMapper = Models_Mapper_ShoppingConfig::getInstance();
-		$this->_view->priceIncTax = $configMapper->getConfigParam('showPriceIncTax');
+		$this->_view->priceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
 
 		echo $this->_view->render('taxes.phtml');
 	}
@@ -252,11 +235,42 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	private function _taxrulesRESTService() {
 		$taxMapper = Models_Mapper_Tax::getInstance();
-		$rules = $taxMapper->fetchAll();
-		$data = array();
-		foreach ($rules as $rule) {
-			$data[] = $rule->toArray();
-		}
+        $data = array();
+        switch (strtolower($this->_request->getMethod())){
+            default:
+            case 'get':
+                $id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_SANITIZE_NUMBER_INT) : null;
+                if ($id) {
+                    $rule = $taxMapper->find($id);
+                    if ($rule instanceof Models_Model_Tax){
+                        $data = $rule->toArray();
+                    }
+                } else {
+                    $rules = $taxMapper->fetchAll();
+                    $data = array();
+                    foreach ($rules as $rule) {
+                        $data[] = $rule->toArray();
+                    }
+                }
+                break;
+            case 'post':
+                $rules = $this->_request->getParam('rules', null);
+                if ($rules) {
+                    foreach ($rules as $rule) {
+                        $data[] = $taxMapper->save($rule);
+                    }
+                }
+                break;
+            case 'put':
+                // for later use
+                break;
+            case 'delete':
+                $id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_SANITIZE_NUMBER_INT) : null;
+                if ($id){
+                    $data = $taxMapper->delete($id);
+                }
+                break;
+        }
 		return $data;
 	}
 
