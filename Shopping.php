@@ -8,6 +8,19 @@ class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
 	const PRODUCT_CATEGORY_URL	= 'product-pages';
 	const PRODUCT_DEFAULT_LIMIT = 30;
+
+	/**
+	 * New system role 'customer'
+	 *
+	 */
+	const ROLE_CUSTOMER = 'customer';
+
+	/**
+	 * New system resource 'cart'
+	 *
+	 */
+	const RESOURCE_CART = 'cart';
+
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -56,6 +69,15 @@ class Shopping extends Tools_Plugins_Abstract {
             );
             Zend_Registry::set('Zend_Currency', $currency);
         }
+	    $acl = Zend_Registry::get('acl');
+        if(!$acl->hasRole(self::ROLE_CUSTOMER)) {
+            $acl->addRole(new Zend_Acl_Role(self::ROLE_CUSTOMER), Tools_Security_Acl::ROLE_GUEST);
+        }
+        if(!$acl->has(self::RESOURCE_CART)) {
+            $acl->addResource(new Zend_Acl_Resource(self::RESOURCE_CART));
+        }
+        $acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
+        Zend_Registry::set('acl', $acl);
     }
 
 	public function run($requestedParams = array()) {

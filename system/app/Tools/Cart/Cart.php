@@ -1,6 +1,8 @@
 <?php
 /**
+ * An abstract class for the shopping cart. Groups all common options methods.
  *
+ * Its recommended for all other cart plugins for the toaster2 to extend this class
  * @author Eugene I. Nezhuta <eugene@seotoaster.com>
  */
 

@@ -168,8 +168,9 @@ class Tools_ShoppingCart {
 				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
-			$summary['total']    = $summary['subTotal'] + $summary['totalTax'];
-			$summary['shipping'] = 0;
+			$summary['shipping'] = $this->_calculateShipping();
+			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
+
 		}
 		return $summary;
 	}
@@ -239,6 +240,16 @@ class Tools_ShoppingCart {
 		return $totalWeight;
 	}
 
+	public function calculateCartPrice() {
+		$totalPrice = 0;
+		if(is_array($this->_content) && !empty($this->_content)) {
+			foreach($this->_content as $cartItem) {
+				$totalPrice += $cartItem['price'] * $cartItem['qty'];
+			}
+		}
+		return $totalPrice;
+	}
+
 	public function clean() {
 		$this->_session->cartContent = null;
 	}
@@ -269,16 +280,27 @@ class Tools_ShoppingCart {
 	}
 
 	private function _calculateShipping() {
-		$shippingPrice = 0;
-		switch($this->_shoppingConfig['shippingType']) {
-			case 'amount':
-
-			break;
-			case 'weight':
-
-			break;
-			default:
-			break;
+		$shippingPrice   = 0;
+		$orderPrice      = $this->calculateCartPrice();
+		$shippingType    = $this->_shoppingConfig['shippingType'];
+		$shippingGeneral = $this->_shoppingConfig['shippingGeneral'];
+		$userShippingInfo = '';
+		if($shippingType == 'pickup') {
+			return $shippingPrice;
+		}
+		$shippingSettings = unserialize($this->_shoppingConfig['shipping' . ucfirst($shippingType)]);
+		if(is_array($shippingSettings) && !empty($shippingSettings)) {
+			foreach($shippingSettings as $ruleNumber => $settingsData) {
+				if($orderPrice > $settingsData['limit']) {
+					if($ruleNumber < 3) {
+						continue;
+					}
+					$shippingPrice = $settingsData['national'];
+					break;
+				}
+				$shippingPrice = $settingsData['national'];
+				break;
+			}
 		}
 		return $shippingPrice;
 	}

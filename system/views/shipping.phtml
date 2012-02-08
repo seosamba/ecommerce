@@ -16,9 +16,7 @@
 	    <script>
             $(function() {
                 $('.fieldset-content').hide();
-
                 $('input[name=shippingType]:checked').parent().next().slideDown();
-
                 $('input[name=shippingType]').on('click', function() {
                     $('.fieldset-content').hide();
                     $(this).parent().next().slideDown();
@@ -37,10 +35,6 @@
             </div>
 			<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
 			    <div class="grid_6">
-		            <fieldset class="grid_12"><legend>General Options</legend>
-		                <label>Notice for users:</label>
-		                <textarea style="height:60px;" id="shipping-general-notice" name="shippingGeneral[notice]"><?php echo $this->config['shippingGeneral']['notice']?></textarea>
-		            </fieldset>
 			        <fieldset class="grid_12" id="#shipping-options"><legend>Shipping Options</legend>
 			            <fieldset><legend class="option"><input type="radio" name="shippingType" value="pickup" <?php echo ($this->config['shippingType']=='pickup'?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
 			                <div class="fieldset-content <?php echo ($this->config['shippingType']=='pickup'?'active':'');?>">
