@@ -279,14 +279,14 @@ define([
         validateProduct: function(){
             var error   = false;
 
-            if (!this.model.has('name') || trim(this.model.get('name')) === ''){
+            if (!this.model.has('name') || $.trim(this.model.get('name')) === ''){
                 this.$('#product-name').addClass('highlight');
                 error = true || error;
             } else {
                 this.$('#product-name').removeClass('highlight');
             }
 
-            if (!this.model.has('sku') || trim(this.model.get('sku')) === ''){
+            if (!this.model.has('sku') || $.trim(this.model.get('sku')) === ''){
                 this.$('#product-sku').addClass('highlight');
                 error = true || error;
             } else {
@@ -300,7 +300,7 @@ define([
                 this.$('#product-price').removeClass('highlight');
             }
 
-            if (!this.model.has('brand') && trim($('#new-brand').val()) === '') {
+            if (!this.model.has('brand') && $.trim($('#new-brand').val()) === '') {
                 this.$('#product-brand').addClass('highlight');
                 error = true || error;
             } else {
@@ -314,7 +314,7 @@ define([
                 this.$('#product-image-holder').removeClass('highlight');
             }
 
-            if (!this.model.has('shortDescription') || trim(this.model.get('shortDescription')) === ''){
+            if (!this.model.has('shortDescription') || $.trim(this.model.get('shortDescription')) === ''){
                 this.$('#product-shortDescription').addClass('highlight');
                 error = true || error;
             } else {
@@ -358,7 +358,7 @@ define([
             return false;
         },
         newBrand: function(e){
-            var newBrand = trim(this.$('#new-brand').val());
+            var newBrand = $.trim(this.$('#new-brand').val());
             if (e.keyCode === 13 && newBrand !== '') {
                 this.addNewBrand(newBrand)
                     .$('#new-brand').val('');
@@ -367,7 +367,7 @@ define([
             return this;
         },
         addNewBrand: function(newBrand){
-            newBrand = trim(newBrand);
+            newBrand = $.trim(newBrand);
             var currentList = appRouter.brands.pluck('name').map(function(item){ return item.toLowerCase()});
             if (!_.include(currentList, newBrand.toLowerCase())){
                 appRouter.brands.add({name: newBrand});
