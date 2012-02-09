@@ -10,7 +10,8 @@ class Forms_Shipping extends Zend_Form {
 	public function init() {
 
 		$this->setLegend('Shipping address')
-			->setDecorators(array('Form', 'FormElements'));
+			//->setDecorators(array('Form', 'FormElements'))
+			->setAttribs(array('id' => 'shipping-user-address'));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'firstName',

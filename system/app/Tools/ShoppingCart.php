@@ -14,11 +14,13 @@ class Tools_ShoppingCart {
 
     protected static $_instance = null;
 
-    private $_content           = array();
+	protected $_content         = array();
 
-    private $_session           = null;
+	protected $_session         = null;
 
-	private $_filterId          = 0;
+	protected $_filterId        = 0;
+
+	protected $_customerInfo    = array();
 
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
@@ -50,6 +52,15 @@ class Tools_ShoppingCart {
         $this->_content = $content;
 	    return $this;
     }
+
+	public function setCustomerInfo($customerInfo) {
+		$this->_customerInfo = $customerInfo;
+		return $this;
+	}
+
+	public function getCustomerInfo() {
+		return $this->_customerInfo;
+	}
 
 	public function save() {
 		$this->_save();

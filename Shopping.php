@@ -154,6 +154,41 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_view->render('shipping.phtml');
 	}
 
+	public function calculateAction() {
+		if(!$this->_request->isPost()) {
+			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+		}
+
+		$form = new Forms_Shipping();
+		if($form->isValid($this->_request->getParams())) {
+			$formData = $form->getValues();
+			$cutomer = new Models_Model_Customer();
+			$cutomer->setRoleId(self::ROLE_CUSTOMER);
+			$cutomer->setEmail($formData['email']);
+			$cutomer->setFullName($formData['firstName'] . ' ' . $formData['lastName']);
+			$cutomer->setIpaddress($_SERVER['REMOTE_ADDR']);
+			$cutomer->setPassword('customer');
+			$cutomer->setShippingAddress(array(
+				'shippingAddress1' => $formData['shippingAddress1'],
+				'shippingAddress2' => $formData['shippingAddress2'],
+				'country'          => $formData['country'],
+				'city'             => $formData['city'],
+				'state'            => $formData['state'],
+				'zipCode'          => $formData['zipCode']
+			));
+			$cutomer->setBillingAddress(array());
+			$cutomer->setCompany($formData['company']);
+			$cutomer->setMobile($formData['mobile']);
+			Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
+
+			//loading cart storage
+			$cartStorage = Tools_ShoppingCart::getInstance();
+			$cartStorage->setCustomerInfo($cutomer->toArray())->calculate();
+			$this->_responseHelper->success('succ');
+		}
+		$this->_responseHelper->success('err');
+	}
+
 	protected function setConfigAction(){
 		$status = false;
 		if ($this->_request->isPost()){
