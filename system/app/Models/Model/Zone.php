@@ -82,10 +82,10 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 			throw new Exception('Wrong parameter given');
 		}
 		if (!array_key_exists($country, $this->_countries)){
-			$this->_countries[$country] = array(
+			array_push($this->_countries, array(
 				'country'	=> $country,
 				'name'		=>	Zend_Locale::getTranslation($country, 'Country')
-			);
+			));
 		}
 		return $this;
 	}
@@ -99,7 +99,7 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 				}
 			}
 			if (!array_key_exists($state['id'], $this->_states)){
-				$this->_states[$state['id']] = $state;
+				array_push($this->_states, $state);
 			}
 		} else {
 			throw new Exception('Wrong parameter given');

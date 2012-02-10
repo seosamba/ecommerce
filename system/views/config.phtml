@@ -49,7 +49,10 @@
 				$('select[name$="country"]').each(function(){
 					var $stateField = $(this).closest('form').find('select[name$="state"]');
 					$(this).selectChain({
-						data: $(this),
+						data: {
+                            country: $(this).val(),
+                            pairs: true
+                        },
 						target: $stateField,
 						url: '<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/states'
 					})

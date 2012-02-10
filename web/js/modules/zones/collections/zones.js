@@ -6,7 +6,7 @@ define([
 
     var zoneCollection = Backbone.Collection.extend({
         model: ZoneModel,
-        url: $('#websiteUrl').val()+'plugin/shopping/run/getdata/type/zones'
+        url: $('#websiteUrl').val()+'plugin/shopping/run/getdata/type/zones/id'
     });
 
 	return zoneCollection;
