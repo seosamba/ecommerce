@@ -158,8 +158,12 @@ class Tools_Geo {
         $countryTable = new Models_DbTable_Country();
         $countryList = $countryTable->fetchAll()->toArray();
         foreach ($countryList as $country){
-            $country['name'] = $countriesNames[$country['country']];
-            array_push($data, $country);
+	        if(!isset($countriesNames[$country['country']])) {
+		        continue;
+	        }
+	        $country['name'] = $countriesNames[$country['country']];
+            //array_push($data, array($country['country'] => $country['name']));
+	        $data[$country['country']] = $country['name'];
         }
 
 		return $data;
