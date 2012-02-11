@@ -149,8 +149,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
-		$this->_view->config          = $config;
-		$this->_view->shippingPlugins = Tools_Plugins_Tools::getEnabledPlugins();
+		$this->_view->config           = $config;
+		$this->_view->shippingAmount   = $config['shippingAmount'];
+		$this->_view->shippingGeneral  = $config['shippingGeneral'];
+		$this->_view->shippingWeight   = $config['shippingWeight'];
+		$this->_view->shippingExternal = json_encode($config['shippingExternal']);
+		$this->_view->shippingPlugins  = Tools_Plugins_Tools::getEnabledPlugins();
 		echo $this->_view->render('shipping.phtml');
 	}
 
@@ -159,34 +163,77 @@ class Shopping extends Tools_Plugins_Abstract {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
 
+		$config = array_map(function($param) {
+			$unserialized = @unserialize($param);
+			return ($unserialized === 'b:0' || $unserialized !== false) ? $unserialized : $param;
+		}, $this->_configMapper->getConfigParams());
+
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
 		$form = new Forms_Shipping();
 		if($form->isValid($this->_request->getParams())) {
 			$formData = $form->getValues();
-			$cutomer = new Models_Model_Customer();
-			$cutomer->setRoleId(self::ROLE_CUSTOMER);
-			$cutomer->setEmail($formData['email']);
-			$cutomer->setFullName($formData['firstName'] . ' ' . $formData['lastName']);
-			$cutomer->setIpaddress($_SERVER['REMOTE_ADDR']);
-			$cutomer->setPassword('customer');
-			$cutomer->setShippingAddress(array(
-				'shippingAddress1' => $formData['shippingAddress1'],
-				'shippingAddress2' => $formData['shippingAddress2'],
-				'country'          => $formData['country'],
-				'city'             => $formData['city'],
-				'state'            => $formData['state'],
-				'zipCode'          => $formData['zipCode']
-			));
-			$cutomer->setBillingAddress(array());
-			$cutomer->setCompany($formData['company']);
-			$cutomer->setMobile($formData['mobile']);
-			Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
-
+			$cutomer  = $sessionHelper->getCurrentUser();
+			if($cutomer === null) {
+				$cutomer = new Models_Model_Customer();
+				$cutomer->setRoleId(self::ROLE_CUSTOMER);
+				$cutomer->setEmail($formData['email']);
+				$cutomer->setFullName($formData['firstName'] . ' ' . $formData['lastName']);
+				$cutomer->setIpaddress($_SERVER['REMOTE_ADDR']);
+				$cutomer->setPassword('customer');
+				$cutomer->setShippingAddress(array(
+					'shippingAddress1' => $formData['shippingAddress1'],
+					'shippingAddress2' => $formData['shippingAddress2'],
+					'country'          => $formData['country'],
+					'city'             => $formData['city'],
+					'state'            => $formData['state'],
+					'zipCode'          => $formData['zipCode']
+				));
+				$cutomer->setBillingAddress(array());
+				$cutomer->setCompany($formData['company']);
+				$cutomer->setMobile($formData['mobile']);
+				Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
+			}
 			//loading cart storage
 			$cartStorage = Tools_ShoppingCart::getInstance();
-			$cartStorage->setCustomerInfo($cutomer->toArray())->calculate();
-			$this->_responseHelper->success('succ');
+			if($config['shippingType'] == 'internal') {
+				$cartStorage->setCustomerInfo($cutomer->toArray())->calculate();
+			} else {
+				$shippingPluginClass = ucfirst($config['shippingPlugin']);
+				if(class_exists($shippingPluginClass)) {
+					$shippingPlugin = new $shippingPluginClass($config['shippingExternal']);
+					$shippingPlugin->setOrigination(array(
+						'address1' => $config['address1'],
+						'address2' => $config['address2'],
+						'city'     => $config['city'],
+						'state'    => $config['state'],
+						'zip'      => $config['zip'],
+						'country'  => $config['country'],
+						'phone'    => $config['phone']
+					));
+					$shippingPlugin->setDestination(array(
+						'firstName'    => $formData['firstName'],
+						'lastName'     => $formData['lastName'],
+						'company'      => $formData['company'],
+						'email'        => $formData['email'],
+						'address1'     => $formData['shippingAddress1'],
+						'address2'     => $formData['shippingAddress2'],
+						'city'         => $formData['city'],
+						'state'        => $formData['state'],
+						'zip'          => $formData['zipCode'],
+						'country'      => $formData['country'],
+						'phone'        => $formData['phone'],
+						'mobile'       => $formData['mobile'],
+						'instructions' => strip_tags($formData['instructions']),
+						'referrer'     => $_SERVER['REMOTE_ADDR']
+					));
+					$shippingPlugin->setWeight(Tools_ShoppingCart::getInstance()->calculateCartWeight(), $config['weightUnit']);
+					$result = $shippingPlugin->run();
+				}
+
+			}
+			$this->_responseHelper->success($this->_translator->translate('Your shipping costs has been calculated.'));
 		}
-		$this->_responseHelper->success('err');
+		$this->_responseHelper->fail(Tools_Content_Tools::proccessFormMessagesIntoHtml($form->getMessages(),get_class($form)));
 	}
 
 	protected function setConfigAction(){
