@@ -152,14 +152,17 @@ class Tools_Geo {
 	 * @todo redo for db 
 	 */
 	public static function getCountries() {
-		$countryTable = new Models_DbTable_Country();
-		$countries = Zend_Locale::getTranslationList('territory', null, 2);
-		array_pop($countries);
-		if (isset($countries['SU'])) {
-			unset ($countries['SU']);	
-		}
-        asort($countries);
-		return $countries;
+        $data = array();
+        $countriesNames = Zend_Locale::getTranslationList('territory', null, 2);
+
+        $countryTable = new Models_DbTable_Country();
+        $countryList = $countryTable->fetchAll()->toArray();
+        foreach ($countryList as $country){
+            $country['name'] = $countriesNames[$country['country']];
+            array_push($data, $country);
+        }
+
+		return $data;
 	}
 	
 	/**
@@ -185,7 +188,7 @@ class Tools_Geo {
 			if ($where){
 				$select->where($where);
 			}
-			$data = $stateTable->getAdapter()->fetchAssoc($select);
+			$data = $stateTable->getAdapter()->fetchAll($select);
 		}
 		return $data;
 	}

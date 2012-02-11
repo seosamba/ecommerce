@@ -11,24 +11,24 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 	protected $_model	= 'Models_Model_Zone';
 
 
-	public function save($zone) {
-		if (! $zone instanceof $this->_model){
-			throw new Exception('Given parameter should be instance of '.$this->_model);
-		}
+	public function save($model) {
+        if (!$model instanceof $this->_model){
+            $model = new $this->_model($model);
+        }
 		$data = array(
-			'name' => $zone->getName()
+			'name' => $model->getName()
 		);
-		if ($zone->getId() === null){
+		if ($model->getId() === null){
 			$result = $this->getDbTable()->insert($data);
-			$zone->setId($result);
+            $model->setId($result);
 		} else {
-			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $zone->getId());
+			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
 			$result = (bool) $this->getDbTable()->update($data, $where);
 		}
 		
-		$this->_updateCountries($zone);
-		$this->_updateStates($zone);
-		$this->_updateZip($zone);
+		$this->_updateCountries($model);
+		$this->_updateStates($model);
+		$this->_updateZip($model);
 		
 		return $result;
 	}
@@ -77,11 +77,15 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 	
 	private function _updateCountries($zone){
 		$countryTable = new Models_DbTable_Country();
-		$newCountries = $zone->getCountries(true);
-		
-		if (!empty($newCountries)){	
+		$newCountries = $zone->getCountries();
+        $newCodesList = array();
+        foreach ($newCountries as $country) {
+            array_push($newCodesList, $country['country']);
+        }
+
+        if (!empty($newCodesList)){
 			$sql = $countryTable->getAdapter()->select()->from($countryTable->info('name'))
-				->where('country in (?)', $newCountries);
+				->where('country in (?)', $newCodesList);
 			$list = $countryTable->getAdapter()->fetchAll($sql);
 		} else {
 			$list = array();

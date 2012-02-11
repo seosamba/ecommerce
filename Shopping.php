@@ -313,27 +313,64 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	private function _countrylistRESTService(){
+        $toPairs = $this->_request->getParam('pairs', false);
 		$data = Tools_Geo::getCountries();
 		asort($data);
 		return $data;
 	}
 
+    /**
+     * @deprecated
+     * @return array|null
+     */
 	private function _stateslistRESTService() {
 		return Tools_Geo::getState();
 	}
 
 	private function _statesRESTService() {
+        $toPairs = $this->_request->getParam('pairs', false);
 		$country = $this->_request->getParam('country');
-		return Tools_Geo::getState($country?$country:null, true);
+		return Tools_Geo::getState($country?$country:null, $toPairs);
 	}
 
 	private function _zonesRESTService() {
 		$zonesMapper = Models_Mapper_Zone::getInstance();
-		$zones = $zonesMapper->fetchAll();
-		$data = array();
-		foreach ($zones as $zone) {
-			$data[] = $zone->toArray();
-		}
+        switch (strtolower($this->_request->getMethod())){
+            default:
+            case 'get':
+                $id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_SANITIZE_NUMBER_INT) : null;
+                if ($id) {
+                    $rule = $zonesMapper->find($id);
+                    if ($rule instanceof Models_Model_Tax){
+                        $data = $rule->toArray();
+                    }
+                } else {
+                    $zones = $zonesMapper->fetchAll();
+                    $data = array();
+                    foreach ($zones as $zone) {
+                        $data[] = $zone->toArray();
+                    }
+                }
+                break;
+            case 'post':
+                $rules = $this->_request->getParam('zones', null);
+                if ($rules) {
+                    foreach ($rules as $rule) {
+                        $data[] = $zonesMapper->save($rule);
+                    }
+                }
+                break;
+            case 'put':
+                // for later use
+                break;
+            case 'delete':
+                $id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_SANITIZE_NUMBER_INT) : null;
+                if ($id){
+                    $data = $zonesMapper->delete($id);
+                }
+                break;
+        }
+
 		return $data;
 	}
 
