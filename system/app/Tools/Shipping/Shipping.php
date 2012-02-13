@@ -6,17 +6,23 @@
 
 class Tools_Shipping_Shipping {
 
-	protected $_shoppingConfig        = array();
+	protected $_shoppingConfig = array();
 
-	protected $_sessionHelper         = null;
+	protected $_sessionHelper  = null;
 
-	protected $_customer              = null;
+	protected $_customer       = null;
 
-	protected $_shippingData          = array();
+	protected $_shippingData   = array();
+
+	protected $_mailValidator  = null;
 
 	public function __construct(array $shoppingConfig) {
 		$this->_shoppingConfig = $shoppingConfig;
 		$this->_sessionHelper  = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+		$this->_mailValidator  = new Zend_Validate_Db_NoRecordExists(array(
+			'table' => 'user',
+			'field' => 'email'
+		));
 	}
 
 	public function calculateShipping($shippingData) {
@@ -25,6 +31,10 @@ class Tools_Shipping_Shipping {
 		if($this->_customer->getRoleId() == Tools_Security_Acl::ROLE_GUEST) {
 			$this->_customer = $this->_saveNewCustomer($shippingData);
 			$this->_sessionHelper->setCurrentUser($this->_customer);
+		} else {
+			if(!$this->_mailValidator->isValid($shippingData['email'])) {
+				throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
+			}
 		}
 		$shippingCalculator = '_calculate' . ucfirst((($this->_shoppingConfig['shippingType'] != 'external') ? 'internal' : $this->_shoppingConfig['shippingType']));
 
@@ -96,23 +106,29 @@ class Tools_Shipping_Shipping {
 	 * @return Models_Model_Customer
 	 */
 	protected function _saveNewCustomer($customerData) {
-		$cutomer = new Models_Model_Customer();
-		$cutomer->setRoleId(Shopping::ROLE_CUSTOMER);
-		$cutomer->setEmail($customerData['email']);
-		$cutomer->setFullName($customerData['firstName'] . ' ' . $customerData['lastName']);
-		$cutomer->setIpaddress($_SERVER['REMOTE_ADDR']);
-		$cutomer->setPassword(md5(uniqid('customer_' . time())));
-		$cutomer->setShippingAddress(array(
-			'shippingAddress1' => $customerData['shippingAddress1'],
-			'shippingAddress2' => $customerData['shippingAddress2'],
-			'country'          => $customerData['country'],
-			'city'             => $customerData['city'],
-			'state'            => $customerData['state'],
-			'zipCode'          => $customerData['zipCode']
-		));
-		$cutomer->setBillingAddress(array());
-		$cutomer->setCompany($customerData['company']);
-		$cutomer->setMobile($customerData['mobile']);
+		$cutomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($customerData['email']);
+		if(!$cutomer) {
+			$cutomer = new Models_Model_Customer();
+		}
+
+		$cutomer->setRoleId(Shopping::ROLE_CUSTOMER)
+			->setEmail($customerData['email'])
+			->setFullName($customerData['firstName'] . ' ' . $customerData['lastName'])
+			->setIpaddress($_SERVER['REMOTE_ADDR'])
+			->setPassword(md5(uniqid('customer_' . time())))
+			->setShippingAddress(array(
+				'shippingAddress1' => $customerData['shippingAddress1'],
+				'shippingAddress2' => $customerData['shippingAddress2'],
+				'country'          => $customerData['country'],
+				'city'             => $customerData['city'],
+				'state'            => $customerData['state'],
+				'zipCode'          => $customerData['zipCode']
+			))
+			->setBillingAddress(array())
+			->setCompany($customerData['company'])
+			->setMobile($customerData['mobile'])
+			->setPhone($customerData['phone']);
+
 		$customerId = Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
 		$cutomer->setId($customerId);
 		return $cutomer;
