@@ -22,8 +22,9 @@ class Tools_Shipping_Shipping {
 	public function calculateShipping($shippingData) {
 		$this->_shippingData = $shippingData;
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
-		if($this->_customer === null) {
+		if($this->_customer->getRoleId() == Tools_Security_Acl::ROLE_GUEST) {
 			$this->_customer = $this->_saveNewCustomer($shippingData);
+			$this->_sessionHelper->setCurrentUser($this->_customer);
 		}
 		$shippingCalculator = '_calculate' . ucfirst((($this->_shoppingConfig['shippingType'] != 'external') ? 'internal' : $this->_shoppingConfig['shippingType']));
 
@@ -53,7 +54,7 @@ class Tools_Shipping_Shipping {
 			$shippingServicePlugin->setOrigination($this->_getOrigination());
 			$shippingServicePlugin->setDestination($this->_getCustomerShippingAddress());
 			$shippingServicePlugin->setWeight(Tools_ShoppingCart::getInstance()->calculateCartWeight(), $this->_shoppingConfig['weightUnit']);
-			$shippingServicePlugin->run();
+			return $shippingServicePlugin->run();
 		}
 	}
 
@@ -113,7 +114,8 @@ class Tools_Shipping_Shipping {
 		$cutomer->setCompany($customerData['company']);
 		$cutomer->setMobile($customerData['mobile']);
 		$customerId = Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
-		return $cutomer->setId($customerId);
+		$cutomer->setId($customerId);
+		return $cutomer;
 	}
 
 }
