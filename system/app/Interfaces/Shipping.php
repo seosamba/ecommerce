@@ -6,6 +6,8 @@
  */
 interface Interfaces_Shipping {
 
+	public function setConfig($config);
+
 	/**
 	 * Setting origination address from array
 	 */

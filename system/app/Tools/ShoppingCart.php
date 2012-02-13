@@ -291,12 +291,12 @@ class Tools_ShoppingCart {
 	}
 
 	private function _calculateShipping() {
-		$shippingPrice   = 0;
-		$orderPrice      = $this->calculateCartPrice();
-		$shippingType    = $this->_shoppingConfig['shippingType'];
-		$shippingGeneral = $this->_shoppingConfig['shippingGeneral'];
-		$userShippingInfo = '';
-		if($shippingType == 'pickup') {
+		$shippingPrice    = 0;
+		$orderPrice       = $this->calculateCartPrice();
+		$shippingType     = $this->_shoppingConfig['shippingType'];
+		$shippingGeneral  = $this->_shoppingConfig['shippingGeneral'];
+		$userShippingInfo = $this->getCustomerInfo();
+		if($shippingType == 'pickup' || !$userShippingInfo || empty($userShippingInfo)) {
 			return $shippingPrice;
 		}
 		$shippingSettings = unserialize($this->_shoppingConfig['shipping' . ucfirst($shippingType)]);
@@ -306,10 +306,10 @@ class Tools_ShoppingCart {
 					if($ruleNumber < 3) {
 						continue;
 					}
-					$shippingPrice = $settingsData['national'];
+					$shippingPrice = ($this->_shoppingConfig['country'] == $userShippingInfo['country']) ? $settingsData['national'] : $settingsData['international'];
 					break;
 				}
-				$shippingPrice = $settingsData['national'];
+				$shippingPrice = ($this->_shoppingConfig['country'] == $userShippingInfo['country']) ? $settingsData['national'] : $settingsData['international'];
 				break;
 			}
 		}

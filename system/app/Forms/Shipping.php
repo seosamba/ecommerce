@@ -10,8 +10,12 @@ class Forms_Shipping extends Zend_Form {
 	public function init() {
 
 		$this->setLegend('Shipping address')
-			//->setDecorators(array('Form', 'FormElements'))
-			->setAttribs(array('id' => 'shipping-user-address'));
+			->setAttribs(array(
+				'id'     => 'shipping-user-address',
+				'action' => '/plugin/shopping/run/calculateandcheckout/',
+				'method' => Zend_Form::METHOD_POST
+			)
+		);
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'firstName',
@@ -56,7 +60,7 @@ class Forms_Shipping extends Zend_Form {
 			'name'         => 'country',
 			'id'           => 'country',
 			'label'        => 'Country *',
-			'multiOptions' =>  Tools_Geo::getCountries(),
+			'multiOptions' =>  Tools_Geo::getCountries(true),
 			'required'     => true
 		)));
 
@@ -148,6 +152,14 @@ class Forms_Shipping extends Zend_Form {
 			    'Fieldset',
 			    array('HtmlTag',array('tag'=>'div'))
 		));
+
+		$this->addElement(new Zend_Form_Element_Submit(array(
+					'name'   => 'calculateAndCheckout',
+					'ignore' => true,
+					'label'  => 'Calculate shipping and checkout'
+		)));
+		$this->getElement('calculateAndCheckout')->removeDecorator('DtDdWrapper')
+			->addDecorator('HtmlTag', array('tag' => 'div', 'class' => 'cart-form-submit'));
 	}
 
 

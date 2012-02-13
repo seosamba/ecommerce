@@ -57,4 +57,18 @@ class Models_Model_Customer extends Application_Model_Models_User {
 	public function getShippingAddress($unserialize = true) {
 		return ($unserialize) ? unserialize($this->_shippingAddress) : $this->_shippingAddress;
 	}
+
+	public function toArray() {
+		$explodedName = explode(' ', $this->_fullName);
+		$data = array(
+			'firstName' => $explodedName[0],
+			'lastName'  => $explodedName[1],
+			'copany'    => $this->_company,
+			'email'     => $this->_email,
+			'mobile'    => $this->_mobile,
+			'phone'     => $this->_phone
+		);
+		$data = array_merge($data, $this->getShippingAddress(), $this->getBillingAddress());
+		return $data;
+	}
 }

@@ -32,6 +32,12 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		} else {
 			return $this->getDbTable()->update($data, array('user_id = ?' => $id));
 		}
+	}
 
+	public function find($id) {
+		$userDbTable = new Application_Model_DbTable_User();
+		$user     = $userDbTable->find($id)->current();
+		$userInfo = $this->getDbTable()->fetchAll(array('user_id' => $id))->current();
+		return new $this->_model(array_merge($user->toArray(), $userInfo->toArray()));
 	}
 }

@@ -21,6 +21,36 @@
                     $('.fieldset-content').hide();
                     $(this).parent().next().slideDown();
                 });
+
+	            //init shipping plugin fields
+	            var pluginConfig = <?php echo isset($this->shippingExternal) ? $this->shippingExternal : null ?>;
+	            for (var value in pluginConfig) {
+		            if(pluginConfig[value] instanceof Array) {
+			            var element = $('[name="shippingExternal[' + value + '][]"]');
+			            if(element.size() == 1) {
+				            if(element.attr('type') == 'checkbox') {
+					            element.attr('checked', true);
+				            } else {
+					            element.val(pluginConfig[value]);
+				            }
+			            }
+		            } else {
+			            var element = $('[name="shippingExternal[' + value + ']"]');
+                        if (element.size() == '1') {
+                            element.val(pluginConfig[value]);
+                        }
+                        else if(element.size() != 0){
+                            if(element.attr('type')=='radio') {
+                                $.each(element, function(i, v){
+                                    if($(v).val() == pluginConfig[value]) {
+                                        $('[name="shippingExternal['+value+']"][value='+pluginConfig[value]+']').attr("checked", true);
+                                    }
+                                });
+                            }
+                        }
+		            }
+	            }
+
             });
         </script>
     </head>
@@ -70,13 +100,13 @@
 				                </div>
 				                <div style="grid_12">
 									<label class="grid_12">Free shipping for order over:</label>
-									<input class="grid_3" type="text" class="numonly" name="shippingGeneral[freeShippingOver]" id="sh-free-over"  value="<?php echo $this->shippingGeneral['free-shipping-over'];?>"/>
+									<input class="grid_3" type="text" class="numonly" name="shippingGeneral[freeShippingOver]" id="sh-free-over"  value="<?php echo $this->shippingGeneral['freeShippingOver'];?>"/>
 									<label class="grid_2">&nbsp;<?php echo $this->currency;?>&nbsp;for&nbsp;</label>
 									<select class="grid_3" name="shippingGeneral[freeShippingOptions]" id="sh-free-over-options">
 										   <option value="">select</option>
-										   <option value="national" <?php echo ($this->shippingGeneral['free-shipping-options']=='national'?' selected="selected"':''); ?>>National</option>
-										   <option value="international" <?php echo ($this->shippingGeneral['free-shipping-options']=='international'?' selected="selected"':''); ?>>International</option>
-										   <option value="both" <?php echo ($this->shippingGeneral['free-shipping-options']=='both'?' selected="selected"':''); ?>>Both</option>
+										   <option value="national" <?php echo ($this->shippingGeneral['freeShippingOptions']=='national'?' selected="selected"':''); ?>>National</option>
+										   <option value="international" <?php echo ($this->shippingGeneral['freeShippingOptions']=='international'?' selected="selected"':''); ?>>International</option>
+										   <option value="both" <?php echo ($this->shippingGeneral['freeShippingOptions']=='both'?' selected="selected"':''); ?>>Both</option>
 									</select>
 									<label class="grid_3">delivery</label>
 				                </div>
@@ -123,8 +153,9 @@
 			                    </select>
 			                </p>
 			                <div id="shipper-config">
-			                    <?php //decho ($this->extShipperScreen ? $this->extShipperScreen : '') ; ?>
-				                <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
+			                    <?php if(strtolower($this->config['shippingPlugin']) != 'select'): ?>
+				                    <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
+								<?php endif; ?>
 			                </div>
 			            </div>
 			        </fieldset>
