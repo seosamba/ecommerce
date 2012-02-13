@@ -167,7 +167,7 @@ class Tools_Geo {
 	            array_push($data, $country);
             }
         }
-
+        asort($data);
 		return $data;
 	}
 	
