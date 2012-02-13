@@ -224,6 +224,15 @@ CREATE TABLE IF NOT EXISTS `shopping_zone_zip` (
   PRIMARY KEY (`zone_id`,`zip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
+  `user_id` int(10) unsigned NOT NULL,
+  `shipping_address` text COLLATE utf8_unicode_ci NOT NULL,
+  `billing_address` text COLLATE utf8_unicode_ci NOT NULL,
+  `company` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mobile` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `shopping_product`
   ADD CONSTRAINT `shopping_product_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `page` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
@@ -240,3 +249,6 @@ ALTER TABLE `shopping_product_has_related`
 
 ALTER TABLE `shopping_product_option_selection`
   ADD CONSTRAINT `fk_shopping_product_option_selection_shopping_product_option1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_customer_info`
+  ADD CONSTRAINT `shopping_customer_info_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
