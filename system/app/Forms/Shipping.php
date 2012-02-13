@@ -20,14 +20,14 @@ class Forms_Shipping extends Zend_Form {
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'firstName',
 			'id'       => 'first-name',
-			'label'    => 'First Name *',
-			'required' => true
+			'label'    => 'First Name'
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
-			'name'  => 'lastName',
-			'id'    => 'last-name',
-			'label' => 'Last Name'
+			'name'     => 'lastName',
+			'id'       => 'last-name',
+			'label'    => 'Last Name *',
+			'required' => true
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(

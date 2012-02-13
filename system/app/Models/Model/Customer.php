@@ -63,7 +63,7 @@ class Models_Model_Customer extends Application_Model_Models_User {
 		$data = array(
 			'firstName' => $explodedName[0],
 			'lastName'  => $explodedName[1],
-			'copany'    => $this->_company,
+			'company'    => $this->_company,
 			'email'     => $this->_email,
 			'mobile'    => $this->_mobile,
 			'phone'     => $this->_phone

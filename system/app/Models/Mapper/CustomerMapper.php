@@ -36,8 +36,18 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
 	public function find($id) {
 		$userDbTable = new Application_Model_DbTable_User();
-		$user     = $userDbTable->find($id)->current();
-		$userInfo = $this->getDbTable()->fetchAll(array('user_id' => $id))->current();
+		$user        = $userDbTable->find($id)->current();
+		$userInfo    = $this->getDbTable()->fetchAll(array('user_id' => $id))->current();
+		return new $this->_model(array_merge($user->toArray(), $userInfo->toArray()));
+	}
+
+	public function findByEmail($email) {
+		$userDbTable = new Application_Model_DbTable_User();
+		$user        = $userDbTable->fetchAll($userDbTable->getAdapter()->quoteInto("email=?", $email))->current();
+		if($user === null) {
+			return null;
+		}
+		$userInfo = $this->getDbTable()->fetchAll(array('user_id' => $user->id))->current();
 		return new $this->_model(array_merge($user->toArray(), $userInfo->toArray()));
 	}
 }
