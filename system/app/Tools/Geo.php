@@ -151,7 +151,7 @@ class Tools_Geo {
 	 * @return array list of world countries
 	 * @todo redo for db 
 	 */
-	public static function getCountries() {
+	public static function getCountries($pairs = false) {
         $data = array();
         $countriesNames = Zend_Locale::getTranslationList('territory', null, 2);
 
@@ -162,8 +162,11 @@ class Tools_Geo {
 		        continue;
 	        }
 	        $country['name'] = $countriesNames[$country['country']];
-            //array_push($data, array($country['country'] => $country['name']));
-	        $data[$country['country']] = $country['name'];
+            if($pairs) {
+	        	$data[$country['country']] = $country['name'];
+            } else {
+	            array_push($data, $country);
+            }
         }
 
 		return $data;
