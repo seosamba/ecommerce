@@ -241,6 +241,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `user_id` int(10) unsigned DEFAULT NULL,
+  `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

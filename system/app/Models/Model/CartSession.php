@@ -1,6 +1,16 @@
 <?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
+	const CART_STATUS_NEW       = 'new';
+
+	const CART_STATUS_PENDING   = 'pending';
+
+	const CART_STATUS_COMPLETED = 'completed';
+
+	const CART_STATUS_CANCELED  = 'canceled';
+
+	const CART_STATUS_ERROR     = 'error';
+
 	protected $_cartContent = '';
 
 	protected $_ipAddress   = '';
@@ -8,6 +18,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	protected $_id          = '';
 
 	protected $_userId      = null;
+
+	protected $_status      = null;
+
+	protected $_gateway     = null;
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -43,6 +57,22 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getUserId()	{
 		return $this->_userId;
+	}
+
+	public function setStatus($status) {
+		$this->_status = $status;
+	}
+
+	public function getStatus() {
+		return $this->_status;
+	}
+
+	public function setGateway($gateway) {
+		$this->_gateway = $gateway;
+	}
+
+	public function getGateway() {
+		return $this->_gateway;
 	}
 
 

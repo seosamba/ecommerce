@@ -5,6 +5,12 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 	protected $_model	= 'Models_Model_CartSession';
 
+	/**
+	 * Save cart to database
+	 * @param $model Models_Model_CartSession
+	 * @return mixed
+	 * @throws Exceptions_SeotoasterPluginException
+	 */
 	public function save($model) {
 		if(!$model instanceof Models_Model_CartSession) {
 			throw new Exceptions_SeotoasterPluginException('Wrong model type given.');
@@ -13,7 +19,9 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'id'           => $model->getId(),
 			'cart_content' => $model->getCartContent(),
 			'ip_address'   => $model->getIpAddress(),
-			'user_id'      => $model->getUserId()
+			'user_id'      => $model->getUserId(),
+			'status'       => $model->getStatus(),
+			'gateway'      => $model->getGateway()
 		);
 
 		;
