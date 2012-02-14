@@ -264,5 +264,5 @@ ALTER TABLE `shopping_product_option_selection`
 ALTER TABLE `shopping_customer_info`
   ADD CONSTRAINT `shopping_customer_info_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `plugin_cart_session`
-  ADD CONSTRAINT `plugin_cart_session_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+ALTER TABLE `shopping_cart_session`
+  ADD CONSTRAINT `shopping_cart_session` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
