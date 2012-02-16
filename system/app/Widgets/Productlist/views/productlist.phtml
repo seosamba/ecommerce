@@ -1,0 +1,37 @@
+<div class="product-list">
+	<?php echo $this->plContent; ?>
+</div>
+<?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js'); ?>
+<script type="text/javascript">
+	var offset = <?php echo $this->offset; ?>;
+	$(function() {
+		wpcallback();
+	});
+
+	function loadList(callback) {
+		var productTemplate = '<?php echo $this->productTemplate; ?>';
+		console.log(offset);
+		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product/', {
+			offset : offset,
+			limit  : <?php echo $this->limit; ?>
+		}, function(response) {
+			$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', {
+				products  : response,
+				template  : productTemplate,
+				offset    : offset
+			},
+			function(response) {
+				$('.product-list').append(response.responseText.content);
+				offset += <?php echo $this->limit; ?>;
+				wpcallback();
+			}, 'json');
+		});
+	}
+
+	function wpcallback() {
+		$('.product-thumb:last').waypoint(function() {
+			$(this).waypoint('remove');
+	   	    loadList(wpcallback);
+		});
+	}
+</script>
