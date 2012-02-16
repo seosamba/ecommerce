@@ -52,11 +52,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		//'$product:price'             => $this->_renderProductWidgetOption(array($product->getId(), 'price'), $product->getPage()->toArray()),
 		//'$product:options'           => $productList->_renderProductWidgetOption(array($product->getId(), 'options'), $product->getPage()->toArray()),
 		//'$product:editproduct'       => $productList->_renderProductWidgetOption(array($product->getId(), 'editproduct'), $product->getPage()->toArray())
-		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
-		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
+		$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
+		if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
 			$content = $this->_processList();
-		//	$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
-		//}
+			$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
+		}
 		$this->_view->plContent       = $content;
 		$this->_view->offset          = (!isset($this->_options[0])) ? self::DEFAULT_OFFSET : $this->_options[0];
 		$this->_view->limit           = self::DEFAULT_OFFSET;
