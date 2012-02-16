@@ -32,7 +32,7 @@ class Forms_GeneralSettings extends Zend_Form {
 		
 		$this->addElement('select', 'country', array(
 			'label' => 'Country',
-			'multiOptions' => $coutryList
+			'multiOptions' => Tools_Geo::getCountries(true)
 		));
 		
 		$this->addElement('text', 'city', array(

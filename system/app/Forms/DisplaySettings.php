@@ -10,10 +10,10 @@ class Forms_DisplaySettings extends Zend_Form {
 	public function init() {
 		$this->setLegend('Units')
 			 ->setDecorators(array('Form', 'FormElements'));
-		
+
 		$this->addElement('select', 'currency', array(
 			'label' => 'Currency',
-			'multiOptions' => Tools_Misc::$_currencies
+			'multiOptions' => Tools_Misc::getCurrencyList()
 		));
 		
 		$this->addElement('select', 'weightUnit', array(
