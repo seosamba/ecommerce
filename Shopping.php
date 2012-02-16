@@ -755,6 +755,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$products = $this->_request->getParam('products');
 		$offset   = $this->_request->getParam('offset');
+		if(empty($products)) {
+			$this->_responseHelper->success(array('content' => ''));
+		}
 		$products = array_map(function($item) {
 			$product = new Models_Model_Product($item);
 			$product->setPage(new Application_Model_Models_Page($item['page']));
