@@ -137,6 +137,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description:full'  => $product->getFullDescription(),
 				'$store:addtocart'           => $storeWidget->render() //'{$store:addtocart:' . $product->getId() . '}'
 			))->parse($data['templateContent']);
+
+			unset($storeWidget);
 		});
 		return $renderedContent;
 	}
