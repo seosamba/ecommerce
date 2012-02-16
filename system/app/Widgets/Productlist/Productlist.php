@@ -97,8 +97,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'domain'              => str_replace('www.', '', $wesiteData['url']),
 			'mediaServersAllowed' => $confiHelper->getConfig('mediaServers')
 		);
+
 		// here we go - proccessing the list
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data) {
+
+			$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
+
 			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
 			if($data['mediaServersAllowed']) {
 				$mediaServer = Tools_Content_Tools::getMediaServer();
@@ -131,7 +135,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description:short' => $shortDesc,
                 '$product:description'       => $shortDesc,
                 '$product:description:full'  => $product->getFullDescription(),
-				'$store:addtocart'           => '{$store:addtocart:' . $product->getId() . '}'
+				'$store:addtocart'           => $storeWidget->render() //'{$store:addtocart:' . $product->getId() . '}'
 			))->parse($data['templateContent']);
 		});
 		return $renderedContent;
