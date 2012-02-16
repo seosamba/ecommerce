@@ -10,7 +10,7 @@
 
 	function loadList(callback) {
 		var productTemplate = '<?php echo $this->productTemplate; ?>';
-		console.log(offset);
+		showSpinner();
 		$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product/', {
 			offset : offset,
 			limit  : <?php echo $this->limit; ?>
@@ -23,6 +23,7 @@
 			function(response) {
 				$('.product-list').append(response.responseText.content);
 				offset += <?php echo $this->limit; ?>;
+				hideSpinner();
 				wpcallback();
 			}, 'json');
 		});
@@ -32,6 +33,6 @@
 		$('.product-thumb:last').waypoint(function() {
 			$(this).waypoint('remove');
 	   	    loadList(wpcallback);
-		});
+		}, {'offset' : '130%'});
 	}
 </script>
