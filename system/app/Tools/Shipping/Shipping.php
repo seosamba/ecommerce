@@ -28,14 +28,16 @@ class Tools_Shipping_Shipping {
 	public function calculateShipping($shippingData) {
 		$this->_shippingData = $shippingData;
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
-		if($this->_customer->getRoleId() == Tools_Security_Acl::ROLE_GUEST) {
-			$this->_customer = $this->_saveNewCustomer($shippingData);
-			$this->_sessionHelper->setCurrentUser($this->_customer);
-		} else {
-			if(!$this->_mailValidator->isValid($shippingData['email'])) {
-				throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
-			}
-		}
+//		if($this->_customer->getRoleId() == Tools_Security_Acl::ROLE_GUEST) {
+//
+//		}
+		$this->_customer = $this->_saveNewCustomer($shippingData);
+		$this->_sessionHelper->setCurrentUser($this->_customer);
+		//} else {
+		//	if(!$this->_mailValidator->isValid($shippingData['email'])) {
+		//		throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
+		//	}
+		//}
 		$shippingCalculator = '_calculate' . ucfirst((($this->_shoppingConfig['shippingType'] != 'external') ? 'internal' : $this->_shoppingConfig['shippingType']));
 
 		if(!method_exists($this, $shippingCalculator)) {
@@ -106,6 +108,11 @@ class Tools_Shipping_Shipping {
 	 * @return Models_Model_Customer
 	 */
 	protected function _saveNewCustomer($customerData) {
+		if($this->_customer->getEmail() != $customerData['email']) {
+			if(!$this->_mailValidator->isValid($customerData['email'])) {
+				throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
+			}
+		}
 		$cutomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($customerData['email']);
 		if(!$cutomer) {
 			$cutomer = new Models_Model_Customer();
