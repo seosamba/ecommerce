@@ -742,4 +742,31 @@ class Shopping extends Tools_Plugins_Abstract {
 			return ($unserialized === 'b:0' || $unserialized !== false) ? $unserialized : $param;
 		}, $this->_configMapper->getConfigParams());
 	}
+
+
+	/**
+	 * This action is used to help product list gets an portional content
+	 *
+	 * @throws Exceptions_SeotoasterPluginException
+	 */
+	public function renderproductsAction() {
+		if(!$this->_request->isPost()) {
+			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+		}
+		$products = $this->_request->getParam('products');
+		$offset   = $this->_request->getParam('offset');
+		if(empty($products)) {
+			$this->_responseHelper->success(array('content' => ''));
+		}
+		$products = array_map(function($item) {
+			$product = new Models_Model_Product($item);
+			$product->setPage(new Application_Model_Models_Page($item['page']));
+			return $product;
+		}, $products);
+		$template = $this->_request->getParam('template');
+		$widget   = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + Widgets_Productlist_Productlist::DEFAULT_OFFSET));
+		$content  = $widget->setProducts($products)->setCleanListOnly(true)->render();
+		$widget->setProducts(array());
+		$this->_responseHelper->success(array('content' => $content));
+	}
 }

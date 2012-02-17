@@ -134,7 +134,7 @@ class Tools_ShoppingCart {
 			    'sid'         => $itemKey,
 			    'options'     => $options,
 			    'id'          => $item->getId(),
-			    'item'        => $item,
+			    //'item'        => $item,
 			    'price'       => $itemPrice,
 			    'weight'      => $this->_calculateItemWeight($item, $options),
 			    'tax'         => $itemTax,

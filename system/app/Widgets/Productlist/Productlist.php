@@ -17,18 +17,36 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	const OPTTYPE_ORDER         = 'order';
 
+	const DEFAULT_OFFSET        = 100;
+
 	protected $_websiteHelper   = null;
 
 	protected $_productMapper   = null;
 
+	protected $_productTemplate = null;
+
+	protected $_cleanListOnly   = false;
+
+	private $_products = array();
+
 	public function _init() {
 		parent::_init();
+		$this->_view = new Zend_View(array(
+			'scriptPath' => __DIR__ . '/views/'
+		));
+		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
 		if (empty($this->_options)){
 			throw new Exceptions_SeotoasterWidgetException('No options provided');
 		}
         $this->_websiteHelper    = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 	    $this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
+		$this->_productTemplate  = Application_Model_Mappers_TemplateMapper::getInstance()->findByName(array_shift($this->_options));
+		if($this->_productTemplate === null) {
+			throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
+		}
 	}
+
+
 
 	public function _load() {
 		//'$product:price'             => $this->_renderProductWidgetOption(array($product->getId(), 'price'), $product->getPage()->toArray()),
@@ -39,7 +57,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$content = $this->_processList();
 			$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
 		}
-		return $content;
+		$this->_view->plContent       = $content;
+		$this->_view->offset          = (!isset($this->_options[0])) ? self::DEFAULT_OFFSET : $this->_options[0];
+		$this->_view->limit           = self::DEFAULT_OFFSET;
+		$this->_view->productTemplate = $this->_productTemplate->getName();
+		if($this->_cleanListOnly) {
+			return $content;
+		}
+		return $this->_view->render('productlist.phtml');
 	}
 
 	/**
@@ -50,15 +75,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	protected function _processList() {
 		// loading product listing template
-		$template = Application_Model_Mappers_TemplateMapper::getInstance()->findByName(array_shift($this->_options));
-		if($template === null) {
-			throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
-		}
-
-		$products = $this->_loadProducts();
+		$template = $this->_productTemplate;
+		$products = $this->_products;
 		if(empty($products)) {
-			return '<!-- Products list is empty -->';
+			$products = $this->_loadProducts();
 		}
+//		if(empty($products)) {
+//			return '<!-- Products list is empty -->';
+//		}
 
 		$wesiteData  = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
@@ -73,8 +97,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'domain'              => str_replace('www.', '', $wesiteData['url']),
 			'mediaServersAllowed' => $confiHelper->getConfig('mediaServers')
 		);
+
 		// here we go - proccessing the list
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data) {
+
+			$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
+
 			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
 			if($data['mediaServersAllowed']) {
 				$mediaServer = Tools_Content_Tools::getMediaServer();
@@ -107,8 +135,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description:short' => $shortDesc,
                 '$product:description'       => $shortDesc,
                 '$product:description:full'  => $product->getFullDescription(),
-				'$store:addtocart'           => '{$store:addtocart:' . $product->getId() . '}'
+				'$store:addtocart'           => $storeWidget->render() //'{$store:addtocart:' . $product->getId() . '}'
 			))->parse($data['templateContent']);
+
+			unset($storeWidget);
 		});
 		return $renderedContent;
 	}
@@ -131,7 +161,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	private function _loadProducts() {
 		$products = array();
 		if(empty($this->_options)) {
-			return $this->_productMapper->fetchAll(null, array(), 0, 100);
+			return $this->_productMapper->fetchAll(null, array(), 0, self::DEFAULT_OFFSET);
 		}
 		foreach($this->_options as $option) {
 			if(false === ($optData = $this->_processOption($option))) {
@@ -216,4 +246,16 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		});
 		return $products;
 	}
+
+	public function setProducts($products) {
+		$this->_products = $products;
+		return $this;
+	}
+
+	public function setCleanListOnly($cleanListOnly) {
+		$this->_cleanListOnly = $cleanListOnly;
+		return $this;
+	}
+
+
 }
