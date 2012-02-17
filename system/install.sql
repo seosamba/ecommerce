@@ -226,13 +226,31 @@ CREATE TABLE IF NOT EXISTS `shopping_zone_zip` (
 
 CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
   `user_id` int(10) unsigned NOT NULL,
-  `shipping_address` text COLLATE utf8_unicode_ci NOT NULL,
-  `billing_address` text COLLATE utf8_unicode_ci NOT NULL,
-  `company` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `phone` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `mobile` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `shipping_address_id` int(10) unsigned DEFAULT NULL,
+  `billing_address_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned DEFAULT NULL,
+  `address_type` varchar(255) DEFAULT NULL,
+  `firstname` varchar(255) DEFAULT NULL,
+  `lastname` varchar(255) DEFAULT NULL,
+  `company` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address1` varchar(255) DEFAULT NULL,
+  `address2` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
+  `zip` varchar(255) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `mobile` varchar(255) DEFAULT NULL,
+  `fax` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -265,6 +283,9 @@ ALTER TABLE `shopping_product_option_selection`
 
 ALTER TABLE `shopping_customer_info`
   ADD CONSTRAINT `shopping_customer_info_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `shopping_customer_address`
+  ADD CONSTRAINT `shopping_customer_address_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 ALTER TABLE `shopping_cart_session`
   ADD CONSTRAINT `shopping_cart_session` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;

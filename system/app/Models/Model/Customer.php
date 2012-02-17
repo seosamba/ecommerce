@@ -1,74 +1,71 @@
 <?php
-
+/**
+ * Customer Model
+ * @todo add address validator
+ */
 class Models_Model_Customer extends Application_Model_Models_User {
 
-	protected $_company         = '';
+	protected $_addresses;
 
-	protected $_shippingAddress = '';
+	protected $_billing_address_id;
 
-	protected $_billingAddress  = '';
+	protected $_shipping_address_id;
 
-	protected $_phone           = '';
+	public function getBillingAddress() {
+		if ($this->_billing_address_id){
+			return $this->getAddressById($this->_billing_address_id);
+		}
+		return reset($this->_filterAddress('address_type', 'billing'));
+	}
 
-	protected $_mobile          = '';
+	public function getShippingAddress() {
+		if ($this->_shipping_address_id){
+			return $this->getAddressById($this->_shipping_address_id);
+		}
+		return reset($this->_filterAddress('address_type', 'shipping'));
+	}
 
-
-	public function setBillingAddress($billingAddress) {
-		$this->_billingAddress = is_array($billingAddress) ? serialize($billingAddress) : $billingAddress;
+	public function setAddresses($addresses) {
+		$this->_addresses = $addresses;
 		return $this;
 	}
 
-	public function getBillingAddress($unserialize = true) {
-		return ($unserialize) ? unserialize($this->_billingAddress) : $this->_billingAddress;
+	public function getAddresses() {
+		return $this->_addresses;
 	}
 
-	public function setCompany($company) {
-		$this->_company = $company;
+	public function addAddress($address, $type) {
+		if ($this->_addresses === null) {
+			$this->_addresses = array();
+		}
+		$address = array_merge($address, array('address_type' => $type));
+		array_push($this->_addresses, $address);
+
 		return $this;
 	}
 
-	public function getCompany() {
-		return $this->_company;
+	public function setBillingAddressId($billing_address_id) {
+		$this->_billing_address_id = $billing_address_id;
 	}
 
-	public function setMobile($mobile) {
-		$this->_mobile = $mobile;
-		return $this;
+	public function getBillingAddressId() {
+		return $this->_billing_address_id;
 	}
 
-	public function getMobile() {
-		return $this->_mobile;
+	public function setShippingAddressId($shipping_address_id) {
+		$this->_shipping_address_id = $shipping_address_id;
 	}
 
-	public function setPhone($phone) {
-		$this->_phone = $phone;
-		return $this;
+	public function getShippingAddressId() {
+		return $this->_shipping_address_id;
 	}
 
-	public function getPhone() {
-		return $this->_phone;
+	public function getAddressById($id) {
+		return $this->_filterAddress('id', $id);
 	}
 
-	public function setShippingAddress($shippingAddress) {
-		$this->_shippingAddress = is_array($shippingAddress) ? serialize($shippingAddress) : $shippingAddress;
-		return $this;
+	private function _filterAddress($param, $value){
+		return array_filter($this->_addresses, function($address) use ($param, $value) { return $address[$param] === $value; });
 	}
 
-	public function getShippingAddress($unserialize = true) {
-		return ($unserialize) ? unserialize($this->_shippingAddress) : $this->_shippingAddress;
-	}
-
-	public function toArray() {
-		$explodedName = explode(' ', $this->_fullName);
-		$data = array(
-			'firstName' => $explodedName[0],
-			'lastName'  => $explodedName[1],
-			'company'    => $this->_company,
-			'email'     => $this->_email,
-			'mobile'    => $this->_mobile,
-			'phone'     => $this->_phone
-		);
-		$data = array_merge($data, $this->getShippingAddress(), $this->getBillingAddress());
-		return $data;
-	}
 }

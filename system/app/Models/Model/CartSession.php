@@ -1,15 +1,19 @@
 <?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
-	const CART_STATUS_NEW       = 'new';
+	const CART_STATUS_NEW           = 'new';
 
-	const CART_STATUS_PENDING   = 'pending';
+	const CART_STATUS_PENDING       = 'pending';
 
-	const CART_STATUS_COMPLETED = 'completed';
+	const CART_STATUS_PROCESSING    = 'processing';
 
-	const CART_STATUS_CANCELED  = 'canceled';
+	const CART_STATUS_COMPLETED     = 'completed';
 
-	const CART_STATUS_ERROR     = 'error';
+	const CART_STATUS_UNPROCESSED   = 'unprocessed';
+
+	const CART_STATUS_CANCELED      = 'canceled';
+
+	const CART_STATUS_ERROR         = 'error';
 
 	protected $_cartContent = '';
 
@@ -61,14 +65,16 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function setStatus($status) {
 		$this->_status = $status;
+		return $this;
 	}
 
 	public function getStatus() {
-		return $this->_status;
+		return $this->_status !== null ? $this->_status : self::CART_STATUS_NEW;
 	}
 
 	public function setGateway($gateway) {
 		$this->_gateway = $gateway;
+		return $this;
 	}
 
 	public function getGateway() {

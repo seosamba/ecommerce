@@ -24,10 +24,13 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'gateway'      => $model->getGateway()
 		);
 
-		;
 		if(null === ($exists = $this->find($data['id']))) {
 			$data['created_at'] = date(DATE_ATOM);
-			return $this->getDbTable()->insert($data);
+			$newId = $this->getDbTable()->insert($data);
+			if ($newId){
+				$model->setId($newId);
+			}
+			return $newId;
 		}
 		else {
 			$data['updated_at'] = date(DATE_ATOM);

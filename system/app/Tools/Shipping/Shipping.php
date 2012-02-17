@@ -6,6 +6,10 @@
 
 class Tools_Shipping_Shipping {
 
+	const ADDRESS_TYPE_BILLING = 'billing';
+
+	const ADDRESS_TYPE_SHIPPING = 'shipping';
+
 	protected $_shoppingConfig = array();
 
 	protected $_sessionHelper  = null;
@@ -116,18 +120,14 @@ class Tools_Shipping_Shipping {
 			->setFullName($customerData['firstName'] . ' ' . $customerData['lastName'])
 			->setIpaddress($_SERVER['REMOTE_ADDR'])
 			->setPassword(md5(uniqid('customer_' . time())))
-			->setShippingAddress(array(
+			->addAddress(array(
 				'shippingAddress1' => $customerData['shippingAddress1'],
 				'shippingAddress2' => $customerData['shippingAddress2'],
 				'country'          => $customerData['country'],
 				'city'             => $customerData['city'],
 				'state'            => $customerData['state'],
 				'zipCode'          => $customerData['zipCode']
-			))
-			->setBillingAddress(array())
-			->setCompany($customerData['company'])
-			->setMobile($customerData['mobile'])
-			->setPhone($customerData['phone']);
+			), self::ADDRESS_TYPE_SHIPPING);
 
 		$customerId = Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
 		$cutomer->setId($customerId);

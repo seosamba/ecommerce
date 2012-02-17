@@ -22,6 +22,8 @@ class Tools_ShoppingCart {
 
 	protected $_customerInfo    = array();
 
+	protected $_cartId          = null;
+
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
         $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -266,15 +268,61 @@ class Tools_ShoppingCart {
 	}
 
 	private function _load() {
-        if (isset($this->_session->cartContent)) {
-            $this->_content = unserialize($this->_session->cartContent);
-        }
-        return $this;
-    }
+		if (isset($this->_session->cartContent)) {
+			$this->setContent(unserialize($this->_session->cartContent));
+		}
+		if (isset($this->_session->cartId)) {
+			$this->setCartId($this->_session->cartId);
+		}
+		return $this;
+	}
 
     private function _save() {
-        $this->_session->cartContent = serialize($this->_content);
+        $this->_session->cartContent = serialize($this->getContent());
+	    $this->_session->cartId      = $this->getCartId();
     }
+
+	/**
+	 * Saves cuurent cart data to database
+	 * @return Tools_ShoppingCart
+	 */
+	public function saveCartSession() {
+		$cartSession = new Models_Model_CartSession();
+		$cartSession->setId($this->getCartId()?$this->getCartId():null)
+			->setCartContent(serialize($this->getContent()))
+			->setIpAddress($_SERVER['REMOTE_ADDR']);
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+		$currentUser   = $sessionHelper->getCurrentUser();
+
+		if ($currentUser->getId() !== null) {
+			$cartSession->setUserId($currentUser->getId());
+		}
+		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
+		if ($result && $this->getCartId() === null){
+			$this->setCartId($cartSession->getId())->save();
+		}
+
+        return $this;
+	}
+
+	public function restoreCartSession($cartId) {
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+		$currentUser   = $sessionHelper->getCurrentUser();
+
+		$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(intval($cartId));
+		if ($cartSession !== null ) {
+			//preventing user to restore foreign cart
+			//			if ( $cartSession->getUserId() === null ||
+			//              $currentUser->getRoleId() !== Shopping::ROLE_CUSTOMER ||
+			//				$currentUser->getId() !== $cartSession->getUserId()){
+			//				return false;
+			//			}
+
+			$this->setCartId($cartSession->getId())
+				->setContent(unserialize($cartSession->getCartContent()))
+				->save();
+		}
+	}
 
 	private function _calculateTax(Models_Model_Product $item) {
 		if(($taxClass = $item->getTaxClass()) != 0) {
@@ -408,5 +456,15 @@ class Tools_ShoppingCart {
 
 	private function _filterCallback($item) {
 		return (isset($item['id']) && $item['id'] == $this->_filterId);
+	}
+
+	public function setCartId($cartId) {
+		$this->_cartId = $cartId;
+
+		return $this;
+	}
+
+	public function getCartId() {
+		return $this->_cartId;
 	}
 }

@@ -198,7 +198,14 @@ class Tools_Geo {
 		}
 		return $data;
 	}
-	
+
+	/**
+	 * Get full state info by given id
+	 * @static
+	 * @param $stateId Id of state
+	 * @return array State info
+	 * @todo add check if stateId not found
+	 */
 	public static function getStateById($stateId) {
 		$stateTable = new Zend_Db_Table('shopping_list_state');
 		return $stateTable->find($stateId)->current()->toArray();
