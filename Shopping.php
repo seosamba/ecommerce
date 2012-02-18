@@ -166,7 +166,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/**
 	 * Calculates shipping. Sign up new user. Assign saved cart to the user
-	 *
+	 * @throws Exceptions_SeotoasterPluginException
 	 */
 	public function calculateandcheckoutAction() {
 		if(!$this->_request->isPost()) {
@@ -174,9 +174,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$form = new Forms_Shipping();
 		if($form->isValid($this->_request->getParams())) {
+			//@todo check if customer with given 'email' already exists
 			$shippingCalc = new Tools_Shipping_Shipping($this->_getConfig());
 			try {
 				$shippingCalc->calculateShipping($form->getValues());
+				Tools_ShoppingCart::getInstance()->saveCartSession();
 			} catch (Exceptions_SeotoasterPluginException $spe) {
 				$this->_responseHelper->fail($spe->getMessage());
 			}
@@ -194,7 +196,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		if(!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
-
 	}
 
 	protected function setConfigAction(){

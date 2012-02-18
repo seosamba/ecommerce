@@ -3,7 +3,6 @@
  * Eugene I. Nezhuta <eugene@seotoaster.com>
  *
  */
-
 class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_dbTable = 'Models_DbTable_CustomerInfo';
@@ -38,6 +37,10 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		}
 	}
 
+	/**
+	 * @param $customer Models_Model_Customer
+	 * @return Models_Model_Customer
+	 */
 	private function _processAddresses($customer) {
 		if (($addresses = $customer->getAddresses()) !== null) {
 			$addressTable = new Models_DbTable_CustomerAddress();
@@ -46,23 +49,32 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 				$address['user_id'] = $customer->getId();
 				if (isset($address['id'])){
 					$row = $addressTable->find($address['id']);
+					$row->setFromArray($address)->save();
 				} else {
 					$row = $addressTable->createRow($address);
+					$status = $row->save();
+					$address['id'] = $status;
 				}
-				$status = $row->save();
 			}
 			$addressTable->getAdapter()->commit();
+			$customer->setAddresses($addresses);
 		}
-		return null;
+		return $customer;
 	}
 
 	public function find($id) {
 		$userDbTable    = new Application_Model_DbTable_User();
 		$user           = $userDbTable->find($id)->current();
-		$userInfo       = $this->getDbTable()->fetchAll(array('user_id' => $id))->current();
-		$addresses      = $userInfo->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
-
-		return new $this->_model(array_merge($user->toArray(), $userInfo->toArray(), array('addresses' => $addresses)));
+		if (!$user){
+			return null;
+		}
+		$customerInfo       = $this->getDbTable()->find($id)->current();
+		if ($customerInfo) {
+			$customerAddresses = $customerInfo->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
+			$userData = array_merge($user->toArray(), $customerInfo->toArray(), array('addresses' => $customerAddresses));
+			return new $this->_model($userData);
+		}
+		return null;
 	}
 
 	public function findByEmail($email) {
@@ -71,7 +83,6 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		if($user === null) {
 			return null;
 		}
-		$userInfo = $this->getDbTable()->fetchAll(array('user_id' => $user->id))->current();
-		return new $this->_model(array_merge($user->toArray(), $userInfo->toArray()));
+		return $this->find($user->id);
 	}
 }

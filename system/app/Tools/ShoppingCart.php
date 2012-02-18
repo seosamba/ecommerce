@@ -20,9 +20,9 @@ class Tools_ShoppingCart {
 
 	protected $_filterId        = 0;
 
-	protected $_customerInfo    = array();
-
 	protected $_cartId          = null;
+
+	protected $_customer;
 
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
@@ -55,13 +55,13 @@ class Tools_ShoppingCart {
 	    return $this;
     }
 
-	public function setCustomerInfo($customerInfo) {
-		$this->_customerInfo = $customerInfo;
+	public function setCustomer($customer) {
+		$this->_customer = $customer;
 		return $this;
 	}
 
-	public function getCustomerInfo() {
-		return $this->_customerInfo;
+	public function getCustomer() {
+		return $this->_customer;
 	}
 
 	public function save() {
@@ -339,25 +339,38 @@ class Tools_ShoppingCart {
 	}
 
 	private function _calculateShipping() {
-		$shippingPrice    = 0;
-		$orderPrice       = $this->calculateCartPrice();
-		$shippingType     = $this->_shoppingConfig['shippingType'];
-		$shippingGeneral  = $this->_shoppingConfig['shippingGeneral'];
-		$userShippingInfo = $this->getCustomerInfo();
-		if($shippingType == 'pickup' || !$userShippingInfo || empty($userShippingInfo)) {
+		$shippingPrice       =  0;
+		$orderPrice          = floatval($this->calculateCartPrice());
+		$shippingType        = $this->_shoppingConfig['shippingType'];
+		$shippingGeneral     = $this->_shoppingConfig['shippingGeneral'];
+		$userShippingAddress = $this->getCustomer() !== null ? $this->getCustomer()->getShippingAddress() : null;
+		if($shippingType == 'shipping' || !$userShippingAddress || empty($userShippingAddress)) {
 			return $shippingPrice;
 		}
 		$shippingSettings = unserialize($this->_shoppingConfig['shipping' . ucfirst($shippingType)]);
-		if(is_array($shippingSettings) && !empty($shippingSettings)) {
+		$freeShippingSettings = unserialize($shippingGeneral);
+		$locationType = $this->_shoppingConfig['country'] == $userShippingAddress['country'] ? 'national' : 'international';
+		if (is_array($freeShippingSettings) && !empty($freeShippingSettings)){
+			$freeLimit = floatval($freeShippingSettings['freeShippingOver']);
+			if ($freeShippingSettings['freeShippingOptions'] === 'both'
+					&& $orderPrice > $freeLimit) {
+				return $shippingPrice;
+			} elseif ($locationType === $freeShippingSettings['freeShippingOptions']
+					&& $orderPrice > $freeLimit) {
+				return $shippingPrice;
+			}
+		}
+
+		if (is_array($shippingSettings) && !empty($shippingSettings)) {
 			foreach($shippingSettings as $ruleNumber => $settingsData) {
 				if($orderPrice > $settingsData['limit']) {
 					if($ruleNumber < 3) {
 						continue;
 					}
-					$shippingPrice = ($this->_shoppingConfig['country'] == $userShippingInfo['country']) ? $settingsData['national'] : $settingsData['international'];
+					$shippingPrice = $settingsData[$locationType] ;
 					break;
 				}
-				$shippingPrice = ($this->_shoppingConfig['country'] == $userShippingInfo['country']) ? $settingsData['national'] : $settingsData['international'];
+				$shippingPrice = $settingsData[$locationType] ;
 				break;
 			}
 		}

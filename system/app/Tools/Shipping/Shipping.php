@@ -6,14 +6,13 @@
 
 class Tools_Shipping_Shipping {
 
-	const ADDRESS_TYPE_BILLING = 'billing';
-
-	const ADDRESS_TYPE_SHIPPING = 'shipping';
-
 	protected $_shoppingConfig = array();
 
 	protected $_sessionHelper  = null;
 
+	/**
+	 * @var null|Models_Model_Customer
+	 */
 	protected $_customer       = null;
 
 	protected $_shippingData   = array();
@@ -32,16 +31,22 @@ class Tools_Shipping_Shipping {
 	public function calculateShipping($shippingData) {
 		$this->_shippingData = $shippingData;
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
-//		if($this->_customer->getRoleId() == Tools_Security_Acl::ROLE_GUEST) {
-//
-//		}
-		$this->_customer = $this->_saveNewCustomer($shippingData);
-		$this->_sessionHelper->setCurrentUser($this->_customer);
-		//} else {
-		//	if(!$this->_mailValidator->isValid($shippingData['email'])) {
-		//		throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
-		//	}
-		//}
+		if ($this->_customer->getRoleId() === Tools_Security_Acl::ROLE_GUEST) {
+			$this->_customer = $this->_saveNewCustomer($shippingData);
+			$this->_sessionHelper->setCurrentUser($this->_customer);
+		} else if ($this->_customer->getId() && $this->_customer->getRoleId() !== Shopping::ROLE_CUSTOMER) {
+			//user exists and logged in, trying to fetch customer data
+			$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_customer->getId());
+			if ($customer !== null) {
+				$customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING, true);
+			} else {
+				$customer = new Models_Model_Customer($this->_customer->toArray());
+				$customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
+				Models_Mapper_CustomerMapper::getInstance()->save($customer);
+			}
+			$this->_customer = $customer;
+			$this->_sessionHelper->setCurrentUser($customer);
+		}
 		$shippingCalculator = '_calculate' . ucfirst((($this->_shoppingConfig['shippingType'] != 'external') ? 'internal' : $this->_shoppingConfig['shippingType']));
 
 		if(!method_exists($this, $shippingCalculator)) {
@@ -56,7 +61,7 @@ class Tools_Shipping_Shipping {
 	 */
 	protected function _calculateInternal() {
 		$cartStorage = Tools_ShoppingCart::getInstance();
-		return $cartStorage->setCustomerInfo($this->_customer->toArray())->calculate();
+		return $cartStorage->setCustomer($this->_customer)->calculate();
 	}
 
 	/**
@@ -68,29 +73,10 @@ class Tools_Shipping_Shipping {
 			$shippingServicePlugin = Tools_Factory_PluginFactory::createPlugin($shippingServiceClass, array(), array());
 			$shippingServicePlugin->setConfig($this->_shoppingConfig['shippingExternal']);
 			$shippingServicePlugin->setOrigination($this->_getOrigination());
-			$shippingServicePlugin->setDestination($this->_getCustomerShippingAddress());
+			$shippingServicePlugin->setDestination($this->_customer->getShippingAddress());
 			$shippingServicePlugin->setWeight(Tools_ShoppingCart::getInstance()->calculateCartWeight(), $this->_shoppingConfig['weightUnit']);
 			return $shippingServicePlugin->run();
 		}
-	}
-
-	protected function _getCustomerShippingAddress() {
-		return array(
-			'firstName'    => $this->_shippingData['firstName'],
-			'lastName'     => $this->_shippingData['lastName'],
-			'company'      => $this->_shippingData['company'],
-			'email'        => $this->_shippingData['email'],
-			'address1'     => $this->_shippingData['shippingAddress1'],
-			'address2'     => $this->_shippingData['shippingAddress2'],
-			'city'         => $this->_shippingData['city'],
-			'state'        => $this->_shippingData['state'],
-			'zip'          => $this->_shippingData['zipCode'],
-			'country'      => $this->_shippingData['country'],
-			'phone'        => $this->_shippingData['phone'],
-			'mobile'       => $this->_shippingData['mobile'],
-			'instructions' => (isset($this->_shippingData['instructions'])) ? strip_tags($this->_shippingData['instructions']) : '',
-			'referrer'     => $_SERVER['REMOTE_ADDR']
-		);
 	}
 
 	protected function _getOrigination() {
@@ -113,32 +99,25 @@ class Tools_Shipping_Shipping {
 	 */
 	protected function _saveNewCustomer($customerData) {
 		if($this->_customer->getEmail() != $customerData['email']) {
-			if(!$this->_mailValidator->isValid($customerData['email'])) {
-				throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
-			}
+//			if(!$this->_mailValidator->isValid($customerData['email'])) {
+//				throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
+//			}
 		}
-		$cutomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($customerData['email']);
-		if(!$cutomer) {
-			$cutomer = new Models_Model_Customer();
+		$customer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($customerData['email']);
+		if(!$customer) {
+			$customer = new Models_Model_Customer();
 		}
 
-		$cutomer->setRoleId(Shopping::ROLE_CUSTOMER)
+		$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 			->setEmail($customerData['email'])
-			->setFullName($customerData['firstName'] . ' ' . $customerData['lastName'])
+			->setFullName($customerData['firstname'] . ' ' . $customerData['lastname'])
 			->setIpaddress($_SERVER['REMOTE_ADDR'])
 			->setPassword(md5(uniqid('customer_' . time())))
-			->addAddress(array(
-				'shippingAddress1' => $customerData['shippingAddress1'],
-				'shippingAddress2' => $customerData['shippingAddress2'],
-				'country'          => $customerData['country'],
-				'city'             => $customerData['city'],
-				'state'            => $customerData['state'],
-				'zipCode'          => $customerData['zipCode']
-			), self::ADDRESS_TYPE_SHIPPING);
+			->addAddress($customerData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
 
-		$customerId = Models_Mapper_CustomerMapper::getInstance()->save($cutomer);
-		$cutomer->setId($customerId);
-		return $cutomer;
+		$result = Models_Mapper_CustomerMapper::getInstance()->save($customer);
+
+		return $customer;
 	}
 
 }
