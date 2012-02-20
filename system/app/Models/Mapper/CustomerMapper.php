@@ -16,7 +16,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 	public function save($customer) {
 		//save user data
 		$userMapper = Application_Model_Mappers_UserMapper::getInstance();
-		$userId     = $userMapper->save($customer);
+		$userId     = $customer->getId() ? $customer->getId() : $userMapper->save($customer);
 
 		if (!$customer->getId()){
 			$customer->setId($userId);
