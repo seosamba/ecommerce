@@ -16,15 +16,15 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-categories" id="categories" multiple class="pselect ui-corner-all" data-placeholder="Filter by categories..."></select>
+		<select style="width: 205px;float:left;" name="product-categories" id="categories" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
 	</div>
 	<div class="grid_4">
-		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="Filter by brands..."></select>
+		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands');?>..."></select>
 	</div>
 
 	<!-- Ordering -->
 	<div id="order" class="grid_4">
-		<select style="width: 205px;float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="Sort by...">
+		<select style="width: 205px;float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Sort by');?>...">
 			<option value="name"><?php echo $this->translate('Name'); ?></option>
 			<option value="price"><?php echo $this->translate('Price'); ?></option>
 			<option value="brand"><?php echo $this->translate('Brand'); ?></option>

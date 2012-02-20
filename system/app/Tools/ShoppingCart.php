@@ -130,6 +130,7 @@ class Tools_ShoppingCart {
 			    'photo'       => $item->getPhoto(),
 			    'name'        => $item->getName(),
 			    'sku'         => $item->getSku(),
+			    'mpn'         => $item->getMpn(),
 			    'description' => Tools_Text_Tools::cutText($item->getShortDescription(), 100),
 			    'sid'         => $itemKey,
 			    'options'     => $options,
