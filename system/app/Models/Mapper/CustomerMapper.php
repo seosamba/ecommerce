@@ -48,13 +48,15 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 			foreach ($addresses as $address) {
 				$address['user_id'] = $customer->getId();
 				if (isset($address['id'])){
-					$row = $addressTable->find($address['id']);
-					$row->setFromArray($address)->save();
-				} else {
-					$row = $addressTable->createRow($address);
-					$status = $row->save();
-					$address['id'] = $status;
+					$row = $addressTable->find($address['id'])->current();
+					if ($row) {
+						$row->setFromArray($address)->save();
+						continue;
+					}
 				}
+				$row = $addressTable->createRow($address);
+				$status = $row->save();
+				$address['id'] = $status;
 			}
 			$addressTable->getAdapter()->commit();
 			$customer->setAddresses($addresses);
