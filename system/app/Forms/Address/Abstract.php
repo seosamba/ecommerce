@@ -57,7 +57,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 		$this->addElement(new Zend_Form_Element_Select(array(
 			'name'         => 'state',
 			'label'        => 'State',
-//			'multiOptions' =>  Tools_Geo::getState(null, true),
+			'multiOptions' =>  Tools_Geo::getState(null, true),
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
@@ -71,5 +71,33 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 			'label'    => 'Phone'
 		)));
 
+		$this->addElement(new Zend_Form_Element_Hash(array(
+			'name'       => 'nocsrf',
+			'salt'       => SITE_NAME
+		)));
+
+		$this->getElement('state')->addValidator(new Zend_Validate_Db_RecordExists(array(
+			'table' => 'shopping_list_state',
+			'field' => 'id'
+		)),true);
+	}
+
+	public function setDefault($name, $value) {
+		switch ($name) {
+			case 'state':
+				$list = Tools_Geo::getState($this->getElement('country')->getValue(), true);
+				if (empty ($list) || !array_key_exists($value, $list)) {
+					return $this;
+				}
+				if (!count($this->getElement('country')->getMultiOptions())) {
+					$this->getElement('state')->setMultiOptions(Tools_Geo::getState($value, true));
+				}
+				$this->getElement($name)->setMultiOptions($list);
+				break;
+			case 'country':
+				$this->getElement('state')->setMultiOptions(Tools_Geo::getState($value, true));
+				break;
+		}
+		parent::setDefault($name, $value);
 	}
 }
