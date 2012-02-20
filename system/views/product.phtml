@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Manage product</title>
+        <title><?php echo $this->translate('Manage product');?></title>
         <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
                 ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
                 ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
@@ -540,7 +540,7 @@
             </div>
             <div id="category-tab" class="clearfix">
                 <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
-                    <input type="text" id="new-category" placeholder="<?php echo $this->translate('Create new category');?>" data-confirmMsg="<?php echo $this->translate('Really, delete category &quot;%cat%&quot;?'); ?>"/>
+                    <input type="text" id="new-category" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%cat%&quot;?'); ?>"/>
                 </div>
 
                 <div id="product-categories" class="grid_12 h350" style="overflow-y: auto;">

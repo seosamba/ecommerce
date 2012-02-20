@@ -198,6 +198,19 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	/**
+	 * Redirects user to checkout page if it exists
+	 * @throws Exceptions_SeotoasterPluginException
+	 */
+	public function cartAction() {
+		$checkoutPage = Tools_Page_Tools::getCheckoutPage();
+		if(!$checkoutPage instanceof Application_Model_Models_Page) {
+			throw new Exceptions_SeotoasterPluginException('Error rendering cart. Please select a checkout page');
+		}
+
+		$this->_redirector->gotoUrl($this->_websiteUrl . $checkoutPage->getUrl());
+	}
+
 	protected function setConfigAction(){
 		$status = false;
 		if ($this->_request->isPost()){
@@ -434,6 +447,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			case 'put':
 				$rawData = json_decode($this->_request->getRawBody(), true);
 				if (!empty($rawData)){
+					$rawData['name'] = ucfirst($rawData['name']);
 					$result = $catMapper->save($rawData);
 				} else {
 					continue;
