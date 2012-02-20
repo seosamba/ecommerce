@@ -22,8 +22,6 @@ class Tools_ShoppingCart {
 
 	protected $_cartId          = null;
 
-	protected $_customer;
-
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
         $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -55,13 +53,28 @@ class Tools_ShoppingCart {
 	    return $this;
     }
 
-	public function setCustomer($customer) {
-		$this->_customer = $customer;
-		return $this;
-	}
-
 	public function getCustomer() {
-		return $this->_customer;
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+		$currentUser = $sessionHelper->getCurrentUser();
+
+		if ($currentUser->getRoleId() !== Shopping::ROLE_CUSTOMER || !$currentUser instanceof Models_Model_Customer) {
+			if ($currentUser->getId()) {
+				$customer = Models_Mapper_CustomerMapper::getInstance()->find($currentUser->getId());
+				if ($customer === null) {
+					$customer = new Models_Model_Customer($currentUser->toArray());
+				}
+			} elseif ($currentUser->getId() === null || $currentUser->getRoleId() === Tools_Security_Acl::ROLE_GUEST){
+				$customer = new Models_Model_Customer();
+			}
+
+			if (isset($customer)) {
+				$sessionHelper->setCurrentUser($customer);
+				$currentUser = $customer;
+				unset($customer);
+			}
+		}
+
+		return $currentUser;
 	}
 
 	public function save() {
@@ -344,7 +357,7 @@ class Tools_ShoppingCart {
 		$orderPrice          = floatval($this->calculateCartPrice());
 		$shippingType        = $this->_shoppingConfig['shippingType'];
 		$shippingGeneral     = $this->_shoppingConfig['shippingGeneral'];
-		$userShippingAddress = $this->getCustomer() !== null ? $this->getCustomer()->getShippingAddress() : null;
+		$userShippingAddress = $this->getCustomer()->getShippingAddress();
 		if($shippingType == 'shipping' || !$userShippingAddress || empty($userShippingAddress)) {
 			return $shippingPrice;
 		}
@@ -478,6 +491,10 @@ class Tools_ShoppingCart {
 		return $this;
 	}
 
+	/**
+	 * Returns id if cart is saved null if not
+	 * @return mixed Cart id or null if cart is not saved
+	 */
 	public function getCartId() {
 		return $this->_cartId;
 	}

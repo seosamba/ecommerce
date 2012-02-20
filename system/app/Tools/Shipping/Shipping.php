@@ -32,20 +32,12 @@ class Tools_Shipping_Shipping {
 		$this->_shippingData = $shippingData;
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
 		if ($this->_customer->getRoleId() === Tools_Security_Acl::ROLE_GUEST) {
-			$this->_customer = $this->_saveNewCustomer($shippingData);
+			$this->_saveNewCustomer($shippingData);
 			$this->_sessionHelper->setCurrentUser($this->_customer);
-		} else if ($this->_customer->getId() && $this->_customer->getRoleId() !== Shopping::ROLE_CUSTOMER) {
+		} elseif ($this->_customer->getId() && $this->_customer->getRoleId() !== Shopping::ROLE_CUSTOMER) {
 			//user exists and logged in, trying to fetch customer data
-			$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_customer->getId());
-			if ($customer !== null) {
-				$customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING, true);
-			} else {
-				$customer = new Models_Model_Customer($this->_customer->toArray());
-				$customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
-				Models_Mapper_CustomerMapper::getInstance()->save($customer);
-			}
-			$this->_customer = $customer;
-			$this->_sessionHelper->setCurrentUser($customer);
+			$this->_customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING, true);
+			Models_Mapper_CustomerMapper::getInstance()->save($this->_customer);
 		}
 		$shippingCalculator = '_calculate' . ucfirst((($this->_shoppingConfig['shippingType'] != 'external') ? 'internal' : $this->_shoppingConfig['shippingType']));
 
@@ -61,7 +53,7 @@ class Tools_Shipping_Shipping {
 	 */
 	protected function _calculateInternal() {
 		$cartStorage = Tools_ShoppingCart::getInstance();
-		return $cartStorage->setCustomer($this->_customer)->calculate();
+		return $cartStorage->calculate();
 	}
 
 	/**
@@ -98,26 +90,23 @@ class Tools_Shipping_Shipping {
 	 * @return Models_Model_Customer
 	 */
 	protected function _saveNewCustomer($customerData) {
-		if($this->_customer->getEmail() != $customerData['email']) {
-//			if(!$this->_mailValidator->isValid($customerData['email'])) {
-//				throw new Exceptions_SeotoasterPluginException('We already have user with such e-mail in te database');
-//			}
-		}
-		$customer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($customerData['email']);
-		if(!$customer) {
-			$customer = new Models_Model_Customer();
+		if(null !== (Models_Mapper_CustomerMapper::getInstance()->findByEmail($customerData['email']))) {
+			throw new Exception('User with given email already exists');
 		}
 
-		$customer->setRoleId(Shopping::ROLE_CUSTOMER)
+		$this->_customer->setRoleId(Shopping::ROLE_CUSTOMER)
 			->setEmail($customerData['email'])
 			->setFullName($customerData['firstname'] . ' ' . $customerData['lastname'])
 			->setIpaddress($_SERVER['REMOTE_ADDR'])
 			->setPassword(md5(uniqid('customer_' . time())))
 			->addAddress($customerData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
 
-		$result = Models_Mapper_CustomerMapper::getInstance()->save($customer);
+		$result = Models_Mapper_CustomerMapper::getInstance()->save($this->_customer);
+		if ($result) {
+			$this->_customer->setId($result);
+		}
 
-		return $customer;
+		return $this->_customer;
 	}
 
 }
