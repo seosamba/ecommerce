@@ -15,8 +15,6 @@ class Tools_Shipping_Shipping {
 	 */
 	protected $_customer       = null;
 
-	protected $_shippingData   = array();
-
 	protected $_mailValidator  = null;
 
 	public function __construct(array $shoppingConfig) {
@@ -29,16 +27,20 @@ class Tools_Shipping_Shipping {
 	}
 
 	public function calculateShipping($shippingData) {
-		$this->_shippingData = $shippingData;
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
 		if ($this->_customer->getRoleId() === Tools_Security_Acl::ROLE_GUEST) {
 			$this->_saveNewCustomer($shippingData);
-			$this->_sessionHelper->setCurrentUser($this->_customer);
-		} elseif ($this->_customer->getId() && $this->_customer->getRoleId() !== Shopping::ROLE_CUSTOMER) {
-			//user exists and logged in, trying to fetch customer data
-			$this->_customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING, true);
+		}
+
+		if ($this->_customer instanceof Models_Model_Customer){
+			$addressUniqId = $this->_customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
 			Models_Mapper_CustomerMapper::getInstance()->save($this->_customer);
 		}
+		$this->_sessionHelper->setCurrentUser($this->_customer);
+
+		//setting address to cart
+		Tools_ShoppingCart::getInstance()->setShippingAddressKey($addressUniqId)->save();
+
 		$shippingCalculator = '_calculate' . ucfirst((($this->_shoppingConfig['shippingType'] != 'external') ? 'internal' : $this->_shoppingConfig['shippingType']));
 
 		if(!method_exists($this, $shippingCalculator)) {
@@ -65,7 +67,7 @@ class Tools_Shipping_Shipping {
 			$shippingServicePlugin = Tools_Factory_PluginFactory::createPlugin($shippingServiceClass, array(), array());
 			$shippingServicePlugin->setConfig($this->_shoppingConfig['shippingExternal']);
 			$shippingServicePlugin->setOrigination($this->_getOrigination());
-			$shippingServicePlugin->setDestination($this->_customer->getShippingAddress());
+			$shippingServicePlugin->setDestination($this->_customer->getAddressByUniqKey(Tools_ShoppingCart::getInstance()->getShippingAddressKey()));
 			$shippingServicePlugin->setWeight(Tools_ShoppingCart::getInstance()->calculateCartWeight(), $this->_shoppingConfig['weightUnit']);
 			return $shippingServicePlugin->run();
 		}
@@ -98,8 +100,7 @@ class Tools_Shipping_Shipping {
 			->setEmail($customerData['email'])
 			->setFullName($customerData['firstname'] . ' ' . $customerData['lastname'])
 			->setIpaddress($_SERVER['REMOTE_ADDR'])
-			->setPassword(md5(uniqid('customer_' . time())))
-			->addAddress($customerData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
+			->setPassword(md5(uniqid('customer_' . time())));
 
 		$result = Models_Mapper_CustomerMapper::getInstance()->save($this->_customer);
 		if ($result) {

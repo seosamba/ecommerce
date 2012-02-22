@@ -16,9 +16,9 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 	public function save($customer) {
 		//save user data
 		$userMapper = Application_Model_Mappers_UserMapper::getInstance();
-		$userId     = $customer->getId() ? $customer->getId() : $userMapper->save($customer);
 
 		if (!$customer->getId()){
+			$userId = $userMapper->save($customer);
 			$customer->setId($userId);
 		}
 
@@ -45,7 +45,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		if (($addresses = $customer->getAddresses()) !== null) {
 			$addressTable = new Models_DbTable_CustomerAddress();
 			$addressTable->getAdapter()->beginTransaction();
-			foreach ($addresses as $address) {
+			foreach ($addresses as &$address) {
 				$address['user_id'] = $customer->getId();
 				if (isset($address['id'])){
 					$row = $addressTable->find($address['id'])->current();
@@ -57,6 +57,16 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 				$row = $addressTable->createRow($address);
 				$status = $row->save();
 				$address['id'] = $status;
+				if (isset($address['setDefault']) && $address['setDefault'] === true) {
+					switch ($address['address_type']){
+						case Models_Model_Customer::ADDRESS_TYPE_BILLING:
+							$customer->setBillingAddressId($address['id']);
+							break;
+						case Models_Model_Customer::ADDRESS_TYPE_SHIPPING:
+							$customer->setShippingAddressId($address['id']);
+							break;
+					}
+				}
 			}
 			$addressTable->getAdapter()->commit();
 			$customer->setAddresses($addresses);
@@ -72,8 +82,13 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		}
 		$customerInfo       = $this->getDbTable()->find($id)->current();
 		if ($customerInfo) {
+			$userData = array_merge($user->toArray(), $customerInfo->toArray(), array('addresses' => array()));
 			$customerAddresses = $customerInfo->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
-			$userData = array_merge($user->toArray(), $customerInfo->toArray(), array('addresses' => $customerAddresses));
+			foreach ($customerAddresses as $addr){
+				$addr = Tools_Misc::clenupAddress($addr);
+				$userData['addresses'][Tools_Misc::getAddressUniqKey($addr)] = $addr;
+				unset($addr);
+			}
 			return new $this->_model($userData);
 		}
 		return null;
