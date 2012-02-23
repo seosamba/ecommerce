@@ -139,21 +139,21 @@ class Tools_ShoppingCart {
 		    $options   = $this->_parseOptions($item, $options);
 		    $itemPrice = $this->_calculateItemPrice($item, $options, $itemTax);
 		    $this->_content[$itemKey] = array(
-			    'qty'         => $qty,
-			    'photo'       => $item->getPhoto(),
-			    'name'        => $item->getName(),
-			    'sku'         => $item->getSku(),
-			    'mpn'         => $item->getMpn(),
-			    'description' => Tools_Text_Tools::cutText($item->getShortDescription(), 100),
-			    'sid'         => $itemKey,
-			    'options'     => $options,
-			    'id'          => $item->getId(),
-			    //'item'        => $item,
-			    'price'       => $itemPrice,
-			    'weight'      => $this->_calculateItemWeight($item, $options),
-			    'tax'         => $itemTax,
-			    'taxPrice'    => $itemPrice + $itemTax,
-			    'taxIncluded' => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false
+			    'qty'              => $qty,
+			    'photo'            => $item->getPhoto(),
+			    'name'             => $item->getName(),
+			    'sku'              => $item->getSku(),
+			    'mpn'              => $item->getMpn(),
+			    'description'      => $item->getFullDescription(),
+			    'shortDescription' => $item->getShortDescription(),
+			    'sid'              => $itemKey,
+			    'options'          => $options,
+			    'id'               => $item->getId(),
+			    'price'            => $itemPrice,
+			    'weight'           => $this->_calculateItemWeight($item, $options),
+			    'tax'              => $itemTax,
+			    'taxPrice'         => $itemPrice + $itemTax,
+			    'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false
 		    );
 	    }
 	    else {
