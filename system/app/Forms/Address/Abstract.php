@@ -71,10 +71,10 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 			'label'    => 'Phone'
 		)));
 
-		$this->addElement(new Zend_Form_Element_Hash(array(
-			'name'       => 'nocsrf',
-			'salt'       => SITE_NAME
-		)));
+//		$this->addElement(new Zend_Form_Element_Hash(array(
+//			'name'       => 'nocsrf',
+//			'salt'       => SITE_NAME
+//		)));
 
 		$this->getElement('state')->addValidator(new Zend_Validate_Db_RecordExists(array(
 			'table' => 'shopping_list_state',
