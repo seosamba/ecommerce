@@ -247,22 +247,38 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `zip` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `mobile` varchar(255) DEFAULT NULL,
-  `fax` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  KEY `state` (`state`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `cart_content` longtext COLLATE utf8_unicode_ci NOT NULL,
   `ip_address` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `user_id` int(10) unsigned DEFAULT NULL,
+  `shipping_address_id` int(10) unsigned DEFAULT NULL,
+  `billing_address_id` int(10) unsigned DEFAULT NULL,
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  KEY `shipping_address_id` (`shipping_address_id`),
+  KEY `billing_address_id` (`billing_address_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cart_id` int(10) unsigned DEFAULT NULL,
+  `product_id` int(10) unsigned DEFAULT NULL,
+  `options` text,
+  `price` decimal(10,2) DEFAULT NULL,
+  `qty` int(10) unsigned DEFAULT NULL,
+  `tax` int(11) DEFAULT NULL,
+  `tax_price` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `shopping_product`
@@ -289,3 +305,6 @@ ALTER TABLE `shopping_customer_address`
 
 ALTER TABLE `shopping_cart_session`
   ADD CONSTRAINT `shopping_cart_session_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_cart_session_content`
+  ADD CONSTRAINT `shopping_cart_session_content_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;

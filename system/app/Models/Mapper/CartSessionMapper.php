@@ -17,11 +17,12 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		}
 		$data = array(
 			'id'           => $model->getId(),
-			'cart_content' => $model->getCartContent(),
 			'ip_address'   => $model->getIpAddress(),
 			'user_id'      => $model->getUserId(),
 			'status'       => $model->getStatus(),
-			'gateway'      => $model->getGateway()
+			'gateway'      => $model->getGateway(),
+			'shipping_address_id'   => $model->getShippingAddressId(),
+			'billing_address_id'    => $model->getBillingAddressId()
 		);
 
 		if(null === ($exists = $this->find($data['id']))) {
@@ -30,11 +31,71 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			if ($newId){
 				$model->setId($newId);
 			}
-			return $newId;
 		}
 		else {
 			$data['updated_at'] = date(DATE_ATOM);
-			return $this->getDbTable()->update($data, array('id = ?' => $exists->getId()));
+			$this->getDbTable()->update($data, array('id = ?' => $exists->getId()));
 		}
+
+		$this->_processCartContent($model);
+
+		return $model;
+	}
+
+	private function _processCartContent(Models_Model_CartSession $cartSession){
+		$cartSessionContentDbTable = new Models_DbTable_CartSessionContent();
+		$content = $cartSession->getCartContent();
+		if (!empty($content)) {
+			$cartSessionContentDbTable->getAdapter()->beginTransaction();
+			$cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSession->getId() ));
+			foreach ($content as $item) {
+				$item['options'] = http_build_query($item['options']);
+				$item['cart_id'] = $cartSession->getId();
+
+				$cartSessionContentDbTable->insert($item);
+			}
+			try {
+				$cartSessionContentDbTable->getAdapter()->commit();
+			} catch (Exception $e) {
+
+			}
+		}
+	}
+
+	public function find($id) {
+		$result = $this->getDbTable()->find($id);
+		if(0 == count($result)) {
+			return null;
+		}
+		$row = $result->current();
+		if ($row) {
+			return $this->_toModel($row);
+		}
+		return null;
+	}
+
+	public function fetchAll($where = null, $order = array()) {
+		$entries = array();
+		$resultSet = $this->getDbTable()->fetchAll($where, $order);
+		if(null === $resultSet) {
+			return null;
+		}
+		foreach ($resultSet as $row) {
+			$entries[] = $this->_toModel($row);
+		}
+		return $entries;
+	}
+
+	private function _toModel(Zend_Db_Table_Row_Abstract $row) {
+		$model = new $this->_model($row->toArray());
+		$content = $row->findDependentRowset('Models_DbTable_CartSessionContent')->toArray();
+		if (!empty($content)){
+			array_walk($content, function(&$item){
+				parse_str($item['options'],$item['options']);
+			});
+			$model->setCartContent($content);
+		}
+
+		return $model;
 	}
 }

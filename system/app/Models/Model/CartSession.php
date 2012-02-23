@@ -15,7 +15,7 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	const CART_STATUS_ERROR         = 'error';
 
-	protected $_cartContent = '';
+	protected $_cartContent = null;
 
 	protected $_ipAddress   = '';
 
@@ -26,6 +26,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	protected $_status      = null;
 
 	protected $_gateway     = null;
+
+	protected $_shippingAddressId = null;
+
+	protected $_billingAddressId = null;
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -79,6 +83,26 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getGateway() {
 		return $this->_gateway;
+	}
+
+	public function setBillingAddressId($billingAddressId) {
+		$this->_billingAddressId = $billingAddressId;
+
+		return $this;
+	}
+
+	public function getBillingAddressId() {
+		return $this->_billingAddressId;
+	}
+
+	public function setShippingAddressId($shippingAddressId) {
+		$this->_shippingAddressId = $shippingAddressId;
+
+		return $this;
+	}
+
+	public function getShippingAddressId() {
+		return $this->_shippingAddressId;
 	}
 
 

@@ -208,4 +208,30 @@ class Tools_Misc {
         return $data;
     }
 
+	public static function clenupAddress($address) {
+		$_addressTmpl   = array(
+			'address_type'  => '',
+			'firstname'     => '',
+			'lastname'      => '',
+			'company'       => '',
+			'email'         => '',
+			'address1'      => '',
+			'address2'      => '',
+			'country'       => '',
+			'city'          => '',
+			'state'         => '',
+			'zip'           => '',
+			'phone'         => '',
+			'mobile'        => ''
+		);
+
+		$address = array_intersect_key($address, $_addressTmpl);
+		ksort($address);
+		return $address;
+	}
+
+	public static function getAddressUniqKey($address) {
+		$address = self::clenupAddress($address);
+		return md5(http_build_query($address));
+	}
 }

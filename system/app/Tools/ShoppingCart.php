@@ -22,6 +22,10 @@ class Tools_ShoppingCart {
 
 	protected $_cartId          = null;
 
+	protected $_shippingAddressKey  = null;
+
+	protected $_billingAddressKey   = null;
+
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
         $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -288,12 +292,18 @@ class Tools_ShoppingCart {
 		if (isset($this->_session->cartId)) {
 			$this->setCartId($this->_session->cartId);
 		}
+
+		$this->_shippingAddressKey  = $this->_session->shippingAddressKey;
+		$this->_billingAddressKey   = $this->_session->billingAddressKey;
+
 		return $this;
 	}
 
     private function _save() {
         $this->_session->cartContent = serialize($this->getContent());
 	    $this->_session->cartId      = $this->getCartId();
+	    $this->_session->shippingAddressKey = $this->_shippingAddressKey;
+	    $this->_session->billingAddressKey  = $this->_billingAddressKey;
     }
 
 	/**
@@ -303,14 +313,33 @@ class Tools_ShoppingCart {
 	public function saveCartSession() {
 		$cartSession = new Models_Model_CartSession();
 		$cartSession->setId($this->getCartId()?$this->getCartId():null)
-			->setCartContent(serialize($this->getContent()))
 			->setIpAddress($_SERVER['REMOTE_ADDR']);
-		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
-		$currentUser   = $sessionHelper->getCurrentUser();
 
-		if ($currentUser->getId() !== null) {
-			$cartSession->setUserId($currentUser->getId());
+		$customer = $this->getCustomer();
+		$cartSessionContent = array();
+		foreach ($this->getContent() as $uniqKey => $item) {
+			$data = array(
+				'product_id'    => $item['id'],
+				'price'         => $item['price'],
+				'qty'           => $item['qty'],
+				'tax'           => $item['tax'],
+				'tax_price'     => $item['taxPrice'],
+				'options'       => array()
+			);
+
+			foreach ($item['options'] as $option) {
+				$data['options'][$option['option_id']] = $option['id'];
+			}
+			array_push($cartSessionContent, $data);
 		}
+		$cartSession->setCartContent($cartSessionContent);
+
+		if ($customer->getId() !== null) {
+			$cartSession->setUserId($customer->getId())
+					->setShippingAddressId($customer->getAddressByUniqKey($this->getShippingAddressKey(), true))
+					->setBillingAddressId($customer->getAddressByUniqKey($this->getBillingAddressKey(), true));
+		}
+
 		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
 		if ($result && $this->getCartId() === null){
 			$this->setCartId($cartSession->getId())->save();
@@ -333,7 +362,7 @@ class Tools_ShoppingCart {
 			//			}
 
 			$this->setCartId($cartSession->getId())
-				->setContent(unserialize($cartSession->getCartContent()))
+				->setContent($cartSession->getCartContent())
 				->save();
 		}
 	}
@@ -357,7 +386,7 @@ class Tools_ShoppingCart {
 		$orderPrice          = floatval($this->calculateCartPrice());
 		$shippingType        = $this->_shoppingConfig['shippingType'];
 		$shippingGeneral     = $this->_shoppingConfig['shippingGeneral'];
-		$userShippingAddress = $this->getCustomer()->getShippingAddress();
+		$userShippingAddress = $this->getCustomer()->getAddressByUniqKey($this->getShippingAddressKey());
 		if($shippingType == 'shipping' || !$userShippingAddress || empty($userShippingAddress)) {
 			return $shippingPrice;
 		}
@@ -497,5 +526,23 @@ class Tools_ShoppingCart {
 	 */
 	public function getCartId() {
 		return $this->_cartId;
+	}
+
+	public function setShippingAddressKey($shippingAddressKey) {
+		$this->_shippingAddressKey = $shippingAddressKey;
+		return $this;
+	}
+
+	public function getShippingAddressKey() {
+		return $this->_shippingAddressKey;
+	}
+
+	public function setBillingAddressKey($billingAddressKey) {
+		$this->_billingAddressKey = $billingAddressKey;
+		return $this;
+	}
+
+	public function getBillingAddressKey() {
+		return $this->_billingAddressKey;
 	}
 }

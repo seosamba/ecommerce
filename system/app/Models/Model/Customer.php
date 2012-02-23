@@ -15,24 +15,24 @@ class Models_Model_Customer extends Application_Model_Models_User {
 
 	protected $_shipping_address_id;
 
-	public function getBillingAddress() {
-		if ($this->_billing_address_id){
-			return $this->getAddressById($this->_billing_address_id);
+	public function getDefaultAddress($type = self::ADDRESS_TYPE_SHIPPING) {
+		if (empty($type)) {
+			throw new Exception('Address type must be defined');
 		}
-		$list = $this->_filterAddresses('address_type', self::ADDRESS_TYPE_BILLING);
-		if (!empty($list)){
-			return reset($list);
-		}
-		return null;
-	}
-
-	public function getShippingAddress() {
-		if ($this->_shipping_address_id){
-			return $this->getAddressById($this->_shipping_address_id);
-		}
-		$list = $this->_filterAddresses('address_type', self::ADDRESS_TYPE_SHIPPING);
-		if (!empty($list)){
-			return reset($list);
+		switch ($type) {
+			case static::ADDRESS_TYPE_SHIPPING :
+				if ($this->_shipping_address_id !== null) {
+					return $this->getAddressById($this->_shipping_address_id);
+				}
+				break;
+			case static::ADDRESS_TYPE_BILLING :
+				if ($this->_shipping_address_id !== null) {
+					return $this->getAddressById($this->_shipping_address_id);
+				}
+				break;
+			default:
+				throw new Exception('Unknown address type given');
+				break;
 		}
 		return null;
 	}
@@ -46,14 +46,39 @@ class Models_Model_Customer extends Application_Model_Models_User {
 		return $this->_addresses;
 	}
 
-	public function addAddress($address, $type, $useByDefault = false) {
+	public function addAddress($address, $type = null) {
 		if ($this->_addresses === null) {
 			$this->_addresses = array();
 		}
-		$address = array_merge($address, array('address_type' => $type));
-		array_push($this->_addresses, $address);
 
-		return $this;
+		if (!array_key_exists('address_type', $address) && $type !== null) {
+			$address['address_type'] = $type;
+		}
+
+		$address = Tools_Misc::clenupAddress($address);
+
+		$uniqKey = Tools_Misc::getAddressUniqKey($address);
+
+		if (!array_key_exists($uniqKey, $this->_addresses)) {
+			$this->_addresses[$uniqKey] = $address;
+		}
+
+		return $uniqKey;
+	}
+
+	public function getAddressByUniqKey($key, $onlyAddressId = false){
+		if (empty($key) || empty($this->_addresses)){
+			return null;
+		}
+		if (array_key_exists($key, $this->_addresses)) {
+			$address = $this->_addresses[$key];
+			if ($onlyAddressId){
+				return $address['id'];
+			}
+			return $address;
+		}
+
+		return null;
 	}
 
 	public function setBillingAddressId($billing_address_id) {
@@ -75,7 +100,8 @@ class Models_Model_Customer extends Application_Model_Models_User {
 	}
 
 	public function getAddressById($id) {
-		return $this->_filterAddresses('id', $id);
+		$list = $this->_filterAddresses('id', $id);
+		return $list !== null ? reset($list) : null;
 	}
 
 	private function _filterAddresses($param, $value){
