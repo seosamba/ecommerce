@@ -13,7 +13,8 @@ class Forms_Shipping extends Forms_Address_Abstract {
 		$this->setLegend('Shipping address')
 			->setAttribs(array(
 				'id'     => 'shipping-user-address',
-				'action' => '/plugin/shopping/run/calculateandcheckout/',
+				'class'  => 'toaster-checkout',
+				'action' => '/plugin/shopping/run/checkout/',
 				'method' => Zend_Form::METHOD_POST
 			));
 

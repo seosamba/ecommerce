@@ -182,7 +182,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			} catch (Exceptions_SeotoasterPluginException $spe) {
 				$this->_responseHelper->fail($spe->getMessage());
 			}
-			$this->_responseHelper->success($this->_translator->translate('Your shipping costs has been calculated.'));
+			$this->_responseHelper->success($this->_renderPaymentZone());
 		}
 		$this->_responseHelper->fail(Tools_Content_Tools::proccessFormMessagesIntoHtml($form->getMessages(),get_class($form)));
 	}
@@ -195,6 +195,10 @@ class Shopping extends Tools_Plugins_Abstract {
 	public function checkoutAction() {
 		if(!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+		}
+
+		if ($this->_configMapper->getConfigParam('shippingType') !== 'pickup'){
+			$this->calculateandcheckoutAction();
 		}
 	}
 
@@ -783,5 +787,22 @@ class Shopping extends Tools_Plugins_Abstract {
 		$content  = $widget->setProducts($products)->setCleanListOnly(true)->render();
 		$widget->setProducts(array());
 		$this->_responseHelper->success(array('content' => $content));
+	}
+
+	protected function _renderPaymentZone() {
+		$paymentZoneTmpl = isset($this->_sessionHelper->paymentZoneTmpl) ? $this->_sessionHelper->paymentZoneTmpl : null;
+		if ($paymentZoneTmpl !== null) {
+			$themeData = Zend_Registry::get('theme');
+			$extConfig = Zend_Registry::get('extConfig');
+			$parserOptions = array(
+
+				'websiteUrl'   => $this->_websiteHelper->getUrl(),
+				'websitePath'  => $this->_websiteHelper->getPath(),
+				'currentTheme' => $extConfig['currentTheme'],
+				'themePath'    => $themeData['path'],
+			);
+			$parser = new Tools_Content_Parser($paymentZoneTmpl, Tools_Page_Tools::getCheckoutPage()->toArray(), $parserOptions);
+			return $parser->parse();
+		}
 	}
 }

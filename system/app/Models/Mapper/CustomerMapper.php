@@ -25,9 +25,9 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		$this->_processAddresses($customer);
 		//save customer info
 		$data = array(
-			'user_id'          => $customer->getId(),
-			'shipping_address_id' => $customer->getShippingAddressId(),
-			'billing_address_id'  => $customer->getBillingAddressId()
+			'user_id'               => $customer->getId(),
+			'shipping_address_id'   => $customer->getShippingAddressId(),
+			'billing_address_id'    => $customer->getBillingAddressId()
 		);
 		$userInfo = $this->getDbTable()->find($customer->getId());
 		if(!$userInfo->current()) {
@@ -57,16 +57,6 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 				$row = $addressTable->createRow($address);
 				$status = $row->save();
 				$address['id'] = $status;
-				if (isset($address['setDefault']) && $address['setDefault'] === true) {
-					switch ($address['address_type']){
-						case Models_Model_Customer::ADDRESS_TYPE_BILLING:
-							$customer->setBillingAddressId($address['id']);
-							break;
-						case Models_Model_Customer::ADDRESS_TYPE_SHIPPING:
-							$customer->setShippingAddressId($address['id']);
-							break;
-					}
-				}
 			}
 			$addressTable->getAdapter()->commit();
 			$customer->setAddresses($addresses);

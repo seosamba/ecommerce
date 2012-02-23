@@ -15,15 +15,9 @@ class Tools_Shipping_Shipping {
 	 */
 	protected $_customer       = null;
 
-	protected $_mailValidator  = null;
-
 	public function __construct(array $shoppingConfig) {
 		$this->_shoppingConfig = $shoppingConfig;
 		$this->_sessionHelper  = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
-		$this->_mailValidator  = new Zend_Validate_Db_NoRecordExists(array(
-			'table' => 'user',
-			'field' => 'email'
-		));
 	}
 
 	public function calculateShipping($shippingData) {
