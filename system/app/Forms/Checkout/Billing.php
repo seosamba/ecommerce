@@ -5,14 +5,14 @@
  * @author Eugene I. Nezhuta <theneiam@gmail.com>
  */
 
-class Forms_Shipping extends Forms_Address_Abstract {
+class Forms_Checkout_Billing extends Forms_Address_Abstract {
 
 	public function init() {
 		parent::init();
 
-		$this->setLegend('Shipping address')
+		$this->setLegend('Billing address')
 			->setAttribs(array(
-				'id'     => 'shipping-user-address',
+				'id'     => 'billing-user-address',
 				'class'  => 'toaster-checkout',
 				'action' => '/plugin/shopping/run/checkout/',
 				'method' => Zend_Form::METHOD_POST
@@ -25,11 +25,9 @@ class Forms_Shipping extends Forms_Address_Abstract {
 			'label'    => 'Mobile'
 		)));
 
-		$this->addElement(new Zend_Form_Element_Textarea(array(
-			'name'     => 'shippingInstructions',
-			'id'       => 'shipping-instructions',
-			'label'    => 'Shipping instructions'
-		)));
+		// setting required fields
+		$this->getElement('lastname')->setRequired(true)->setAttrib('class', 'required');
+		$this->getElement('email')->setRequired(true)->setAttrib('class', 'required');
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(
@@ -47,8 +45,7 @@ class Forms_Shipping extends Forms_Address_Abstract {
 				'zip',
 				'phone',
 				'mobile'
-			),
-			'bottom' => array('shippingInstructions')
+			)
 		));
 
 		$lcol = $this->getDisplayGroup('lcol')
@@ -65,20 +62,13 @@ class Forms_Shipping extends Forms_Address_Abstract {
 //			    array('HtmlTag',array('tag'=>'div'))
 		));
 
-		$bottom = $this->getDisplayGroup('bottom')
-			->setDecorators(array(
-				'FormElements',
-			    'Fieldset',
-//			    array('HtmlTag',array('tag'=>'div'))
-		));
-
 		$this->addElement(new Zend_Form_Element_Submit(array(
-					'name'   => 'calculateAndCheckout',
-					'ignore' => true,
-					'label'  => 'Calculate shipping and checkout'
+			'name'   => 'checkout',
+			'ignore' => true,
+			'label'  => 'Checkout'
 		)));
 
-		$this->getElement('calculateAndCheckout')->removeDecorator('DtDdWrapper')
+		$this->getElement('checkout')->removeDecorator('DtDdWrapper')
 			->addDecorator('HtmlTag', array('tag' => 'div', 'class' => 'cart-form-submit'));
 
 	}

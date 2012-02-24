@@ -165,29 +165,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * Calculates shipping. Sign up new user. Assign saved cart to the user
-	 * @throws Exceptions_SeotoasterPluginException
-	 */
-	public function calculateandcheckoutAction() {
-		if(!$this->_request->isPost()) {
-			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
-		}
-		$form = new Forms_Shipping();
-		if($form->isValid($this->_request->getParams())) {
-			//@todo check if customer with given 'email' already exists
-			$shippingCalc = new Tools_Shipping_Shipping($this->_getConfig());
-			try {
-				$shippingCalc->calculateShipping($form->getValues());
-				Tools_ShoppingCart::getInstance()->saveCartSession();
-			} catch (Exceptions_SeotoasterPluginException $spe) {
-				$this->_responseHelper->fail($spe->getMessage());
-			}
-			$this->_responseHelper->success($this->_renderPaymentZone());
-		}
-		$this->_responseHelper->fail(Tools_Content_Tools::proccessFormMessagesIntoHtml($form->getMessages(),get_class($form)));
-	}
-
-	/**
 	 * Checkout action
 	 *
 	 * @throws Exceptions_SeotoasterPluginException
@@ -196,10 +173,58 @@ class Shopping extends Tools_Plugins_Abstract {
 		if(!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
-
-		if ($this->_configMapper->getConfigParam('shippingType') !== 'pickup'){
-			$this->calculateandcheckoutAction();
+		$shippingType = $this->_configMapper->getConfigParam('shippingType');
+		$form =  $shippingType !== 'pickup' ? new Forms_Checkout_Shipping() : new Forms_Checkout_Billing();
+		if ($form->isValid($this->_request->getParams())){
+			$formData = $form->getValues();
+			try {
+				$result = $this->_processCustomer($formData);
+			} catch (Exception $e) {
+				error_log($e->getMessage());
+				$this->_responseHelper->fail('showCustomerLogin('.$this->_renderCustomerLogin().');');
+			}
+			if ($shippingType !== 'pickup') {
+				$shippingCalc = new Tools_Shipping_Shipping($this->_getConfig());
+				try {
+					$shippingCalc->calculateShipping($formData);
+				} catch (Exceptions_SeotoasterPluginException $spe) {
+					$this->_responseHelper->fail($spe->getMessage());
+				}
+			} else {
+				$uniqId = Tools_ShoppingCart::getInstance()->getCustomer()->addAddress($formData, Models_Model_Customer::ADDRESS_TYPE_BILLING);
+				Tools_ShoppingCart::getInstance()->setBillingAddressKey($uniqId)->save();
+			}
+			Tools_ShoppingCart::getInstance()->saveCartSession();
+			$this->_responseHelper->success($this->_renderPaymentZone());
+		} else {
+			$this->_responseHelper->fail(Tools_Content_Tools::proccessFormMessagesIntoHtml($form->getMessages(),get_class($form)));
 		}
+	}
+
+	private function _processCustomer($data) {
+		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
+		if (!$customer->getId()){
+			$mailValidator = new Zend_Validate_Db_NoRecordExists('user','email');
+			if(!$mailValidator->isValid($data['email'])) {
+				throw new Exception('User with given email already exists');
+			}
+
+			$customer->setRoleId(Shopping::ROLE_CUSTOMER)
+				->setEmail($data['email'])
+				->setFullName($data['firstname'] . ' ' . $data['lastname'])
+				->setIpaddress($_SERVER['REMOTE_ADDR'])
+				->setPassword(md5(uniqid('customer_' . time())));
+			//@todo send email notification
+
+			$result = Models_Mapper_CustomerMapper::getInstance()->save($customer);
+			if ($result) {
+				$customer->setId($result);
+			}
+
+			$this->_sessionHelper->setCurrentUser($customer);
+		}
+
+		return true;
 	}
 
 	/**
@@ -804,5 +829,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			$parser = new Tools_Content_Parser($paymentZoneTmpl, Tools_Page_Tools::getCheckoutPage()->toArray(), $parserOptions);
 			return $parser->parse();
 		}
+	}
+
+	protected function _renderCustomerLogin() {
+		return 'DUDE LOGIN PLEASE!!!';
 	}
 }

@@ -22,9 +22,6 @@ class Tools_Shipping_Shipping {
 
 	public function calculateShipping($shippingData) {
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
-		if ($this->_customer->getRoleId() === Tools_Security_Acl::ROLE_GUEST) {
-			$this->_saveNewCustomer($shippingData);
-		}
 
 		if ($this->_customer instanceof Models_Model_Customer){
 			$addressUniqId = $this->_customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);

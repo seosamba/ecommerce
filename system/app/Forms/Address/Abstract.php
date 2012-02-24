@@ -15,8 +15,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'lastname',
-			'label'    => 'Last Name *',
-			'required' => true
+			'label'    => 'Last Name',
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
@@ -26,14 +25,12 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'email',
-			'label'    => 'E-mail *',
-			'required' => true
+			'label'    => 'E-mail'
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'address1',
-			'label'    => 'Address 1 *',
-			'required' => true
+			'label'    => 'Address 1',
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
@@ -43,15 +40,13 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Select(array(
 			'name'         => 'country',
-			'label'        => 'Country *',
+			'label'        => 'Country',
 			'multiOptions' =>  Tools_Geo::getCountries(true),
-			'required'     => true
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'city',
-			'label'    => 'City *',
-			'required' => true
+			'label'    => 'City',
 		)));
 
 		$this->addElement(new Zend_Form_Element_Select(array(
@@ -62,8 +57,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'zip',
-			'label'    => 'ZIP Code *',
-			'required' => true
+			'label'    => 'ZIP Code',
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
