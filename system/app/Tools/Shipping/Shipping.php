@@ -15,22 +15,13 @@ class Tools_Shipping_Shipping {
 	 */
 	protected $_customer       = null;
 
-	protected $_mailValidator  = null;
-
 	public function __construct(array $shoppingConfig) {
 		$this->_shoppingConfig = $shoppingConfig;
 		$this->_sessionHelper  = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
-		$this->_mailValidator  = new Zend_Validate_Db_NoRecordExists(array(
-			'table' => 'user',
-			'field' => 'email'
-		));
 	}
 
 	public function calculateShipping($shippingData) {
 		$this->_customer     = $this->_sessionHelper->getCurrentUser();
-		if ($this->_customer->getRoleId() === Tools_Security_Acl::ROLE_GUEST) {
-			$this->_saveNewCustomer($shippingData);
-		}
 
 		if ($this->_customer instanceof Models_Model_Customer){
 			$addressUniqId = $this->_customer->addAddress($shippingData, Models_Model_Customer::ADDRESS_TYPE_SHIPPING);
