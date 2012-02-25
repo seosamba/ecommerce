@@ -55,7 +55,7 @@
         </script>
     </head>
     <body>
-        <div id="shipping-config" class="seotoaster container_12 h570">
+        <div id="shipping-config" class="seotoaster container_12 h540 rounded3px">
 	        <div class="header" style="overflow:hidden;">
                 <div class="closebutton">
                     <span class="help"><?php echo $this->translate('Help'); ?></span>
@@ -65,7 +65,7 @@
             </div>
 			<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
 			    <div class="grid_6">
-			        <fieldset class="grid_12" id="#shipping-options"><legend>Shipping Options</legend>
+			        <fieldset id="#shipping-options"><legend>Shipping Options</legend>
 			            <fieldset><legend class="option"><input type="radio" name="shippingType" value="pickup" <?php echo ($this->config['shippingType']=='pickup'?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
 			                <div class="fieldset-content <?php echo ($this->config['shippingType']=='pickup'?'active':'');?>">
 			                    <label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
@@ -141,7 +141,7 @@
 					</fieldset>
 			    </div>
 			    <div class="grid_6">
-			        <fieldset class="grid_12">
+			        <fieldset>
 				        <legend class="option"><input type="radio" name="shippingType" value="external" <?php echo ($this->config['shippingType']=='external'?' checked="checked"':'');?>/>Shipping Plugin:</legend>
 			            <div class="fieldset-content <?php echo ($this->config['shippingType']=='external'?'active':'');?>">
 			                <p>

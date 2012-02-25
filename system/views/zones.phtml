@@ -59,8 +59,8 @@
                     <a href="javascript:;" class="clearprop" data-property="zip">[ clear ]</a>
                     <span style="font-weight:normal; margin-left:160px;">Insert list of zip/postal codes: one per line</span>
                 </div>
-                    <div class="ui-widget-content" style="height: 180px; overflow-y: auto; text-align: center">
-                    <textarea style="width: 99%; height: 160px; resize: none;" class="zone-zip">${zip.join('\n')}</textarea>
+                    <div class="ui-widget-content" style="text-align: center">
+                    <textarea style="width: 99%; height: 155px; resize: none;" class="zone-zip">${zip.join('\n')}</textarea>
 				</div>
 			</div>
 		</script>
@@ -92,6 +92,11 @@
             width: 100%;
             z-index: 5000;
         }
+        #manage-zones .clearprop {
+          float: right;
+          font-size: 10pt;
+          color: #E6E6FA;
+        }
         </style>
 	</head>
     <body>
@@ -102,7 +107,7 @@
         <input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
         <input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
         <div id="ajax_msg" class="smoke">
-            <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /><?php echo $this->translate('Loading');?>...
+            <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" />
         </div>
         <div class="seotoaster container_12 rounded3px" id="manage-zones">
             <div id="zones" class="ui-helper-clearfix h530">
@@ -110,7 +115,7 @@
                 <ul><button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button></ul>
 			</div>
 
-            <a id="delete-zone" href="javascript:;" style="margin-left:20px; color: #8b0000; font-weight: bold;">[ <?php echo $this->translate('Delete this zone'); ?> ]</a>
+            <a id="delete-zone" href="javascript:;" class="delete-selected" style="margin-left:10px;">[ <?php echo $this->translate('Delete this zone'); ?> ]</a>
             <button id="save-btn" title="Hotkey: Ctrl+S" style="margin: 0 10px 10px 0;"><?php echo $this->translate('Save');?></button>
 		</div>
 
