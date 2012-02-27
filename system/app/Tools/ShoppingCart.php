@@ -157,7 +157,8 @@ class Tools_ShoppingCart {
 			    'weight'           => $this->_calculateItemWeight($item, $options),
 			    'tax'              => $itemTax,
 			    'taxPrice'         => $itemPrice + $itemTax,
-			    'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false
+			    'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
+			    'note'             => ''
 		    );
 	    }
 	    else {

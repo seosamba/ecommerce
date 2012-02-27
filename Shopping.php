@@ -606,7 +606,8 @@ class Shopping extends Tools_Plugins_Abstract {
 					}
 
                     if ($page->getDraft() !== $product->getEnabled()){
-                        $page->setDraft((bool)$product->getEnabled());
+                        $page->setDraft(!(bool)$product->getEnabled());
+	                    $cacheHelper->clean(Helpers_Action_Cache::KEY_DRAFT, Helpers_Action_Cache::PREFIX_DRAFT);
                         $isModified = true;
                     }
 

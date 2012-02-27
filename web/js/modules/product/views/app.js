@@ -185,10 +185,12 @@ define([
 					$(el).find(':checkbox').attr('checked','checked');
 				});
 			}
+
 			//toggle enabled flag
-			if (this.model.get('enabled')){
+			if (parseInt(this.model.get('enabled'))){
 				this.$('#product-enabled').attr('checked', 'checked');
 			} else {
+
 				this.$('#product-enabled').removeAttr('checked');
 			}
 

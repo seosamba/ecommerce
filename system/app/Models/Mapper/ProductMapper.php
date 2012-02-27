@@ -30,18 +30,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 		$data = array(
-			'parent_id' => $model->getParentId(),
-			'sku'	=> $model->getSku(),
-			'name' => $model->getName(),
-			'photo' => $model->getPhoto(),
-			'brand_id'  => isset($brand)?$brand->getId():null,
-			'mpn' => $model->getMpn(),
-			'weight' => $model->getWeight(),
+			'parent_id'         => $model->getParentId(),
+			'sku'	            => $model->getSku(),
+			'name'              => $model->getName(),
+			'photo'             => $model->getPhoto(),
+			'brand_id'          => isset($brand)?$brand->getId():null,
+			'mpn'               => $model->getMpn(),
+			'enabled'           => $model->getEnabled(),
+			'weight'            => $model->getWeight(),
 			'short_description'	=> $model->getShortDescription(),
-			'full_description' => $model->getFullDescription(),
-			'price' => $model->getPrice(),
-			'tax_class' => $model->getTaxClass()
-			);
+			'full_description'  => $model->getFullDescription(),
+			'price'             => $model->getPrice(),
+			'tax_class'         => $model->getTaxClass()
+		);
 
 		if ($model->getId()){
 			$data['updated_at'] = date(DATE_ATOM);
