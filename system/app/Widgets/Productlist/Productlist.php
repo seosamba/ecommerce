@@ -1,43 +1,77 @@
 <?php
 
+/**
+ * Product list widget.
+ *
+ */
 class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	/**
 	 * Suboption for the categories
+	 *
 	 */
 	const OPTTYPE_CATEGORIES    = 'categories';
 
 	/**
 	 *  Suboption for the brands
+	 *
 	 */
 	const OPTTYPE_BRANDS        = 'brands';
 
 	/**
 	 * Suboption for the order
+	 *
 	 */
 	const OPTTYPE_ORDER         = 'order';
 
+	/**
+	 * Product list default offset (used for portional load)
+	 */
 	const DEFAULT_OFFSET        = 100;
 
+	/**
+	 * Seotoaster website action helper
+	 *
+	 * @var Helpers_Action_Website
+	 */
 	protected $_websiteHelper   = null;
 
+	/**
+	 * Product mapper
+	 *
+	 * @var Models_Mapper_ProductMapper
+	 */
 	protected $_productMapper   = null;
 
+	/**
+	 * Current product template content
+	 *
+	 * @var string
+	 */
 	protected $_productTemplate = null;
 
+	/**
+	 * Flag that shows the widget to return only product list html (without any wrappers, etc...)
+	 *
+	 * @var boolean
+	 */
 	protected $_cleanListOnly   = false;
 
+	/**
+	 * Set of products to proccess
+	 *
+	 * @var array
+	 */
 	private $_products = array();
 
 	public function _init() {
 		parent::_init();
-		$this->_view = new Zend_View(array(
-			'scriptPath' => __DIR__ . '/views/'
-		));
-		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
 		if (empty($this->_options)){
 			throw new Exceptions_SeotoasterWidgetException('No options provided');
 		}
+		$this->_view             = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
+		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
+		$this->_view->limit      = self::DEFAULT_OFFSET;
         $this->_websiteHelper    = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 	    $this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
 		$this->_productTemplate  = Application_Model_Mappers_TemplateMapper::getInstance()->findByName(array_shift($this->_options));
@@ -46,23 +80,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 	}
 
-
-
 	public function _load() {
-		//'$product:price'             => $this->_renderProductWidgetOption(array($product->getId(), 'price'), $product->getPage()->toArray()),
-		//'$product:options'           => $productList->_renderProductWidgetOption(array($product->getId(), 'options'), $product->getPage()->toArray()),
-		//'$product:editproduct'       => $productList->_renderProductWidgetOption(array($product->getId(), 'editproduct'), $product->getPage()->toArray())
-		$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
-		if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
+		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
+		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
 			$content = $this->_processList();
-			$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
-		}
-		$this->_view->plContent       = $content;
-		$this->_view->offset          = (!isset($this->_options[0])) ? self::DEFAULT_OFFSET : $this->_options[0];
-		$this->_view->limit           = self::DEFAULT_OFFSET;
-		$this->_view->productTemplate = $this->_productTemplate->getName();
+			//$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
+		//}
 		if($this->_cleanListOnly) {
 			return $content;
+		}
+		$this->_view->plContent       = $content;
+		$this->_view->productTemplate = $this->_productTemplate->getName();
+		if(!isset($this->_options[0])) {
+			$this->_view->offset = self::DEFAULT_OFFSET;
+		} else if(!intval($this->_options[0])) {
+			return $this->_view->render('productlist.phtml');
+		} else {
+			$this->_view->offset = $this->_options[0];
 		}
 		return $this->_view->render('productlist.phtml');
 	}
@@ -77,13 +111,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		// loading product listing template
 		$template = $this->_productTemplate;
 		$products = $this->_products;
+		if((isset($this->_options[0])) && $this->_options[0] == 'sametags') {
+			$products = $this->_listSameTags();
+		}
 		if(empty($products)) {
 			$products = $this->_loadProducts();
 		}
-//		if(empty($products)) {
-//			return '<!-- Products list is empty -->';
-//		}
-
 		$wesiteData  = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
 		// init variables we will use in closure
@@ -100,9 +133,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		// here we go - proccessing the list
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data) {
-
 			$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
-
 			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
 			if($data['mediaServersAllowed']) {
 				$mediaServer = Tools_Content_Tools::getMediaServer();
@@ -110,11 +141,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					$data['mediaPath'] = str_replace($data['websiteUrl'], $mediaServer . '.' . $data['domain'], $data['mediaPath']);
 				}
 			}
-
 			// proccessing product photo and get some data
 			$productPhotoData = explode('/', $product->getPhoto());
 			$photoUrlPart     = $data['mediaPath'] . $productPhotoData[0];
-
 			$shortDesc        = $product->getShortDescription();
 			//setting up the entity parser
 			$renderedContent .= $entityParser->setDictionary(array(
@@ -135,14 +164,40 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description:short' => $shortDesc,
                 '$product:description'       => $shortDesc,
                 '$product:description:full'  => $product->getFullDescription(),
-				'$store:addtocart'           => $storeWidget->render() //'{$store:addtocart:' . $product->getId() . '}'
+				'$store:addtocart'           => $storeWidget->render()
 			))->parse($data['templateContent']);
-
 			unset($storeWidget);
 		});
 		return $renderedContent;
 	}
 
+	protected function _listSameTags() {
+		//get the product
+		$sameTagsProducts = array();
+		$product   = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
+		if(!$product instanceof Models_Model_Product) {
+			throw new Exceptions_SeotoasterWidgetException('Use this widget only on product page');
+		}
+		$excludeId = $product->getId();
+		$tags      = $product->getCategories();
+		unset($product);
+		if(is_array($tags) && !empty($tags)) {
+			$sameTagsProducts = $this->_productMapper->findByCategories(array_map(function($item) {
+				return $item['id'];
+			}, $tags), false);
+		}
+		return array_filter($sameTagsProducts, function($product) use($excludeId) {
+			return ($product->getId() != $excludeId);
+		});
+	}
+
+	/**
+	 * Render specific options using product widget
+	 *
+	 * @param $option
+	 * @param $data
+	 * @return mixed
+	 */
 	private function _renderProductWidgetOption($option, $data) {
         if (!is_array($option)){
             $option = (array) $option;

@@ -255,7 +255,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 	}
 
-	public function findByCategories(array $categories) {
+	public function findByCategories(array $categories, $intersect = true) {
 		$products         = array();
 		$filteredProducts = array();
 		$catDbTable       = new Models_DbTable_Category();
@@ -270,8 +270,16 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 						$products[$modelHash] = $productModel;
 					}
 				}
-				$filteredProducts = (empty($filteredProducts)) ? $products : array_intersect_key($products, $filteredProducts);
-				$products = array();
+				if(empty($filteredProducts)) {
+					$filteredProducts = $products;
+				} else {
+					if($intersect) {
+						$filteredProducts = array_intersect_key($products, $filteredProducts);
+					} else {
+						$filteredProducts = array_merge($products, $filteredProducts);
+					}
+				}
+                $products = array();
 			}
 		}
 		return array_values($filteredProducts);
