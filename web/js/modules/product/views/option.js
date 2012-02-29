@@ -77,12 +77,15 @@ define([
 			}
 		},
 		toggleIsTemplate: function(e){
-			var $tplNameInput = $(e.target).closest('div').find('input[name=templateName]');
+			var $tplNameInput   = $(e.target).closest('div').find('input[name=templateName]'),
+                $tplLabel       = $(e.target).closest('div').find('label');
             if (e.target.checked) {
                 this.model.set({isTemplate: true});
+                $tplLabel.hide();
                 $tplNameInput.show();
             } else {
                 this.model.unset('isTemplate');
+                $tplLabel.show();
                 $tplNameInput.hide();
             }
 		},
