@@ -6,7 +6,7 @@
  */
 class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
-	const PRODUCT_CATEGORY_URL	= 'product-pages';
+	const PRODUCT_CATEGORY_URL	= 'product-pages.html';
 	const PRODUCT_DEFAULT_LIMIT = 30;
 
 	/**
@@ -542,11 +542,13 @@ class Shopping extends Tools_Plugins_Abstract {
 									}
 								}
 	                            //cleanup unnecessary values
-	                            $product->setPage(array(
-	                                'id'         => $product->getPage()->getId(),
-	                                'url'        => $product->getPage()->getUrl(),
-	                                'templateId' => $product->getPage()->getTemplateId()
-	                            ));
+								if ($product->getPage()){
+		                            $product->setPage(array(
+		                                'id'         => $product->getPage()->getId(),
+		                                'url'        => $product->getPage()->getUrl(),
+		                                'templateId' => $product->getPage()->getTemplateId()
+		                            ));
+								}
 
 	                            array_push($data, $product->toArray());
 							}
@@ -667,20 +669,16 @@ class Shopping extends Tools_Plugins_Abstract {
 		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
 		if (!$prodCatPage){
 			$prodCatPage = new Application_Model_Models_Page(array(
-				'h1Tag'			=> self::PRODUCT_CATEGORY_NAME,
+				'h1'			=> self::PRODUCT_CATEGORY_NAME,
 				'headerTitle'	=> self::PRODUCT_CATEGORY_NAME,
 				'url'			=> self::PRODUCT_CATEGORY_URL,
 				'navName'		=> self::PRODUCT_CATEGORY_NAME,
-				'metaDescription'	=> '',
-				'teaserText'	=> '',
 				'templateId'	=> Application_Model_Models_Template::ID_DEFAULT,
 				'parentId'		=> 0,
 				'system'		=> 1,
 				'is404page'		=> 0,
 				'protected'		=> 0,
 				'memLanding'	=> 0,
-				'siloId'		=> 0,
-				'lastUpdate'	=> date(DATE_ATOM),
 				'showInMenu'	=> 0,
 				'targetedKey'	=> self::PRODUCT_CATEGORY_NAME
 			));
