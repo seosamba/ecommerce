@@ -322,15 +322,13 @@
                 </div>
             </div>
             <div class="grid_3">
-              <div class="grid_9">
+              <div class="grid_9" style="height: 26px;">
                 {{if id}}
                 &nbsp;
                 {{else}}
-                <label>
-                    <input type="checkbox" title="Add as template?" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} style="margin-right: 5px;" />
-                    Add as template?
-                </label>
-                <input type="text" name="templateName" placeholder="Template name" />
+	            <input type="checkbox" title="<?php echo $this->translate('Add to library?');?>" name="isTemplate" style="margin: 5px 5px 5px 0; cursor:pointer" {{if isTemplate}}checked="checked"{{/if}} />
+	            <label style="display:inline;"><?php echo $this->translate('Add to library?');?></label>
+                <input type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label');?>" style="width: 80%"/>
                 {{/if}}
               </div>
               <div class="grid_3">
