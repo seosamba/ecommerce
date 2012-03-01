@@ -145,6 +145,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$productPhotoData = explode('/', $product->getPhoto());
 			$photoUrlPart     = $data['mediaPath'] . $productPhotoData[0];
 			$shortDesc        = $product->getShortDescription();
+			$templatePrepend  = '<!--pid="' . $product->getId() . '"-->';
 			//setting up the entity parser
 			$renderedContent .= $entityParser->setDictionary(array(
 				'$product:name'              => $product->getName(),
@@ -165,7 +166,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description'       => $shortDesc,
                 '$product:description:full'  => $product->getFullDescription(),
 				'$store:addtocart'           => $storeWidget->render()
-			))->parse($data['templateContent']);
+			))->parse($templatePrepend . $data['templateContent']);
 			unset($storeWidget);
 		});
 		return $renderedContent;

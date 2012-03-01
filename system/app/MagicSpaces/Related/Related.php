@@ -1,5 +1,5 @@
 <?php
-class  MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
+class MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 
 	protected function _run() {
 		$this->_saveRelatedProducts();
@@ -17,11 +17,17 @@ class  MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 			}
 			return false;
 		}
-		preg_match_all('~data-productId="([0-9]+)"~u', $this->_spaceContent, $found);
+
+
+
+		preg_match_all('~<!--pid="([0-9]+)"-->~u', $this->_spaceContent, $found);
 		if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
-			preg_match_all('~data-pid="([0-9]+)"~u', $this->_spaceContent, $found);
+			preg_match_all('~data-productId="([0-9]+)"~u', $this->_spaceContent, $found);
 			if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
-				return false;
+				preg_match_all('~data-pid="([0-9]+)"~u', $this->_spaceContent, $found);
+				if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
+					return false;
+				}
 			}
 		}
 		$product->setRelated($found[1]);

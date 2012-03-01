@@ -91,7 +91,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
         $template = Application_Model_Mappers_TemplateMapper::getInstance()->findByName($this->_options[0]);
         if ($template !== null) {
-            $themeConfig = Zend_Registry::get('theme');
+
+	        $templatePrepend = '<!--pid="' . $this->_product->getId() . '"-->';
+
+	        $themeConfig = Zend_Registry::get('theme');
             $parserOptions = array(
                 'websiteUrl'   => $this->_websiteHelper->getUrl(),
                 'websitePath'  => $this->_websiteHelper->getPath(),
@@ -100,7 +103,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
             );
             unset($themeConfig);
 
-            $parser = new Tools_Content_Parser($template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
+            $parser = new Tools_Content_Parser($templatePrepend . $template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
             return $parser->parse();
         }
 
