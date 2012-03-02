@@ -224,42 +224,17 @@ CREATE TABLE IF NOT EXISTS `shopping_zone_zip` (
   PRIMARY KEY (`zone_id`,`zip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
-  `user_id` int(10) unsigned NOT NULL,
-  `shipping_address_id` int(10) unsigned DEFAULT NULL,
-  `billing_address_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `address_type` varchar(255) DEFAULT NULL,
-  `firstname` varchar(255) DEFAULT NULL,
-  `lastname` varchar(255) DEFAULT NULL,
-  `company` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `address1` varchar(255) DEFAULT NULL,
-  `address2` varchar(255) DEFAULT NULL,
-  `country` varchar(255) DEFAULT NULL,
-  `city` varchar(255) DEFAULT NULL,
-  `state` varchar(255) DEFAULT NULL,
-  `zip` varchar(255) DEFAULT NULL,
-  `phone` varchar(255) DEFAULT NULL,
-  `mobile` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `state` (`state`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip_address` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP ,
   `user_id` int(10) unsigned DEFAULT NULL,
-  `shipping_address_id` int(10) unsigned DEFAULT NULL,
-  `billing_address_id` int(10) unsigned DEFAULT NULL,
+  `shipping_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `billing_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `shipping_price` decimal(10,2) DEFAULT NULL,
+  `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -281,6 +256,35 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
   KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
+  `id` varchar(32) NOT NULL,
+  `user_id` int(10) unsigned DEFAULT NULL,
+  `address_type` varchar(255) DEFAULT NULL,
+  `firstname` varchar(255) DEFAULT NULL,
+  `lastname` varchar(255) DEFAULT NULL,
+  `company` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address1` varchar(255) DEFAULT NULL,
+  `address2` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
+  `zip` varchar(255) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `mobile` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `state` (`state`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
+  `user_id` int(10) unsigned NOT NULL,
+  `shipping_address_id` int(10) unsigned DEFAULT NULL,
+  `billing_address_id` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 ALTER TABLE `shopping_product`
   ADD CONSTRAINT `shopping_product_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `page` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
@@ -297,14 +301,14 @@ ALTER TABLE `shopping_product_has_related`
 ALTER TABLE `shopping_product_option_selection`
   ADD CONSTRAINT `fk_shopping_product_option_selection_shopping_product_option1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
-ALTER TABLE `shopping_customer_info`
-  ADD CONSTRAINT `shopping_customer_info_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
-
-ALTER TABLE `shopping_customer_address`
-  ADD CONSTRAINT `shopping_customer_address_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
-
 ALTER TABLE `shopping_cart_session`
   ADD CONSTRAINT `shopping_cart_session_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
 ALTER TABLE `shopping_cart_session_content`
   ADD CONSTRAINT `shopping_cart_session_content_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_customer_address`
+  ADD CONSTRAINT `shopping_customer_address_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_customer_info`
+  ADD CONSTRAINT `shopping_customer_info_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
