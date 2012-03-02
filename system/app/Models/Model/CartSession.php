@@ -79,7 +79,7 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	}
 
 	public function getStatus() {
-		return $this->_status !== null ? $this->_status : self::CART_STATUS_NEW;
+		return $this->_status;
 	}
 
 	public function setGateway($gateway) {

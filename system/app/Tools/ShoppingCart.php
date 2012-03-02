@@ -63,18 +63,16 @@ class Tools_ShoppingCart {
 		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
 		$currentUser = $sessionHelper->getCurrentUser();
 
-		if ($currentUser->getRoleId() !== Shopping::ROLE_CUSTOMER || !$currentUser instanceof Models_Model_Customer) {
-			if ($currentUser->getId()) {
-				$customer = Models_Mapper_CustomerMapper::getInstance()->find($currentUser->getId());
-				if ($customer === null) {
-					$customer = new Models_Model_Customer($currentUser->toArray());
-				}
-			} elseif ($currentUser->getId() === null || $currentUser->getRoleId() === Tools_Security_Acl::ROLE_GUEST){
-				$customer = new Models_Model_Customer();
+		if ($currentUser->getId()) {
+			$customer = Models_Mapper_CustomerMapper::getInstance()->find($currentUser->getId());
+			if ($customer === null) {
+				$customer = new Models_Model_Customer($currentUser->toArray());
 			}
+		} else {
+			$customer = new Models_Model_Customer();
 		}
 
-		return $currentUser;
+		return $customer;
 	}
 
 	public function save() {
@@ -315,9 +313,16 @@ class Tools_ShoppingCart {
 	 * @return Tools_ShoppingCart
 	 */
 	public function saveCartSession($customer) {
+		if (null === $customer) {
+			$customer = $this->getCustomer();
+		}
+
 		$cartSession = new Models_Model_CartSession();
-		$cartSession->setId($this->getCartId()?$this->getCartId():null)
-			->setIpAddress($_SERVER['REMOTE_ADDR']);
+		if ($this->getCartId()) {
+			$cartSession->setId($this->getCartId());
+		} else {
+			$cartSession->setStatus(Models_Model_CartSession::CART_STATUS_NEW);
+		}
 
 		$cartSessionContent = array();
 		foreach ($this->getContent() as $uniqKey => $item) {
@@ -336,6 +341,7 @@ class Tools_ShoppingCart {
 			array_push($cartSessionContent, $data);
 		}
 		$cartSession->setCartContent($cartSessionContent);
+		$cartSession->setIpAddress($_SERVER['REMOTE_ADDR']);
 
 		if ($customer->getId() !== null) {
 			$cartSession->setUserId($customer->getId())
