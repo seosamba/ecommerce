@@ -27,7 +27,7 @@ class Tools_Shipping_Shipping {
 		}
 		$result = $this->$shippingCalculator();
 		if ($method === self::SHIPPING_TYPE_INTERNAL){
-			return array('service' => self::SHIPPING_TYPE_INTERNAL,
+			$result = array('service' => self::SHIPPING_TYPE_INTERNAL,
 				'rates' => array($result)
 			);
 		}
