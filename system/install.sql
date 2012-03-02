@@ -280,8 +280,8 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
 
 CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
   `user_id` int(10) unsigned NOT NULL,
-  `shipping_address_id` int(10) unsigned DEFAULT NULL,
-  `billing_address_id` int(10) unsigned DEFAULT NULL,
+  `shipping_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `billing_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
