@@ -31,6 +31,12 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_billingAddressId = null;
 
+	protected $_shippingPrice = null;
+
+	protected $_shippingType  = null;
+
+	protected $_shippingService = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -105,5 +111,34 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 		return $this->_shippingAddressId;
 	}
 
+	public function setShippingPrice($shippingPrice) {
+		$this->_shippingPrice = $shippingPrice;
+
+		return $this;
+	}
+
+	public function getShippingPrice() {
+		return $this->_shippingPrice;
+	}
+
+	public function setShippingService($shippingService) {
+		$this->_shippingService = $shippingService;
+
+		return $this;
+	}
+
+	public function getShippingService() {
+		return $this->_shippingService;
+	}
+
+	public function setShippingType($shippingType) {
+		$this->_shippingType = $shippingType;
+
+		return $this;
+	}
+
+	public function getShippingType() {
+		return $this->_shippingType;
+	}
 
 }

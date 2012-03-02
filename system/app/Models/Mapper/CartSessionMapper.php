@@ -22,7 +22,10 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'status'       => $model->getStatus(),
 			'gateway'      => $model->getGateway(),
 			'shipping_address_id'   => $model->getShippingAddressId(),
-			'billing_address_id'    => $model->getBillingAddressId()
+			'billing_address_id'    => $model->getBillingAddressId(),
+			'shipping_price'        => $model->getShippingPrice(),
+			'shipping_type'         => $model->getShippingType(),
+			'shipping_service'      => $model->getShippingService()
 		);
 
 		if(null === ($exists = $this->find($data['id']))) {

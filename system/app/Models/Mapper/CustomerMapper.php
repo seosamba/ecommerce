@@ -71,17 +71,14 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 			return null;
 		}
 		$customerInfo       = $this->getDbTable()->find($id)->current();
+		$customer = new $this->_model($user->toArray());
 		if ($customerInfo) {
-			$userData = array_merge($user->toArray(), $customerInfo->toArray(), array('addresses' => array()));
 			$customerAddresses = $customerInfo->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
-			foreach ($customerAddresses as $addr){
-				$addr = Tools_Misc::clenupAddress($addr);
-				$userData['addresses'][Tools_Misc::getAddressUniqKey($addr)] = $addr;
-				unset($addr);
+			if (!empty($customerAddresses)){
+				$customer->setAddresses($customerAddresses);
 			}
-			return new $this->_model($userData);
 		}
-		return null;
+		return $customer;
 	}
 
 	public function findByEmail($email) {
@@ -91,5 +88,24 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 			return null;
 		}
 		return $this->find($user->id);
+	}
+
+	public function addAddress(Models_Model_Customer $customer, $address, $type = null){
+		$addressTable = new Models_DbTable_CustomerAddress();
+		if (!empty($address)){
+			if ($type !== null) {
+				$address['address_type'] = $type;
+			}
+			$address = Tools_Misc::clenupAddress($address);
+			$address['id'] = Tools_Misc::getAddressUniqKey($address);
+			$address['user_id'] = $customer->getId();
+			if (null === ($row = $addressTable->find($address['id'])->current())) {
+				$row = $addressTable->createRow();
+			}
+			$row->setFromArray($address);
+
+			return $row->save();
+		}
+		return null;
 	}
 }

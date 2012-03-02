@@ -26,6 +26,8 @@ class Tools_ShoppingCart {
 
 	protected $_billingAddressKey   = null;
 
+	protected $_shippingData    = null;
+
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
         $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -69,12 +71,6 @@ class Tools_ShoppingCart {
 				}
 			} elseif ($currentUser->getId() === null || $currentUser->getRoleId() === Tools_Security_Acl::ROLE_GUEST){
 				$customer = new Models_Model_Customer();
-			}
-
-			if (isset($customer)) {
-				$sessionHelper->setCurrentUser($customer);
-				$currentUser = $customer;
-				unset($customer);
 			}
 		}
 
@@ -200,7 +196,10 @@ class Tools_ShoppingCart {
 				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
-			$summary['shipping'] = $this->_calculateShipping();
+			$summary['shipping'] = 0;
+			if (($shipping = $this->getShippingData()) !== null){
+				$summary['shipping'] = $shipping['price'];
+			}
 			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
 
 		}
@@ -283,7 +282,7 @@ class Tools_ShoppingCart {
 	}
 
 	public function clean() {
-		$this->_session->cartContent = null;
+		$this->_session->unsetAll();
 	}
 
 	private function _load() {
@@ -292,6 +291,9 @@ class Tools_ShoppingCart {
 		}
 		if (isset($this->_session->cartId)) {
 			$this->setCartId($this->_session->cartId);
+		}
+		if (isset($this->_session->shippingData)) {
+			$this->setShippingData(unserialize($this->_session->shippingData));
 		}
 
 		$this->_shippingAddressKey  = $this->_session->shippingAddressKey;
@@ -305,18 +307,18 @@ class Tools_ShoppingCart {
 	    $this->_session->cartId      = $this->getCartId();
 	    $this->_session->shippingAddressKey = $this->_shippingAddressKey;
 	    $this->_session->billingAddressKey  = $this->_billingAddressKey;
+	    $this->_session->shippingData  = serialize($this->getShippingData());
     }
 
 	/**
 	 * Saves cuurent cart data to database
 	 * @return Tools_ShoppingCart
 	 */
-	public function saveCartSession() {
+	public function saveCartSession($customer) {
 		$cartSession = new Models_Model_CartSession();
 		$cartSession->setId($this->getCartId()?$this->getCartId():null)
 			->setIpAddress($_SERVER['REMOTE_ADDR']);
 
-		$customer = $this->getCustomer();
 		$cartSessionContent = array();
 		foreach ($this->getContent() as $uniqKey => $item) {
 			$data = array(
@@ -337,8 +339,14 @@ class Tools_ShoppingCart {
 
 		if ($customer->getId() !== null) {
 			$cartSession->setUserId($customer->getId())
-					->setShippingAddressId($customer->getAddressByUniqKey($this->getShippingAddressKey(), true))
-					->setBillingAddressId($customer->getAddressByUniqKey($this->getBillingAddressKey(), true));
+					->setShippingAddressId( $this->_shippingAddressKey )
+					->setBillingAddressId(  $this->_billingAddressKey );
+		}
+
+		if (null !== ($shippingData = $this->getShippingData())) {
+			$cartSession->setShippingPrice($shippingData['price'])
+				->setShippingType($shippingData['type'])
+				->setShippingService($shippingData['service']);
 		}
 
 		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
@@ -383,42 +391,7 @@ class Tools_ShoppingCart {
 	}
 
 	private function _calculateShipping() {
-		$shippingPrice       =  0;
-		$orderPrice          = floatval($this->calculateCartPrice());
-		$shippingType        = $this->_shoppingConfig['shippingType'];
-		$shippingGeneral     = $this->_shoppingConfig['shippingGeneral'];
-		$userShippingAddress = $this->getCustomer()->getAddressByUniqKey($this->getShippingAddressKey());
-		if($shippingType == 'shipping' || !$userShippingAddress || empty($userShippingAddress)) {
-			return $shippingPrice;
-		}
-		$shippingSettings = unserialize($this->_shoppingConfig['shipping' . ucfirst($shippingType)]);
-		$freeShippingSettings = unserialize($shippingGeneral);
-		$locationType = $this->_shoppingConfig['country'] == $userShippingAddress['country'] ? 'national' : 'international';
-		if (is_array($freeShippingSettings) && !empty($freeShippingSettings)){
-			$freeLimit = floatval($freeShippingSettings['freeShippingOver']);
-			if ($freeShippingSettings['freeShippingOptions'] === 'both'
-					&& $orderPrice > $freeLimit) {
-				return $shippingPrice;
-			} elseif ($locationType === $freeShippingSettings['freeShippingOptions']
-					&& $orderPrice > $freeLimit) {
-				return $shippingPrice;
-			}
-		}
 
-		if (is_array($shippingSettings) && !empty($shippingSettings)) {
-			foreach($shippingSettings as $ruleNumber => $settingsData) {
-				if($orderPrice > $settingsData['limit']) {
-					if($ruleNumber < 3) {
-						continue;
-					}
-					$shippingPrice = $settingsData[$locationType] ;
-					break;
-				}
-				$shippingPrice = $settingsData[$locationType] ;
-				break;
-			}
-		}
-		return $shippingPrice;
 	}
 
 	/**
@@ -529,21 +502,43 @@ class Tools_ShoppingCart {
 		return $this->_cartId;
 	}
 
-	public function setShippingAddressKey($shippingAddressKey) {
-		$this->_shippingAddressKey = $shippingAddressKey;
+	public function setAddressKey($type, $addressKey) {
+		switch ($type){
+			case Models_Model_Customer::ADDRESS_TYPE_BILLING:
+				$this->_billingAddressKey = $addressKey;
+				break;
+			case Models_Model_Customer::ADDRESS_TYPE_SHIPPING:
+				$this->_shippingAddressKey = $addressKey;
+				break;
+		}
+
 		return $this;
 	}
 
-	public function getShippingAddressKey() {
-		return $this->_shippingAddressKey;
+	public function getAddressKey($type) {
+		switch ($type){
+			case Models_Model_Customer::ADDRESS_TYPE_BILLING:
+				return $this->_billingAddressKey;
+				break;
+			case Models_Model_Customer::ADDRESS_TYPE_SHIPPING:
+				return $this->_shippingAddressKey;
+				break;
+		}
 	}
 
-	public function setBillingAddressKey($billingAddressKey) {
-		$this->_billingAddressKey = $billingAddressKey;
+	public static function getAddressById($id) {
+		$addressTable = new Models_DbTable_CustomerAddress();
+		$address = $addressTable->find($id)->current();
+		return $address ? $address->toArray() : null ;
+	}
+
+	public function setShippingData($shippingData) {
+		$this->_shippingData = $shippingData;
 		return $this;
 	}
 
-	public function getBillingAddressKey() {
-		return $this->_billingAddressKey;
+	public function getShippingData() {
+		return $this->_shippingData;
 	}
+
 }
