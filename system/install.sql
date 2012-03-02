@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip_address` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP ,
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `user_id` int(10) unsigned DEFAULT NULL,
   `shipping_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `billing_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
