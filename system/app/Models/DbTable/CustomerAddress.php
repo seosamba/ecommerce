@@ -13,6 +13,11 @@ class Models_DbTable_CustomerAddress extends Zend_Db_Table_Abstract {
 				'columns'		=> 'user_id',
 				'refTableClass'	=> 'Models_DbTable_CustomerInfo',
 				'refColumns'	=> 'user_id'
+			),
+			'User' => array(
+				'columns'		=> 'user_id',
+				'refTableClass'	=> 'Application_Model_DbTable_User',
+				'refColumns'	=> 'id'
 			)
 	);
 

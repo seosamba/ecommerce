@@ -11,9 +11,9 @@ class Models_Model_Customer extends Application_Model_Models_User {
 
 	protected $_addresses;
 
-	protected $_billing_address_id;
+	protected $_default_billing_address_id;
 
-	protected $_shipping_address_id;
+	protected $_default_shipping_address_id;
 
 	public function getDefaultAddress($type = self::ADDRESS_TYPE_SHIPPING) {
 		if (empty($type)) {
@@ -21,13 +21,13 @@ class Models_Model_Customer extends Application_Model_Models_User {
 		}
 		switch ($type) {
 			case static::ADDRESS_TYPE_SHIPPING :
-				if ($this->_shipping_address_id !== null) {
-					return $this->getAddressById($this->_shipping_address_id);
+				if ($this->_default_shipping_address_id !== null) {
+					return $this->getAddressById($this->_default_shipping_address_id);
 				}
 				break;
 			case static::ADDRESS_TYPE_BILLING :
-				if ($this->_shipping_address_id !== null) {
-					return $this->getAddressById($this->_shipping_address_id);
+				if ($this->_default_shipping_address_id !== null) {
+					return $this->getAddressById($this->_default_shipping_address_id);
 				}
 				break;
 			default:
@@ -81,22 +81,22 @@ class Models_Model_Customer extends Application_Model_Models_User {
 		return null;
 	}
 
-	public function setBillingAddressId($billing_address_id) {
-		$this->_billing_address_id = $billing_address_id;
+	public function setDefaultBillingAddressId($billing_address_id) {
+		$this->_default_billing_address_id = $billing_address_id;
 		return $this;
 	}
 
-	public function getBillingAddressId() {
-		return $this->_billing_address_id;
+	public function getDefaultBillingAddressId() {
+		return $this->_default_billing_address_id;
 	}
 
-	public function setShippingAddressId($shipping_address_id) {
-		$this->_shipping_address_id = $shipping_address_id;
+	public function setDefaultShippingAddressId($shipping_address_id) {
+		$this->_default_shipping_address_id = $shipping_address_id;
 		return $this;
 	}
 
-	public function getShippingAddressId() {
-		return $this->_shipping_address_id;
+	public function getDefaultShippingAddressId() {
+		return $this->_default_shipping_address_id;
 	}
 
 	public function getAddressById($id) {

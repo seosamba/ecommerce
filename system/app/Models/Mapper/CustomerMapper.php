@@ -26,8 +26,8 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		//save customer info
 		$data = array(
 			'user_id'               => $customer->getId(),
-			'shipping_address_id'   => $customer->getShippingAddressId(),
-			'billing_address_id'    => $customer->getBillingAddressId()
+			'default_shipping_address_id'   => $customer->getDefaultShippingAddressId(),
+			'default_billing_address_id'    => $customer->getDefaultBillingAddressId()
 		);
 		$userInfo = $this->getDbTable()->find($customer->getId());
 		if(!$userInfo->current()) {
@@ -70,14 +70,19 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		if (!$user){
 			return null;
 		}
-		$customerInfo       = $this->getDbTable()->find($id)->current();
+
 		$customer = new $this->_model($user->toArray());
-		if ($customerInfo) {
-			$customerAddresses = $customerInfo->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
-			if (!empty($customerAddresses)){
-				$customer->setAddresses($customerAddresses);
-			}
+		$customerAddresses = $user->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
+
+		if (!empty($customerAddresses)){
+			$customer->setAddresses($customerAddresses);
 		}
+
+		$customerInfo = $user->findDependentRowset($this->_dbTable)->current();
+		if ($customerInfo) {
+			$customer->setOptions($customerInfo->toArray());
+		}
+
 		return $customer;
 	}
 
