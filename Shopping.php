@@ -888,7 +888,4 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
-	protected function _renderCustomerLogin() {
-		return 'DUDE LOGIN PLEASE!!!';
-	}
 }
