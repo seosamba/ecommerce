@@ -16,7 +16,6 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			throw new Exceptions_SeotoasterPluginException('Wrong model type given.');
 		}
 		$data = array(
-			'id'           => $model->getId(),
 			'ip_address'   => $model->getIpAddress(),
 			'user_id'      => $model->getUserId(),
 			'status'       => $model->getStatus(),
@@ -28,7 +27,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'shipping_service'      => $model->getShippingService()
 		);
 
-		if(null === ($exists = $this->find($data['id']))) {
+		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {
 			$data['created_at'] = date(DATE_ATOM);
 			$newId = $this->getDbTable()->insert($data);
 			if ($newId){
