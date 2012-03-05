@@ -46,41 +46,6 @@ class Models_Model_Customer extends Application_Model_Models_User {
 		return $this->_addresses;
 	}
 
-	public function addAddress($address, $type = null) {
-		if ($this->_addresses === null) {
-			$this->_addresses = array();
-		}
-
-		if (!array_key_exists('address_type', $address) && $type !== null) {
-			$address['address_type'] = $type;
-		}
-
-		$address = Tools_Misc::clenupAddress($address);
-
-		$uniqKey = Tools_Misc::getAddressUniqKey($address);
-
-		if (!array_key_exists($uniqKey, $this->_addresses)) {
-			$this->_addresses[$uniqKey] = $address;
-		}
-
-		return $uniqKey;
-	}
-
-	public function getAddressByUniqKey($key, $onlyAddressId = false){
-		if (empty($key) || empty($this->_addresses)){
-			return null;
-		}
-		if (array_key_exists($key, $this->_addresses)) {
-			$address = $this->_addresses[$key];
-			if ($onlyAddressId){
-				return $address['id'];
-			}
-			return $address;
-		}
-
-		return null;
-	}
-
 	public function setDefaultBillingAddressId($billing_address_id) {
 		$this->_default_billing_address_id = $billing_address_id;
 		return $this;
