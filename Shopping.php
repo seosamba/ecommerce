@@ -252,7 +252,7 @@ class Shopping extends Tools_Plugins_Abstract {
 							'service'   => $item['service'],
 							'type'      => $item['rates'][$data['index']]['type'],
 							'price'     => $item['rates'][$data['index']]['price']
-						))->save();
+						))->save()->saveCartSession(null);
 					unset($this->_sessionHelper->tmpShippingRates);
 					return true;
 				}
@@ -279,7 +279,6 @@ class Shopping extends Tools_Plugins_Abstract {
 				}
 			}
 
-//			return $customer;
 		}
 
 		return $customer;
