@@ -317,10 +317,10 @@ class Tools_ShoppingCart {
 			$customer = $this->getCustomer();
 		}
 
-		$cartSession = new Models_Model_CartSession();
 		if ($this->getCartId()) {
-			$cartSession->setId($this->getCartId());
+			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($this->getCartId());
 		} else {
+			$cartSession = new Models_Model_CartSession();
 			$cartSession->setStatus(Models_Model_CartSession::CART_STATUS_NEW);
 		}
 
