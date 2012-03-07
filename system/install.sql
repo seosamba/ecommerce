@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `shopping_brands` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_tags` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
@@ -148,7 +148,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
 CREATE TABLE IF NOT EXISTS `shopping_product_has_tag` (
   `product_id` int(10) unsigned NOT NULL,
   `tag_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`product_id`,`tag_id`)
+  PRIMARY KEY (`product_id`,`tag_id`),
+  KEY `tag_id` (`tag_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_product_has_option` (
@@ -289,7 +290,8 @@ ALTER TABLE `shopping_product`
   ADD CONSTRAINT `shopping_product_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `page` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
 ALTER TABLE `shopping_product_has_tag`
-  ADD CONSTRAINT `shopping_product_has_tag_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `shopping_product_has_tag_ibfk_3` FOREIGN KEY (`tag_id`) REFERENCES `shopping_tags` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `shopping_product_has_tag_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `shopping_product_has_option`
   ADD CONSTRAINT `shopping_product_has_option_ibfk_1` FOREIGN KEY (`option_id`) REFERENCES `shopping_product_option` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
