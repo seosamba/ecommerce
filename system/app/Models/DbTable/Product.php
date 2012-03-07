@@ -11,7 +11,7 @@ class Models_DbTable_Product extends Zend_Db_Table_Abstract {
 	
 	protected $_dependentTables = array(
 		'Models_DbTable_Brand',
-		'Models_DbTable_ProductCategory',
+		'Models_DbTable_ProductTag',
 		'Models_DbTable_ProductOption',
 		'Models_DbTable_ProductRelated'
 	);

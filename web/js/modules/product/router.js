@@ -5,11 +5,11 @@ define([
 	'modules/product/models/product',
 	'modules/product/collections/productlist',
 	'modules/product/views/productlist',
-	'modules/product/collections/categories',
-	'modules/product/views/category',
+	'modules/product/collections/tags',
+	'modules/product/views/tag',
     'modules/product/collections/brands'
 ], function(_, Backbone, AppView, ProductModel, ProductsCollection, ProductListingView,
-            CategoryCollection, CategoryView, BrandsCollection){
+            TagsCollection, TagView, BrandsCollection){
 	var Router = Backbone.Router.extend({
 		app: null,
 		routes: {
@@ -19,7 +19,7 @@ define([
 		},
 		products: null,
         productListHolder: $('#product-list-holder'),
-		categories: null,
+		tags: null,
         brands: null,
 		initialize: function(){
 			this.app = new AppView();
@@ -27,9 +27,9 @@ define([
 			$('#product-list').hide();
 			$('#manage-product').show();
 
-			this.categories = new CategoryCollection();
-			this.categories.bind('add', this.addCategory, this);
-			this.categories.bind('reset', this.renderCategories, this);
+			this.tags = new TagsCollection();
+			this.tags.bind('add', this.addTag, this);
+			this.tags.bind('reset', this.renderTags, this);
 
             this.brands = new BrandsCollection();
             this.brands.bind('all', this.renderBrands, this);
@@ -56,18 +56,18 @@ define([
 			var productView = new ProductListingView({model: product});
 			this.productListHolder.append(productView.render().el).trigger('scroll');
 		},
-		addCategory: function(category, index){
-            var view = new CategoryView({model: category});
+		addTag: function(tag, index){
+            var view = new TagView({model: tag});
                 view.render();
             if (index instanceof Backbone.Collection){
-                $('#product-categories').prepend(view.$el);
+                $('#product-tags').prepend(view.$el);
             } else {
-                $('#product-categories').append(view.$el);
+                $('#product-tags').append(view.$el);
             }
         },
-		renderCategories: function(){
-			$('#product-categories').empty();
-			this.categories.each(this.addCategory, this);
+		renderTags: function(){
+			$('#product-tags').empty();
+			this.tags.each(this.addTag, this);
         },
         addBrand: function(brand) {
             $.tmpl("<option value='${name}' {{if url}}data-url='${url}'{{/if}}>${name}</option>", brand.toJSON()).appendTo('#product-brand');
@@ -91,7 +91,7 @@ define([
 	var initialize = function(){
 		window.appRouter = new Router;
 		$.when(
-			appRouter.categories.fetch(),
+			appRouter.tags.fetch(),
             appRouter.brands.fetch()
 		).then(function(){
 			Backbone.history.start();

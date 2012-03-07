@@ -16,7 +16,7 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-categories" id="categories" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
+		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
 	</div>
 	<div class="grid_4">
 		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands');?>..."></select>
@@ -110,7 +110,7 @@
 			    $(document).on('click', '.currproduct', this.insertSingleProduct)
 			        .on('click', '#btn-create', this.insertList);
 			    $('.pselect').chosen().change(function() {
-					if(!$('#categories').val() && !$('#brands').val()) {
+					if(!$('#tags').val() && !$('#brands').val()) {
 						uiTab.offset = 0;
 					}
 				    uiTab.loadStoreData('product', true)
@@ -133,7 +133,7 @@
                     $('table#content_tbl').width('230px');
                     $('table#content_tbl').height('475px');
                     //loading store data
-				    uiTab.loadStoreData('categories');
+				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');
 				    uiTab.loadStoreData('product')
 			    }
@@ -154,8 +154,8 @@
                 }
                 //listing template
                 shortCode += $('#templates').val();
-                //categories filter
-                shortCode += (($('#categories').val() != null) ? ':categories-' + $('#categories').val() : '');
+                //tags filter
+                shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
                 //brands filter
                 shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                 //ordering
@@ -174,14 +174,14 @@
 				function(response) {
                     if(response.length) {
                         switch(dataType) {
-                            case 'categories':
+                            case 'tags':
                             case 'brands':
-	                        	uiTab.parseCategoriesAndBrands(response, dataType);
+	                        	uiTab.parseTagsAndBrands(response, dataType);
                             break;
                             case 'product':
-	                            //console.log(!$('#categories').val(), !$('#brands').val());
+	                            //console.log(!$('#tags').val(), !$('#brands').val());
 	                            uiTab.parseProducts(response, filter);
-								if(!$('#categories').val() && !$('#brands').val()) {
+								if(!$('#tags').val() && !$('#brands').val()) {
 		                            $('.productlisting:last-child').waypoint(function() {
 										$(this).waypoint('remove');
 										utab.offset += 30;
@@ -211,15 +211,15 @@
                     data.limit = this.limit;
                 }
                 if(typeof filter != 'undefined' && filter) {
-                    data.fcat = $('#categories').val();
+                    data.ftag = $('#tags').val();
                     data.fbrand = $('#brands').val();
                 }
 			    return data;
 		    },
-		    parseCategoriesAndBrands: function(catBrandResponse, dataType) {
-               $.each(catBrandResponse, function() {
+		    parseTagsAndBrands: function(tagsBrandResponse, dataType) {
+               $.each(tagsBrandResponse, function() {
                    $('#' + dataType).append(
-                       $('<option></option>').val((dataType == 'categories') ? this.id : this.name).text(this.name)
+                       $('<option></option>').val((dataType == 'tags') ? this.id : this.name).text(this.name)
                    );
                });
 		    },

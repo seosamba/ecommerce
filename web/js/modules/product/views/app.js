@@ -2,18 +2,18 @@ define([
 	'libs/underscore/underscore',
 	'libs/backbone/backbone',
 	'modules/product/models/product',
-	'modules/product/views/category',
+	'modules/product/views/tag',
 //	'modules/product/collections/options',
 	'modules/product/models/option',
 	'modules/product/views/option',
 	'modules/product/views/productlist'
-], function(_, Backbone, ProductModel, CategoryView, /*OptionCollection,*/ ProductOption, ProductOptionView, ProductListView){
+], function(_, Backbone, ProductModel, TagView, /*OptionCollection,*/ ProductOption, ProductOptionView, ProductListView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
 		events: {
             'click .show-list': 'toggleList',
-			'keypress input#new-category': 'newCategory',
+			'keypress input#new-tag': 'newTag',
 			'click #add-new-option-btn': 'newOption',
             'change select#option-library': 'addOption',
 			'click #submit': 'saveProduct',
@@ -21,7 +21,7 @@ define([
 			'click div.box': 'setProductImage',
 			'change [data-reflection=property]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
-			'click input[name^=category]': 'toggleCategory',
+			'click input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
             'keypress input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
@@ -54,12 +54,12 @@ define([
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
 		},
-		newCategory: function(e){
-			var name = this.$('#new-category').val();
+		newTag: function(e){
+			var name = this.$('#new-tag').val();
 			if (e.keyCode == 13 && name !== '') {
-			   appRouter.categories.create({name: name}, {
+			   appRouter.tags.create({name: name}, {
 				   success: function(model, response){
-					   $('#new-category').val('').blur();
+					   $('#new-tag').val('').blur();
 				   },
 				   error: function(model, response){
 					   showMessage(response.responseText, true);
@@ -67,14 +67,14 @@ define([
 			   });
 			}
 		},
-		toggleCategory: function(e){
-			var checkedCategories = [];
+		toggleTag: function(e){
+			var checkedTags = [];
 
-			_.each($('input[name^=category]:checked'), function(el){
-				checkedCategories.push(appRouter.categories.get( el.value ).toJSON());
+			_.each($('input[name^=tag]:checked'), function(el){
+				checkedTags.push(appRouter.tags.get( el.value ).toJSON());
 			});
 
-			this.model.set({categories: checkedCategories});
+			this.model.set({tags: checkedTags});
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
@@ -177,11 +177,11 @@ define([
             //render related products
             this.renderRelated();
 
-            //populating selected categories
-			$('#product-categories').find('input:checkbox:checked').removeAttr('checked');
-			if (this.model.has('categories')){
-				_.each(this.model.get('categories'), function(category, name){
-					var el = appRouter.categories.get(category.id).view.el;
+            //populating selected tags
+			$('#product-tags').find('input:checkbox:checked').removeAttr('checked');
+			if (this.model.has('tags')){
+				_.each(this.model.get('tags'), function(tag, name){
+					var el = appRouter.tags.get(tag.id).view.el;
 					$(el).find(':checkbox').attr('checked','checked');
 				});
 			}

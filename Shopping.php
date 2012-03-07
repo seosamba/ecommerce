@@ -512,19 +512,19 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
-	private function _categoriesRESTService() {
+	private function _tagsRESTService() {
 		$data = array();
-		$catMapper = Models_Mapper_Category::getInstance();
+		$tagMapper = Models_Mapper_Tag::getInstance();
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		switch (strtolower($this->_request->getMethod())){
 			case 'get':
 				if ($id) {
-					$result = $catMapper->find($id);
+					$result = $tagMapper->find($id);
 					if ($result !== null){
 						$data = $result->toArray();
 					}
 				} else {
-					foreach ($catMapper->fetchAll(null, array('name')) as $cat){
+					foreach ($tagMapper->fetchAll(null, array('name')) as $cat){
 						array_push($data, $cat->toArray());
 					}
 				}
@@ -534,19 +534,23 @@ class Shopping extends Tools_Plugins_Abstract {
 				$rawData = json_decode($this->_request->getRawBody(), true);
 				if (!empty($rawData)){
 					$rawData['name'] = ucfirst($rawData['name']);
-					$result = $catMapper->save($rawData);
+					$result = $tagMapper->save($rawData);
 				} else {
 					continue;
 				}
 				if ($result === null){
-					$data = array('error'=>true, 'message' => 'This tag already exists', 'code' => 400);
+					$data = array(
+						'error'=>true,
+					    'message' => $this->_translator->translate('This tag already exists'),
+					    'code' => 400
+					);
 				} else {
 					$data = $result->toArray();
 				}
 				break;
 			case 'delete':
 				if ($id !== false){
-					$result = $catMapper->delete($id);
+					$result = $tagMapper->delete($id);
 				} else {
 					$result = false;
 				}
@@ -574,15 +578,15 @@ class Shopping extends Tools_Plugins_Abstract {
 					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
 					$key    = isset($this->_requestedParams['key']) ? filter_var($this->_requestedParams['key'], FILTER_SANITIZE_STRING) : null;
 
-					$filter['categories'] = isset($this->_requestedParams['fcat']) ? $this->_requestedParams['fcat'] : null;
+					$filter['tags'] = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
-					$categoryPart         = (is_array($filter['categories']) && !empty($filter['categories'])) ? implode('.', $filter['categories']) : 'allcategories';
+					$tagPart              = (is_array($filter['tags']) && !empty($filter['tags'])) ? implode('.', $filter['tags']) : 'alltags';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
-					$cacheKey             = $categoryPart . $brandPart . $offset . $limit . $key;
+					$cacheKey             = $tagPart . $brandPart . $offset . $limit . $key;
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
 						$data = array();
-						if(is_array($filter['categories']) && !empty($filter['categories'])) {
-							$products = $productMapper->findByCategories($filter['categories']) ;
+						if(is_array($filter['tags']) && !empty($filter['tags'])) {
+							$products = $productMapper->findByTags($filter['tags']) ;
 						}
 						else {
                             if(is_array($filter['brands']) && !empty($filter['brands'])) {

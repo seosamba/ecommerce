@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ProductCategory
+ * ProductOption
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */

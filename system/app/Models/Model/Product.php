@@ -35,7 +35,7 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_taxClass;
 	
-	protected $_categories;
+	protected $_tags;
 	
 	protected $_defaultOptions = array();
 	
@@ -142,12 +142,12 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 		$this->_taxClass = $_tax;
 	}
 
-	public function getCategories() {
-		return $this->_categories;
+	public function getTags() {
+		return $this->_tags;
 	}
 
-	public function setCategories($_categories) {
-		$this->_categories = $_categories;
+	public function setTags($_tags) {
+		$this->_tags = $_tags;
 	}
 	
 	public function getParentId() {

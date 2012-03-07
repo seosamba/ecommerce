@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Category
+ * Tag
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Models_Mapper_Category extends Application_Model_Mappers_Abstract {
+class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 
-	protected $_model = 'Models_Model_Category';
+	protected $_model = 'Models_Model_Tag';
 
-	protected $_dbTable = 'Models_DbTable_Category';
+	protected $_dbTable = 'Models_DbTable_Tag';
 	
 	public function save($model) {
 		if (!$model instanceof $this->_model){
@@ -43,8 +43,15 @@ class Models_Mapper_Category extends Application_Model_Mappers_Abstract {
 		$result = $this->getDbTable()->find($id);
 		if ($result->count()){
 			$result = $result->current();
-			
-			return $result->delete();
+			if ($result) {
+				$relations = $result->findDependentRowset('Models_DbTable_ProductTag');
+				if ($relations->count()){
+					foreach ($relations as $relation) {
+						$relation->delete();
+					}
+				}
+				return $result->delete();
+			}
 		}
 		return false;
 	}

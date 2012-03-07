@@ -192,18 +192,18 @@ class Widgets_Product_Product extends Widgets_Abstract {
         return $this->_product->getSku();
     }
 
-    private function _renderCategories() {
+    private function _renderTags() {
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-        $categories = $this->_product->getCategories();
-        if (!empty($categories)){
-            foreach ($categories as &$category) {
-                if ($url = $pageMapper->findByUrl($category['name'].'.html')){
-                    $category['url'] = $url;
+        $tags = $this->_product->getTags();
+        if (!empty($tags)){
+            foreach ($tags as &$tag) {
+                if ($url = $pageMapper->findByUrl($tag['name'].'.html')){
+                    $tag['url'] = $url;
                 }
             }
         }
-        $this->_view->categories = $categories;
-        return $this->_view->render('categories.phtml');
+        $this->_view->tags = $tags;
+        return $this->_view->render('tags.phtml');
     }
 
     private function _renderRelated() {

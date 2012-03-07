@@ -1,13 +1,13 @@
 <?php
 
 /**
- * ProductCategory
+ * Product to Tags relation table
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Models_DbTable_ProductCategory extends Zend_Db_Table_Abstract {
+class Models_DbTable_ProductTag extends Zend_Db_Table_Abstract {
 
-	protected $_name = 'shopping_product_category';
+	protected $_name = 'shopping_product_has_tag';
 
 	protected $_referenceMap = array(
 		'Product' => array(
@@ -15,9 +15,9 @@ class Models_DbTable_ProductCategory extends Zend_Db_Table_Abstract {
 			'refTableClass'	=> 'Models_DbTable_Product',
 			'refColumns'	=> 'id'
 		),
-		'Category' => array(
-			'columns'		=> 'category_id',
-			'refTableClass'	=> 'Models_DbTable_Category',
+		'Tags' => array(
+			'columns'		=> 'tag_id',
+			'refTableClass'	=> 'Models_DbTable_Tag',
 			'refColumns'	=> 'id'
 		)
 	);

@@ -7,10 +7,10 @@
 class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	/**
-	 * Suboption for the categories
+	 * Suboption for the tags
 	 *
 	 */
-	const OPTTYPE_CATEGORIES    = 'categories';
+	const OPTTYPE_TAGS    = 'tags';
 
 	/**
 	 *  Suboption for the brands
@@ -180,10 +180,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			throw new Exceptions_SeotoasterWidgetException('Use this widget only on product page');
 		}
 		$excludeId = $product->getId();
-		$tags      = $product->getCategories();
+		$tags      = $product->getTags();
 		unset($product);
 		if(is_array($tags) && !empty($tags)) {
-			$sameTagsProducts = $this->_productMapper->findByCategories(array_map(function($item) {
+			$sameTagsProducts = $this->_productMapper->findByTags(array_map(function($item) {
 				return $item['id'];
 			}, $tags), false);
 		}
@@ -224,8 +224,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				continue;
 			}
 			switch($optData['type']) {
-				case self::OPTTYPE_CATEGORIES:
-					$products = $this->_productMapper->findByCategories($optData['values']);
+				case self::OPTTYPE_TAGS:
+					$products = $this->_productMapper->findByTags($optData['values']);
 				break;
 				case self::OPTTYPE_BRANDS:
 					if(empty($products)) {
@@ -251,8 +251,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	/**
 	 * Takes an option from the options array and find the specific constructions
 	 *
-	 * such as categories-id1,id2,idn; brands-name1,name2,namen, order-name,brand,price
-	 * and makes an array: array('type' => 'categories', 'values' => 'id1,id2,idn')
+	 * such as tags-id1,id2,idn; brands-name1,name2,namen, order-name,brand,price
+	 * and makes an array: array('type' => 'tags', 'values' => 'id1,id2,idn')
 	 *
 	 * @param $option string
 	 * @return mixed

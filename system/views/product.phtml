@@ -23,7 +23,7 @@
 			div.box:hover {
 				box-shadow: 0 0 3px lightseagreen;
 			}
-			#product-categories .category-widget {
+			#product-tags .tag-widget {
 				float:left;
                 margin: 3px 10px 3px 0;
 				border: 2px solid white;
@@ -35,7 +35,7 @@
 				font-weight: normal;
 				border-image: initial;
 			}
-			#product-categories .category-widget {
+			#product-tags .tag-widget {
 			    background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
 			    border: 2px solid white;
 			    -moz-border-radius: 3px 3px 3px 3px;
@@ -48,24 +48,24 @@
 			    padding: 5px 4px 4px;
 			    width: 23%;
 			}
-            #product-categories .category-widget span {
+            #product-tags .tag-widget span {
                 cursor: pointer;
             }
-			#product-categories .category-widget .ui-icon-closethick {
+			#product-tags .tag-widget .ui-icon-closethick {
 			    float: right;
 			    margin: -1px 0 0 3px;
 			}
 
-            .category-widget span.ui-icon {
+            .tag-widget span.ui-icon {
 				display: inline-block;
 				border-radius: 4px;
 				cursor:pointer;
                 vertical-align: bottom;
 			}
-            .category-widget .category-editable {
+            .tag-widget .tag-editable {
                 vertical-align:top;
             }
-            .category-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
+            .tag-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
                 background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
             }
 			#options-holder .option-content .option-modifier-select {
@@ -288,10 +288,10 @@
             echo $this->headScript();
         ?>
 
-		<script id="categoryTemplate" type="text/x-jquery-tmpl">
-			<input type="checkbox" name="category[]" value="${id}"/>
-			<span class="category-editable" title="Click to edit">${name}</span>
-			<span class="ui-icon ui-icon-closethick">Delete</span>
+		<script id="tagTemplate" type="text/x-jquery-tmpl">
+			<input type="checkbox" name="tag[]" value="${id}"/>
+			<span class="tag-editable" title="Click to edit">${name}</span>
+			<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
 		</script>
 		
 		<script id="imgTemplate" type="text/x-jquery-tmpl">
@@ -468,7 +468,7 @@
 
             <ul>
                 <li><a href="#tab1"><?php echo $this->translate('Main Info'); ?></a></li>
-                <li><a href="#category-tab"><?php echo $this->translate('Product tags'); ?></a></li>
+                <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
                 <li><a href="#options-tab"><?php echo $this->translate('Options'); ?></a></li>
                 <li><a href="#tab4"><?php echo $this->translate('Related Products'); ?></a></li>
                 <?php foreach ($this->plugins as $plugin) : ?>
@@ -568,15 +568,15 @@
                 </div>
                 <div id="quick-preview" class="grid_4"></div>
             </div>
-            <div id="category-tab" class="clearfix">
+            <div id="tag-tab" class="clearfix">
                 <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
-                    <input type="text" id="new-category" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%cat%&quot;?'); ?>"/>
+                    <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
                 </div>
 
-                <div id="product-categories" class="grid_12 h380" style="overflow-y: auto;">
+                <div id="product-tags" class="grid_12 h380" style="overflow-y: auto;">
                 </div>
 
-            </div> <!-- #category-tab -->
+            </div> <!-- #tag-tab -->
 
             <div id="options-tab" class="clearfix">
                 <div class="grid_6 prefix_3 suffix_3 mb5px" style="text-align:center;">

@@ -56,17 +56,17 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 
-		if ($model->getCategories()) {
-			$productCategoryTable = new Models_DbTable_ProductCategory();
-			$productCategoryTable->getAdapter()->beginTransaction();
-			$productCategoryTable->delete($productCategoryTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
-			foreach ($model->getCategories() as $category) {
-				$productCategoryTable->insert(array(
+		if ($model->getTags()) {
+			$productTagsTable = new Models_DbTable_ProductTag();
+			$productTagsTable->getAdapter()->beginTransaction();
+			$productTagsTable->delete($productTagsTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
+			foreach ($model->getTags() as $tag) {
+				$productTagsTable->insert(array(
 					'product_id' => $model->getId(),
-					'category_id' => $category['id']
+					'tag_id'     => $tag['id']
 				));
 			}
-			$productCategoryTable->getAdapter()->commit();
+			$productTagsTable->getAdapter()->commit();
 		}
 
 		$this->_processOptions($model);
@@ -96,10 +96,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                     ->orWhere('shopping_product.sku LIKE ?', '%'.$search.'%')
                     ->orWhere('shopping_product.mpn LIKE ?', '%'.$search.'%')
                     ->join('shopping_brands', 'shopping_brands.id = shopping_product.brand_id', null)
-                    ->join('shopping_product_category', 'shopping_product_category.product_id = shopping_product.id', null)
-                    ->join('shopping_categories', 'shopping_categories.id = shopping_product_category.category_id', null)
+                    ->join('shopping_product_has_tag', 'shopping_product_has_tag.product_id = shopping_product.id', null)
+                    ->join('shopping_tags', 'shopping_tags.id = shopping_product_has_tag.tag_id', null)
                     ->orWhere('shopping_brands.name LIKE ?', '%'.$search.'%')
-                    ->orWhere('shopping_categories.name LIKE ?', '%'.$search.'%')
+                    ->orWhere('shopping_tags.name LIKE ?', '%'.$search.'%')
                     ->group('shopping_product.id')
                     ->limit($limit, $offset)
                     ->order($order);
@@ -151,10 +151,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 
-		//fetching categories
-		$categorySet = $row->findManyToManyRowset('Models_DbTable_Category','Models_DbTable_ProductCategory');
-		if ($categorySet->count()){
-			$entity->setCategories($categorySet->toArray());
+		//fetching tags
+		$tagsSet = $row->findManyToManyRowset('Models_DbTable_Tag','Models_DbTable_ProductTag');
+		if ($tagsSet->count()){
+			$entity->setTags($tagsSet->toArray());
 		}
 
 		//fetching options
@@ -255,14 +255,14 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 	}
 
-	public function findByCategories(array $categories, $intersect = true) {
+	public function findByTags(array $tags, $intersect = true) {
 		$products         = array();
 		$filteredProducts = array();
-		$catDbTable       = new Models_DbTable_Category();
-		if(!empty($categories)) {
-			foreach($categories as $cId) {
-				$catRow         = $catDbTable->find($cId)->current();
-			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductCategory');
+		$catDbTable       = new Models_DbTable_Tag();
+		if(!empty($tags)) {
+			foreach($tags as $tagId) {
+				$catRow         = $catDbTable->find($tagId)->current();
+			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductTag');
 				foreach($productsRowset as $productRow) {
 					$productModel = $this->_toModel($productRow);
 					$modelHash    = md5($productModel->getId());
@@ -334,15 +334,15 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $db = $this->getDbTable()->getAdapter();
 
         $select[] = $db->select()
-                ->from('shopping_product', array('name'));
+            ->from('shopping_product', array('name'));
         $select[] = $db->select()
-                ->from('shopping_product', array('sku'));
+            ->from('shopping_product', array('sku'));
         $select[] = $db->select()
-                ->from('shopping_product', array('mpn'));
+            ->from('shopping_product', array('mpn'));
         $select[] = $db->select()
-                ->from('shopping_categories', array('name'));
+            ->from('shopping_tags', array('name'));
         $select[] = $db->select()
-                        ->from('shopping_brands', array('name'));
+            ->from('shopping_brands', array('name'));
 
         return $db->fetchCol($db->select()->union($select));
     }

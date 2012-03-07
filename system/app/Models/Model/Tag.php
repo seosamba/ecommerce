@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Category
+ * Tag
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Models_Model_Category extends Application_Model_Models_Abstract {
+class Models_Model_Tag extends Application_Model_Models_Abstract {
 
 	protected  $_id;
 	

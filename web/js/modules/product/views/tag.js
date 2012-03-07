@@ -3,16 +3,16 @@ define([
 	'libs/backbone/backbone'
 ], function(_, Backbone){
 	
-	var CategoryView = Backbone.View.extend({
+	var TagView = Backbone.View.extend({
 		tagName: 'div',
-		className: 'category-widget',
-		template: $('#categoryTemplate').template(),
+		className: 'tag-widget',
+		template: $('#tagTemplate').template(),
 		nameInput: null,
 		events: {
 			"click span.ui-icon-closethick": "kill",
-			"dblclick span.category-editable": "edit",
-			"keypress span.category-editable": "preventLineBreak",
-			"blur span.category-editable": "save"
+			"dblclick span.tag-editable": "edit",
+			"keypress span.tag-editable": "preventLineBreak",
+			"blur span.tag-editable": "save"
 		},
 		initialize: function(){
 			this.model.bind('change', this.render, this);
@@ -20,11 +20,11 @@ define([
 		},
 		render: function(){
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
-			this.nameInput = this.$el.children('span.category-editable');
+			this.nameInput = this.$el.children('span.tag-editable');
 			return this;
 		},
 		kill: function(){
-			var confirmMsg = $('#new-category').data('confirmmsg').replace('%cat%', this.model.get('name'));
+			var confirmMsg = $('#new-tag').data('confirmmsg').replace('%tag%', this.model.get('name'));
 			var modelHolder = this.model;
 			
 			showConfirm(confirmMsg, function(){
@@ -51,5 +51,5 @@ define([
 		
 	});
 	
-	return CategoryView;
+	return TagView;
 });
