@@ -60,7 +60,7 @@
                                 stateLabel && stateLabel.hide();
                             }
 
-                            if (defaultValues.state && stateSelect.children().size()){
+                            if (defaultValues && stateSelect.children().size()){
                                 stateSelect.val(defaultValues.state);
                             }
                         }
@@ -68,7 +68,7 @@
                 });
             });
 
-            if (countrySelect.find("[selected]").size() === 0 && defaultValues.country){
+            if (defaultValues && countrySelect.find("[selected]").size()){
                 countrySelect.val(defaultValues.country).change();
             } else {
                 if (stateSelect.children().size() === 0) {
