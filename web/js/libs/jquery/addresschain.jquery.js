@@ -16,8 +16,8 @@
         return this.each(function () {
             var elem = $(this),
                 countrySelect = (options.countrySelector instanceof $ ? options.countrySelector : $(options.countrySelector, this)),
-                stateSelect   = (options.stateSelector instanceof $ ? options.stateSelector : $(options.stateSelector, this))
-                stateLabel = stateSelect.attr('id') && $('label[for='+stateSelect.attr('id')+']', this);
+                stateSelect   = (options.stateSelector instanceof $ ? options.stateSelector : $(options.stateSelector, this)),
+                stateLabel    = stateSelect.attr('id') && $('label[for='+stateSelect.attr('id')+']', this);
 
             //hiding state element if it's empty
             if (stateSelect.find('option').length === 0){
