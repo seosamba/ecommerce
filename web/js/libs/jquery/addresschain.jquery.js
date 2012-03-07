@@ -7,6 +7,10 @@
 ;(function ( $, window, document, undefined ) {
 
     $.fn.addressChain = function ( options ) {
+        var defaultValues = options && options.hasOwnProperty('defaults') ?
+            $.extend({country: null, state: null}, options.defaults) :
+            null ;
+
         options = $.extend( {}, $.fn.addressChain.options, options );
 
         return this.each(function () {
@@ -25,7 +29,7 @@
                 var countryCode = $(this).val();
 
                 //doing AJAX-request
-                $.ajax({
+                return $.ajax({
                     url: options.url,
                     dataType: 'json',
                     data: { country: countryCode },
@@ -55,10 +59,23 @@
                                 stateSelect.hide();
                                 stateLabel && stateLabel.hide();
                             }
+
+                            if (defaultValues.state && stateSelect.children().size()){
+                                stateSelect.val(defaultValues.state);
+                            }
                         }
                     }
                 });
             });
+
+            if (countrySelect.find("[selected]").size() === 0 && defaultValues.country){
+                countrySelect.val(defaultValues.country).change();
+            } else {
+                if (stateSelect.children().size() === 0) {
+                    countrySelect.trigger('change');
+                }
+            }
+
         });
     };
 
@@ -69,7 +86,7 @@
     // experience but can also override the values as necessary.
     // eg. $fn.pluginName.key ='otherval';
 
-    
+
     $.fn.addressChain.options = {
         countrySelector: "select[name$=country]",
         stateSelector: "select[name$=state]",
