@@ -16,9 +16,8 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 				'class'  => 'toaster-checkout',
 				'action' => '/plugin/shopping/run/checkout/',
 				'method' => Zend_Form::METHOD_POST
-			));
-
-		$this->setDecorators(array('FormElements', 'Form'));
+			))
+			->setDecorators(array('FormElements', 'Form'));
 
 		$this->getElement('lastname')->setRequired(true)->setAttrib('class', 'required');
 		$this->getElement('email')->setRequired(true)->setAttrib('class', 'required');
@@ -62,32 +61,33 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 		$lcol = $this->getDisplayGroup('lcol')
 			->setDecorators(array(
 				'FormElements',
-			    'Fieldset',
-//			    array('HtmlTag',array('tag'=>'div'))
+			    'Fieldset'
 		));
 
 		$rcol = $this->getDisplayGroup('rcol')
 			->setDecorators(array(
 				'FormElements',
-			    'Fieldset',
-//			    array('HtmlTag',array('tag'=>'div'))
+			    'Fieldset'
 		));
 
 		$bottom = $this->getDisplayGroup('bottom')
 			->setDecorators(array(
 				'FormElements',
-			    'Fieldset',
-//			    array('HtmlTag',array('tag'=>'div'))
+			    'Fieldset'
+		));
+
+		$this->setElementDecorators(array(
+			'ViewHelper',
+			'Label',
+			array('HtmlTag', array('tag' => 'div'))
 		));
 
 		$this->addElement(new Zend_Form_Element_Submit(array(
 			'name'   => 'calculateAndCheckout',
 			'ignore' => true,
-			'label'  => 'Calculate shipping and checkout'
+			'label'  => 'Calculate shipping and checkout',
+			'decorators' => array('ViewHelper', new Zend_Form_Decorator_HtmlTag(array('tag' => 'div', 'class' => 'cart-form-submit')))
 		)));
-
-		$this->getElement('calculateAndCheckout')->removeDecorator('DtDdWrapper')
-			->addDecorator('HtmlTag', array('tag' => 'div', 'class' => 'cart-form-submit'));
 
 	}
 

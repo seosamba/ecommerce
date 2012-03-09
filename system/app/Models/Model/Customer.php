@@ -26,8 +26,8 @@ class Models_Model_Customer extends Application_Model_Models_User {
 				}
 				break;
 			case static::ADDRESS_TYPE_BILLING :
-				if ($this->_default_shipping_address_id !== null) {
-					return $this->getAddressById($this->_default_shipping_address_id);
+				if ($this->_default_billing_address_id !== null) {
+					return $this->getAddressById($this->_default_billing_address_id);
 				}
 				break;
 			default:

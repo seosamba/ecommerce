@@ -52,14 +52,18 @@ class Forms_Checkout_Billing extends Forms_Address_Abstract {
 			->setDecorators(array(
 				'FormElements',
 			    'Fieldset',
-//			    array('HtmlTag',array('tag'=>'div'))
 		));
 
 		$rcol = $this->getDisplayGroup('rcol')
 			->setDecorators(array(
 				'FormElements',
 			    'Fieldset',
-//			    array('HtmlTag',array('tag'=>'div'))
+		));
+
+		$this->setElementDecorators(array(
+			'ViewHelper',
+			'Label',
+			array('HtmlTag', array('tag' => 'div'))
 		));
 
 		$this->addElement(new Zend_Form_Element_Submit(array(
@@ -68,11 +72,6 @@ class Forms_Checkout_Billing extends Forms_Address_Abstract {
 			'label'  => 'Checkout'
 		)));
 
-		$this->getElement('checkout')->removeDecorator('DtDdWrapper')
-			->addDecorator('HtmlTag', array('tag' => 'div', 'class' => 'cart-form-submit'));
-
 	}
-
-
 
 }
