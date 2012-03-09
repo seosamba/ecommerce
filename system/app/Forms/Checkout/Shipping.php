@@ -86,7 +86,7 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 			'name'   => 'calculateAndCheckout',
 			'ignore' => true,
 			'label'  => 'Calculate shipping and checkout',
-			'decorators' => array('ViewHelper', new Zend_Form_Decorator_HtmlTag(array('tag' => 'div', 'class' => 'cart-form-submit')))
+			'decorators' => array('ViewHelper')
 		)));
 
 	}

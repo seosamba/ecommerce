@@ -70,7 +70,7 @@ class Forms_Checkout_Billing extends Forms_Address_Abstract {
 			'name'   => 'checkout',
 			'ignore' => true,
 			'label'  => 'Checkout',
-			'decorators' => array('ViewHelper', new Zend_Form_Decorator_HtmlTag(array('tag' => 'div', 'class' => 'cart-form-submit')))
+			'decorators' => array('ViewHelper')
 		)));
 
 	}
