@@ -891,4 +891,49 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	public function peopleAction() {
+		echo $this->_view->render('people.phtml');
+	}
+
+	protected function _makeOptionPeople() {
+		return '<iframe src="'.$this->_websiteUrl.'plugin/shopping/run/people" width="100%"></iframe>';
+//				$this->_view->render('people.phtml');
+	}
+
+	/**
+	 * @return array
+	 */
+	private function _customerRESTService() {
+		$data = array();
+		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
+		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
+		$for = isset($this->_requestedParams['for']) ? filter_var($this->_requestedParams['for'], FILTER_SANITIZE_STRING) : false;
+		switch (strtolower($this->_request->getMethod())){
+			default:
+			case 'get':
+				if ($for === 'dashboard'){
+					$order = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
+					$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+					$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
+					$data = $customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset);
+				} else {
+					$result = $customerMapper->fetchAll($id ? array('id = ?'=>$id) : null);
+					if ($result){
+						$data = array_map(function($model){ return $model->toArray(); }, $result);
+					}
+				}
+	            break;
+	        case 'post':
+	            break;
+			case 'put':
+				break;
+			case 'delete':
+				break;
+	    }
+		return $data;
+	}
+
+	protected function _customerlistAction() {
+
+	}
 }
