@@ -7,18 +7,14 @@ define([
         template: $('#tableRowTemplate').template(),
         tagName: 'tr',
         events: {
-            'click a.delete': 'kill'
+            'click a.details': 'details'
         },
         render: function(){
             $(this.el).html($.tmpl(this.template, this.model.toJSON()));
             return this;
         },
-        kill: function() {
-            var self = this;
-            showConfirm('Are you sure?', function(){
-                self.model.destroy();
-                self.$el.remove();
-            });
+        details: function(){
+            app.showCustomerDetails(this.model.get('id'));
         }
     });
 

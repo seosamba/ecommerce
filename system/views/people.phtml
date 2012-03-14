@@ -1,0 +1,111 @@
+<?php $this->headTitle($this->translate('Manage customers')) ?>
+<style>
+    table#people-table th.sortable {
+	    cursor: pointer;
+	    white-space: nowrap;
+    }
+    table#people-table th.sortable::after{
+	    color: #5f9ea0;
+	    content: " \21D5";
+	    display: inline;
+    }
+    table#people-table th.sortUp::after{
+	    content: " \21E7";
+    }
+    table#people-table th.sortDown::after{
+        content: " \21E9";
+    }
+    table#people-table thead tr{
+	    background-color: #d5d5d5;
+	    /*border-bottom: 1px solid #ccc;*/
+    }
+    table#people-table td.text-center{
+	    text-align: center;
+    }
+    table#people-table tbody tr:nth-child(even) {
+	    background-color: rgba(213, 213, 213, 0.6);
+    }
+    table#people-table tbody tr:nth-child(odd) {
+	    background-color: rgba(239, 239, 239, 0.8);
+    }
+    table#people-table a.table-nav {
+	    margin: 10px 2px;
+    }
+    table#people-table a.table-nav:hover {
+	    text-decoration: underline;
+    }
+</style>
+
+<script id="tableRowTemplate" type="text/x-jquery-tmpl">
+    <td><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" /></td>
+    <td><a href="javascript:;" class="details">${full_name}</a></td>
+    <td>${email}</td>
+    <td>${reg_date}</td>
+    <td class="text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
+</script>
+
+<script id="customerDetailsTemplate" type="text/x-jquery-tmpl">
+	<h2 class="fn">${fullName}</h2>
+	<h3><a href="mailto:${email}" class="email">${email}</a></h3>
+	<p>${roleId} since ${regDate}</p>
+
+</script>
+
+<script id="addressTemplate" type="text/x-jquery-tmpl">
+	<div class="adr">
+		<h3><?php echo $this->translate('Default shipping address');?></h3>
+		<span class="street-address">address1 + address2</span>
+		<br/>
+		<span class="locality">city</span>
+		<span class="region">state</span>
+		<span class="postal-code">zip</span>
+	</div>
+</script>
+
+<?php
+    $this->headScript()->setAllowArbitraryAttributes(true)
+		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/people.js'));
+
+	echo $this->noLayout ? $this->headScript() : '';
+?>
+
+
+<div id="people" class="ui-helper-clearfix">
+    <table id="people-table" style="width: 100%">
+        <thead>
+            <tr>
+	            <th></th>
+	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
+	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
+	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
+	            <th class="sortable" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+	            <td colspan="4">
+		            <?php echo $this->translate('with selected');?>
+					<!-- @todo add some actions -->
+		            <select style="width: 250px">
+			            <option value="">add</option>
+			            <option value="">some</option>
+			            <option value="">actions</option>
+		            </select>
+	            </td>
+	            <th>
+		            <a href="#" id="people-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
+		            <a href="#" id="people-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
+	            </th>
+            </tr>
+        </tfoot>
+        <tbody id="customer-list">
+            <tr>
+	            <td colspan="5" class="text-center"><img src="<?php echo $this->websiteUrl;?>/system/images/loading.gif"/></td>
+            </tr>
+        </tbody>
+    </table>
+	<div id="customer-details" class="vcard">
+
+	</div>
+</div>

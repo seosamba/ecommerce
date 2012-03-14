@@ -2,8 +2,9 @@ define([
 	'Underscore',
 	'Backbone',
     'modules/people/collections/customers',
-    'modules/people/views/customer_row'
-], function(_, Backbone, CustomersCollection, CustomerRowView){
+    'modules/people/views/customer_row',
+    'modules/people/models/customer',
+], function(_, Backbone, CustomersCollection, CustomerRowView, CustomerModel){
 
     var AppView = Backbone.View.extend({
         el: $('#people'),
@@ -49,6 +50,17 @@ define([
                 }
                 this.customers.fetch()
             }
+        },
+        showCustomerDetails: function(uid) {
+            var model = new CustomerModel(),
+                tmpl = $('#customerDetailsTemplate').template();
+            model.fetch({data: {id: uid}}).done(function(){
+                $('#customer-details').html($.tmpl(tmpl, model.toJSON()))
+            });
+
+        },
+        renderCustomerDetails: function() {
+            console.log(arguments)
         }
     });
 	

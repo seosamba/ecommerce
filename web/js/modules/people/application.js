@@ -1,8 +1,8 @@
 define([
   'Underscore',
   'Backbone',
-  'modules/people/router', // Request router.js
-], function(_, Backbone, Router ){
+  'modules/people/views/app'
+], function(_, Backbone, AppView ){
 	if (!window.console) {
 		window.console = {
 		log: function(){
@@ -12,7 +12,7 @@ define([
 	}
 
 	var initialize = function(){
-		Router.initialize();
+		app = new AppView();
 	}
 
 	return { 

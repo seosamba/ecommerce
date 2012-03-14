@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <?php echo $this->headTitle() ?>
+	    <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
+		        ->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
+		        ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
+                ->appendStylesheet($this->websiteUrl . 'system/css/seotoaster.css')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/smoke.css')
+                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css'); ?>
+        <?php echo $this->headLink(); ?>
+
+	    <?php $this->jQuery()->enable(); ?>
+        <?php $this->jQuery()->uiEnable(); ?>
+
+	    <?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js'); ?>
+	    <?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/smoke/smoke.min.js'); ?>
+	    <?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/jquery/plugins/cookie/jquery.cookie.js'); ?>
+        <?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/internal/system.js'); ?>
+
+	    <?php
+	        echo $this->jQuery();
+	        $this->headScript()->setAllowArbitraryAttributes(true);
+	        echo $this->headScript();
+        ?>
+
+	</head>
+    <body>
+        <noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
+        JavaScript must be enabled at this point.<br/>
+        <a href="http://www.seotoaster.com/">seotoaster.com</a>
+        </noscript>
+        <?php echo $this->formHidden('website_url', $this->websiteUrl);?>
+        <div class="seotoaster container_12 rounded3px">
+	        <div class="ui-widget-header ui-corner-top" style="height: 22px; padding: 7px 0 2px 8px;">
+	            <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
+	        </div>
+            <?php echo $this->layout()->content; ?>
+        </div>
+    </body>
+</html>

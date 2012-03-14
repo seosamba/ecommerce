@@ -53,7 +53,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
 
+		$this->_layout = new Zend_Layout();
+		$this->_layout->setLayoutPath(__DIR__ . '/system/views/');
+
 		$this->_view->setScriptPath(__DIR__ . '/system/views/');
+
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig	= Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
@@ -892,12 +896,14 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	public function peopleAction() {
-		echo $this->_view->render('people.phtml');
+		$content = $this->_view->render('people.phtml');
+		$this->_layout->content = $content;
+		echo $this->_layout->render();
 	}
 
 	protected function _makeOptionPeople() {
-		return '<iframe src="'.$this->_websiteUrl.'plugin/shopping/run/people" width="100%"></iframe>';
-//				$this->_view->render('people.phtml');
+		$this->_view->noLayout = true;
+		return $this->_view->render('people.phtml');
 	}
 
 	/**
@@ -917,9 +923,16 @@ class Shopping extends Tools_Plugins_Abstract {
 					$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
 					$data = $customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset);
 				} else {
-					$result = $customerMapper->fetchAll($id ? array('id = ?'=>$id) : null);
-					if ($result){
-						$data = array_map(function($model){ return $model->toArray(); }, $result);
+					if ($id) {
+						$result = $customerMapper->find($id);
+						if ($result) {
+							$data = $result->toArray();
+						}
+					} else {
+						$result = $customerMapper->fetchAll();
+						if ($result){
+							$data = array_map(function($model){ return $model->toArray(); }, $result);
+						}
 					}
 				}
 	            break;
@@ -933,7 +946,4 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
-	protected function _customerlistAction() {
-
-	}
 }
