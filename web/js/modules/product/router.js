@@ -42,8 +42,9 @@ define([
 			$('#product-list:visible').hide('slide');
             if (this.products === null) {
                 var product = new ProductModel();
-                product.fetch({data: {id: productId}});
-                this.app.setModel(product);
+                product.fetch({data: {id: productId}}).done(function(){
+                    appRouter.app.setModel(product);
+                });
             } else {
                 this.app.setModel(this.products.get(productId));
             }
