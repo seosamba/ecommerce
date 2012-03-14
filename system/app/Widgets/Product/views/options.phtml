@@ -20,7 +20,7 @@
         <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_RADIO): ?>
         <div>
-        <?php echo  $this->formRadio($uniqName, $defaultId, null, $options); ?>
+        <?php echo  $this->formRadio($uniqName, $defaultId, null, $options, ''); ?>
         </div>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXT): ?>
         <input type="text" name="<?php echo  $uniqName;?>" id="" />
