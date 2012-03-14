@@ -13,14 +13,6 @@ define([
             'change #price-inc-tax': 'changeTaxConfig'
         },
         initialize: function(){
-            $('#new-rule-btn').button({
-                icons: {primary: 'ui-icon-plus'}
-            });
-
-            $('#save-btn').button({
-                icons: {primary: 'ui-icon-disk'}
-            });
-
             this.rulesCollection = new RulesCollection;
             this.rulesCollection.on('add', this.render, this);
             this.rulesCollection.on('remove', this.render, this);

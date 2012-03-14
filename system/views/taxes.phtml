@@ -2,8 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title></title>
-        <title><?php echo $this->translate('Manage product'); ?></title>
+        <title><?php echo $this->translate('Manage taxes'); ?></title>
         <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
                 ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
                 ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
@@ -96,8 +95,8 @@
 				
 			</div>
 			<div class="padding10px">
-				<button id="new-rule-btn">Add new</button>
-				<button id="save-btn" style="float:right;">Save</button>
+				<button id="new-rule-btn" class="blue-btn"><?php echo $this->translate('Add new');?></button>
+				<button id="save-btn" style="float:right;"><?php echo $this->translate('Save');?></button>
 			</div>
 		</div>
 
