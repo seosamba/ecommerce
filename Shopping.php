@@ -142,7 +142,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$form->populate($config);
 		$this->_view->form = $form;
 
-		echo $this->_view->render('config.phtml');
+		$this->_layout->content = $this->_view->render('config.phtml');
+		echo $this->_layout->render();
 	}
 
 	/**
