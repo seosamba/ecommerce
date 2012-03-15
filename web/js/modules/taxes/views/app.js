@@ -9,10 +9,10 @@ define([
         el: $('#manage-taxes'),
         events: {
             'click #new-rule-btn': 'newRule',
-            'click #save-btn': 'save',
-            'change #price-inc-tax': 'changeTaxConfig'
+            'click #save-btn': 'save'
         },
         initialize: function(){
+            $('#price-inc-tax').on('change', this.changeTaxConfig)
             this.rulesCollection = new RulesCollection;
             this.rulesCollection.on('add', this.render, this);
             this.rulesCollection.on('remove', this.render, this);

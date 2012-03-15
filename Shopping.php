@@ -339,7 +339,8 @@ class Shopping extends Tools_Plugins_Abstract {
 				'deleted' => isset($deleted) ? $deleted : null
 				));
 		}
-		echo $this->_view->render('zones.phtml');
+		$this->_layout->content = $this->_view->render('zones.phtml');
+		echo $this->_layout->render();
 	}
 
 	/**
@@ -348,8 +349,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	protected function taxesAction() {
 		$this->_view->priceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
-
-		echo $this->_view->render('taxes.phtml');
+		$this->_layout->content = $this->_view->render('taxes.phtml');
+		echo $this->_layout->render();
 	}
 
 	/**

@@ -6,7 +6,7 @@ define([
 
     var rulesCollection = Backbone.Collection.extend({
         model: RuleModel,
-        url: $('#websiteUrl').val()+'plugin/shopping/run/getdata/type/taxrules/id'
+        url: $('#website_url').val()+'plugin/shopping/run/getdata/type/taxrules/id'
     });
 
 	return rulesCollection;

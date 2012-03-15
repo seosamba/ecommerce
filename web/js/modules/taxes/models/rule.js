@@ -4,7 +4,7 @@ define([
 ], function(_, Backbone){
 
     var ruleModel = Backbone.Model.extend({
-        urlRoot: $('#websiteUrl').val()+'/plugin/shopping/run/getdata/type/taxrules',
+        urlRoot: $('#website_url').val()+'/plugin/shopping/run/getdata/type/taxrules',
         defaults: {
             isDefault: 0,
             zoneId: null,
