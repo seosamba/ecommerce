@@ -2,12 +2,18 @@
 <style>
     .taxrule {
         margin-top: 5px;
+	    color: #5F9EA0;
     }
     .ui-widget-header label {
       display: inline;
       vertical-align: bottom;
     }
     #price-inc-tax {margin-top:2px;}
+	#rules input[type=text] {
+		width: 70%;
+		margin-right:-22px;
+		padding-right:22px;
+	}
 </style>
 
 <?php
@@ -27,15 +33,15 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         {{tmpl '#zoneListTemplate'}}
         </select>
     </div>
-    <div class="grid_6" style="white-space:nowrap; font-weight:bold;">
-        <div class="grid_4 alpha">
-            <input type="text" name="rate1" data-reflection="property" style="width: 85%" value="${rate1}" placeholder="0"/>%
+    <div class="grid_6 omega" style="white-space:nowrap; font-weight:bold;">
+        <div class="grid_4">
+            <input type="text" name="rate1" data-reflection="property" value="${rate1}" placeholder="0"/>%
         </div>
         <div class="grid_4 ">
-            <input type="text" name="rate2" data-reflection="property" style="width: 85%" value="${rate2}" placeholder="0"/>%
+            <input type="text" name="rate2" data-reflection="property" value="${rate2}" placeholder="0"/>%
         </div>
-        <div class="grid_4 omega">
-            <input type="text" name="rate3" data-reflection="property" style="width: 85%" value="${rate3}" placeholder="0"/>%
+        <div class="grid_4">
+            <input type="text" name="rate3" data-reflection="property" value="${rate3}" placeholder="0"/>%
         </div>
     </div>
     <div class="grid_1 textcentered mt8px">
@@ -62,10 +68,10 @@ $this->placeholder('headerContent')->captureEnd();
 	<div class="ui-helper-clearfix padding10px" style="text-align:center; font-weight:bold; line-height: 20px;">
 		<div class="grid_1">Selected</div>
 		<div class="grid_4"><a href="javascript:;" data-url="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" class="tpopup" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
-		<div class="grid_6">
-			<div class="grid_4 alpha">Default Tax</div>
+		<div class="grid_6 omega">
+			<div class="grid_4">Default Tax</div>
 			<div class="grid_4">Tax Rate 1</div>
-			<div class="grid_4 omega">Tax Rate 2</div>
+			<div class="grid_4">Tax Rate 2</div>
 		</div>
 		<div class="grid_1">&nbsp;</div>
 	</div>

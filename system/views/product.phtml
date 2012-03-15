@@ -24,18 +24,6 @@
 				box-shadow: 0 0 3px lightseagreen;
 			}
 			#product-tags .tag-widget {
-				float:left;
-                margin: 3px 10px 3px 0;
-				border: 2px solid white;
-                min-width: 19%;
-				padding: 5px;
-				border-radius: 3px;
-				background: url("/system/images/bg-strip.png") repeat 0 0 transparent;
-				color: #5C5C5C;
-				font-weight: normal;
-				border-image: initial;
-			}
-			#product-tags .tag-widget {
 			    background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
 			    border: 2px solid white;
 			    -moz-border-radius: 3px 3px 3px 3px;
@@ -47,13 +35,28 @@
 			    margin: 3px 6px 3px 0;
 			    padding: 5px 4px 4px;
 			    width: 23%;
+				height:18px;
 			}
             #product-tags .tag-widget span {
                 cursor: pointer;
             }
+			#product-tags .tag-widget span.tag-editable {
+                float: left;
+                margin-left: 2%;
+                width: 81%;
+                white-space: nowrap;
+                overflow: hidden;
+                line-height: 1.2em;
+            }
+            #product-tags .tag-widget input {
+				float: left;
+				margin-top: 2px;
+				margin-left: 1px;
+            }
+
 			#product-tags .tag-widget .ui-icon-closethick {
 			    float: right;
-			    margin: -1px 0 0 3px;
+			    margin: 0 0 0 3px;
 			}
 
             .tag-widget span.ui-icon {
