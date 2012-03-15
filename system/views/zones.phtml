@@ -5,10 +5,8 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_6 suffix_6 mb10px">
-		<div>
-			<label for="">Zone Name:</label>
-			<input type="text" class="zone-name" value="${name}" placeholder="enter name for zone"/>
-		</div>
+		<label for="" class="grid_3 mt5px alpha">Zone Name:</label>
+		<input type="text" class="zone-name grid_9 alpha omega" value="${name}" placeholder="enter name for zone"/>
 	</div>
 	<div class="countries grid_6">
 		<div class="ui-widget-header ui-corner-top padding5px">
@@ -41,7 +39,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             <span style="font-weight:normal; margin-left:160px;">Insert list of zip/postal codes: one per line</span>
         </div>
             <div class="ui-widget-content" style="text-align: center">
-            <textarea style="width: 99%; height: 155px; resize: none;" class="zone-zip">${zip.join('\n')}</textarea>
+            <textarea style="width: 99%; height: 180px; resize: none;" class="zone-zip">${zip.join('\n')}</textarea>
 		</div>
 	</div>
 </script>
@@ -74,9 +72,31 @@ li.entry-row .ui-icon:hover {
     z-index: 5000;
 }
 #manage-zones .clearprop {
-  float: right;
-  font-size: 10pt;
-  color: #E6E6FA;
+	float: right;
+	font-size: 10pt;
+	color: #E6E6FA;
+}
+li.add-new-zone {
+	float: none !important;
+	-moz-border-radius:3px 3px 0 0;
+	-webkit-border-radius:3px 3px 0 0;
+	border-radius:3px 3px 0 0;
+	background: url("/system/uithemes/seotoasterui/images/ui-bg_highlight-soft_50_dedede_1x100.png") repeat-x scroll 50% 50% #E8E8E8;
+	border: 1px solid #D6D6D6;
+	display: inline-block;
+}
+li.add-new-zone:hover {
+	background: url("/system/uithemes/seotoasterui/images/ui-bg_inset-soft_50_e6e6fa_1x100.png") repeat-x scroll 50% 50% #E6E6FA;
+	border: 1px solid #D3D3D3;
+}
+#new-zone-btn {
+	background: url("/system/uithemes/seotoasterui/images/ui-icons_444444_256x240.png") -12px -125px no-repeat;
+	border: none;
+	height: 1.3em;
+	width: 1.5em;
+	cursor: pointer;
+	margin: 2px 3px 4px;
+	text-indent: -5000em;
 }
 </style>
 
@@ -88,7 +108,11 @@ li.entry-row .ui-icon:hover {
 <div id="manage-zones">
     <div id="zones" class="ui-helper-clearfix h530">
 	    <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
-        <ul><button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button></ul>
+        <ul>
+	        <li class="add-new-zone">
+		        <button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>
+	        </li>
+        </ul>
 	</div>
 
     <a id="delete-zone" href="javascript:;" class="delete-selected" style="margin-left:10px;">[ <?php echo $this->translate('Delete this zone'); ?> ]</a>
