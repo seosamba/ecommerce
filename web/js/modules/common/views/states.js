@@ -10,10 +10,9 @@ define([
             'change #state-filter': 'filterList'
         },
         render: function(){
-            var stateFilter = this.$el.find('#state-filter');
-            _.each(app.countries.toJSON(), function(country){
-                stateFilter.append($.tmpl('<option value="${country}">${name}</option>', country));
-            });
+            var stateFilter = $('#state-filter');
+
+            stateFilter.append($.tmpl('<option value="${country}">${name}</option>', app.countries.toJSON()));
 
             this.$el.find('#state-list').empty();
 

@@ -96,7 +96,7 @@ li.entry-row .ui-icon:hover {
 </div>
 
 <div class="ui-helper-hidden">
-    <div id="add-country-dialog" title="Add country">
+    <div id="add-country-dialog" title="<?php echo $this->translate('Add country');?>">
         <ul tabindex="0" id="country-list" class="ui-helper-clearfix" style="height: 200px; overflow-x:hidden;overflow-y: auto; background: lavender;">
         </ul>
         <div class="ui-widget-header padding5px" style="text-align:center;">
@@ -105,9 +105,9 @@ li.entry-row .ui-icon:hover {
         </div>
     </div>
 
-    <div id="add-state-dialog" style="margin-top: -5px; padding: 0;">
+    <div id="add-state-dialog" style="margin-top: -5px; padding: 0;" title="<?php echo $this->translate('Add state');?>">
         <div class="ui-widget-header padding5px">
-            <?php echo $this->translate('Select country');?>:
+            <?php echo $this->translate('Filter by country');?>:
             <select id="state-filter">
                 <option value="0" selected="selected"><?php echo $this->translate('all');?></option>
             </select>
