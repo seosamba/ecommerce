@@ -144,8 +144,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 					array('cart' => 'shopping_cart_session'),
 					'cart.user_id = user.id',
 					array(
-						//@todo change to cart.total_amount
-						'total_amount' => 'SUM(cart.shipping_price)',
+						'total_amount' => 'SUM(cart.total)',
 						'total_orders'=>'COUNT(cart.id)'
 					))
 				->group('user.id')
