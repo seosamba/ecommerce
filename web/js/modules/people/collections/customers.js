@@ -46,6 +46,9 @@ define([
             } else {
                 this.paginator.last = (this.length < this.paginator.limit);
             }
+        },
+        checked: function(){
+            return this.filter(function(customer){ return customer.has('checked') && customer.get('checked'); });
         }
     });
 
