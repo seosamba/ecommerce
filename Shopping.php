@@ -88,7 +88,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	public function run($requestedParams = array()) {
 		$dispatchersResult = parent::run($requestedParams);
 		if($dispatchersResult) {
-			return $dispatchersResult;
+			return $this->_getOption($dispatchersResult);
 		}
 	}
 
@@ -889,6 +889,23 @@ class Shopping extends Tools_Plugins_Abstract {
 			$parser = new Tools_Content_Parser($paymentZoneTmpl, Tools_Page_Tools::getCheckoutPage()->toArray(), $parserOptions);
 			return $parser->parse();
 		}
+	}
+
+	protected function _getOption($option) {
+		$config = $this->_configMapper->getConfigParams();
+		if(isset($config[$option])) {
+			if($option == 'country') {
+				$countries = Tools_Geo::getCountries(true);
+				$option   = $countries[$config[$option]];
+			} else {
+				$option = $config[$option];
+			}
+		} else {
+		   if($option == 'state') {
+			   $option = '';
+		   }
+		}
+		return $option;
 	}
 
 }
