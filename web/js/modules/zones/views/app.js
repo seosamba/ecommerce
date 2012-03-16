@@ -9,7 +9,6 @@ define([
         el: $('#manage-zones'),
         zoneHolder: $('#zones'),
         events: {
-            'keyup': 'hotkey',
             'click #new-zone-btn': 'newZone',
             'click #delete-zone': 'deleteZone',
             'click #save-btn': 'saveZones',
@@ -20,18 +19,20 @@ define([
             this.zonesCollection.on('add', this.renderZone, this);
             this.zonesCollection.on('reset', this.resetZones, this);
         },
-        hotkey: function(e){
-            console.log(e);
-        },
         newZone: function(){
             this.zonesCollection.add();
         },
         deleteZone: function(){
-            var index = this.zoneHolder.tabs('option', 'selected');
+            var zoneHolder = this.zoneHolder;
+                index = zoneHolder.tabs('option', 'selected');
                 model = this.zonesCollection.at(index);
             if (model){
-                model.destroy();
-                this.zoneHolder.tabs('remove', index);
+                showConfirm('Are you sure?', function(){
+                    model.destroy();
+                    zoneHolder.tabs('remove', index);
+                });
+            } else {
+                console.log('No zone to remove');
             }
         },
         renderZone: function(zone){

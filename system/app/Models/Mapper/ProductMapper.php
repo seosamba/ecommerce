@@ -214,7 +214,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 }
                 $result = $optionMapper->save($option);
 			}
-			array_push($options, $result);
+			array_push($options, $result->toArray());
 			array_push($validIds, $result->getId());
 		}
 

@@ -1,119 +1,94 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title><?php echo $this->translate('Manage config'); ?></title>
-        <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
-            ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
-            ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
-            ->appendStylesheet($this->websiteUrl . 'system/css/seotoaster.css')
-            ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/smoke.css')
-            ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css'); ?>
-        <?php echo $this->headLink(); ?>
+<?php
+$this->headTitle($this->translate('Manage config'));
 
-        <?php
-        $this->jQuery()->enable()
-            ->uiEnable()
-            ->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js')
-            ->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
-            ->addJavascriptFile($this->websiteUrl . 'system/js/internal/system.js')
-            ->addJavascriptFile($this->websiteUrl.'system/js/external/smoke/smoke.min.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
+?>
 
-        echo $this->jQuery();
-        ?>
+<script>
+<?php $this->jQuery()->onLoadCaptureStart();?>
+	$('div.seotoaster > div.ui-widget-header:first').remove();
 
-        <script>
-            $(function(){
-				var shopping = {};
-				shopping.saveconfig = function(){
-					var url = '<?php echo $this->form->getAction(); ?>';
-					var data = $('form[user-changed="true"]').serialize();
-					if (!data) {
-						window.console && console.log('nothing to save');
-						return false;
-					} else {
-						window.console && console.log(data);
-					}
-					
-					$.ajax({
-						url: url,
-						data: data,
-						type: 'POST',
-						dataType: 'html',
-						success: function(response){
-							$('form[user-changed="true"]').removeAttr('user-changed');
-							$('#config > ul > li > a.user-changed').removeClass('user-changed');
-                            showMessage('<?php echo $this->translate('Saved'); ?>');
-						}
-					});
-				}
-				
-				$('#save-btn').on('click', shopping.saveconfig);
-				
-				$('#config').tabs({
-					select: function(event, ui){
-						$form = $(ui.panel).children('form');
-						if ($form.attr('user-changed') === true && $form.find(':submit').size() == 0) {
-							$form.append('<input type=submit />');
-						}
-					}
-				});
-				$('select[name$="country"]').each(function(){
-					var $stateField = $(this).closest('form').find('select[name$="state"]');
-					$(this).selectChain({
-						data: {
-                            country: $(this).val(),
-                            pairs: true
-                        },
-						target: $stateField,
-						url: '<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/states'
-					})
-				});
-				
-				$('form :input').on('change', function(){
-					var $form = $(this).closest('form');
-					if (!$form.attr('user-changed')){
-						$form.attr('user-changed', true);
-						var currentTab = $('#config').tabs('option', 'selected');
-						$('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
-					}
-				});
-			});
-		</script>
+	var shopping = {};
+	shopping.saveconfig = function(){
+		var url = '<?php echo $this->form->getAction(); ?>';
+		var data = $('form[user-changed="true"]').serialize();
+		if (!data) {
+			window.console && console.log('nothing to save');
+			return false;
+		} else {
+			window.console && console.log(data);
+		}
 
-		<style>
-			a.user-changed::after {
-				content: '*'
+		$.ajax({
+			url: url,
+			data: data,
+			type: 'POST',
+			dataType: 'html',
+			success: function(response){
+				$('form[user-changed="true"]').removeAttr('user-changed');
+				$('#config > ul > li > a.user-changed').removeClass('user-changed');
+                showMessage('<?php echo $this->translate('Saved'); ?>');
 			}
-            .ui-tabs#config .ui-tabs-panel {
-                padding: 10px 10px 10px 15px;
-                background: #DAE8ED;
-            }
-            #config .ui-tabs-nav li.ui-tabs-selected {
-                background: #DAE8ED;
-            }
-            button#save-btn {
-                float: right;
-                margin: 0 20px 10px;
-            }
-		</style>
-    </head>
-    <body>
-        <noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
-        JavaScript must be enabled at this point.<br/>
-        <a href="http://www.seotoaster.com/">seotoaster.com</a>
-        </noscript>
-        <input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
-        <input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
-        <div id="config" class="seotoaster h540">
-            <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
-            <ul>
-			<?php foreach ($this->form->getSubForms() as $subform): ?>
-			<li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
-			<?php endforeach; ?>
-			</ul>
-			<?php echo $this->form; ?>
-            <button id="save-btn"><?php echo $this->translate('Save');?></button>
-        </div>
-	</body>
-</html>
+		});
+	}
+
+	$('#save-btn').on('click', shopping.saveconfig);
+
+	$('#config').tabs({
+		select: function(event, ui){
+			$form = $(ui.panel).children('form');
+			if ($form.attr('user-changed') === true && $form.find(':submit').size() == 0) {
+				$form.append('<input type=submit />');
+			}
+		}
+	});
+	$('select[name$="country"]').each(function(){
+		var $stateField = $(this).closest('form').find('select[name$="state"]');
+		$(this).selectChain({
+			data: {
+                country: $(this).val(),
+                pairs: true
+            },
+			target: $stateField,
+			url: '<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/states'
+		})
+	});
+
+	$('form :input').on('change', function(){
+		var $form = $(this).closest('form');
+		if (!$form.attr('user-changed')){
+			$form.attr('user-changed', true);
+			var currentTab = $('#config').tabs('option', 'selected');
+			$('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+		}
+	});
+<?php $this->jQuery()->onLoadCaptureEnd();?>
+</script>
+
+<style>
+	a.user-changed::after {
+		content: '*'
+	}
+    .ui-tabs#config .ui-tabs-panel {
+        padding: 10px 10px 10px 15px;
+        background: #DAE8ED;
+    }
+    #config .ui-tabs-nav li.ui-tabs-selected {
+        background: #DAE8ED;
+    }
+    button#save-btn {
+        float: right;
+        margin: 0 20px 10px;
+    }
+</style>
+
+<div id="config" class="h540">
+    <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
+    <ul>
+	<?php foreach ($this->form->getSubForms() as $subform): ?>
+	<li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
+	<?php endforeach; ?>
+	</ul>
+	<?php echo $this->form; ?>
+    <button id="save-btn"><?php echo $this->translate('Save');?></button>
+</div>

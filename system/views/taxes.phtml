@@ -1,105 +1,87 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title></title>
-        <title><?php echo $this->translate('Manage product'); ?></title>
-        <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
-                ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
-                ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
-                ->appendStylesheet($this->websiteUrl . 'system/css/seotoaster.css')
-                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/smoke.css')
-                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css'); ?>
-        <?php echo $this->headLink(); ?>
-        <style>
-            .taxrule {
-                margin-top: 5px;
-            }
-            .ui-widget-header label {
-              display: inline;
-              vertical-align: bottom;
-            }
-            #price-inc-tax {margin-top:2px;}
-        </style>
+<?php $this->headTitle($this->translate('Manage taxes')); ?>
+<style>
+    .taxrule {
+        margin-top: 5px;
+	    color: #5F9EA0;
+    }
+    .ui-widget-header label {
+      display: inline;
+      vertical-align: bottom;
+    }
+    #price-inc-tax {margin-top:2px;}
+	#rules input[type=text] {
+		width: 70%;
+		margin-right:-22px;
+		padding-right:22px;
+	}
+</style>
 
-        <?php
-            $this->headScript()->setAllowArbitraryAttributes(true)
-                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js')
-                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js')
-                    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
-                    ->appendFile($this->websiteUrl . 'system/js/internal/system.js')
-                    ->appendFile($this->websiteUrl.'system/js/external/smoke/smoke.min.js')
-                    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/taxes.js'));
-            echo $this->headScript();
-        ?>
+<?php
+$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/taxes.js'));
+?>
 
-		<script id="ruleTemplate" type="text/x-jquery-tmpl">	
-            {{if id}}
-            <input type="hidden" name="rule-id" value="${id}"/>
-            {{/if}}
-            <div class="grid_1 textcentered mt8px">
-                <input type="radio" name="default" {{if isDefault == 1}}checked="checked"{{/if}} />
-            </div>
-            <div class="grid_4">
-                <select name="zoneId" data-reflection="property" style="width: 95%">
-                <option value="-1"><?php echo $this->translate('Select zone');?></option>
-                {{tmpl '#zoneListTemplate'}}
-                </select>
-            </div>
-            <div class="grid_6" style="white-space:nowrap; font-weight:bold;">
-                <div class="grid_4 alpha">
-                    <input type="text" name="rate1" data-reflection="property" style="width: 85%" value="${rate1}" placeholder="0"/>%
-                </div>
-                <div class="grid_4 ">
-                    <input type="text" name="rate2" data-reflection="property" style="width: 85%" value="${rate2}" placeholder="0"/>%
-                </div>
-                <div class="grid_4 omega">
-                    <input type="text" name="rate3" data-reflection="property" style="width: 85%" value="${rate3}" placeholder="0"/>%
-                </div>
-            </div>
-            <div class="grid_1 textcentered mt8px">
-                <a href="javascript:;" class="delete-rule">
-                    <img src="<?php echo $this->websiteUrl;?>system/images/delete.png" />
-                </a>
-            </div>
-		</script>
-		<script id="zoneListTemplate" type="text/x-jquery-tmpl">
-            {{each app.zones.toJSON()}}
-			<option value="${id}" {{if zoneId}}{{if zoneId == id}}selected{{/if}}{{/if}}>${name}</option>
-			{{/each}}
-		</script>
-	</head>
-    <body>
-        <noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
-        JavaScript must be enabled at this point.<br/>
-        <a href="http://www.seotoaster.com/">seotoaster.com</a>
-        </noscript>
-        <input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
-        <input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
-		<div class="seotoaster container_12 ui-widget rounded3px" id="manage-taxes">
-			<div class="ui-widget-header ui-corner-top" style="height: 22px; padding: 7px 0 2px 8px;">
-                    <?php echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );?>
-					<?php echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.')); ?>
-                <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
-			</div>
-			<div class="ui-helper-clearfix padding10px" style="text-align:center; font-weight:bold; line-height: 20px;">
-				<div class="grid_1">Selected</div>
-				<div class="grid_4"><a href="javascript:;" data-url="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" class="tpopup" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
-				<div class="grid_6">
-					<div class="grid_4 alpha">Default Tax</div>
-					<div class="grid_4">Tax Rate 1</div>
-					<div class="grid_4 omega">Tax Rate 2</div>
-				</div>
-				<div class="grid_1">&nbsp;</div>
-			</div>
-			<div id="rules" class="ui-widget-content ui-helper-clearfix h450" style="overflow-x: hidden; overflow-y: auto;">
-				
-			</div>
-			<div class="padding10px">
-				<button id="new-rule-btn">Add new</button>
-				<button id="save-btn" style="float:right;">Save</button>
-			</div>
+<script id="ruleTemplate" type="text/x-jquery-tmpl">
+	{{if id}}
+    <input type="hidden" name="rule-id" value="${id}"/>
+    {{/if}}
+    <div class="grid_1 textcentered mt8px">
+        <input type="radio" name="default" {{if isDefault == 1}}checked="checked"{{/if}} />
+    </div>
+    <div class="grid_4">
+        <select name="zoneId" data-reflection="property" style="width: 95%">
+        <option value="-1"><?php echo $this->translate('Select zone');?></option>
+        {{tmpl '#zoneListTemplate'}}
+        </select>
+    </div>
+    <div class="grid_6 omega" style="white-space:nowrap; font-weight:bold;">
+        <div class="grid_4">
+            <input type="text" name="rate1" data-reflection="property" value="${rate1}" placeholder="0"/>%
+        </div>
+        <div class="grid_4 ">
+            <input type="text" name="rate2" data-reflection="property" value="${rate2}" placeholder="0"/>%
+        </div>
+        <div class="grid_4">
+            <input type="text" name="rate3" data-reflection="property" value="${rate3}" placeholder="0"/>%
+        </div>
+    </div>
+    <div class="grid_1 textcentered mt8px">
+        <a href="javascript:;" class="delete-rule">
+            <img src="<?php echo $this->websiteUrl;?>system/images/delete.png" />
+        </a>
+    </div>
+</script>
+<script id="zoneListTemplate" type="text/x-jquery-tmpl">
+    {{each app.zones.toJSON()}}
+	<option value="${id}" {{if zoneId}}{{if zoneId == id}}selected{{/if}}{{/if}}>${name}</option>
+	{{/each}}
+</script>
+
+<?php
+$this->placeholder('headerContent')->captureStart();
+	echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
+	echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'));
+$this->placeholder('headerContent')->captureEnd();
+?>
+
+<div id="manage-taxes">
+
+	<div class="ui-helper-clearfix padding10px" style="text-align:center; font-weight:bold; line-height: 20px;">
+		<div class="grid_1">Selected</div>
+		<div class="grid_4"><a href="javascript:;" data-url="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" class="tpopup" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
+		<div class="grid_6 omega">
+			<div class="grid_4">Default Tax</div>
+			<div class="grid_4">Tax Rate 1</div>
+			<div class="grid_4">Tax Rate 2</div>
 		</div>
+		<div class="grid_1">&nbsp;</div>
+	</div>
 
-    </body>
-</html>
+	<div id="rules" class="ui-widget-content ui-helper-clearfix h450" style="overflow-x: hidden; overflow-y: auto;">
+		<!-- container for rules -->
+	</div>
+
+	<div class="padding10px">
+		<button id="new-rule-btn" class="blue-btn"><?php echo $this->translate('Add new');?></button>
+		<button id="save-btn" style="float:right;"><?php echo $this->translate('Save');?></button>
+	</div>
+</div>

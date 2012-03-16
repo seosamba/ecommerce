@@ -19,20 +19,26 @@ define([
             photo: null
 		},
 		initialize: function (){
-			this.set({options: new ProductOptions()});
+//			this.set({options: new ProductOptions()});
             this.bind('error', function(model, error) {
                 showMessage(error, true);
             });
 
-            this.bind('change:defaultOptions', function(){
-                this.get('options').reset(this.get('defaultOptions'));
-            }, this);
+//            this.bind('change:defaultOptions', function(){
+//                this.get('options').reset(this.get('defaultOptions'));
+//            }, this);
         },
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
 				return 'Price must be a number, e.g: 12.95';
 			}
-		}
+		},
+        parse: function(data) {
+            if (!_.isEmpty(data.defaultOptions)){
+                data.options = new ProductOptions(data.defaultOptions);
+            }
+            return data;
+        }
 	});
 	
 	return Product;

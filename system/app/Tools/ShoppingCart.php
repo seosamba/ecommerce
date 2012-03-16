@@ -344,6 +344,7 @@ class Tools_ShoppingCart {
 		}
 		$cartSession->setCartContent($cartSessionContent);
 		$cartSession->setIpAddress($_SERVER['REMOTE_ADDR']);
+		$cartSession->setOptions($this->calculate());
 
 		if ($customer->getId() !== null) {
 			$cartSession->setUserId($customer->getId())

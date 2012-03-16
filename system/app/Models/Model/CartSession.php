@@ -35,6 +35,12 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_shippingService = null;
 
+	protected $_subTotal;
+
+	protected $_totalTax;
+
+	protected $_total;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -137,6 +143,33 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getShippingType() {
 		return $this->_shippingType;
+	}
+
+	public function setTotal($total) {
+		$this->_total = $total;
+		return $this;
+	}
+
+	public function getTotal() {
+		return $this->_total;
+	}
+
+	public function setSubTotal($subTotal) {
+		$this->_subTotal = $subTotal;
+		return $this;
+	}
+
+	public function getSubTotal() {
+		return $this->_subTotal;
+	}
+
+	public function setTotalTax($totalTax) {
+		$this->_totalTax = $totalTax;
+		return $this;
+	}
+
+	public function getTotalTax() {
+		return $this->_totalTax;
 	}
 
 }

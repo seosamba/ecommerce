@@ -170,7 +170,7 @@ define([
 			if (this.model.has('options')) {
 				this.model.get('options').each(function(option){
 					var optWidget = new ProductOptionView({model: option});
-					$('#options-holder').append(optWidget.render().el);
+					optWidget.render().$el.appendTo('#options-holder');
 				});
 			}
 
@@ -224,6 +224,7 @@ define([
             }
 
             if (this.model.has('options')){
+                var newInLibrary = !_.isEmpty(_.compact(this.model.get('options').pluck('isTemplate')));
 			    this.model.set({defaultOptions: this.model.get('options').toJSON()});
             }
 
@@ -255,6 +256,10 @@ define([
 					showMessage('Product saved');
 				}, error: this.processSaveError});
 			}
+
+            if (newInLibrary && appRouter.hasOwnProperty('optionLibrary')){
+                appRouter.optionLibrary.fetch();
+            }
 		},
         processSaveError: function(model, response){
             showMessage(response.responseText, true);
@@ -398,10 +403,8 @@ define([
                     model: ProductOption,
                     initialize: function(){
                         this.bind('reset', function(collection){
-                            $('#option-library').html('<option value="-1" disabled="disabled">select from library</option>');
-                            collection.each(function(item){
-                                $.tmpl("<option value='${id}' >${title}</option>", item.toJSON()).appendTo('#option-library');
-                            })
+                            $('#option-library').html('<option value="-1" disabled="disabled">select from library</option>')
+                                .append($.tmpl('<option value="${id}" >${title}</option>', collection.toJSON()));
                         }, this);
                     }
                 });

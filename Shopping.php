@@ -46,14 +46,22 @@ class Shopping extends Tools_Plugins_Abstract {
             'taxes',
             'zones',
             'product',
-	        'shipping'
-        )
+	        'shipping',
+	        'people'
+        ),
+	    Tools_Security_Acl::ROLE_GUEST => array(
+		    'people'
+	    )
     );
 
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
 
+		$this->_layout = new Zend_Layout();
+		$this->_layout->setLayoutPath(__DIR__ . '/system/views/');
+
 		$this->_view->setScriptPath(__DIR__ . '/system/views/');
+
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig	= Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
@@ -138,7 +146,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$form->populate($config);
 		$this->_view->form = $form;
 
-		echo $this->_view->render('config.phtml');
+		$this->_layout->content = $this->_view->render('config.phtml');
+		echo $this->_layout->render();
 	}
 
 	/**
@@ -335,7 +344,8 @@ class Shopping extends Tools_Plugins_Abstract {
 				'deleted' => isset($deleted) ? $deleted : null
 				));
 		}
-		echo $this->_view->render('zones.phtml');
+		$this->_layout->content = $this->_view->render('zones.phtml');
+		echo $this->_layout->render();
 	}
 
 	/**
@@ -344,8 +354,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	protected function taxesAction() {
 		$this->_view->priceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
-
-		echo $this->_view->render('taxes.phtml');
+		$this->_layout->content = $this->_view->render('taxes.phtml');
+		echo $this->_layout->render();
 	}
 
 	/**
@@ -906,6 +916,59 @@ class Shopping extends Tools_Plugins_Abstract {
 		   }
 		}
 		return $option;
+	}
+
+	public function peopleAction() {
+		$content = $this->_view->render('people.phtml');
+		$this->_layout->content = $content;
+		echo $this->_layout->render();
+	}
+
+	protected function _makeOptionPeople() {
+		if (Tools_Security_Acl::isAllowed(__CLASS__.'-people')){
+			$this->_view->noLayout = true;
+			return $this->_view->render('people.phtml');
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	private function _customerRESTService() {
+		$data = array();
+		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
+		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
+		$for = isset($this->_requestedParams['for']) ? filter_var($this->_requestedParams['for'], FILTER_SANITIZE_STRING) : false;
+		switch (strtolower($this->_request->getMethod())){
+			default:
+			case 'get':
+				if ($for === 'dashboard'){
+					$order = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
+					$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+					$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
+					$data = $customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset);
+				} else {
+					if ($id) {
+						$result = $customerMapper->find($id);
+						if ($result) {
+							$data = $result->toArray();
+						}
+					} else {
+						$result = $customerMapper->fetchAll();
+						if ($result){
+							$data = array_map(function($model){ return $model->toArray(); }, $result);
+						}
+					}
+				}
+	            break;
+	        case 'post':
+	            break;
+			case 'put':
+				break;
+			case 'delete':
+				break;
+	    }
+		return $data;
 	}
 
 }

@@ -113,4 +113,55 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		}
 		return null;
 	}
+
+	public function fetchAll($where = null, $order = array()){
+		$this->_dbTable = 'Application_Model_DbTable_User';
+		$entries = array();
+
+		$resultSet = $this->getDbTable()->fetchAll($where, $order);
+		if(null === $resultSet) {
+			return null;
+		}
+		foreach ($resultSet as $row) {
+			$model = new $this->_model($row->toArray());
+			$model->setPassword(null);
+			$customerAddresses = $row->findDependentRowset('Models_DbTable_CustomerAddress')->toArray();
+			if ($customerAddresses) {
+				$model->setAddresses($customerAddresses);
+			}
+			array_push($entries, $model);
+		}
+		return $entries;
+	}
+
+
+	public function listAll($where = null, $order = null, $limit = null, $offset = null) {
+		$userDbTable = new Application_Model_DbTable_User();
+		$select = $userDbTable->select()
+				->setIntegrityCheck(false)
+				->from('user',array('id', 'full_name', 'email', 'reg_date' => "DATE_FORMAT(reg_date, '%d %b, %Y')" ))
+				->joinLeft(
+					array('cart' => 'shopping_cart_session'),
+					'cart.user_id = user.id',
+					array(
+						'total_amount' => 'SUM(cart.total)',
+						'total_orders'=>'COUNT(cart.id)'
+					))
+				->group('user.id')
+				//@todo filter only paid carts
+//				->where('cart.role_id = ?', Shopping::ROLE_CUSTOMER )
+//				->orWhere('total_orders > 0')
+		;
+
+		if ($where) {
+			$select->where($where);
+		}
+		if ($order) {
+			$select->order($order);
+		}
+
+		$select->limit($limit, $offset);
+
+		return $userDbTable->fetchAll($select)->toArray();
+	}
 }
