@@ -198,7 +198,8 @@ CREATE TABLE IF NOT EXISTS `shopping_tax` (
   `rate2` decimal(10,2) NOT NULL DEFAULT '0.00',
   `rate3` decimal(10,2) NOT NULL DEFAULT '0.00',
   `isDefault` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `zoneId` (`zoneId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_zone` (
@@ -238,6 +239,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sub_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total',
+  `total_tax` double(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Total Tax',
+  `total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total + Total Tax + Shipping',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -249,10 +253,10 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
   `cart_id` int(10) unsigned DEFAULT NULL,
   `product_id` int(10) unsigned DEFAULT NULL,
   `options` text,
-  `price` decimal(10,2) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL COMMENT  'Price w/o Tax',
   `qty` int(10) unsigned DEFAULT NULL,
-  `tax` int(11) DEFAULT NULL,
-  `tax_price` decimal(10,2) DEFAULT NULL,
+  `tax` int(11) DEFAULT NULL COMMENT  'Tax Price',
+  `tax_price` decimal(10,2) DEFAULT NULL COMMENT  'Price + Tax',
   PRIMARY KEY (`id`),
   KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -314,3 +318,7 @@ ALTER TABLE `shopping_customer_address`
 
 ALTER TABLE `shopping_customer_info`
   ADD CONSTRAINT `shopping_customer_info_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `shopping_tax`
+  ADD CONSTRAINT `shopping_tax_ibfk_1` FOREIGN KEY (`zoneId`) REFERENCES `shopping_zone` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
