@@ -46,8 +46,12 @@ class Shopping extends Tools_Plugins_Abstract {
             'taxes',
             'zones',
             'product',
-	        'shipping'
-        )
+	        'shipping',
+	        'people'
+        ),
+	    Tools_Security_Acl::ROLE_GUEST => array(
+		    'people'
+	    )
     );
 
 	public function  __construct($options, $seotoasterData) {
@@ -904,8 +908,10 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	protected function _makeOptionPeople() {
-		$this->_view->noLayout = true;
-		return $this->_view->render('people.phtml');
+		if (Tools_Security_Acl::isAllowed(__CLASS__.'-people')){
+			$this->_view->noLayout = true;
+			return $this->_view->render('people.phtml');
+		}
 	}
 
 	/**
