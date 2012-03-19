@@ -14,7 +14,8 @@ define([
             'click #people-next': 'goNextPage',
             'click th.sortable': 'sort',
             'change #people-check-all': 'toggleAllPeople',
-            'change select#mass-action': 'doAction'
+            'change select#mass-action': 'doAction',
+            'keyup #people-search': 'searchPeople'
         },
         initialize: function(){
             this.customers = new CustomersCollection();
@@ -89,6 +90,15 @@ define([
                 var ids = _(checked).pluck('id');
             });
 
+        },
+        searchPeople: function(e){
+            var term = e.target.value,
+                self = this;
+
+            clearTimeout(self.searching);
+            self.searching = setTimeout(function(){
+                self.customers.search(term);
+            }, 600);
         }
     });
 	
