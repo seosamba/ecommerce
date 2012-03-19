@@ -135,7 +135,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 	}
 
 
-	public function listAll($where = null, $order = null, $limit = null, $offset = null) {
+	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null) {
 		$userDbTable = new Application_Model_DbTable_User();
 		$select = $userDbTable->select()
 				->setIntegrityCheck(false)
@@ -160,8 +160,13 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 			$select->order($order);
 		}
 
-		$select->limit($limit, $offset);
+		if ($search) {
+			$select->orWhere('user.full_name LIKE ?', '%'.$search.'%')
+					->orWhere('user.email LIKE ?', '%'.$search.'%');
+		}
 
+		$select->limit($limit, $offset);
+		error_log($select->__toString());
 		return $userDbTable->fetchAll($select)->toArray();
 	}
 }

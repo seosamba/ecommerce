@@ -1,8 +1,11 @@
 <?php $this->headTitle($this->translate('Manage customers')) ?>
 <style>
-    table#people-table th.sortable {
-	    cursor: pointer;
+	table#people-table th.sortable {
+		cursor: pointer;
 	    white-space: nowrap;
+	    color: #3C78A7;
+	    text-align: left;
+		padding: 5px;
     }
     table#people-table th.sortable::after{
 	    color: #5f9ea0;
@@ -18,6 +21,14 @@
     table#people-table thead tr{
 	    background-color: #d5d5d5;
 	    /*border-bottom: 1px solid #ccc;*/
+    }
+    table#people-table tbody tr:hover td {
+	    background-color:  #F9F9F9;
+    }
+    table#people-table td {
+	    padding: 6px 2px;
+	    border: 1px solid #999;
+	    border-bottom: 1px dashed white;
     }
     table#people-table td.text-center{
 	    text-align: center;
@@ -37,7 +48,7 @@
 </style>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
-    <td><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" /></td>
+    <td class="textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td><a href="javascript:;" class="details">${full_name}</a></td>
     <td>${email}</td>
     <td>${reg_date}</td>
@@ -72,10 +83,11 @@
 
 
 <div id="people" class="ui-helper-clearfix">
+	<div><?php echo $this->translate('Search');?>:&nbsp;<input type="text" id="people-search" name="people-search" placeholder="by name or email"/></div>
     <table id="people-table" style="width: 100%">
         <thead>
-            <tr>
-	            <th></th>
+            <tr class="mb10px">
+	            <th><?php echo $this->formCheckbox('people-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
@@ -85,13 +97,14 @@
         <tfoot>
             <tr>
 	            <td colspan="4">
-		            <?php echo $this->translate('with selected');?>
+		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
-		            <select style="width: 250px">
-			            <option value="">add</option>
-			            <option value="">some</option>
-			            <option value="">actions</option>
+		            <select id="mass-action" style="width: 250px">
+			            <option value="0"><?php echo $this->translate('nothing');?></option>
+			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
+			            <option value="deleteExport"><?php echo $this->translate('export to csv');?></option>
 		            </select>
+		            <form id="expusrs" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users"><?php echo $this->translate('export as csv file');?></a></form>
 	            </td>
 	            <th>
 		            <a href="#" id="people-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>

@@ -15,16 +15,22 @@ define([
             by: null,
             asc: true
         },
+        searchTerm: '',
+        cached: {}, //@todo add caching mecanism
         initialize: function(){
             this.bind('reset', this.updatePaginator, this);
         },
         url: function(){
             var url = $('#website_url').val()+'plugin/shopping/run/getdata/type/customer/for/dashboard/',
                 order = '';
+            url += '?'+'limit='+this.paginator.limit+'&offset='+this.paginator.offset;
             if (this.order.by) {
-                order = '&order=' + this.order.by + ' ' + (this.order.asc ? 'asc' : 'desc');
+                url += '&order=' + this.order.by + ' ' + (this.order.asc ? 'asc' : 'desc');
             }
-            return url+'?'+'limit='+this.paginator.limit+'&offset='+this.paginator.offset + order + '&id=';
+            if (this.searchTerm) {
+                url += '&search='+this.searchTerm;
+            }
+            return url + '&id=';
         },
         next: function(callback) {
             if (!this.paginator.last) {
@@ -45,6 +51,18 @@ define([
                 this.previous();
             } else {
                 this.paginator.last = (this.length < this.paginator.limit);
+            }
+        },
+        checked: function(){
+            return this.filter(function(customer){ return customer.has('checked') && customer.get('checked'); });
+        },
+        search: function(term){
+            if (term !== this.searchTerm){
+                this.searchTerm = escape(term);
+                this.paginator.offset = 0;
+                this.paginator.last = false;
+                this.paginator.order = {by: null,asc: true};
+                return this.fetch();
             }
         }
     });

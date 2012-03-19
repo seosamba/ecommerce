@@ -946,7 +946,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					$order = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
 					$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
 					$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
-					$data = $customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset);
+					$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
+
+					$data = $customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset, $search);
 				} else {
 					if ($id) {
 						$result = $customerMapper->find($id);

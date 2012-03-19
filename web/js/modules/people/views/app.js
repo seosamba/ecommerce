@@ -9,9 +9,13 @@ define([
     var AppView = Backbone.View.extend({
         el: $('#people'),
         events: {
+            'click #export-users': function(){ $('#expusrs').submit(); },
             'click #people-previous': 'goPreviousPage',
             'click #people-next': 'goNextPage',
-            'click th.sortable': 'sort'
+            'click th.sortable': 'sort',
+            'change #people-check-all': 'toggleAllPeople',
+            'change select#mass-action': 'doAction',
+            'keyup #people-search': 'searchPeople'
         },
         initialize: function(){
             this.customers = new CustomersCollection();
@@ -61,6 +65,40 @@ define([
         },
         renderCustomerDetails: function() {
             console.log(arguments)
+        },
+        toggleAllPeople: function(e) {
+            var value = e.target.checked;
+            this.customers.each(function(customer){
+                customer.set({checked: value});
+            });
+        },
+        doAction: function(e){
+            var method = $(e.target).val();
+
+            method = this[method]
+            if (_.isFunction(method)){
+                method.call(this);
+            }
+            $(e.target).val(0);
+        },
+        deleteSelected: function(){
+            var checked = this.customers.checked();
+            if (_.isEmpty(checked)){
+                return false;
+            }
+            showConfirm('Are you sure?', function(){
+                var ids = _(checked).pluck('id');
+            });
+
+        },
+        searchPeople: function(e){
+            var term = e.target.value,
+                self = this;
+
+            clearTimeout(self.searching);
+            self.searching = setTimeout(function(){
+                self.customers.search(term);
+            }, 600);
         }
     });
 	
