@@ -14,7 +14,7 @@
         }
     }
     ?>
-    <div class="product-option option-<?php echo  $option['type'];?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
+    <div class="product-option option-<?php echo strtolower(preg_replace('/[^\w\d]/i', '', $option['title']));?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
         <label for="<?php echo $uniqName; ?>" ><?php echo $option['title'];?></label>
         <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
         <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
