@@ -149,7 +149,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 					))
 				->group('user.id')
 				//@todo filter only paid carts
-//				->where('cart.role_id = ?', Shopping::ROLE_CUSTOMER )
+//				->where('cart.status = ?', Models_Model_CartSession::CART_STATUS_COMPLETED )
 //				->orWhere('total_orders > 0')
 		;
 
@@ -166,7 +166,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		}
 
 		$select->limit($limit, $offset);
-		error_log($select->__toString());
+//		error_log($select->__toString());
 		return $userDbTable->fetchAll($select)->toArray();
 	}
 }
