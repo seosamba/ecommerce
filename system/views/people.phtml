@@ -1,5 +1,8 @@
 <?php $this->headTitle($this->translate('Manage customers')) ?>
 <style>
+	table#people-table {
+	    background-color: #efefef;
+	}
 	table#people-table th.sortable {
 		cursor: pointer;
 	    white-space: nowrap;
@@ -19,25 +22,21 @@
         content: " \21E9";
     }
     table#people-table thead tr{
-	    background-color: #d5d5d5;
-	    /*border-bottom: 1px solid #ccc;*/
+	    border-bottom: 1px dashed #ccc;
     }
     table#people-table tbody tr:hover td {
-	    background-color:  #F9F9F9;
+	    background-color:  #d3d3d3;
+	    color: #3C78A7;
     }
     table#people-table td {
 	    padding: 6px 2px;
-	    border: 1px solid #999;
-	    border-bottom: 1px dashed white;
     }
     table#people-table td.text-center{
 	    text-align: center;
     }
-    table#people-table tbody tr:nth-child(even) {
-	    background-color: rgba(213, 213, 213, 0.6);
-    }
-    table#people-table tbody tr:nth-child(odd) {
-	    background-color: rgba(239, 239, 239, 0.8);
+    table#people-table tbody tr {
+	    background-color: white;
+	    border-bottom: 1px dashed #cccccc;
     }
     table#people-table a.table-nav {
 	    margin: 10px 2px;
@@ -83,7 +82,7 @@
 
 
 <div id="people" class="ui-helper-clearfix">
-	<div><?php echo $this->translate('Search');?>:&nbsp;<input type="text" id="people-search" name="people-search" placeholder="by name or email"/></div>
+	<div><?php echo $this->translate('Search');?>&nbsp;<input type="text" id="people-search" name="people-search" placeholder="<?php echo $this->translate('by name or email');?>" style="width: 200px"/></div>
     <table id="people-table" style="width: 100%">
         <thead>
             <tr class="mb10px">
