@@ -234,4 +234,26 @@ class Tools_Misc {
 		$address = self::clenupAddress($address);
 		return md5(http_build_query($address));
 	}
+
+	public static function getDefaultProductOptions(Models_Model_Product $product) {
+		$productOptions = $product->getDefaultOptions();
+		if(!is_array($productOptions) || empty($productOptions)) {
+			return array();
+		}
+		foreach($productOptions as $option) {
+			if(isset($option['selection']) && is_array($option['selection']) && !empty($option['selection'])) {
+				$selections = $option['selection'];
+				foreach($selections as $selectionData) {
+					if(!$selectionData['isDefault']) {
+						continue;
+					}
+		            return array(
+				        $selectionData['option_id'] => $selectionData['id']
+			        );
+				}
+			} else {
+				return array();
+			}
+		}
+	}
 }

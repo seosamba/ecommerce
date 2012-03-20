@@ -19,8 +19,6 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_ipAddress   = '';
 
-	protected $_id          = '';
-
 	protected $_userId      = null;
 
 	protected $_status      = null;
