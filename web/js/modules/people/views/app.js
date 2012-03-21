@@ -13,13 +13,15 @@ define([
             'click #people-previous': 'goPreviousPage',
             'click #people-next': 'goNextPage',
             'click th.sortable': 'sort',
+            'click #customer-details div.toolbar a:first': function() {$('#people-table,#customer-details').toggle()},
             'change #people-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #people-search': 'searchPeople'
         },
         initialize: function(){
+            $('#customer-details').hide();
             this.customers = new CustomersCollection();
-            this.customers.bind('reset', this.render, this);
+            this.customers.on('reset', this.render, this);
             this.customers.fetch();
         },
         render: function(){
@@ -56,14 +58,13 @@ define([
             }
         },
         showCustomerDetails: function(uid) {
-            var model = new CustomerModel(),
-                tmpl = $('#customerDetailsTemplate').template();
-            model.fetch({data: {id: uid}}).done(function(){
-                $('#customer-details').html($.tmpl(tmpl, model.toJSON()))
-            });
-
+            $.get($('#website_url').val()+'plugin/shopping/run/profile/', {id: uid}, this.renderCustomerDetails);
         },
-        renderCustomerDetails: function() {
+        renderCustomerDetails: function(response, status) {
+            if (status === "success") {
+                $('#people-table').hide();
+                $('#customer-details').find('#profile').html(response).end().show();
+            }
             console.log(arguments)
         },
         toggleAllPeople: function(e) {

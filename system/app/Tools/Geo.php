@@ -148,6 +148,7 @@ class Tools_Geo {
 	/** 
 	 * Method builds a list of world countries with ISO codes as key, 
 	 * translated country name as value
+	 * @todo add caching
 	 * @return array list of world countries
 	 */
 	public static function getCountries($pairs = false) {

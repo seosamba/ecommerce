@@ -1,0 +1,195 @@
+<?php $countryList = Tools_Geo::getCountries(true); ?>
+<div class="clearfix profile-header">
+	<div class="profile-picture">
+		<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'avatar') ); ?>
+	</div>
+	<div class="profile-main-info vcard">
+		<h1 class="fn"><?php echo $this->customer->getFullName();?></h1>
+		<h3><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><?php echo $this->customer->getEmail();?></a></h3>
+		<p><?php echo $this->customer->getRoleId();?> since <?php echo $this->customer->getRegDate();?></p>
+		<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
+			<div class="adr">
+				<span class="street-address"><?php echo $billingAddressDefault['address1'].' '. $billingAddressDefault['address2'];?></span>
+				<br/>
+				<span class="locality"><?php echo $billingAddressDefault['city'];?></span>
+				<span class="region"><?php $state = Tools_Geo::getStateById($billingAddressDefault['state']); echo $state['state']; ?></span>
+				<span class="postal-code"><?php echo $billingAddressDefault['zip'];?></span>
+			</div>
+		<?php endif;?>
+		<?php if ($shippingAddressDefault = $this->customer->getDefaultAddress('shipping')) : ?>
+			<div class="adr">
+				<span class="street-address"><?php echo $shippingAddressDefault['address1'].' '. $shippingAddressDefault['address2'];?></span>
+				<br/>
+				<span class="locality"><?php echo $shippingAddressDefault['city'];?></span>
+				<span class="region"><?php $state = Tools_Geo::getStateById($shippingAddressDefault['state']); echo $state['state']; ?></span>
+				<span class="postal-code"><?php echo $shippingAddressDefault['zip'];?></span>
+			</div>
+		<?php endif;?>
+	</div>
+	<div class="profile-actions">
+		<input type="button" class="blue-btn" value="<?php echo $this->translate('Edit profile');?>" />
+		<ul class="stats">
+			<li><a href="">15 orders</a></li>
+			<li>10 payed orders</li>
+			<li>5 pending orders</li>
+			<li>17 products in whishlist</li>
+		</ul>
+	</div>
+</div>
+<div class="profile-dashboard">
+	<ul class="profile-nav">
+		<li><a href="#profile-address-list">Addresses</a></li>
+		<li><a href="#profile-orders-list">Orders</a></li>
+	</ul>
+</div>
+<div class="profile-content">
+	<div id="profile-address-list">
+	<?php $addressList = $this->customer->getAddresses(); ?>
+	<?php if (!empty($addressList)): ?>
+	<?php foreach ($addressList as $address): ?>
+		<div class="adr">
+			<?php echo $this->formHidden('id', $address['id'], array('id'=>'id_'.$address['id']));?>
+			<?php echo $this->formHidden('type', $address['address_type'], array('id'=>'type_'.$address['id']));?>
+			<span class="street-address"><?php echo $address['address1'].' '. $address['address2'];?></span>
+			<br/>
+			<span class="locality"><?php
+				echo $address['city'].
+					($address['city']&&($address['state'] || $address['zip'])?',':'');
+				?></span>
+			<span class="region"><?php $state = Tools_Geo::getStateById($address['state']); echo $state['state']; ?></span>
+			<span class="postal-code"><?php echo $address['zip'];?></span>
+			<br />
+			<span><?php echo $countryList[$address['country']];?></span>
+			<a class="delete-lnk" href="javascript:;" title="<?php echo $this->translate('Delete this address');?>"><img src="/system/images/delete.png" alt="[x]"></a>
+		</div>
+	<?php endforeach; ?>
+	<?php else : ?>
+	<p>no addresses</p>
+	<?php endif;?>
+	</div>
+	<div id="profile-orders-list">
+		<p>PLACEHOLDER for orders list</p>
+		<table border="1" width="100%">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Status</th>
+					<th>Item in cart</th>
+					<th>Total Price</th>
+					<th>Shipping via</th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php if ($this->orders): ?>
+			<?php foreach ($this->orders as $order):?>
+				<tr data-role="cart">
+					<td>#<?php echo $order->getId();?></td>
+					<td><?php echo $order->getStatus();?></td>
+					<td><?php echo sizeof($order->getCartContent());?></td>
+					<td><?php echo $order->getTotal();?></td>
+					<td><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></td>
+				</tr>
+				<?php if ($order->getCartContent()): ?>
+				<?php foreach($order->getCartContent() as $item):?>
+				<tr data-role="cartcontent">
+					<?php //var_dump($item); ?>
+				</tr>
+				<?php endforeach; ?>
+				<?php endif; ?>
+			<?php endforeach; ?>
+			<?php endif; ?>
+			</tbody>
+		</table>
+		<?php //var_dump($this->orders); ?>
+	</div>
+</div>
+<script>
+	//	simple tab script for navigation
+	$('div.profile-content > div:first').siblings().hide().end().show();
+	$('ul.profile-nav').find('a:first').addClass('active').end().on('click', 'a', function(e){
+		e.preventDefault();
+		$(this).closest('ul').find('li > a').removeClass('active');
+		$(this).addClass('active');
+		var containerId = $(this).attr('href');
+		$(containerId).siblings('div').hide().removeClass('active').end().show().addClass('active');
+	})
+</script>
+<style>
+	/*#customer-details * {*/
+		/*margin: 0;*/
+		/*padding: 0;*/
+		/*border: 0;*/
+		/*outline: 0;*/
+		/*font-size: 100%;*/
+		/*vertical-align: baseline;*/
+		/*background: transparent;*/
+	/*}*/
+
+	#profile .profile-header > div {
+		float: left;
+	}
+	#profile .profile-header .profile-picture {
+		width: 10%;
+		min-width: 80px;
+		margin: 0 1%;
+	}
+	#profile .profile-header .profile-main-info {
+		width: 50%
+	}
+	#profile .profile-header .profile-actions {
+		width: 30%
+	}
+	#profile ul {
+		margin: 0;
+		padding: 0;
+	}
+	#profile ul li {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	#profile .profile-dashboard {
+		width: 19%;
+		float: left;
+	}
+	#profile .profile-content {
+		width: 79%;
+		float: left;
+		padding: 4px 2px;
+		border: 1px solid #e6e6fa;
+		border-radius: 0 8px 8px 0;
+	}
+	#profile ul.profile-nav li {
+		background-color: #e6e6fa;
+		margin-bottom: 2px;
+	}
+	#profile ul.profile-nav li:first-child { border-radius:  4px 0 0 0; }
+	#profile ul.profile-nav li:last-child { border-radius: 0 0 0 4px; }
+
+	#profile ul.profile-nav li:hover {
+		background-color: #f5f5f5;
+	}
+	#profile ul.profile-nav li a {
+		display: block;
+		margin: 0 auto;
+		padding: 5px;
+	}
+	#profile ul.profile-nav li a.active {
+		text-decoration: underline;
+	}
+
+	#profile #profile-address-list div.adr {
+		padding: 5px;
+		margin: 4px 1%;
+		position: relative;
+		border: 1px solid #e6e6fa;
+		border-radius: 8px 0 8px 8px;
+		width: 46%;
+		float: left;
+	}
+	#profile div.adr a.delete-lnk {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+	}
+</style>

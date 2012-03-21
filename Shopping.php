@@ -975,4 +975,15 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	public function profileAction(){
+		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
+		if ($id){
+			$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
+			if ($customer) {
+				$this->_view->customer = $customer;
+				$this->_view->orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
+			}
+			echo $this->_view->render('customer_profile.phtml');
+		}
+	}
 }
