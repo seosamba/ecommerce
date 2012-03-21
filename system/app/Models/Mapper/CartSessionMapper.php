@@ -24,7 +24,10 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'billing_address_id'    => $model->getBillingAddressId(),
 			'shipping_price'        => $model->getShippingPrice(),
 			'shipping_type'         => $model->getShippingType(),
-			'shipping_service'      => $model->getShippingService()
+			'shipping_service'      => $model->getShippingService(),
+			'sub_total'             => $model->getSubTotal(),
+			'total_tax'             => $model->getTotalTax(),
+			'total'                 => $model->getTotal()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {
