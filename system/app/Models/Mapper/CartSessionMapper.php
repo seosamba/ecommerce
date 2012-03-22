@@ -93,7 +93,14 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 	private function _toModel(Zend_Db_Table_Row_Abstract $row) {
 		$model = new $this->_model($row->toArray());
-		$content = $row->findDependentRowset('Models_DbTable_CartSessionContent')->toArray();
+		$contentTable = new Models_DbTable_CartSessionContent();
+		$select = $contentTable->select()
+				->setIntegrityCheck(false)
+				->from(array('c' => 'shopping_cart_session_content'))
+				->join(array('prod' => 'shopping_product'), 'prod.id = c.product_id', array('name', 'sku', 'original_price'=>'price'))
+				->where('cart_id = ?', $model->getId());
+		$content = $contentTable->fetchAll($select)->toArray();
+//		$content = $row->findDependentRowset('Models_DbTable_CartSessionContent')->toArray();
 		if (!empty($content)){
 			array_walk($content, function(&$item){
 				parse_str($item['options'],$item['options']);

@@ -986,4 +986,13 @@ class Shopping extends Tools_Plugins_Abstract {
 			echo $this->_view->render('customer_profile.phtml');
 		}
 	}
+
+	public function orderAction(){
+		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
+		if ($id) {
+			$this->_view->order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
+			$this->_layout->content = $this->_view->render('order.phtml');
+		}
+		echo $this->_layout->render();
+	}
 }

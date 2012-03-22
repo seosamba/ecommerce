@@ -46,20 +46,20 @@
 	<div id="profile-address-list">
 	<?php $addressList = $this->customer->getAddresses(); ?>
 	<?php if (!empty($addressList)): ?>
-	<?php foreach ($addressList as $address): ?>
+	<?php foreach ($addressList as $billingAddress): ?>
 		<div class="adr">
-			<?php echo $this->formHidden('id', $address['id'], array('id'=>'id_'.$address['id']));?>
-			<?php echo $this->formHidden('type', $address['address_type'], array('id'=>'type_'.$address['id']));?>
-			<span class="street-address"><?php echo $address['address1'].' '. $address['address2'];?></span>
+			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
+			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
+			<span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
 			<br/>
 			<span class="locality"><?php
-				echo $address['city'].
-					($address['city']&&($address['state'] || $address['zip'])?',':'');
+				echo $billingAddress['city'].
+					($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
 				?></span>
-			<span class="region"><?php $state = Tools_Geo::getStateById($address['state']); echo $state['state']; ?></span>
-			<span class="postal-code"><?php echo $address['zip'];?></span>
+			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
 			<br />
-			<span><?php echo $countryList[$address['country']];?></span>
+			<span><?php echo $countryList[$billingAddress['country']];?></span>
 			<a class="delete-lnk" href="javascript:;" title="<?php echo $this->translate('Delete this address');?>"><img src="/system/images/delete.png" alt="[x]"></a>
 		</div>
 	<?php endforeach; ?>
@@ -68,34 +68,37 @@
 	<?php endif;?>
 	</div>
 	<div id="profile-orders-list">
-		<p>PLACEHOLDER for orders list</p>
+		<p>Orders list:</p>
 		<table border="1" width="100%">
 			<thead>
 				<tr>
-					<th>#</th>
+					<th>Order #</th>
+					<th>Purchased On</th>
 					<th>Status</th>
-					<th>Item in cart</th>
+					<th>Products in cart</th>
+<!--					<th>Cart Price</th>-->
+<!--					<th>Tax</th>-->
 					<th>Total Price</th>
+					<th>Shipping price</th>
 					<th>Shipping via</th>
+					<th>Details</th>
 				</tr>
 			</thead>
 			<tbody>
 			<?php if ($this->orders): ?>
 			<?php foreach ($this->orders as $order):?>
 				<tr data-role="cart">
-					<td>#<?php echo $order->getId();?></td>
+					<td><?php echo $order->getId();?></td>
+					<td><?php echo Zend_Date::now();?></td>
 					<td><?php echo $order->getStatus();?></td>
 					<td><?php echo sizeof($order->getCartContent());?></td>
-					<td><?php echo $order->getTotal();?></td>
+<!--					<td>--><?php //echo $this->currency($order->getSubTotal());?><!--</td>-->
+<!--					<td>--><?php //echo $this->currency($order->getTotalTax());?><!--</td>-->
+					<td><?php echo $this->currency($order->getTotal());?></td>
+					<td><?php echo $this->currency($order->getShippingPrice()) ;?></td>
 					<td><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></td>
+					<td><a href="javascript:;" class="tpopup" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
 				</tr>
-				<?php if ($order->getCartContent()): ?>
-				<?php foreach($order->getCartContent() as $item):?>
-				<tr data-role="cartcontent">
-					<?php //var_dump($item); ?>
-				</tr>
-				<?php endforeach; ?>
-				<?php endif; ?>
 			<?php endforeach; ?>
 			<?php endif; ?>
 			</tbody>
@@ -115,16 +118,6 @@
 	})
 </script>
 <style>
-	/*#customer-details * {*/
-		/*margin: 0;*/
-		/*padding: 0;*/
-		/*border: 0;*/
-		/*outline: 0;*/
-		/*font-size: 100%;*/
-		/*vertical-align: baseline;*/
-		/*background: transparent;*/
-	/*}*/
-
 	#profile .profile-header > div {
 		float: left;
 	}

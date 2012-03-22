@@ -1,0 +1,105 @@
+<?php $this->placeholder('headerContent')->set('Order #'.$this->order->getId() ) ; ?>
+<?php $countryList = Tools_Geo::getCountries(true); ?>
+<div class="ui-widget">
+	<div class="grid_12">
+		<div class="ui-widget-header ui-corner-top padding5px">Summary</div>
+		<div>Placed on ####-##-##</div>
+		<div>Placed from IP <?php echo $this->order->getIpAddress();?></div>
+	</div>
+
+	<div class="mt10px">&nbsp;</div>
+
+	<div class="grid_6">
+		<div class="ui-widget-header ui-corner-top padding5px">Billing Address <!--span>[edit]</span--></div>
+		<div class="adr">
+			<?php if (null !== ($billingAddressId = $this->order->getBillingAddressId())): ?>
+			<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId);?>
+			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
+			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
+			<span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
+			<br/>
+			<span class="locality"><?php
+				echo $billingAddress['city'].
+					($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
+				?></span>
+			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
+			<br />
+			<span><?php echo $countryList[$billingAddress['country']];?></span>
+			<?php else:?>
+				<p>not provided</p>
+			<?php endif;?>
+		</div>
+	</div>
+
+	<div class="grid_6">
+		<div class="ui-widget-header ui-corner-top padding5px">Shipping Address <!--span>[edit]</span--></div>
+		<div class="adr">
+			<?php if (null !== ($shippingAddressId = $this->order->getShippingAddressId())): ?>
+			<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
+			<span><?php echo $shippingAddress['firstname'];?></span>
+			<span><?php echo $shippingAddress['lastname'];?></span>
+			<br/>
+			<span class="street-address"><?php echo $shippingAddress['address1'].' '. $shippingAddress['address2'];?></span>
+			<br/>
+			<span class="locality"><?php
+				echo $shippingAddress['city'].
+					($shippingAddress['city']&&($shippingAddress['state'] || $shippingAddress['zip'])?',':'');
+				?></span>
+			<span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+			<span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
+			<br />
+			<span><?php echo $countryList[$shippingAddress['country']];?></span>
+			<?php else:?>
+				<p>not provided</p>
+			<?php endif;?>
+		</div>
+	</div>
+
+	<div class="grid_12 mt10px">
+		<div class="ui-widget-header ui-corner-top padding5px">Order content</div>
+		<table style="width: 100%">
+			<thead>
+			<tr>
+				<th>Product</th>
+				<th>Original Price</th>
+				<th>Price</th>
+				<th>Qty</th>
+				<th>Subtotal</th>
+				<th>Tax</th>
+				<th>Total</th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php foreach ($this->order->getCartContent() as $item) : ?>
+				<tr>
+					<td><?php echo $item['name'];?><br />SKU: <?php echo $item['sku'];?></td>
+					<td style="text-align: right;"><?php echo $this->currency($item['original_price']);?></td>
+					<td style="text-align: right;"><?php echo $this->currency($item['price']);?></td>
+					<td style="text-align: right;"><?php echo $item['qty'];?></td>
+					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['price']);?></td>
+					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['tax']);?></td>
+					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['tax_price']);?></td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="5"></td>
+					<td>Subtotal</td>
+					<td style="text-align: right;"><?php echo $this->currency($this->order->getSubTotal());?></td>
+				</tr>
+				<tr>
+					<td colspan="5"></td>
+					<td>Shipping</td>
+					<td style="text-align: right;"><?php echo $this->currency($this->order->getShippingPrice());?></td>
+				</tr>
+				<tr>
+					<td colspan="5"></td>
+					<td>Grand Total</td>
+					<td style="text-align: right;"><?php echo $this->currency($this->order->getTotal());?></td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>

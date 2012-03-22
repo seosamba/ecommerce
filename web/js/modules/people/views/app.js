@@ -65,7 +65,6 @@ define([
                 $('#people-table').hide();
                 $('#customer-details').find('#profile').html(response).end().show();
             }
-            console.log(arguments)
         },
         toggleAllPeople: function(e) {
             var value = e.target.checked;
