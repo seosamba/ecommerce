@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone',
+	'Underscore',
+	'Backbone',
 	'modules/product/collections/selections'
 ], function(_, Backbone, Selections){
 	

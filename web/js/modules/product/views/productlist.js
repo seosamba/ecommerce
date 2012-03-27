@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone'
+	'Underscore',
+	'Backbone'
 ], function(_, Backbone){
 	
 	var ProductView = Backbone.View.extend({
@@ -20,7 +20,7 @@ define([
 		},
 		render: function(){
 			var data = this.model.toJSON();
-            data.websiteUrl = $('#websiteUrl').val();
+            data.websiteUrl = $('#website_url').val();
 			if (this.options.hasOwnProperty('showDelete')){
 				data['showDelete'] = this.options.showDelete;
 			}

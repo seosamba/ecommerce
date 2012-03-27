@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone',
+	'Underscore',
+	'Backbone',
 	'modules/product/models/tag'
 ], function(_, Backbone, TagModel){
 	

@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone',
+	'Underscore',
+	'Backbone',
 	'modules/product/models/product'
 ], function(_, Backbone, ProductModel){
 	var ProductList = Backbone.Collection.extend({

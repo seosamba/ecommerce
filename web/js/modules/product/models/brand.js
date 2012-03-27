@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone'
+	'Underscore',
+	'Backbone'
 ], function(_, Backbone){
 	
 	var BrandModel = Backbone.Model.extend({

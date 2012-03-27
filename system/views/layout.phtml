@@ -18,6 +18,8 @@
                 ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css');
             echo $this->headLink();
 
+	        echo $this->headStyle();
+
 	        $this->jQuery()->enable();
             $this->jQuery()->uiEnable();
 

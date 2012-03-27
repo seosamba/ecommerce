@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone',
+	'Underscore',
+	'Backbone',
 	'modules/product/collections/options'
 ], function(_, Backbone, ProductOptions){
 	
@@ -34,9 +34,7 @@ define([
 			}
 		},
         parse: function(data) {
-            if (!_.isEmpty(data.defaultOptions)){
-                data.options = new ProductOptions(data.defaultOptions);
-            }
+            data.options = new ProductOptions(!_.isEmpty(data.defaultOptions) ? data.defaultOptions : []);
             return data;
         }
 	});

@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone',
+	'Underscore',
+	'Backbone',
 	'modules/product/models/product',
 	'modules/product/views/tag',
 //	'modules/product/collections/options',
@@ -29,7 +29,7 @@ define([
             'submit form.binded-plugin': 'formSubmit',
             'click #massaction': 'massAction'
 		},
-		websiteUrl: $('#websiteUrl').val(),
+		websiteUrl: $('#website_url').val(),
 		initialize: function(){
 			$('#add-new-option-btn').button();
             var self = this;

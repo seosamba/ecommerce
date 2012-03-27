@@ -1,10 +1,10 @@
 define([
-	'libs/underscore/underscore',
-	'libs/backbone/backbone'
+	'Underscore',
+	'Backbone'
 ], function(_, Backbone){
 	
 	var TagModel = Backbone.Model.extend({
-		urlRoot:  $('#websiteUrl').val() + '/plugin/shopping/run/getdata/type/tags/id/',
+		urlRoot:  $('#website_url').val() + '/plugin/shopping/run/getdata/type/tags/id/',
 		defaults: function(){
 			return {
 				name: ''

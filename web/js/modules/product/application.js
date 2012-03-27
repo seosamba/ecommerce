@@ -1,6 +1,6 @@
 define([
-  'libs/underscore/underscore', 
-  'libs/backbone/backbone',
+  'Underscore',
+  'Backbone',
   'modules/product/router', // Request router.js
 ], function(_, Backbone, Router ){
 	if (!window.console) {

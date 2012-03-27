@@ -1,6 +1,6 @@
 define([
-	'libs/underscore/underscore', 
-	'libs/backbone/backbone',
+	'Underscore',
+	'Backbone',
 	'modules/product/views/app',
 	'modules/product/models/product',
 	'modules/product/collections/productlist',

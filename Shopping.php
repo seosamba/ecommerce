@@ -843,7 +843,8 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
-		echo $this->_view->render('product.phtml');
+		$this->_layout->content = $this->_view->render('product.phtml');
+	    echo $this->_layout->render();
 	}
 
     protected  function _indexRESTService(){

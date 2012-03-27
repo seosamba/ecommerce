@@ -1,613 +1,598 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title><?php echo $this->translate('Manage product');?></title>
-        <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset.css')
-                ->appendStylesheet($this->websiteUrl . 'system/css/grid.css')
-                ->appendStylesheet($this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css')
-                ->appendStylesheet($this->websiteUrl . 'system/css/seotoaster.css')
-                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/smoke.css')
-                ->appendStylesheet($this->websiteUrl . 'system/js/external/smoke/themes/toaster.css'); ?>
-        <?php echo $this->headLink(); ?>
+<?php
+$this->headTitle('Manage product');
+?>
 
-		<style>
-			div.box {
-                background-color: white;
-                margin: 3px 0;
-                padding: 5px 5px 0;
-                cursor: pointer;
-                border: 1px solid whiteSmoke;
-                height: auto;
-			}
-			div.box:hover {
-				box-shadow: 0 0 3px lightseagreen;
-			}
-			#product-tags .tag-widget {
-			    background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
-			    border: 2px solid white;
-			    -moz-border-radius: 3px 3px 3px 3px;
-			    -webkit-border-radius: 3px 3px 3px 3px;
-			    border-radius: 3px 3px 3px 3px;
-			    color: #5C5C5C;
-			    float: left;
-			    font-weight: normal;
-			    margin: 3px 6px 3px 0;
-			    padding: 5px 4px 4px;
-			    width: 23%;
-				height:18px;
-			}
-            #product-tags .tag-widget span {
-                cursor: pointer;
-            }
-			#product-tags .tag-widget span.tag-editable {
-                float: left;
-                margin-left: 2%;
-                width: 81%;
-                white-space: nowrap;
-                overflow: hidden;
-                line-height: 1.2em;
-            }
-            #product-tags .tag-widget input {
-				float: left;
-				margin-top: 2px;
-				margin-left: 1px;
-            }
+<style>
+<?php $this->headStyle()->captureStart();?>
+.seotoaster #manage-product {
+	font-size: 11pt;
+}
+div.box {
+	background-color: white;
+	margin: 3px 0;
+	padding: 5px 5px 0;
+	cursor: pointer;
+	border: 1px solid whiteSmoke;
+	height: auto;
+}
+div.box:hover {
+	box-shadow: 0 0 3px lightseagreen;
+}
+#product-tags .tag-widget {
+    background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
+    border: 2px solid white;
+    -moz-border-radius: 3px 3px 3px 3px;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+    color: #5C5C5C;
+    float: left;
+    font-weight: normal;
+    margin: 3px 6px 3px 0;
+    padding: 5px 4px 4px;
+    width: 23%;
+	height:18px;
+}
+#product-tags .tag-widget span {
+	cursor: pointer;
+}
+#product-tags .tag-widget span.tag-editable {
+	float: left;
+	margin-left: 2%;
+	width: 81%;
+	white-space: nowrap;
+	overflow: hidden;
+	line-height: 1.2em;
+}
+#product-tags .tag-widget input {
+	float: left;
+	margin-top: 2px;
+	margin-left: 1px;
+}
 
-			#product-tags .tag-widget .ui-icon-closethick {
-			    float: right;
-			    margin: 0 0 0 3px;
-			}
+#product-tags .tag-widget .ui-icon-closethick {
+    float: right;
+    margin: 0 0 0 3px;
+}
 
-            .tag-widget span.ui-icon {
-				display: inline-block;
-				border-radius: 4px;
-				cursor:pointer;
-                vertical-align: bottom;
-			}
-            .tag-widget .tag-editable {
-                vertical-align:top;
-            }
-            .tag-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
-                background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
-            }
-			#options-holder .option-content .option-modifier-select {
-				width: 50px;
-			}
-            #massaction::before {
-                content: '[ '
-            }#massaction::after {
-                content: ' ]'
-            }
-            #product-image-holder {
-                height: 130px;
-                width: 191px;
-                background: white;
-                text-align: center;
-                vertical-align: middle;
-                border: 1px solid #BDE6F1;
-                border-radius: 3px 3px 3px 3px;
-                -moz-border-radius: 3px 3px 3px 3px;
-                -webkit-border-radius: 3px 3px 3px 3px;
-            }
-            #product-image-holder img { max-height: 130px; max-width: 190px; height:auto; width:auto; }
-            a.nav-links.first {
-                margin-left: 175px;
-            }
-            a.nav-links {
-                color:#e7e7e7;
-                font-weight: normal;
-                line-height:24px;
-			}
-			a.nav-links:hover {
-				border-bottom: 1px solid #E7E7E7;
-			}
-			a.nav-links.first {
-			    margin-left: 90px;
-			}
-			a.nav-links {
-			    color: #E7E7E7;
-			    font-weight: bold;
-			    line-height: 24px;
-			}
-			div.productlisting {
-                width: 11%;
-                border: 1px solid #fff;
-                height: 140px;
-                margin: 5px;
-                float: left;
-                border-radius: 3px;
-                -moz-border-radius: 3px;
-                -webkit-border-radius: 3px;
-                box-shadow: 0 0 4px #bbbbbb;
-                -moz-box-shadow: 0 0 4px #bbbbbb;
-                -webkit-box-shadow: 0 0 4px #bbbbbb;
-                overflow: hidden;
-                position: relative;
-                text-align: center;
-                cursor: pointer;
-                background: #fff;
-                font-size: 9pt;
-            }
-            div.productlisting img{
-                max-height: 80px;
-            }
-            div.productlisting input.marker {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-            }
-            p.brand {
-                padding: 2px 0;
-                background-color: lavender;
-                margin-bottom: 1px;
-            }
-            p.sku{
-                text-align: right;
-                font-size: 8pt;
-                border-top: 1px dotted #eee;
-                padding: 4px 0;
-                margin-top: 4px;
-                color: #7C7C7C;
-                position: absolute;
-                bottom: 0;
-                right: 2px;
-                width: 100%;
-                height: 8pt;
-                overflow: hidden;
-                background-color:#fff;
-            }
-            .add-selection-btn {
-              float: right;
-              font-size: 10pt;
-            }
-            .add-selection-btn .ui-button-text {
-                padding: 5px 10px 4px;
-            }
-            .add-selection-btn .ui-icon {display:none;}
-            input#delete {
-                padding: 3px 16px 4px !important;
-                display: none;
-                float: left;
-                margin-left: 5px;
-            }
-            #manage-product>.ui-tabs-nav li.ui-tabs-selected, #manage-product>.ui-tabs-panel {
-                background: #DAE8ED;
-            }
-            #short-description-tab, #full-description-tab {
-	            padding: 6px 5px !important;
-	            border: 1px solid #DDDDDD;
-	            border-top-width: 0;
-	            text-align: center;
-            }
+.tag-widget span.ui-icon {
+	display: inline-block;
+	border-radius: 4px;
+	cursor:pointer;
+	vertical-align: bottom;
+}
+.tag-widget .tag-editable {
+	vertical-align:top;
+}
+.tag-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
+	background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
+}
+#options-holder .option-content .option-modifier-select {
+	width: 50px;
+}
+#massaction::before {
+	content: '[ '
+}#massaction::after {
+	content: ' ]'
+}
+#product-image-holder {
+	height: 130px;
+	width: 191px;
+	background: white;
+	text-align: center;
+	vertical-align: middle;
+	border: 1px solid #BDE6F1;
+	border-radius: 3px 3px 3px 3px;
+	-moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+}
+#product-image-holder img { max-height: 130px; max-width: 190px; height:auto; width:auto; }
+a.nav-links.first {
+	margin-left: 175px;
+}
+a.nav-links {
+	color:#e7e7e7;
+	font-weight: normal;
+	line-height:24px;
+}
+a.nav-links:hover {
+	border-bottom: 1px solid #E7E7E7;
+}
+a.nav-links.first {
+    margin-left: 90px;
+}
+a.nav-links {
+    color: #E7E7E7;
+    font-weight: bold;
+    line-height: 24px;
+}
+div.productlisting {
+	width: 11%;
+	border: 1px solid #fff;
+	height: 140px;
+	margin: 5px;
+	float: left;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	box-shadow: 0 0 4px #bbbbbb;
+	-moz-box-shadow: 0 0 4px #bbbbbb;
+	-webkit-box-shadow: 0 0 4px #bbbbbb;
+	overflow: hidden;
+	position: relative;
+	text-align: center;
+	cursor: pointer;
+	background: #fff;
+	font-size: 9pt;
+}
+div.productlisting img{
+	max-height: 80px;
+}
+div.productlisting input.marker {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+p.brand {
+	padding: 2px 0;
+	background-color: lavender;
+	margin-bottom: 1px;
+}
+p.sku{
+	text-align: right;
+	font-size: 8pt;
+	border-top: 1px dotted #eee;
+	padding: 4px 0;
+	margin-top: 4px;
+	color: #7C7C7C;
+	position: absolute;
+	bottom: 0;
+	right: 2px;
+	width: 100%;
+	height: 8pt;
+	overflow: hidden;
+	background-color:#fff;
+}
+.add-selection-btn {
+	float: right;
+	font-size: 10pt;
+}
+.add-selection-btn .ui-button-text {
+	padding: 5px 10px 4px;
+}
+.add-selection-btn .ui-icon {display:none;}
+input#delete {
+	padding: 3px 16px 4px !important;
+	display: none;
+	float: left;
+	margin-left: 5px;
+}
+#manage-product>.ui-tabs-nav li.ui-tabs-selected, #manage-product>.ui-tabs-panel {
+	background: #DAE8ED;
+}
+#short-description-tab, #full-description-tab {
+	padding: 6px 5px !important;
+	border: 1px solid #DDDDDD;
+	border-top-width: 0;
+	text-align: center;
+}
 
-            .highlight {
-                border: 1px solid #cd5c5c !important;
-            }
-            #manage-product > .ui-tabs-panel {
-                height: 420px;
-            }
-            #manage-product .ui-tabs-panel {
-                padding: 10px 0;
-            }
-            #options-holder > div.option-wrapper {
-                padding: 7px 0 0;
-                color: #444;
-                border-radius: 3px 3px 3px 3px;
-                -moz-border-radius: 3px 3px 3px 3px;
-                -webkit-border-radius: 3px 3px 3px 3px;
-                background: #81AAC3;
-                width: 918px;
-            }
-            #options-holder .option-content {
-                background: #fff;
-                color: #444;
-                overflow: hidden;
-            }
-            #options-holder .option-content .ui-widget-header {
-              background: #EFEFEF;
-              color: #666;
-              font-size: 9pt;
-              padding:4px;
-              border: none;
-            }
-            #options-holder input[type="text"], #options-holder textarea {
-              padding: 3px 0 3px 3px;
-              font-size:9pt;
-            }
-            #options-holder select {
-              padding: 2px 0 2px 3px;
-              font-size:9pt;
-            }
-            .ui-widget.ui-button.remove-option, .ui-widget.ui-button.item-remove {
-                background: none;
-                border:none;
-                box-shadow: none;
-                -moz-box-shadow: none;
-                -webkit-box-shadow: none;
-                min-width: 10px;
-                overflow: visible;
-            }
-            .ui-widget.ui-button.remove-option {
-                   background: #49738b;
-                   float: right;
-                   height: 36px;
-                   margin: -6px -13px;
-                   width: 36px;
-            }
-            .ui-widget.ui-button.remove-option:hover {
-              background: #3d6075;
-            }
-            .ui-widget.ui-button.remove-option span.ui-icon {
-              background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
-            }
-            #image-list {
-                height:460px !important;
-            }
-            #ajax_msg {
-                line-height: 50px;
-                position: absolute;
-                top: 30%;
-                left:0;
-                width: 100%;
-                z-index: 5000;
-            }
-            .ui-autocomplete {
-                max-height: 180px;
-                overflow-y: auto;
-                overflow-x: hidden;
-                padding-right: 5px;
-                background: url('/system/images/bg-strip.png');
-                box-shadow: rgb(153, 153, 153) 0px 4px 10px;
-            }
-            /* IE 6 doesn't support max-height
-             * we use height instead, but this forces the menu to always be this tall
-             */
-            * html .ui-autocomplete {
-                height: 100px;
-                }
-            .ui-autocomplete .ui-menu-item {
-                cursor: pointer;
-            }
-            #product-list-holder > p.nothing {
-                text-align: center;
-                padding: 5px;
-                font-size: 150%;
-                margin-top: 20%;
-            }
-        </style>
+.highlight {
+	border: 1px solid #cd5c5c !important;
+}
+#manage-product > .ui-tabs-panel {
+	height: 420px;
+}
+#manage-product .ui-tabs-panel {
+	padding: 10px 0;
+}
+#options-holder > div.option-wrapper {
+	padding: 7px 0 0;
+	color: #444;
+	border-radius: 3px 3px 3px 3px;
+	-moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+	background: #81AAC3;
+	width: 918px;
+}
+#options-holder .option-content {
+	background: #fff;
+	color: #444;
+	overflow: hidden;
+}
+#options-holder .option-content .ui-widget-header {
+	background: #EFEFEF;
+	color: #666;
+	font-size: 9pt;
+	padding:4px;
+	border: none;
+}
+#options-holder input[type="text"], #options-holder textarea {
+	padding: 3px 0 3px 3px;
+	font-size:9pt;
+}
+#options-holder select {
+	padding: 2px 0 2px 3px;
+	font-size:9pt;
+}
+.ui-widget.ui-button.remove-option, .ui-widget.ui-button.item-remove {
+	background: none;
+	border:none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	min-width: 10px;
+	overflow: visible;
+}
+.ui-widget.ui-button.remove-option {
+	background: #49738b;
+	float: right;
+	height: 36px;
+	margin: -6px -13px;
+	width: 36px;
+}
+.ui-widget.ui-button.remove-option:hover {
+	background: #3d6075;
+}
+.ui-widget.ui-button.remove-option span.ui-icon {
+	background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
+}
+#image-list {
+	height:460px !important;
+}
+#ajax_msg {
+	line-height: 50px;
+	position: absolute;
+	top: 30%;
+	left:0;
+	width: 100%;
+	z-index: 5000;
+}
+.ui-autocomplete {
+	max-height: 180px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding-right: 5px;
+	background: url('/system/images/bg-strip.png');
+	box-shadow: rgb(153, 153, 153) 0px 4px 10px;
+}
+/* IE 6 doesn't support max-height
+* we use height instead, but this forces the menu to always be this tall
+*/
+* html .ui-autocomplete {
+	height: 100px;
+}
+.ui-autocomplete .ui-menu-item {
+	cursor: pointer;
+}
+#product-list-holder > p.nothing {
+	text-align: center;
+	padding: 5px;
+	font-size: 150%;
+	margin-top: 20%;
+}
+<?php $this->headStyle()->captureEnd();?>
+</style>
 
-        <?php
-            $this->headScript()->setAllowArbitraryAttributes(true)
-                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js')
-                    ->appendFile('https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js')
-                    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
-                    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
-                    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js')
-                    ->appendFile($this->websiteUrl.'system/js/external/smoke/smoke.min.js')
-                    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require-dev.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/product/main.js'))
-                    ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js')
-                    ->appendFile($this->websiteUrl . 'system/js/internal/system.js');
-            echo $this->headScript();
-        ?>
+<?php
+$this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
+        ->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js');
+$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/product.js'))
+        ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js')
+?>
 
-		<script id="tagTemplate" type="text/x-jquery-tmpl">
-			<input type="checkbox" name="tag[]" value="${id}"/>
-			<span class="tag-editable" title="Click to edit">${name}</span>
-			<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
-		</script>
-		
-		<script id="imgTemplate" type="text/x-jquery-tmpl">
-			{{each imageList}}
-			<div class="box">
-				<img src="${src}" width="100px" data-name="${name}" title="${name}"/>
-			</div>
-			{{/each}}
-		</script>
-		
-		<script id="optionMainTemplate" type="text/x-jquery-tmpl">
-            <div class="grid_5">
-                <div class="grid_4"><label>Option Name</label></div>
-                <div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
-            </div>
-            <div class="grid_4">
-                <div class="grid_3">
-                    <label>Type</label>
-                </div>
-                <div class="grid_9">
-                    <select class="option-type-select">
-                        <option value="dropdown">Dropdown Box</option>
-                        <option value="radio">Radio Switch</option>
-                        <option value="text">Text Field</option>
-                        <option value="date">Datepicker</option>
+<script id="tagTemplate" type="text/x-jquery-tmpl">
+	<input type="checkbox" name="tag[]" value="${id}"/>
+	<span class="tag-editable" title="Click to edit">${name}</span>
+	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
+</script>
+
+<script id="imgTemplate" type="text/x-jquery-tmpl">
+	{{each imageList}}
+	<div class="box">
+		<img src="${src}" width="100px" data-name="${name}" title="${name}"/>
+	</div>
+	{{/each}}
+</script>
+
+<script id="optionMainTemplate" type="text/x-jquery-tmpl">
+    <div class="grid_5">
+        <div class="grid_4"><label>Option Name</label></div>
+        <div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
+    </div>
+    <div class="grid_4">
+        <div class="grid_3">
+            <label>Type</label>
+        </div>
+        <div class="grid_9">
+            <select class="option-type-select">
+                <option value="dropdown">Dropdown Box</option>
+                <option value="radio">Radio Switch</option>
+                <option value="text">Text Field</option>
+                <option value="date">Datepicker</option>
 <!--							<option value="file">Upload File</option>-->
-                    </select>
-                </div>
+            </select>
+        </div>
+    </div>
+    <div class="grid_3">
+      <div class="grid_9" style="height: 26px;">
+        {{if id}}
+        &nbsp;
+        {{else}}
+        <input type="checkbox" title="<?php echo $this->translate('Add to library?');?>" name="isTemplate" style="margin: 5px 5px 5px 0; cursor:pointer" {{if isTemplate}}checked="checked"{{/if}} />
+        <label style="display:inline;"><?php echo $this->translate('Add to library?');?></label>
+        <input type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label');?>" style="width: 80%"/>
+        {{/if}}
+      </div>
+      <div class="grid_3">
+        <button class="remove-option">Delete option</button>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div class="option-content mt5px"></div>
+</script>
+
+<script id="optionListTemplate" type="text/x-jquery-tmpl">
+	<div class="ui-widget-header clearfix">
+		<div class="grid_4">Title</div>
+		<div class="grid_3">Price modifier</div>
+		<div class="grid_3">Weight modifier</div>
+		<div class="grid_1">Default</div>
+		<div class="grid_1"></div>
+	</div>
+	<div class="option-list-holder mt5px">
+
+	</div>
+	<div class="clearfix grid_12 mt5px mb10px">
+		<a class="add-selection-btn" href="javascript:;">[ Add new selection ]</a>
+	</div>
+</script>
+
+<script id="listItemTemplate" type="text/x-jquery-tmpl">
+	<div class="grid_4">
+		<input type="text" name="title" data-role="title" value="${title}" />
+	</div>
+	<div class="grid_3">
+		<select class="option-modifier-select" name="priceModifierSign" >
+			<option value="+" {{if priceSign == '+'}}selected{{/if}} >+</option>
+			<option value="-" {{if priceSign == '-'}}selected{{/if}} >-</option>
+		</select>
+		<input type="text" name="priceModifierValue" value="${priceValue}" class="option-modifier-select" placeholder="0" />
+		<select name="priceModifierType" class="option-modifier-select" >
+			<option value="percent" {{if priceType == 'percent'}}selected{{/if}} >%</option>
+			<option value="unit" {{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
+		</select>
+	</div>
+	<div class="grid_3">
+		<select name="weightModifierSign" class="option-modifier-select">
+			<option value="+" {{if weightSign == '+'}}selected{{/if}} >+</option>
+			<option value="-" {{if weightSign == '-'}}selected{{/if}} >-</option>
+		</select>
+		<input name="weightModifierValue" type="text" class="option-modifier-select" placeholder="0" value="${weightValue}"/>
+		<span><?php echo $this->generalConfig['weightUnit']; ?></span>
+	</div>
+	<div class="grid_1 mt8px">
+		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
+	</div>
+	<div class="grid_1">
+		<button class="item-remove">Delete item</button>
+	</div>
+</script>
+
+<script id="productListingTemplate" type="text/x-jquery-tmpl">
+	{{if showDelete}}
+    <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
+    {{else}}
+    <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
+    {{/if}}
+        <p class="brand">${brand}</p>
+        {{if showDelete}}
+        <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+        {{else}}
+        <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+        {{/if}}
+        <p class="name">${name}</p>
+        <p class="sku">${sku}</p>
+    {{if showDelete}}
+    {{else}}
+    </a>
+    <input class="marker" type=checkbox {{if marked}}checked="checked"{{/if}} />
+    {{/if}}
+</script>
+
+<script id="quickPreviewTemplate" type="text/x-jquery-tmpl">
+    <fieldset style="background-image:none; background-color: white; height:272px;">
+        <legend><?php echo $this->translate('Preview');?></legend>
+        <a href="{{= $('#websiteUrl').val() + page.url }}" target="_blank" style="text-decoration: none; color: inherit;">
+            <img src="/media/${photo.replace('/','/product/')}" style="float:left; padding: 15px; max-height: 120px"/>
+            <p style="text-align:center; font-weight: bold;">${name}</p>
+            <p class="mt10px" style="height: 160px;">${ shortDescription.length > 300 ? shortDescription.slice(0,299)+'...' : shortDescription }</p>
+            <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
+                ${price}&nbsp;${ $('#currency-unit').text() }
+            </p>
+        </a>
+    </fieldset>
+</script>
+
+<script>
+    $(function(){
+	    $('div.seotoaster > div.ui-widget-header:first').remove();
+        $('#manage-product,#description-box').tabs();
+        $(".ui-tabs-nav, .ui-tabs-nav > *" )
+            .removeClass( "ui-corner-all" )
+            .addClass( "ui-corner-top" );
+    });
+</script>
+
+<div id="ajax_msg" class="smoke">
+    <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" />
+</div>
+<div id="manage-product" class="h520" style="padding: 0;">
+    <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: #fff;">
+        <div class="clearfix ui-widget-header">
+	        <div class="grid_1 mt10px">
+		        <a href="javascript:;" onclick="$('#product-list').hide('slide');" style="color:#e6e6fa;">&nbsp;&laquo; <?php echo $this->translate('back');?></a>
+	        </div>
+            <div class="grid_1 prefix_2 mt5px">
+                <label for="product-list-search">Search</label>
             </div>
-            <div class="grid_3">
-              <div class="grid_9" style="height: 26px;">
-                {{if id}}
-                &nbsp;
-                {{else}}
-	            <input type="checkbox" title="<?php echo $this->translate('Add to library?');?>" name="isTemplate" style="margin: 5px 5px 5px 0; cursor:pointer" {{if isTemplate}}checked="checked"{{/if}} />
-	            <label style="display:inline;"><?php echo $this->translate('Add to library?');?></label>
-                <input type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label');?>" style="width: 80%"/>
-                {{/if}}
-              </div>
-              <div class="grid_3">
-                <button class="remove-option">Delete option</button>
-              </div>
+            <div class="grid_5 suffix_1">
+                <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags" style="margin-top: 2px;" />
             </div>
-            <div class="clear"></div>
-            <div class="option-content mt5px"></div>
-		</script>
-		
-		<script id="optionListTemplate" type="text/x-jquery-tmpl">
-			<div class="ui-widget-header clearfix">
-				<div class="grid_4">Title</div>
-				<div class="grid_3">Price modifier</div>
-				<div class="grid_3">Weight modifier</div>
-				<div class="grid_1">Default</div>
-				<div class="grid_1"></div>
-			</div>
-			<div class="option-list-holder mt5px">
-				
-			</div>
-			<div class="clearfix grid_12 mt5px mb10px">
-				<a class="add-selection-btn" href="javascript:;">[ Add new selection ]</a>
-			</div>
-		</script>
-		
-		<script id="listItemTemplate" type="text/x-jquery-tmpl">
-			<div class="grid_4">
-				<input type="text" name="title" data-role="title" value="${title}" />
-			</div>
-			<div class="grid_3">
-				<select class="option-modifier-select" name="priceModifierSign" >
-					<option value="+" {{if priceSign == '+'}}selected{{/if}} >+</option>
-					<option value="-" {{if priceSign == '-'}}selected{{/if}} >-</option>
-				</select>
-				<input type="text" name="priceModifierValue" value="${priceValue}" class="option-modifier-select" placeholder="0" />
-				<select name="priceModifierType" class="option-modifier-select" >
-					<option value="percent" {{if priceType == 'percent'}}selected{{/if}} >%</option>
-					<option value="unit" {{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
-				</select>
-			</div>
-			<div class="grid_3">
-				<select name="weightModifierSign" class="option-modifier-select">
-					<option value="+" {{if weightSign == '+'}}selected{{/if}} >+</option>
-					<option value="-" {{if weightSign == '-'}}selected{{/if}} >-</option>
-				</select>
-				<input name="weightModifierValue" type="text" class="option-modifier-select" placeholder="0" value="${weightValue}"/>
-				<span><?php echo $this->generalConfig['weightUnit']; ?></span>
-			</div>
-			<div class="grid_1 mt8px">
-				<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
-			</div>
-			<div class="grid_1">
-				<button class="item-remove">Delete item</button>
-			</div>
-		</script>
-		
-		<script id="productListingTemplate" type="text/x-jquery-tmpl">
-			{{if showDelete}}
-            <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
-            {{else}}
-            <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
-            {{/if}}
-                <p class="brand">${brand}</p>
-                {{if showDelete}}
-                <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-                {{else}}
-                <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-                {{/if}}
-                <p class="name">${name}</p>
-                <p class="sku">${sku}</p>
-            {{if showDelete}}
-            {{else}}
-            </a>
-            <input class="marker" type=checkbox {{if marked}}checked="checked"{{/if}} />
-            {{/if}}
-        </script>
-
-        <script id="quickPreviewTemplate" type="text/x-jquery-tmpl">
-            <fieldset style="background-image:none; background-color: white; height:272px;">
-                <legend><?php echo $this->translate('Preview');?></legend>
-                <a href="{{= $('#websiteUrl').val() + page.url }}" target="_blank" style="text-decoration: none; color: inherit;">
-                    <img src="/media/${photo.replace('/','/product/')}" style="float:left; padding: 15px; max-height: 120px"/>
-                    <p style="text-align:center; font-weight: bold;">${name}</p>
-                    <p class="mt10px" style="height: 160px;">${ shortDescription.length > 300 ? shortDescription.slice(0,299)+'...' : shortDescription }</p>
-                    <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-                        ${price}&nbsp;${ $('#currency-unit').text() }
-                    </p>
-                </a>
-            </fieldset>
-        </script>
-
-        <script>
-            $(function(){
-                $('#manage-product,#description-box').tabs();
-                $(".ui-tabs-nav, .ui-tabs-nav > *" )
-                    .removeClass( "ui-corner-all" )
-                    .addClass( "ui-corner-top" );
-            });
-        </script>
-	</head>
-    <body>
-		<noscript style="width: 100%; height: 100%; position: fixed; display: block; background: white; font-size: 150%; text-align: center; padding-top: 30%;">
-		JavaScript must be enabled at this point.<br/>
-		<a href="http://www.seotoaster.com/">seotoaster.com</a>
-		</noscript>
-		<input type="hidden" id="pluginUrl" name="pluginUrl" value="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run'=>''));?>" />
-		<input type="hidden" id="websiteUrl" name="websiteUrl" value="<?php echo $this->websiteUrl;?>" />
-		<div id="ajax_msg" class="smoke">
-            <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /></div>
-        <div id="manage-product" class="seotoaster container_12 h520" style="padding: 0;">
-            <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: #fff;">
-                <div class="clearfix ui-widget-header">
-                    <div class="grid_1 prefix_3 mt5px">
-                        <label for="product-list-search">Search</label>
-                    </div>
-                    <div class="grid_5 suffix_1">
-                        <input type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags" style="margin-top: 2px;" />
-                    </div>
-                    <div class="grid_2 mt5px" style="text-align:center;">
-                        <label>
-                            <a id="massaction" style="color:#e6e6fa;" href="javascript:;" data-labels='{"related": "add as related", "edit": "delete selected"}' >run mass action</a>
-                        </label>
-                    </div>
-                </div>
-                <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
-            </div>
-
-            <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
-                <div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
-                    <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');$('#product-image-folder').val('0');">&nbsp;&laquo; back</a>
-                    <span style="margin-left: 30%"><?php echo $this->translate('select image for product');?></span>
-                </div>
-                <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
-            </div>
-            <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
-
-            <ul>
-                <li><a href="#tab1"><?php echo $this->translate('Main Info'); ?></a></li>
-                <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
-                <li><a href="#options-tab"><?php echo $this->translate('Options'); ?></a></li>
-                <li><a href="#tab4"><?php echo $this->translate('Related Products'); ?></a></li>
-                <?php foreach ($this->plugins as $plugin) : ?>
-                <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.ucfirst($plugin));?></a></li>
-                <?php endforeach; ?>
-                <a href="#new" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
-            </ul>
-            <!--------- MAIN INFO -------------->
-            <div id="tab1" class="clearfix">
-                <div class="grid_8">
-	                <fieldset>
-	                <div class="grid_4" style="margin-left: 0.7%;">
-                        <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-                        <div id="product-image-holder">
-                            <img id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
-                        </div>
-                    </div>
-                    <div class="grid_4">
-                        <label for="product-name">Product Name</label>
-                    </div>
-					<div class="grid_4" style="text-align: right;">
-						<label for="product-enabled">This product is enabled</label>
-					</div>
-		            <div class="grid_7">
-			            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
-		            </div>
-					<div class="grid_1">
-						<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
-					</div>
-                    <div class="grid_2">
-                        <label for="product-sku">SKU</label>
-                        <input type="text" id="product-sku" data-reflection="property" placeholder="item id" />
-                    </div>
-                    <div class="grid_3">
-                        <label for="product-mpn">MPN</label>
-                        <input type="text" id="product-mpn" data-reflection="property" placeholder="manufacturer partnumber" />
-                    </div>
-                    <div class="grid_3">
-                        <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
-                        <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
-                    </div>
-                    <div class="grid_8">
-                        <label for="product-brand">Brand</label>
-                    </div>
-                    <div class="grid_4">
-                        <select name="product-brand" id="product-brand" data-reflection="property">
-                        </select>
-                    </div>
-                    <div class="grid_4">
-                        <input type="text" name="" id="new-brand" placeholder="or create new">
-                    </div>
-                    <div class="clear"></div>
-		            </fieldset>
-
-                    <div class="mt5px">
-                        <div id="description-box">
-                            <ul>
-                                <li><a href="#short-description-tab">Short description</a></li>
-                                <li><a href="#full-description-tab">Full description</a></li>
-                            </ul>
-                            <div id="short-description-tab">
-                            <textarea id="product-shortDescription" class="h170" data-reflection="property" placeholder="Short description"></textarea>
-                            </div>
-                            <div id="full-description-tab">
-                            <textarea id="product-fullDescription" class="h170" data-reflection="property" placeholder="Full description"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--End grid_8-->
-				<div class="grid_4">
-				<fieldset>
-					<div class="grid_6 alpha">
-	                    <label for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
-	                    <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
-	                </div>
-	                <div class="grid_6">
-	                    <label for="product-taxClass"><?php echo $this->translate('Taxes');?></label>
-	                    <select name="taxes" id="product-taxClass" data-reflection="property" >
-	                        <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
-	                        <option value="1"><?php echo $this->translate('Default');?></option>
-	                        <option value="2"><?php echo $this->translate('Alternative');?></option>
-	                        <option value="3"><?php echo $this->translate('Alternative 2');?></option>
-	                    </select>
-	                </div>
-	                <div class="grid_12 alpha">
-	                    <label for="product-pageTemplate">Select a product page template</label>
-	                    <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
-	                        <option value="-1" disabled="disable">Select Template</option>
-	                        <?php foreach ($this->templateList as $tmpl) : ?>
-	                        <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
-	                        <?php endforeach; ?>
-	                    </select>
-	                </div>
-				</fieldset>
-                </div>
-                <div id="quick-preview" class="grid_4"></div>
-            </div>
-            <div id="tag-tab" class="clearfix">
-                <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
-                    <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
-                </div>
-
-                <div id="product-tags" class="grid_12 h380" style="overflow-y: auto;">
-                </div>
-
-            </div> <!-- #tag-tab -->
-
-            <div id="options-tab" class="clearfix">
-                <div class="grid_6 prefix_3 suffix_3 mb5px" style="text-align:center;">
-                    <button id="add-new-option-btn">Create new option</button>
-                    or
-                    <select name="option-library" id="option-library" style="width: 230px;">
-                        <option value="-1" disabled="disabled">select from library</option>
-                    </select>
-                </div>
-                <div id="options-holder" class="clearfix h380 grid_12" style="overflow-y: auto;">
-
-                </div>
-            </div> <!-- End Tab 3 -->
-
-            <div id="tab4" class="clearfix">
-                <div class="grid_12 mb5px">
-                    <a href="javascript:;" data-listtype="related" class="show-list" title="<?php echo $this->translate('Add related'); ?>">&#10010; <?php echo $this->translate('Add related'); ?></a>
-                </div>
-                <div id="related-holder" class="grid_12">
-
-                </div>
-            </div>
-
-            <div class="grid_12 mb10px">
-                <a href="javascript:;" class="delete-selected" style="margin-left: 10px;" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
-                <input type="submit" name="submit" id="submit" value="Save"/>
+            <div class="grid_2 mt5px" style="text-align:center;">
+                <label>
+                    <a id="massaction" style="color:#e6e6fa;" href="javascript:;" data-labels='{"related": "add as related", "edit": "delete selected"}' >run mass action</a>
+                </label>
             </div>
         </div>
+        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+    </div>
 
-    </body>
-</html>
+    <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
+        <div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
+            <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');$('#product-image-folder').val('0');">&nbsp;&laquo; back</a>
+            <span style="margin-left: 30%"><?php echo $this->translate('select image for product');?></span>
+        </div>
+        <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
+    </div>
+	<div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
+
+    <ul>
+        <li><a href="#main-tab"><?php echo $this->translate('Main Info'); ?></a></li>
+        <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
+        <li><a href="#options-tab"><?php echo $this->translate('Options'); ?></a></li>
+        <li><a href="#related-tab"><?php echo $this->translate('Related Products'); ?></a></li>
+        <?php foreach ($this->plugins as $plugin) : ?>
+        <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.ucfirst($plugin));?></a></li>
+        <?php endforeach; ?>
+        <a href="#new" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
+    </ul>
+    <!--------- MAIN INFO -------------->
+    <div id="main-tab" class="clearfix">
+        <div class="grid_8">
+            <fieldset>
+            <div class="grid_4" style="margin-left: 0.7%;">
+                <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
+                <div id="product-image-holder">
+                    <img id="product-image" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="" />
+                </div>
+            </div>
+            <div class="grid_4">
+                <label for="product-name">Product Name</label>
+            </div>
+			<div class="grid_4" style="text-align: right;">
+				<label for="product-enabled">This product is enabled</label>
+			</div>
+            <div class="grid_7">
+	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
+            </div>
+			<div class="grid_1">
+				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
+			</div>
+            <div class="grid_2">
+                <label for="product-sku">SKU</label>
+                <input type="text" id="product-sku" data-reflection="property" placeholder="item id" />
+            </div>
+            <div class="grid_3">
+                <label for="product-mpn">MPN</label>
+                <input type="text" id="product-mpn" data-reflection="property" placeholder="manufacturer partnumber" />
+            </div>
+            <div class="grid_3">
+                <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
+                <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
+            </div>
+            <div class="grid_8">
+                <label for="product-brand">Brand</label>
+            </div>
+            <div class="grid_4">
+                <select name="product-brand" id="product-brand" data-reflection="property">
+                </select>
+            </div>
+            <div class="grid_4">
+                <input type="text" name="" id="new-brand" placeholder="or create new">
+            </div>
+            <div class="clear"></div>
+            </fieldset>
+
+            <div class="mt5px">
+                <div id="description-box">
+                    <ul>
+                        <li><a href="#short-description-tab">Short description</a></li>
+                        <li><a href="#full-description-tab">Full description</a></li>
+                    </ul>
+                    <div id="short-description-tab">
+                    <textarea id="product-shortDescription" class="h170" data-reflection="property" placeholder="Short description"></textarea>
+                    </div>
+                    <div id="full-description-tab">
+                    <textarea id="product-fullDescription" class="h170" data-reflection="property" placeholder="Full description"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End grid_8-->
+		<div class="grid_4">
+		<fieldset>
+			<div class="grid_6 alpha">
+                <label for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
+                <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
+            </div>
+            <div class="grid_6">
+                <label for="product-taxClass"><?php echo $this->translate('Taxes');?></label>
+                <select name="taxes" id="product-taxClass" data-reflection="property" >
+                    <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
+                    <option value="1"><?php echo $this->translate('Default');?></option>
+                    <option value="2"><?php echo $this->translate('Alternative');?></option>
+                    <option value="3"><?php echo $this->translate('Alternative 2');?></option>
+                </select>
+            </div>
+            <div class="grid_12 alpha">
+                <label for="product-pageTemplate">Select a product page template</label>
+                <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
+                    <option value="-1" disabled="disable">Select Template</option>
+                    <?php foreach ($this->templateList as $tmpl) : ?>
+                    <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+		</fieldset>
+        </div>
+        <div id="quick-preview" class="grid_4"></div>
+    </div>
+
+    <div id="tag-tab" class="clearfix">
+        <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
+            <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
+        </div>
+
+        <div id="product-tags" class="grid_12 h380" style="overflow-y: auto;">
+        </div>
+
+    </div> <!-- #tag-tab -->
+
+    <div id="options-tab" class="clearfix">
+        <div class="grid_6 prefix_3 suffix_3 mb5px" style="text-align:center;">
+            <button id="add-new-option-btn">Create new option</button>
+            or
+            <select name="option-library" id="option-library" style="width: 230px;">
+                <option value="-1" disabled="disabled">select from library</option>
+            </select>
+        </div>
+        <div id="options-holder" class="clearfix h380 grid_12" style="overflow-y: auto;">
+
+        </div>
+    </div> <!-- End Tab 3 -->
+
+    <div id="related-tab" class="clearfix">
+        <div class="grid_12 mb5px">
+            <a href="javascript:;" data-listtype="related" class="show-list" title="<?php echo $this->translate('Add related'); ?>">&#10010; <?php echo $this->translate('Add related'); ?></a>
+        </div>
+        <div id="related-holder" class="grid_12">
+
+        </div>
+    </div>
+
+    <div class="grid_12 mb10px">
+        <a href="javascript:;" class="delete-selected" style="margin-left: 10px;" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
+        <input type="submit" name="submit" id="submit" value="Save"/>
+    </div>
+</div>
