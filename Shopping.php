@@ -9,6 +9,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_URL	= 'product-pages.html';
 	const PRODUCT_DEFAULT_LIMIT = 30;
 
+	const BRAND_LOGOS_FOLDER = 'brands';
 	/**
 	 * New system role 'customer'
 	 *
@@ -47,10 +48,14 @@ class Shopping extends Tools_Plugins_Abstract {
             'zones',
             'product',
 	        'shipping',
-	        'people'
+	        'people',
+	        'brandlogos'
         ),
+	    Tools_Security_Acl::ROLE_ADMIN => array(
+		    'brandlogos'
+	    ),
 	    Tools_Security_Acl::ROLE_GUEST => array(
-		    'people'
+
 	    )
     );
 
@@ -60,7 +65,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_layout = new Zend_Layout();
 		$this->_layout->setLayoutPath(__DIR__ . '/system/views/');
 
-		$this->_view->setScriptPath(__DIR__ . '/system/views/');
+		if ($viewScriptPath = Zend_Layout::getMvcInstance()->getView()->getScriptPaths()){
+			$this->_view->setScriptPath($viewScriptPath);
+		}
+		$this->_view->addScriptPath(__DIR__ . '/system/views/');
 
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig	= Zend_Registry::get('website');
@@ -993,6 +1001,11 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
 			$this->_layout->content = $this->_view->render('order.phtml');
 		}
+		echo $this->_layout->render();
+	}
+
+	public function brandlogosAction(){
+		$this->_layout->content = $this->_view->render('brandlogos.phtml');
 		echo $this->_layout->render();
 	}
 }

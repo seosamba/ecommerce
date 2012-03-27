@@ -1,0 +1,89 @@
+<?php
+$this->headTitle('Manage brand logos');
+$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/brandlogos.js'));
+$this->placeholder('headerContent')->set($this->translate('Manage brand logos'));
+?>
+
+<div class="ui-helper-hidden">
+<?php
+	echo $this->formHidden('things-select-folder', Shopping::BRAND_LOGOS_FOLDER);
+	$thingsUploader = $this->toasterUploader(
+		array(
+			'id'      => 'brand-logo-uploader',
+			'caption' => $this->translate('Upload brand logos'),
+			'caller'  => 'media',
+			'noMultiupload' => true
+		));
+	echo $thingsUploader;
+?>
+</div>
+
+<div id="manage-logos">
+	<ul class="brand-list clearfix h500">
+
+	</ul>
+</div>
+<style type="text/css">
+
+	ul.brand-list {
+		margin: 0;
+		overflow-y: scroll;
+	}
+	ul.brand-list li {
+		margin: 10px 0;
+		border: 1px solid white;
+		text-align: center;
+		cursor: pointer;
+		position: relative;
+		background-color: white;
+		overflow: hidden;
+	}
+	ul.brand-list li:hover {
+		-moz-box-shadow: 0 0 7px indianred;
+		-webkit-box-shadow: 0 0 7px indianred;
+		box-shadow: 0 0 7px indianred;
+	}
+	ul.brand-list li img {
+		width: 100px;
+		max-height: 100px;
+		margin-top: 10px;
+	}
+	ul.brand-list li p {
+		padding:5px 0;
+		margin: 0;
+		background-color: #666666;
+		font-size:11pt;
+	    color: #FFFFFF;
+		overflow: hidden;
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		-o-text-overflow: ellipsis;
+		-icab-text-overflow: ellipsis;
+		-khtml-text-overflow: ellipsis;
+		-moz-text-overflow: ellipsis;
+		-webkit-text-overflow: ellipsis;
+		text-overflow: ellipsis;
+	}
+	ul.brand-list li:hover p {
+		background-color: #d3d3d3;
+		color: #666666;
+	}
+</style>
+<script type="text/javascript">
+	$(function(){
+		jsBrandLogoUploader.bind('BeforeUpload', function(uploader, file){
+			var ext = /\.jpe?g|\.gif|\.png$/i.exec(file.name);
+			file.name = app.filename+'.png';
+		});
+		jsBrandLogoUploader.bind('FileUploaded', function(uploader, file){
+			var newSrc = $('#website_url').val()+'media/brands/small/'+file.name,
+				brand = app.view.brands.find(function(brand){ return brand.get('name') === app.filename; });
+			console.log(newSrc,brand);
+			if (brand !== undefined){
+				brand.set('src', newSrc);
+			}
+			brand.trigger('change');
+		});
+	})
+</script>
