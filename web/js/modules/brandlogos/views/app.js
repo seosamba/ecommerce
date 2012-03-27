@@ -28,7 +28,7 @@ define([
                     brand.set({src: ( _.isObject(image) ? image.get('src').replace('product', 'small') : $('#website_url').val()+'system/images/noimage.png')});
                 }
                 var view = new BrandView({model: brand});
-                view.render().$el.appendTo('#manage-logos ul.brand-list').addClass((i%5==0)?'omega':'');
+                view.render().$el.appendTo('#manage-logos ul.brand-list').addClass(((i+1)%6==0)?'omega':'');
             })
         },
         fetchImages: function() {
