@@ -35,6 +35,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_shippingService = null;
 
+	protected $_shippingTrackingId = null;
+
 	protected $_subTotal;
 
 	protected $_totalTax;
@@ -170,6 +172,15 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getTotalTax() {
 		return $this->_totalTax;
+	}
+
+	public function setShippingTrackingId($shippingTrackingId) {
+		$this->_shippingTrackingId = $shippingTrackingId;
+		return $this;
+	}
+
+	public function getShippingTrackingId() {
+		return $this->_shippingTrackingId;
 	}
 
 }

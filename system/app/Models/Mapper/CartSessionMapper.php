@@ -25,6 +25,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'shipping_price'        => $model->getShippingPrice(),
 			'shipping_type'         => $model->getShippingType(),
 			'shipping_service'      => $model->getShippingService(),
+			'shipping_tracking_id'  => $model->getShippingTrackingId(),
 			'sub_total'             => $model->getSubTotal(),
 			'total_tax'             => $model->getTotalTax(),
 			'total'                 => $model->getTotal()
@@ -42,7 +43,13 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			$this->getDbTable()->update($data, array('id = ?' => $exists->getId()));
 		}
 
-		$this->_processCartContent($model);
+		try {
+			$this->_processCartContent($model);
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			error_log($e->getTraceAsString());
+			return false;
+		}
 
 		return $model;
 	}
@@ -63,11 +70,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 				$cartSessionContentDbTable->insert($item);
 			}
-			try {
-				$cartSessionContentDbTable->getAdapter()->commit();
-			} catch (Exception $e) {
 
-			}
+			$cartSessionContentDbTable->getAdapter()->commit();
 		}
 	}
 
