@@ -139,7 +139,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		$userDbTable = new Application_Model_DbTable_User();
 		$select = $userDbTable->select()
 				->setIntegrityCheck(false)
-				->from('user',array('id', 'full_name', 'email', 'reg_date' => "DATE_FORMAT(reg_date, '%d %b, %Y')" ))
+				->from('user',array('id', 'full_name', 'email', 'reg_date' ))
 				->joinLeft(
 					array('cart' => 'shopping_cart_session'),
 					'cart.user_id = user.id',

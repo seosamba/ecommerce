@@ -958,7 +958,11 @@ class Shopping extends Tools_Plugins_Abstract {
 					$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
 
 					$c = Zend_Registry::get('Zend_Currency');
-					$data = array_map(function($row) use ($c){ $row['total_amount'] = $c->toCurrency($row['total_amount']); return $row;},
+					$data = array_map(function($row) use ($c){
+							$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
+							$row['total_amount'] = $c->toCurrency($row['total_amount']);
+							return $row;
+						},
 						$customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset, $search));
 				} else {
 					if ($id) {
