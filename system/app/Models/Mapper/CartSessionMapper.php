@@ -57,6 +57,10 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 				$item['options'] = http_build_query($item['options']);
 				$item['cart_id'] = $cartSession->getId();
 
+				unset($item['sku']);
+				unset($item['name']);
+				unset($item['original_price']);
+
 				$cartSessionContentDbTable->insert($item);
 			}
 			try {
