@@ -130,8 +130,11 @@
 		var self = this,
 			id = parseInt($(this).closest('tr').data('id'));
 		smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
+			if (value === false) {
+				return value;
+			}
 			value = $.trim(value);
-			if (value !== false && $(self).data('shippingTrackingId') !== value) {
+			if ($(self).data('shippingTrackingId') !== value) {
 				$.ajax({
 					url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
 					data: {shippingTrackingId: value},
