@@ -8,7 +8,7 @@
 class Widgets_Product_Product extends Widgets_Abstract {
 
     const TYPE_PRODUCTLISTING = 'productlisting';
-	
+
 	/**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -57,8 +57,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			array_shift($this->_options);
 		} else {
 			$this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
-			$this->_type = $this->_options[0];
-			array_shift($this->_options);
+			$this->_type = array_shift($this->_options);
 		}
 
         //initializing Zend Currency for future use
@@ -70,9 +69,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
     protected function _load() {
         if ($this->_product === null || $this->_type === null) {
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
-                 return "<b>Product doesn't exist or wrong options provided</b>";
+                 return "<b>Product doesn&quote;t exist or wrong options provided</b>";
             }
-            return "<!--Product doesn't exist or wrong options provided-->";
+            return "<!--Product doesn&quote;t exist or wrong options provided-->";
         }
 
         $this->_view->product = $this->_product;
@@ -224,12 +223,19 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     public static function getAllowedOptions() {
 		$translator = Zend_Registry::get('Zend_Translate');
-		return array(
-			array(
-				'alias'  => $translator->translate('Product name'),
-				'option' => 'product:name'
-			)
-		);
+	    $allowedOptions = array();
+
+	    $methods = get_class_methods(__CLASS__);
+	    $generators = preg_grep('/^_render(?!Productlisting)/', $methods);
+	    foreach ($generators as $method) {
+		    $type = strtolower(str_replace('_render', '', $method));
+		    array_push($allowedOptions, array(
+			    'alias'  => $translator->translate('Product '.$type),
+			    'option' => 'product:'.$type
+		    ));
+	    }
+
+	    return $allowedOptions;
 	}
 
 }
