@@ -1009,7 +1009,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->orders    = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
 		}
 
-		$content = $this->_view->render('customer_profile.phtml');
+		$content = $this->_view->render('profile.phtml');
 
 		if ($this->_request->isXmlHttpRequest()){
 			echo $content;
