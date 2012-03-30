@@ -1,4 +1,4 @@
-<?php
+\<?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	const CART_STATUS_NEW           = 'new';
@@ -36,6 +36,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	protected $_shippingService = null;
 
 	protected $_subTotal = 0;
+
+	protected $_shippingTrackingId = null;
 
 	protected $_totalTax = 0;
 
@@ -170,6 +172,15 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getTotalTax() {
 		return $this->_totalTax;
+	}
+
+	public function setShippingTrackingId($shippingTrackingId) {
+		$this->_shippingTrackingId = $shippingTrackingId;
+		return $this;
+	}
+
+	public function getShippingTrackingId() {
+		return $this->_shippingTrackingId;
 	}
 
 }

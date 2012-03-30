@@ -933,6 +933,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_layout->render();
 	}
 
+	/**
+	 * Generates list of website customers
+	 * for admins only
+	 * @return string Html content
+	 */
 	protected function _makeOptionPeople() {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-people')){
 			$this->_view->noLayout = true;
@@ -989,24 +994,71 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	public function profileAction(){
-		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
-		if ($id){
-			$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
-			if ($customer) {
-				$this->_view->customer = $customer;
-				$this->_view->orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
-			}
-			echo $this->_view->render('customer_profile.phtml');
+		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
+
+		if ($customer->getId() === null){
+			$this->_redirector->gotoUrl($this->_websiteUrl);
+		}
+
+		if ($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN){
+			$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
+		}
+		if (!isset($id) || $id === false){
+			$id = $customer->getId();
+		}
+
+		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
+		if ($customer) {
+			$this->_view->customer  = $customer;
+			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
+			$this->_view->stats = array(
+				'total'     => sizeof($orders),
+				'new' => sizeof(array_filter($orders, function($order){
+					return ( !$order->getStatus() || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_NEW));
+					})
+				),
+				'completed' => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED; })),
+				'pending'   => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING; }))
+			);
+			$this->_view->orders = $orders;
+		}
+
+		$content = $this->_view->render('profile.phtml');
+
+		if ($this->_request->isXmlHttpRequest()){
+			echo $content;
+		} else {
+			$this->_layout->content = '<div id="profile">'.$content.'</div>';
+			echo $this->_layout->render();
 		}
 	}
 
 	public function orderAction(){
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		if ($id) {
-			$this->_view->order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
+			$order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
+			$customer = Tools_ShoppingCart::getInstance()->getInstance()->getCustomer();
+			if (!$order) {
+				throw new Exceptions_SeotoasterPluginException('Order not found');
+			}
+			if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)){
+				if ((int)$order->getUserId() !== (int)$customer->getId()) {
+					throw new Exceptions_SeotoasterPluginException('Not allowed action');
+				}
+			}
+
+			if ($this->_request->isPost()) {
+				$params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+
+				$order->setOptions($params);
+				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
+
+				$this->_responseHelper->response($status->toArray(),false);
+			}
+			$this->_view->order = $order;
 			$this->_layout->content = $this->_view->render('order.phtml');
+			echo $this->_layout->render();
 		}
-		echo $this->_layout->render();
 	}
 
 	public function brandlogosAction(){

@@ -27,12 +27,12 @@
 		<?php endif;?>
 	</div>
 	<div class="profile-actions">
-		<input type="button" class="blue-btn" value="<?php echo $this->translate('Edit profile');?>" />
+		<!--		<input type="button" class="blue-btn" value="--><?php //echo $this->translate('Edit profile');?><!--" />-->
+		<h3><?php echo $this->translate('Orders summary');?></h3>
 		<ul class="stats">
-			<li><a href="">15 orders</a></li>
-			<li>10 payed orders</li>
-			<li>5 pending orders</li>
-			<li>17 products in whishlist</li>
+			<?php foreach ($this->stats as $key => $value) : ?>
+				<li class="<?php echo $key;?>"><?php echo $value.' '.$this->translate($key);?></li>
+			<?php endforeach; ?>
 		</ul>
 	</div>
 </div>
@@ -60,11 +60,11 @@
 			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
 			<br />
 			<span><?php echo $countryList[$billingAddress['country']];?></span>
-			<a class="delete-lnk" href="javascript:;" title="<?php echo $this->translate('Delete this address');?>"><img src="/system/images/delete.png" alt="[x]"></a>
+<!--			<a class="delete-lnk" href="javascript:;" title="--><?php //echo $this->translate('Delete this address');?><!--"><img src="/system/images/delete.png" alt="[x]"></a>-->
 		</div>
 	<?php endforeach; ?>
 	<?php else : ?>
-	<p>no addresses</p>
+	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
 	<?php endif;?>
 	</div>
 	<div id="profile-orders-list">
@@ -76,8 +76,6 @@
 					<th>Purchased On</th>
 					<th>Status</th>
 					<th>Products in cart</th>
-<!--					<th>Cart Price</th>-->
-<!--					<th>Tax</th>-->
 					<th>Total Price</th>
 					<th>Shipping price</th>
 					<th>Shipping via</th>
@@ -87,19 +85,30 @@
 			<tbody>
 			<?php if ($this->orders): ?>
 			<?php foreach ($this->orders as $order):?>
-				<tr data-role="cart">
+				<tr data-role="cart" data-id="<?php echo $order->getId();?>">
 					<td><?php echo $order->getId();?></td>
 					<td><?php echo Zend_Date::now();?></td>
 					<td><?php echo $order->getStatus();?></td>
 					<td><?php echo sizeof($order->getCartContent());?></td>
-<!--					<td>--><?php //echo $this->currency($order->getSubTotal());?><!--</td>-->
-<!--					<td>--><?php //echo $this->currency($order->getTotalTax());?><!--</td>-->
 					<td><?php echo $this->currency($order->getTotal());?></td>
 					<td><?php echo $this->currency($order->getShippingPrice()) ;?></td>
-					<td><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></td>
+					<td class="shipping-data">
+						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
+						<?php if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)):?>
+						<p>
+							<u>Tracking ID</u>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+							<a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
+						</p>
+						<?php endif;?>
+						<p class="textcentered">
+							<a target="_blank" class="tracking-link" href="<?php echo $this->websiteUrl;?>plugin/shopping/run/track/id/<?php echo $order->getId();?>"><?php echo $this->translate('Where is my order?');?></a>
+						</p>
+					</td>
 					<td><a href="javascript:;" class="tpopup" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
 				</tr>
 			<?php endforeach; ?>
+			<?php else: ?>
+			<tr><td colspan="8" class="padding5px textcentered"><?php echo $this->translate("You don't have any orders yet");?></td></tr>
 			<?php endif; ?>
 			</tbody>
 		</table>
@@ -115,7 +124,33 @@
 		$(this).addClass('active');
 		var containerId = $(this).attr('href');
 		$(containerId).siblings('div').hide().removeClass('active').end().show().addClass('active');
-	})
+	});
+	$('a.tracking-dialog').on('click', function(e){
+		e.preventDefault();
+		var self = this,
+			id = parseInt($(this).closest('tr').data('id'));
+		smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
+			if (value === false) {
+				return value;
+			}
+			value = $.trim(value);
+			if ($(self).data('shippingTrackingId') !== value) {
+				$.ajax({
+					url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+					data: {shippingTrackingId: value},
+					type: 'POST',
+					dataType: 'json',
+					success: function(response) {
+						showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+						if (response.hasOwnProperty('responseText')){
+							$(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
+							$(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
+						}
+					}
+				});
+			}
+		});
+	});
 </script>
 <style>
 	#profile .profile-header > div {
@@ -152,6 +187,12 @@
 		border: 1px solid #e6e6fa;
 		border-radius: 0 8px 8px 0;
 	}
+	#profile .profile-actions {
+		border-left: 1px solid #e6e6fa;
+	}
+	#profile .profile-actions h3 {
+		text-align: center;
+	}
 	#profile ul.profile-nav li {
 		background-color: #e6e6fa;
 		margin-bottom: 2px;
@@ -184,5 +225,15 @@
 		position: absolute;
 		top: 2px;
 		right: 2px;
+	}
+	#profile td.shipping-data p {
+		margin: 5px 0;
+	}
+	#profile ul.stats li {
+		text-align: right;
+	}
+	#profile ul.stats li.total {
+		font-size: 120%;
+		font-weight: bold;
 	}
 </style>

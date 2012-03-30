@@ -71,7 +71,9 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->order->getCartContent() as $item) : ?>
+			<?php $cartContent = $this->order->getCartContent(); ?>
+			<?php if (!empty($cartContent)): ?>
+			<?php foreach ($cartContent as $item) : ?>
 				<tr>
 					<td><?php echo $item['name'];?><br />SKU: <?php echo $item['sku'];?></td>
 					<td style="text-align: right;"><?php echo $this->currency($item['original_price']);?></td>
@@ -82,6 +84,7 @@
 					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['tax_price']);?></td>
 				</tr>
 			<?php endforeach; ?>
+			<?php endif; ?>
 			</tbody>
 			<tfoot>
 				<tr>

@@ -1,0 +1,8 @@
+<div id="profile" class="clearfix">&nbsp;</div>
+<script>
+	$(function(){
+		$.get('<?php $this->websiteUrl;?>plugin/shopping/run/profile',null, function(response){
+			$('#profile').html(response);
+		});
+	});
+</script>

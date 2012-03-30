@@ -237,6 +237,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_price` decimal(10,2) DEFAULT NULL,
   `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `shipping_tracking_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping Tracking ID',
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `sub_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total',
