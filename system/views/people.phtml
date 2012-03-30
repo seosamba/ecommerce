@@ -38,18 +38,27 @@
 	    background-color: white;
 	    border-bottom: 1px dashed #cccccc;
     }
+	table#people-table tbody td.email a:before {
+		content: ' ';
+	}
     table#people-table a.table-nav {
 	    margin: 10px 2px;
     }
     table#people-table a.table-nav:hover {
 	    text-decoration: underline;
     }
+	table#people-table #export-users {
+		color: #3C78A7;
+		white-space: nowrap;
+	}
+	table#people-table #export-users:before { content: '[ '; }
+	table#people-table #export-users:after { content: ' ]'; }
 </style>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
     <td class="textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td><a href="javascript:;" class="details">${full_name}</a></td>
-    <td>${email}&nbsp;<a href="mailto:${email}">&#x2709;</a></td>
+    <td class="email">${email}&nbsp;<a href="mailto:${email}">&#x2709;</a></td>
     <td>${reg_date}</td>
     <td class="text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
@@ -99,15 +108,16 @@
         </thead>
         <tfoot>
             <tr>
-	            <td colspan="4">
+	            <td colspan="3" class="ui-resizable">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
 		            <select id="mass-action" style="width: 250px">
 			            <option value="0"><?php echo $this->translate('nothing');?></option>
 			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
-			            <option value="deleteExport"><?php echo $this->translate('export to csv');?></option>
 		            </select>
-		            <form id="expusrs" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users"><?php echo $this->translate('export as csv file');?></a></form>
+	            </td>
+	            <td>
+		            <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users"><?php echo $this->translate('export as csv file');?></a></form>
 	            </td>
 	            <th>
 		            <a href="#" id="people-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>

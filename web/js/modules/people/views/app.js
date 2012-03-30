@@ -2,9 +2,8 @@ define([
 	'Underscore',
 	'Backbone',
     'modules/people/collections/customers',
-    'modules/people/views/customer_row',
-    'modules/people/models/customer',
-], function(_, Backbone, CustomersCollection, CustomerRowView, CustomerModel){
+    'modules/people/views/customer_row'
+], function(_, Backbone, CustomersCollection, CustomerRowView){
 
     var AppView = Backbone.View.extend({
         el: $('#people'),
