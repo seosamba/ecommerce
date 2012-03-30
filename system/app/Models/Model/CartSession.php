@@ -1,4 +1,4 @@
-<?php
+\<?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	const CART_STATUS_NEW           = 'new';
@@ -35,13 +35,13 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_shippingService = null;
 
+	protected $_subTotal = 0;
+
 	protected $_shippingTrackingId = null;
 
-	protected $_subTotal;
+	protected $_totalTax = 0;
 
-	protected $_totalTax;
-
-	protected $_total;
+	protected $_total = 0;
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
