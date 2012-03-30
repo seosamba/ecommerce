@@ -1,4 +1,4 @@
-\<?php
+<?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	const CART_STATUS_NEW           = 'new';
