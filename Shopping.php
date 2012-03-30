@@ -933,6 +933,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_layout->render();
 	}
 
+	/**
+	 * Generates list of website customers
+	 * for admins only
+	 * @return string Html content
+	 */
 	protected function _makeOptionPeople() {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-people')){
 			$this->_view->noLayout = true;
@@ -1005,8 +1010,17 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
 		if ($customer) {
 			$this->_view->customer  = $customer;
-			$this->_view->stats     =
-			$this->_view->orders    = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
+			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
+			$this->_view->stats = array(
+				'total'     => sizeof($orders),
+				'new' => sizeof(array_filter($orders, function($order){
+					return ( !$order->getStatus() || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_NEW));
+					})
+				),
+				'completed' => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED; })),
+				'pending'   => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING; }))
+			);
+			$this->_view->orders = $orders;
 		}
 
 		$content = $this->_view->render('profile.phtml');

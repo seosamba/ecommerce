@@ -49,7 +49,7 @@
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
     <td class="textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td><a href="javascript:;" class="details">${full_name}</a></td>
-    <td>${email}</td>
+    <td>${email}&nbsp;<a href="mailto:${email}">&#x2709;</a></td>
     <td>${reg_date}</td>
     <td class="text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
@@ -82,9 +82,13 @@
 
 
 <div id="people" class="ui-helper-clearfix">
-	<div><?php echo $this->translate('Search');?>&nbsp;<input type="text" id="people-search" name="people-search" placeholder="<?php echo $this->translate('by name or email');?>" style="width: 200px"/></div>
     <table id="people-table" style="width: 100%">
         <thead>
+            <tr>
+	            <th colspan="5">
+	            <?php echo $this->translate('Search');?>&nbsp;<input type="text" id="people-search" name="people-search" placeholder="<?php echo $this->translate('by name or email');?>" style="width: 200px"/>
+                </th>
+            </tr>
             <tr class="mb10px">
 	            <th><?php echo $this->formCheckbox('people-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
@@ -120,7 +124,7 @@
 
 	<div id="customer-details">
 		<div class="toolbar mb10px" style="border-bottom: 2px solid #a9a9a9;">
-			<a href="javascript:;" class="link">&#8678; back to customer list</a>
+			<a href="javascript:;" class="link textcentered" style="font-size: 110%; display:block; width: 100%">&#8678; back to customer list</a>
 		</div>
 		<div id="profile">
 

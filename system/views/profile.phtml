@@ -27,12 +27,12 @@
 		<?php endif;?>
 	</div>
 	<div class="profile-actions">
-		<input type="button" class="blue-btn" value="<?php echo $this->translate('Edit profile');?>" />
+		<!--		<input type="button" class="blue-btn" value="--><?php //echo $this->translate('Edit profile');?><!--" />-->
+		<h3><?php echo $this->translate('Orders summary');?></h3>
 		<ul class="stats">
-			<li><a href="">15 orders</a></li>
-			<li>10 payed orders</li>
-			<li>5 pending orders</li>
-			<li>17 products in whishlist</li>
+			<?php foreach ($this->stats as $key => $value) : ?>
+				<li class="<?php echo $key;?>"><?php echo $value.' '.$this->translate($key);?></li>
+			<?php endforeach; ?>
 		</ul>
 	</div>
 </div>
@@ -64,7 +64,7 @@
 		</div>
 	<?php endforeach; ?>
 	<?php else : ?>
-	<p>no addresses</p>
+	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
 	<?php endif;?>
 	</div>
 	<div id="profile-orders-list">
@@ -187,6 +187,12 @@
 		border: 1px solid #e6e6fa;
 		border-radius: 0 8px 8px 0;
 	}
+	#profile .profile-actions {
+		border-left: 1px solid #e6e6fa;
+	}
+	#profile .profile-actions h3 {
+		text-align: center;
+	}
 	#profile ul.profile-nav li {
 		background-color: #e6e6fa;
 		margin-bottom: 2px;
@@ -222,5 +228,12 @@
 	}
 	#profile td.shipping-data p {
 		margin: 5px 0;
+	}
+	#profile ul.stats li {
+		text-align: right;
+	}
+	#profile ul.stats li.total {
+		font-size: 120%;
+		font-weight: bold;
 	}
 </style>
