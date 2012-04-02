@@ -48,7 +48,7 @@ class Shopping extends Tools_Plugins_Abstract {
             'zones',
             'product',
 	        'shipping',
-	        'people',
+	        'clients',
 	        'brandlogos'
         ),
 	    Tools_Security_Acl::ROLE_ADMIN => array(
@@ -939,7 +939,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return string Html content
 	 */
 	protected function _makeOptionClients() {
-		if (Tools_Security_Acl::isAllowed(__CLASS__.'-people')){
+		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 			$this->_view->noLayout = true;
 			return $this->_view->render('clients.phtml');
 		}
@@ -988,6 +988,24 @@ class Shopping extends Tools_Plugins_Abstract {
 			case 'put':
 				break;
 			case 'delete':
+				$rawBody = Zend_Json::decode($this->_request->getRawBody());
+				if (isset($rawBody['ids'])){
+					$ids = filter_var_array($rawBody['ids'], FILTER_SANITIZE_NUMBER_INT);
+					if (!empty($ids)){
+						$customers = $customerMapper->fetchAll(array('id IN (?)' => $ids, 'role_id <> ?' => Tools_Security_Acl::ROLE_SUPERADMIN));
+						if ( !empty($customers) ) {
+							foreach ($customers as $user) {
+								$data[$user->getId()] = (bool)Application_Model_Mappers_UserMapper::getInstance()->delete($user);
+							}
+						} else {
+							$data = array(
+								'error'		=> true,
+								'code'		=> 404,
+								'message'	=> 'Requested users not found'
+							);
+						}
+					}
+				}
 				break;
 	    }
 		return $data;

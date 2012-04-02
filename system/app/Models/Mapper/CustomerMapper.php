@@ -134,7 +134,15 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		return $entries;
 	}
 
-
+	/**
+	 * Method for fetching users for customer dashboard with special set of agregated fields
+	 * @param null| $where
+	 * @param null $order
+	 * @param null $limit
+	 * @param null $offset
+	 * @param null $search
+	 * @return array
+	 */
 	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null) {
 		$userDbTable = new Application_Model_DbTable_User();
 		$select = $userDbTable->select()
@@ -152,6 +160,13 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 //				->where('cart.status = ?', Models_Model_CartSession::CART_STATUS_COMPLETED )
 //				->orWhere('total_orders > 0')
 		;
+
+		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {
+			$select->where('user.role_id NOT IN (?)', array(
+				Tools_Security_Acl::ROLE_SUPERADMIN,
+				Tools_Security_Acl::ROLE_ADMIN
+			));
+		}
 
 		if ($where) {
 			$select->where($where);

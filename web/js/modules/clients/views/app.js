@@ -9,13 +9,13 @@ define([
         el: $('#clients'),
         events: {
             'click #export-users': function(){ $('#export-users-form').submit(); },
-            'click #people-previous': 'goPreviousPage',
-            'click #people-next': 'goNextPage',
+            'click #clients-previous': 'goPreviousPage',
+            'click #clients-next': 'goNextPage',
             'click th.sortable': 'sort',
             'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details').toggle()},
-            'change #people-check-all': 'toggleAllPeople',
+            'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
-            'keyup #people-search': 'searchPeople'
+            'keyup #clients-search': 'searchClient'
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -117,7 +117,7 @@ define([
             });
 
         },
-        searchPeople: function(e){
+        searchClient: function(e){
             var term = e.target.value,
                 self = this;
 

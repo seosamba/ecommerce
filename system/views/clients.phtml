@@ -1,91 +1,91 @@
 <?php $this->headTitle($this->translate('Manage customers')); ?>
 <style>
-	#people{
+	#clients {
 	}
-	#people table{
+	#clients table{
 	}
-	#people table#people-table tr{
+	#clients table#clients-table tr{
 	}
-	#people table#people-table tr.search-line th{
+	#clients table#clients-table tr.search-line th{
 	    padding: 5px 20px 10px;
 	    text-align: left;
 	}
-	#people table#people-table tr.search-line th input{
+	#clients table#clients-table tr.search-line th input{
 		margin-left:10px;
 		width:250px;
 	}
-	#people table#people-table tr.title-table{
+	#clients table#clients-table tr.title-table{
 		background:#666;
 		color:#eee;
 	}
-	#people table#people-table tr.title-table th{
+	#clients table#clients-table tr.title-table th{
 	}
-	#people table#people-table th, #people table#people-table td{
+	#clients table#clients-table th, #clients table#clients-table td{
 		vertical-align:middle;
 		text-align:center;
 		padding:5px;
 	}
-	#people table#people-table th{
+	#clients table#clients-table th{
 	}
-	#people table#people-table td{
+	#clients table#clients-table td{
 	}
-	#people table#people-table td.full-name, #people table#people-table td.email{
+	#clients table#clients-table td.full-name, #clients table#clients-table td.email{
 		text-align:left;
 	}
-	#people table#people-table th.sortable {
+	#clients table#clients-table th.sortable {
 		white-space: nowrap;
 		cursor: pointer;
 	}
-	#people table#people-table th.sortable::after{
+	#clients table#clients-table th.sortable::after{
 	    content: " \21D5";
 	    display: inline;
     }
-	#people table#people-table th.sortUp::after{
+	#clients table#clients-table th.sortUp::after{
 	    content: " \21E7";
     }
-	#people table#people-table th.sortDown::after{
+	#clients table#clients-table th.sortDown::after{
         content: " \21E9";
     }
-	#people table#people-table tbody tr:hover{
+	#clients table#clients-table tbody tr:hover{
         background-color: rgba(220,220,220,0.8);
     }
-	#people table#people-table td.check-td{
+	#clients table#clients-table td.check-td{
 		border-left:none;
 	}
-	#people table#people-table td.total{
+	#clients table#clients-table td.total{
 		border-right:none;
 	}
-	#people table#people-table tfoot td, #people table#people-table tfoot th{
+	#clients table#clients-table tfoot td, #clients table#clients-table tfoot th{
 		border:none;
 		padding-top:10px;
 	}
-	#people table#people-table tfoot td:first-child{
+	#clients table#clients-table tfoot td:first-child{
 		text-align:left;
 	}
-	#people table#people-table tfoot #people-previous{
+	#clients table#clients-table tfoot #clients-previous {
 		margin-right:10px;
 	}
-	#people #customer-details{
+	#clients #customer-details{
 	}
-	#people #customer-details .toolbar{
+	#clients #customer-details .toolbar{
 		border-bottom: 2px solid #a9a9a9;
 		margin-bottom:10px;
 		padding:5px 10px;
 	}
-	#people #customer-details #profile h3{
+	#clients #customer-details #profile h3{
 		border:none;
 	}
-	#people #customer-details .profile-actions ul.stats{
+	#clients #customer-details .profile-actions ul.stats{
 		text-align:center;
 	}
-	#people #customer-details .profile-actions ul.stats li{
+	#clients #customer-details .profile-actions ul.stats li{
 		display:inline-block;
 		vertical-align:bottom;
 		padding-left:15px;
 		margin-right:15px;
 		border-left:1px dashed #ccc;
 	}
-	#people #customer-details .profile-actions ul.stats li:first-child{
+	#clients #customer-details .profile-actions ul.stats li:first-child{
 		border:none;
 	}
 </style>
@@ -119,22 +119,22 @@
 <?php
     $this->headScript()->setAllowArbitraryAttributes(true)
 		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
-			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/people.js'));
+			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/clients.js'));
 
 	echo $this->noLayout ? $this->headScript() : '';
 ?>
 
 
-<div id="people" class="ui-helper-clearfix">
-    <table id="people-table" style="width: 100%">
+<div id="clients" class="ui-helper-clearfix">
+    <table id="clients-table" style="width: 100%">
         <thead>
             <tr class="search-line">
 	            <th colspan="5">
-	            <?php echo $this->translate('Search');?>&nbsp;<input type="text" id="people-search" name="people-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
+	            <?php echo $this->translate('Search');?>&nbsp;<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
                 </th>
             </tr>
             <tr class="title-table">
-	            <th><?php echo $this->formCheckbox('people-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
+	            <th><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
@@ -155,8 +155,8 @@
 		            <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a></form>
 	            </td>
 	            <th>
-		            <a href="#" id="people-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
-		            <a href="#" id="people-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
+		            <a href="#" id="clients-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
+		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
 	            </th>
             </tr>
         </tfoot>
@@ -169,7 +169,7 @@
 
 	<div id="customer-details" class="grid_12">
 		<div class="toolbar">
-			<a href="javascript:;" class="link textcentered">&#8678; back to customer list</a>
+			<a href="javascript:;" class="link textcentered">&#8678; back to clients list</a>
 		</div>
 		<div id="profile">
 
