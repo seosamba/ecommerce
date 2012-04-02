@@ -88,7 +88,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
             throw new Exceptions_SeotoasterWidgetException('No template specified');
         }
 
-        $template = Application_Model_Mappers_TemplateMapper::getInstance()->findByName($this->_options[0]);
+        $template = Application_Model_Mappers_TemplateMapper::getInstance()->find($this->_options[0]);
         if ($template !== null) {
 
 	        $templatePrepend = '<!--pid="' . $this->_product->getId() . '"-->';
