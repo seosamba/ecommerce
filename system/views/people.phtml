@@ -1,66 +1,84 @@
-<?php $this->headTitle($this->translate('Manage customers')) ?>
+<?php $this->headTitle($this->translate('Manage customers')); ?>
 <style>
-	table#people-table {
-	    background-color: #efefef;
+	#people{
 	}
-	table#people-table th.sortable {
-		cursor: pointer;
-	    white-space: nowrap;
-	    color: #3C78A7;
+	#people table{
+	}
+	#people table tr{
+	}
+	#people table tr.search-line th{
+	    padding: 5px 20px 10px;
 	    text-align: left;
-		padding: 5px;
-    }
-    table#people-table th.sortable::after{
-	    color: #5f9ea0;
-	    content: " \21D5";
-	    display: inline;
-    }
-    table#people-table th.sortUp::after{
-	    content: " \21E7";
-    }
-    table#people-table th.sortDown::after{
-        content: " \21E9";
-    }
-    table#people-table thead tr{
-	    border-bottom: 1px dashed #ccc;
-    }
-    table#people-table tbody tr:hover td {
-	    background-color:  #d3d3d3;
-	    color: #3C78A7;
-    }
-    table#people-table td {
-	    padding: 6px 2px;
-    }
-    table#people-table td.text-center{
-	    text-align: center;
-    }
-    table#people-table tbody tr {
-	    background-color: white;
-	    border-bottom: 1px dashed #cccccc;
-    }
-	table#people-table tbody td.email a:before {
-		content: ' ';
 	}
-    table#people-table a.table-nav {
-	    margin: 10px 2px;
-    }
-    table#people-table a.table-nav:hover {
-	    text-decoration: underline;
-    }
-	table#people-table #export-users {
-		color: #3C78A7;
-		white-space: nowrap;
+	#people table tr.search-line th input{
+		margin-left:10px;
+		width:250px;
 	}
-	table#people-table #export-users:before { content: '[ '; }
-	table#people-table #export-users:after { content: ' ]'; }
+	#people table tr.title-table{
+		background:#666;
+		color:#eee;
+	}
+	#people table tr.title-table th{
+	}
+	#people table th, #people table td{
+		vertical-align:middle;
+		text-align:center;
+		padding:5px;
+	}
+	#people table th{
+	}
+	#people table td{
+	}
+	#people table td.full-name, #people table td.email{
+		text-align:left;
+	}
+	#people table td.chek-td{
+		border-left:none;
+	}
+	#people table td.total{
+		border-right:none;
+	}
+	#people table tfoot td, #people table tfoot th{
+		border:none;
+		padding-top:10px;
+	}
+	#people table tfoot td:first-child{
+		text-align:left;
+	}
+	#people table tfoot #people-previous{
+		margin-right:10px;
+	}
+	#people #customer-details{
+	}
+	#people #customer-details .toolbar{
+		border-bottom: 2px solid #a9a9a9;
+		margin-bottom:10px;
+		padding:5px 10px;
+	}
+	#people #customer-details #profile h3{
+		border:none;
+	}
+	#people #customer-details .profile-actions ul.stats{
+		text-align:center;
+	}
+	#people #customer-details .profile-actions ul.stats li{
+		display:inline-block;
+		vertical-align:bottom;
+		padding-left:15px;
+		margin-right:15px;
+		border-left:1px dashed #ccc;
+	}
+	#people #customer-details .profile-actions ul.stats li:first-child{
+		border:none;
+	}
 </style>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
-    <td class="textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
-    <td><a href="javascript:;" class="details">${full_name}</a></td>
+    <td class="chek-td textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
+    <td class="full-name"><a href="javascript:;" class="details">${full_name}</a></td>
     <td class="email">${email}&nbsp;<a href="mailto:${email}">&#x2709;</a></td>
-    <td>${reg_date}</td>
-    <td class="text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
+    <td class="date">${reg_date}</td>
+    <td class="total text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
 
 <script id="customerDetailsTemplate" type="text/x-jquery-tmpl">
@@ -93,12 +111,12 @@
 <div id="people" class="ui-helper-clearfix">
     <table id="people-table" style="width: 100%">
         <thead>
-            <tr>
+            <tr class="search-line">
 	            <th colspan="5">
-	            <?php echo $this->translate('Search');?>&nbsp;<input type="text" id="people-search" name="people-search" placeholder="<?php echo $this->translate('by name or email');?>" style="width: 200px"/>
+	            <?php echo $this->translate('Search');?>&nbsp;<input type="text" id="people-search" name="people-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
                 </th>
             </tr>
-            <tr class="mb10px">
+            <tr class="title-table">
 	            <th><?php echo $this->formCheckbox('people-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
@@ -132,9 +150,9 @@
         </tbody>
     </table>
 
-	<div id="customer-details">
-		<div class="toolbar mb10px" style="border-bottom: 2px solid #a9a9a9;">
-			<a href="javascript:;" class="link textcentered" style="font-size: 110%; display:block; width: 100%">&#8678; back to customer list</a>
+	<div id="customer-details" class="grid_12">
+		<div class="toolbar">
+			<a href="javascript:;" class="link textcentered">&#8678; back to customer list</a>
 		</div>
 		<div id="profile">
 

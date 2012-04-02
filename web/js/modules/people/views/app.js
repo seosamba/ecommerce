@@ -8,7 +8,7 @@ define([
     var AppView = Backbone.View.extend({
         el: $('#people'),
         events: {
-            'click #export-users': function(){ $('#expusrs').submit(); },
+            'click #export-users': function(){ $('#export-users-form').submit(); },
             'click #people-previous': 'goPreviousPage',
             'click #people-next': 'goNextPage',
             'click th.sortable': 'sort',
