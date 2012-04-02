@@ -150,15 +150,12 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 				->from('user',array('id', 'full_name', 'email', 'reg_date' ))
 				->joinLeft(
 					array('cart' => 'shopping_cart_session'),
-					'cart.user_id = user.id',
+					sprintf('cart.user_id = user.id AND cart.status = "%s"', Models_Model_CartSession::CART_STATUS_COMPLETED),
 					array(
 						'total_amount' => 'SUM(cart.total)',
 						'total_orders'=>'COUNT(cart.id)'
 					))
-				->group('user.id')
-				//@todo filter only paid carts
-//				->where('cart.status = ?', Models_Model_CartSession::CART_STATUS_COMPLETED )
-//				->orWhere('total_orders > 0')
+				->group('user.id');
 		;
 
 		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {
