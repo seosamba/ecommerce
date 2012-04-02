@@ -927,21 +927,21 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $option;
 	}
 
-	public function peopleAction() {
-		$content = $this->_view->render('people.phtml');
+	public function clientsAction() {
+		$content = $this->_view->render('clients.phtml');
 		$this->_layout->content = $content;
 		echo $this->_layout->render();
 	}
 
 	/**
-	 * Generates list of website customers
+	 * Generates list of website clients
 	 * for admins only
 	 * @return string Html content
 	 */
-	protected function _makeOptionPeople() {
+	protected function _makeOptionClients() {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-people')){
 			$this->_view->noLayout = true;
-			return $this->_view->render('people.phtml');
+			return $this->_view->render('clients.phtml');
 		}
 	}
 

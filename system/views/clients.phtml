@@ -4,48 +4,65 @@
 	}
 	#people table{
 	}
-	#people table tr{
+	#people table#people-table tr{
 	}
-	#people table tr.search-line th{
+	#people table#people-table tr.search-line th{
 	    padding: 5px 20px 10px;
 	    text-align: left;
 	}
-	#people table tr.search-line th input{
+	#people table#people-table tr.search-line th input{
 		margin-left:10px;
 		width:250px;
 	}
-	#people table tr.title-table{
+	#people table#people-table tr.title-table{
 		background:#666;
 		color:#eee;
 	}
-	#people table tr.title-table th{
+	#people table#people-table tr.title-table th{
 	}
-	#people table th, #people table td{
+	#people table#people-table th, #people table#people-table td{
 		vertical-align:middle;
 		text-align:center;
 		padding:5px;
 	}
-	#people table th{
+	#people table#people-table th{
 	}
-	#people table td{
+	#people table#people-table td{
 	}
-	#people table td.full-name, #people table td.email{
+	#people table#people-table td.full-name, #people table#people-table td.email{
 		text-align:left;
 	}
-	#people table td.chek-td{
+	#people table#people-table th.sortable {
+		white-space: nowrap;
+		cursor: pointer;
+	}
+	#people table#people-table th.sortable::after{
+	    content: " \21D5";
+	    display: inline;
+    }
+	#people table#people-table th.sortUp::after{
+	    content: " \21E7";
+    }
+	#people table#people-table th.sortDown::after{
+        content: " \21E9";
+    }
+	#people table#people-table tbody tr:hover{
+        background-color: rgba(220,220,220,0.8);
+    }
+	#people table#people-table td.check-td{
 		border-left:none;
 	}
-	#people table td.total{
+	#people table#people-table td.total{
 		border-right:none;
 	}
-	#people table tfoot td, #people table tfoot th{
+	#people table#people-table tfoot td, #people table#people-table tfoot th{
 		border:none;
 		padding-top:10px;
 	}
-	#people table tfoot td:first-child{
+	#people table#people-table tfoot td:first-child{
 		text-align:left;
 	}
-	#people table tfoot #people-previous{
+	#people table#people-table tfoot #people-previous{
 		margin-right:10px;
 	}
 	#people #customer-details{
@@ -74,9 +91,9 @@
 </style>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
-    <td class="chek-td textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
+    <td class="check-td textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td class="full-name"><a href="javascript:;" class="details">${full_name}</a></td>
-    <td class="email">${email}&nbsp;<a href="mailto:${email}">&#x2709;</a></td>
+    <td class="email"><a href="mailto:${email}">${email}</a></td>
     <td class="date">${reg_date}</td>
     <td class="total text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
@@ -135,7 +152,7 @@
 		            </select>
 	            </td>
 	            <td>
-		            <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users"><?php echo $this->translate('export as csv file');?></a></form>
+		            <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a></form>
 	            </td>
 	            <th>
 		            <a href="#" id="people-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
