@@ -1,11 +1,12 @@
 define([
 	'Underscore',
 	'Backbone',
-    'modules/people/models/customer_row'
+    'modules/clients/models/customer_row'
 ], function(_, Backbone, CustomerRowModel){
 
     var CustomersCollection = Backbone.Collection.extend({
         model: CustomerRowModel,
+        urlRoot: $('#website_url').val()+'plugin/shopping/run/getdata/type/customer/',
         paginator: {
             limit: 30,
             offset: 0,
@@ -21,7 +22,7 @@ define([
             this.bind('reset', this.updatePaginator, this);
         },
         url: function(){
-            var url = $('#website_url').val()+'plugin/shopping/run/getdata/type/customer/for/dashboard/',
+            var url = this.urlRoot + 'for/dashboard/',
                 order = '';
             url += '?'+'limit='+this.paginator.limit+'&offset='+this.paginator.offset;
             if (this.order.by) {

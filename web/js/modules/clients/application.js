@@ -1,7 +1,7 @@
 define([
   'Underscore',
   'Backbone',
-  'modules/people/views/app'
+  'modules/clients/views/app'
 ], function(_, Backbone, AppView ){
 	if (!window.console) {
 		window.console = {

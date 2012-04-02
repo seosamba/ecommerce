@@ -1,18 +1,18 @@
 define([
 	'Underscore',
 	'Backbone',
-    'modules/people/collections/customers',
-    'modules/people/views/customer_row'
+    'modules/clients/collections/customers',
+    'modules/clients/views/customer_row'
 ], function(_, Backbone, CustomersCollection, CustomerRowView){
 
     var AppView = Backbone.View.extend({
-        el: $('#people'),
+        el: $('#clients'),
         events: {
             'click #export-users': function(){ $('#export-users-form').submit(); },
             'click #people-previous': 'goPreviousPage',
             'click #people-next': 'goNextPage',
             'click th.sortable': 'sort',
-            'click #customer-details div.toolbar a:first': function() {$('#people-table,#customer-details').toggle()},
+            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details').toggle()},
             'change #people-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #people-search': 'searchPeople'
@@ -61,7 +61,7 @@ define([
         },
         renderCustomerDetails: function(response, status) {
             if (status === "success") {
-                $('#people-table').hide();
+                $('#clients-table').hide();
                 $('#customer-details').find('#profile').html(response).end().show();
             }
         },
@@ -87,6 +87,33 @@ define([
             }
             showConfirm('Are you sure?', function(){
                 var ids = _(checked).pluck('id');
+                console.log(ids);
+                Backbone.sync('delete', null, {
+                    url: app.customers.urlRoot,
+                    data: JSON.stringify({ids: ids}),
+                    success: function(response){
+                        app.customers.fetch().done(function(){
+                            var msg = '';
+                            _(response).each(function(status, id){
+                               if (status === false) {
+                                   var model = app.customers.get(id);
+                                   if (model) {
+                                       msg += (msg.length ? ', ' : '') + model.get('full_name');
+                                       model.set('checked', true);
+                                   }
+                               }
+                            });
+                            if (msg.length) {
+                                showMessage('Unable to remove following users: '+msg, true);
+                            }
+                        });
+                    },
+                    error: function(xhr, error, msg){
+                        if (xhr.status === 404) {
+                            showMessage(xhr.responseText, true);
+                        }
+                    }
+                });
             });
 
         },
