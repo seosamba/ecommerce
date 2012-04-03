@@ -46,7 +46,7 @@
 
 	<div class="ot profile-actions">
 		<!--		<input type="button" class="blue-btn" value="--><?php //echo $this->translate('Edit profile');?><!--" />-->
-		<p class="title textcentered">
+		<p class="title textcentered ui-state-default">
 			<img style="width: 16px; vertical-align: text-bottom;" src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAA/UlEQVR42r2VvQ3CMBBGswEjMIJHyASeIUV6qChSISRKpLR0jEDBABmBkpIRIk8QPks+3ekkfkzOsfSUxIm+p/PFSYUxRTAqAsPPvN6BEUzpWJcSBcolWSnRpJGT3oolK3ooSWMuwtinzCtwNG8qisEpL4CVfMa2R7xkBzlvWpFYskHfny1KG3FUjV+bi1jCInnfqketkhAt8PN6xMt14+DMinSwWv8AtuAuQp+gVx/PJl/EAZoBnNTzHZ1n9+iN5Ah8Lt8q0pLx3332SXRWkgAaU1EMFM11oP4lOLdHG/Ev6YC3QIscvWn6rbKtiPdID3wZEXOJk8VEpVlU9AI9gR1AIgkvUwAAAABJRU5ErkJggg==">
 			<?php echo $this->translate('Orders summary');?>
 		</p>
@@ -57,40 +57,15 @@
 		</ul>
 	</div>
 </div>
-<div class="ot profile-dashboard">
+
+
+<div id="profile-content">
 	<ul class="profile-nav">
-		<li><a href="#profile-address-list">Addresses</a></li>
 		<li><a href="#profile-orders-list">Orders</a></li>
+		<li><a href="#profile-address-list">Addresses</a></li>
 	</ul>
-</div>
-<div class="tt profile-content">
-	<div id="profile-address-list">
-	<?php $addressList = $this->customer->getAddresses(); ?>
-	<?php if (!empty($addressList)): ?>
-	<?php foreach ($addressList as $billingAddress): ?>
-	<div class="oh">
-		<div class="adr">
-			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
-			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
-			<span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
-			<br/>
-			<span class="locality"><?php
-				echo $billingAddress['city'].
-					($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
-				?></span>
-			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
-			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
-			<br />
-			<span><?php echo $countryList[$billingAddress['country']];?></span>
-<!--			<a class="delete-lnk" href="javascript:;" title="--><?php //echo $this->translate('Delete this address');?><!--"><img src="/system/images/delete.png" alt="[x]"></a>-->
-		</div>
-	</div>
-	<?php endforeach; ?>
-	<?php else : ?>
-	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
-	<?php endif;?>
-	</div>
-	<div id="profile-orders-list">
+
+	<div id="profile-orders-list" class="clearfix">
 		<table border="1">
 			<thead>
 				<tr class="title-table">
@@ -136,17 +111,37 @@
 		</table>
 		<?php //var_dump($this->orders); ?>
 	</div>
+	<div id="profile-address-list" class="clearfix">
+	<?php $addressList = $this->customer->getAddresses(); ?>
+	<?php if (!empty($addressList)): ?>
+	<?php foreach ($addressList as $billingAddress): ?>
+	<div class="ot">
+		<div class="adr">
+			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
+			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
+			<span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
+			<br/>
+			<span class="locality"><?php
+				echo $billingAddress['city'].
+					($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
+				?></span>
+			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
+			<br />
+			<span><?php echo $countryList[$billingAddress['country']];?></span>
+<!--			<a class="delete-lnk" href="javascript:;" title="--><?php //echo $this->translate('Delete this address');?><!--"><img src="/system/images/delete.png" alt="[x]"></a>-->
+		</div>
+	</div>
+	<?php endforeach; ?>
+	<?php else : ?>
+	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
+	<?php endif;?>
+	</div>
 </div>
 <script>
-	//	simple tab script for navigation
-	$('div.profile-content > div:first').siblings().hide().end().show();
-	$('ul.profile-nav').find('a:first').addClass('active').end().on('click', 'a', function(e){
-		e.preventDefault();
-		$(this).closest('ul').find('li > a').removeClass('active');
-		$(this).addClass('active');
-		var containerId = $(this).attr('href');
-		$(containerId).siblings('div').hide().removeClass('active').end().show().addClass('active');
-	});
+	$('#profile-content').tabs();
+	$('div#profile-content > *').removeClass('ui-widget-header ui-widget-content');
+	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-corner-all ui-corner-top" )
 	$('a.tracking-dialog').on('click', function(e){
 		e.preventDefault();
 		var self = this,
@@ -185,45 +180,17 @@
 		margin: 0;
 		padding: 0;
 	}
-	#profile .profile-dashboard {
-		width: 24%;
-		margin-right: 0;
-	}
-	#profile .profile-content {
-		width: 74%;
-		margin-left: 0;
-		border: 1px solid #e6e6fa;
-	}
 	#profile .profile-actions {
 		border-left: 1px solid #e6e6fa;
 	}
-
-	#profile ul.profile-nav {
-		border: 1px solid #e6e6fa;
-		border-right: none;
-	}
-	#profile ul.profile-nav li {
-		margin: 1px 0 1px 1px;
-	}
 	#profile ul.profile-nav li a {
-		text-transform: uppercase;
-		display: block;
-		margin: 0 auto;
-		padding: 5px 5px 5px 10px;
+		font-variant: small-caps;
 		font-weight: bold;
-		color: #666;
-		/*text-shadow: 1px 1px 0 #ddd;*/
 	}
-	#profile ul.profile-nav li a:hover {
-		background-color: #ccc;
-		color: #ffffff;
-		/*text-shadow: 1px 1px 0 #999;*/
-	}
-	#profile ul.profile-nav li a.active {
-		background-color: #666;
-		color: #f5f5f5;
-		/*text-shadow: 1px 1px 0 #333;*/
-	}
+    #profile #profile-content.ui-tabs .ui-tabs-nav li.ui-tabs-selected,
+    #profile #profile-content.ui-tabs .ui-tabs-panel {
+	    background: #ffffff;
+    }
 
 	#profile #profile-address-list div.adr {
 		padding: 5px;
@@ -246,7 +213,8 @@
 		color: #666;
 		text-transform: uppercase;
 		font-weight: bold;
-		/*text-shadow: 1px 1px 0 white;*/
+		/*font-variant: small-caps;*/
+		border: none;
 	}
 
 	#profile .profile-header ul.stats li {
@@ -274,6 +242,7 @@
 	}
 
 	#profile table {
+		width: 100%
 	}
 	#profile table thead tr {
 		background:#666;
