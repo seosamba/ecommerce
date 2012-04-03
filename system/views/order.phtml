@@ -1,8 +1,8 @@
 <?php $this->placeholder('headerContent')->set('Order #'.$this->order->getId() ) ; ?>
 <?php $countryList = Tools_Geo::getCountries(true); ?>
-<div class="ui-widget">
+<div id="order-view" class="clearfix">
 	<div class="grid_12">
-		<div class="ui-widget-header ui-corner-top padding5px">Summary</div>
+		<div class="title padding5px">Summary</div>
 		<div><?php echo $this->translate("Placed on %1\$s", date('d M, Y', strtotime($this->order->getCreatedAt())));?></div>
 		<div><?php echo $this->translate("Placed from IP %1\$s", $this->order->getIpAddress());?></div>
 	</div>
@@ -10,7 +10,7 @@
 	<div class="mt10px">&nbsp;</div>
 
 	<div class="grid_6">
-		<div class="ui-widget-header ui-corner-top padding5px">Billing Address <!--span>[edit]</span--></div>
+		<div class="title padding5px">Billing Address <!--span>[edit]</span--></div>
 		<div class="adr">
 			<?php if (null !== ($billingAddressId = $this->order->getBillingAddressId())): ?>
 			<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId);?>
@@ -33,7 +33,7 @@
 	</div>
 
 	<div class="grid_6">
-		<div class="ui-widget-header ui-corner-top padding5px">Shipping Address <!--span>[edit]</span--></div>
+		<div class="title padding5px">Shipping Address <!--span>[edit]</span--></div>
 		<div class="adr">
 			<?php if (null !== ($shippingAddressId = $this->order->getShippingAddressId())): ?>
 			<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
@@ -56,8 +56,8 @@
 		</div>
 	</div>
 
-	<div class="grid_12 mt10px">
-		<div class="ui-widget-header ui-corner-top padding5px">Order content</div>
+	<div class="grid_12 mt20px mb20px">
+		<div class="title padding5px"><?php echo $this->translate("Order #%1\$s content", $this->order->getId());?></div>
 		<table style="width: 100%">
 			<thead>
 			<tr>
@@ -75,13 +75,13 @@
 			<?php if (!empty($cartContent)): ?>
 			<?php foreach ($cartContent as $item) : ?>
 				<tr>
-					<td><?php echo $item['name'];?><br />SKU: <?php echo $item['sku'];?></td>
-					<td style="text-align: right;"><?php echo $this->currency($item['original_price']);?></td>
-					<td style="text-align: right;"><?php echo $this->currency($item['price']);?></td>
-					<td style="text-align: right;"><?php echo $item['qty'];?></td>
-					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['price']);?></td>
-					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['tax']);?></td>
-					<td style="text-align: right;"><?php echo $this->currency($item['qty']*$item['tax_price']);?></td>
+					<td><b><?php echo $item['name'];?></b><br />SKU: <?php echo $item['sku'];?></td>
+					<td class="textcentered"><?php echo $this->currency($item['original_price']);?></td>
+					<td class="textcentered"><?php echo $this->currency($item['price']);?></td>
+					<td class="textcentered"><?php echo $item['qty'];?></td>
+					<td class="textcentered"><?php echo $this->currency($item['qty']*$item['price']);?></td>
+					<td class="textcentered"><?php echo $this->currency($item['qty']*$item['tax']);?></td>
+					<td class="textcentered"><?php echo $this->currency($item['qty']*$item['tax_price']);?></td>
 				</tr>
 			<?php endforeach; ?>
 			<?php endif; ?>
@@ -90,19 +90,53 @@
 				<tr>
 					<td colspan="5"></td>
 					<td>Subtotal</td>
-					<td style="text-align: right;"><?php echo $this->currency($this->order->getSubTotal());?></td>
+					<td class="textcentered"><?php echo $this->currency($this->order->getSubTotal());?></td>
 				</tr>
 				<tr>
 					<td colspan="5"></td>
 					<td>Shipping</td>
-					<td style="text-align: right;"><?php echo $this->currency($this->order->getShippingPrice());?></td>
+					<td class="textcentered"><?php echo $this->currency($this->order->getShippingPrice());?></td>
 				</tr>
 				<tr>
 					<td colspan="5"></td>
 					<td>Grand Total</td>
-					<td style="text-align: right;"><?php echo $this->currency($this->order->getTotal());?></td>
+					<td class="textcentered"><?php echo $this->currency($this->order->getTotal());?></td>
 				</tr>
 			</tfoot>
 		</table>
 	</div>
 </div>
+<style>
+	.seotoaster {
+		background-color: #ffffff !important;
+	}
+	.title {
+		color: #666;
+		font-weight: bold;
+		border-bottom: 1px solid #ddd;
+		margin: 10px 0;
+	}
+	#order-view {
+		width: 210mm;
+		margin: 0 auto;
+	}
+	.adr {
+		padding: 0 10px;
+	}
+
+	table thead tr {
+		background-color: #666666;
+		color: #eee;
+		text-shadow: 0 0 2px #333;
+	}
+	table td, table th {
+		padding: 4px 6px;
+	}
+	table tbody td {
+		vertical-align: middle;
+		border-bottom: 1px solid #d3d3d3;
+	}
+	table tfoot td {
+		border-bottom: 1px solid #d3d3d3;
+	}
+</style>
