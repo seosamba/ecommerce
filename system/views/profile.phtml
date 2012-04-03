@@ -1,52 +1,74 @@
 <?php $countryList = Tools_Geo::getCountries(true); ?>
 <div class="clearfix profile-header">
-	<div class="profile-picture">
-		<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'avatar') ); ?>
+	<div class="tt">
+		<div class="ot profile-picture textcentered">
+			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
+		</div>
+		<div class="tt profile-main-info vcard">
+			<h1 class="fn"><?php echo $this->customer->getFullName();?></h1>
+			<h3><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><?php echo $this->customer->getEmail();?></a></h3>
+			<p><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
+			<p><?php
+				if ($this->customer->getLastLogin()) {
+					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
+					$lastSeen = intval($lastSeen->format('%a'));
+					if ($lastSeen < 7) {
+						$lastSeenStamp = date('l', strtotime($lastSeen.' days ago'));
+					} else {
+						$lastSeenStamp = $lastSeen.' days ago';
+					}
+				} else {
+					$lastSeenStamp = 'never';
+				}
+				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
+				?></p>
+			<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
+				<div class="adr">
+					<span class="street-address"><?php echo $billingAddressDefault['address1'].' '. $billingAddressDefault['address2'];?></span>
+					<br/>
+					<span class="locality"><?php echo $billingAddressDefault['city'];?></span>
+					<span class="region"><?php $state = Tools_Geo::getStateById($billingAddressDefault['state']); echo $state['state']; ?></span>
+					<span class="postal-code"><?php echo $billingAddressDefault['zip'];?></span>
+				</div>
+			<?php endif;?>
+			<?php if ($shippingAddressDefault = $this->customer->getDefaultAddress('shipping')) : ?>
+				<div class="adr">
+					<span class="street-address"><?php echo $shippingAddressDefault['address1'].' '. $shippingAddressDefault['address2'];?></span>
+					<br/>
+					<span class="locality"><?php echo $shippingAddressDefault['city'];?></span>
+					<span class="region"><?php $state = Tools_Geo::getStateById($shippingAddressDefault['state']); echo $state['state']; ?></span>
+					<span class="postal-code"><?php echo $shippingAddressDefault['zip'];?></span>
+				</div>
+			<?php endif;?>
+		</div>
 	</div>
-	<div class="profile-main-info vcard">
-		<h1 class="fn"><?php echo $this->customer->getFullName();?></h1>
-		<h3><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><?php echo $this->customer->getEmail();?></a></h3>
-		<p><?php echo $this->customer->getRoleId();?> since <?php echo $this->customer->getRegDate();?></p>
-		<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
-			<div class="adr">
-				<span class="street-address"><?php echo $billingAddressDefault['address1'].' '. $billingAddressDefault['address2'];?></span>
-				<br/>
-				<span class="locality"><?php echo $billingAddressDefault['city'];?></span>
-				<span class="region"><?php $state = Tools_Geo::getStateById($billingAddressDefault['state']); echo $state['state']; ?></span>
-				<span class="postal-code"><?php echo $billingAddressDefault['zip'];?></span>
-			</div>
-		<?php endif;?>
-		<?php if ($shippingAddressDefault = $this->customer->getDefaultAddress('shipping')) : ?>
-			<div class="adr">
-				<span class="street-address"><?php echo $shippingAddressDefault['address1'].' '. $shippingAddressDefault['address2'];?></span>
-				<br/>
-				<span class="locality"><?php echo $shippingAddressDefault['city'];?></span>
-				<span class="region"><?php $state = Tools_Geo::getStateById($shippingAddressDefault['state']); echo $state['state']; ?></span>
-				<span class="postal-code"><?php echo $shippingAddressDefault['zip'];?></span>
-			</div>
-		<?php endif;?>
-	</div>
-	<div class="profile-actions">
+
+
+	<div class="ot profile-actions">
 		<!--		<input type="button" class="blue-btn" value="--><?php //echo $this->translate('Edit profile');?><!--" />-->
-		<h3><?php echo $this->translate('Orders summary');?></h3>
-		<ul class="stats">
+		<p class="title textcentered">
+			<img style="width: 16px; vertical-align: text-bottom;" src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAA/UlEQVR42r2VvQ3CMBBGswEjMIJHyASeIUV6qChSISRKpLR0jEDBABmBkpIRIk8QPks+3ekkfkzOsfSUxIm+p/PFSYUxRTAqAsPPvN6BEUzpWJcSBcolWSnRpJGT3oolK3ooSWMuwtinzCtwNG8qisEpL4CVfMa2R7xkBzlvWpFYskHfny1KG3FUjV+bi1jCInnfqketkhAt8PN6xMt14+DMinSwWv8AtuAuQp+gVx/PJl/EAZoBnNTzHZ1n9+iN5Ah8Lt8q0pLx3332SXRWkgAaU1EMFM11oP4lOLdHG/Ev6YC3QIscvWn6rbKtiPdID3wZEXOJk8VEpVlU9AI9gR1AIgkvUwAAAABJRU5ErkJggg==">
+			<?php echo $this->translate('Orders summary');?>
+		</p>
+		<ul class="stats clearfix">
 			<?php foreach ($this->stats as $key => $value) : ?>
-				<li class="<?php echo $key;?>"><?php echo $value.' '.$this->translate($key);?></li>
+				<li class="oh <?php echo $key;?>"><?php echo $value.' '.$this->translate($key);?></li>
 			<?php endforeach; ?>
 		</ul>
 	</div>
 </div>
-<div class="profile-dashboard">
+<div class="ot profile-dashboard">
 	<ul class="profile-nav">
 		<li><a href="#profile-address-list">Addresses</a></li>
 		<li><a href="#profile-orders-list">Orders</a></li>
 	</ul>
 </div>
-<div class="profile-content">
+<div class="tt profile-content">
 	<div id="profile-address-list">
 	<?php $addressList = $this->customer->getAddresses(); ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
+	<div class="oh">
 		<div class="adr">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
@@ -62,24 +84,24 @@
 			<span><?php echo $countryList[$billingAddress['country']];?></span>
 <!--			<a class="delete-lnk" href="javascript:;" title="--><?php //echo $this->translate('Delete this address');?><!--"><img src="/system/images/delete.png" alt="[x]"></a>-->
 		</div>
+	</div>
 	<?php endforeach; ?>
 	<?php else : ?>
 	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
 	<?php endif;?>
 	</div>
 	<div id="profile-orders-list">
-		<p>Orders list:</p>
-		<table border="1" width="100%">
+		<table border="1">
 			<thead>
-				<tr>
-					<th>Order #</th>
-					<th>Purchased On</th>
-					<th>Status</th>
-					<th>Products in cart</th>
-					<th>Total Price</th>
-					<th>Shipping price</th>
-					<th>Shipping via</th>
-					<th>Details</th>
+				<tr class="title-table">
+					<th>#</th>
+					<th><?php echo $this->translate('Purchased On');?></th>
+					<th><?php echo $this->translate('Status');?></th>
+					<th><?php echo $this->translate('Products in cart');?></th>
+					<th><?php echo $this->translate('Total Price');?></th>
+					<th><?php echo $this->translate('Shipping price');?></th>
+					<th><?php echo $this->translate('Shipping via');?></th>
+					<th><?php echo $this->translate('Details');?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -87,7 +109,7 @@
 			<?php foreach ($this->orders as $order):?>
 				<tr data-role="cart" data-id="<?php echo $order->getId();?>">
 					<td><?php echo $order->getId();?></td>
-					<td><?php echo Zend_Date::now();?></td>
+					<td><?php echo date('d M, Y', strtotime($order->getCreatedAt()));?></td>
 					<td><?php echo $order->getStatus();?></td>
 					<td><?php echo sizeof($order->getCartContent());?></td>
 					<td><?php echo $this->currency($order->getTotal());?></td>
@@ -153,20 +175,7 @@
 	});
 </script>
 <style>
-	#profile .profile-header > div {
-		float: left;
-	}
-	#profile .profile-header .profile-picture {
-		width: 10%;
-		min-width: 80px;
-		margin: 0 1%;
-	}
-	#profile .profile-header .profile-main-info {
-		width: 50%
-	}
-	#profile .profile-header .profile-actions {
-		width: 30%
-	}
+	.oh,.ot,.tt{float:left;margin:1%;width:48%}.ot{width:31%}.tt{width:65%}.cl{clear:both}
 	#profile ul {
 		margin: 0;
 		padding: 0;
@@ -177,49 +186,50 @@
 		padding: 0;
 	}
 	#profile .profile-dashboard {
-		width: 19%;
-		float: left;
+		margin-right: 0;
 	}
 	#profile .profile-content {
-		width: 79%;
-		float: left;
-		padding: 4px 2px;
+		margin-left: 0;
+	}
+	#profile .profile-content {
 		border: 1px solid #e6e6fa;
-		border-radius: 0 8px 8px 0;
 	}
 	#profile .profile-actions {
 		border-left: 1px solid #e6e6fa;
 	}
-	#profile .profile-actions h3 {
-		text-align: center;
+
+	#profile ul.profile-nav {
+		border: 1px solid #e6e6fa;
+		border-right: none;
 	}
 	#profile ul.profile-nav li {
-		background-color: #e6e6fa;
-		margin-bottom: 2px;
-	}
-	#profile ul.profile-nav li:first-child { border-radius:  4px 0 0 0; }
-	#profile ul.profile-nav li:last-child { border-radius: 0 0 0 4px; }
-
-	#profile ul.profile-nav li:hover {
-		background-color: #f5f5f5;
+		margin: 1px 0 1px 1px;
 	}
 	#profile ul.profile-nav li a {
+		text-transform: uppercase;
 		display: block;
 		margin: 0 auto;
-		padding: 5px;
+		padding: 5px 5px 5px 10px;
+		font-weight: bold;
+		color: #666;
+		text-shadow: 1px 1px 0 #ddd;
+	}
+	#profile ul.profile-nav li a:hover {
+		background-color: #ccc;
+		color: #ffffff;
+		text-shadow: 1px 1px 0 #999;
 	}
 	#profile ul.profile-nav li a.active {
-		text-decoration: underline;
+		background-color: #666;
+		color: #f5f5f5;
+		text-shadow: 1px 1px 0 #333;
 	}
 
 	#profile #profile-address-list div.adr {
 		padding: 5px;
-		margin: 4px 1%;
 		position: relative;
 		border: 1px solid #e6e6fa;
 		border-radius: 8px 0 8px 8px;
-		width: 46%;
-		float: left;
 	}
 	#profile div.adr a.delete-lnk {
 		position: absolute;
@@ -229,11 +239,59 @@
 	#profile td.shipping-data p {
 		margin: 5px 0;
 	}
-	#profile ul.stats li {
-		text-align: right;
-	}
-	#profile ul.stats li.total {
-		font-size: 120%;
+
+	#profile .profile-header p.title {
+		line-height: 24px;
+		background-color: #cccccc;
+		color: #666;
+		text-transform: uppercase;
 		font-weight: bold;
+		text-shadow: 1px 1px 0 white;
+	}
+
+	#profile .profile-header ul.stats li {
+		text-align: center;
+		vertical-align: middle;
+		padding: 10px 0;
+		margin: 1%;
+		border-radius: 4px;
+		color: #f5f5f5;
+		font-weight: bold;
+		font-variant: small-caps;
+	}
+	#profile .profile-header ul.stats li.total {
+		background-color: #87ceeb;
+
+	}
+	#profile .profile-header ul.stats li.new {
+		background-color: #32cd32;
+	}
+	#profile .profile-header ul.stats li.completed {
+		background-color: #666666;
+	}
+	#profile .profile-header ul.stats li.pending {
+		background-color: #ff7f50;
+	}
+
+	#profile table {
+	}
+	#profile table thead tr {
+		background:#666;
+		color:#eee;
+		text-shadow: 0 0 2px #333;
+	}
+	#profile table th, #profile table td{
+		border: 1px solid #666;
+		vertical-align:middle;
+		text-align:center;
+		padding:5px;
+	}
+	#profile table th:first-child,
+	#profile table td:first-child {
+		border-left: none
+	}
+	#profile table th:last-child,
+	#profile table td:last-child {
+		border-right: none;
 	}
 </style>

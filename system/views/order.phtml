@@ -3,8 +3,8 @@
 <div class="ui-widget">
 	<div class="grid_12">
 		<div class="ui-widget-header ui-corner-top padding5px">Summary</div>
-		<div>Placed on ####-##-##</div>
-		<div>Placed from IP <?php echo $this->order->getIpAddress();?></div>
+		<div><?php echo $this->translate("Placed on %1\$s", date('d M, Y', strtotime($this->order->getCreatedAt())));?></div>
+		<div><?php echo $this->translate("Placed from IP %1\$s", $this->order->getIpAddress());?></div>
 	</div>
 
 	<div class="mt10px">&nbsp;</div>

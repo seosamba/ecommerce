@@ -43,6 +43,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_total = 0;
 
+	protected $_createdAt;
+
+	protected $_updatedAt;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -181,6 +185,24 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getShippingTrackingId() {
 		return $this->_shippingTrackingId;
+	}
+
+	public function setCreatedAt($createdAt) {
+		$this->_createdAt = $createdAt;
+		return $this;
+	}
+
+	public function getCreatedAt() {
+		return $this->_createdAt;
+	}
+
+	public function setUpdatedAt($updatedAt) {
+		$this->_updatedAt = $updatedAt;
+		return $this;
+	}
+
+	public function getUpdatedAt() {
+		return $this->_updatedAt;
 	}
 
 }
