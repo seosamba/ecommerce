@@ -140,8 +140,8 @@
 </div>
 <script>
 	$('#profile-content').tabs();
-	$('div#profile-content > *').removeClass('ui-widget-header ui-widget-content');
-	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-corner-all ui-corner-top" )
+	$('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
+	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-all ui-corner-top" )
 	$('a.tracking-dialog').on('click', function(e){
 		e.preventDefault();
 		var self = this,
@@ -194,6 +194,7 @@
 	#profile #profile-content.ui-tabs .ui-tabs-panel {
 		padding: 5px;
 		font-size: 14px;
+		border: 1px solid #CACACA;
 	}
 
 	#profile #profile-address-list div.adr {
