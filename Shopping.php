@@ -281,8 +281,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	private function _processCustomer($data) {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()){
-			if (null === ($customer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
-				$customer = new Models_Model_Customer();
+			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
+//				$customer = new Models_Model_Customer();
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 					->setEmail($data['email'])
 					->setFullName($data['firstname'] . ' ' . $data['lastname'])
@@ -294,10 +294,10 @@ class Shopping extends Tools_Plugins_Abstract {
 				if ($result) {
 					$customer->setId($result);
 				}
+			} else {
+				return $existingCustomer;
 			}
-
 		}
-
 		return $customer;
 	}
 

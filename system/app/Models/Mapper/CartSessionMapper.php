@@ -17,6 +17,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		}
 		$data = array(
 			'ip_address'   => $model->getIpAddress(),
+			'referer'      => $model->getReferer(),
 			'user_id'      => $model->getUserId(),
 			'status'       => $model->getStatus(),
 			'gateway'      => $model->getGateway(),

@@ -65,11 +65,10 @@ class Tools_ShoppingCart {
 
 		if ($currentUser->getId()) {
 			$customer = Models_Mapper_CustomerMapper::getInstance()->find($currentUser->getId());
-			if ($customer === null) {
-				$customer = new Models_Model_Customer($currentUser->toArray());
-			}
-		} else {
-			$customer = new Models_Model_Customer();
+		}
+
+		if (!isset($customer) || $customer === null) {
+			$customer = new Models_Model_Customer($currentUser->toArray());
 		}
 
 		return $customer;
@@ -350,6 +349,10 @@ class Tools_ShoppingCart {
 			$cartSession->setUserId($customer->getId())
 					->setShippingAddressId( $this->_shippingAddressKey )
 					->setBillingAddressId(  $this->_billingAddressKey );
+		}
+
+		if ($customer->getReferer()){
+			$cartSession->setReferer($customer->getReferer());
 		}
 
 		if (null !== ($shippingData = $this->getShippingData())) {

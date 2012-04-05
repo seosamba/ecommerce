@@ -43,6 +43,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_total = 0;
 
+	protected $_referer = null;
+
 	protected $_createdAt;
 
 	protected $_updatedAt;
@@ -203,6 +205,15 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getUpdatedAt() {
 		return $this->_updatedAt;
+	}
+
+	public function setReferer($referer) {
+		$this->_referer = $referer;
+		return $this;
+	}
+
+	public function getReferer() {
+		return $this->_referer;
 	}
 
 }
