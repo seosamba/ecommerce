@@ -148,6 +148,9 @@
 			bPaginate: false,
 			bLengthChange: false,
 			sDom: 't',
+			aoColumnDefs: [
+				{bSortable: false, aTargets: [-1]}
+			],
 			oLanguage: {
 		      sEmptyTable: "<?php echo $this->translate('You do not have any orders'); ?>"
 		    }
@@ -271,6 +274,9 @@
 		background:#666;
 		color:#eee;
 		text-shadow: 0 0 2px #333;
+	}
+	#profile table thead th:not(.sorting_disabled) {
+		cursor: pointer;
 	}
 	#profile table thead th::after {
 	    display: inline;
