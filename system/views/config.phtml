@@ -80,6 +80,12 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
         float: right;
         margin: 0 20px 10px;
     }
+	.email-trigger label {
+		display: inline-block;
+	}
+	.email-trigger select {
+		width: 300px;
+	}
 </style>
 
 <div id="config" class="h540">
@@ -90,5 +96,5 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 	<?php endforeach; ?>
 	</ul>
 	<?php echo $this->form; ?>
-    <button id="save-btn"><?php echo $this->translate('Save');?></button>
+    <button id="save-btn" class="mt10px"><?php echo $this->translate('Save');?></button>
 </div>

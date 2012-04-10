@@ -323,6 +323,9 @@ class Tools_ShoppingCart {
 		} else {
 			$cartSession = new Models_Model_CartSession();
 			$cartSession->setStatus(Models_Model_CartSession::CART_STATUS_NEW);
+			$cartSession->registerObserver(new Tools_EmailTriggerWatchdog(array(
+				'trigger' => Tools_EmailTriggerWatchdog::TRIGGER_NEW_ORDER
+			)));
 		}
 
 		$cartSessionContent = array();
@@ -363,6 +366,7 @@ class Tools_ShoppingCart {
 
 		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
 		if ($result && $this->getCartId() === null){
+			$cartSession->notifyObservers();
 			$this->setCartId($cartSession->getId())->save();
 		}
 

@@ -15,10 +15,12 @@ class Forms_Config extends Zend_Form {
 				));
 		$general = new Forms_GeneralSettings();
 		$display = new Forms_DisplaySettings();
+		$triggers = new Forms_TriggerSettings();
 		
 		$this->addSubForms(array(
 			'general' => $general,
-			'display' => $display
+			'display' => $display,
+			'triggers' => $triggers
 		));
 		
 		foreach ($this->getSubForms() as $id => $form){

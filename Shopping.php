@@ -282,17 +282,19 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()){
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
-//				$customer = new Models_Model_Customer();
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 					->setEmail($data['email'])
 					->setFullName($data['firstname'] . ' ' . $data['lastname'])
 					->setIpaddress($_SERVER['REMOTE_ADDR'])
 					->setPassword(md5(uniqid('customer_' . time())));
 				//@todo send email notification about creating new account
-
+				$customer->registerObserver(new Tools_EmailTriggerWatchdog(array(
+					'trigger' => Tools_EmailTriggerWatchdog::TRIGGER_NEW_CUSTOMER
+				)));
 				$result = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($result) {
 					$customer->setId($result);
+					$customer->notifyObservers();
 				}
 			} else {
 				return $existingCustomer;
