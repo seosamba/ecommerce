@@ -1,13 +1,15 @@
 <?php
 /**
- * StoreMailWatchdog.php
+ * StoreMailWatchdog
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Tools_EmailTriggerWatchdog implements Interfaces_Observer  {
+class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
-	const TRIGGER_NEW_CUSTOMER  = 'newcustomer';
+	const TRIGGER_NEW_CUSTOMER  = 'new customer';
 
-	const TRIGGER_NEW_ORDER     = 'neworder';
+	const TRIGGER_NEW_ORDER     = 'new order';
+
+	const RECIPIENT_SALESPERSON = 'sales person';
 
 	private $_options;
 
@@ -65,7 +67,7 @@ class Tools_EmailTriggerWatchdog implements Interfaces_Observer  {
 			return false;
 		}
 		if (isset($this->_options['trigger'])){
-			$methodName = '_send'.ucfirst(strtolower($this->_options['trigger'])).'Mail';
+			$methodName = '_send'.ucfirst(strtolower(preg_replace('/\s*/', '', $this->_options['trigger']))).'Mail';
 			if (method_exists($this, $methodName)){
 				$this->$methodName($object);
 			}
@@ -89,8 +91,8 @@ class Tools_EmailTriggerWatchdog implements Interfaces_Observer  {
 		if (!is_array($objects)){
 			$objects = array($objects);
 		}
-		$tmplName = strtolower($this->_options['trigger']).'template';
-		$tmplMessage = strtolower($this->_options['trigger']).'message';
+		$tmplName = $this->_options['template'];
+		$tmplMessage = $this->_options['message'];
 		$mailTemplate = isset($this->_storeConfig[$tmplName]) ? Application_Model_Mappers_TemplateMapper::getInstance()->find($this->_storeConfig[$tmplName]) : null;
 
 		if (!empty($mailTemplate)){

@@ -59,6 +59,10 @@ class Shopping extends Tools_Plugins_Abstract {
 	    )
     );
 
+	public static $emailTriggers = array(
+		'Tools_StoreMailWatchdog'
+	);
+
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
 
@@ -287,9 +291,8 @@ class Shopping extends Tools_Plugins_Abstract {
 					->setFullName($data['firstname'] . ' ' . $data['lastname'])
 					->setIpaddress($_SERVER['REMOTE_ADDR'])
 					->setPassword(md5(uniqid('customer_' . time())));
-				//@todo send email notification about creating new account
-				$customer->registerObserver(new Tools_EmailTriggerWatchdog(array(
-					'trigger' => Tools_EmailTriggerWatchdog::TRIGGER_NEW_CUSTOMER
+				$customer->registerObserver(new Tools_Mail_Watchdog(array(
+					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
 				)));
 				$result = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($result) {
