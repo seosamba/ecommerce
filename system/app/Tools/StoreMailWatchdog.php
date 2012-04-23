@@ -11,6 +11,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_SALESPERSON = 'sales person';
 
+	const RECIPIENT_CUSTOMER    = 'customer';
+
 	private $_options;
 
 	/**
@@ -36,6 +38,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_options = $options;
 		$this->_initMailer();
+		$this->_entityParser = new Tools_Content_EntityParser();
 	}
 
 	private function _initMailer(){
@@ -62,7 +65,6 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 	}
 
 	public function notify($object) {
-		// TODO: Implement notify() method.
 		if (!$object){
 			return false;
 		}
@@ -76,38 +78,47 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 
 	private function _sendNewcustomerMail(Models_Model_Customer $customer){
-		if (!$this->_prepareEmailBody(array($customer))) {
+		switch ($this->_options['recipient']) {
+			case self::RECIPIENT_SALESPERSON:
+				$this->_mailer->setMailToLabel($customer->getFullName())
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:'admin@localhost');
+				break;
+			case self::RECIPIENT_CUSTOMER:
+				$this->_mailer->setMailToLabel($customer->getFullName())
+						->setMailTo($customer->getEmail());
+				break;
+			default:
+				error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+				return false;
+				break;
+		}
+
+		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
 			return false;
 		}
 
-		$this->_mailer->setMailToLabel($customer->getFullName())
-			->setMailTo($customer->getEmail())
-			->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:'admin@localhost')
+		$this->_entityParser->objectToDictionary($customer);
+		$this->_mailer->setBody($this->_entityParser->parse($body));
+
+		$this->_mailer->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:'admin@localhost')
 			->setMailFromLabel($this->_storeConfig['company']);
 		return ($this->_mailer->send() !== false);
 	}
 
-	private function _prepareEmailBody($objects){
-		if (!is_array($objects)){
-			$objects = array($objects);
-		}
+	private function _prepareEmailBody(){
 		$tmplName = $this->_options['template'];
 		$tmplMessage = $this->_options['message'];
-		$mailTemplate = isset($this->_storeConfig[$tmplName]) ? Application_Model_Mappers_TemplateMapper::getInstance()->find($this->_storeConfig[$tmplName]) : null;
+		$mailTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->find($tmplName);
 
 		if (!empty($mailTemplate)){
-			$entityParser = new Tools_Content_EntityParser();
-			$entityParser->setDictionary(array(
-				'emailmessage' => isset($this->_storeConfig[$tmplMessage]) ? $this->_storeConfig[$tmplMessage] : ''
+			$this->_entityParser->setDictionary(array(
+				'emailmessage' => !empty($tmplMessage) ? $tmplMessage : ''
 			));
-			$mailTemplate = $entityParser->parse($mailTemplate->getContent());
+			//pushing message template to email template and cleaning dictionary
+			$mailTemplate = $this->_entityParser->parse($mailTemplate->getContent());
+			$this->_entityParser->setDictionary(array());
 
-			$entityParser->setDictionary(array());
-			foreach ($objects as $object) {
-				$entityParser->objectToDictionary($object);
-			}
-
-			$mailTemplate = $entityParser->parse($mailTemplate);
+			$mailTemplate = $this->_entityParser->parse($mailTemplate);
 
 			$themeData = Zend_Registry::get('theme');
 			$extConfig = Zend_Registry::get('extConfig');
@@ -118,15 +129,53 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				'themePath'    => $themeData['path'],
 			);
 			$parser = new Tools_Content_Parser($mailTemplate, Tools_Page_Tools::getCheckoutPage()->toArray(), $parserOptions);
-			$this->_mailer->setBody($parser->parseSimple());
-			return true;
+
+			return $parser->parseSimple();
 		}
 
 		return false;
 	}
 
 	private function _sendNeworderMail(Models_Model_CartSession $order) {
+		$customer = Models_Mapper_CustomerMapper::getInstance()->find($order->getUserId());
+		switch ($this->_options['recipient']) {
+			case self::RECIPIENT_SALESPERSON:
+				$this->_mailer->setMailToLabel('Sales person')
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+				break;
+			case self::RECIPIENT_CUSTOMER:
+				if ($customer && $customer->getEmail()){
+					$this->_mailer->setMailToLabel($customer->getFullName())
+							->setMailTo($customer->getEmail());
+				} else {
+					return false;
+				}
+				break;
+			default:
+				error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+				return false;
+				break;
+		}
 
+		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
+			return false;
+		}
+		$currency = new Zend_Currency(); //Zend_Registry::get('Zend_Currency');
+
+		$dict = array(
+			'order:total' => $currency->toCurrency($order->getTotal()),
+			'order:status' => $order->getStatus(),
+			'order:referer' => $order->getReferer()
+		);
+		$this->_entityParser->addToDictionary($dict);
+		$this->_entityParser->objectToDictionary($customer);
+
+		$this->_mailer->setBody($this->_entityParser->parse($body));
+
+		$this->_mailer->setMailFromLabel($this->_storeConfig['company'])
+			->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+
+		return ($this->_mailer->send() !== false);
 	}
 
 }
