@@ -262,6 +262,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		if(!empty($tags)) {
 			foreach($tags as $tagId) {
 				$catRow         = $catDbTable->find($tagId)->current();
+				if ($catRow === null){
+					continue;
+				}
 			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductTag');
 				foreach($productsRowset as $productRow) {
 					$productModel = $this->_toModel($productRow);
