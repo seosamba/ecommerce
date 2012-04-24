@@ -181,7 +181,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->shippingGeneral  = $config['shippingGeneral'];
 		$this->_view->shippingWeight   = $config['shippingWeight'];
 		$this->_view->shippingExternal = json_encode($config['shippingExternal']);
-		$this->_view->shippingPlugins  = Tools_Plugins_Tools::getEnabledPlugins();
+		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
+			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
+			return $reflection->implementsInterface('Interfaces_Shipping');
+		});
 		echo $this->_view->render('shipping.phtml');
 	}
 
