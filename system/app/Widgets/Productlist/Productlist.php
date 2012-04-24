@@ -238,10 +238,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					}
 				break;
 				case self::OPTTYPE_ORDER:
-					if(empty($products)) {
-						$products = $this->_productMapper->fetchAll(null, array(), 0, 100);
+					if(!empty($products)) {
+						//$products = $this->_productMapper->fetchAll(null, array(), 0, 100);
+						$products = $this->_sort($products, $optData['values']);
 					}
-					$products = $this->_sort($products, $optData['values']);
+
 				break;
 			}
 		}
