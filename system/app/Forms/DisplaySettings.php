@@ -21,12 +21,13 @@ class Forms_DisplaySettings extends Zend_Form {
 			'multiOptions' => Tools_Misc::$_weightUnits
 		));
 
-        $plugins = Tools_Plugins_Tools::getEnabledPlugins();
         $list = array();
-        foreach ($plugins as $plugin) {
-//            @todo: add some check if it's a cart plugin
-            $list[$plugin->getName()] = $plugin->getName();
-        }
+		array_walk(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin, $index) use(&$list){
+			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
+			if ($reflection->isSubclassOf('Tools_Cart_Cart')) {
+				$list[$plugin->getName()] = $plugin->getName();
+			}
+		});
 
         $this->addElement('select', 'cartPlugin', array(
             'label' => 'Cart',
