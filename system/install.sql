@@ -142,7 +142,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
-  KEY `page_id` (`page_id`)
+  KEY `page_id` (`page_id`),
+  KEY `brand_id` (`brand_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_product_has_tag` (
