@@ -16,8 +16,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     /**
      * @var array Contains payment config
+     * @static
      */
-	protected $_shoppingConfig;
+	protected static $_shoppingConfig = null;
 
     /**
 	 * @var Models_Model_Product Product instance
@@ -34,40 +35,43 @@ class Widgets_Product_Product extends Widgets_Abstract {
      */
     private $_currency = null;
 
-	protected function  _init() {
-		parent::_init();
+	protected function _load(){
 		if (empty($this->_options)){
 			throw new Exceptions_SeotoasterWidgetException('No options provided');
 		}
-        $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
-        $this->_configHelper  = Zend_Controller_Action_HelperBroker::getExistingHelper('config');
+
+		$this->_websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
+
+		self::$_shoppingConfig || self::$_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
 		$this->_view = new Zend_View(array(
 			'scriptPath' => dirname(__FILE__) . '/views'
 		));
 		$this->_view->setHelperPath(APPLICATION_PATH . '/views/helpers/');
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
-        $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
+        $this->_view->websiteUrl = $this->_websiteUrl;
 
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
-		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
 		if (is_numeric($this->_options[0])){
 			$this->_product = $this->_productMapper->find(intval($this->_options[0]));
 			$this->_type = self::TYPE_PRODUCTLISTING;
 			array_shift($this->_options);
 		} else {
-			$this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
+			$productCacheId = __CLASS__.'_byPage_'.$this->_toasterOptions['id'];
+			if (null === ($this->_product = $this->_cache->load($productCacheId, 'store_'))){
+				$this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
+				$this->_cache->save($productCacheId, $this->_product, 'store_', array(), Helpers_Action_Cache::CACHE_FLASH);
+			}
 			$this->_type = array_shift($this->_options);
 		}
 
-        //initializing Zend Currency for future use
+		//initializing Zend Currency for future use
         if ($this->_currency === null){
             $this->_currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
         }
-    }
 
-    protected function _load() {
-        if ($this->_product === null || $this->_type === null) {
+	    if ($this->_product === null || $this->_type === null) {
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
                  return "<b>Product doesn&quote;t exist or wrong options provided</b>";
             }
@@ -95,9 +99,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 	        $themeConfig = Zend_Registry::get('theme');
             $parserOptions = array(
-                'websiteUrl'   => $this->_websiteHelper->getUrl(),
-                'websitePath'  => $this->_websiteHelper->getPath(),
-                'currentTheme' => $this->_configHelper->getConfig('currentTheme'),
+                'websiteUrl'   => $this->_websiteUrl,
+                'websitePath'  => Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getPath(),
+                'currentTheme' => Zend_Controller_Action_HelperBroker::getExistingHelper('config')->getConfig('currentTheme'),
                 'themePath'    => $themeConfig['path']
             );
             unset($themeConfig);
@@ -114,7 +118,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
              return false;
         }
         $html = sprintf('<a href="javascript:;" data-url="%splugin/shopping/run/product#edit/%d" class="tpopup">%s</a>',
-            $this->_websiteHelper->getUrl(),
+            $this->_websiteUrl,
             $this->_product->getId(),
             $this->_translator->translate('Edit product')
         );
@@ -136,7 +140,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         } else {
             $photoSrc = str_replace('/', '/product/', $photoSrc);
         }
-        return $this->_websiteHelper->getUrl() .'media/' . $photoSrc;
+        return $this->_websiteUrl .'media/' . $photoSrc;
 	}
 	
 	private function _renderPrice() {
@@ -175,7 +179,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 
     private function _renderWeight() {
-        return $this->_product->getWeight() . ' ' .$this->_shoppingConfig['weightUnit'];
+        return $this->_product->getWeight() . ' ' .self::$_shoppingConfig['weightUnit'];
     }
 
     private function _renderMpn() {
@@ -184,7 +188,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderUrl() {
         $page = $this->_product->getPage();
-        return $this->_websiteHelper->getUrl() . $page->getUrl();
+        return $this->_websiteUrl . $page->getUrl();
     }
 
     private function _renderSku() {

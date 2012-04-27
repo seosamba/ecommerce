@@ -111,9 +111,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			return null;
 		}
 		foreach ($resultSet as $row) {
-			$entity = $this->_toModel($row);
-
-			array_push($entities, $entity);
+			array_push($entities, $this->_toModel($row));
 		}
 		return $entities;
 	}
@@ -129,9 +127,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	}
 	
 	public function findByPageId($id) {
-		$products = $this->fetchAll(array('page_id = ?' => $id));
-		if (!empty ($products)){
-			return $products[0];
+		$productRow = $this->getDbTable()->fetchRow(array('page_id = ?' => $id));
+		if (!empty ($productRow)){
+			return $this->_toModel($productRow);
 		}
 		return null;
 	}
@@ -143,7 +141,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
      */
 	private function _toModel(Zend_Db_Table_Row_Abstract $row){
 		$entity = new $this->_model($row->toArray());
-
         if ($row->brand_id){
 			$brandRow = $row->findDependentRowset('Models_DbTable_Brand');
 			if ($brandRow->count()){
@@ -180,13 +177,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		//fetching product page
 		if ($row->page_id){
-			$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-			$page = $pageMapper->find($row->page_id);
+			$page = Application_Model_Mappers_PageMapper::getInstance()->find($row->page_id);
 			if ($page){
 				$entity->setPage($page);
 			}
 		}
-
 		return $entity;
 	}
 
