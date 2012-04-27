@@ -28,6 +28,6 @@ class Models_DbTable_ShoppingConfig extends Zend_Db_Table_Abstract {
 	}
 
 	public function selectConfig() {
-		return $this->getAdapter()->fetchPairs($this->select()->from($this->_name));
+		return $this->getAdapter()->fetchPairs('SELECT `name`, `value` from `'. $this->_name.'`');
 	}
 }
