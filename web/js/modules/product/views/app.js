@@ -388,7 +388,8 @@ define([
             return this;
         },
         filterProducts: function(e, forceRun) {
-            if (e.charCode === 13 || forceRun === true) {
+            console.log(e);
+            if (e.keyCode === 13 || forceRun === true) {
                 appRouter.products.reset().load([
                     appRouter.app.waypointCallback,
                     function(response){ if (response.length === 0) { $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>')} ; }
