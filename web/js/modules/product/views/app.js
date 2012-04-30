@@ -388,7 +388,6 @@ define([
             return this;
         },
         filterProducts: function(e, forceRun) {
-            console.log(e);
             if (e.keyCode === 13 || forceRun === true) {
                 appRouter.products.reset().load([
                     appRouter.app.waypointCallback,
