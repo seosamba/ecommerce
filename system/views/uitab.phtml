@@ -179,7 +179,6 @@
 	                        	uiTab.parseTagsAndBrands(response, dataType);
                             break;
                             case 'product':
-	                            //console.log(!$('#tags').val(), !$('#brands').val());
 	                            uiTab.parseProducts(response, filter);
 								if(!$('#tags').val() && !$('#brands').val()) {
 		                            $('.productlisting:last-child').waypoint(function() {
