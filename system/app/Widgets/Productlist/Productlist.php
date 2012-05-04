@@ -134,7 +134,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		// here we go - proccessing the list
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data) {
-			$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
+			if (strpos($data['templateContent'], '$store:addtocart') !== false ){
+				$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
+			}
 			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
 			if($data['mediaServersAllowed']) {
 				$mediaServer = Tools_Content_Tools::getMediaServer();
@@ -166,7 +168,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description:short' => $shortDesc,
                 '$product:description'       => $shortDesc,
                 '$product:description:full'  => $product->getFullDescription(),
-				'$store:addtocart'           => $storeWidget->render()
+				'$store:addtocart'           => isset($storeWidget) ? $storeWidget->render() : ''
 			))->parse($templatePrepend . $data['templateContent']);
 			unset($storeWidget);
 		});
