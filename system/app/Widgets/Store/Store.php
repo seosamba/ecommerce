@@ -29,7 +29,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		    $cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
             if ($cartPluginName){
                 $cart = Tools_Factory_PluginFactory::createPlugin($cartPluginName, $this->_options, $this->_toasterOptions);
-	            Zend_Registry::set(serialize(self::$_zendRegistryKey), $cart);
+	            Zend_Registry::set(self::$_zendRegistryKey, serialize($cart));
             } else{
                 throw new Exceptions_SeotoasterWidgetException('No cart plugin selected');
             }
