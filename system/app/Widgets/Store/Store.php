@@ -8,24 +8,33 @@
  */
 class Widgets_Store_Store extends Widgets_Abstract {
 
+	private static $_zendRegistryKey = 'store-cart-plugin';
+
     protected function _load() {
 	    $methodName = Tools_Plugins_Abstract::OPTION_MAKER_PREFIX.ucfirst(strtolower($this->_options[0]));
-	    $shoppingPlugin = Tools_Factory_PluginFactory::createPlugin('shopping', $this->_options, $this->_toasterOptions);
-	    if (method_exists($shoppingPlugin, $methodName)) {
+//	    $shoppingPlugin = Tools_Factory_PluginFactory::createPlugin('shopping', $this->_options, $this->_toasterOptions);
+	    $shopPlugRefl = new Zend_Reflection_Class('Shopping');
+//	    if (method_exists($shoppingPlugin, $methodName)) {
+	    if ($shopPlugRefl->hasMethod($methodName)) {
+			$shoppingPlugin = Tools_Factory_PluginFactory::createPlugin('shopping', $this->_options, $this->_toasterOptions);
 		    return $shoppingPlugin->run();
 	    } elseif (method_exists($this, $methodName)) {
 
 		    return $this->$methodName();
 	    }
 
-        $cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
-        if ($cartPluginName){
-            $cart = Tools_Factory_PluginFactory::createPlugin($cartPluginName, $this->_options, $this->_toasterOptions);
-            return $cart->run();
-        } else{
-            throw new Exceptions_SeotoasterWidgetException('No cart plugin selected');
-        }
-        return false;
+	    if (Zend_Registry::isRegistered(self::$_zendRegistryKey)){
+		    $cart = unserialize(Zend_Registry::get(self::$_zendRegistryKey));
+	    } else {
+		    $cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
+            if ($cartPluginName){
+                $cart = Tools_Factory_PluginFactory::createPlugin($cartPluginName, $this->_options, $this->_toasterOptions);
+	            Zend_Registry::set(serialize(self::$_zendRegistryKey), $cart);
+            } else{
+                throw new Exceptions_SeotoasterWidgetException('No cart plugin selected');
+            }
+	    }
+	    return $cart->run();
     }
 
 	protected function _init() {
