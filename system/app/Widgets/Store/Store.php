@@ -23,13 +23,14 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		    return $this->$methodName();
 	    }
 
-	    if (Zend_Registry::isRegistered(self::$_zendRegistryKey)){
-		    $cart = Zend_Registry::get(self::$_zendRegistryKey);
+	    $regKey = self::$_zendRegistryKey.implode('_', $this->_options);
+	    if (Zend_Registry::isRegistered($regKey)){
+		    $cart = Zend_Registry::get($regKey);
 	    } else {
 		    $cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
             if ($cartPluginName){
                 $cart = Tools_Factory_PluginFactory::createPlugin($cartPluginName, $this->_options, $this->_toasterOptions);
-	            Zend_Registry::set(self::$_zendRegistryKey, $cart);
+	            Zend_Registry::set($regKey, $cart);
             } else{
                 throw new Exceptions_SeotoasterWidgetException('No cart plugin selected');
             }
