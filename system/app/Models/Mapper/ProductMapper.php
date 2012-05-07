@@ -135,11 +135,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	}
 
     /**
-     * @var Models_Model_Product $entity
      * @param Zend_Db_Table_Row_Abstract $row
      * @return mixed
      */
 	private function _toModel(Zend_Db_Table_Row_Abstract $row){
+		/**
+	      * @var Models_Model_Product $entity
+		 */
 		$entity = new $this->_model($row->toArray());
         if ($row->brand_id){
 			$brandRow = $row->findDependentRowset('Models_DbTable_Brand');
@@ -161,7 +163,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             foreach ($optionSet as $optionRow) {
                 array_push($ids, $optionRow->option_id);
             }
-			$entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->find($ids, true));
+			$entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->fetchAll(array('id IN (?)' => $ids), null, false));
             unset($ids);
 		}
 
