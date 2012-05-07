@@ -75,8 +75,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$this->_processRelated($model);
 		}
 
-		Zend_Controller_Action_HelperBroker::getStaticHelper('cache')->clean('Widgets_Product_Product_byPage_'.$model->getPage()->getId(), 'store_');
-
 		$model->notifyObservers();
 
 		return $model;
