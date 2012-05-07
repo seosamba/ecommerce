@@ -197,16 +197,23 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderTags() {
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-        $tags = $this->_product->getTags();
-        if (!empty($tags)){
+	    $tags = $this->_product->getTags();
+	    if (!empty($tags)){
+	        $pageHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('page');
+	        $pagesList = $pageMapper->getDbTable()->getAdapter()->fetchCol($pageMapper->getDbTable()->select()->from($pageMapper->getDbTable()->info('name'), 'url')->where("system = '0'"));
             foreach ($tags as &$tag) {
-                if ($url = $pageMapper->findByUrl($tag['name'].'.html')){
+	            $url = $pageHelper->filterUrl($tag['name']);
+                if (in_array($url, $pagesList)){
                     $tag['url'] = $url;
                 }
             }
-        }
-        $this->_view->tags = $tags;
-        return $this->_view->render('tags.phtml');
+		    if (isset($this->_options[0]) && strtolower($this->_options[0]) === 'json' ){
+			    return json_encode($tags);
+		    } else {
+	            $this->_view->tags = $tags;
+	            return $this->_view->render('tags.phtml');
+	        }
+	    }
     }
 
     private function _renderRelated() {

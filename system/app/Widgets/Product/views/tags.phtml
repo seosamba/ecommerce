@@ -1,9 +1,9 @@
 <?php if (!empty($this->tags)): ?>
 <?php foreach ($this->tags as $tag): ?>
     <?php if (isset($tag['url'])): ?>
-<a href="<?php echo $this->websiteUrl.$tag['name'].'.html';?>"><?php echo $tag['name'];?></a>
+<a href="<?php echo $this->websiteUrl.$tag['name'].'.html';?>" title="<?php echo htmlentities($tag['name']);?>"><?php echo htmlentities($tag['name']);?></a>
     <?php else: ?>
-<span><?php echo $tag['name'];?></span>
+<span><?php echo htmlentities($tag['name']);?></span>
     <?php endif; ?>
 <?php endforeach; ?>
 <?php endif; ?>
