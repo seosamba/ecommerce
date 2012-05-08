@@ -56,7 +56,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 
-		if ($model->getTags()) {
+		if (!is_null($model->getTags())) {
 			$productTagsTable = new Models_DbTable_ProductTag();
 			$productTagsTable->getAdapter()->beginTransaction();
 			$productTagsTable->delete($productTagsTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
