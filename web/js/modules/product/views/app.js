@@ -33,6 +33,11 @@ define([
 		initialize: function(){
 			$('#add-new-option-btn').button();
             var self = this;
+            $('#product-list-search').ajaxStart(function(){
+                    $(this).attr('disabled', 'disabled');
+                }).ajaxStop(function(){
+                    $(this).removeAttr('disabled');
+                })
             $.getJSON(this.websiteUrl + 'plugin/shopping/run/getdata/type/index', function(response){
                 $('#product-list-search').autocomplete({
                     minLength: 2,
