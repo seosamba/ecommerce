@@ -56,7 +56,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			}
 		}
 
-		if ($model->getTags()) {
+		if (!is_null($model->getTags())) {
 			$productTagsTable = new Models_DbTable_ProductTag();
 			$productTagsTable->getAdapter()->beginTransaction();
 			$productTagsTable->delete($productTagsTable->getAdapter()->quoteInto('product_id = ?', $model->getId()));
@@ -96,9 +96,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $select->where('shopping_product.name LIKE ?', '%'.$search.'%')
                     ->orWhere('shopping_product.sku LIKE ?', '%'.$search.'%')
                     ->orWhere('shopping_product.mpn LIKE ?', '%'.$search.'%')
-                    ->join('shopping_brands', 'shopping_brands.id = shopping_product.brand_id', null)
-                    ->join('shopping_product_has_tag', 'shopping_product_has_tag.product_id = shopping_product.id', null)
-                    ->join('shopping_tags', 'shopping_tags.id = shopping_product_has_tag.tag_id', null)
+                    ->joinLeft('shopping_brands', 'shopping_brands.id = shopping_product.brand_id', null)
+                    ->joinLeft('shopping_product_has_tag', 'shopping_product_has_tag.product_id = shopping_product.id', null)
+                    ->joinLeft('shopping_tags', 'shopping_tags.id = shopping_product_has_tag.tag_id', null)
                     ->orWhere('shopping_brands.name LIKE ?', '%'.$search.'%')
                     ->orWhere('shopping_tags.name LIKE ?', '%'.$search.'%')
                     ->group('shopping_product.id')
