@@ -62,6 +62,13 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 			$('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
 		}
 	});
+
+    $('.no-save-btn').on('click', function() {
+        $('#save-btn').hide();
+    })
+    $('a').not('.no-save-btn').on('click', function() {
+        $('#save-btn').show();
+    })
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
 
@@ -91,9 +98,14 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 <div id="config" class="h540">
     <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
     <ul>
-	<?php foreach ($this->form->getSubForms() as $subform): ?>
-	<li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
-	<?php endforeach; ?>
+        <?php foreach ($this->form->getSubForms() as $subform): ?>
+            <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
+        <?php endforeach; ?>
+        <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
+            <?php foreach($this->configTabs as $configTab): ?>
+                <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
+            <?php endforeach; ?>
+        <?php endif; ?>
 	</ul>
 	<?php echo $this->form; ?>
     <button id="save-btn" class="mt10px"><?php echo $this->translate('Save');?></button>

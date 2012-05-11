@@ -133,8 +133,6 @@ class Shopping extends Tools_Plugins_Abstract {
             'title'   => '<span id="products">' . $translator->translate('Products') . '</span>',
             'content' => $view->render('uitab.phtml')
         );
-        unset($translator);
-        unset($view);
     }
 
 	/**
@@ -156,9 +154,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 		}
 		$form->populate($config);
-		$this->_view->form = $form;
-
-		$this->_layout->content = $this->_view->render('config.phtml');
+		$this->_view->form       = $form;
+        $this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
+		$this->_layout->content  = $this->_view->render('config.phtml');
 		echo $this->_layout->render();
 	}
 
