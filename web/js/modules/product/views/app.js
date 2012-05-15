@@ -3,11 +3,10 @@ define([
 	'Backbone',
 	'modules/product/models/product',
 	'modules/product/views/tag',
-//	'modules/product/collections/options',
 	'modules/product/models/option',
 	'modules/product/views/option',
 	'modules/product/views/productlist'
-], function(_, Backbone, ProductModel, TagView, /*OptionCollection,*/ ProductOption, ProductOptionView, ProductListView){
+], function(_, Backbone, ProductModel, TagView, ProductOption, ProductOptionView, ProductListView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
