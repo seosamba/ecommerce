@@ -845,7 +845,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
         $this->_view->plugins = array();
         foreach (Tools_Plugins_Tools::getEnabledPlugins() as $plugin){
-            if ($plugin->getTag() === 'ecommerce') {
+            if ($plugin->getTags() && in_array('ecommerce', $plugin->getTags())) {
                 array_push($this->_view->plugins, $plugin->getName());
             }
         }
