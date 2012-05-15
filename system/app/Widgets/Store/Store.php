@@ -8,6 +8,12 @@
  */
 class Widgets_Store_Store extends Widgets_Abstract {
 
+	/**
+	 * @todo see how it works in real life
+	 * @var bool
+	 */
+	protected $_cacheable      = false;
+
 	private static $_zendRegistryKey = 'store-cart-plugin';
 
     protected function _load() {

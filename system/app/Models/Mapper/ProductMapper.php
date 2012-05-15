@@ -253,34 +253,31 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 	}
 
+	/**
+	 * Find product wich contains given tags
+	 * @param array $tags List of tags to search for
+	 * @param bool $intersect
+	 * @return array List of products
+	 */
 	public function findByTags(array $tags, $intersect = true) {
 		$products         = array();
 		$filteredProducts = array();
 		$catDbTable       = new Models_DbTable_Tag();
 		if(!empty($tags)) {
-			foreach($tags as $tagId) {
-				$catRow         = $catDbTable->find($tagId)->current();
-				if ($catRow === null){
-					continue;
-				}
-			 	$productsRowset = $catRow->findManyToManyRowset('Models_DbTable_Product', 'Models_DbTable_ProductTag');
-				foreach($productsRowset as $productRow) {
-					$productModel = $this->_toModel($productRow);
-					$modelHash    = md5($productModel->getId());
-					if(!array_key_exists($modelHash, $products)) {
-						$products[$modelHash] = $productModel;
-					}
-				}
-				if(empty($filteredProducts)) {
-					$filteredProducts = $products;
-				} else {
-					if($intersect) {
-						$filteredProducts = array_intersect_key($products, $filteredProducts);
-					} else {
-						$filteredProducts = array_merge($products, $filteredProducts);
-					}
-				}
-                $products = array();
+			$select = $catDbTable->getAdapter()->select()->from(array('t' => $catDbTable->info('name')), null)
+				->joinLeft(array('pht'=>'shopping_product_has_tag'), 'pht.tag_id = t.id', null)
+				->joinLeft(array('p'=>'shopping_product'), 'p.id = pht.product_id')
+				->where('t.id IN (?)', $tags)
+				->group('p.id');
+
+			$productsRaw = $catDbTable->getAdapter()->fetchAll($select);
+
+			if (!empty($productsRaw)){
+				$products = array_map(function($product){
+					return new Zend_Db_Table_Row(array('table' => new Models_DbTable_Product(), 'data'=>$product));
+				}, $productsRaw);
+				unset($productsRaw);
+				$filteredProducts = array_map(array($this, '_toModel'), $products);
 			}
 		}
 		return array_values($filteredProducts);
