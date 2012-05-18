@@ -40,9 +40,8 @@ define([
         clearProperty: function(e){
             var propName = $(e.target).data('property');
             if (this.model.has(propName)){
-                var data = {};
-                data[propName] = this.model.defaults[propName];
-                this.model.set(data);
+                _.isArray(this.model.get(propName)) && this.model.set(propName, []);
+                _.isString(this.model.get(propName)) && this.model.set(propName, '');
             }
             console.log(this.model.toJSON());
         },
