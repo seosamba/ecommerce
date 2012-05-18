@@ -844,8 +844,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->imageDirList = $listFolders;
 
         $this->_view->plugins = array();
-        foreach (Tools_Plugins_Tools::getEnabledPlugins() as $plugin){
-            if ($plugin->getTags() && in_array('ecommerce', $plugin->getTags())) {
+        foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin){
+            if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
                 array_push($this->_view->plugins, $plugin->getName());
             }
         }
