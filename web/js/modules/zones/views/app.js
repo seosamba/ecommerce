@@ -2,8 +2,9 @@ define([
 	'Underscore',
 	'Backbone',
     'modules/zones/collections/zones',
-    'modules/zones/views/zone'
-], function(_, Backbone, ZonesCollection, ZoneView){
+    'modules/zones/views/zone',
+    'modules/zones/models/zone'
+], function(_, Backbone, ZonesCollection, ZoneView, ZoneModel){
 
     var appView = Backbone.View.extend({
         el: $('#manage-zones'),
@@ -20,7 +21,8 @@ define([
             this.zonesCollection.on('reset', this.resetZones, this);
         },
         newZone: function(){
-            this.zonesCollection.add();
+            var model = new ZoneModel();
+            this.zonesCollection.add(model);
         },
         deleteZone: function(){
             var zoneHolder = this.zoneHolder;
@@ -36,7 +38,7 @@ define([
             }
         },
         renderZone: function(zone){
-            console.log(zone.toJSON())
+            console.log(zone);
             var view = new ZoneView({model: zone}),
                 id = '#zone-'+zone.cid;
             this.zoneHolder.tabs('add', id, zone.get('name'));

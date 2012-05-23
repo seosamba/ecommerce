@@ -12,15 +12,17 @@ define([
         },
         addItem: function(property, itemModel){
             if (!_.any(this.get(property), function(item){
-                if (item.hasOwnProperty('id') && itemModel.hasOwnProperty('id')){
-                    return item.id == itemModel.id;
-                } else {
-                    return _.isEqual(item,itemModel);
-                }
-                return false;
-            })){
-                this.get(property).push(_.extend({},itemModel));
-                this.trigger('change');
+                    if (item.hasOwnProperty('id') && itemModel.hasOwnProperty('id')){
+                        return item.id == itemModel.id;
+                    } else {
+                        return _.isEqual(item,itemModel);
+                    }
+                    return false;
+                })
+            ){
+                var p = _.union(this.get(property), [_.extend({}, itemModel)]);
+                this.set(property, p);
+//                this.trigger('change');
             }
             return this;
         },

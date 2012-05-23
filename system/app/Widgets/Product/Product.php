@@ -77,7 +77,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
             }
             return "<!--Product doesn&quote;t exist or wrong options provided-->";
         }
-
+		array_push($this->_cacheTags, 'prodid_'.$this->_product->getId());
         $this->_view->product = $this->_product;
 
         $methodName = '_render'.ucfirst(strtolower($this->_type));

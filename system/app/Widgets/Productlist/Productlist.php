@@ -136,8 +136,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             return '<!-- you do not have products -->';
         }
 
+		$cacheTags = array();
 		// here we go - proccessing the list
-		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data) {
+		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data, &$cacheTags) {
+			array_push($cacheTags, 'prodid_'.$product->getId());
 			if (strpos($data['templateContent'], '$store:addtocart') !== false ){
 				$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
 			}
@@ -176,6 +178,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			))->parse($templatePrepend . $data['templateContent']);
 			unset($storeWidget);
 		});
+		$this->_cacheTags = array_merge($this->_cacheTags, $cacheTags);
 		return $renderedContent;
 	}
 

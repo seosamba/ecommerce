@@ -702,7 +702,8 @@ class Shopping extends Tools_Plugins_Abstract {
                         $pageMapper->save($page);
 					}
 				}
-				Zend_Controller_Action_HelperBroker::getStaticHelper('cache')->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
+				$cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
+				$cacheHelper->clean(false, false, array('prodid_'.$product->getId()));
 				$data = $product->toArray();
 				break;
 			case 'DELETE':
@@ -844,8 +845,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->imageDirList = $listFolders;
 
         $this->_view->plugins = array();
-        foreach (Tools_Plugins_Tools::getEnabledPlugins() as $plugin){
-            if ($plugin->getTags() && in_array('ecommerce', $plugin->getTags())) {
+        foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin){
+            if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
                 array_push($this->_view->plugins, $plugin->getName());
             }
         }

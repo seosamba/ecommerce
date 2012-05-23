@@ -1,0 +1,125 @@
+CREATE TABLE IF NOT EXISTS `shopping_zone` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `shopping_zone` (`id`, `name`) VALUES
+(1, 'US'),
+(2, 'CA'),
+(3, 'EU');
+
+CREATE TABLE IF NOT EXISTS `shopping_zone_country` (
+  `zone_id` int(11) unsigned NOT NULL,
+  `country_id` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`zone_id`,`country_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `shopping_zone_country` (`zone_id`, `country_id`) VALUES
+(1, 243),
+(2, 39),
+(3, 13),
+(3, 21),
+(3, 23),
+(3, 57),
+(3, 58),
+(3, 60),
+(3, 62),
+(3, 67),
+(3, 71),
+(3, 73),
+(3, 79),
+(3, 82),
+(3, 94),
+(3, 105),
+(3, 107),
+(3, 115),
+(3, 139),
+(3, 140),
+(3, 141),
+(3, 160),
+(3, 173),
+(3, 189),
+(3, 194),
+(3, 201),
+(3, 209),
+(3, 212),
+(3, 214);
+
+CREATE TABLE IF NOT EXISTS `shopping_zone_state` (
+  `zone_id` int(10) unsigned NOT NULL,
+  `state_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`zone_id`,`state_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `shopping_zone_state` (`zone_id`, `state_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 9),
+(1, 10),
+(1, 11),
+(1, 12),
+(1, 13),
+(1, 14),
+(1, 15),
+(1, 16),
+(1, 17),
+(1, 18),
+(1, 19),
+(1, 20),
+(1, 21),
+(1, 22),
+(1, 23),
+(1, 24),
+(1, 25),
+(1, 26),
+(1, 27),
+(1, 28),
+(1, 29),
+(1, 30),
+(1, 31),
+(1, 32),
+(1, 33),
+(1, 34),
+(1, 35),
+(1, 36),
+(1, 37),
+(1, 38),
+(1, 39),
+(1, 40),
+(1, 41),
+(1, 42),
+(1, 43),
+(1, 44),
+(1, 45),
+(1, 46),
+(1, 47),
+(1, 48),
+(1, 49),
+(1, 50),
+(1, 51),
+(2, 52),
+(2, 53),
+(2, 54),
+(2, 55),
+(2, 56),
+(2, 57),
+(2, 58),
+(2, 59),
+(2, 60),
+(2, 61),
+(2, 62),
+(2, 63),
+(2, 64);
+
+CREATE TABLE IF NOT EXISTS `shopping_zone_zip` (
+  `zone_id` int(11) NOT NULL,
+  `zip` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`zone_id`,`zip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
