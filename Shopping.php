@@ -702,7 +702,8 @@ class Shopping extends Tools_Plugins_Abstract {
                         $pageMapper->save($page);
 					}
 				}
-				Zend_Controller_Action_HelperBroker::getStaticHelper('cache')->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
+				$cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
+				$cacheHelper->clean(false, false, array('prodid_'.$product->getId()));
 				$data = $product->toArray();
 				break;
 			case 'DELETE':
