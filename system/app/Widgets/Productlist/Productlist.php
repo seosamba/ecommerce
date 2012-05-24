@@ -132,6 +132,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'mediaServersAllowed' => $confiHelper->getConfig('mediaServers')
 		);
 
+        if(empty($products)) {
+            return '<!-- you do not have products -->';
+        }
+
 		$cacheTags = array();
 		// here we go - proccessing the list
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data, &$cacheTags) {
