@@ -27,8 +27,8 @@ class Forms_Config extends Zend_Form {
 				->setElementDecorators(
 					array(
 						'ViewHelper'
-						, 'Label'
-						, array('HtmlTag', array('tag' => 'div'))
+						, array('Label', array('class' => 'grid_6' ))
+						, array('HtmlTag', array('tag' => 'div', 'class' => 'mt5px'))
 						)
 					);
 		}

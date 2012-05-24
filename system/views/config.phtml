@@ -1,12 +1,13 @@
 <?php
 $this->headTitle($this->translate('Manage config'));
+$this->placeholder('headerContent')->set('Manage store config');
 
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
-	$('div.seotoaster > div.ui-widget-header:first').remove();
+//	$('div.seotoaster > div.ui-widget-header:first').remove();
 
 	var shopping = {};
 	shopping.saveconfig = function(){
@@ -77,15 +78,12 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 		content: '*'
 	}
     .ui-tabs#config .ui-tabs-panel {
-        padding: 10px 10px 10px 15px;
-        background: #DAE8ED;
-    }
-    #config .ui-tabs-nav li.ui-tabs-selected {
-        background: #DAE8ED;
+        padding: 2px 0 10px;
     }
     button#save-btn {
-        float: right;
-        margin: 0 20px 10px;
+	    position: absolute;
+        bottom: 5px;
+	    right: 0;
     }
 	.email-trigger label {
 		display: inline-block;
@@ -95,10 +93,11 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 	}
 </style>
 
-<div id="config" class="h540">
-    <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
+<div id="config" class="h425 grid_12 mt5px">
+<!--    <div class="closebutton"><span class="close">--><?php //echo $this->translate('Close'); ?><!--</span></div>-->
     <ul>
-        <?php foreach ($this->form->getSubForms() as $subform): ?>
+	    <?php $subForms = $this->form->getSubForms(); ?>
+        <?php foreach ($subForms as $subform): ?>
             <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
         <?php endforeach; ?>
         <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
@@ -107,6 +106,22 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
             <?php endforeach; ?>
         <?php endif; ?>
 	</ul>
-	<?php echo $this->form; ?>
-    <button id="save-btn" class="mt10px"><?php echo $this->translate('Save');?></button>
+
+	<form action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<?php foreach ($subForms as $subform) :?>
+		<div id="<?php echo $subform->getId();?>-tab">
+			<?php foreach ($subform->getElements() as $elem):?>
+			<div class="mt5px clearfix">
+				<?php echo $elem->renderLabel();?>
+				<div class="grid_6 alpha">
+					<?php echo $elem->renderViewHelper();?>
+				</div>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	<?php endforeach; ?>
+	</form>
+
+	<?php //echo $this->form; ?>
+	<button id="save-btn"><?php echo $this->translate('Save');?></button>
 </div>

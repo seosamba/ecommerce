@@ -33,7 +33,6 @@ class Forms_DisplaySettings extends Zend_Form {
             'label' => 'Cart',
             'multiOptions' => $list
         ));
-
 	}
 
 }

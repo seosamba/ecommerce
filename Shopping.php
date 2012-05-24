@@ -15,12 +15,21 @@ class Shopping extends Tools_Plugins_Abstract {
 	 *
 	 */
 	const ROLE_CUSTOMER = 'customer';
+	/**
+	 * New system role 'salesperson'
+	 */
+	const ROLE_SALESPERSON = 'sales person';
 
 	/**
 	 * New system resource 'cart'
 	 *
 	 */
 	const RESOURCE_CART = 'cart';
+
+	/**
+	 * New system resource 'api'
+	 */
+	const RESOURCE_API  = 'api';
 
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
@@ -58,6 +67,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	    )
     );
+
+	private $_allowedApi = array('countrylist', 'states');
 
 	public static $emailTriggers = array(
 		'Tools_StoreMailWatchdog'
@@ -98,10 +109,19 @@ class Shopping extends Tools_Plugins_Abstract {
         if(!$acl->hasRole(self::ROLE_CUSTOMER)) {
             $acl->addRole(new Zend_Acl_Role(self::ROLE_CUSTOMER), Tools_Security_Acl::ROLE_GUEST);
         }
+	    if(!$acl->hasRole(self::ROLE_SALESPERSON)){
+		    $acl->addRole(new Zend_Acl_Role(self::ROLE_SALESPERSON), Tools_Security_Acl::ROLE_MEMBER);
+	    }
         if(!$acl->has(self::RESOURCE_CART)) {
             $acl->addResource(new Zend_Acl_Resource(self::RESOURCE_CART));
         }
+	    if(!$acl->has(self::RESOURCE_API)) {
+		    $acl->addResource(new Zend_Acl_Resource(self::RESOURCE_API));
+	    }
         $acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
+	    $acl->deny(Tools_Security_Acl::ROLE_GUEST, self::RESOURCE_API);
+	    $acl->deny(self::ROLE_SALESPERSON);
+	    $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_ADMINPANEL);
         Zend_Registry::set('acl', $acl);
     }
 
@@ -380,17 +400,20 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function getdataAction(){
 		$data = array();
 		if (isset($this->_requestedParams['type'])){
-			$methodName = '_'.strtolower($this->_requestedParams['type']).'RESTService';
-			if (method_exists($this, $methodName)){
-				$data = $this->$methodName();
-				if (!isset($data['error'])){
-					return $this->_jsonHelper->direct($data);
-				} else {
-					$this->_response->clearAllHeaders()->clearBody();
-					return $this->_response->setHttpResponseCode( isset($data['code']) ? intval($data['code']) : 400)
-							->setBody(json_encode($data['message']))
-                            ->setHeader('Content-Type', 'application/json', true)
-							->sendResponse();
+			$type = strtolower($this->_requestedParams['type']);
+			if (in_array($type, $this->_allowedApi) || Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
+				$methodName = '_'.$type.'RESTService';
+				if (method_exists($this, $methodName)){
+					$data = $this->$methodName();
+					if (!isset($data['error'])){
+						return $this->_jsonHelper->direct($data);
+					} else {
+						$this->_response->clearAllHeaders()->clearBody();
+						return $this->_response->setHttpResponseCode( isset($data['code']) ? intval($data['code']) : 400)
+								->setBody(json_encode($data['message']))
+	                            ->setHeader('Content-Type', 'application/json', true)
+								->sendResponse();
+					}
 				}
 			}
 		}
@@ -399,7 +422,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	private function _countrylistRESTService(){
         $toPairs = $this->_request->getParam('pairs', false);
-		$data = Tools_Geo::getCountries();
+		$data = Tools_Geo::getCountries($toPairs);
 		asort($data);
 		return $data;
 	}
@@ -501,22 +524,19 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	private function _brandsRESTService() {
-		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll(null, array('name'));
-
-        $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-        $pagesUrls = $pageMapper->fetchAllUrls();
-
         $data = array();
         switch (strtolower($this->_request->getMethod())){
             default:
             case 'get':
-                foreach ($brandsList as $brand) {
-                    $item = $brand->toArray();
+		        $brandsList = Models_Mapper_Brand::getInstance()->fetchAll(null, array('name'));
+                $pagesUrls = Application_Model_Mappers_PageMapper::getInstance()->fetchAllUrls();
+		        $data = array_map(function($brand) use ($pagesUrls) {
+			        $item = $brand->toArray();
                     if (in_array(strtolower($brand->getName()).'.html', $pagesUrls)){
                         $item['url'] = strtolower($brand->getName()).'.html';
                     }
-                    array_push($data, $item);
-                }
+                    return $item;
+		        }, $brandsList);
                 break;
             case 'post':
                 $postData = json_decode($this->_request->getRawBody(), true);
