@@ -165,7 +165,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:photourl:large'    => $photoUrlPart . '/large/' . $productPhotoData[1],
                 '$product:photourl:original' => $photoUrlPart . '/original/' . $productPhotoData[1],
                 '$product:url'               => $product->getPage() ? $product->getPage()->getUrl() : null,
-                '$product:price'             => $currency->toCurrency((float)$product->getPrice()),
+                '$product:price'             => $currency->toCurrency((float)($product->getCurrentPrice() !== null?$product->getCurrentPrice():$product->getPrice())),
                 '$product:brand'             => $product->getBrand(),
                 '$product:weight'            => $product->getWeight(),
                 '$product:mpn'               => $product->getMpn(),
