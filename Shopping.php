@@ -802,7 +802,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$uniqName = implode('-', $uniqName);
 		$page->setTemplateId($templateId ? $templateId : Application_Model_Models_Template::ID_DEFAULT );
 		$page->setParentId($prodCatPage->getId());
-		$page->setNavName($product->getName().($product->getSku()?' - '.$product->getSku():''));
+		$page->setNavName($product->getName().' - '.$product->getBrand());
         $page->setMetaDescription(strip_tags($product->getShortDescription()));
 		$page->setMetaKeywords('');
 		$page->setHeaderTitle($product->getBrand().' '.$product->getName());
