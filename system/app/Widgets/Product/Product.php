@@ -144,10 +144,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPrice() {
-        if (empty($this->_options)){
+		if (empty($this->_options)){
             return $this->_currency->toCurrency($this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice());
         } else {
             $pluginName = strtolower($this->_options[0]);
+			if ($pluginName === 'original'){
+				return $this->_currency->toCurrency($this->_product->getPrice());
+			}
             $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
             if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
                 return Tools_Factory_PluginFactory::createPlugin($plugin->getName(), array('price', $this->_product->getId()), $this->_toasterOptions)->run();
