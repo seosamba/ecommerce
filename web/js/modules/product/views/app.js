@@ -426,7 +426,7 @@ define([
                 success: function(response) {
                     console.log(response);
                     if (response.hasOwnProperty('result')) {
-                        showMessage(response.result, true);
+                        smoke.alert(response.result);
                     }
                 }
             });
