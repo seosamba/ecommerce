@@ -61,7 +61,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			$productCacheId = __CLASS__.'_byPage_'.$this->_toasterOptions['id'];
 			if (null === ($this->_product = $this->_cache->load($productCacheId, 'store_'))){
 				$this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
-				$this->_cache->save($productCacheId, $this->_product, 'store_', array('productwidget'), Helpers_Action_Cache::CACHE_FLASH);
+				if (null !== $this->_product){
+					$this->_cache->save($productCacheId, $this->_product, 'store_', array('productwidget', 'prodid_'.$this->_product->getId()), Helpers_Action_Cache::CACHE_FLASH);
+				}
 			}
 			$this->_type = array_shift($this->_options);
 		}

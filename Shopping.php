@@ -723,7 +723,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					}
 				}
 				$cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
-				$cacheHelper->clean(false, false, array('prodid_'.$product->getId(), 'pid_'.$page->getId()));
+				$cacheHelper->clean(false, false, array('prodid_'.$product->getId(), 'pageid_'.$page->getId()));
 				$data = $product->toArray();
 				break;
 			case 'DELETE':
