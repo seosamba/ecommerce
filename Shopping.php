@@ -723,7 +723,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					}
 				}
 				$cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
-				$cacheHelper->clean(false, false, array('prodid_'.$product->getId()));
+				$cacheHelper->clean(false, false, array('prodid_'.$product->getId(), 'pid_'.$page->getId()));
 				$data = $product->toArray();
 				break;
 			case 'DELETE':
@@ -759,8 +759,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 
         if (!$this->_request->isGet()){
-            $cacheHelper->clean(null, null, array('productlist', 'productListWidget'));
-
+            $cacheHelper->clean(null, null, array('productlist', 'productListWidget', 'productindex'));
         }
 
 		return $data;
@@ -806,7 +805,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$page->setNavName($product->getName().($product->getSku()?' - '.$product->getSku():''));
         $page->setMetaDescription(strip_tags($product->getShortDescription()));
 		$page->setMetaKeywords('');
-		$page->setHeaderTitle($uniqName);
+		$page->setHeaderTitle($product->getBrand().' '.$product->getName());
 		$page->setH1($product->getName());
 		$page->setUrl(strtolower($uniqName).'.html');
 		$page->setTeaserText(strip_tags($product->getShortDescription()));
