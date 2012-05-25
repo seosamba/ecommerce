@@ -257,7 +257,7 @@ define([
                 }, error: this.processSaveError});
 			} else {
 				this.model.save(null, {success: function(model, response){
-					showMessage('Product saved');
+					showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
 				}, error: this.processSaveError});
 			}
 
