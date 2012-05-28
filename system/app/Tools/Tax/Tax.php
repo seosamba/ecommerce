@@ -13,14 +13,14 @@ class Tools_Tax_Tax {
 
 	const ZONE_TYPE_COUNTRY      = 'country';
 
-	public static function calculateProductTax(Models_Model_Product $prouct) {
-		if(($taxClass = $prouct->getTaxClass()) != 0) {
+	public static function calculateProductTax(Models_Model_Product $product) {
+		if(($taxClass = $product->getTaxClass()) != 0) {
 			$zoneId = self::getZoneId();
 			if($zoneId) {
 				$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
 				if($tax !== null) {
 					$rateMethodName = 'getRate' . $taxClass;
-					return ($prouct->getPrice() / 100) * $tax->$rateMethodName();
+					return ($product->getPrice() / 100) * $tax->$rateMethodName();
 				}
 			}
 		}
