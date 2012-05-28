@@ -772,6 +772,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
 		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+        $pageHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('page');
 		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
 		if (!$prodCatPage){
 			$prodCatPage = new Application_Model_Models_Page(array(
@@ -793,7 +794,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$page = new Application_Model_Models_Page();
 		$uniqName = array_map(function($str){
             $filter = new Zend_Filter_PregReplace(array(
-                   'match'   => '/[^\w\d]+/',
+                   'match'   => '/[^\w\d]+/u',
                    'replace' => '-'
                 ));
             return trim($filter->filter($str), ' -');
@@ -807,7 +808,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$page->setMetaKeywords('');
 		$page->setHeaderTitle($product->getBrand().' '.$product->getName());
 		$page->setH1($product->getName());
-		$page->setUrl(strtolower($uniqName).'.html');
+		//$page->setUrl(strtolower($uniqName).'.html');
+        $page->setUrl($pageHelper->filterUrl($uniqName));
 		$page->setTeaserText(strip_tags($product->getShortDescription()));
 		$page->setLastUpdate(date(DATE_ATOM));
 		$page->setIs404page(0);
