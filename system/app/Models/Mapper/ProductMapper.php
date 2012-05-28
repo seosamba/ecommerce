@@ -4,6 +4,7 @@
  * ProductMapper
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ * @method Models_Mapper_ProductMapper getInstance() getInstance()  Returns an instance of itself
  */
 class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 

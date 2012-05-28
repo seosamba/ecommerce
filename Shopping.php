@@ -760,6 +760,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
         if (!$this->_request->isGet()){
             $cacheHelper->clean(null, null, array('productlist', 'productListWidget', 'productindex'));
+	        Tools_FeedGenerator::getInstance()->generateProductFeed();
         }
 
 		return $data;

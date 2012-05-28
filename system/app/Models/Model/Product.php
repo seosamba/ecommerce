@@ -41,6 +41,12 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_related;
 
+	protected $_createdAt;
+
+	protected $_updatedAt;
+
+	protected $_extraProperties = array();
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -207,6 +213,36 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 			}
         }
         return $vars;
+	}
+
+	public function setCreatedAt($createdAt) {
+		$this->_createdAt = $createdAt;
+	}
+
+	public function getCreatedAt() {
+		return $this->_createdAt;
+	}
+
+	public function setUpdatedAt($updatedAt) {
+		$this->_updatedAt = $updatedAt;
+	}
+
+	public function getUpdatedAt() {
+		return $this->_updatedAt;
+	}
+
+	public function setExtraProperties($extraProperties) {
+		$this->_extraProperties = $extraProperties;
+		return $this;
+	}
+
+	public function getExtraProperties() {
+		return $this->_extraProperties;
+	}
+
+	public function addExtraProperty($property){
+		$this->_extraProperties[] = $property;
+		return $this;
 	}
 
 }
