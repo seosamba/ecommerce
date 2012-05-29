@@ -79,8 +79,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         $this->_view             = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
         $this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $this->_view->limit      = self::DEFAULT_OFFSET;
-        $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
-        $this->_productMapper = Models_Mapper_ProductMapper::getInstance();
+        $this->_websiteHelper    = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+        $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
+        $this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
 
 		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
 		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
