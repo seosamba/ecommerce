@@ -95,6 +95,7 @@ class Tools_FeedGenerator {
 			if ($product->getDefaultOptions()){
 				foreach ($this->_parseProductOptions($product->getDefaultOptions()) as $name => $value) {
 					$item->appendChild($feed->createElement('c:'.$name, $value));
+					unset($name, $value);
 				}
 
 			}
@@ -104,7 +105,7 @@ class Tools_FeedGenerator {
 //			}
 
 			$channel->appendChild($item);
-			unset($item);
+			unset($item, $product);
 		}
 
 		Tools_Filesystem_Tools::saveFile($this->_websiteHelper->getPath().'products.xml', $feed->saveXml());
