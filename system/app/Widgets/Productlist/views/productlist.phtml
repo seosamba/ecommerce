@@ -3,6 +3,7 @@
 </div>
 <?php if(isset($this->offset)): ?>
 	<?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js'); ?>
+<!--    <script type="text/javascript" src="--><?php //echo $this->websiteUrl; ?><!--system/js/external/waypoints/waypoints.min.js"></script>-->
 	<script type="text/javascript">
 		var offset = <?php echo $this->offset; ?>;
 		$(function() {
