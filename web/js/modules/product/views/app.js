@@ -502,7 +502,12 @@ define([
         },
         hideProductList: function(){
             $('#product-list').hide('slide');
-//            console.log($('#product-list-search').val(), appRouter.products.data.key );
+            var term = $('#product-list-search').val();
+            if (term == ''){
+                $('#product-list-search').trigger('keypress', true);
+            } else if (term != appRouter.products.data.key){
+                $('#product-list-search').val(appRouter.products.data.key);
+            }
         }
 	});
 
