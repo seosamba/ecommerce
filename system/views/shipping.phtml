@@ -1,169 +1,186 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title></title>
-		<link href="<?php echo $this->websiteUrl;?>system/css/reset.css" media="screen" rel="stylesheet" type="text/css" >
-		<link href="<?php echo $this->websiteUrl;?>system/css/grid.css" media="screen" rel="stylesheet" type="text/css" >
-		<link href="<?php echo $this->websiteUrl;?>system/uithemes/seotoasterui/seotoasterui.css" media="screen" rel="stylesheet" type="text/css" >
-		<link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" media="screen" rel="stylesheet" type="text/css" >
-	    <link href="<?php echo $this->websiteUrl;?>system/js/external/smoke/smoke.css" media="screen" rel="stylesheet" type="text/css" >
-	    <link href="<?php echo $this->websiteUrl;?>system/js/external/smoke/themes/toaster.css" media="screen" rel="stylesheet" type="text/css" >
-	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-	    <script src="<?php echo $this->websiteUrl;?>system/js/internal/system.js"></script>
-	    <script type="text/javascript" src="<?php echo $this->websiteUrl;?>system/js/external/smoke/smoke.min.js"></script>
-	    <script>
-            $(function() {
-                $('.fieldset-content').hide();
-                $('input[name=shippingType]:checked').parent().next().slideDown();
-                $('input[name=shippingType]').on('click', function() {
-                    $('.fieldset-content').hide();
-                    $(this).parent().next().slideDown();
-                });
+<?php
+$title = $this->translate('Shipping configuration');
+$this->headTitle($title);
+$this->placeholder('headerContent')->set($title);
+?>
+<style>
+	header.option, header.option label{
+		cursor: pointer;
+	}
+	header.option label input {
+		vertical-align: bottom;
+	}
+	header.option {
+		padding: 4px 2px;
+		border-bottom: 1px solid #ccc;
+	}
+	header.section {
+		font-weight: bold;
+		padding: 4px 20px;
+		color: #eee;
+		background-color: #666;
+		margin-top: 10px;
+		font-variant: small-caps;
+	}
+	/*#shipping-config fieldset legend,*/
+	#shipping-config  label {
+		padding: 0;
+	}
+	#shipping-config fieldset fieldset {
+		padding: 0;
+	}
+	#shipping-config fieldset legend {
+	}
+</style>
+<script>
+    $(function() {
+        $('.fieldset-content').not('.active').hide();
+        $('input[name=shippingType]').on('click', function() {
+            $('.fieldset-content').hide();
+            console.log($(this).closest('fieldset').find('.fieldset-content:first').slideDown());
+        });
 
-	            //init shipping plugin fields
-	            var pluginConfig = <?php echo isset($this->shippingExternal) ? $this->shippingExternal : null ?>;
-	            for (var value in pluginConfig) {
-		            if(pluginConfig[value] instanceof Array) {
-			            var element = $('[name="shippingExternal[' + value + '][]"]');
-			            if(element.size() == 1) {
-				            if(element.attr('type') == 'checkbox') {
-					            element.attr('checked', true);
-				            } else {
-					            element.val(pluginConfig[value]);
-				            }
-			            }
-		            } else {
-			            var element = $('[name="shippingExternal[' + value + ']"]');
-                        if (element.size() == '1') {
-                            element.val(pluginConfig[value]);
-                        }
-                        else if(element.size() != 0){
-                            if(element.attr('type')=='radio') {
-                                $.each(element, function(i, v){
-                                    if($(v).val() == pluginConfig[value]) {
-                                        $('[name="shippingExternal['+value+']"][value='+pluginConfig[value]+']').attr("checked", true);
-                                    }
-                                });
-                            }
-                        }
-		            }
-	            }
+	    $('#shipping-plugin').on('change', function(e){
+		    if ($(this).val() === '-1' ){
+			    $('#shipper-config').html('');
+			    return false;
+		    }
+		    $.ajax({
+			    url: '<?php echo $this->url(array('run' => 'shippingconfig'), 'pluginroute');?>',
+			    data: {pluginname: $(this).val()},
+			    success: function(response) {
+				    $('#shipper-config').html(response);
+			    }
+		    })
+	    });
+    });
+</script>
 
-            });
-        </script>
-    </head>
-    <body>
-        <div id="shipping-config" class="seotoaster container_12 h540 rounded3px">
-	        <div class="header" style="overflow:hidden;">
-                <div class="closebutton">
-                    <span class="help"><?php echo $this->translate('Help'); ?></span>
-                    <span class="close"><?php echo $this->translate('Close'); ?></span>
-                </div>
-                <?php echo $this->translate('Shipping configuration'); ?>
-            </div>
-			<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
-			    <div class="grid_6">
-			        <fieldset id="#shipping-options"><legend>Shipping Options</legend>
-			            <fieldset><legend class="option"><input type="radio" name="shippingType" value="pickup" <?php echo ($this->config['shippingType']=='pickup'?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
-			                <div class="fieldset-content <?php echo ($this->config['shippingType']=='pickup'?'active':'');?>">
-			                    <label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
-			                </div>
-			            </fieldset>
-			            <fieldset>
-				            <legend class="option">
-				                <input type="radio" name="shippingType" value="amount" <?php echo ($this->config['shippingType']=='amount'?' checked="checked"':'');?>/>&nbsp;Shipping per order amount
-			                </legend>
-				            <div class="fieldset-content <?php echo ($this->config['shippingType']=='amount'?'active':'');?>">
-				                <div class="sh-1-col grid_4">
-			                        <label>Order amount...&nbsp;</label>
-									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shippingAmount[1][limit]" id="sh-amount-1-limit" type="text" value="<?php echo $this->shippingAmount[1]['limit'];?>" />
-									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shippingAmount[2][limit]" id="sh-amount-2-limit" type="text" value="<?php echo $this->shippingAmount[2]['limit'];?>" />
-									<label class="grid_5">over&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shippingAmount[3][limit]" id="sh-amount-3-limit" type="text" value="<?php echo $this->shippingAmount[3]['limit'];?>" />
-			                    </div>
-				                <div class="sh-2-col grid_4">
-				                    <label>National</label>
-									<input class="grid_10 incolumn numonly" name="shippingAmount[1][national]" id="sh-amount-1-national" type="text" value="<?php echo $this->shippingAmount[1]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shippingAmount[2][national]" id="sh-amount-2-national" type="text" value="<?php echo $this->shippingAmount[2]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shippingAmount[3][national]" id="sh-amount-3-national" type="text" value="<?php echo $this->shippingAmount[3]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-				                </div>
 
-				                <div class="sh-3-col grid_4">
-				                    <label>International</label>
-						            <input class="grid_10 incolumn numonly" name="shippingAmount[1][international]" id="sh-amount-1-international" type="text" value="<?php echo $this->shippingAmount[1]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
-					                <input class="grid_10 incolumn numonly" name="shippingAmount[2][international]" id="sh-amount-2-international" type="text" value="<?php echo $this->shippingAmount[2]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
-				                    <input class="grid_10 incolumn numonly" name="shippingAmount[3][international]" id="sh-amount-3-international" type="text" value="<?php echo $this->shippingAmount[3]['international'];?>" /><label >&nbsp;<?php echo $this->currency;?></label>
-				                </div>
-				                <div style="grid_12">
-									<label class="grid_12">Free shipping for order over:</label>
-									<input class="grid_3" type="text" class="numonly" name="shippingGeneral[freeShippingOver]" id="sh-free-over"  value="<?php echo $this->shippingGeneral['freeShippingOver'];?>"/>
-									<label class="grid_2">&nbsp;<?php echo $this->currency;?>&nbsp;for&nbsp;</label>
-									<select class="grid_3" name="shippingGeneral[freeShippingOptions]" id="sh-free-over-options">
-										   <option value="">select</option>
-										   <option value="national" <?php echo ($this->shippingGeneral['freeShippingOptions']=='national'?' selected="selected"':''); ?>>National</option>
-										   <option value="international" <?php echo ($this->shippingGeneral['freeShippingOptions']=='international'?' selected="selected"':''); ?>>International</option>
-										   <option value="both" <?php echo ($this->shippingGeneral['freeShippingOptions']=='both'?' selected="selected"':''); ?>>Both</option>
-									</select>
-									<label class="grid_3">delivery</label>
-				                </div>
+<div id="shipping-config" class="container_12 h540 rounded3px">
+
+	<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
+	    <div class="grid_6">
+		    <header class="section"><?php echo $this->translate('flat rate shipping');?></header>
+		    <fieldset id="#shipping-options">
+			    <fieldset>
+		            <header class="option">
+			            <?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('pickup'=>" Pickup: (No shipping)"));?>
+		            </header>
+	                <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='pickup'?'active':'');?>">
+	                    <label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
+	                </div>
+	            </fieldset>
+	            <fieldset>
+		            <header class="option">
+			            <?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('amount'=>" Shipping per order amount"));?>
+	                </header>
+		            <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='amount'?'active':'');?>">
+		                <div class="grid_4 textcentered">
+	                        <label class="mb5px"><?php echo $this->translate('Order amount...');?></label>
+							<label class="grid_5 mt10px">up to&nbsp;</label>
+			                <input class="grid_5" name="shippingAmount[1][limit]" type="text" value="<?php echo $this->shippingAmount[1]['limit'];?>" />
+							<label class="grid_5 mt10px">up to&nbsp;</label>
+			                <input class="grid_5" name="shippingAmount[2][limit]" type="text" value="<?php echo $this->shippingAmount[2]['limit'];?>" />
+							<label class="grid_5 mt10px">over&nbsp;</label>
+			                <input class="grid_5" name="shippingAmount[3][limit]" type="text" value="<?php echo $this->shippingAmount[3]['limit'];?>" />
+	                    </div>
+		                <div class="grid_4 textcentered">
+		                    <label class="mb5px"><?php echo $this->translate('National');?></label>
+			                <?php foreach ($this->shippingAmount as $index => $amount) :?>
+			                <div class="grid_8">
+				                <?php echo $this->formText("shippingAmount[$index][national]", $amount['national']); ?>
 			                </div>
-						</fieldset>
-						<fieldset>
-							<legend class="option"><input type="radio" name="shippingType" value="weight" <?php echo ($this->config['shippingType']=='weight'?' checked="checked"':'');?>/>&nbsp;Shipping per total weight</legend>
-				            <div class="fieldset-content <?php echo ($this->config['shippingType']=='weight'?' active':'');?>">
-				                <div class="sh-1-col grid_4">
-				                    <label>Order weight...&nbsp;</label>
-									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shippingWeight[1][limit]" id="sh-weight-1-limit" type="text" value="<?php echo $this->shippingWeight[1]['limit'];?>" />
-									<label class="grid_5">up to&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shippingWeight[2][limit]" id="sh-weight-2-limit" type="text" value="<?php echo $this->shippingWeight[2]['limit'];?>" />
-									<label class="grid_5">over&nbsp;</label>
-					                <input class="grid_5 incolumn numonly" name="shippingWeight[3][limit]" id="sh-weight-3-limit" type="text" value="<?php echo $this->shippingWeight[3]['limit'];?>" />
-				                </div>
-				                <div class="sh-2-col grid_4">
-				                    <label>National</label>
-									<input class="grid_10 incolumn numonly" name="shippingWeight[1][national]" id="sh-weight-1-national" type="text" value="<?php echo $this->shippingWeight[1]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shippingWeight[2][national]" id="sh-weight-2-national" type="text" value="<?php echo $this->shippingWeight[2]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shippingWeight[3][national]" id="sh-weight-3-national" type="text" value="<?php echo $this->shippingWeight[3]['national'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-				                </div>
-				                <div class="sh-3-col grid_4">
-				                    <label>International</label>
-									<input class="grid_10 incolumn numonly" name="shippingWeight[1][international]" id="sh-weight-1-international" type="text" value="<?php echo $this->shippingWeight[1]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shippingWeight[2][international]" id="sh-weight-2-international" type="text" value="<?php echo $this->shippingWeight[2]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-									<input class="grid_10 incolumn numonly" name="shippingWeight[3][international]" id="sh-weight-3-international" type="text" value="<?php echo $this->shippingWeight[3]['international'];?>" /><label>&nbsp;<?php echo $this->currency;?></label>
-				                </div>
-							</div>
-						</fieldset>
-					</fieldset>
-			    </div>
-			    <div class="grid_6">
-			        <fieldset>
-				        <legend class="option"><input type="radio" name="shippingType" value="external" <?php echo ($this->config['shippingType']=='external'?' checked="checked"':'');?>/>Shipping Plugin:</legend>
-			            <div class="fieldset-content <?php echo ($this->config['shippingType']=='external'?'active':'');?>">
-			                <p>
-			                    <select name="shippingPlugin">
-			                        <option value="select">select</option>
-			                        <?php foreach ($this->shippingPlugins as $shippingPlugin): ?>
-			                            <option value="<?php echo $shippingPlugin->getName();?>" <?php echo ($shippingPlugin->getName() == $this->config['shippingPlugin'] ? ' selected="selected" ' : '') ;?>><?php echo $shippingPlugin->getName();?></option>
-			                        <?php endforeach; ?>
-			                    </select>
-			                </p>
-			                <div id="shipper-config">
-			                    <?php if(strtolower($this->config['shippingPlugin']) != 'select'): ?>
-				                    <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
-								<?php endif; ?>
-			                </div>
-			            </div>
-			        </fieldset>
-			    </div>
-				<div class="grid_12">
-			        <input type="submit" name="submit" value="Save" class="formsubmit"/>
-				</div>
-			</form>
+			                <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
+			                <?php endforeach;?>
+		                </div>
+
+		                <div class="grid_4 textcentered">
+		                    <label class="mb5px"><?php echo $this->translate('International');?></label>
+			                <?php foreach ($this->shippingAmount as $index => $amount) :?>
+                            <div class="grid_8">
+                                <?php echo $this->formText("shippingAmount[$index][international]", $amount['international']); ?>
+                            </div>
+                            <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
+                            <?php endforeach;?>
+		                </div>
+		                <div style="grid_12">
+							<label class="grid_12 mt5px mb5px">Free shipping for order over:</label>
+							<input class="grid_3" type="text" name="shippingGeneral[freeShippingOver]" value="<?php echo $this->shippingGeneral['freeShippingOver'];?>"/>
+							<label class="grid_2 mt10px">&nbsp;<?php echo $this->config['currency'];?>&nbsp;for&nbsp;</label>
+			                <?php echo $this->formSelect('shippingGeneral[freeShippingOptions]',
+										$this->shippingGeneral['freeShippingOptions'],
+										array('class' => 'grid_3'), array(
+				                            'select',
+				                            'national' => $this->translate('National'),
+				                            'international' => $this->translate('International'),
+				                            'both' => $this->translate('Both')
+			                            ));
+			                ?>
+							<label class="grid_3 mt10px">delivery</label>
+		                </div>
+	                </div>
+				</fieldset>
+				<fieldset>
+					<header class="option">
+						<?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('weight'=>' Shipping per total weight'));?>
+					</header>
+		            <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='weight'?' active':'');?>">
+		                <div class="grid_4 textcentered">
+		                    <label class="mb5px">Order weight...&nbsp;</label>
+							<label class="grid_5 mt10px">up to&nbsp;</label>
+			                <input class="grid_5" name="shippingWeight[1][limit]" id="sh-weight-1-limit" type="text" value="<?php echo $this->shippingWeight[1]['limit'];?>" />
+							<label class="grid_5 mt10px">up to&nbsp;</label>
+			                <input class="grid_5" name="shippingWeight[2][limit]" id="sh-weight-2-limit" type="text" value="<?php echo $this->shippingWeight[2]['limit'];?>" />
+							<label class="grid_5 mt10px">over&nbsp;</label>
+			                <input class="grid_5" name="shippingWeight[3][limit]" id="sh-weight-3-limit" type="text" value="<?php echo $this->shippingWeight[3]['limit'];?>" />
+		                </div>
+		                <div class="grid_4 textcentered">
+		                    <label class="mb5px">National</label>
+			                <?php foreach ($this->shippingWeight as $index => $amount) :?>
+                            <div class="grid_8">
+                                <?php echo $this->formText("shippingWeight[$index][national]", $amount['national']); ?>
+                            </div>
+                            <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
+                            <?php endforeach;?>
+		                </div>
+		                <div class="grid_4 textcentered">
+		                    <label class="mb5px">International</label>
+			                <?php foreach ($this->shippingWeight as $index => $amount) :?>
+                            <div class="grid_8">
+                                <?php echo $this->formText("shippingWeight[$index][international]", $amount['international']); ?>
+                            </div>
+                            <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
+                            <?php endforeach;?>
+		                </div>
+					</div>
+				</fieldset>
+			</fieldset>
+	    </div>
+	    <div class="grid_6">
+		    <fieldset class="mt10px">
+			    <header class="option" style="font-weight: bold; padding: 4px 20px; color: #EEE; background-color: #666; margin: -6px -2% 5px;">
+				    <?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('external'=>' Shipping plugin'));?>
+			    </header>
+			    <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='external'?'active':'');?>">
+	                <p>
+	                    <select name="shippingPlugin" id="shipping-plugin">
+	                        <option value="-1">select</option>
+	                        <?php foreach ($this->shippingPlugins as $shippingPlugin): ?>
+	                            <option value="<?php echo $shippingPlugin->getName();?>" <?php echo ($shippingPlugin->getName() == $this->config['shippingPlugin'] ? ' selected="selected" ' : '') ;?>><?php echo $shippingPlugin->getName();?></option>
+	                        <?php endforeach; ?>
+	                    </select>
+	                </p>
+	                <div id="shipper-config" class="mt5px">
+	                    <?php if(strtolower($this->config['shippingPlugin']) !== '-1'): ?>
+		                    <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
+						<?php endif; ?>
+	                </div>
+	            </div>
+	        </fieldset>
+	    </div>
+		<div class="grid_12">
+	        <input type="submit" name="submit" value="Save" class="formsubmit"/>
 		</div>
-    </body>
-</html>
+	</form>
+</div>

@@ -198,12 +198,23 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->shippingAmount   = $config['shippingAmount'];
 		$this->_view->shippingGeneral  = $config['shippingGeneral'];
 		$this->_view->shippingWeight   = $config['shippingWeight'];
-		$this->_view->shippingExternal = json_encode($config['shippingExternal']);
+//		$this->_view->shippingExternal = json_encode($config['shippingExternal']);
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
 		});
-		echo $this->_view->render('shipping.phtml');
+		$this->_layout->content  = $this->_view->render('shipping.phtml');
+		echo $this->_layout->render();
+	}
+
+	protected function shippingconfigAction(){
+		if (!Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
+			$this->_response->setHttpResponseCode(403)->sendResponse();
+		}
+		$plugin = filter_var($this->_request->getParam('pluginname'), FILTER_SANITIZE_STRING);
+		if ($plugin){
+			echo Tools_Misc::getShippingPluginContent($plugin);
+		}
 	}
 
 	/**
