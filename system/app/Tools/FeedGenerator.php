@@ -61,9 +61,9 @@ class Tools_FeedGenerator {
 		}
 		foreach ($products as $product) {
 			$item = $feed->createElement('item');
-			$item->appendChild($feed->createElement('title', $product->getName()));
+			$item->appendChild($feed->createElement('title', htmlentities($product->getName())));
 			$item->appendChild($feed->createElement('link', $websiteUrl.$product->getPage()->getUrl()));
-			$item->appendChild($feed->createElement('description', $product->getShortDescription()));
+			$item->appendChild($feed->createElement('description', htmlentities($product->getShortDescription())));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
 			$item->appendChild($feed->createElement('g:availability', 'in stock'));
