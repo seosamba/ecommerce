@@ -25,6 +25,10 @@ class Tools_FeedGenerator {
     }
 
 	public function generateProductFeed(){
+		if (!file_exists($this->_websiteHelper->getPath().'products.xml') || !is_writable($this->_websiteHelper->getPath().'products.xml') ){
+			error_log(__CLASS__.': missing "products.xml" in website root directory');
+			return false;
+		}
 
 		$websiteUrl = $this->_websiteHelper->getUrl();
 
