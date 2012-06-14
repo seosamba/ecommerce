@@ -85,7 +85,7 @@ class Tools_FeedGenerator {
 			}
 			unset($tags);
 
-			$item->appendChild($feed->createElement('g:image_link', $websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto())));
+			$item->appendChild($feed->createElement('g:image_link', htmlentities($websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto()))));
 
 			if (null !== ($weight = $product->getWeight())){
 				$item->appendChild($feed->createElement('g:shipping_weight', $weight.' '.$this->_shoppingConfig['weightUnit'] ));
