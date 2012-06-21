@@ -93,17 +93,16 @@ class Shopping extends Tools_Plugins_Abstract {
     public function beforeController(){
         if (!Zend_Registry::isRegistered('Zend_Currency')){
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-            try {
-                $currency = new Zend_Currency(
-                    array('currency' => $shoppingConfig['currency']),
-                    Zend_Locale::getLocaleToTerritory($shoppingConfig['country'])
-                );
+	        $locale = Zend_Locale::getLocaleToTerritory($shoppingConfig['country']);
+	        try {
+		        $currency = new Zend_Currency(
+			        array('currency' => $shoppingConfig['currency']),
+			        $locale
+		        );
             } catch (Zend_Currency_Exception $e) {
                 error_log($e->getMessage());
                 error_log($e->getTraceAsString());
-                $currency = new Zend_Currency(
-	                array('currency' => $shoppingConfig['currency']),
-	                'en_US');
+                $currency = new Zend_Currency();
             }
             Zend_Registry::set('Zend_Currency', $currency);
         }
