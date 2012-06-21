@@ -103,7 +103,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 error_log($e->getTraceAsString());
                 $currency = new Zend_Currency(
 	                array('currency' => $shoppingConfig['currency']),
-	                'en');
+	                Zend_Locale::getDefault());
             }
             Zend_Registry::set('Zend_Currency', $currency);
         }
