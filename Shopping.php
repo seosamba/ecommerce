@@ -95,13 +95,15 @@ class Shopping extends Tools_Plugins_Abstract {
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
             try {
                 $currency = new Zend_Currency(
-                    Zend_Locale::getLocaleToTerritory($shoppingConfig['country']),
-                    $shoppingConfig['currency']
+                    array('currency' => $shoppingConfig['currency']),
+                    Zend_Locale::getLocaleToTerritory($shoppingConfig['country'])
                 );
             } catch (Zend_Currency_Exception $e) {
                 error_log($e->getMessage());
                 error_log($e->getTraceAsString());
-                $currency = new Zend_Currency($shoppingConfig['currency']);
+                $currency = new Zend_Currency(
+	                array('currency' => $shoppingConfig['currency']),
+	                'en');
             }
             Zend_Registry::set('Zend_Currency', $currency);
         }
