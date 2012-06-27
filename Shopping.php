@@ -96,7 +96,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	        $locale = Zend_Locale::getLocaleToTerritory($shoppingConfig['country']);
 	        try {
 		        $currency = new Zend_Currency(
-			        array('currency' => $shoppingConfig['currency']),
+			        $shoppingConfig['currency'],
 			        $locale
 		        );
             } catch (Zend_Currency_Exception $e) {
