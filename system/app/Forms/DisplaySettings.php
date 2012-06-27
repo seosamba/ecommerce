@@ -34,6 +34,10 @@ class Forms_DisplaySettings extends Zend_Form {
 //	        'class' => 'ui-helper-hidden',
 //            'multiOptions' => $list
 //        ));
+
+		$this->addElement('checkbox', 'forceSSLCheckout', array(
+			'label' => 'Force use HTTPS for checkout page'
+		));
 	}
 
 }

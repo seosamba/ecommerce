@@ -37,6 +37,15 @@ class Shopping extends Tools_Plugins_Abstract {
 	const DEFAULT_CART_PLUGIN = 'cart';
 
 	/**
+	 * Default cache id for checkout page
+	 */
+	const CHECKOUT_PAGE_CACHE_ID = 'cart_checkoutpage';
+
+	/**
+	 * Cache prefix for use in shopping system
+	 */
+	const CACHE_PREFIX = 'store_';
+	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
 	protected $_jsonHelper;
@@ -96,7 +105,17 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
     public function beforeController(){
-        if (!Zend_Registry::isRegistered('Zend_Currency')){
+	    $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
+	    if (null === ($checkoutPage = $cacheHelper->load(self::CHECKOUT_PAGE_CACHE_ID, self::CACHE_PREFIX))){
+		    $checkoutPage = Tools_Page_Tools::getCheckoutPage();
+		    $cacheHelper->save(self::CHECKOUT_PAGE_CACHE_ID, $checkoutPage, self::CACHE_PREFIX);
+	    }
+	    if (!$this->_request->isSecure() && $checkoutPage->getUrl() === $this->_request->getParam('page') &&
+			Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('forceSSLCheckout')){
+		    $this->_redirector->gotoUrlAndExit(Zend_Controller_Request_Http::SCHEME_HTTPS.'://'.$this->_websiteConfig['url'].$checkoutPage->getUrl());
+	    }
+
+	    if (!Zend_Registry::isRegistered('Zend_Currency')){
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 	        $locale = Zend_Locale::getLocaleToTerritory($shoppingConfig['country']);
 	        try {
