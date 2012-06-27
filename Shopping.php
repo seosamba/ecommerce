@@ -201,10 +201,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$config                        = $this->_getConfig();
 		$this->_view->config           = $config;
-		$this->_view->shippingAmount   = $config['shippingAmount'];
-		$this->_view->shippingGeneral  = $config['shippingGeneral'];
-		$this->_view->shippingWeight   = $config['shippingWeight'];
-//		$this->_view->shippingExternal = json_encode($config['shippingExternal']);
+		$this->_view->shippingAmount   = isset($config['shippingAmount']) ? $config['shippingAmount'] : 0;
+		$this->_view->shippingGeneral  = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
+		$this->_view->shippingWeight   = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
+		//$this->_view->shippingExternal = isset($config['shippingExternal']) ? json_encode($config['shippingExternal']) : 0;
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');

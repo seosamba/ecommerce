@@ -2,11 +2,15 @@
     <?php foreach ($this->related as $product) : ?>
     <li>
         <?php if ($this->withImg && $product->getPhoto()) : ?>
-        <?php $photo = explode('/', $product->getPhoto());
-               $src = $this->websiteUrl.'media/'.$photo[0].'/product/'.$photo[1]; ?>
-        <img src="<?php echo $src; ?>" alt="<?php echo $product->getName(); ?>" title="<?php echo $product->getName(); ?>" />
+        <?php
+            $photo = explode('/', $product->getPhoto());
+            $src = $this->websiteUrl.'media/'.$photo[0].'/product/'.$photo[1];
+        ?>
+        <a class="page-teaser-image" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>">
+            <img src="<?php echo $src; ?>" alt="<?php echo $product->getName(); ?>" title="<?php echo $product->getName(); ?>" />
+        </a>
         <?php endif; ?>
-        <a href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>"><?php echo $product->getName(); ?></a>
+        <a href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>"><?php echo $product->getName(); ?></a>
     </li>
     <?php endforeach ; ?>
 </ul>
