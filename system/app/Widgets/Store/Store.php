@@ -18,9 +18,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
     protected function _load() {
 	    $methodName = Tools_Plugins_Abstract::OPTION_MAKER_PREFIX.ucfirst(strtolower($this->_options[0]));
-//	    $shoppingPlugin = Tools_Factory_PluginFactory::createPlugin('shopping', $this->_options, $this->_toasterOptions);
 	    $shopPlugRefl = new Zend_Reflection_Class('Shopping');
-//	    if (method_exists($shoppingPlugin, $methodName)) {
 	    if ($shopPlugRefl->hasMethod($methodName)) {
 			$shoppingPlugin = Tools_Factory_PluginFactory::createPlugin('shopping', $this->_options, $this->_toasterOptions);
 		    return $shoppingPlugin->run();
@@ -33,7 +31,8 @@ class Widgets_Store_Store extends Widgets_Abstract {
 	    if (Zend_Registry::isRegistered($regKey)){
 		    $cart = Zend_Registry::get($regKey);
 	    } else {
-		    $cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
+		    $cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin1');
+		    is_null($cartPluginName) && $cartPluginName = Shopping::DEFAULT_CART_PLUGIN;
             if ($cartPluginName){
                 $cart = Tools_Factory_PluginFactory::createPlugin($cartPluginName, $this->_options, $this->_toasterOptions);
 	            Zend_Registry::set($regKey, $cart);

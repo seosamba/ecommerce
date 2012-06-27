@@ -21,18 +21,19 @@ class Forms_DisplaySettings extends Zend_Form {
 			'multiOptions' => Tools_Misc::$_weightUnits
 		));
 
-        $list = array();
-		array_walk(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin, $index) use(&$list){
-			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
-			if ($reflection->isSubclassOf('Tools_Cart_Cart')) {
-				$list[$plugin->getName()] = $plugin->getName();
-			}
-		});
-
-        $this->addElement('select', 'cartPlugin', array(
-            'label' => 'Cart',
-            'multiOptions' => $list
-        ));
+//        $list = array();
+//		array_walk(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin, $index) use(&$list){
+//			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
+//			if ($reflection->isSubclassOf('Tools_Cart_Cart')) {
+//				$list[$plugin->getName()] = $plugin->getName();
+//			}
+//		});
+//
+//        $this->addElement('select', 'cartPlugin', array(
+//            'label' => 'Cart plugin',
+//	        'class' => 'ui-helper-hidden',
+//            'multiOptions' => $list
+//        ));
 	}
 
 }

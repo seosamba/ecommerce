@@ -32,6 +32,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	const RESOURCE_API  = 'api';
 
 	/**
+	 * Default cart plugin
+	 */
+	const DEFAULT_CART_PLUGIN = 'cart';
+
+	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
 	protected $_jsonHelper;
