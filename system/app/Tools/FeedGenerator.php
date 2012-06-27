@@ -25,6 +25,10 @@ class Tools_FeedGenerator {
     }
 
 	public function generateProductFeed(){
+		if (!file_exists($this->_websiteHelper->getPath().'products.xml') || !is_writable($this->_websiteHelper->getPath().'products.xml') ){
+			error_log(__CLASS__.': missing "products.xml" in website root directory');
+			return false;
+		}
 
 		$websiteUrl = $this->_websiteHelper->getUrl();
 
@@ -61,9 +65,9 @@ class Tools_FeedGenerator {
 		}
 		foreach ($products as $product) {
 			$item = $feed->createElement('item');
-			$item->appendChild($feed->createElement('title', $product->getName()));
+			$item->appendChild($feed->createElement('title', htmlentities($product->getName())));
 			$item->appendChild($feed->createElement('link', $websiteUrl.$product->getPage()->getUrl()));
-			$item->appendChild($feed->createElement('description', $product->getShortDescription()));
+			$item->appendChild($feed->createElement('description', htmlentities($product->getShortDescription())));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
 			$item->appendChild($feed->createElement('g:availability', 'in stock'));
@@ -81,7 +85,7 @@ class Tools_FeedGenerator {
 			}
 			unset($tags);
 
-			$item->appendChild($feed->createElement('g:image_link', $websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto())));
+			$item->appendChild($feed->createElement('g:image_link', htmlentities($websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto()))));
 
 			if (null !== ($weight = $product->getWeight())){
 				$item->appendChild($feed->createElement('g:shipping_weight', $weight.' '.$this->_shoppingConfig['weightUnit'] ));
@@ -95,6 +99,7 @@ class Tools_FeedGenerator {
 			if ($product->getDefaultOptions()){
 				foreach ($this->_parseProductOptions($product->getDefaultOptions()) as $name => $value) {
 					$item->appendChild($feed->createElement('c:'.$name, $value));
+					unset($name, $value);
 				}
 
 			}
@@ -104,7 +109,7 @@ class Tools_FeedGenerator {
 //			}
 
 			$channel->appendChild($item);
-			unset($item);
+			unset($item, $product);
 		}
 
 		Tools_Filesystem_Tools::saveFile($this->_websiteHelper->getPath().'products.xml', $feed->saveXml());

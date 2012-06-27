@@ -431,7 +431,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
     <div id="product-list" class="clearfix" style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: #fff;">
         <div class="clearfix ui-widget-header">
 	        <div class="grid_1 mt10px">
-		        <a href="javascript:;" onclick="$('#product-list').hide('slide');" style="color:#e6e6fa;">&nbsp;&laquo; <?php echo $this->translate('back');?></a>
+		        <a href="javascript:;" id="product-list-back-link" style="color:#e6e6fa;">&nbsp;&laquo; <?php echo $this->translate('back');?></a>
 	        </div>
             <div class="grid_1 prefix_2 mt5px">
                 <label for="product-list-search">Search</label>

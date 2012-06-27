@@ -51,8 +51,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 
 	public static function getAllowedOptions() {
+		$classes = array('Shopping', __CLASS__);
 		$cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
-		$classes = array('Shopping', __CLASS__, ucfirst($cartPluginName));
+		if ($cartPluginName){
+			array_push($classes, ucfirst(strtolower($cartPluginName)));
+		}
 
 		$methods = array();
 		foreach ($classes as $className) {

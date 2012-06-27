@@ -186,7 +186,7 @@ class Tools_Misc {
 	public static function getShippingPluginContent($shippingPlugin) {
 		$className = ucfirst($shippingPlugin);
 		$method    = 'getConfigScreen';
-		if(method_exists($className, $method)) {
+		if(class_exists($className) && method_exists($className, $method)) {
 			return preg_replace('~name="([-_\w\s\d]+)([\[\]]{0,2})"~','name="shippingExternal[$1]$2"', $className::$method());
 		}
 	}

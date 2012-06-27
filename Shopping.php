@@ -93,15 +93,16 @@ class Shopping extends Tools_Plugins_Abstract {
     public function beforeController(){
         if (!Zend_Registry::isRegistered('Zend_Currency')){
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-            try {
-                $currency = new Zend_Currency(
-                    Zend_Locale::getLocaleToTerritory($shoppingConfig['country']),
-                    $shoppingConfig['currency']
-                );
+	        $locale = Zend_Locale::getLocaleToTerritory($shoppingConfig['country']);
+	        try {
+		        $currency = new Zend_Currency(
+			        array('currency' => $shoppingConfig['currency']),
+			        $locale
+		        );
             } catch (Zend_Currency_Exception $e) {
                 error_log($e->getMessage());
                 error_log($e->getTraceAsString());
-                $currency = new Zend_Currency($shoppingConfig['currency']);
+                $currency = new Zend_Currency();
             }
             Zend_Registry::set('Zend_Currency', $currency);
         }
@@ -198,12 +199,23 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->shippingAmount   = isset($config['shippingAmount']) ? $config['shippingAmount'] : 0;
 		$this->_view->shippingGeneral  = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
 		$this->_view->shippingWeight   = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
-		$this->_view->shippingExternal = isset($config['shippingExternal']) ? json_encode($config['shippingExternal']) : 0;
+		//$this->_view->shippingExternal = isset($config['shippingExternal']) ? json_encode($config['shippingExternal']) : 0;
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
 		});
-		echo $this->_view->render('shipping.phtml');
+		$this->_layout->content  = $this->_view->render('shipping.phtml');
+		echo $this->_layout->render();
+	}
+
+	protected function shippingconfigAction(){
+		if (!Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
+			$this->_response->setHttpResponseCode(403)->sendResponse();
+		}
+		$plugin = filter_var($this->_request->getParam('pluginname'), FILTER_SANITIZE_STRING);
+		if ($plugin){
+			echo Tools_Misc::getShippingPluginContent($plugin);
+		}
 	}
 
 	/**
@@ -622,7 +634,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
 					$key    = isset($this->_requestedParams['key']) ? filter_var($this->_requestedParams['key'], FILTER_SANITIZE_STRING) : null;
 
-					$filter['tags']       = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
+					$filter['tags'] = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
 					$tagPart              = (is_array($filter['tags']) && !empty($filter['tags'])) ? implode('.', $filter['tags']) : 'alltags';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';

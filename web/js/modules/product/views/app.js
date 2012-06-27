@@ -26,7 +26,8 @@ define([
             'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
-            'click #massaction': 'massAction'
+            'click #massaction': 'massAction',
+            'click #product-list-back-link': 'hideProductList'
 		},
 		websiteUrl: $('#website_url').val(),
 		initialize: function(){
@@ -498,6 +499,15 @@ define([
                 $(this).waypoint('remove');
                 appRouter.products.load(appRouter.app.waypointCallback);
             }, {context: '#product-list-holder', offset: '130%' } );
+        },
+        hideProductList: function(){
+            $('#product-list').hide('slide');
+            var term = $('#product-list-search').val();
+            if (term == ''){
+                $('#product-list-search').trigger('keypress', true);
+            } else if (term != appRouter.products.data.key){
+                $('#product-list-search').val(appRouter.products.data.key);
+            }
         }
 	});
 
