@@ -195,7 +195,7 @@ class Tools_ShoppingCart {
 			}
 			$summary['shipping'] = 0;
 			if (($shipping = $this->getShippingData()) !== null){
-				$summary['shipping'] = $shipping['price'];
+				$summary['shipping'] = floatval($shipping['price']);
 			}
 			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
 

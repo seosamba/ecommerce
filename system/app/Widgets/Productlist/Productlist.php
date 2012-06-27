@@ -228,7 +228,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	private function _loadProducts() {
 		$products = array();
 		if(empty($this->_options)) {
-			return $this->_productMapper->fetchAll(null, array(), 0, self::DEFAULT_OFFSET);
+			return $this->_productMapper->fetchAll(null, array('created_at DESC'), 0, self::DEFAULT_OFFSET);
 		}
 		foreach($this->_options as $option) {
 			if(false === ($optData = $this->_processOption($option))) {

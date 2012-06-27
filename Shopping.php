@@ -195,10 +195,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$config                        = $this->_getConfig();
 		$this->_view->config           = $config;
-		$this->_view->shippingAmount   = $config['shippingAmount'];
-		$this->_view->shippingGeneral  = $config['shippingGeneral'];
-		$this->_view->shippingWeight   = $config['shippingWeight'];
-		$this->_view->shippingExternal = json_encode($config['shippingExternal']);
+		$this->_view->shippingAmount   = isset($config['shippingAmount']) ? $config['shippingAmount'] : 0;
+		$this->_view->shippingGeneral  = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
+		$this->_view->shippingWeight   = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
+		$this->_view->shippingExternal = isset($config['shippingExternal']) ? json_encode($config['shippingExternal']) : 0;
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -622,7 +622,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
 					$key    = isset($this->_requestedParams['key']) ? filter_var($this->_requestedParams['key'], FILTER_SANITIZE_STRING) : null;
 
-					$filter['tags'] = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
+					$filter['tags']       = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
 					$tagPart              = (is_array($filter['tags']) && !empty($filter['tags'])) ? implode('.', $filter['tags']) : 'alltags';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';

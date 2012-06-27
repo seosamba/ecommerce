@@ -66,16 +66,16 @@
 			<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
 			    <div class="grid_6">
 			        <fieldset id="#shipping-options"><legend>Shipping Options</legend>
-			            <fieldset><legend class="option"><input type="radio" name="shippingType" value="pickup" <?php echo ($this->config['shippingType']=='pickup'?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
-			                <div class="fieldset-content <?php echo ($this->config['shippingType']=='pickup'?'active':'');?>">
+			            <fieldset><legend class="option"><input type="radio" name="shippingType" value="pickup" <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='pickup')?' checked="checked"':'');?>/>&nbsp;Pickup: (No shipping)</legend>
+			                <div class="fieldset-content <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='pickup') ?'active':'');?>">
 			                    <label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
 			                </div>
 			            </fieldset>
 			            <fieldset>
 				            <legend class="option">
-				                <input type="radio" name="shippingType" value="amount" <?php echo ($this->config['shippingType']=='amount'?' checked="checked"':'');?>/>&nbsp;Shipping per order amount
+				                <input type="radio" name="shippingType" value="amount" <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='amount')?' checked="checked"':'');?>/>&nbsp;Shipping per order amount
 			                </legend>
-				            <div class="fieldset-content <?php echo ($this->config['shippingType']=='amount'?'active':'');?>">
+				            <div class="fieldset-content <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='amount')?'active':'');?>">
 				                <div class="sh-1-col grid_4">
 			                        <label>Order amount...&nbsp;</label>
 									<label class="grid_5">up to&nbsp;</label>
@@ -113,8 +113,8 @@
 			                </div>
 						</fieldset>
 						<fieldset>
-							<legend class="option"><input type="radio" name="shippingType" value="weight" <?php echo ($this->config['shippingType']=='weight'?' checked="checked"':'');?>/>&nbsp;Shipping per total weight</legend>
-				            <div class="fieldset-content <?php echo ($this->config['shippingType']=='weight'?' active':'');?>">
+							<legend class="option"><input type="radio" name="shippingType" value="weight" <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='weight')?' checked="checked"':'');?>/>&nbsp;Shipping per total weight</legend>
+				            <div class="fieldset-content <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='weight')?' active':'');?>">
 				                <div class="sh-1-col grid_4">
 				                    <label>Order weight...&nbsp;</label>
 									<label class="grid_5">up to&nbsp;</label>
@@ -142,18 +142,18 @@
 			    </div>
 			    <div class="grid_6">
 			        <fieldset>
-				        <legend class="option"><input type="radio" name="shippingType" value="external" <?php echo ($this->config['shippingType']=='external'?' checked="checked"':'');?>/>Shipping Plugin:</legend>
-			            <div class="fieldset-content <?php echo ($this->config['shippingType']=='external'?'active':'');?>">
+				        <legend class="option"><input type="radio" name="shippingType" value="external" <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='external')?' checked="checked"':'');?>/>Shipping Plugin:</legend>
+			            <div class="fieldset-content <?php echo ((isset($this->config['shippingType']) && $this->config['shippingType']=='external')?'active':'');?>">
 			                <p>
 			                    <select name="shippingPlugin">
 			                        <option value="select">select</option>
 			                        <?php foreach ($this->shippingPlugins as $shippingPlugin): ?>
-			                            <option value="<?php echo $shippingPlugin->getName();?>" <?php echo ($shippingPlugin->getName() == $this->config['shippingPlugin'] ? ' selected="selected" ' : '') ;?>><?php echo $shippingPlugin->getName();?></option>
+			                            <option value="<?php echo $shippingPlugin->getName();?>" <?php echo ((isset($this->config['shippingPlugin']) && ($shippingPlugin->getName() == $this->config['shippingPlugin'])) ? ' selected="selected" ' : '') ;?>><?php echo $shippingPlugin->getName();?></option>
 			                        <?php endforeach; ?>
 			                    </select>
 			                </p>
 			                <div id="shipper-config">
-			                    <?php if(strtolower($this->config['shippingPlugin']) != 'select'): ?>
+			                    <?php if(isset($this->config['shippingPlugin']) && strtolower($this->config['shippingPlugin']) != 'select'): ?>
 				                    <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
 								<?php endif; ?>
 			                </div>
