@@ -146,12 +146,17 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPrice() {
+		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
+		if ($noCurrency === true){
+			array_splice($this->_options, -1 ,1);
+		}
 		if (empty($this->_options)){
-            return $this->_currency->toCurrency($this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice());
-        } else {
+			$price = $this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice();
+			return !$noCurrency ? $this->_currency->toCurrency($price): $price;
+		} else {
             $pluginName = strtolower($this->_options[0]);
 			if ($pluginName === 'original'){
-				return $this->_currency->toCurrency($this->_product->getPrice());
+				return !$noCurrency ? $this->_currency->toCurrency($this->_product->getPrice()) : $this->_product->getPrice() ;
 			}
             $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
             if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
