@@ -110,8 +110,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		    $checkoutPage = Tools_Page_Tools::getCheckoutPage();
 		    $cacheHelper->save(self::CHECKOUT_PAGE_CACHE_ID, $checkoutPage, self::CACHE_PREFIX);
 	    }
-	    if (!$this->_request->isSecure() && $checkoutPage->getUrl() === $this->_request->getParam('page') &&
-			Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('forceSSLCheckout')){
+	    if (!$this->_request->isSecure()
+			    && $checkoutPage instanceof Application_Model_Models_Page
+			    && $checkoutPage->getUrl() === $this->_request->getParam('page')
+			    && Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('forceSSLCheckout')){
 		    $this->_redirector->gotoUrlAndExit(Zend_Controller_Request_Http::SCHEME_HTTPS.'://'.$this->_websiteConfig['url'].$checkoutPage->getUrl());
 	    }
 
@@ -1008,6 +1010,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 			$this->_view->noLayout = true;
 			return $this->_view->render('clients.phtml');
+		}
+	}
+
+	protected function _makeOptionProducts() {
+		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
+			$this->_view->noLayout = true;
+			return $this->_view->render('manage_products.phtml');
 		}
 	}
 
