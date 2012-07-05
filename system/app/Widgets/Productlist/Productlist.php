@@ -172,9 +172,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:mpn'               => $product->getMpn(),
                 '$product:sku'               => $product->getSku(),
                 '$product:id'                => $product->getId(),
-                '$product:description:short' => $shortDesc,
-                '$product:description'       => $shortDesc,
-                '$product:description:full'  => $product->getFullDescription(),
+                '$product:description:short' => nl2br($shortDesc),
+                '$product:description'       => nl2br($shortDesc),
+                '$product:description:full'  => nl2br($product->getFullDescription()),
 				'$store:addtocart'           => isset($storeWidget) ? $storeWidget->render() : ''
 			))->parse($templatePrepend . $data['templateContent']);
 			unset($storeWidget);
