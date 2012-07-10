@@ -461,7 +461,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         <li><a href="#main-tab"><?php echo $this->translate('Main Info'); ?></a></li>
         <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
         <li><a href="#options-tab"><?php echo $this->translate('Options'); ?></a></li>
-        <li><a href="#related-tab"><?php echo $this->translate('Related Products'); ?></a></li>
+        <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
         <?php foreach ($this->plugins as $plugin) : ?>
         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.ucfirst($plugin));?></a></li>
         <?php endforeach; ?>
