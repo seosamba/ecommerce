@@ -49,12 +49,18 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$data['updated_at'] = date(DATE_ATOM);
 			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
 			$result = $this->getDbTable()->update($data, $where);
+			$model->registerObserver(new Tools_ProductWatchdog(array(
+				'action' => Tools_Cache_GarbageCollector::CLEAN_ONUPDATE
+			)));
 		} else {
 			$data['created_at'] = date(DATE_ATOM);
 			$id = $this->getDbTable()->insert($data);
 			if ($id){
 				$model->setId($id);
 			}
+			$model->registerObserver(new Tools_ProductWatchdog(array(
+				'action' => Tools_Cache_GarbageCollector::CLEAN_ONCREATE
+			)));
 		}
 
 		if (!is_null($model->getTags())) {
@@ -122,6 +128,12 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$result = $this->getDbTable()->find($id);
 		if(0 == count($result)) {
 			return null;
+		} elseif (count($result) > 1) {
+			$list = array();
+			foreach ($result as $row) {
+				array_push($list, $this->_toModel($row));
+			}
+			return $list;
 		}
 		$row = $result->current();
 
@@ -145,6 +157,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	      * @var Models_Model_Product $entity
 		 */
 		$entity = new $this->_model($row->toArray());
+
         if ($row->brand_id){
 			$brandRow = $row->findDependentRowset('Models_DbTable_Brand');
 			if ($brandRow->count()){
@@ -304,6 +317,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
      * @return boolean true on success, false on failure
      */
 	public function delete(Models_Model_Product $product){
+		$product->registerObserver(new Tools_ProductWatchdog(array(
+			'action' => Tools_Cache_GarbageCollector::CLEAN_ONDELETE
+		)));
+
         $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $product->getId());
 
         $status = $this->getDbTable()->delete($where);
@@ -323,6 +340,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 Application_Model_Mappers_PageMapper::getInstance()->delete($product->getPage());
             }
 
+	        $product->notifyObservers();
             return true;
         } else {
             return false;
@@ -345,4 +363,18 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         return $db->fetchCol($db->select()->union($select));
     }
+
+	public function updateAttributes($id, $attributes){
+		if (is_array($id) && !empty($id)){
+			$status = 0;
+			foreach ($id as $prodId) {
+				if ($this->updateAttributes($prodId, $attributes)){
+					$status++;
+				};
+			}
+			return $status;
+		} else {
+			return $this->getDbTable()->update($attributes, array('id = ?' => $id));
+		}
+	}
 }

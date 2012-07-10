@@ -649,11 +649,15 @@ class Shopping extends Tools_Plugins_Abstract {
 		$cacheHelper   = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
 		switch ($method){
 			case 'GET':
-				$id = isset ($this->_requestedParams['id']) ? $this->_requestedParams['id'] : null;
-				if ($id !== null) {
+			    $id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
+				if (!empty($id)) {
 					$product              = $productMapper->find($id);
-					if ($product !== null) {
+					if ($product instanceof Models_Model_Product) {
 						$data = $product->toArray();
+					} elseif (is_array($product) && !empty($product)){
+						$data = array_map(function($prod){
+							return $prod->toArray();
+						}, $product);
 					}
 				} else {
 					$offset = isset($this->_requestedParams['offset']) ? $this->_requestedParams['offset'] : 0;
@@ -719,9 +723,9 @@ class Shopping extends Tools_Plugins_Abstract {
                     );
                 }
 				if ($newProduct instanceof Models_Model_Product){
-					$page = $this->_savePageForProduct($newProduct, $srcData['pageTemplate']);
-					$newProduct->setPage($page);
-					$productMapper->updatePageIdForProduct($newProduct);
+//					$page = $this->_savePageForProduct($newProduct, $srcData['pageTemplate']);
+//					$newProduct->setPage($page);
+//					$productMapper->updatePageIdForProduct($newProduct);
 
 					$data = $newProduct->toArray();
 				} else {
@@ -729,40 +733,28 @@ class Shopping extends Tools_Plugins_Abstract {
 						'error' => true,
 						'code'	=> 404,
 						'message' => "Can't create product"
-						);
+					);
 					$data = $newProduct->toArray();
 				}
 				break;
 			case 'PUT':
+				$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 				$srcData = json_decode($this->_request->getRawBody(), true);
-				$product = $productMapper->save($srcData);
-				if (!$product->getPage()){
-					$page = $this->_savePageForProduct($product, $srcData['pageTemplate']);
-					$product->setPage($page);
-					$productMapper->updatePageIdForProduct($product);
-				} else {
-                    $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-                    $page = $pageMapper->find($srcData['page']['id']);
-                    $isModified = false;
-
-					if (isset($srcData['pageTemplate']) && $srcData['pageTemplate'] !== $page->getTemplateId()){
-						$page->setTemplateId($srcData['pageTemplate']);
-                        $isModified = true;
+				if (!empty($id) && !empty($srcData)){
+					$result = $productMapper->find($id);
+					!is_array($result) && $result = array($result);
+					if (isset($srcData['id'])){
+						unset($srcData['id']);
+					}
+					foreach ($result as $product) {
+						$product->setOptions($srcData);
+						$productMapper->save($product);
 					}
 
-                    if ($page->getDraft() !== $product->getEnabled()){
-                        $page->setDraft(!(bool)$product->getEnabled());
-	                    $cacheHelper->clean(Helpers_Action_Cache::KEY_DRAFT, Helpers_Action_Cache::PREFIX_DRAFT);
-                        $isModified = true;
-                    }
-
-					if ($isModified){
-                        $pageMapper->save($page);
+					if (count($result) === 1){
+						$data = $result[0]->toArray();
 					}
 				}
-				$cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
-				$cacheHelper->clean(false, false, array('prodid_'.$product->getId(), 'pageid_'.$page->getId()));
-				$data = $product->toArray();
 				break;
 			case 'DELETE':
 				preg_match_all('~product/(.*)$~', $this->_request->getRequestUri(), $uri);
@@ -804,10 +796,25 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
-    protected function _optionsRESTService(){
+	protected function _optionsRESTService(){
         $optionMapper = Models_Mapper_OptionMapper::getInstance();
         return $optionMapper->fetchAll(array('parentId = ?' => 0), null, false);
     }
+
+	protected function _templatesRESTService(){
+		$templatesMapper = Application_Model_Mappers_TemplateMapper::getInstance();
+		if ($this->_request->isGet()){
+			$type = $this->_request->getParam('filter');
+			if ($type){
+				$data = $templatesMapper->findByType($type);
+			} else {
+				$data = $templatesMapper->fetchAll();
+			}
+			return array_map(function($template){
+				return array_filter($template->toArray());
+			}, $data);
+		}
+	}
 
 	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
 		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();

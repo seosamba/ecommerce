@@ -10,6 +10,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	protected $_parentId;
 	
 	protected $_page;
+
+	protected $_pageTemplate;
 	
 	protected $_enabled;
 	
@@ -243,6 +245,15 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	public function addExtraProperty($property){
 		$this->_extraProperties[] = $property;
 		return $this;
+	}
+
+	public function setPageTemplate($templateId) {
+		$this->_pageTemplate = $templateId;
+		return $this;
+	}
+
+	public function getPageTemplate() {
+		return $this->_pageTemplate;
 	}
 
 }
