@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, ProductOptions){
 	
 	var Product = Backbone.Model.extend({
-		urlRoot: '/plugin/shopping/run/getdata/type/product/',
+		urlRoot: $('#website_url').val()+'plugin/shopping/run/getdata/type/product/id',
 		defaults: {
 			name: '',
 			sku: '',
