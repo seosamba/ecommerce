@@ -1,0 +1,9 @@
+<div title="Assign brand">
+    <select name="brands">
+        <option value="-1" disabled="disabled" selected="selected">select brand</option>
+        {{each brands}}
+        <option value="${name}">${name}</option>
+        {{/each}}
+    </select>
+    <input name="newbrand" type="text" placeholder="or create new" />
+</div>

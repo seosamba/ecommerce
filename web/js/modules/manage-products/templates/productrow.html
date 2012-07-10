@@ -1,0 +1,13 @@
+<td><input type="checkbox" value="${id}" {{if checked}}checked='checked'{{/if}}></td>
+<td class="editable" data-prop="name">
+    <a href="javascript:;" title="Click to open editor" class="tpopup" data-url="{{= $('#website_url').val()}}plugin/shopping/run/product#edit/${id}">${name}</a>
+</td>
+<td>${brand}</td>
+<td class="editable" data-prop="sku">${sku}</td>
+<td class="editable" data-prop="mpn">${mpn}</td>
+<td class="editable" data-prop="weight">${weight}</td>
+<td class="editable" data-prop="price">${price}</td>
+<td>
+    <!--<img src="${window.location.origin}/system/images/loading.gif" alt="getting data" />-->
+    n/a
+</td>

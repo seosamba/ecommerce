@@ -1,0 +1,68 @@
+<?php $this->headTitle($this->translate('Manage products')); ?>
+
+<?php
+    $this->headScript()->setAllowArbitraryAttributes(true)
+		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/manage_products.js'));
+
+	echo $this->noLayout ? $this->headScript() : '';
+?>
+
+<div id="manage-products">
+	<table class="products-table" style="width: 100%">
+		<thead>
+			<tr>
+				<th></th>
+				<th><?php echo $this->translate('Name');?></th>
+				<th><?php echo $this->translate('Brand');?></th>
+				<th><?php echo $this->translate('Sku');?></th>
+				<th><?php echo $this->translate('Mpn');?></th>
+				<th><?php echo $this->translate('Weight');?></th>
+				<th><?php echo $this->translate('Price');?></th>
+				<th><?php echo $this->translate('Sales count');?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td colspan="8" style="text-align:center;">
+					<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading..." />
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="5">
+					<?php echo $this->translate('with selected');?>:&nbsp;
+					<select name="product-mass-action" id="">
+						<option value="0"><?php echo $this->translate('select action');?></option>
+						<option value="tax"><?php echo $this->translate('assign tax');?></option>
+						<option value="brand"><?php echo $this->translate('assign brand');?></option>
+						<option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
+						<option value="template"><?php echo $this->translate('assign page template');?></option>
+						<option value="toggle"><?php echo $this->translate('enable/disable');?></option>
+						<option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
+					</select>
+				</td>
+				<td colspan="3" class="textcentered">
+					<a href="#manage-products" data-dir="prev" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
+					|
+					<a href="#manage-products" data-dir="next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+
+</div>
+
+<style>
+	table.products-table tbody tr:hover {
+		background-color: #dddddd;
+	}
+	table.products-table td.editable:hover {
+		cursor: pointer;
+	}
+
+	.seotoaster label.partial {
+	    color: #999999 !important;
+	}
+</style>
