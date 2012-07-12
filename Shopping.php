@@ -662,45 +662,32 @@ class Shopping extends Tools_Plugins_Abstract {
 				} else {
 					$offset = isset($this->_requestedParams['offset']) ? $this->_requestedParams['offset'] : 0;
 					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
-					$key    = isset($this->_requestedParams['key']) ? filter_var($this->_requestedParams['key'], FILTER_SANITIZE_STRING) : null;
+					$key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING);
 
 					$filter['tags'] = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
 					$tagPart              = (is_array($filter['tags']) && !empty($filter['tags'])) ? implode('.', $filter['tags']) : 'alltags';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
-					$cacheKey             = $tagPart . $brandPart . $offset . $limit . $key;
+					$cacheKey             = md5($tagPart . $brandPart . $offset . $limit . $key);
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
-						$data = array();
-						if(is_array($filter['tags']) && !empty($filter['tags'])) {
-							$products = $productMapper->findByTags($filter['tags']) ;
-						}
-						else {
-                            if(is_array($filter['brands']) && !empty($filter['brands'])) {
-								$products = $productMapper->fetchAll(null, array());
-							} else {
-								$products = $productMapper->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null);
-							}
-						}
-						if(!empty($products)) {
-							foreach ($products as $product) {
-								if(is_array($filter['brands']) && !empty($filter['brands'])) {
-									if(!in_array($product->getBrand(), $filter['brands'])) {
-										continue;
-									}
-								}
-	                            //cleanup unnecessary values
-								if ($product->getPage()){
-		                            $product->setPage(array(
-		                                'id'         => $product->getPage()->getId(),
-		                                'url'        => $product->getPage()->getUrl(),
-		                                'templateId' => $product->getPage()->getTemplateId()
-		                            ));
-								}
 
-	                            array_push($data, $product->toArray());
+						$products = $productMapper->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null,
+							(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
+							(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null);
+
+						$data = !is_null($products) ? array_map(function($prod){
+							//cleanup unnecessary values
+							if ($prod->getPage()){
+								$prod->setPage(array(
+	                                'id'         => $prod->getPage()->getId(),
+	                                'url'        => $prod->getPage()->getUrl(),
+	                                'templateId' => $prod->getPage()->getTemplateId()
+	                            ));
 							}
-							$cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
-						}
+							return $prod->toArray();
+						}, $products) : array();
+
+						$cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
 					}
 				}
 				break;
@@ -1023,6 +1010,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function _makeOptionProducts() {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 			$this->_view->noLayout = true;
+			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
+			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			return $this->_view->render('manage_products.phtml');
 		}
 	}

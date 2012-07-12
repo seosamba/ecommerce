@@ -19,17 +19,15 @@ define([
 //            totalPages: 2
         },
         server_api: {
-            'key': '',
+            'key': function() { return $('input[name="productsearch"]').val(); },
             'limit': function() { return this.perPage },
             'offset': function() { return this.currentPage * this.perPage },
-            'order': ''
+            'order': '',
+            'ftag': function() { return $('select[name="filter-tag"]').val() || ''; },
+            'fbrand': function() { return $('select[name="filter-brand"]').val() || ''; }
         },
         parse: function (response) {
             var resultsCount = _.size(response);
-            if (resultsCount === 0){
-                this.goTo(this.currentPage-1);
-                return;
-            }
             if (resultsCount < this.perPage){
                 this.totalPages = this.currentPage;
             }

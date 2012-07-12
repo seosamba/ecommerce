@@ -13,7 +13,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	protected $_model	= 'Models_Model_Product';
 
     /**
-     * @var #M#C\Models_Mapper_Brand.getInstance|null|?
+     * @var Models_Mapper_Brand
      */
 	protected $_brandMapper = null;
 
@@ -92,28 +92,46 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		return $this->getDbTable()->update( array('page_id' => $model->getPage()->getId()), $where);
 	}
 
-	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null, $search = null) {
+	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null,
+	                         $search = null, $tags = null, $brands = null) {
 		$entities = array();
 
-        if ($search === null) {
-            $resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
-        } else {
-            $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITH_FROM_PART)
-                    ->setIntegrityCheck(false);
-            $select->where('shopping_product.name LIKE ?', '%'.$search.'%')
-                    ->orWhere('shopping_product.sku LIKE ?', '%'.$search.'%')
-                    ->orWhere('shopping_product.mpn LIKE ?', '%'.$search.'%')
-                    ->joinLeft('shopping_brands', 'shopping_brands.id = shopping_product.brand_id', null)
-                    ->joinLeft('shopping_product_has_tag', 'shopping_product_has_tag.product_id = shopping_product.id', null)
-                    ->joinLeft('shopping_tags', 'shopping_tags.id = shopping_product_has_tag.tag_id', null)
-                    ->orWhere('shopping_brands.name LIKE ?', '%'.$search.'%')
-                    ->orWhere('shopping_tags.name LIKE ?', '%'.$search.'%')
-                    ->group('shopping_product.id')
-                    ->limit($limit, $offset)
-                    ->order($order);
+		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+				->from(array('p' => 'shopping_product'))
+				->from(array('t' => 'shopping_tags'), null)
+//				->from(array('pt' => 'shopping_product_has_tag'), null)
+				->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
+				->group('p.id')
+				->order($order)
+				->limit($limit, $offset);
 
-            $resultSet = $this->getDbTable()->fetchAll($select);
+		if (!empty($where)){
+			$select->where($where);
+		}
+
+		if (!empty($brands)){
+			if (!is_array($brands)) $brands = (array) $brands;
+			$select->where('b.name in (?)', $brands);
+		}
+
+		if (!empty($tags)){
+			if (!is_array($tags)) $tags = (array) $tags;
+			$select->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
+				->where('pt.tag_id IN (?)', $tags)
+				->having('COUNT(*) = ?', sizeof($tags));
+		}
+
+        if ((bool)$search) {
+	        $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
+	        if (empty($tags)){
+		        $select->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id AND t.id = pt.tag_id', null);
+		        $likeWhere .= ' OR t.name LIKE ?';
+	        }
+	        $select->where($likeWhere, '%'.$search.'%');
         }
+
+		error_log($select->__toString());
+		$resultSet = $this->getDbTable()->fetchAll($select);
 
 		if(count($resultSet) === 0) {
 			return null;
@@ -278,11 +296,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$filteredProducts = array();
 		$catDbTable       = new Models_DbTable_Tag();
 		if(!empty($tags)) {
-			$select = $catDbTable->getAdapter()->select()->from(array('t' => $catDbTable->info('name')), null)
-				->joinLeft(array('pht'=>'shopping_product_has_tag'), 'pht.tag_id = t.id', null)
-				->joinLeft(array('p'=>'shopping_product'), 'p.id = pht.product_id')
+//			$select = $catDbTable->getAdapter()->select()->from(array('t' => $catDbTable->info('name')), null)
+//				->joinLeft(array('pht'=>'shopping_product_has_tag'), 'pht.tag_id = t.id', null)
+//				->joinLeft(array('p'=>'shopping_product'), 'p.id = pht.product_id')
+//				->where('t.id IN (?)', $tags)
+//				->group('p.id');
+			$select = $catDbTable->getAdapter()->select()->from(array(
+					'pt' => 'shopping_product_has_tag', 'p' => 'shopping_product', 't' => 'shopping_tags'
+				), array('p.*'))
+				->where('pt.product_id = p.id')
+				->where('pt.tag_id = t.id')
 				->where('t.id IN (?)', $tags)
-				->group('p.id');
+				->group('p.id')
+				->having('COUNT(p.id) = ?', sizeof($tags));
 
 			$productsRaw = $catDbTable->getAdapter()->fetchAll($select);
 
@@ -298,6 +324,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	}
 
 	public function findByBrands(array $brands) {
+
 		$products = array();
 		foreach($brands as $brand) {
 		 	$brandModel =  $this->_brandMapper->findByName($brand);

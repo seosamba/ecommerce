@@ -17,7 +17,10 @@ define([
         el: $('#manage-products table.products-table'),
         events: {
             'change select[name="product-mass-action"]': 'massAction',
-            'click tfoot a.table-nav': 'navigate'
+            'click tfoot a.table-nav': 'navigate',
+            'change .pselect': function() {
+                this.products.pager()
+            }
         },
         initialize: function(){
             this.products = new ProductsCollection();
@@ -32,6 +35,7 @@ define([
                     $(this).remove();
                 }
             });
+            $('select.pselect').chosen();
         },
         renderProducts: function(productCollection){
             this.$el.find('a.table-nav').hide();

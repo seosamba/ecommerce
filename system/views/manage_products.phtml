@@ -3,9 +3,13 @@
 <?php
     $this->headScript()->setAllowArbitraryAttributes(true)
 		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+            ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
 			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/manage_products.js'));
 
 	echo $this->noLayout ? $this->headScript() : '';
+
+	$this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
+	echo $this->noLayout ? $this->headLink() : '';
 ?>
 
 <div id="manage-products">
@@ -20,6 +24,29 @@
 				<th><?php echo $this->translate('Weight');?></th>
 				<th><?php echo $this->translate('Price');?></th>
 				<th><?php echo $this->translate('Sales count');?></th>
+			</tr>
+			<tr>
+				<th><input type="checkbox" name="check-all" ></th>
+				<th>
+					<?php echo $this->translate('Search');?>:
+					<input type="text" class="pselect" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
+				</th>
+				<th colspan="3">
+<!--					--><?php //echo $this->translate('Filter by brand');?>
+					<select class="pselect" style="width:98%;" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
+						<?php foreach($this->brands as $brand):?>
+						<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
+						<?php endforeach;?>
+					</select>
+				</th>
+				<th colspan="3">
+<!--					--><?php //echo $this->translate('Filter by tags');?>
+					<select class="pselect" style="width:98%;" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
+						<?php foreach($this->tags as $tag):?>
+						<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
+						<?php endforeach;?>
+					</select>
+				</th>
 			</tr>
 		</thead>
 		<tbody>
