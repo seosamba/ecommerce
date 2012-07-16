@@ -663,6 +663,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					$offset = isset($this->_requestedParams['offset']) ? $this->_requestedParams['offset'] : 0;
 					$limit  = isset($this->_requestedParams['limit']) ? $this->_requestedParams['limit'] : self::PRODUCT_DEFAULT_LIMIT;
 					$key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING);
+					$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
 					$filter['tags'] = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
@@ -671,9 +672,13 @@ class Shopping extends Tools_Plugins_Abstract {
 					$cacheKey             = md5($tagPart . $brandPart . $offset . $limit . $key);
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
 
-						$products = $productMapper->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null,
+						$products = $productMapper->logSelectResultLength($count)->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null,
 							(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 							(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null);
+
+						if ($count){
+							$this->_response->setHeader('X-Toasted-Total-Rows', $productMapper->lastSelectResulyLength());
+						}
 
 						$data = !is_null($products) ? array_map(function($prod){
 							//cleanup unnecessary values
