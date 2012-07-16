@@ -17,8 +17,22 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
      */
 	protected $_brandMapper = null;
 
-	public function __construct() {
+	protected static $_lastSelectResultLength = null;
+
+	protected static $_logSelectResultLength = false;
+
+
+	protected function __construct() {
 		$this->_brandMapper = Models_Mapper_Brand::getInstance();
+	}
+
+	public function logSelectResultLength(){
+		func_num_args() && is_bool(func_get_arg(0))  && self::$_logSelectResultLength = func_get_arg(0) ;
+		return $this;
+	}
+
+	public function lastSelectResulyLength(){
+		return self::$_lastSelectResultLength;
 	}
 
 	public function save($model) {
@@ -102,8 +116,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 //				->from(array('pt' => 'shopping_product_has_tag'), null)
 				->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
 				->group('p.id')
-				->order($order)
-				->limit($limit, $offset);
+				->order($order);
 
 		if (!empty($where)){
 			$select->where($where);
@@ -124,18 +137,37 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         if ((bool)$search) {
 	        $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
 	        if (empty($tags)){
-		        $select->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id AND t.id = pt.tag_id', null);
-		        $likeWhere .= ' OR t.name LIKE ?';
+		        $select->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', null);
+		        $likeWhere .= ' OR (t.name LIKE ? AND pt.tag_id = t.id)';
 	        }
 	        $select->where($likeWhere, '%'.$search.'%');
         }
 
-		error_log($select->__toString());
+
+		if (self::$_logSelectResultLength === false){
+			$select->limit($limit, $offset);
+		}
+
+//		error_log($select->__toString());
 		$resultSet = $this->getDbTable()->fetchAll($select);
 
 		if(count($resultSet) === 0) {
 			return null;
 		}
+
+		if (self::$_logSelectResultLength === true){
+			self::$_lastSelectResultLength = sizeof($resultSet);
+			$tmp = array();
+			$maxOffset = (sizeof($resultSet) < ($offset + $limit)) ? sizeof($resultSet) : $offset + $limit;
+			for ($offset; $offset < $maxOffset; $offset++){
+				if ($resultSet->offsetExists($offset)){
+					$resultSet->seek($offset);
+					array_push($tmp, $resultSet->current());
+				}
+			}
+			$resultSet = $tmp;
+		}
+
 		foreach ($resultSet as $row) {
 			array_push($entities, $this->_toModel($row));
 		}
