@@ -16,6 +16,26 @@
 	<table class="products-table" style="width: 100%">
 		<thead>
 			<tr>
+				<td colspan="8">
+					<div class="grid_6">
+						<select class="pselect" style="width:98%;" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
+							<?php foreach($this->brands as $brand):?>
+							<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+<!--				</td>-->
+<!--				<td colspan="4">-->
+					<div class="grid_6">
+						<select class="pselect" style="width:98%;" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
+							<?php foreach($this->tags as $tag):?>
+							<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</td>
+			</tr>
+			<tr>
 				<th></th>
 				<th><?php echo $this->translate('Name');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
@@ -30,22 +50,6 @@
 				<th>
 					<?php echo $this->translate('Search');?>:
 					<input type="text" class="pselect" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
-				</th>
-				<th colspan="3">
-<!--					--><?php //echo $this->translate('Filter by brand');?>
-					<select class="pselect" style="width:98%;" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
-						<?php foreach($this->brands as $brand):?>
-						<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
-						<?php endforeach;?>
-					</select>
-				</th>
-				<th colspan="3">
-<!--					--><?php //echo $this->translate('Filter by tags');?>
-					<select class="pselect" style="width:98%;" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
-						<?php foreach($this->tags as $tag):?>
-						<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
-						<?php endforeach;?>
-					</select>
 				</th>
 			</tr>
 		</thead>
