@@ -669,7 +669,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
 					$tagPart              = (is_array($filter['tags']) && !empty($filter['tags'])) ? implode('.', $filter['tags']) : 'alltags';
 					$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
-					$cacheKey             = md5($tagPart . $brandPart . $offset . $limit . $key);
+					$cacheKey             = $method.'_product_'.md5($tagPart . $brandPart . $offset . $limit . $key . $count);
 					if(($data = $cacheHelper->load($cacheKey, 'store_')) === null) {
 
 						$products = $productMapper->logSelectResultLength($count)->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null,
@@ -691,6 +691,14 @@ class Shopping extends Tools_Plugins_Abstract {
 							}
 							return $prod->toArray();
 						}, $products) : array();
+
+						if ($count) {
+							$data = array(
+								'totalCount' => $productMapper->lastSelectResulyLength(),
+								'count'      => sizeof($data),
+								'data'       => $data
+							);
+						}
 
 						$cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
 					}
@@ -733,50 +741,88 @@ class Shopping extends Tools_Plugins_Abstract {
 				$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 				$srcData = json_decode($this->_request->getRawBody(), true);
 				if (!empty($id) && !empty($srcData)){
-					$result = $productMapper->find($id);
-					!is_array($result) && $result = array($result);
+					$products = $productMapper->find($id);
+					!is_array($products) && $products = array($products);
 					if (isset($srcData['id'])){
 						unset($srcData['id']);
 					}
-					foreach ($result as $product) {
-						$product->setOptions($srcData);
-						$productMapper->save($product);
+				} elseif(!empty($srcData)) {
+					$key    = filter_var($this->_request->getParam('key'), FILTER_SANITIZE_STRING);
+					$tags   = filter_var_array($this->_request->getParam('ftag', array()), FILTER_SANITIZE_NUMBER_INT);
+					$brands  = filter_var_array($this->_request->getParam('fbrand', array()), FILTER_SANITIZE_STRING);
+					if (empty($key) && empty($tags) && empty($brands)){
+						return array(
+							'error'		=> true,
+							'code'		=> 400,
+							'message'	=> 'Bad request'
+						);
 					}
 
-					if (count($result) === 1){
-						$data = $result[0]->toArray();
+					$products = $productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands);
+				}
+
+				if (!empty($products)){
+					foreach ($products as $product) {
+						$product->setOptions($srcData);
+						if ($productMapper->save($product)){
+							$data[] = $product->toArray();
+						}
+					}
+
+					if (count($data) === 1){
+						$data = array_shift($data);
 					}
 				}
 				break;
 			case 'DELETE':
-				preg_match_all('~product/(.*)$~', $this->_request->getRequestUri(), $uri);
+				$ids = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 
-				$ids = filter_var_array(explode('/', $uri[1][0]), FILTER_VALIDATE_INT);
-                $ids = array_filter(array_unique($ids), function($id) {return (!empty($id) && is_numeric($id)); } );
+				if (!empty($ids)) {
+					$products = $productMapper->find($ids);
+				} else {
+					$key    = filter_var($this->_request->getParam('key'), FILTER_SANITIZE_STRING);
+					$tags   = filter_var_array($this->_request->getParam('ftag', array()), FILTER_SANITIZE_NUMBER_INT);
+					$brands  = filter_var_array($this->_request->getParam('fbrand', array()), FILTER_SANITIZE_STRING);
+					if (empty($key) && empty($tags) && empty($brands)){
+						return array(
+							'error'		=> true,
+							'code'		=> 400,
+							'message'	=> 'Bad request'
+						);
+					}
 
-				if (!empty($ids) && null !== ($products = $productMapper->fetchAll(array('id IN(?)' => $ids))) ) {
-                    $result = array();
-                    foreach ($products as $product){
-                        $result[$product->getId()] = $productMapper->delete($product);
+					$products = $productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands);
+				}
+
+				if (isset($products) && !is_null($products)) {
+					!is_array($products) && $products = array($products);
+					$products = array();
+					foreach ($products as $product){
+                        $products[$product->getId()] = $productMapper->delete($product);
                         unset($product);
 					}
-                    if (!empty($result)){
-                        $data = in_array(false, $result) ? array(
+                    if (!empty($products)){
+                        $data = in_array(false, $products) ? array(
                             'error' => true,
                             'code' => 409,
-                            'message' => $result
-                        ) : $result;
+                            'message' => $products
+                        ) : $products;
                     }
 				} else {
-					$data = array(
+					return array(
 						'error'		=> true,
 						'code'		=> 404,
 						'message'	=> 'Requested product not found'
-						);
+					);
 				}
 
 				break;
 			default:
+				return array(
+					'error'		=> true,
+					'code'		=> 400,
+					'message'	=> 'Bad request'
+				);
 				break;
 		}
 

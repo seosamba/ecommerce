@@ -93,6 +93,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 		$this->_view->plContent       = $content;
 		$this->_view->productTemplate = $this->_productTemplate->getName();
+		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 		if(!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_OFFSET;
 		} else if(!intval($this->_options[0])) {

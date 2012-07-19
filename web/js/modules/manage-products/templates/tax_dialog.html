@@ -6,4 +6,10 @@
         <option value="2">Alternative</option>
         <option value="3">Alternative 2</option>
     </select>
+    {{if app.products.totalCount}}
+    <hr />
+    <label>
+        <input type="checkbox" name="applyToAll"> Apply to all ${app.products.totalCount} products
+    </label>
+    {{/if}}
 </div>

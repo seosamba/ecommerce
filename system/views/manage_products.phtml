@@ -15,28 +15,28 @@
 <div id="manage-products">
 	<table class="products-table" style="width: 100%">
 		<thead>
-			<tr>
-				<td colspan="8">
-					<div class="grid_6">
-						<select class="pselect" style="width:98%;" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
+			<tr class="ui-helper-hidden">
+				<th colspan="2">
+					<?php echo $this->translate('Search');?>:
+					<input type="text" class="pfilter" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
+				</th>
+				<th colspan="6">
+					<div>
+						<select class="pfilter" style="width: 100%" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
 							<?php foreach($this->brands as $brand):?>
 							<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
 							<?php endforeach;?>
 						</select>
-					</div>
-<!--				</td>-->
-<!--				<td colspan="4">-->
-					<div class="grid_6">
-						<select class="pselect" style="width:98%;" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
+						<select class="pfilter" style="width: 100%" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
 							<?php foreach($this->tags as $tag):?>
 							<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
 							<?php endforeach;?>
 						</select>
 					</div>
-				</td>
+				</th>
 			</tr>
 			<tr>
-				<th></th>
+				<th><input type="checkbox" name="check-all" ></th>
 				<th><?php echo $this->translate('Name');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
@@ -46,11 +46,7 @@
 				<th><?php echo $this->translate('Sales count');?></th>
 			</tr>
 			<tr>
-				<th><input type="checkbox" name="check-all" ></th>
-				<th>
-					<?php echo $this->translate('Search');?>:
-					<input type="text" class="pselect" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
-				</th>
+
 			</tr>
 		</thead>
 		<tbody>
@@ -74,10 +70,8 @@
 						<option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
 					</select>
 				</td>
-				<td colspan="3" class="textcentered">
-					<a href="#manage-products" data-dir="prev" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
-					|
-					<a href="#manage-products" data-dir="next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
+				<td id="paginator" colspan="3" class="textcentered">
+
 				</td>
 			</tr>
 		</tfoot>
