@@ -9,10 +9,10 @@
         </div>
         {{/each}}
     </div>
-    {{if app.products.totalCount}}
+    {{if app.products.totalRecords}}
     <hr />
     <label>
-        <input type="checkbox" name="applyToAll"> Apply to all ${app.products.totalCount} products
+        <input type="checkbox" name="applyToAll"> Apply to all ${app.products.totalRecords} products
     </label>
     {{/if}}
 </div>

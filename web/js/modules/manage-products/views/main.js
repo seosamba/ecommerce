@@ -69,7 +69,7 @@ define([
                         this.products.goTo(this.products.firstPage);
                         break;
                     case 'last':
-                        this.products.goTo(this.products.lastPage);
+                        this.products.goTo(this.products.totalPages);
                         break;
                     case 'prev':
                         this.products.requestPreviousPage();

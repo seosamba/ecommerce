@@ -32,11 +32,11 @@ define([
             var totalCount = response.totalCount;
             if (!isNaN(totalCount)){
                 this.totalPages = Math.floor(totalCount/this.perPage);
-                this.totalCount = totalCount;
+                this.totalRecords = totalCount;
             }
-            if (resultsCount < this.perPage){
-                this.totalPages = this.currentPage;
-            }
+//            if (resultsCount < this.perPage){
+//                this.totalPages = this.currentPage;
+//            }
             return response.data;
         },
         getFilter: function(){
