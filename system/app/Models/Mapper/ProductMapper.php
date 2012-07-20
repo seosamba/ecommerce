@@ -112,8 +112,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
 				->from(array('p' => 'shopping_product'))
-				->from(array('t' => 'shopping_tags'), null)
-//				->from(array('pt' => 'shopping_product_has_tag'), null)
 				->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
 				->group('p.id')
 				->order($order);
@@ -129,7 +127,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		if (!empty($tags)){
 			if (!is_array($tags)) $tags = (array) $tags;
-			$select->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
+
+			$select->from(array('t' => 'shopping_tags'), null)
+                ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
 				->where('pt.tag_id IN (?)', $tags)
 				->having('COUNT(*) = ?', sizeof($tags));
 		}
@@ -137,7 +137,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         if ((bool)$search) {
 	        $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
 	        if (empty($tags)){
-		        $select->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', null);
+		        $select->from(array('t' => 'shopping_tags'), null)
+                    ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', null);
 		        $likeWhere .= ' OR (t.name LIKE ? AND pt.tag_id = t.id)';
 	        }
 	        $select->where($likeWhere, '%'.$search.'%');
