@@ -706,11 +706,15 @@ class Shopping extends Tools_Plugins_Abstract {
 				break;
 			case 'POST':
 				$srcData = Zend_Json_Decoder::decode($this->_request->getRawBody());
-                $isUniq = $productMapper->fetchAll(array('sku = ?' => $srcData['sku']));
-                if (!empty($isUniq)){
+				$validator = new Zend_Validate_Db_NoRecordExists(array(
+					'table' => 'shopping_product',
+					'field' => 'sku'
+				));
+
+                if (!$validator->isValid($srcData['sku'])){
                     return array(
                         'error' => true,
-                        'message' => 'You already have a product with this SKU'
+                        'message' => $this->_translator->translate('You already have a product with this SKU')
                     );
                 }
                 try {
@@ -723,10 +727,6 @@ class Shopping extends Tools_Plugins_Abstract {
                     );
                 }
 				if ($newProduct instanceof Models_Model_Product){
-//					$page = $this->_savePageForProduct($newProduct, $srcData['pageTemplate']);
-//					$newProduct->setPage($page);
-//					$productMapper->updatePageIdForProduct($newProduct);
-
 					$data = $newProduct->toArray();
 				} else {
 					$data = array(
