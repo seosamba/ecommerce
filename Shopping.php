@@ -676,10 +676,6 @@ class Shopping extends Tools_Plugins_Abstract {
 							(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 							(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null);
 
-						if ($count){
-							$this->_response->setHeader('X-Toasted-Total-Rows', $productMapper->lastSelectResulyLength());
-						}
-
 						$data = !is_null($products) ? array_map(function($prod){
 							//cleanup unnecessary values
 							if ($prod->getPage()){
@@ -694,7 +690,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 						if ($count) {
 							$data = array(
-								'totalCount' => $productMapper->lastSelectResulyLength(),
+								'totalCount' => $productMapper->lastSelectResultLength(),
 								'count'      => sizeof($data),
 								'data'       => $data
 							);

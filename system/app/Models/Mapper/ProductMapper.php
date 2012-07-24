@@ -26,15 +26,29 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$this->_brandMapper = Models_Mapper_Brand::getInstance();
 	}
 
+	/**
+	 * Toggle on count of select query results if true passed as first parameter.
+	 * Use lastSelectResultLength() method to get value.
+	 * @return Models_Mapper_ProductMapper Returns self instance for chaining
+	 */
 	public function logSelectResultLength(){
 		func_num_args() && is_bool(func_get_arg(0))  && self::$_logSelectResultLength = func_get_arg(0) ;
 		return $this;
 	}
 
-	public function lastSelectResulyLength(){
+	/**
+	 * Returns length of last select query result set
+	 * @return number|null
+	 */
+	public function lastSelectResultLength(){
 		return self::$_lastSelectResultLength;
 	}
 
+	/**
+	 * Save product model to database
+	 * @param $model array|Models_Model_Product Product model or hash with product properties
+	 * @return Models_Model_Product Saved product model
+	 */
 	public function save($model) {
 		if (!$model instanceof $this->_model){
 			$model = new $this->_model($model);
@@ -106,15 +120,29 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		return $this->getDbTable()->update( array('page_id' => $model->getPage()->getId()), $where);
 	}
 
-	public function fetchAll($where = null, $order = array(), $offset = null, $limit = null,
+	/**
+	 * Fetch products
+	 * @param string|null $where Where clause
+	 * @param string|array|null $order Fields to order by
+	 * @param string|null $offset Number of results to skip
+	 * @param string|null $limit Maximum number of results
+	 * @param array|null $search Keyword, to search across name, mpn, sku, brand name or tags
+	 * @param array|null $tags List of tags ids to filter by
+	 * @param array|null $brands List of brand names to filter by
+	 * @return array|null List of products
+	 */
+	public function fetchAll($where = null, $order = null, $offset = null, $limit = null,
 	                         $search = null, $tags = null, $brands = null) {
 		$entities = array();
 
 		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
 				->from(array('p' => 'shopping_product'))
 				->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
-				->group('p.id')
-				->order($order);
+				->group('p.id');
+
+		if (!is_null($order)) {
+			$select->order($order);
+		}
 
 		if (!empty($where)){
 			$select->where($where);
@@ -149,7 +177,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$select->limit($limit, $offset);
 		}
 
-//		error_log($select->__toString());
+		error_log($select->__toString());
 		$resultSet = $this->getDbTable()->fetchAll($select);
 
 		if(count($resultSet) === 0) {
@@ -319,56 +347,23 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	}
 
 	/**
-	 * Find product wich contains given tags
+	 * Find product which contains given tags
+	 * Shorthand method to self::fetchAll
 	 * @param array $tags List of tags to search for
-	 * @param bool $intersect
-	 * @return array List of products
+	 * @return array|null List of products
 	 */
-	public function findByTags(array $tags, $intersect = true) {
-		$products         = array();
-		$filteredProducts = array();
-		$catDbTable       = new Models_DbTable_Tag();
-		if(!empty($tags)) {
-//			$select = $catDbTable->getAdapter()->select()->from(array('t' => $catDbTable->info('name')), null)
-//				->joinLeft(array('pht'=>'shopping_product_has_tag'), 'pht.tag_id = t.id', null)
-//				->joinLeft(array('p'=>'shopping_product'), 'p.id = pht.product_id')
-//				->where('t.id IN (?)', $tags)
-//				->group('p.id');
-			$select = $catDbTable->getAdapter()->select()->from(array(
-					'pt' => 'shopping_product_has_tag', 'p' => 'shopping_product', 't' => 'shopping_tags'
-				), array('p.*'))
-				->where('pt.product_id = p.id')
-				->where('pt.tag_id = t.id')
-				->where('t.id IN (?)', $tags)
-				->group('p.id')
-				->having('COUNT(p.id) = ?', sizeof($tags));
-
-			$productsRaw = $catDbTable->getAdapter()->fetchAll($select);
-
-			if (!empty($productsRaw)){
-				$products = array_map(function($product){
-					return new Zend_Db_Table_Row(array('table' => new Models_DbTable_Product(), 'data'=>$product));
-				}, $productsRaw);
-				unset($productsRaw);
-				$filteredProducts = array_map(array($this, '_toModel'), $products);
-			}
-		}
-		return array_values($filteredProducts);
+	public function findByTags(array $tags) {
+		return $this->fetchAll(null, null, null, null, null, $tags);
 	}
 
+	/**
+	 * Find product with given brands
+	 * Shorthand method to self::fetchAll
+	 * @param array $brands List of brands
+	 * @return array|null List of products
+	 */
 	public function findByBrands(array $brands) {
-
-		$products = array();
-		foreach($brands as $brand) {
-		 	$brandModel =  $this->_brandMapper->findByName($brand);
-			if($brandModel) {
-				$brandProducts = $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('brand_id = ?', $brandModel->getId()));
-				if(is_array($brandProducts)) {
-					$products = array_merge($products, $brandProducts);
-				}
-			}
-		}
-		return $products;
+		return $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('b.name IN (?)', $brands));
 	}
 
     /**
