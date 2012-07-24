@@ -110,9 +110,7 @@
 			    $(document).on('click', '.currproduct', this.insertSingleProduct)
 			        .on('click', '#btn-create', this.insertList);
 			    $('.pselect').chosen().change(function() {
-					if(!$('#tags').val() && !$('#brands').val()) {
-						uiTab.offset = 0;
-					}
+					uiTab.offset = 0;
 				    uiTab.loadStoreData('product', true)
 			    });
 		    },

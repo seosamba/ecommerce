@@ -48,7 +48,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
             }
             , array( $this->_object->getBrand(), $this->_object->getName(), $this->_object->getSku() ));
 		$uniqName = implode('-', $uniqName);
-		$page->setTemplateId(Zend_Registry::get('website') || Application_Model_Models_Template::ID_DEFAULT );
+		$page->setTemplateId($this->_object->getPageTemplate() ? $this->_object->getPageTemplate() : Application_Model_Models_Template::ID_DEFAULT);
 		$page->setParentId($prodCatPage->getId());
 		$page->setNavName($this->_object->getName().' - '.$this->_object->getBrand());
         $page->setMetaDescription(strip_tags($this->_object->getShortDescription()));

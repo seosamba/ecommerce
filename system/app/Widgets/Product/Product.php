@@ -75,9 +75,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 	    if ($this->_product === null || $this->_type === null) {
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
-                 return "<b>Product doesn&quote;t exist or wrong options provided</b>";
+                 return "<b>Product doesn&apos;t exist or wrong options provided</b>";
             }
-            return "<!--Product doesn&quote;t exist or wrong options provided-->";
+            return "<!--Product doesn&apos;t exist or wrong options provided-->";
         }
 		array_push($this->_cacheTags, 'prodid_'.$this->_product->getId());
         $this->_view->product = $this->_product;
