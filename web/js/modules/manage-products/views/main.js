@@ -252,7 +252,7 @@ define([
                 url: $('#website_url').val()+'storeapi/v1/stats',
                 data: {id: this.products.pluck('id').join(',')},
                 success: function(response){
-                    if (_.isArray(response) && !_.isEmpty(response)){
+                    if (_.isArray(response)){
                         var stats = _.groupBy(response, function(r){ return r.product_id; });
                         self.products.each(function(prod){
                            prod.set('stats', _.isUndefined(stats[prod.get('id')]) ? [] : stats[prod.get('id')] );
