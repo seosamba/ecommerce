@@ -87,7 +87,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
                 }
                 $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . str_replace('/', '/small/' , $this->_object->getPhoto());
                 $pagePreviewImg = $savePath.strtolower($uniqName).'.'.pathinfo($productImg, PATHINFO_EXTENSION);
-                if (copy($productImg, $pagePreviewImg)) {
+                if (is_file($productImg) && copy($productImg, $pagePreviewImg)) {
                     Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, null, true);
                 }
             }
