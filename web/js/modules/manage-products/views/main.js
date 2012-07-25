@@ -36,6 +36,7 @@ define([
         initialize: function(){
             this.products = new ProductsCollection();
             this.products.on('reset', this.renderProducts, this);
+            this.products.on('reset', this.loadStats, this);
             this.products.pager();
             $.extend($.ui.dialog.prototype.options, {
                 modal: true,
@@ -241,6 +242,21 @@ define([
                     },
                     "Disable": function(){
                         self.products.batch('PUT', {enabled: 0}, $(this).find('input[name="applyToAll"]').attr('checked') );
+                    }
+                }
+            })
+        },
+        loadStats: function(){
+            var self = this;
+            $.ajax({
+                url: $('#website_url').val()+'storeapi/v1/stats',
+                data: {id: this.products.pluck('id').join(',')},
+                success: function(response){
+                    if (_.isArray(response) && !_.isEmpty(response)){
+                        var stats = _.groupBy(response, function(r){ return r.product_id; });
+                        self.products.each(function(prod){
+                           prod.set('stats', _.isUndefined(stats[prod.get('id')]) ? [] : stats[prod.get('id')] );
+                        });
                     }
                 }
             })

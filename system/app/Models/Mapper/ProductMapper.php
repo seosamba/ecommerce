@@ -432,4 +432,22 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			return $this->getDbTable()->update($attributes, array('id = ?' => $id));
 		}
 	}
+
+	public function fetchProductSalesCount($id){
+		if (!is_array($id)){
+			$id = array($id);
+		}
+		/**
+		 * @var Zend_Db_Table_Select
+		 */
+		$select = $this->getDbTable()->getAdapter()
+			->select()
+			->from(array('sales' => 'shopping_cart_session_content'), array('sales.product_id', 'cart.status', 'count' => 'COUNT(cart.status)'))
+			->join(array('cart' => 'shopping_cart_session'), 'cart.id = sales.cart_id', null)
+			->where('sales.product_id IN (?)', $id)
+			->group(array('sales.product_id', 'cart.status'));
+
+		$result = $this->getDbTable()->getAdapter()->fetchAll($select);
+		return $result;
+	}
 }

@@ -9,12 +9,13 @@ define([
             'change input[type=checkbox]': 'toggle',
             'dblclick td.editable': 'editProperty'
         },
+        template: _.template(ProductRowTemplate),
         initialize: function(){
             this.model.on('change', this.render, this);
         },
         render: function(){
             console.log('render');
-            this.$el.html($.tmpl(ProductRowTemplate, this.model.toJSON()));
+            this.$el.html(this.template(this.model.toJSON()));
             return this;
         },
         toggle: function(e){

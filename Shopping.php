@@ -1201,4 +1201,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_layout->content = $this->_view->render('brandlogos.phtml');
 		echo $this->_layout->render();
 	}
+
+	protected function _statsRESTService(){
+		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
+		if (is_array($id) && !empty($id)){
+			return Models_Mapper_ProductMapper::getInstance()->fetchProductSalesCount($id);
+		}
+	}
 }
