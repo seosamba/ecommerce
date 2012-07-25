@@ -78,6 +78,10 @@ define([
                 dataType: 'json',
                 success: function(response){
                     app.products.pager();
+                },
+                error: function(){
+                    console.log('Batch action error:', arguments);
+                    showMessage('Error occured. Contact support', true);
                 }
             });
         }
