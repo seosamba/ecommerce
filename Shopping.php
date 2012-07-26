@@ -792,17 +792,17 @@ class Shopping extends Tools_Plugins_Abstract {
 
 				if (isset($products) && !is_null($products)) {
 					!is_array($products) && $products = array($products);
-					$products = array();
+					$results = array();
 					foreach ($products as $product){
-                        $products[$product->getId()] = $productMapper->delete($product);
+						$results[$product->getId()] = $productMapper->delete($product);
                         unset($product);
 					}
-                    if (!empty($products)){
-                        $data = in_array(false, $products) ? array(
+                    if (!empty($results)){
+                        $data = in_array(false, $results) ? array(
                             'error' => true,
                             'code' => 409,
-                            'message' => $products
-                        ) : $products;
+                            'message' => $results
+                        ) : $results;
                     }
 				} else {
 					return array(

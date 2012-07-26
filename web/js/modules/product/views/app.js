@@ -457,13 +457,11 @@ define([
             showConfirm('Oh man... Really?', function(){
                 if (!_.isEmpty(ids)) {
                     $.ajax({
-                        url: appRouter.products.url() + ids.join('/'),
+                        url: $('#website_url').val()+appRouter.products.urlOriginal +'id/'+ids.join(','),
                         type: 'DELETE',
                         dataType: 'json',
                         statusCode: {
-                            409: function() {
-                                showMessage("Can't remove products", true);
-                            }
+                            409: function() { showMessage("Can't remove products", true); }
                         }
                     }).done(function(){
                         appRouter.products.remove(ids);
