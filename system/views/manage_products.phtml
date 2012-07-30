@@ -36,7 +36,7 @@
 				</th>
 			</tr>
 			<tr>
-				<th><input type="checkbox" name="check-all" ></th>
+				<th><label><input type="checkbox" name="check-all" ><?php echo $this->translate('Select all');?></label></th>
 				<th><?php echo $this->translate('Name');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
@@ -61,13 +61,13 @@
 				<td colspan="5">
 					<?php echo $this->translate('with selected');?>:&nbsp;
 					<select name="product-mass-action" id="">
-						<option value="0"><?php echo $this->translate('select action');?></option>
-						<option value="tax"><?php echo $this->translate('assign tax');?></option>
+						<option value="0"><?php echo $this->translate('select mass action');?></option>
 						<option value="brand"><?php echo $this->translate('assign brand');?></option>
-						<option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
 						<option value="template"><?php echo $this->translate('assign page template');?></option>
-						<option value="toggle"><?php echo $this->translate('enable/disable');?></option>
+						<option value="tax"><?php echo $this->translate('assign tax');?></option>
+						<option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
 						<option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
+						<option value="toggle"><?php echo $this->translate('enable/disable');?></option>
 					</select>
 				</td>
 				<td id="paginator" colspan="3" class="textcentered">
