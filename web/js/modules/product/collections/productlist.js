@@ -5,7 +5,6 @@ define([
 ], function(_, Backbone, ProductModel){
 	var ProductList = Backbone.Collection.extend({
 		model: ProductModel,
-//		url: '/plugin/shopping/run/getdata/type/product/',
 		urlOriginal: '/plugin/shopping/run/getdata/type/product/',
         paginator: {
             limit: 32,

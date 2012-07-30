@@ -55,7 +55,13 @@ define([
 		},
 		renderProductView: function(product){
 			var productView = new ProductListingView({model: product});
-			this.productListHolder.append(productView.render().el).trigger('scroll');
+			this.productListHolder.append(productView.render().el);
+            if (this.productListHolder.children().size() === this.products.size()){
+                this.productListHolder.find('img.lazy').lazyload({
+                    container: this.productListHolder,
+                    effect: 'fadeIn'
+                }).removeClass('lazy');
+            }
 		},
 		addTag: function(tag, index){
             var view = new TagView({model: tag});

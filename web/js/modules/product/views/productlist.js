@@ -25,10 +25,6 @@ define([
 				data['showDelete'] = this.options.showDelete;
 			}
 			$(this.el).html($.tmpl(this.template, data));
-            this.$('img.lazy').lazyload({
-                container: this.container,
-                effect: 'fadeIn'
-            });
 			return this;
 		},
         mark: function(e){
