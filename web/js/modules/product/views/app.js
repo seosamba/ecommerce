@@ -408,7 +408,7 @@ define([
                     model: ProductOption,
                     initialize: function(){
                         this.bind('reset', function(collection){
-                            $('#option-library').html('<option value="-1" disabled="disabled">select from library</option>')
+                            $('#option-library').html('<option value="-1" disabled="disabled" selected="selected">select from library</option>')
                                 .append($.tmpl('<option value="${id}" >${title}</option>', collection.toJSON()));
                         }, this);
                     }
