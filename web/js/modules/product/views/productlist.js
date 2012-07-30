@@ -14,16 +14,21 @@ define([
             'click span.ui-icon-closethick': 'removeRelated'
 		},
 		initialize: function(){
-			this.model.bind('change', this.render, this);
-            this.model.bind('remove', this.remove, this);
-			this.model.view = this;
+			this.model.on('change', this.render, this);
+            this.model.on('remove', this.remove, this);
+//			this.model.view = this;
 		},
 		render: function(){
+            console.log('rendered: productlist.js', this.model);
 			var data = this.model.toJSON();
             data.websiteUrl = $('#website_url').val();
 			if (this.options.hasOwnProperty('showDelete')){
-				data['showDelete'] = this.options.showDelete;
+				data.showDelete = this.options.showDelete;
 			}
+            if (!this.model.has('rendered')){
+                data.lazy = true;
+                this.model.set('rendered', true);
+            }
 			$(this.el).html($.tmpl(this.template, data));
 			return this;
 		},

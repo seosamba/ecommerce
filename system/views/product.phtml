@@ -385,10 +385,14 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
     <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
     {{/if}}
         <p class="brand">${brand}</p>
-        {{if showDelete}}
+	    {{if showDelete}}
         <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
         {{else}}
-        <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+	    {{if rendered}}
+        <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+        {{else}}
+	    <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
+	    {{/if}}
         {{/if}}
         <p class="name">${name}</p>
         <p class="sku">${sku}</p>

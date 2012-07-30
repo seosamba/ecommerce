@@ -33,11 +33,13 @@ define([
 		initialize: function(){
 			$('#add-new-option-btn').button();
             var self = this;
+
             $('#product-list-search').ajaxStart(function(){
-                    $(this).attr('disabled', 'disabled');
-                }).ajaxStop(function(){
-                    $(this).removeAttr('disabled');
-                })
+                $(this).attr('disabled', 'disabled');
+            }).ajaxStop(function(){
+                $(this).removeAttr('disabled');
+            });
+
             $.getJSON(this.websiteUrl + 'plugin/shopping/run/getdata/type/index', function(response){
                 $('#product-list-search').autocomplete({
                     minLength: 2,
@@ -48,11 +50,15 @@ define([
                 });
             });
             this.quickPreviewTmpl = $('#quickPreviewTemplate').template();
+
+            $('#image-list').masonry({
+                itemSelector : '.box',
+                columnWidth : 118
+            });
 		},
 		setModel: function (model) {
 			this.model = model;
-            this.model.view = this;
-            this.model.bind('change', this.render, this);
+            this.model.on('change', this.render, this);
             this.model.trigger('change');
             $('#manage-product').tabs("select" , 0);
 		},
@@ -136,7 +142,7 @@ define([
 			this.model.set(data);
 		},
 		render: function(){
-            console.log('render app.js', this.model.changedAttributes());
+            console.log('render: app.js', this.model.changedAttributes());
             $("#manage-product").tabs( "option", "ajaxOptions",
                 { data: {productId: this.model.get('id') } }
             );
@@ -195,33 +201,24 @@ define([
 			if (parseInt(this.model.get('enabled'))){
 				this.$('#product-enabled').attr('checked', 'checked');
 			} else {
-
 				this.$('#product-enabled').removeAttr('checked');
 			}
 
 			if (this.model.has('pageTemplate')){
 				this.$('#product-pageTemplate').val(this.model.get('pageTemplate'));
-			} else {
+			} else if (this.model.has('page')){
+                this.$('#product-pageTemplate').val(this.model.get('page').templateId);
+            } else {
                 this.$('#product-pageTemplate').val('-1');
 			}
-
-            if (this.model.has('page')){
-                this.$('#product-pageTemplate').val(this.model.get('page').templateId);
-            }
 
             if (!this.model.isNew()){
                 $('#quick-preview').html($.tmpl(this.quickPreviewTmpl, this.model.toJSON()));
             }
 
-			$('#image-list').masonry({
-				itemSelector : '.box',
-				columnWidth : 118
-			});
-
-            $('div#ajax_msg:visible').hide('fade');
+			$('div#ajax_msg:visible').hide('fade');
 		},
 		saveProduct: function(){
-			//@todo: make messages translatable
             if (!this.validateProduct()) {
                 showMessage('Missing some required fields', true);
                 $('#manage-product').tabs("select" , 0);
@@ -254,7 +251,7 @@ define([
                         appRouter.products.add(model);
                     }
                     appRouter.navigate('edit/'+model.id, true);
-                    showMessage('Product added');
+                    showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
                 }, error: this.processSaveError});
 			} else {
 				this.model.save(null, {success: function(model, response){
@@ -501,10 +498,12 @@ define([
         hideProductList: function(){
             $('#product-list').hide('slide');
             var term = $('#product-list-search').val();
-            if (term == ''){
-                $('#product-list-search').trigger('keypress', true);
-            } else if (term != appRouter.products.data.key){
-                $('#product-list-search').val(appRouter.products.data.key);
+            if (term != appRouter.products.data.key){
+                if (term == ''){
+                    $('#product-list-search').trigger('keypress', true);
+                } else {
+                    $('#product-list-search').val(appRouter.products.data.key);
+                }
             }
         }
 	});
