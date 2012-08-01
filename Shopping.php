@@ -51,6 +51,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * Cache prefix for use in shopping system
 	 */
 	const CACHE_PREFIX = 'store_';
+
+	const MODULE_NAME = 'store';
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -110,6 +112,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
 	}
 
+	public function beforeRouter(){
+		Zend_Controller_Front::getInstance()->addControllerDirectory(__DIR__.'/system/app/Rest', self::MODULE_NAME);
+	}
+
     public function beforeController(){
 	    $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
 	    if (null === ($checkoutPage = $cacheHelper->load(self::CHECKOUT_PAGE_CACHE_ID, self::CACHE_PREFIX))){
@@ -153,6 +159,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	    }
         $acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
 	    $acl->deny(Tools_Security_Acl::ROLE_GUEST, self::RESOURCE_API);
+	    $acl->deny(Tools_Security_Acl::ROLE_MEMBER, self::RESOURCE_API);
 	    $acl->deny(self::ROLE_SALESPERSON);
 	    $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_ADMINPANEL);
         Zend_Registry::set('acl', $acl);
@@ -1212,6 +1219,23 @@ class Shopping extends Tools_Plugins_Abstract {
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (is_array($id) && !empty($id)){
 			return Models_Mapper_ProductMapper::getInstance()->fetchProductSalesCount($id);
+		}
+	}
+
+	public function restAction(){
+		$resourse = filter_var($this->_request->getParam('resource'), FILTER_SANITIZE_STRING);
+		$className = 'RestService_'.ucfirst(strtolower($resourse));
+		if (in_array(strtolower($resourse), $this->_allowedApi) || Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
+			$zendAutoloader = Zend_Loader_Autoloader::getInstance();
+			$zendAutoloader->suppressNotFoundWarnings(true);
+			if ($zendAutoloader->autoload($className)){
+				$resourse = new $className($this->_request, $this->_response);
+				return $resourse->dispatch();
+			} else {
+				$this->_response->clearAllHeaders()->clearBody();
+				$this->_response->setHttpResponseCode(RestService_Abstract::REST_STATUS_BAD_REQUEST)
+					->sendResponse();
+			}
 		}
 	}
 }
