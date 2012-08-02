@@ -16,7 +16,8 @@ define([
 			enabled: 1,
 			taxClass: 1,
 			related: [],
-            photo: null
+            photo: null,
+            options: new ProductOptions()
 		},
 		initialize: function (){
 //			this.set({options: new ProductOptions()});

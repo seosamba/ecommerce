@@ -48,26 +48,25 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
             }
             , array( $this->_object->getBrand(), $this->_object->getName(), $this->_object->getSku() ));
 		$uniqName = implode('-', $uniqName);
-		$page->setTemplateId($this->_object->getPageTemplate() ? $this->_object->getPageTemplate() : Application_Model_Models_Template::ID_DEFAULT);
-		$page->setParentId($prodCatPage->getId());
-		$page->setNavName($this->_object->getName().' - '.$this->_object->getBrand());
-        $page->setMetaDescription(strip_tags($this->_object->getShortDescription()));
-		$page->setMetaKeywords('');
-		$page->setHeaderTitle($this->_object->getBrand().' '.$this->_object->getName());
-		$page->setH1($this->_object->getName());
-		//$page->setUrl(strtolower($uniqName).'.html');
-        $page->setUrl($pageHelper->filterUrl($uniqName));
-		$page->setTeaserText(strip_tags($this->_object->getShortDescription()));
-		$page->setLastUpdate(date(DATE_ATOM));
-		$page->setIs404page(0);
-		$page->setShowInMenu(1);
-		$page->setSiloId(0);
-		$page->setTargetedKey(Shopping::PRODUCT_CATEGORY_NAME);
-		$page->setProtected(0);
-		$page->setSystem(0);
-		$page->setDraft((bool)$this->_object->getEnabled()?'0':'1');
-		$page->setMemLanding(0);
-		$page->setNews(0);
+		$page->setTemplateId($this->_object->getPageTemplate() ? $this->_object->getPageTemplate() : Application_Model_Models_Template::ID_DEFAULT)
+			->setParentId($prodCatPage->getId())
+			->setNavName($this->_object->getName().' - '.$this->_object->getBrand())
+			->setMetaDescription(strip_tags($this->_object->getShortDescription()))
+			->setMetaKeywords('')
+			->setHeaderTitle($this->_object->getBrand().' '.$this->_object->getName())
+			->setH1($this->_object->getName())
+			->setUrl($pageHelper->filterUrl($uniqName))
+			->setTeaserText(strip_tags($this->_object->getShortDescription()))
+			->setLastUpdate(date(DATE_ATOM))
+			->setIs404page(0)
+			->setShowInMenu(0)
+			->setSiloId(0)
+			->setTargetedKey(Shopping::PRODUCT_CATEGORY_NAME)
+			->setProtected(0)
+			->setSystem(0)
+			->setDraft((bool)$this->_object->getEnabled()?'0':'1')
+			->setMemLanding(0)
+			->setNews(0);
 
 		$id = $pageMapper->save($page);
 
