@@ -256,4 +256,8 @@ class Tools_Misc {
 			}
 		}
 	}
+
+    public static function getCheckoutPage() {
+        return Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_CHECKOUT, true);
+    }
 }

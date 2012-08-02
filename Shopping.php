@@ -41,6 +41,12 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CHECKOUT_PAGE_CACHE_ID = 'cart_checkoutpage';
 
+    /**
+     * Option for the page options system.
+     *
+     */
+    const OPTION_CHECKOUT        = 'option_checkout';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -107,7 +113,7 @@ class Shopping extends Tools_Plugins_Abstract {
     public function beforeController(){
 	    $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
 	    if (null === ($checkoutPage = $cacheHelper->load(self::CHECKOUT_PAGE_CACHE_ID, self::CACHE_PREFIX))){
-		    $checkoutPage = Tools_Page_Tools::getCheckoutPage();
+		    $checkoutPage = Tools_Misc::getCheckoutPage();
 		    $cacheHelper->save(self::CHECKOUT_PAGE_CACHE_ID, $checkoutPage, self::CACHE_PREFIX);
 	    }
 	    if (!$this->_request->isSecure()
