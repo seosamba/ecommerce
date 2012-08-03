@@ -1,16 +1,20 @@
 <?php
 /**
- * Rest_OrdersService
+ * Api_Store_Products
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  * @todo remove $this->_requestedParams
  */
-class RestService_Products extends RestService_Abstract {
+class Api_Store_Products extends Api_Service_Abstract {
 
 	public function init() {
 		parent::init();
 		$this->_productMapper   = Models_Mapper_ProductMapper::getInstance();
 		$this->_cacheHelper     = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
 		$this->_requestedParams = $this->_request->getParams();
+
+		$acl = $this->getAcl();
+		$acl->allow(Tools_Security_Acl::ROLE_SUPERADMIN, strtolower(__CLASS__.'_get'));
+
 	}
 
 	public function getAction() {
@@ -18,12 +22,15 @@ class RestService_Products extends RestService_Abstract {
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (!empty($id)) {
 			$product              = $this->_productMapper->find($id);
+
 			if ($product instanceof Models_Model_Product) {
 				$data = $product->toArray();
 			} elseif (is_array($product) && !empty($product)){
 				$data = array_map(function($prod){
 					return $prod->toArray();
 				}, $product);
+			} else {
+				$this->_error(null, self::REST_STATUS_NOT_FOUND);
 			}
 		} else {
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
