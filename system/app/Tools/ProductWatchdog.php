@@ -68,10 +68,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			->setMemLanding(0)
 			->setNews(0);
 
-		$id = $pageMapper->save($page);
-
-		if($id) {
-			$page->setId($id);
+		if($pageMapper->save($page)) {
 			$this->_object->setPage($page);
 			Models_Mapper_ProductMapper::getInstance()->updatePageIdForProduct($this->_object);
             //setting product photo as page preview
