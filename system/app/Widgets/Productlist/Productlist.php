@@ -116,8 +116,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$products = $this->_products;
 		if((isset($this->_options[0])) && $this->_options[0] == 'sametags') {
 			$products = $this->_listSameTags();
-		}
-		if(empty($products)) {
+		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
 		$wesiteData  = Zend_Registry::get('website');
@@ -187,22 +186,20 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 	protected function _listSameTags() {
 		//get the product
-		$sameTagsProducts = array();
 		$product   = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
 		if(!$product instanceof Models_Model_Product) {
 			throw new Exceptions_SeotoasterWidgetException('Use this widget only on product page');
 		}
-		$excludeId = $product->getId();
-		$tags      = $product->getTags();
-		unset($product);
-		if(is_array($tags) && !empty($tags)) {
-			$sameTagsProducts = $this->_productMapper->findByTags(array_map(function($item) {
-				return $item['id'];
-			}, $tags), false);
+		if (!$product->getTags()){
+			return null;
 		}
-		return array_filter($sameTagsProducts, function($product) use($excludeId) {
-			return ($product->getId() != $excludeId);
-		});
+		$ids = array_map(function($tag) {
+			return $tag['id'];
+		}, $product->getTags());
+
+		$where = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('p.id != ?', $product->getId());
+		unset($product);
+		return $this->_productMapper->fetchAll($where, null, null, null, null, $ids);
 	}
 
 	/**
