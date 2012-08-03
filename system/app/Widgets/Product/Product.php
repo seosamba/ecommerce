@@ -231,8 +231,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
         if (empty($ids)){
             return null;
         }
-        $where = $this->_productMapper->getDbTable()->select()->where('id IN (?)', $ids);
-        $related = $this->_productMapper->fetchAll($where);
+//        $where = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('id IN (?)', $ids);
+        $related = $this->_productMapper->find($ids);
 
         if ($related !== null) {
             $this->_view->related = $related;
