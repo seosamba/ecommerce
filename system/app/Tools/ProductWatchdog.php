@@ -19,9 +19,9 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 	protected function _runOnCreate() {
 		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
 		$pageHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('page');
-		$prodCatPage = $pageMapper->findByUrl(Shopping::PRODUCT_CATEGORY_URL);
-		if (!$prodCatPage){
-			$prodCatPage = new Application_Model_Models_Page(array(
+		$productCategoryPage = $pageMapper->findByUrl(Shopping::PRODUCT_CATEGORY_URL);
+		if (!$productCategoryPage){
+			$productCategoryPage = new Application_Model_Models_Page(array(
 				'h1'			=> Shopping::PRODUCT_CATEGORY_NAME,
 				'headerTitle'	=> Shopping::PRODUCT_CATEGORY_NAME,
 				'url'			=> Shopping::PRODUCT_CATEGORY_URL,
@@ -35,7 +35,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 				'showInMenu'	=> 0,
 				'targetedKey'	=> Shopping::PRODUCT_CATEGORY_NAME
 			));
-			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
+			$pageMapper->save($productCategoryPage);
 		}
 
 		$page = new Application_Model_Models_Page();
@@ -49,7 +49,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
             , array( $this->_object->getBrand(), $this->_object->getName(), $this->_object->getSku() ));
 		$uniqName = implode('-', $uniqName);
 		$page->setTemplateId($this->_object->getPageTemplate() ? $this->_object->getPageTemplate() : Application_Model_Models_Template::ID_DEFAULT)
-			->setParentId($prodCatPage->getId())
+			->setParentId($productCategoryPage->getId())
 			->setNavName($this->_object->getName().' - '.$this->_object->getBrand())
 			->setMetaDescription(strip_tags($this->_object->getShortDescription()))
 			->setMetaKeywords('')
