@@ -376,7 +376,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @throws Exceptions_SeotoasterPluginException
 	 */
 	public function cartAction() {
-		$checkoutPage = Tools_Page_Tools::getCheckoutPage();
+		$checkoutPage = Tools_Misc::getCheckoutPage();
 		if(!$checkoutPage instanceof Application_Model_Models_Page) {
 			throw new Exceptions_SeotoasterPluginException('Error rendering cart. Please select a checkout page');
 		}
@@ -1020,7 +1020,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				'currentTheme' => $extConfig['currentTheme'],
 				'themePath'    => $themeData['path'],
 			);
-			$parser = new Tools_Content_Parser($paymentZoneTmpl, Tools_Page_Tools::getCheckoutPage()->toArray(), $parserOptions);
+			$parser = new Tools_Content_Parser($paymentZoneTmpl, Tools_Misc::getCheckoutPage()->toArray(), $parserOptions);
 			return $parser->parse();
 		}
 	}
