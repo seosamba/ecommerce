@@ -20,7 +20,7 @@ class MagicSpaces_Paymentgateways_Paymentgateways extends Tools_MagicSpaces_Abst
 	}
 
 	private function _findCheckoutTemplateContent() {
-		$checkoutPage     = Tools_Page_Tools::getCheckoutPage();
+		$checkoutPage     = Tools_Misc::getCheckoutPage();
 		$checkoutTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->find($checkoutPage->getTemplateId());
 		if(!$checkoutTemplate instanceof Application_Model_Models_Template) {
 			return false;
