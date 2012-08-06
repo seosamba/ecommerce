@@ -225,38 +225,25 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 * @return array
 	 */
 	private function _loadProducts() {
-		$products = array();
 		if(empty($this->_options)) {
 			return $this->_productMapper->fetchAll(null, array('created_at DESC'), 0, self::DEFAULT_OFFSET);
 		}
-		foreach($this->_options as $option) {
-			if(false === ($optData = $this->_processOption($option))) {
-				continue;
-			}
-			switch($optData['type']) {
-				case self::OPTTYPE_TAGS:
-					$products = $this->_productMapper->findByTags($optData['values']);
-				break;
-				case self::OPTTYPE_BRANDS:
-					if(empty($products)) {
-						$products = $this->_productMapper->findByBrands($optData['values']);
-					}
-					foreach($products as $key => $product) {
-						if(!in_array($product->getBrand(), $optData['values'])) {
-							unset($products[$key]);
-						}
-					}
-				break;
-				case self::OPTTYPE_ORDER:
-					if(!empty($products)) {
-						//$products = $this->_productMapper->fetchAll(null, array(), 0, 100);
-						$products = $this->_sort($products, $optData['values']);
-					}
-
-				break;
+		$filters = array(
+			'tags'      => null,
+			'brands'    => null,
+			'order'     => null
+		);
+		foreach ($this->_options as $option) {
+			if (preg_match('/^(brands|tags|order)-(.*)$/u', $option, $parts)){
+				$filters[$parts[1]] = explode(',', $parts[2]);
 			}
 		}
-		return $products;
+		if (is_array($filters['order']) && !empty($filters['order'])){
+			//normalization to proper column names
+			$filters['order'] = array_map(function($field){ return trim($field)==='brand'? 'b.name' : 'p.'.$field; }, $filters['order']);
+		}
+
+		return $this->_productMapper->fetchAll(null, $filters['order'], null, null, null, $filters['tags'], $filters['brands']);
 	}
 
 	/**
