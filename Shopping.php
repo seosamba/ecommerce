@@ -52,7 +52,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CACHE_PREFIX = 'store_';
 
-	const MODULE_NAME = 'store';
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -112,11 +111,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
 	}
 
-	public function beforeRouter(){
-		Zend_Controller_Front::getInstance()->addControllerDirectory(__DIR__.'/system/app/Rest', self::MODULE_NAME);
-	}
-
-    public function beforeController(){
+	/**
+	 * Method executed before controller launch
+	 */
+	public function beforeController(){
 	    $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
 	    if (null === ($checkoutPage = $cacheHelper->load(self::CHECKOUT_PAGE_CACHE_ID, self::CACHE_PREFIX))){
 		    $checkoutPage = Tools_Misc::getCheckoutPage();
