@@ -533,6 +533,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _taxrulesRESTService() {
 		$taxMapper = Models_Mapper_Tax::getInstance();
         $data = array();
@@ -574,6 +577,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _brandsRESTService() {
         $data = array();
         switch (strtolower($this->_request->getMethod())){
@@ -655,6 +661,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _productRESTService(){
 		$productMapper = Models_Mapper_ProductMapper::getInstance();
 		$method        =  $this->_request->getMethod();
