@@ -478,7 +478,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
     /**
      * @deprecated
-     * @return array|null
      */
 	private function _stateslistRESTService() {
 		return Tools_Geo::getState();
@@ -490,6 +489,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return Tools_Geo::getState($country?$country:null, $toPairs);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _zonesRESTService() {
 		$zonesMapper = Models_Mapper_Zone::getInstance();
         switch (strtolower($this->_request->getMethod())){
