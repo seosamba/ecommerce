@@ -2,7 +2,6 @@
 /**
  * Api_Store_Products
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
- * @todo remove $this->_requestedParams
  */
 class Api_Store_Products extends Api_Service_Abstract {
 
@@ -10,11 +9,10 @@ class Api_Store_Products extends Api_Service_Abstract {
 		parent::init();
 		$this->_productMapper   = Models_Mapper_ProductMapper::getInstance();
 		$this->_cacheHelper     = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
-		$this->_requestedParams = $this->_request->getParams();
 
 		$acl = $this->getAcl();
 		$acl->allow(Tools_Security_Acl::ROLE_SUPERADMIN, strtolower(__CLASS__.'_get'));
-
+		Zend_Registry::set('acl', $acl);
 	}
 
 	public function getAction() {
@@ -38,11 +36,9 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING);
 			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
-			$filter['tags']       = isset($this->_requestedParams['ftag']) ? $this->_requestedParams['ftag'] : null;
-			$filter['brands']     = isset($this->_requestedParams['fbrand']) ? $this->_requestedParams['fbrand'] : null;
-			$tagPart              = (is_array($filter['tags']) && !empty($filter['tags'])) ? implode('.', $filter['tags']) : 'alltags';
-			$brandPart            = (is_array($filter['brands']) && !empty($filter['brands'])) ? implode('.', $filter['brands']) : 'allbrands';
-			$cacheKey             = 'get_product_'.md5($tagPart . $brandPart . $offset . $limit . $key . $count);
+			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
+			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
+			$cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . $offset . $limit . $key . $count);
 			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
 
 				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null,
