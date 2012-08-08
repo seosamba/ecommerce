@@ -613,6 +613,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _tagsRESTService() {
 		$data = array();
 		$tagMapper = Models_Mapper_Tag::getInstance();
@@ -852,11 +855,17 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _optionsRESTService(){
         $optionMapper = Models_Mapper_OptionMapper::getInstance();
         return $optionMapper->fetchAll(array('parentId = ?' => 0), null, false);
     }
 
+	/**
+	 * @deprecated
+	 */
 	protected function _templatesRESTService(){
 		$templatesMapper = Application_Model_Mappers_TemplateMapper::getInstance();
 		if ($this->_request->isGet()){
@@ -998,6 +1007,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	/**
+	 * Generates product grid
+	 * for admins only
+	 * @return string Widget html content
+	 */
 	protected function _makeOptionProducts() {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 			$this->_view->noLayout = true;
@@ -1008,7 +1022,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @deprecated
 	 */
 	private function _customerRESTService() {
 		$data = array();
@@ -1146,6 +1160,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_layout->render();
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _statsRESTService(){
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (is_array($id) && !empty($id)){
