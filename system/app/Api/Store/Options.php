@@ -1,27 +1,22 @@
 <?php
 /**
- * Stats.php
+ * Options.php
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Api_Store_Stats extends Api_Service_Abstract {
+class Api_Store_Options extends Api_Service_Abstract {
 
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
-			'allow' => array('get')
+			'allow' => array('get', 'post')
 		)
 	);
-
 	/**
 	 * The get action handles GET requests and receives an 'id' parameter; it
 	 * should respond with the server resource state of the resource identified
 	 * by the 'id' value.
-	 * @return null|array
 	 */
 	public function getAction() {
-		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
-		if (is_array($id) && !empty($id)){
-			return Models_Mapper_ProductMapper::getInstance()->fetchProductSalesCount($id);
-		}
+        return Models_Mapper_OptionMapper::getInstance()->fetchAll(array('parentId = ?' => 0), null, false);
 	}
 
 	/**
