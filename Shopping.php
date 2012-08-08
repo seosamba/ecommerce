@@ -978,7 +978,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	    echo $this->_layout->render();
 	}
 
-    protected  function _indexRESTService(){
+    public function searchindexAction(){
         $cacheHelper    = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
 
         if(($data = $cacheHelper->load('index', 'store_')) === null) {
@@ -987,7 +987,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $cacheHelper->save('index', $data, 'store_', array('productindex'), Helpers_Action_Cache::CACHE_NORMAL);
         }
 
-        return $data;
+        echo json_encode($data);
     }
 
 	protected function _getConfig() {
