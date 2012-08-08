@@ -872,84 +872,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
-	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
-		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-        $pageHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('page');
-		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
-		if (!$prodCatPage){
-			$prodCatPage = new Application_Model_Models_Page(array(
-				'h1'			=> self::PRODUCT_CATEGORY_NAME,
-				'headerTitle'	=> self::PRODUCT_CATEGORY_NAME,
-				'url'			=> self::PRODUCT_CATEGORY_URL,
-				'navName'		=> self::PRODUCT_CATEGORY_NAME,
-				'templateId'	=> Application_Model_Models_Template::ID_DEFAULT,
-				'parentId'		=> 0,
-				'system'		=> 1,
-				'is404page'		=> 0,
-				'protected'		=> 0,
-				'memLanding'	=> 0,
-				'showInMenu'	=> 0,
-				'targetedKey'	=> self::PRODUCT_CATEGORY_NAME
-			));
-			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
-		}
-		$page = new Application_Model_Models_Page();
-		$uniqName = array_map(function($str){
-            $filter = new Zend_Filter_PregReplace(array(
-                   'match'   => '/[^\w\d]+/u',
-                   'replace' => '-'
-                ));
-            return trim($filter->filter($str), ' -');
-            }
-            , array( $product->getBrand(), $product->getName(), $product->getSku() ));
-		$uniqName = implode('-', $uniqName);
-		$page->setTemplateId($templateId ? $templateId : Application_Model_Models_Template::ID_DEFAULT );
-		$page->setParentId($prodCatPage->getId());
-		$page->setNavName($product->getName().' - '.$product->getBrand());
-        $page->setMetaDescription(strip_tags($product->getShortDescription()));
-		$page->setMetaKeywords('');
-		$page->setHeaderTitle($product->getBrand().' '.$product->getName());
-		$page->setH1($product->getName());
-		//$page->setUrl(strtolower($uniqName).'.html');
-        $page->setUrl($pageHelper->filterUrl($uniqName));
-		$page->setTeaserText(strip_tags($product->getShortDescription()));
-		$page->setLastUpdate(date(DATE_ATOM));
-		$page->setIs404page(0);
-		$page->setShowInMenu(1);
-		$page->setSiloId(0);
-		$page->setTargetedKey(self::PRODUCT_CATEGORY_NAME);
-		$page->setProtected(0);
-		$page->setSystem(0);
-		$page->setDraft((bool)$product->getEnabled()?'0':'1');
-		$page->setMemLanding(0);
-		$page->setNews(0);
-
-		$id = $pageMapper->save($page);
-
-		if($id) {
-			$page->setId($id);
-            //setting product photo as page preview
-            if ($product->getPhoto() != null){
-                $miscConfig = Zend_Registry::get('misc');
-                $savePath = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'];
-                $existingFiles = preg_grep('~^'.strtolower($uniqName).'\.(png|jpg|gif)$~i', Tools_Filesystem_Tools::scanDirectory($savePath, false, false));
-                if  (!empty($existingFiles)){
-                    foreach ($existingFiles as $file) {
-                        Tools_Filesystem_Tools::deleteFile($savePath.$file);
-                    }
-                }
-                $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . str_replace('/', '/small/' , $product->getPhoto());
-                $pagePreviewImg = $savePath.strtolower($uniqName).'.'.pathinfo($productImg, PATHINFO_EXTENSION);
-                if (copy($productImg, $pagePreviewImg)) {
-                    Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, null, true);
-                }
-            }
-		} else {
-			return null;
-		}
-		return $page;
-	}
-
 	/**
      * Method renders product management screen
      * @var $pageMapper Application_Model_Mappers_PageMapper
@@ -1231,20 +1153,4 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
-	public function restAction(){
-		$resourse = filter_var($this->_request->getParam('resource'), FILTER_SANITIZE_STRING);
-		$className = 'RestService_'.ucfirst(strtolower($resourse));
-		if (in_array(strtolower($resourse), $this->_allowedApi) || Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
-			$zendAutoloader = Zend_Loader_Autoloader::getInstance();
-			$zendAutoloader->suppressNotFoundWarnings(true);
-			if ($zendAutoloader->autoload($className)){
-				$resourse = new $className($this->_request, $this->_response);
-				return $resourse->dispatch();
-			} else {
-				$this->_response->clearAllHeaders()->clearBody();
-				$this->_response->setHttpResponseCode(RestService_Abstract::REST_STATUS_BAD_REQUEST)
-					->sendResponse();
-			}
-		}
-	}
 }
