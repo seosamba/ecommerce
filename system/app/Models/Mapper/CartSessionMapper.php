@@ -1,4 +1,7 @@
 <?php
+/**
+ * @method Models_Mapper_CartSessionMapper getInstance() getInstance() Returns an instance of itself
+ */
 class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_dbTable	= 'Models_DbTable_CartSession';
@@ -91,11 +94,10 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 	public function fetchAll($where = null, $order = array()) {
 		$entries = array();
 		$resultSet = $this->getDbTable()->fetchAll($where, $order);
-		if(null === $resultSet) {
-			return null;
-		}
-		foreach ($resultSet as $row) {
-			$entries[] = $this->_toModel($row);
+		if(sizeof($resultSet)){
+			foreach ($resultSet as $row) {
+				$entries[] = $this->_toModel($row);
+			}
 		}
 		return $entries;
 	}
@@ -118,5 +120,16 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		}
 
 		return $model;
+	}
+
+	public function findByProductId($productId){
+		if (!is_numeric($productId)){}
+		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+				->from(array('cart' => 'shopping_cart_session'))
+				->join(array('content' => 'shopping_cart_session_content'), 'content.cart_id = cart.id')
+				->where('content.product_id = ?', $productId);
+
+		APPLICATION_ENV === 'development' && error_log($select->__toString());
+		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
 }
