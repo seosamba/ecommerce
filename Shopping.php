@@ -220,8 +220,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/**
 	 * Shipping configuration action
-	 * @todo Optimize view assertion - config and shipping plugins will be enough all others should be on the view
-	 *
 	 */
 	protected function shippingAction() {
 		if($this->_request->isPost()) {
@@ -231,12 +229,10 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
-		$config                        = $this->_getConfig();
-		$this->_view->config           = $config;
-		$this->_view->shippingAmount   = isset($config['shippingAmount']) ? $config['shippingAmount'] : 0;
-		$this->_view->shippingGeneral  = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
-		$this->_view->shippingWeight   = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
-		//$this->_view->shippingExternal = isset($config['shippingExternal']) ? json_encode($config['shippingExternal']) : 0;
+
+		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+		$this->_view->freeForm = new Forms_Shipping_FreeShipping();
+
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -249,10 +245,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
 			$this->_response->setHttpResponseCode(403)->sendResponse();
 		}
-		$plugin = filter_var($this->_request->getParam('pluginname'), FILTER_SANITIZE_STRING);
-		if ($plugin){
-			echo Tools_Misc::getShippingPluginContent($plugin);
-		}
+		$this->_jsonHelper->direct(Models_Mapper_ShippingConfigMapper::getInstance()->fetchAll());
 	}
 
 	/**
