@@ -2,185 +2,121 @@
 $title = $this->translate('Shipping configuration');
 $this->headTitle($title);
 $this->placeholder('headerContent')->set($title);
+
+$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/shipping.js'));
+
 ?>
 <style>
-	header.option, header.option label{
-		cursor: pointer;
-	}
-	header.option label input {
-		vertical-align: bottom;
-	}
-	header.option {
-		padding: 4px 2px;
-		border-bottom: 1px solid #ccc;
-	}
-	header.section {
-		font-weight: bold;
-		padding: 4px 20px;
-		color: #eee;
-		background-color: #666;
-		margin-top: 10px;
-		font-variant: small-caps;
-	}
-	/*#shipping-config fieldset legend,*/
-	#shipping-config  label {
-		padding: 0;
-	}
-	#shipping-config fieldset fieldset {
-		padding: 0;
-	}
-	#shipping-config fieldset legend {
-	}
+#shippers ul li {
+	clear: both;
+	width: 100%;
+}
+#shippers ul li > a {
+	width: 80%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#shippers .ui-tabs-panel {
+	padding: 4px;
+}
+#shippers #pane-container header {
+	color: gray;
+	padding: 4px 20px;
+	border-bottom: 1px solid #b5b5b5;
+	font-variant: small-caps;
+	font-size: 120%;
+}
+.textright {
+	text-align: right;
+}
+.relative {
+	position: relative;
+}
+#shippers .relative input {
+
+}
+.unit-over {
+	color: #999;
+	position: absolute;
+	top: 5px;
+	right: 3px;
+}
+ul.ui-tabs-nav span.unit-over {
+	cursor: pointer;
+}
+ul.ui-tabs-nav span.unit-over:hover {
+	text-decoration: underline;
+}
+ul.ui-tabs-nav li.enabled a {
+	color: #228b22;
+}
+ul.ui-tabs-nav li.disabled a {
+	color: #cd5c5c;
+}
+#ajax_msg {
+	position: absolute;
+	top: 3px;
+	left: 0;
+	width: 100%;
+	z-index: 5000;
+	text-align: center;
+	display: none;
+}
+#ajax_msg img {
+	vertical-align: middle;
+}
 </style>
-<script>
-    $(function() {
-        $('.fieldset-content').not('.active').hide();
-        $('input[name=shippingType]').on('click', function() {
-            $('.fieldset-content').hide();
-            console.log($(this).closest('fieldset').find('.fieldset-content:first').slideDown());
-        });
 
-	    $('#shipping-plugin').on('change', function(e){
-		    if ($(this).val() === '-1' ){
-			    $('#shipper-config').html('');
-			    return false;
-		    }
-		    $.ajax({
-			    url: '<?php echo $this->url(array('run' => 'shippingconfig'), 'pluginroute');?>',
-			    data: {pluginname: $(this).val()},
-			    success: function(response) {
-				    $('#shipper-config').html(response);
-			    }
-		    })
-	    });
-    });
-</script>
+<div id="ajax_msg"><img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /></div>
+<div id="shipping-config" class="container_12">
+	<div id="shippers" class="mt10px mb10px clearfix">
+		<ul class="grid_4 omega">
+			<li><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup');?></a></li>
+			<li><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping');?></a></li>
+		<?php foreach($this->shippingPlugins as $plugin):?>
+			<li><a data-plugin="<?php echo $plugin->getName();?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute');?>"><?php echo $plugin->getName();?></a></li>
+		<?php endforeach; ?>
+		</ul>
+		<div id="pane-container" class="grid_8 relative">
 
-
-<div id="shipping-config" class="container_12 h540 rounded3px">
-
-	<form action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/shipping/" name="saveconfig" class="_fajax" id="saveconfig" method="post" enctype="multipart/form-data">
-	    <div class="grid_6">
-		    <header class="section"><?php echo $this->translate('flat rate shipping');?></header>
-		    <fieldset id="#shipping-options">
-			    <fieldset>
-		            <header class="option">
-			            <?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('pickup'=>" Pickup: (No shipping)"));?>
-		            </header>
-	                <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='pickup'?'active':'');?>">
-	                    <label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
-	                </div>
-	            </fieldset>
-	            <fieldset>
-		            <header class="option">
-			            <?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('amount'=>" Shipping per order amount"));?>
-	                </header>
-		            <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='amount'?'active':'');?>">
-		                <div class="grid_4 textcentered">
-	                        <label class="mb5px"><?php echo $this->translate('Order amount...');?></label>
-							<label class="grid_5 mt10px">up to&nbsp;</label>
-			                <input class="grid_5" name="shippingAmount[1][limit]" type="text" value="<?php echo $this->shippingAmount[1]['limit'];?>" />
-							<label class="grid_5 mt10px">up to&nbsp;</label>
-			                <input class="grid_5" name="shippingAmount[2][limit]" type="text" value="<?php echo $this->shippingAmount[2]['limit'];?>" />
-							<label class="grid_5 mt10px">over&nbsp;</label>
-			                <input class="grid_5" name="shippingAmount[3][limit]" type="text" value="<?php echo $this->shippingAmount[3]['limit'];?>" />
-	                    </div>
-		                <div class="grid_4 textcentered">
-		                    <label class="mb5px"><?php echo $this->translate('National');?></label>
-			                <?php foreach ($this->shippingAmount as $index => $amount) :?>
-			                <div class="grid_8">
-				                <?php echo $this->formText("shippingAmount[$index][national]", $amount['national']); ?>
-			                </div>
-			                <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
-			                <?php endforeach;?>
-		                </div>
-
-		                <div class="grid_4 textcentered">
-		                    <label class="mb5px"><?php echo $this->translate('International');?></label>
-			                <?php foreach ($this->shippingAmount as $index => $amount) :?>
-                            <div class="grid_8">
-                                <?php echo $this->formText("shippingAmount[$index][international]", $amount['international']); ?>
-                            </div>
-                            <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
-                            <?php endforeach;?>
-		                </div>
-		                <div style="grid_12">
-							<label class="grid_12 mt5px mb5px">Free shipping for order over:</label>
-							<input class="grid_3" type="text" name="shippingGeneral[freeShippingOver]" value="<?php echo $this->shippingGeneral['freeShippingOver'];?>"/>
-							<label class="grid_2 mt10px">&nbsp;<?php echo $this->config['currency'];?>&nbsp;for&nbsp;</label>
-			                <?php echo $this->formSelect('shippingGeneral[freeShippingOptions]',
-										$this->shippingGeneral['freeShippingOptions'],
-										array('class' => 'grid_3'), array(
-				                            'select',
-				                            'national' => $this->translate('National'),
-				                            'international' => $this->translate('International'),
-				                            'both' => $this->translate('Both')
-			                            ));
-			                ?>
-							<label class="grid_3 mt10px">delivery</label>
-		                </div>
-	                </div>
-				</fieldset>
-				<fieldset>
-					<header class="option">
-						<?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('weight'=>' Shipping per total weight'));?>
-					</header>
-		            <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='weight'?' active':'');?>">
-		                <div class="grid_4 textcentered">
-		                    <label class="mb5px">Order weight...&nbsp;</label>
-							<label class="grid_5 mt10px">up to&nbsp;</label>
-			                <input class="grid_5" name="shippingWeight[1][limit]" id="sh-weight-1-limit" type="text" value="<?php echo $this->shippingWeight[1]['limit'];?>" />
-							<label class="grid_5 mt10px">up to&nbsp;</label>
-			                <input class="grid_5" name="shippingWeight[2][limit]" id="sh-weight-2-limit" type="text" value="<?php echo $this->shippingWeight[2]['limit'];?>" />
-							<label class="grid_5 mt10px">over&nbsp;</label>
-			                <input class="grid_5" name="shippingWeight[3][limit]" id="sh-weight-3-limit" type="text" value="<?php echo $this->shippingWeight[3]['limit'];?>" />
-		                </div>
-		                <div class="grid_4 textcentered">
-		                    <label class="mb5px">National</label>
-			                <?php foreach ($this->shippingWeight as $index => $amount) :?>
-                            <div class="grid_8">
-                                <?php echo $this->formText("shippingWeight[$index][national]", $amount['national']); ?>
-                            </div>
-                            <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
-                            <?php endforeach;?>
-		                </div>
-		                <div class="grid_4 textcentered">
-		                    <label class="mb5px">International</label>
-			                <?php foreach ($this->shippingWeight as $index => $amount) :?>
-                            <div class="grid_8">
-                                <?php echo $this->formText("shippingWeight[$index][international]", $amount['international']); ?>
-                            </div>
-                            <label class="grid_4 mt10px"><?php echo $this->config['currency']; ?></label>
-                            <?php endforeach;?>
-		                </div>
+			<div id="pickup">
+				<label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
+			</div>
+			<div id="freeshipping">
+				<header>Free shipping</header>
+				<form class="clearfix" action="<?php echo $this->freeForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
+					<label class="grid_3 mt5px textright" for="amount"><?php echo $this->freeForm->getElement('amount')->getLabel();?></label>
+					<div class="grid_3 relative">
+						<?php echo $this->freeForm->getElement('amount')->renderViewHelper();?>
+						<label class="unit-over"><?php echo $this->config['currency'];?></label>
 					</div>
-				</fieldset>
-			</fieldset>
-	    </div>
-	    <div class="grid_6">
-		    <fieldset class="mt10px">
-			    <header class="option" style="font-weight: bold; padding: 4px 20px; color: #EEE; background-color: #666; margin: -6px -2% 5px;">
-				    <?php echo $this->formRadio('shippingType', $this->config['shippingType'], null, array('external'=>' Shipping plugin'));?>
-			    </header>
-			    <div class="padding5px fieldset-content <?php echo ($this->config['shippingType']=='external'?'active':'');?>">
-	                <p>
-	                    <select name="shippingPlugin" id="shipping-plugin">
-	                        <option value="-1">select</option>
-	                        <?php foreach ($this->shippingPlugins as $shippingPlugin): ?>
-	                            <option value="<?php echo $shippingPlugin->getName();?>" <?php echo ($shippingPlugin->getName() == $this->config['shippingPlugin'] ? ' selected="selected" ' : '') ;?>><?php echo $shippingPlugin->getName();?></option>
-	                        <?php endforeach; ?>
-	                    </select>
-	                </p>
-	                <div id="shipper-config" class="mt5px">
-	                    <?php if(strtolower($this->config['shippingPlugin']) !== '-1'): ?>
-		                    <?php echo Tools_Misc::getShippingPluginContent($this->config['shippingPlugin']); ?>
-						<?php endif; ?>
-	                </div>
-	            </div>
-	        </fieldset>
-	    </div>
-		<div class="grid_12">
-	        <input type="submit" name="submit" value="Save" class="formsubmit"/>
+					<label class="grid_2 mt5px textcentered"><?php echo $this->freeForm->getElement('destination')->getLabel();?></label>
+					<div class="grid_3">
+						<?php echo $this->freeForm->getElement('destination')->renderViewHelper();?>
+					</div>
+				</form>
+			</div>
 		</div>
-	</form>
+		<div class="grid_12 mt10px">
+			<?php echo $this->formSubmit('submit', 'Save');?>
+		</div>
+	</div>
 </div>
+
+<script>
+$(function(){
+	$('#shippers').tabs({
+		idPrefix: 'shipper-tab',
+		panelTemplate: '<div class="clearfix"></div>',
+		create: function(event, ui){
+			$(this).find('ul.ui-tabs-nav, ul.ui-tabs-nav > li').removeClass('ui-corner-top ui-widget-header')
+				.end().find('.ui-tabs-panel').removeClass('ui-corner-bottom');
+		}
+	});
+	$('#ajax_msg').ajaxStart(function(){
+		$(this).fadeIn();
+	}).ajaxStop(function(){
+		$(this).fadeOut();
+	});
+});
+</script>
