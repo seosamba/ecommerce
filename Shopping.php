@@ -228,13 +228,13 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * Shipping configuration action
 	 */
 	protected function shippingAction() {
-//		if($this->_request->isPost()) {
-//			$shippingData = $this->_request->getParams();
-//			$this->_configMapper->save(array_map(function($param) {
-//				return (is_array($param)) ? serialize($param) : $param;
-//			}, $shippingData));
-//			$this->_jsonHelper->direct($shippingData);
-//		}
+		if($this->_request->isPost()) {
+			$shippingData = $this->_request->getParams();
+			$this->_configMapper->save(array_map(function($param) {
+				return (is_array($param)) ? serialize($param) : $param;
+			}, $shippingData));
+			$this->_jsonHelper->direct($shippingData);
+		}
 
 		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$this->_view->freeForm = new Forms_Shipping_FreeShipping();
@@ -254,6 +254,103 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_jsonHelper->direct(Models_Mapper_ShippingConfigMapper::getInstance()->fetchAll());
 	}
 
+
+	/**
+	 * Checkout action
+	 *
+	 * @throws Exceptions_SeotoasterPluginException
+	 */
+	public function checkoutAction() {
+		if($this->_request->isGet()) {
+			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+		}
+		if ($this->_request->isPut()) {
+			$data = Zend_Json::decode($this->_request->getRawBody());
+			if (!empty($data) && isset($this->_sessionHelper->tmpShippingRates)){
+				if ($this->_applyCustomerShipping($data)) {
+					$this->_responseHelper->success(array(
+						'callback' => 'renderPaymentZone',
+						'data'     => $this->_renderPaymentZone()
+					));
+				}
+			}
+			$this->_responseHelper->fail('Undefined error');
+		}
+		$shippingType = $this->_configMapper->getConfigParam('shippingType');
+		if ($shippingType !== Tools_Shipping_Shipping::SHIPPING_TYPE_PICKUP) {
+			$form = new Forms_Checkout_Shipping();
+			$addressType = Models_Model_Customer::ADDRESS_TYPE_SHIPPING;
+		} else {
+			$form = new Forms_Checkout_Billing();
+			$addressType = Models_Model_Customer::ADDRESS_TYPE_BILLING;
+		}
+
+		if ($form->isValid($this->_request->getParams())){
+			$shoppingCart = Tools_ShoppingCart::getInstance();
+
+			$formData = $form->getValues();
+
+			$customer = $this->_processCustomer($formData);
+
+			$addressId = Models_Mapper_CustomerMapper::getInstance()->addAddress($customer, $formData, $addressType);
+
+			$shoppingCart->setAddressKey($addressType, $addressId);
+
+			$shippingCalc = new Tools_Shipping_Shipping($this->_getConfig());
+			try {
+				$shippingData = $shippingCalc->calculateShipping();
+				if (is_array($shippingData) && !empty($shippingData)){
+					if (sizeof($shippingData) === 1 && sizeof($shippingData[0]['rates']) === 1){
+						$shippingData = reset($shippingData);
+
+						$shippingData['rates'] = reset($shippingData['rates']);
+						$shoppingCart->setShippingData(array(
+							'service' => $shippingData['service'],
+							'type' => $shippingData['rates']['type'],
+							'price' => $shippingData['rates']['price']
+						));
+						$responseData = array(
+							'callback' => 'renderPaymentZone',
+							'data'     => $this->_renderPaymentZone()
+						);
+
+					} else {
+						$this->_sessionHelper->tmpShippingRates = $shippingData;
+						$responseData = array(
+							'callback' => 'showShippingDialog',
+							'data'     => $shippingData
+						);
+					}
+				}
+			} catch (Exceptions_SeotoasterPluginException $spe) {
+				$this->_responseHelper->fail($spe->getMessage());
+			}
+			//saving cart to session and db
+			$shoppingCart->save()->saveCartSession($customer);
+		} else {
+			$this->_responseHelper->fail(Tools_Content_Tools::proccessFormMessagesIntoHtml($form->getMessages(),get_class($form)));
+		}
+
+		$this->_responseHelper->success($responseData);
+	}
+
+	private function _applyCustomerShipping($data) {
+		foreach ($this->_sessionHelper->tmpShippingRates as $item){
+			if (isset($item['service']) && $item['service'] === $data['service']){
+				if (isset($item['rates'][$data['index']])){
+					Tools_ShoppingCart::getInstance()->setShippingData(
+						array(
+							'service'   => $item['service'],
+							'type'      => $item['rates'][$data['index']]['type'],
+							'price'     => $item['rates'][$data['index']]['price']
+						))->save()->saveCartSession(null);
+					unset($this->_sessionHelper->tmpShippingRates);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Method creates customer or returns existing one
