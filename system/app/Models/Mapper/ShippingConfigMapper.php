@@ -8,9 +8,9 @@
  */
 class Models_Mapper_ShippingConfigMapper extends Application_Model_Mappers_Abstract {
 
-	const STATUS_ENABLED = 1;
+	const STATUS_ENABLED = '1';
 
-	const STATUS_DISABLED = 0;
+	const STATUS_DISABLED = '0';
 
 	protected  function __construct(){
 		$this->_dbTable = new Zend_Db_Table('shopping_shipping_config');
@@ -55,7 +55,7 @@ class Models_Mapper_ShippingConfigMapper extends Application_Model_Mappers_Abstr
 	}
 
 	public function fetchByStatus($status){
-		return $this->fetchAll(array('status = ?', (bool) $status ? self::STATUS_ENABLED : self::STATUS_DISABLED));
+		return $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('enabled = ?', $status));
 	}
 
 	public function fetchAll($where = null, $order = array()) {
