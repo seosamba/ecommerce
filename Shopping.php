@@ -47,6 +47,12 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     const OPTION_CHECKOUT        = 'option_checkout';
 
+	const KEY_CHECKOUT_ADDRESS   = 'address';
+	const KEY_CHECKOUT_SHIPPER   = 'shipper';
+
+	const SHIPPING_FREESHIPPING = 'freeshipping';
+
+	const SHIPPING_PICKUP       = 'pickup';
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -345,7 +351,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		return false;
 	}
 
-	private function _processCustomer($data) {
+	/**
+	 * Method creates customer or returns existing one
+	 * @static
+	 * @param $data array Customer details
+	 * @return Models_Model_Customer
+	 */
+	public static function processCustomer($data) {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()){
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
@@ -954,7 +966,6 @@ class Shopping extends Tools_Plugins_Abstract {
 			$themeData = Zend_Registry::get('theme');
 			$extConfig = Zend_Registry::get('extConfig');
 			$parserOptions = array(
-
 				'websiteUrl'   => $this->_websiteHelper->getUrl(),
 				'websitePath'  => $this->_websiteHelper->getPath(),
 				'currentTheme' => $extConfig['currentTheme'],
@@ -1160,6 +1171,47 @@ class Shopping extends Tools_Plugins_Abstract {
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (is_array($id) && !empty($id)){
 			return Models_Mapper_ProductMapper::getInstance()->fetchProductSalesCount($id);
+		}
+	}
+
+	public function bundledshipperAction(){
+		$name = filter_var($this->_request->getParam('shipper'), FILTER_SANITIZE_STRING);
+		$bundledShippers = array(
+			self::SHIPPING_FREESHIPPING,
+			self::SHIPPING_PICKUP
+		);
+
+		if (!in_array($name, $bundledShippers)){
+			throw new Exceptions_SeotoasterException('Bad request');
+		}
+
+		if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)){
+			switch ($name){
+				case self::SHIPPING_FREESHIPPING:
+					$form = new Forms_Shipping_FreeShipping();
+					break;
+				case self::SHIPPING_PICKUP:
+//					$form = new Forms_Shipping_Pickup();
+					break;
+				default:
+					break;
+			}
+			if ($this->_request->isPost()){
+				if ($form->isValid($this->_request->getParams())){
+					$config = array(
+						'name' => $name,
+						'config' => $form->getValues()
+					);
+					Models_Mapper_ShippingConfigMapper::getInstance()->save($config);
+				}
+			} else {
+				$pluginConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find($name);
+				if (isset($pluginConfig['config']) && !empty($pluginConfig['config'])){
+					$form->populate($pluginConfig['config']);
+				}
+			}
+			$form->setAction(trim($this->_websiteUrl,'/').$this->_view->url(array('run'=>'config', 'name' => 'usps'),'pluginroute'));
+			echo $form;
 		}
 	}
 
