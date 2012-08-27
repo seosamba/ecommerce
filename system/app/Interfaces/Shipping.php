@@ -1,32 +1,25 @@
 <?php
 /**
- *
- *
- * @author Eugene I. Nezhuta <eugene@seotoaster.com>
+ * Shipping plugin interface
  */
 interface Interfaces_Shipping {
 
-	public function setConfig($config);
-
 	/**
-	 * Setting origination address from array
+	 * Main method to interact with shipper API server
+	 * Returns a result - collection of rates in format:
+	 * array(
+	 *  'price' => 10.99,
+	 *  'type'  => 'Name of service',
+	 *  'descr' => 'Description of delivery method
+	 * );
 	 */
-	public function setOrigination(array $address);
+	public function calculateAction();
 
 	/**
-     * Setting destination address from array
-     */
-	public function setDestination(array $address);
+	 * Method that returns config form and process config saving.
+	 * Process submited for via POST request
+	 * @return text/html
+	 */
+	public function configAction();
 
-	/**
-     * Setting weight and units
-     */
-    public function setWeight($weight, $unit = '');
-
-	/**
-     * Main method to interact with shipper API server and return a result
-     */
-    public function run();
-
-	public static function getConfigScreen();
 }
