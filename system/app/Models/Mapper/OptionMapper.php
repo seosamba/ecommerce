@@ -70,7 +70,7 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		$selectionTable->getAdapter()->beginTransaction();
 
         $selectionList = $model->getSelection();
-		foreach ($selectionList as $item) {
+		foreach ($selectionList as &$item) {
 			$data = array(
 				'option_id'		=> $model->getId(),
 				'title'			=> $item['title'],
@@ -89,10 +89,14 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 				}
 				$selectionTable->update($data, $where);
 			} else {
-				$selectionTable->insert($data);
+				$id = $selectionTable->insert($data);
+				if ($id) {
+					$item['id'] = $id;
+				}
 			}
 		}
-		
+		$model->setSelection($selectionList);
+
 		return $selectionTable->getAdapter()->commit();
 	}
 
