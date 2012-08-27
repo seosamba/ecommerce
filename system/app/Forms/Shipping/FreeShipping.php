@@ -5,23 +5,30 @@
  */
 class Forms_Shipping_FreeShipping extends Zend_Form {
 
+	const DESTINATION_NATIONAL = 'national';
+
+	const DESTINATION_INTERNATIONAL = 'international';
+
+	const DESTINATION_BOTH = 'both';
+
 	public function init() {
 		//free shipping
-		$this->addElement('text', 'amount', array(
-			'name'      => 'price',
-			'belongsTo' => 'free',
-			'label'     => 'For orders over'
+		$this->addElement('hidden', 'shipper', array(
+			'ignore' => true,
+			'value' => Shopping::SHIPPING_FREESHIPPING
+		));
+
+		$this->addElement('text', 'cartamount', array(
+			'label' => 'For orders over'
 		));
 
 		$this->addElement('select', 'destination', array(
 			'label'         => 'delivery to',
-			'name'          => 'destination',
-			'belongsTo'     => 'free',
 			'multiOptions'  => array(
 				'0'             => 'select',
-				'national'      => 'National',
-				'international' => 'International',
-				'both'          => 'Both'
+				self::DESTINATION_NATIONAL      => 'National',
+				self::DESTINATION_INTERNATIONAL => 'International',
+				self::DESTINATION_BOTH          => 'Both'
 			)
 		));
 	}
