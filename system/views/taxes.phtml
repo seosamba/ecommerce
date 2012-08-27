@@ -60,20 +60,20 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 
 <?php
 $this->placeholder('headerContent')->captureStart();
-	echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
-	echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'));
+echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
+echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'));
 $this->placeholder('headerContent')->captureEnd();
 ?>
 
 <div id="manage-taxes">
 
 	<div class="ui-helper-clearfix padding10px" style="text-align:center; font-weight:bold; line-height: 20px;">
-		<div class="grid_1">Selected</div>
-		<div class="grid_4"><a href="javascript:;" data-url="<?php echo trim($this->websiteUrl, ' /').$this->url(array('run' => 'zones'));?>" class="tpopup" title="Click here to open zone manager">Manage zones<span class="ui-icon ui-icon-newwin" style="display: inline-block;"></span></a></div>
+		<div class="grid_1"><?php echo $this->translate('Default');?></div>
+		<div class="grid_4"><?php echo $this->translate('Zone');?></div>
 		<div class="grid_6 omega">
-			<div class="grid_4">Default Tax</div>
-			<div class="grid_4">Tax Rate 1</div>
-			<div class="grid_4">Tax Rate 2</div>
+			<div class="grid_4"><?php echo $this->translate('Default Tax');?></div>
+			<div class="grid_4"><?php echo $this->translate('Tax Rate 1');?></div>
+			<div class="grid_4"><?php echo $this->translate('Tax Rate 2');?></div>
 		</div>
 		<div class="grid_1">&nbsp;</div>
 	</div>
@@ -84,6 +84,6 @@ $this->placeholder('headerContent')->captureEnd();
 
 	<div class="padding10px">
 		<button id="new-rule-btn" class="blue-btn"><?php echo $this->translate('Add new');?></button>
-		<button id="save-btn" style="float:right;"><?php echo $this->translate('Save');?></button>
+		<button id="save-btn" style="float:right;"><?php echo $this->translate('Save and close');?></button>
 	</div>
 </div>

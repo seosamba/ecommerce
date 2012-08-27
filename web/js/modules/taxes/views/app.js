@@ -29,11 +29,10 @@ define([
             console.log(JSON.stringify(this.rulesCollection.toJSON()));
 
             $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON()}, function(response){
-                app.view.rulesCollection.fetch();
+                closePopup();
             });
         },
         newRule: function(){
-            console.log(arguments);
             this.rulesCollection.add();
         },
         changeTaxConfig: function(e){
