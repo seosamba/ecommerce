@@ -84,10 +84,12 @@ ul.ui-tabs-nav li.disabled a {
 			</div>
 			<div id="freeshipping">
 				<header>Free shipping</header>
+				<?php $this->freeForm->setAction($this->url(array('run' => 'bundledshipper')));?>
 				<form class="clearfix" action="<?php echo $this->freeForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
-					<label class="grid_3 mt5px textright" for="amount"><?php echo $this->freeForm->getElement('amount')->getLabel();?></label>
+					<?php echo $this->freeForm->getElement('shipper')->renderViewHelper(); ?>
+					<label class="grid_3 mt5px textright" for="cartamount"><?php echo $this->freeForm->getElement('cartamount')->getLabel();?></label>
 					<div class="grid_3 relative">
-						<?php echo $this->freeForm->getElement('amount')->renderViewHelper();?>
+						<?php echo $this->freeForm->getElement('cartamount')->renderViewHelper();?>
 						<label class="unit-over"><?php echo $this->config['currency'];?></label>
 					</div>
 					<label class="grid_2 mt5px textcentered"><?php echo $this->freeForm->getElement('destination')->getLabel();?></label>
