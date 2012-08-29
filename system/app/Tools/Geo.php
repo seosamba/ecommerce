@@ -208,7 +208,7 @@ class Tools_Geo {
 	 * @todo add check if stateId not found
 	 */
 	public static function getStateById($stateId) {
-		if (is_nan($stateId)) {
+		if (!is_numeric($stateId)) {
 			return null;
 		}
 		$stateTable = new Zend_Db_Table('shopping_list_state');
