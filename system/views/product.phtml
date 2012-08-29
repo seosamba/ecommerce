@@ -462,12 +462,16 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 	<div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
 
     <ul>
-        <li><a href="#main-tab"><?php echo $this->translate('Main Info'); ?></a></li>
+        <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
         <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
-        <li><a href="#options-tab"><?php echo $this->translate('Options'); ?></a></li>
+        <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
         <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
         <?php foreach ($this->plugins as $plugin) : ?>
-        <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.ucfirst($plugin));?></a></li>
+		<?php
+        $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+	    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+	    ?>
+        <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.$title);?></a></li>
         <?php endforeach; ?>
         <a href="#new" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
         <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
