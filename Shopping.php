@@ -573,7 +573,7 @@ class Shopping extends Tools_Plugins_Abstract {
             default:
             case 'get':
 		        $brandsList = Models_Mapper_Brand::getInstance()->fetchAll(null, array('name'));
-                $pagesUrls = Application_Model_Mappers_PageMapper::getInstance()->fetchAllUrls();
+                $pagesUrls = array(); //Application_Model_Mappers_PageMapper::getInstance()->fetchAllUrls();
 		        $data = array_map(function($brand) use ($pagesUrls) {
 			        $item = $brand->toArray();
                     if (in_array(strtolower($brand->getName()).'.html', $pagesUrls)){
