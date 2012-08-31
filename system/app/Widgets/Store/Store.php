@@ -45,7 +45,9 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 	protected function _init() {
 		$this->_view = new Zend_View();
+		$this->_view->websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
 		$this->_view->setScriptPath(realpath(__DIR__.DIRECTORY_SEPARATOR.'views'));
+//		$this->_view->addScriptPath(realpath(__DIR__.'/../../../views/'));
 	}
 
 
@@ -88,6 +90,19 @@ class Widgets_Store_Store extends Widgets_Abstract {
 	protected function _makeOptionProfile(){
 		if (Tools_ShoppingCart::getInstance()->getCustomer()->getId()) {
 			return $this->_view->render('profile.phtml');
+		}
+	}
+
+	/**
+	 * Generates manage orders grid
+	 * @return string Html content
+	 */
+	protected function _makeOptionOrders() {
+		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
+			$this->_view->noLayout = true;
+			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
+			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
+			return $this->_view->render('manage_orders.phtml');
 		}
 	}
 }

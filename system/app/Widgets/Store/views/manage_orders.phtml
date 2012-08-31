@@ -1,0 +1,102 @@
+<?php
+$this->headScript()->setAllowArbitraryAttributes(true)->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js');
+$this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
+echo $this->noLayout ? $this->headLink() : '';
+?>
+<style>
+	.oh,.ot,.tt{float:left;margin:1%;width:48%}.ot{width:31%}.tt{width:65%}.cl{clear:both}
+</style>
+<div id="store-orders" class="clearfix">
+	<div>
+		<div class="filters cl clearfix">
+			<div class="oh">
+				<div class="ot"><label>Search</label></div>
+				<div class="tt">
+					<input type="text" class="filter" name="filter[search]" placeholder="<?php echo $this->translate('by order ID') ?>" >
+				</div>
+			</div>
+			<div class="oh">
+				<input type="text" class="filter" name="filter[product]" placeholder="by product name, sku, mpn">
+			</div>
+			<div id="extra-filters-switch" class="cl" style="text-align: center">Filter</div>
+			<div id="extra-filters">
+				<div class="ot">
+					<label>by price range</label>
+					<div class="ot"><label class="mt5px">from</label></div>
+					<div class="tt">
+						<input type="text" name="filter[from-amount]" >
+					</div>
+					<div class="ot"><label class="mt5px">to</label></div>
+					<div class="tt"><input class="ot" type="text" name="filter[to-amount]" ></div>
+				</div>
+				<div class="ot">
+					<label class="cl">by dates</label>
+					<div class="ot"><label class="mt5px">from</label></div>
+					<div class="tt"><input type="text" id="orders-filter-fromdate" name="filter[from-date]"></div>
+					<div class="ot"><label class="mt5px">to</label></div>
+					<div class="tt"><input type="text" id="orders-filter-todate" name="filter[to-date]"></div>
+				</div>
+				<div class="ot">
+					<label>by shipping desination</label>
+					<select class="filter" name="filter[country]" style="width: 90%" data-placeholder="shipping country"></select>
+					<select class="filter" name="filter[state]" style="width: 90%" data-placeholder="shipping state"></select>
+					<select class="filter" name="filter[shipper]" style="width: 90%" data-placeholder="shipping carrier"></select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<table id="orders-table" class="ui-helper-reset">
+		<thead>
+			<tr class="title-table">
+				<th>#</th>
+				<th><?php echo $this->translate('Customer name');?></th>
+				<th><?php echo $this->translate('Email');?></th>
+				<th><?php echo $this->translate('Purchased on');?></th>
+				<th><?php echo $this->translate('Status');?></th>
+				<th><?php echo $this->translate('Products in cart');?></th>
+				<th><?php echo $this->translate('Total price');?></th>
+				<th><?php echo $this->translate('Shipping price');?></th>
+				<th><?php echo $this->translate('Shipping via');?></th>
+				<th><?php echo $this->translate('Details');?></th>
+			</tr>
+		</thead>
+		<tbody id="orders-list">
+			<td colspan="8" style="text-align:center;">
+				<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading...">
+			</td>
+		</tbody>
+	</table>
+	<?php //var_dump($this->orders); ?>
+</div>
+
+<script>
+$(function(){
+	$('select.filter', '#store-orders').chosen();
+	var filterFromDate = $('#orders-filter-fromdate', '#store-orders'),
+		filterToDate = $('#orders-filter-todate', '#store-orders');
+	filterFromDate.datepicker({
+	    dateFormat: 'yy-mm-dd',
+        defaultDate: "+1w",
+	    changeMonth: true,
+	    changeYear: true,
+	    yearRange: "c-5:c+5",
+	    onSelect: function(selectedDate){
+		    filterToDate.datepicker("option", "minDate", selectedDate);
+	    }
+    });
+    filterToDate.datepicker({
+        dateFormat: 'yy-mm-dd',
+        defaultDate: "+1w",
+        changeMonth: true,
+	    changeYear: true,
+	    yearRange: "c-5:c+5",
+        onSelect: function(selectedDate){
+	        filterFromDate.datepicker("option", "maxDate", selectedDate);
+        }
+    });
+	$('#extra-filters-switch').on('click', function(){
+		$('#extra-filters').toggle('drop', {});
+	});
+});
+</script>
+<script data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/store-orders.js" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"></script>
