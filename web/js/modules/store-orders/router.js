@@ -4,7 +4,7 @@
  */
 define([
 	'backbone',
-	'./views/app',
+	'./views/app'
 ], function(Backbone, AppView){
 	var Router = Backbone.Router.extend({
 		app: null,
