@@ -3,6 +3,7 @@
  * Ecommerce plugin for SEOTOASTER 2.0
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  * @see http://www.seotoaster.com
+ * @todo remove deprecated before next release
  */
 class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
@@ -30,6 +31,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * New system resource 'api'
 	 */
 	const RESOURCE_API  = 'api';
+
+	/**
+	 * Resource descibes store management widgets and screens
+	 */
+	const RESOURCE_STORE_MANAGEMENT = 'storemanagement';
 
 	/**
 	 * Default cart plugin
@@ -161,10 +167,14 @@ class Shopping extends Tools_Plugins_Abstract {
 	    if(!$acl->has(self::RESOURCE_API)) {
 		    $acl->addResource(new Zend_Acl_Resource(self::RESOURCE_API));
 	    }
+		if (!$acl->has(self::RESOURCE_STORE_MANAGEMENT)) {
+			$acl->addResource(new Zend_Acl_Resource(self::RESOURCE_STORE_MANAGEMENT));
+		}
         $acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
 	    $acl->deny(Tools_Security_Acl::ROLE_GUEST, self::RESOURCE_API);
 	    $acl->deny(Tools_Security_Acl::ROLE_MEMBER, self::RESOURCE_API);
 	    $acl->deny(self::ROLE_SALESPERSON);
+	    $acl->allow(self::ROLE_SALESPERSON, self::RESOURCE_STORE_MANAGEMENT);
 	    $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_ADMINPANEL);
         Zend_Registry::set('acl', $acl);
     }

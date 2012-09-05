@@ -98,7 +98,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 	 * @return string Html content
 	 */
 	protected function _makeOptionOrders() {
-		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
+		if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)){
 			$this->_view->noLayout = true;
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
