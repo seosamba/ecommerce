@@ -18,8 +18,14 @@ class Api_Store_Orders extends Api_Service_Abstract {
 	 */
 	public function getAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
+		$orderMapper = Models_Mapper_OrdersMapper::getInstance();
+		$count = (bool) $this->_request->has('count');
+		if ($count){
+			$orderMapper->lastQueryResultCount($count);
+		}
 		if ($id){
-			$order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
+			$where = $orderMapper->getDbTable()->getAdapter()->quoteInto('order.id = ?', intval($id));
+			$order = $orderMapper->fetchAll($where);
 			if (is_null($order)){
 				$this->_error(null, self::REST_STATUS_NOT_FOUND);
 			}
@@ -28,20 +34,20 @@ class Api_Store_Orders extends Api_Service_Abstract {
 					$this->_error(null, self::REST_STATUS_FORBIDDEN);
 				}
 			}
-			return $order->toArray();
+			return $order;
 		} else {
-			$filter = $this->_request->getParam('pid');
-			if ($filter !== null){
-				$filter = filter_var($filter, FILTER_VALIDATE_INT);
-				if ($filter !== false){
-					return Models_Mapper_CartSessionMapper::getInstance()->findByProductId($filter);
-				} else {
-					$this->_error();
-				}
+			$filter = $this->_request->getParam('filter');
+			$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
+			$order = filter_var_array($this->_request->getParam('order', array()), FILTER_SANITIZE_STRING);
+			if (is_array($filter)){
+				$filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
+				$filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
+				return $orderMapper->fetchAll($filter, $order, $limit, $offset);
 			} else {
-				$orderList = Models_Mapper_CartSessionMapper::getInstance()->fetchAll();
+				$orderList = $orderMapper->fetchAll();
 			}
-			return array_map(function($order){ return $order->toArray(); }, $orderList);
+			return $orderList;
 		}
 	}
 

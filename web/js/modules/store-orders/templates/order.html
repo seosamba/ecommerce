@@ -1,9 +1,10 @@
 <td><%= id %></td>
-<td>NAME</td>
-<td>EMAIL</td>
-<td><%= createdAt %></td>
+<td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
+<td><%= _.isNull(billing_address_id) ? shipping_email+' '+shipping_lastname : billing_email+' '+billing_lastname %></td>
+<td><%= created_at %></td>
 <td><%= status %></td>
-<td><%= cartContent.length %></td>
+<td><%= total_products %></td>
 <td><%= total %></td>
-<td><%= shippingPrice %></td>
-<td><%= shippingService+': '+shippingType %></td>
+<td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
+<td><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+': '+shipping_type %></td>
+<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>">view</a></td>

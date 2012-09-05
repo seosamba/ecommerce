@@ -20,7 +20,7 @@
                 stateLabel    = stateSelect.attr('id') && $('label[for='+stateSelect.attr('id')+']', this);
 
             //hiding state element if it's empty
-            if (stateSelect.find('option').length === 0){
+            if (options.toogleStateVisibility && stateSelect.find('option').length === 0){
                 stateSelect.hide();
                 stateLabel && stateLabel.hide();
             }
@@ -39,7 +39,7 @@
                             var html = '';
 
                             $.each(response, function(key, item){
-                               //handling if states returned as key-value pairs of as set of objects
+                               //handling if states returned as key-value pairs or as set of objects
                                 if (typeof item === 'string') {
                                     html += '<option value="' + key + '" label="' + item +
                                         '" data-country="' + countryCode + '">' + item + '</option>';
@@ -50,14 +50,16 @@
                                     $.error('Wrong response data format from server');
                                 }
                             });
-                            stateSelect.html(html);
+                            stateSelect.html(html).trigger('addressChain:updated');
 
-                            if (html.length) {
-                                stateSelect.show();
-                                stateLabel && stateLabel.show();
-                            } else {
-                                stateSelect.hide();
-                                stateLabel && stateLabel.hide();
+                            if (options.toogleStateVisibility){
+                                if (html.length) {
+                                    stateSelect.show();
+                                    stateLabel && stateLabel.show();
+                                } else {
+                                    stateSelect.hide();
+                                    stateLabel && stateLabel.hide();
+                                }
                             }
 
                             if (defaultValues && stateSelect.children().size()){
@@ -92,7 +94,8 @@
         stateSelector: "select[name$=state]",
         countryUrl: null,
         url: '',
-        cache: false
+        cache: false, /* TODO implement chaching */
+        toogleStateVisibility: true
     };
 
 })( jQuery, window, document );

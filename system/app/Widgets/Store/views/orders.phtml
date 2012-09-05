@@ -1,49 +1,61 @@
 <?php
-$this->headScript()->setAllowArbitraryAttributes(true)->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js');
+$this->headScript()->setAllowArbitraryAttributes(true)
+		->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+		->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/addresschain.jquery.js');
 $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
 echo $this->noLayout ? $this->headLink() : '';
 ?>
 <style>
 	.oh,.ot,.tt{float:left;margin:1%;width:48%}.ot{width:31%}.tt{width:65%}.cl{clear:both}
+	#store-orders select.filter {
+		width: 90%;
+	}
 </style>
 <div id="store-orders" class="clearfix">
 	<div>
-		<div class="filters cl clearfix">
+		<form class="filters cl clearfix">
 			<div class="oh">
 				<div class="ot"><label>Search</label></div>
 				<div class="tt">
-					<input type="text" class="filter" name="filter[search]" placeholder="<?php echo $this->translate('by order ID') ?>" >
+					<input type="text" class="filter" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
 				</div>
 			</div>
 			<div class="oh">
-				<input type="text" class="filter" name="filter[product]" placeholder="by product name, sku, mpn">
+				<input type="text" class="filter" name="filter-product-key" placeholder="by product name, sku, mpn">
 			</div>
-			<div id="extra-filters-switch" class="cl" style="text-align: center">Filter</div>
+			<div id="extra-filters-switch" class="cl" style="text-align: center; cursor:pointer;">show/hide advanced filters</div>
 			<div id="extra-filters">
 				<div class="ot">
 					<label>by price range</label>
 					<div class="ot"><label class="mt5px">from</label></div>
 					<div class="tt">
-						<input type="text" name="filter[from-amount]" >
+						<input type="text" name="filter-from-amount" >
 					</div>
 					<div class="ot"><label class="mt5px">to</label></div>
-					<div class="tt"><input class="ot" type="text" name="filter[to-amount]" ></div>
+					<div class="tt"><input class="ot" type="text" name="filter-to-amount" ></div>
 				</div>
 				<div class="ot">
 					<label class="cl">by dates</label>
 					<div class="ot"><label class="mt5px">from</label></div>
-					<div class="tt"><input type="text" id="orders-filter-fromdate" name="filter[from-date]"></div>
+					<div class="tt"><input type="text" id="orders-filter-fromdate" name="filter-from-date"></div>
 					<div class="ot"><label class="mt5px">to</label></div>
-					<div class="tt"><input type="text" id="orders-filter-todate" name="filter[to-date]"></div>
+					<div class="tt"><input type="text" id="orders-filter-todate" name="filter-to-date"></div>
 				</div>
 				<div class="ot">
 					<label>by shipping desination</label>
-					<select class="filter" name="filter[country]" style="width: 90%" data-placeholder="shipping country"></select>
-					<select class="filter" name="filter[state]" style="width: 90%" data-placeholder="shipping state"></select>
-					<select class="filter" name="filter[shipper]" style="width: 90%" data-placeholder="shipping carrier"></select>
+					<?php
+					$countryList = Tools_Geo::getCountries(true);
+					array_unshift($countryList, '');
+					?>
+					<?php echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => 'shipping country'), $countryList ); ?>
+					<?php echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => 'shipping state'), array('') ); ?>
+					<?php echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), array('') ); ?>
+				</div>
+				<div class="cl" style="text-align:right;">
+					<input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="Apply filter" >
 				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 	<table id="orders-table" class="ui-helper-reset">
 		<thead>
@@ -61,10 +73,14 @@ echo $this->noLayout ? $this->headLink() : '';
 			</tr>
 		</thead>
 		<tbody id="orders-list">
-			<td colspan="8" style="text-align:center;">
+			<td colspan="10" style="text-align:center;">
 				<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading...">
 			</td>
 		</tbody>
+		<tfoot>
+			<td colspan="8"></td>
+			<td colspan="2" class="paginator"></td>
+		</tfoot>
 	</table>
 	<?php //var_dump($this->orders); ?>
 </div>
@@ -94,9 +110,15 @@ $(function(){
 	        filterFromDate.datepicker("option", "maxDate", selectedDate);
         }
     });
-	$('#extra-filters-switch').on('click', function(){
-		$('#extra-filters').toggle('drop', {});
+	$('#filter-state').on('addressChain:updated', function(){
+		$(this).trigger('liszt:updated');
+	})
+	$('#extra-filters').addressChain({
+		countrySelector: $('#filter-country'),
+		stateSelector: $('#filter-state'),
+		toogleStateVisibility: false,
+		url: $('#website_url').val()+'api/store/geo/type/state?pairs'
 	});
 });
 </script>
-<script data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/store-orders.js" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"></script>
+<script data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/modules/store-orders/main.js" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"></script>

@@ -11,15 +11,22 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_model	= 'Models_Model_CartSession';
 
+	protected static $_lastQueryResultCount = false;
+
 	public function save($model) {
 		// TODO: Implement save() method.
 	}
 
-	public function fetchAll(){
+	public function lastQueryResultCount($flag){
+		self::$_lastQueryResultCount = (bool) $flag;
+		return $this;
+	}
+
+	public function fetchAll($where = null, $order = null, $limit = null, $offset = null){
 		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
 				->setIntegrityCheck(false)
 				->from(array('order' => 'shopping_cart_session'))
-				->joinLeft(array('oc' => 'shopping_cart_session_content'), 'oc.cart_id = order.id', array('total_products' => 'COUNT(oc.id)'))
+				->joinLeft(array('oc' => 'shopping_cart_session_content'), 'oc.cart_id = order.id', array('total_products' => 'COUNT(DISTINCT oc.id)'))
 				->joinLeft(array('s_adr' => 'shopping_customer_address'), 's_adr.id = order.shipping_address_id', array(
 					'shipping_firstname' => 'firstname',
 					'shipping_lastname' => 'lastname',
@@ -47,9 +54,81 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 					'billing_zip' => 'zip',
 					'billing_address1' => 'address1',
 					'billing_address2' => 'address2'
-				));
+				))
+				->group('order.id');
+
+		if ($where){
+			$where = (array) $where;
+			$this->_parseWhere($select, $where);
+		}
 
 		APPLICATION_ENV === 'development' && error_log($select->__toString());
+
+		if (self::$_lastQueryResultCount){
+			$data = $this->getDbTable()->fetchAll($select)->toArray();
+
+			return array(
+				'totalRecords'  => sizeof($data),
+				'data'          => array_slice($data, $offset, $limit),
+				'offset'        => $offset,
+				'limit'         => $limit
+			);
+		}
+
+		$select->limit($limit, $offset);
+
 		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
+
+	private function _parseWhere(Zend_Db_Table_Select $select, $where){
+		if (isset($where['product-id']) || isset($where['product-key'])){
+			$select->join(array('p' => 'shopping_product'), 'p.id = oc.product_id', null);
+		}
+		if (is_string($where)){
+			return $select->where($where);
+		}
+		if (!is_array($where)){
+			return $select;
+		}
+		foreach ($where as $key => $val){
+			if (is_int($key)) {
+				$select->where($val);
+			} else {
+				$key = strtolower($key);
+				switch($key){
+					case 'product-id':
+						$select->where('p.id = ?', $val);
+						break;
+					case 'product-key':
+						$likeWhere = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
+						$select->where($likeWhere, '%'.$val.'%');
+						break;
+					case 'country':
+					case 'state':
+						$key = sprintf('s_adr.%1$s = ? OR b_adr.%1$s = ?', $key);
+						$select->where($key, $val);
+						break;
+					case 'carrier':
+						$select->where('order.shipping_service = ?', $val);
+						break;
+					case 'date-from':
+						$select->where('order.created_at > ?', date(DATE_ATOM, strtotime($val)));
+						break;
+					case 'date-to':
+						$select->where('order.created_at < ?', date(DATE_ATOM, strtotime($val)));
+						break;
+					case 'amount-from':
+						$val = filter_var($val, FILTER_SANITIZE_NUMBER_FLOAT);
+						$select->where('order.total >= ?', $val);
+						break;
+					case 'amount-to':
+						$val = filter_var($val, FILTER_SANITIZE_NUMBER_FLOAT);
+						$select->where('order.total <= ?', $val);
+						break;
+				}
+			}
+		}
+		return $select;
+	}
+
 }

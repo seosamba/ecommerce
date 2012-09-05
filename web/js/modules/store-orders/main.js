@@ -1,31 +1,25 @@
-define(['backbone',
-    './collections/orders',
-    './views/order'
-], function(Backbone,
-        OrdersCollection, OrdersView
-    ){
-    var MainView = Backbone.View.extend({
-        el: $('#store-orders'),
-        events: {
+/**
+ * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ */
+require.config({
+    paths: {
+        'underscore': '../../libs/underscore/underscore-min',
+        'backbone'  : '../../libs/backbone/backbone-min',
+        'backbone.paginator'  : '../../libs/backbone/backbone.paginator.min',
+        'text'  : '../../text'
+    },
+    shim: {
+        underscore: { exports: '_' },
+        backbone: {
+            deps: ['underscore'],
+            exports: 'Backbone'
+        },
+        'backbone.paginator': ['backbone']
+    }
+});
 
-        },
-        initialize: function(){
-            this.orders = new OrdersCollection;
-            this.orders.on('reset', this.renderOrders, this);
-            this.orders.pager();
-        },
-        render: function(){
-
-        },
-        renderOrder: function(order){
-            var view = new OrdersView({model: order});
-            this.$('#orders-list').append(view.render().el);
-        },
-        renderOrders: function(){
-            this.$('#orders-list').empty();
-            this.orders.each(this.renderOrder.bind(this));
-        }
-    });
-
-    return MainView;
+require([
+    './router'
+], function(Router){
+    return Router.initialize();
 });

@@ -102,7 +102,8 @@ class Widgets_Store_Store extends Widgets_Abstract {
 			$this->_view->noLayout = true;
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
-			return $this->_view->render('manage_orders.phtml');
+			$this->_view->shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+			return $this->_view->render('orders.phtml');
 		}
 	}
 }
