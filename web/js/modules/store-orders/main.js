@@ -6,7 +6,7 @@ require.config({
         'underscore': '../../libs/underscore/underscore-min',
         'backbone'  : '../../libs/backbone/backbone-min',
         'backbone.paginator'  : '../../libs/backbone/backbone.paginator.min',
-        'text'  : '../../text'
+        'text'  : '../../libs/require/text'
     },
     shim: {
         underscore: { exports: '_' },
