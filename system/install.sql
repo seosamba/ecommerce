@@ -350,3 +350,6 @@ ALTER TABLE `shopping_customer_info`
 ALTER TABLE `shopping_tax`
   ADD CONSTRAINT `shopping_tax_ibfk_1` FOREIGN KEY (`zoneId`) REFERENCES `shopping_zone` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
+INSERT INTO `page_option` (`id`, `title`, `context`, `active`) VALUES
+('option_checkout', 'The cart checkout page', 'Cart and checkout', 1),
+('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1);
