@@ -49,9 +49,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
     /**
      * Option for the page options system.
-     *
      */
-    const OPTION_CHECKOUT        = 'option_checkout';
+    const OPTION_CHECKOUT       = 'option_checkout';
+
+	/**
+	 * Option for the page options system
+	 */
+	const OPTION_THANKYOU       = 'option_storethankyou';
 
 	const KEY_CHECKOUT_ADDRESS   = 'address';
 	const KEY_CHECKOUT_SHIPPER   = 'shipper';
@@ -101,6 +105,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	    )
     );
 
+	/**
+	 * @deprecated
+	 */
 	private $_allowedApi = array('countrylist', 'states');
 
 	public static $emailTriggers = array(
@@ -1226,4 +1233,17 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	/**
+	 * Action redirects customer to post purchase 'thank you' page if exists
+	 * If not redirects to index page
+	 */
+	public function thankyouAction(){
+		Tools_ShoppingCart::getInstance()->clean();
+
+		$thankyouPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_THANKYOU, true);
+		if (!$thankyouPage){
+			$this->_redirector->gotoUrl($this->_websiteHelper->getDefaultPage());
+		}
+		$this->_redirector->gotoUrl($thankyouPage->getUrl());
+	}
 }
