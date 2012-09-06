@@ -123,6 +123,20 @@ CREATE TABLE IF NOT EXISTS `shopping_config` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+INSERT INTO `shopping_config` (`name`, `value`) VALUES
+('address1', ''),
+('address2', ''),
+('cartPlugin', 'cart'),
+('city', 'San Francisco'),
+('company', 'Demo Store'),
+('country', 'US'),
+('currency', 'USD'),
+('email', 'demostore@example.com'),
+('forceSSLCheckout', '0'),
+('showPriceIncTax', '1'),
+('state', '5'),
+('weightUnit', 'kg');
+
 CREATE TABLE IF NOT EXISTS `shopping_product` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
@@ -285,13 +299,24 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   KEY `state` (`state`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
 CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
   `user_id` int(10) unsigned NOT NULL,
   `default_shipping_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `default_billing_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_shipping_config` (
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Shipping plugin name',
+  `enabled` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  `config` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`name`),
+  KEY `enabled` (`enabled`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `shopping_shipping_config` (`name`, `enabled`, `config`) VALUES
+('freeshipping', '1', NULL),
+('pickup', '1', NULL);
 
 ALTER TABLE `shopping_product`
   ADD CONSTRAINT `shopping_product_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `page` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
@@ -325,3 +350,6 @@ ALTER TABLE `shopping_customer_info`
 ALTER TABLE `shopping_tax`
   ADD CONSTRAINT `shopping_tax_ibfk_1` FOREIGN KEY (`zoneId`) REFERENCES `shopping_zone` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
+INSERT INTO `page_option` (`id`, `title`, `context`, `active`) VALUES
+('option_checkout', 'The cart checkout page', 'Cart and checkout', 1),
+('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1);

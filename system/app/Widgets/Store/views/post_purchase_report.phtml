@@ -1,0 +1,34 @@
+<table>
+	<thead>
+		<tr>
+			<th><?php echo $this->translate('Product'); ?></th>
+			<th><?php echo $this->translate('Price'); ?></th>
+			<th><?php echo $this->translate('Qty'); ?></th>
+			<th><?php echo $this->translate('Total'); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($this->cart->getCartContent() as $product) :?>
+		<tr>
+			<td><?php echo $product['name']; ?></td>
+			<td><?php echo $this->currency($product['tax_price']); ?></td>
+			<td><?php echo $product['qty']; ?></td>
+			<td><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="3"><?php echo $this->translate('Sub-Total');?></td>
+			<td><?php echo $this->currency($this->cart->getSubTotal());?></td>
+		</tr>
+		<tr>
+			<td colspan="3"><?php echo $this->translate('Shipping');?></td>
+			<td><?php echo $this->currency($this->cart->getShippingPrice());?></td>
+		</tr>
+		<tr>
+			<td colspan="3"><?php echo $this->translate('Total');?></td>
+			<td><?php echo $this->currency($this->cart->getTotal());?></td>
+		</tr>
+	</tfoot>
+</table>

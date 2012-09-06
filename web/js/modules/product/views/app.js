@@ -40,7 +40,7 @@ define([
                 $(this).removeAttr('disabled');
             });
 
-            $.getJSON(this.websiteUrl + 'plugin/shopping/run/getdata/type/index', function(response){
+            $.getJSON(this.websiteUrl + 'plugin/shopping/run/searchindex', function(response){
                 $('#product-list-search').autocomplete({
                     minLength: 2,
                     source: response,

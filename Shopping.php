@@ -3,6 +3,7 @@
  * Ecommerce plugin for SEOTOASTER 2.0
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  * @see http://www.seotoaster.com
+ * @todo remove deprecated before next release
  */
 class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME	= 'Product Pages';
@@ -32,6 +33,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	const RESOURCE_API  = 'api';
 
 	/**
+	 * Resource descibes store management widgets and screens
+	 */
+	const RESOURCE_STORE_MANAGEMENT = 'storemanagement';
+
+	/**
 	 * Default cart plugin
 	 */
 	const DEFAULT_CART_PLUGIN = 'cart';
@@ -43,14 +49,25 @@ class Shopping extends Tools_Plugins_Abstract {
 
     /**
      * Option for the page options system.
-     *
      */
-    const OPTION_CHECKOUT        = 'option_checkout';
+    const OPTION_CHECKOUT       = 'option_checkout';
 
+	/**
+	 * Option for the page options system
+	 */
+	const OPTION_THANKYOU       = 'option_storethankyou';
+
+	const KEY_CHECKOUT_ADDRESS   = 'address';
+	const KEY_CHECKOUT_SHIPPER   = 'shipper';
+
+	const SHIPPING_FREESHIPPING = 'freeshipping';
+
+	const SHIPPING_PICKUP       = 'pickup';
 	/**
 	 * Cache prefix for use in shopping system
 	 */
 	const CACHE_PREFIX = 'store_';
+
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -88,6 +105,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	    )
     );
 
+	/**
+	 * @deprecated
+	 */
 	private $_allowedApi = array('countrylist', 'states');
 
 	public static $emailTriggers = array(
@@ -110,7 +130,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
 	}
 
-    public function beforeController(){
+	/**
+	 * Method executed before controller launch
+	 */
+	public function beforeController(){
 	    $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
 	    if (null === ($checkoutPage = $cacheHelper->load(self::CHECKOUT_PAGE_CACHE_ID, self::CACHE_PREFIX))){
 		    $checkoutPage = Tools_Misc::getCheckoutPage();
@@ -151,9 +174,14 @@ class Shopping extends Tools_Plugins_Abstract {
 	    if(!$acl->has(self::RESOURCE_API)) {
 		    $acl->addResource(new Zend_Acl_Resource(self::RESOURCE_API));
 	    }
+		if (!$acl->has(self::RESOURCE_STORE_MANAGEMENT)) {
+			$acl->addResource(new Zend_Acl_Resource(self::RESOURCE_STORE_MANAGEMENT));
+		}
         $acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
 	    $acl->deny(Tools_Security_Acl::ROLE_GUEST, self::RESOURCE_API);
+	    $acl->deny(Tools_Security_Acl::ROLE_MEMBER, self::RESOURCE_API);
 	    $acl->deny(self::ROLE_SALESPERSON);
+	    $acl->allow(self::ROLE_SALESPERSON, self::RESOURCE_STORE_MANAGEMENT);
 	    $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_ADMINPANEL);
         Zend_Registry::set('acl', $acl);
     }
@@ -215,8 +243,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/**
 	 * Shipping configuration action
-	 * @todo Optimize view assertion - config and shipping plugins will be enough all others should be on the view
-	 *
 	 */
 	protected function shippingAction() {
 		if($this->_request->isPost()) {
@@ -226,12 +252,10 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
-		$config                        = $this->_getConfig();
-		$this->_view->config           = $config;
-		$this->_view->shippingAmount   = isset($config['shippingAmount']) ? $config['shippingAmount'] : 0;
-		$this->_view->shippingGeneral  = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
-		$this->_view->shippingWeight   = isset($config['shippingGeneral']) ? $config['shippingGeneral'] : 0;
-		//$this->_view->shippingExternal = isset($config['shippingExternal']) ? json_encode($config['shippingExternal']) : 0;
+
+		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+		$this->_view->freeForm = new Forms_Shipping_FreeShipping();
+
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -244,11 +268,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
 			$this->_response->setHttpResponseCode(403)->sendResponse();
 		}
-		$plugin = filter_var($this->_request->getParam('pluginname'), FILTER_SANITIZE_STRING);
-		if ($plugin){
-			echo Tools_Misc::getShippingPluginContent($plugin);
-		}
+		$this->_jsonHelper->direct(Models_Mapper_ShippingConfigMapper::getInstance()->fetchAll());
 	}
+
 
 	/**
 	 * Checkout action
@@ -347,7 +369,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		return false;
 	}
 
-	private function _processCustomer($data) {
+	/**
+	 * Method creates customer or returns existing one
+	 * @static
+	 * @param $data array Customer details
+	 * @return Models_Model_Customer
+	 */
+	public static function processCustomer($data) {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()){
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
@@ -473,7 +501,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
     /**
      * @deprecated
-     * @return array|null
      */
 	private function _stateslistRESTService() {
 		return Tools_Geo::getState();
@@ -485,6 +512,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return Tools_Geo::getState($country?$country:null, $toPairs);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _zonesRESTService() {
 		$zonesMapper = Models_Mapper_Zone::getInstance();
         switch (strtolower($this->_request->getMethod())){
@@ -526,6 +556,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _taxrulesRESTService() {
 		$taxMapper = Models_Mapper_Tax::getInstance();
         $data = array();
@@ -567,6 +600,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _brandsRESTService() {
         $data = array();
         switch (strtolower($this->_request->getMethod())){
@@ -600,6 +636,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _tagsRESTService() {
 		$data = array();
 		$tagMapper = Models_Mapper_Tag::getInstance();
@@ -648,6 +687,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _productRESTService(){
 		$productMapper = Models_Mapper_ProductMapper::getInstance();
 		$method        =  $this->_request->getMethod();
@@ -836,11 +878,17 @@ class Shopping extends Tools_Plugins_Abstract {
 		return $data;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _optionsRESTService(){
         $optionMapper = Models_Mapper_OptionMapper::getInstance();
         return $optionMapper->fetchAll(array('parentId = ?' => 0), null, false);
     }
 
+	/**
+	 * @deprecated
+	 */
 	protected function _templatesRESTService(){
 		$templatesMapper = Application_Model_Mappers_TemplateMapper::getInstance();
 		if ($this->_request->isGet()){
@@ -854,84 +902,6 @@ class Shopping extends Tools_Plugins_Abstract {
 				return array_filter($template->toArray());
 			}, $data);
 		}
-	}
-
-	protected function _savePageForProduct(Models_Model_Product $product, $templateId = null){
-		$pageMapper = Application_Model_Mappers_PageMapper::getInstance();
-        $pageHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('page');
-		$prodCatPage = $pageMapper->findByUrl(self::PRODUCT_CATEGORY_URL);
-		if (!$prodCatPage){
-			$prodCatPage = new Application_Model_Models_Page(array(
-				'h1'			=> self::PRODUCT_CATEGORY_NAME,
-				'headerTitle'	=> self::PRODUCT_CATEGORY_NAME,
-				'url'			=> self::PRODUCT_CATEGORY_URL,
-				'navName'		=> self::PRODUCT_CATEGORY_NAME,
-				'templateId'	=> Application_Model_Models_Template::ID_DEFAULT,
-				'parentId'		=> 0,
-				'system'		=> 1,
-				'is404page'		=> 0,
-				'protected'		=> 0,
-				'memLanding'	=> 0,
-				'showInMenu'	=> 0,
-				'targetedKey'	=> self::PRODUCT_CATEGORY_NAME
-			));
-			$prodCatPage->setId( $pageMapper->save($prodCatPage) );
-		}
-		$page = new Application_Model_Models_Page();
-		$uniqName = array_map(function($str){
-            $filter = new Zend_Filter_PregReplace(array(
-                   'match'   => '/[^\w\d]+/u',
-                   'replace' => '-'
-                ));
-            return trim($filter->filter($str), ' -');
-            }
-            , array( $product->getBrand(), $product->getName(), $product->getSku() ));
-		$uniqName = implode('-', $uniqName);
-		$page->setTemplateId($templateId ? $templateId : Application_Model_Models_Template::ID_DEFAULT );
-		$page->setParentId($prodCatPage->getId());
-		$page->setNavName($product->getName().' - '.$product->getBrand());
-        $page->setMetaDescription(strip_tags($product->getShortDescription()));
-		$page->setMetaKeywords('');
-		$page->setHeaderTitle($product->getBrand().' '.$product->getName());
-		$page->setH1($product->getName());
-		//$page->setUrl(strtolower($uniqName).'.html');
-        $page->setUrl($pageHelper->filterUrl($uniqName));
-		$page->setTeaserText(strip_tags($product->getShortDescription()));
-		$page->setLastUpdate(date(DATE_ATOM));
-		$page->setIs404page(0);
-		$page->setShowInMenu(1);
-		$page->setSiloId(0);
-		$page->setTargetedKey(self::PRODUCT_CATEGORY_NAME);
-		$page->setProtected(0);
-		$page->setSystem(0);
-		$page->setDraft((bool)$product->getEnabled()?'0':'1');
-		$page->setMemLanding(0);
-		$page->setNews(0);
-
-		$id = $pageMapper->save($page);
-
-		if($id) {
-			$page->setId($id);
-            //setting product photo as page preview
-            if ($product->getPhoto() != null){
-                $miscConfig = Zend_Registry::get('misc');
-                $savePath = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'];
-                $existingFiles = preg_grep('~^'.strtolower($uniqName).'\.(png|jpg|gif)$~i', Tools_Filesystem_Tools::scanDirectory($savePath, false, false));
-                if  (!empty($existingFiles)){
-                    foreach ($existingFiles as $file) {
-                        Tools_Filesystem_Tools::deleteFile($savePath.$file);
-                    }
-                }
-                $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . str_replace('/', '/small/' , $product->getPhoto());
-                $pagePreviewImg = $savePath.strtolower($uniqName).'.'.pathinfo($productImg, PATHINFO_EXTENSION);
-                if (copy($productImg, $pagePreviewImg)) {
-                    Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, null, true);
-                }
-            }
-		} else {
-			return null;
-		}
-		return $page;
 	}
 
 	/**
@@ -962,7 +932,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	    echo $this->_layout->render();
 	}
 
-    protected  function _indexRESTService(){
+    public function searchindexAction(){
         $cacheHelper    = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
 
         if(($data = $cacheHelper->load('index', 'store_')) === null) {
@@ -971,7 +941,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $cacheHelper->save('index', $data, 'store_', array('productindex'), Helpers_Action_Cache::CACHE_NORMAL);
         }
 
-        return $data;
+        echo json_encode($data);
     }
 
 	protected function _getConfig() {
@@ -1014,7 +984,6 @@ class Shopping extends Tools_Plugins_Abstract {
 			$themeData = Zend_Registry::get('theme');
 			$extConfig = Zend_Registry::get('extConfig');
 			$parserOptions = array(
-
 				'websiteUrl'   => $this->_websiteHelper->getUrl(),
 				'websitePath'  => $this->_websiteHelper->getPath(),
 				'currentTheme' => $extConfig['currentTheme'],
@@ -1060,6 +1029,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	/**
+	 * Generates product grid
+	 * for admins only
+	 * @return string Widget html content
+	 */
 	protected function _makeOptionProducts() {
 		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 			$this->_view->noLayout = true;
@@ -1070,7 +1044,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @deprecated
 	 */
 	private function _customerRESTService() {
 		$data = array();
@@ -1208,10 +1182,69 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $this->_layout->render();
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _statsRESTService(){
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (is_array($id) && !empty($id)){
 			return Models_Mapper_ProductMapper::getInstance()->fetchProductSalesCount($id);
 		}
+	}
+
+	public function bundledshipperAction(){
+		$name = filter_var($this->_request->getParam('shipper'), FILTER_SANITIZE_STRING);
+		$bundledShippers = array(
+			self::SHIPPING_FREESHIPPING,
+			self::SHIPPING_PICKUP
+		);
+
+		if (!in_array($name, $bundledShippers)){
+			throw new Exceptions_SeotoasterException('Bad request');
+		}
+
+		if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)){
+			switch ($name){
+				case self::SHIPPING_FREESHIPPING:
+					$form = new Forms_Shipping_FreeShipping();
+					break;
+				case self::SHIPPING_PICKUP:
+//					$form = new Forms_Shipping_Pickup();
+					break;
+				default:
+					break;
+			}
+			if ($this->_request->isPost()){
+				if ($form->isValid($this->_request->getParams())){
+					$config = array(
+						'name' => $name,
+						'config' => $form->getValues()
+					);
+					Models_Mapper_ShippingConfigMapper::getInstance()->save($config);
+				}
+			} else {
+				$pluginConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find($name);
+				if (isset($pluginConfig['config']) && !empty($pluginConfig['config'])){
+					$form->populate($pluginConfig['config']);
+				}
+			}
+			$form->setAction(trim($this->_websiteUrl,'/').$this->_view->url(array('run'=>'config', 'name' => 'usps'),'pluginroute'));
+			echo $form;
+		}
+	}
+
+	/**
+	 * Action redirects customer to post purchase 'thank you' page if exists
+	 * If not redirects to index page
+	 */
+	public function thankyouAction(){
+		$this->_sessionHelper->storeCartSessionKey = Tools_ShoppingCart::getInstance()->getCartId();
+		Tools_ShoppingCart::getInstance()->clean();
+
+		$thankyouPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_THANKYOU, true);
+		if (!$thankyouPage){
+			$this->_redirector->gotoUrl($this->_websiteHelper->getDefaultPage());
+		}
+		$this->_redirector->gotoUrl($thankyouPage->getUrl());
 	}
 }

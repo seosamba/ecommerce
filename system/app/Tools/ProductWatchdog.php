@@ -135,7 +135,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 	}
 
 	protected function _runOnDelete() {
-
+		//TODO: implement today
 	}
 
 }

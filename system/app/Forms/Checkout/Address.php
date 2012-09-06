@@ -5,20 +5,27 @@
  * @author Eugene I. Nezhuta <theneiam@gmail.com>
  */
 
-class Forms_Checkout_Billing extends Forms_Address_Abstract {
+class Forms_Checkout_Address extends Forms_Address_Abstract {
 
 	public function init() {
 		parent::init();
 
-		$this->setLegend('Billing address')
+		$this->setLegend('Enter your address')
 			->setAttribs(array(
-				'id'     => 'billing-user-address',
-				'class'  => 'toaster-checkout',
-				'action' => '/plugin/shopping/run/checkout/',
+				'id'     => 'checkout-user-address',
+				'class'  => array('toaster-checkout', 'address-form'),
 				'method' => Zend_Form::METHOD_POST
 			));
 
 		$this->setDecorators(array('FormElements', 'Form'));
+
+		$this->setElementFilters(array(
+			new Zend_Filter_StripTags()
+		));
+
+		$this->addElement('hidden', 'check', array(
+			'value' => Shopping::KEY_CHECKOUT_ADDRESS
+		));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'mobile',
@@ -27,7 +34,9 @@ class Forms_Checkout_Billing extends Forms_Address_Abstract {
 
 		// setting required fields
 		$this->getElement('lastname')->setRequired(true)->setAttrib('class', 'required');
-		$this->getElement('email')->setRequired(true)->setAttrib('class', 'required');
+		$this->getElement('email')->setRequired(true)
+				->setAttrib('class', 'required')
+				->setValidators(array('EmailAddress'));
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(

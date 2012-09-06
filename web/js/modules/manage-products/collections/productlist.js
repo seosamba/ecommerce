@@ -10,7 +10,7 @@ define([
         paginator_core: {
             type: 'GET',
             dataType: 'json',
-            url: $('#website_url').val() + 'storeapi/v1/product/'
+            url: $('#website_url').val() + 'api/store/products/'
         },
         paginator_ui: {
             firstPage: 0,
