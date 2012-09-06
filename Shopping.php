@@ -1238,6 +1238,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * If not redirects to index page
 	 */
 	public function thankyouAction(){
+		$this->_sessionHelper->storeCartSessionKey = Tools_ShoppingCart::getInstance()->getCartId();
 		Tools_ShoppingCart::getInstance()->clean();
 
 		$thankyouPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_THANKYOU, true);

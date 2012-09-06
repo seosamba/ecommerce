@@ -106,4 +106,23 @@ class Widgets_Store_Store extends Widgets_Abstract {
 			return $this->_view->render('orders.phtml');
 		}
 	}
+
+	/**
+	 * Generates order summary for current user
+	 * @return string Html content
+	 */
+	protected function _makeOptionPostPurchaseReport() {
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
+		if (isset($sessionHelper->storeCartSessionKey)){
+			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(intval($sessionHelper->storeCartSessionKey));
+			unset($sessionHelper->storeCartSessionKey);
+			if ($cartSession instanceof Models_Model_CartSession){
+				$this->_view->cart = $cartSession;
+				return $this->_view->render('post_purchase_report.phtml');
+			}
+			return;
+		}
+		$errmsg = 'store:postpurchasereport missing cart id';
+		return Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) ? '<b>'.$errmsg.'</b>' : '<!-- '.$errmsg.' -->' ;
+	}
 }
