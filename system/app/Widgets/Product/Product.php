@@ -148,22 +148,29 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	private function _renderPrice() {
 		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
 		if ($noCurrency === true){
-			array_splice($this->_options, -1 ,1);
+			array_pop($this->_options);
 		}
+
 		if (empty($this->_options)){
-			$price = $this->_product->getCurrentPrice() !== null?$this->_product->getCurrentPrice():$this->_product->getPrice();
-			return !$noCurrency ? $this->_currency->toCurrency($price): $price;
+			$price = $this->_product->getCurrentPrice() !== null ? $this->_product->getCurrentPrice() : $this->_product->getPrice();
 		} else {
             $pluginName = strtolower($this->_options[0]);
 			if ($pluginName === 'original'){
-				return !$noCurrency ? $this->_currency->toCurrency($this->_product->getPrice()) : $this->_product->getPrice() ;
+				$price = !$noCurrency ? $this->_currency->toCurrency($this->_product->getPrice()) : $this->_product->getPrice() ;
+			} else {
+	            $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
+	            if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
+	                return Tools_Factory_PluginFactory::createPlugin($plugin->getName(), array('price', $this->_product->getId()), $this->_toasterOptions)->run();
+	            }
+				return false;
 			}
-            $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
-            if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
-                return Tools_Factory_PluginFactory::createPlugin($plugin->getName(), array('price', $this->_product->getId()), $this->_toasterOptions)->run();
-            }
         }
 
+		if ((bool)self::$_shoppingConfig['showPriceIncTax']){
+			$price += Tools_Tax_Tax::calculateProductTax($this->_product);
+		}
+
+		return !$noCurrency ? $this->_currency->toCurrency($price): $price;
 	}
 	
 	private function _renderBrand() {
