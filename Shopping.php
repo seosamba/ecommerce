@@ -1238,8 +1238,18 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * If not redirects to index page
 	 */
 	public function thankyouAction(){
-		$this->_sessionHelper->storeCartSessionKey = Tools_ShoppingCart::getInstance()->getCartId();
-		Tools_ShoppingCart::getInstance()->clean();
+		$cartId = Tools_ShoppingCart::getInstance()->getCartId();
+
+		if ($cartId){
+			Tools_ShoppingCart::getInstance()->clean();
+			$this->_sessionHelper->storeCartSessionKey = $cartId;
+			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
+			)));
+			$cartSession->notifyObservers();
+		}
+
 
 		$thankyouPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_THANKYOU, true);
 		if (!$thankyouPage){
