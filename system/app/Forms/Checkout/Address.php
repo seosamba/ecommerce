@@ -23,10 +23,6 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			new Zend_Filter_StripTags()
 		));
 
-		$this->addElement('hidden', 'check', array(
-			'value' => Shopping::KEY_CHECKOUT_ADDRESS
-		));
-
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'mobile',
 			'label'    => 'Mobile'
@@ -61,18 +57,23 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			->setDecorators(array(
 				'FormElements',
 			    'Fieldset',
-		));
+		))->setAttrib('class', 'col');
 
 		$rcol = $this->getDisplayGroup('rcol')
 			->setDecorators(array(
 				'FormElements',
 			    'Fieldset',
-		));
+		))->setAttrib('class', 'col');
 
 		$this->setElementDecorators(array(
 			'ViewHelper',
 			'Label',
 			array('HtmlTag', array('tag' => 'div'))
+		));
+
+		$this->addElement('hidden', 'check', array(
+			'value' => Shopping::KEY_CHECKOUT_ADDRESS,
+			'decorators' => array('ViewHelper')
 		));
 
 		$this->addElement(new Zend_Form_Element_Submit(array(
