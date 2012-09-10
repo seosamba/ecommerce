@@ -23,7 +23,12 @@
 			<td><?php echo $this->currency($this->cart->getSubTotal());?></td>
 		</tr>
 		<tr>
-			<td colspan="3"><?php echo $this->translate('Shipping');?></td>
+			<td colspan="3">
+				<?php echo $this->translate('Shipping');?>
+				<?php if ($this->cart->getShippingService()):?>
+				<?php echo $this->translate(' via ') .$this->cart->getShippingService().': '.$this->cart->getShippingType(); ?>
+				<?php endif;?>
+			</td>
 			<td><?php echo $this->currency($this->cart->getShippingPrice());?></td>
 		</tr>
 		<tr>
