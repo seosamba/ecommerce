@@ -187,17 +187,20 @@ class Tools_ShoppingCart {
 	}
 
 	public function calculate() {
-		$summary = array('subTotal' => 0, 'totalTax' => 0, 'shipping' => 0, 'total' => 0);
+		$summary = array('subTotal' => 0, 'totalTax' => 0, 'shipping' => 0, 'total' => 0, 'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']);
 		if(is_array($this->_content) && !empty($this->_content)) {
 			foreach($this->_content as $storageKey => $cartItem) {
 				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
+			if ($summary['showPriceIncTax']){
+				$summary['subTotal'] += $summary['totalTax'];
+			}
 			$summary['shipping'] = 0;
 			if (($shipping = $this->getShippingData()) !== null){
 				$summary['shipping'] = floatval($shipping['price']);
 			}
-			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
+			$summary['total']    = $summary['subTotal'] + ($summary['showPriceIncTax'] ? 0 : $summary['totalTax']) + $summary['shipping'];
 
 		}
 		return $summary;

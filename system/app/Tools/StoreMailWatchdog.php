@@ -9,6 +9,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const TRIGGER_NEW_ORDER     = 'new order';
 
+	const TRIGGER_SHIPPING_TRACKING_NUMBER = 'trackingnumber';
+
 	const RECIPIENT_SALESPERSON = 'sales person';
 
 	const RECIPIENT_CUSTOMER    = 'customer';
@@ -160,7 +162,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
 			return false;
 		}
-		$currency = new Zend_Currency(); //Zend_Registry::get('Zend_Currency');
+		$currency = Zend_Registry::get('Zend_Currency');
 
 		$dict = array(
 			'order:total' => $currency->toCurrency($order->getTotal()),
@@ -169,6 +171,49 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		);
 		$this->_entityParser->addToDictionary($dict);
 		$this->_entityParser->objectToDictionary($customer);
+
+		$this->_mailer->setBody($this->_entityParser->parse($body));
+
+		$this->_mailer->setMailFromLabel($this->_storeConfig['company'])
+			->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+
+		return ($this->_mailer->send() !== false);
+	}
+
+	private function _sendTrackingnumberMail(Models_Model_CartSession $order){
+		$customer = Models_Mapper_CustomerMapper::getInstance()->find($order->getUserId());
+		switch ($this->_options['recipient']) {
+			case self::RECIPIENT_SALESPERSON:
+				$this->_mailer->setMailToLabel('Sales person')
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+				break;
+			case self::RECIPIENT_CUSTOMER:
+				if ($customer && $customer->getEmail()){
+					$this->_mailer->setMailToLabel($customer->getFullName())->setMailTo($customer->getEmail());
+				} else {
+					return false;
+				}
+				break;
+			default:
+				error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+				return false;
+				break;
+		}
+
+		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
+			return false;
+		}
+		$currency = Zend_Registry::get('Zend_Currency');
+
+//		$dict = array(
+//			'order:total' => $currency->toCurrency($order->getTotal()),
+//			'order:status' => $order->getStatus(),
+//			'order:referer' => $order->getReferer()
+//		);
+//		$this->_entityParser->addToDictionary($dict);
+		$this->_entityParser
+			->objectToDictionary($order, 'order')
+			->objectToDictionary($customer);
 
 		$this->_mailer->setBody($this->_entityParser->parse($body));
 

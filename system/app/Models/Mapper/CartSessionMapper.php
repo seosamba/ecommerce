@@ -1,6 +1,7 @@
 <?php
 /**
  * @method Models_Mapper_CartSessionMapper getInstance() getInstance() Returns an instance of itself
+ * @method Zend_Db_Table getDbTable() getDbTable()  Returns an instance of Zend_Db_Table
  */
 class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract {
 
@@ -79,6 +80,11 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		}
 	}
 
+	/**
+	 * Search for cart session by id
+	 * @param $id
+	 * @return Models_Model_CartSession
+	 */
 	public function find($id) {
 		$result = $this->getDbTable()->find($id);
 		if(0 == count($result)) {
