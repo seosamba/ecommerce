@@ -1166,9 +1166,11 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($this->_request->isPost()) {
 				$params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
 
-				$order->registerObserver(new Tools_Mail_Watchdog(array(
-					'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
-				)));
+				if ($order->getShippingTrackingId() !== $params['shippingTrackingId']){
+					$order->registerObserver(new Tools_Mail_Watchdog(array(
+						'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
+					)));
+				}
 
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
