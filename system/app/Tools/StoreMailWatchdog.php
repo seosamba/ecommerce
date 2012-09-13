@@ -5,11 +5,11 @@
  */
 class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
-	const TRIGGER_NEW_CUSTOMER  = 'new customer';
+	const TRIGGER_NEW_CUSTOMER  = 'store_newcustomer';
 
-	const TRIGGER_NEW_ORDER     = 'new order';
+	const TRIGGER_NEW_ORDER     = 'store_neworder';
 
-	const TRIGGER_SHIPPING_TRACKING_NUMBER = 'trackingnumber';
+	const TRIGGER_SHIPPING_TRACKING_NUMBER = 'store_trackingnumber';
 
 	const RECIPIENT_SALESPERSON = 'sales person';
 
