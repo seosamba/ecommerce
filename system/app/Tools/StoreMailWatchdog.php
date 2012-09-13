@@ -71,7 +71,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 			return false;
 		}
 		if (isset($this->_options['trigger'])){
-			$methodName = '_send'.ucfirst(strtolower(preg_replace('/\s*/', '', $this->_options['trigger']))).'Mail';
+			$methodName = str_replace('store_', '', $this->_options['trigger']);
+			$methodName = '_send'.ucfirst(strtolower(preg_replace('/\s*/', '', $methodName))).'Mail';
 			if (method_exists($this, $methodName)){
 				$this->$methodName($object);
 			}
