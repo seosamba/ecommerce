@@ -142,6 +142,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 	private function _sendNeworderMail(Models_Model_CartSession $order) {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($order->getUserId());
 		switch ($this->_options['recipient']) {
+			case Tools_Security_Acl::ROLE_ADMIN:
 			case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel('Sales person')
 						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
