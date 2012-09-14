@@ -84,7 +84,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		switch ($this->_options['recipient']) {
 			case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel($customer->getFullName())
-						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:'admin@localhost');
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				$this->_mailer->setMailToLabel($customer->getFullName())
@@ -103,7 +103,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser->objectToDictionary($customer);
 		$this->_mailer->setBody($this->_entityParser->parse($body));
 
-		$this->_mailer->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:'admin@localhost')
+		$this->_mailer->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail())
 			->setMailFromLabel($this->_storeConfig['company']);
 		return ($this->_mailer->send() !== false);
 	}
@@ -161,7 +161,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				break;
 		}
 
-		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
+		if (false === ($body = $this->_prepareEmailBody())) {
 			return false;
 		}
 		$currency = Zend_Registry::get('Zend_Currency');

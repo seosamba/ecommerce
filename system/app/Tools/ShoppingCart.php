@@ -326,9 +326,6 @@ class Tools_ShoppingCart {
 		} else {
 			$cartSession = new Models_Model_CartSession();
 			$cartSession->setStatus(Models_Model_CartSession::CART_STATUS_NEW);
-			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
-				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
-			)));
 		}
 
 		$cartSessionContent = array();

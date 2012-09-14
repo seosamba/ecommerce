@@ -376,6 +376,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return Models_Model_Customer
 	 */
 	public static function processCustomer($data) {
+		$session = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
+
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()){
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
@@ -384,13 +386,10 @@ class Shopping extends Tools_Plugins_Abstract {
 					->setFullName($data['firstname'] . ' ' . $data['lastname'])
 					->setIpaddress($_SERVER['REMOTE_ADDR'])
 					->setPassword(md5(uniqid('customer_' . time())));
-				$customer->registerObserver(new Tools_Mail_Watchdog(array(
-					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
-				)));
-				$result = Models_Mapper_CustomerMapper::getInstance()->save($customer);
-				if ($result) {
-					$customer->setId($result);
-					$customer->notifyObservers();
+				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
+				if ($newCustomerId) {
+					$customer->setId($newCustomerId);
+					$session->storeIsNewCustomer = true;
 				}
 			} else {
 				return $existingCustomer;
@@ -1251,6 +1250,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($cartId){
 			Tools_ShoppingCart::getInstance()->clean();
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
+			if ($this->_sessionHelper->storeIsNewCustomer){
+				$customer = Tools_ShoppingCart::getInstance()->getCustomer();
+				$customer->registerObserver(new Tools_Mail_Watchdog(array(
+					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
+				)));
+				$customer->notifyObservers();
+			}
 			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
 			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
 				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
