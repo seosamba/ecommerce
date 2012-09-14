@@ -34,6 +34,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	private $_storeConfig;
 
+	/**
+	 * @var Instance of watched object
+	 */
+	private $_object;
+
 	public function __construct($options = array()) {
 		$this->_storeConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$this->_configHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('config');
@@ -70,25 +75,55 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		if (!$object){
 			return false;
 		}
+
+		$this->_object = $object;
+
+		if (isset($this->_options['template']) && !empty($this->_options['template']) ){
+			$this->_template = $this->_preparseEmailTemplate();
+		} else {
+			throw new Exceptions_SeotoasterException('Missing template for action email trigger');
+		}
+
+		$this->_mailer
+				->setMailFromLabel($this->_storeConfig['company'])
+				->setSubject($this->_options['subject']);
+
+		if (!empty($this->_options['from'])){
+			$this->_mailer->setMailFrom($this->_options['from']);
+		} elseif (!empty($this->_storeConfig['email'])) {
+			$this->_mailer->setMailFrom($this->_storeConfig['email']);
+		} else {
+			$this->_mailer->setMailFrom($this->_configHelper->getAdminEmail());
+		}
+
 		if (isset($this->_options['trigger'])){
 			$methodName = str_replace('store_', '', $this->_options['trigger']);
 			$methodName = '_send'.ucfirst(strtolower(preg_replace('/\s*/', '', $methodName))).'Mail';
 			if (method_exists($this, $methodName)){
-				$this->$methodName($object);
+				$this->$methodName();
 			}
 		}
 	}
 
+	protected function _send(){
+		if (!$this->_mailer->getMailFrom() || !$this->_mailer->getMailTo()) {
+			throw new Exceptions_SeotoasterException('Missing required "from" and "to" fields');
+		}
+		$this->_mailer->setBody($this->_entityParser->parse($this->_template));
 
-	private function _sendNewcustomerMail(Models_Model_Customer $customer){
+		return ($this->_mailer->send() !== false);
+	}
+
+
+	private function _sendNewcustomerMail(){
 		switch ($this->_options['recipient']) {
 			case self::RECIPIENT_SALESPERSON:
-				$this->_mailer->setMailToLabel($customer->getFullName())
+				$this->_mailer->setMailToLabel($this->_object->getFullName())
 						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
 				break;
 			case self::RECIPIENT_CUSTOMER:
-				$this->_mailer->setMailToLabel($customer->getFullName())
-						->setMailTo($customer->getEmail());
+				$this->_mailer->setMailToLabel($this->_object->getFullName())
+						->setMailTo($this->_object->getEmail());
 				break;
 			default:
 				error_log('Unsupported recipient '.$this->_options['recipient'].' given');
@@ -96,19 +131,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				break;
 		}
 
-		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
-			return false;
-		}
-
-		$this->_entityParser->objectToDictionary($customer);
-		$this->_mailer->setBody($this->_entityParser->parse($body));
-
-		$this->_mailer->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail())
-			->setMailFromLabel($this->_storeConfig['company']);
-		return ($this->_mailer->send() !== false);
+		return $this->_send();
 	}
 
-	private function _prepareEmailBody(){
+	private function _preparseEmailTemplate(){
 		$tmplName = $this->_options['template'];
 		$tmplMessage = $this->_options['message'];
 		$mailTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->find($tmplName);
@@ -139,8 +165,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		return false;
 	}
 
-	private function _sendNeworderMail(Models_Model_CartSession $order) {
-		$customer = Models_Mapper_CustomerMapper::getInstance()->find($order->getUserId());
+	private function _sendNeworderMail() {
+		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
 		switch ($this->_options['recipient']) {
 			case Tools_Security_Acl::ROLE_ADMIN:
 			case self::RECIPIENT_SALESPERSON:
@@ -161,29 +187,15 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				break;
 		}
 
-		if (false === ($body = $this->_prepareEmailBody())) {
-			return false;
-		}
-		$currency = Zend_Registry::get('Zend_Currency');
+		$this->_entityParser
+				->objectToDictionary($customer)
+				->objectToDictionary($this->_object, 'order');
 
-		$dict = array(
-			'order:total' => $currency->toCurrency($order->getTotal()),
-			'order:status' => $order->getStatus(),
-			'order:referer' => $order->getReferer()
-		);
-		$this->_entityParser->addToDictionary($dict);
-		$this->_entityParser->objectToDictionary($customer);
-
-		$this->_mailer->setBody($this->_entityParser->parse($body));
-
-		$this->_mailer->setMailFromLabel($this->_storeConfig['company'])
-			->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
-
-		return ($this->_mailer->send() !== false);
+		return $this->_send();
 	}
 
-	private function _sendTrackingnumberMail(Models_Model_CartSession $order){
-		$customer = Models_Mapper_CustomerMapper::getInstance()->find($order->getUserId());
+	private function _sendTrackingnumberMail(){
+		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
 		switch ($this->_options['recipient']) {
 			case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel('Sales person')
@@ -202,27 +214,15 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				break;
 		}
 
-		if (false === ($body = $this->_prepareEmailBody(array($customer)))) {
+		if (false === ($body = $this->_preparseEmailTemplate())) {
 			return false;
 		}
-		$currency = Zend_Registry::get('Zend_Currency');
 
-//		$dict = array(
-//			'order:total' => $currency->toCurrency($order->getTotal()),
-//			'order:status' => $order->getStatus(),
-//			'order:referer' => $order->getReferer()
-//		);
-//		$this->_entityParser->addToDictionary($dict);
 		$this->_entityParser
-			->objectToDictionary($order, 'order')
+			->objectToDictionary($this->_order, 'order')
 			->objectToDictionary($customer);
 
-		$this->_mailer->setBody($this->_entityParser->parse($body));
-
-		$this->_mailer->setMailFromLabel($this->_storeConfig['company'])
-			->setMailFrom(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
-
-		return ($this->_mailer->send() !== false);
+		return $this->_send();
 	}
 
 }
