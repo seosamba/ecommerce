@@ -8,3 +8,11 @@
 <td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
 <td><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+': '+shipping_type %></td>
 <td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>">view</a></td>
+<% if(useInvoice == 'enabled') { %>
+   <td><a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
+           <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
+   </a>/
+   <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/">
+           <img src="<%= $('#website_url').val() %>system/images/download.png" alt="Download invoice" title="Download invoice"/>    
+   </a></td>
+<% } %>

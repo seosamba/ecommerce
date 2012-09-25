@@ -103,6 +103,12 @@ class Widgets_Store_Store extends Widgets_Abstract {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			$this->_view->shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            $enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+            if($enabledInvoicePlugin != null){
+                if($enabledInvoicePlugin->getStatus() == 'enabled'){
+                    $this->_view->invoicePlugin = 1;
+                }
+            }
 			return $this->_view->render('orders.phtml');
 		}
 	}

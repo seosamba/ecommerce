@@ -41,6 +41,7 @@ define(['backbone',
         },
         render: function(){},
         renderOrder: function(order){
+            order.set({useInvoice: $('#invoiceEnable').val()});
             var view = new OrdersView({model: order});
             this.$('#orders-list').append(view.render().el);
         },

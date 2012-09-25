@@ -70,6 +70,9 @@ echo $this->noLayout ? $this->headLink() : '';
 				<th><?php echo $this->translate('Shipping price');?></th>
 				<th><?php echo $this->translate('Shipping via');?></th>
 				<th><?php echo $this->translate('Details');?></th>
+                <?php if(isset($this->invoicePlugin)):?>
+                    <th><?php echo $this->translate('View/Download Invoice');?></th>
+                <?php endif;?>
 			</tr>
 		</thead>
 		<tbody id="orders-list">
@@ -82,6 +85,9 @@ echo $this->noLayout ? $this->headLink() : '';
 			<td colspan="2" class="paginator"></td>
 		</tfoot>
 	</table>
+    <?php if(isset($this->invoicePlugin)):?>
+        <input type="hidden" value="enabled" name="invoiceEnable" id="invoiceEnable"/>
+    <?php endif;?>
 	<?php //var_dump($this->orders); ?>
 </div>
 
