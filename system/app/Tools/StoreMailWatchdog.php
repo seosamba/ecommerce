@@ -130,7 +130,9 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				return false;
 				break;
 		}
-
+        
+        $this->_entityParser
+				->objectToDictionary($this->_object);
 		return $this->_send();
 	}
 
@@ -190,7 +192,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 				->objectToDictionary($customer)
 				->objectToDictionary($this->_object, 'order');
-
+        $dictionaryWithaddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId());
+        if(isset($dictionaryWithaddress)){
+            $this->_entityParser->addToDictionary(array('customer:address'=>$dictionaryWithaddress));
+        }
 		return $this->_send();
 	}
 
@@ -219,10 +224,23 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		}
 
 		$this->_entityParser
-			->objectToDictionary($this->_order, 'order')
+			->objectToDictionary($this->_object, 'order')
 			->objectToDictionary($customer);
 
 		return $this->_send();
 	}
+    
+    private function _prepareAdddress($address, $shippingAddressId){
+       foreach($address->getAddresses() as $addressData){
+           if($addressData['id'] == $shippingAddressId){
+               if(isset($addressData['state']) && $addressData['state'] != ''){
+                    $state = Tools_Geo::getStateById($addressData['state']);
+                    return $addressData['firstname'].' '.$addressData['lastname'].' '.$addressData['address1'].' '.$addressData['address2'].' '.$addressData['city'].' '.$state['state'].' '.$addressData['zip'].' '.$addressData['country'];
+               }
+               return $addressData['firstname'].' '.$addressData['lastname'].' '.$addressData['address1'].' '.$addressData['address2'].' '.$addressData['city'].' '.$addressData['zip'].' '.$addressData['country'];
+           }
+       }
+        
+    }
 
 }

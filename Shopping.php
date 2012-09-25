@@ -1256,7 +1256,16 @@ class Shopping extends Tools_Plugins_Abstract {
 			Tools_ShoppingCart::getInstance()->clean();
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer){
-				$customer = Tools_ShoppingCart::getInstance()->getCustomer();
+				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $userData = $userMapper->find($cartSession->getUserId());
+                $newCustomerPassword = uniqid('customer_' . time());
+                $userData->setPassword($newCustomerPassword);
+                $newCustomerId = $userMapper->save($userData);
+                $customer = $customerMapper->find($cartSession->getUserId());
+                $customer->setPassword($newCustomerPassword);
+                //$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 				$customer->registerObserver(new Tools_Mail_Watchdog(array(
 					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
 				)));
