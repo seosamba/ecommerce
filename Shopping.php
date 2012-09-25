@@ -1120,7 +1120,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_redirector->gotoUrl($this->_websiteUrl);
 		}
 
-		if ($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN){
+		if ($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN || $customer->getRoleId() === self::ROLE_SALESPERSON){
 			$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		}
 		if (!isset($id) || $id === false){
