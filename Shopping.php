@@ -92,7 +92,7 @@ class Shopping extends Tools_Plugins_Abstract {
             'setConfig',
             'taxes',
             'zones',
-            'product',
+            //'product',
 	        'shipping',
 	        'clients',
 	        'brandlogos'
@@ -472,7 +472,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$data = array();
 		if (isset($this->_requestedParams['type'])){
 			$type = strtolower($this->_requestedParams['type']);
-			if (in_array($type, $this->_allowedApi) || Tools_Security_Acl::isAllowed(self::RESOURCE_API)){
+			if (in_array($type, $this->_allowedApi) || Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){
 				$methodName = '_'.$type.'RESTService';
 				if (method_exists($this, $methodName)){
 					$data = $this->$methodName();
@@ -908,27 +908,30 @@ class Shopping extends Tools_Plugins_Abstract {
      * @var $pageMapper Application_Model_Mappers_PageMapper
      */
     protected function productAction(){
-		$this->_view->generalConfig = $this->_configMapper->getConfigParams();
+		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){
 
-		$templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
-		$templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
-		$this->_view->templateList = $templateList;
+            $this->_view->generalConfig = $this->_configMapper->getConfigParams();
 
-		$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'].$this->_websiteConfig['media']);
-		if (!empty ($listFolders)){
-			$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
-		}
-		$this->_view->imageDirList = $listFolders;
+            $templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
+            $templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
+            $this->_view->templateList = $templateList;
 
-        $this->_view->plugins = array();
-        foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin){
-            if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
-                array_push($this->_view->plugins, $plugin->getName());
+            $listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'].$this->_websiteConfig['media']);
+            if (!empty ($listFolders)){
+                $listFolders = array('select folder') + array_combine($listFolders, $listFolders);
             }
-        }
+            $this->_view->imageDirList = $listFolders;
 
-		$this->_layout->content = $this->_view->render('product.phtml');
-	    echo $this->_layout->render();
+            $this->_view->plugins = array();
+            foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin){
+                if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
+                    array_push($this->_view->plugins, $plugin->getName());
+                }
+            }
+
+            $this->_layout->content = $this->_view->render('product.phtml');
+            echo $this->_layout->render();
+        }
 	}
 
     public function searchindexAction(){
@@ -1022,8 +1025,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return string Html content
 	 */
 	protected function _makeOptionClients() {
-		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
-			$this->_view->noLayout = true;
+		//if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
+		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){	
+            $this->_view->noLayout = true;
 			return $this->_view->render('clients.phtml');
 		}
 	}
@@ -1034,8 +1038,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return string Widget html content
 	 */
 	protected function _makeOptionProducts() {
-		if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
-			$this->_view->noLayout = true;
+		//if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
+		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){	
+            $this->_view->noLayout = true;
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			return $this->_view->render('manage_products.phtml');
