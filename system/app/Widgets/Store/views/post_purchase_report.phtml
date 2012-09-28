@@ -17,23 +17,27 @@
 		</tr>
 		<?php endforeach; ?>
 	</tbody>
-	<tfoot>
-		<tr>
-			<td colspan="3"><?php echo $this->translate('Sub-Total');?></td>
-			<td><?php echo $this->currency($this->cart->getSubTotal());?></td>
-		</tr>
-		<tr>
-			<td colspan="3">
-				<?php echo $this->translate('Shipping');?>
+</table>
+
+<div class="post-purchase-report-summary">
+	<div class="post-purchase-row cart-subtotal">
+		<span><?php echo $this->translate('Sub-Total');?></span>
+		<span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal());?></span>
+	</div>
+	<div class="post-purchase-row cart-total-tax">
+				<span><?php echo $this->translate('Inc. Tax');?>:</span>
+				<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
+	</div>
+	<div class="post-purchase-row cart-shipping">
+		<span><?php echo $this->translate('Shipping');?>
 				<?php if ($this->cart->getShippingService()):?>
 				<?php echo $this->translate(' via ') .$this->cart->getShippingService().': '.$this->cart->getShippingType(); ?>
 				<?php endif;?>
-			</td>
-			<td><?php echo $this->currency($this->cart->getShippingPrice());?></td>
-		</tr>
-		<tr>
-			<td colspan="3"><?php echo $this->translate('Total');?></td>
-			<td><?php echo $this->currency($this->cart->getTotal());?></td>
-		</tr>
-	</tfoot>
-</table>
+        </span>
+		<span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
+	</div>
+	<div class="post-purchase-row cart-total">
+		<span><?php echo $this->translate('Total');?>:</span>
+		<span><?php echo $this->currency($this->cart->getTotal());?></span>
+	</div>
+</div>
