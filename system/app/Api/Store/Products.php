@@ -14,6 +14,9 @@ class Api_Store_Products extends Api_Service_Abstract {
 		$acl->allow(Tools_Security_Acl::ROLE_SUPERADMIN, strtolower(__CLASS__.'_get'));
         $acl->allow(Tools_Security_Acl::ROLE_ADMIN, strtolower(__CLASS__.'_get'));
         $acl->allow(Shopping::ROLE_SALESPERSON, strtolower(__CLASS__.'_get'));
+        $acl->allow(Tools_Security_Acl::ROLE_SUPERADMIN, strtolower(__CLASS__.'_put'));
+        $acl->allow(Tools_Security_Acl::ROLE_ADMIN, strtolower(__CLASS__.'_put'));
+        $acl->allow(Shopping::ROLE_SALESPERSON, strtolower(__CLASS__.'_put'));
 		Zend_Registry::set('acl', $acl);
 	}
 
