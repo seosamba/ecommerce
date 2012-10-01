@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 	var Selection = Backbone.Model.extend({
 		defaults: function(){

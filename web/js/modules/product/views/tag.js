@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 	
 	var TagView = Backbone.View.extend({
@@ -15,8 +15,8 @@ define([
 			"blur span.tag-editable": "save"
 		},
 		initialize: function(){
-			this.model.bind('change', this.render, this);
-			this.model.view = this;
+			this.model.on('change', this.render, this);
+            this.model.on('destroy', this.remove, this);
 		},
 		render: function(){
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
@@ -24,14 +24,9 @@ define([
 			return this;
 		},
 		kill: function(){
-			var confirmMsg = $('#new-tag').data('confirmmsg').replace('%tag%', this.model.get('name'));
-			var modelHolder = this.model;
-			
-			showConfirm(confirmMsg, function(){
-				modelHolder.destroy({success: function(model, response) {
-                    model.view.remove();
-                }});
-			});
+			var confirmMsg = $('#new-tag').data('confirmmsg').replace('%tag%', this.model.get('name')),
+                model = this.model;
+			showConfirm(confirmMsg, function(){ model.destroy(); });
 		},
 		edit: function(){
             this.buffer = this.nameInput.text();

@@ -1,7 +1,7 @@
 define([
-	'Underscore',
-	'Backbone',
-	'modules/product/collections/selections'
+	'underscore',
+	'backbone',
+	'../collections/selections'
 ], function(_, Backbone, Selections){
 	
 	var ProductOption = Backbone.Model.extend({

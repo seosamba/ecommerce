@@ -1,11 +1,11 @@
 define([
-	'Underscore',
-	'Backbone',
-	'modules/product/collections/options'
+	'underscore',
+	'backbone',
+	'../collections/options'
 ], function(_, Backbone, ProductOptions){
 	
 	var Product = Backbone.Model.extend({
-		urlRoot: $('#website_url').val()+'plugin/shopping/run/getdata/type/product/id',
+		urlRoot: '/api/store/products/id/',
 		defaults: {
 			name: '',
 			sku: '',
@@ -20,14 +20,9 @@ define([
             options: new ProductOptions()
 		},
 		initialize: function (){
-//			this.set({options: new ProductOptions()});
             this.bind('error', function(model, error) {
                 showMessage(error, true);
             });
-
-//            this.bind('change:defaultOptions', function(){
-//                this.get('options').reset(this.get('defaultOptions'));
-//            }, this);
         },
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){
