@@ -166,7 +166,8 @@ define([
 				if (response.hasOwnProperty('imageList') && response.imageList.length ){
 					var $images = $('#imgTemplate').tmpl(response);
 					$box.append($images).imagesLoaded(function(){
-						$(this).masonry('reload')
+                        $(this).masonry('reload')
+                            .find('img.lazy').lazyload();
 					});
 				} else {
 					$box.append('<p>Empty</p>');

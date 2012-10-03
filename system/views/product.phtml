@@ -289,7 +289,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 <script id="imgTemplate" type="text/x-jquery-tmpl">
 	{{each imageList}}
 	<div class="box">
-		<img src="${src}" width="100px" data-name="${name}" title="${name}"/>
+		<img class="lazy" src="" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
 	</div>
 	{{/each}}
 </script>
