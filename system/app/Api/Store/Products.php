@@ -5,19 +5,22 @@
  */
 class Api_Store_Products extends Api_Service_Abstract {
 
+	protected $_accessList = array(
+		Tools_Security_Acl::ROLE_SUPERADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+        Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+        Shopping::ROLE_SALESPERSON => array(
+			'allow' => array('get', 'post')
+		)
+	);
+
 	public function init() {
 		parent::init();
 		$this->_productMapper   = Models_Mapper_ProductMapper::getInstance();
 		$this->_cacheHelper     = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
-
-		$acl = $this->getAcl();
-		$acl->allow(Tools_Security_Acl::ROLE_SUPERADMIN, strtolower(__CLASS__.'_get'));
-        $acl->allow(Tools_Security_Acl::ROLE_ADMIN, strtolower(__CLASS__.'_get'));
-        $acl->allow(Shopping::ROLE_SALESPERSON, strtolower(__CLASS__.'_get'));
-        $acl->allow(Tools_Security_Acl::ROLE_SUPERADMIN, strtolower(__CLASS__.'_put'));
-        $acl->allow(Tools_Security_Acl::ROLE_ADMIN, strtolower(__CLASS__.'_put'));
-        $acl->allow(Shopping::ROLE_SALESPERSON, strtolower(__CLASS__.'_put'));
-		Zend_Registry::set('acl', $acl);
 	}
 
 	public function getAction() {

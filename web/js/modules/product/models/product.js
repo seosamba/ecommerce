@@ -20,9 +20,7 @@ define([
             options: new ProductOptions()
 		},
 		initialize: function (){
-            this.bind('error', function(model, error) {
-                showMessage(error, true);
-            });
+            this.on('error', function(model, error) { showMessage(error, true); });
         },
 		validate: function(attrs) {
 			if (attrs.hasOwnProperty('price') && isNaN(attrs.price)){

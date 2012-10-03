@@ -17,6 +17,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 * by the 'id' value.
 	 */
 	public function getAction() {
+//		sleep(3);
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
 		if ($id) {
 			$result = Models_Mapper_Tag::getInstance()->find($id);

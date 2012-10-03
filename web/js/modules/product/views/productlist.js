@@ -9,9 +9,7 @@ define([
 		template: $('#productListingTemplate').template(),
         container: $('#product-list-holder'),
 		events: {
-            'click a': 'runItemAction',
-            'change input.marker': 'mark',
-            'click span.ui-icon-closethick': 'removeRelated'
+            'change input.marker': 'mark'
 		},
 		initialize: function(){
 			this.model.on('change', this.render, this);
@@ -36,21 +34,6 @@ define([
             } else {
                 this.model.has('marked') && this.model.unset('marked');
             }
-        },
-        runItemAction: function(e){
-            if (this.container.attr('id') !== this.$el.parent().attr('id')){
-                return false;
-            }
-            var type =  this.container.data('type');
-
-            if (type === 'related'){
-                appRouter.app.addRelated(this.model.get('id'));
-                $('#product-list').hide('slide');
-                return false;
-            }
-        },
-        removeRelated: function(){
-            appRouter.app.removeRelated(this.model.get('id'));
         }
 	});
 	
