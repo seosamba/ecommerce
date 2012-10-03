@@ -9,7 +9,8 @@ define([
 		template: $('#productListingTemplate').template(),
         container: $('#product-list-holder'),
 		events: {
-            'change input.marker': 'mark'
+            'change input.marker': 'mark',
+            'click #product-list-holder a[href^=#edit]': 'runAction'
 		},
 		initialize: function(){
 			this.model.on('change', this.render, this);
@@ -33,6 +34,14 @@ define([
                 this.model.set({marked: true});
             } else {
                 this.model.has('marked') && this.model.unset('marked');
+            }
+        },
+        runAction: function(e){
+            e.preventDefault();
+            if ($('#product-list-holder').data('type') === 'related'){
+                app.addRelated(this.model.get('id'));
+                $('#product-list:visible').hide('slide');
+                return false;
             }
         }
 	});

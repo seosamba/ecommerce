@@ -441,7 +441,7 @@ define([
             this.model.set({related: _.without(relateds, this.model.get('id'))});
 		},
 		removeRelated: function(id){
-            var relateds = _(this.app.model.get('related')).map(function(id){ return parseInt(id) });
+            var relateds = _(this.model.get('related')).map(function(id){ return parseInt(id) });
 			this.model.set({related: _.without(relateds, parseInt(id))});
 		},
 		renderRelated: function() {

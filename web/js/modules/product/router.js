@@ -19,10 +19,6 @@ define([
 		},
 		editProduct: function(productId){
 			$('#product-list:visible').hide('slide');
-            if ($('#product-list-holder').data('type') === 'related'){
-                this.app.addRelated(productId);
-                return false;
-            }
             this.app.setProduct(productId);
 		}
 	});
