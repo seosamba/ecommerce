@@ -193,14 +193,14 @@ class Tools_ShoppingCart {
 				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
-			if ($summary['showPriceIncTax']){
-				$summary['subTotal'] += $summary['totalTax'];
-			}
+//			if ($summary['showPriceIncTax']){
+//				$summary['subTotal'] += $summary['totalTax'];
+//			}
 			$summary['shipping'] = 0;
 			if (($shipping = $this->getShippingData()) !== null){
 				$summary['shipping'] = floatval($shipping['price']);
 			}
-			$summary['total']    = $summary['subTotal'] + ($summary['showPriceIncTax'] ? 0 : $summary['totalTax']) + $summary['shipping'];
+			$summary['total'] = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
 
 		}
 		return $summary;
