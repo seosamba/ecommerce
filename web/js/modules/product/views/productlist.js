@@ -37,7 +37,6 @@ define([
             }
         },
         runAction: function(e){
-            e.preventDefault();
             if ($('#product-list-holder').data('type') === 'related'){
                 app.addRelated(this.model.get('id'));
                 $('#product-list:visible').hide('slide');

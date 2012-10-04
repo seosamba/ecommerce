@@ -382,7 +382,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 	{{if showDelete}}
     <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
     {{else}}
-    <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" style="text-align:center;">
+    <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" class="clearfix" style="text-align:center;">
     {{/if}}
         <p class="brand">${brand}</p>
 	    {{if showDelete}}

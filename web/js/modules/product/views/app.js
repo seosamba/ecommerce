@@ -313,6 +313,7 @@ define([
             }
         },
         renderAllProducts: function(){
+            this.$('#product-list-holder').empty();
             this.products.each(this.renderProduct, this);
         },
 		saveProduct: function(){
@@ -499,8 +500,8 @@ define([
         filterProducts: function(e, forceRun) {
             if (e.keyCode === 13 || forceRun === true) {
                 this.products.data.key = e.target.value;
-                this.products.pager().done([
-                    this.waypointCallback,
+                this.products.reset().load([
+                    this.waypointCallback.bind(this),
                     function(response){ if (response.length === 0) { $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>')} ; }
                 ]);
                 $(e.target).autocomplete('close');
@@ -604,7 +605,7 @@ define([
         hideProductList: function(){
             $('#product-list').hide('slide');
             var term = $('#product-list-search').val();
-            if (term != this.products.server_api.key){
+            if (term != this.products.data.key){
                 if (term == ''){
                     $('#product-list-search').trigger('keypress', true);
                 } else {
