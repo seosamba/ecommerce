@@ -50,17 +50,12 @@ define([
                 ui.index === 3 && self.renderRelated();
             });
 
-            this.tags = new TagsCollection();
-            this.tags.on('add', this.renderTag, this);
-            this.tags.on('reset', this.renderAllTags, this);
-            this.tags.on('reset', this.renderProductTags, this);
 
-            this.brands = new BrandsCollection();
-            this.brands.on('add', this.renderBrand, this);
-            this.brands.on('reset', this.renderAllBrands, this);
 
-            this.brands.fetch();
-            this.tags.fetch();
+
+
+//            this.brands.fetch();
+//            this.tags.fetch();
 
             $('#product-list-search').ajaxStart(function(){
                 $(this).attr('disabled', 'disabled');
@@ -68,15 +63,15 @@ define([
                 $(this).removeAttr('disabled');
             });
 
-            $.getJSON(this.websiteUrl + 'plugin/shopping/run/searchindex', function(response){
-                $('#product-list-search').autocomplete({
-                    minLength: 2,
-                    source: response,
-                    select: function(event, ui){
-                        $('#product-list-search').val(ui.item.value).trigger('keypress', true);
-                    }
-                });
-            });
+//            $.getJSON(this.websiteUrl + 'plugin/shopping/run/searchindex', function(response){
+//                $('#product-list-search').autocomplete({
+//                    minLength: 2,
+//                    source: response,
+//                    select: function(event, ui){
+//                        $('#product-list-search').val(ui.item.value).trigger('keypress', true);
+//                    }
+//                });
+//            });
             this.quickPreviewTmpl = $('#quickPreviewTemplate').template();
 
             $('#image-list').masonry({
@@ -93,12 +88,31 @@ define([
 
             return this.products;
         },
+        lazyInit: function() {
+            if (this.brands === null){
+                this.brands = new BrandsCollection();
+                this.brands.on('add', this.renderBrand, this);
+                this.brands.on('reset', this.renderAllBrands, this);
+                this.brands.fetch();
+            }
+
+            if (this.tags === null){
+                this.tags = new TagsCollection();
+                this.tags.on('add', this.renderTag, this);
+                this.tags.on('reset', this.renderAllTags, this);
+                this.tags.on('reset', this.renderProductTags, this);
+                this.tags.fetch();
+            }
+        },
 		setProduct: function (productId) {
             this.model = new ProductModel();
 
             if (productId) {
                 if (this.products === null) {
-                    this.model.fetch({data: {id: productId}}).success(this.render.bind(this));
+                    this.model.fetch({data: {id: productId}})
+                        .success(this.lazyInit.bind(this))
+                        .success(this.render.bind(this))
+                    ;
                 } else {
                     this.model = this.products.get(productId);
                 }
