@@ -1,11 +1,12 @@
 define([
-	'Underscore',
-	'Backbone',
-	'modules/product/models/product'
+	'underscore',
+	'backbone',
+	'../models/product'
 ], function(_, Backbone, ProductModel){
+
 	var ProductList = Backbone.Collection.extend({
 		model: ProductModel,
-		urlOriginal: '/plugin/shopping/run/getdata/type/product/',
+		urlOriginal: '/api/store/products/',
         paginator: {
             limit: 32,
             offset: 0,

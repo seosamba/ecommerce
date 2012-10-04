@@ -1,8 +1,8 @@
 define([
-	'Underscore',
-	'Backbone',
-	'modules/product/collections/selections',
-	'modules/product/views/selection'
+	'underscore',
+	'backbone',
+	'../collections/selections',
+	'../views/selection'
 ], function(_, Backbone, Selections, SelectionView){
 	var ProductOptionView = Backbone.View.extend({
 		template: $('#optionMainTemplate').template(),

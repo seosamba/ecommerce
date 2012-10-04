@@ -1,12 +1,12 @@
 define([
-	'Underscore',
-	'Backbone',
-	'modules/product/models/tag'
+	'underscore',
+	'backbone',
+	'../models/tag'
 ], function(_, Backbone, TagModel){
 	
 	var TagsList = Backbone.Collection.extend({
 		model: TagModel,
-		url: '/plugin/shopping/run/getdata/type/tags/id/',
+		url: '/api/store/tags/',
 		exists: function(name){
 			return this.find(function(tag){return tag.get('name').toLowerCase() == name.toLowerCase();});
 		}

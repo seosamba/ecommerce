@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 	
 	var ProductView = Backbone.View.extend({
@@ -9,17 +9,14 @@ define([
 		template: $('#productListingTemplate').template(),
         container: $('#product-list-holder'),
 		events: {
-            'click a': 'runItemAction',
             'change input.marker': 'mark',
-            'click span.ui-icon-closethick': 'removeRelated'
+            'click #product-list-holder a[href^=#edit]': 'runAction'
 		},
 		initialize: function(){
 			this.model.on('change', this.render, this);
             this.model.on('remove', this.remove, this);
-//			this.model.view = this;
 		},
 		render: function(){
-            console.log('rendered: productlist.js', this.model);
 			var data = this.model.toJSON();
             data.websiteUrl = $('#website_url').val();
 			if (this.options.hasOwnProperty('showDelete')){
@@ -39,20 +36,13 @@ define([
                 this.model.has('marked') && this.model.unset('marked');
             }
         },
-        runItemAction: function(e){
-            if (this.container.attr('id') !== this.$el.parent().attr('id')){
+        runAction: function(e){
+            e.preventDefault();
+            if ($('#product-list-holder').data('type') === 'related'){
+                app.addRelated(this.model.get('id'));
+                $('#product-list:visible').hide('slide');
                 return false;
             }
-            var type =  this.container.data('type');
-
-            if (type === 'related'){
-                appRouter.app.addRelated(this.model.get('id'));
-                $('#product-list').hide('slide');
-                return false;
-            }
-        },
-        removeRelated: function(){
-            appRouter.app.removeRelated(this.model.get('id'));
         }
 	});
 	
