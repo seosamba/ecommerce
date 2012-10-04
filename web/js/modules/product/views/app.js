@@ -39,6 +39,7 @@ define([
         products: null,
         tags: null,
         brands: null,
+        searchIndex: null,
 		websiteUrl: $('#website_url').val(),
 		initialize: function(){
 			$('#add-new-option-btn').button();
@@ -50,28 +51,12 @@ define([
                 ui.index === 3 && self.renderRelated();
             });
 
-
-
-
-
-//            this.brands.fetch();
-//            this.tags.fetch();
-
             $('#product-list-search').ajaxStart(function(){
                 $(this).attr('disabled', 'disabled');
             }).ajaxStop(function(){
                 $(this).removeAttr('disabled');
             });
 
-//            $.getJSON(this.websiteUrl + 'plugin/shopping/run/searchindex', function(response){
-//                $('#product-list-search').autocomplete({
-//                    minLength: 2,
-//                    source: response,
-//                    select: function(event, ui){
-//                        $('#product-list-search').val(ui.item.value).trigger('keypress', true);
-//                    }
-//                });
-//            });
             this.quickPreviewTmpl = $('#quickPreviewTemplate').template();
 
             $('#image-list').masonry({
@@ -102,6 +87,10 @@ define([
                 this.tags.on('reset', this.renderAllTags, this);
                 this.tags.on('reset', this.renderProductTags, this);
                 this.tags.fetch();
+            }
+
+            if (this.searchindex === null) {
+                this.searchindex = _.once(functi)
             }
         },
 		setProduct: function (productId) {
@@ -586,8 +575,22 @@ define([
                 }
             });
         },
+        initSearchIndex: _.once(function(){
+            $.getJSON('/plugin/shopping/run/searchindex', function(response){
+                self.searchIndex = response;
+                $('#product-list-search').autocomplete({
+                    minLength: 2,
+                    source: response,
+                    select: function(event, ui){
+                        $('#product-list-search').val(ui.item.value).trigger('keypress', true);
+                    }
+                });
+            });
+        }),
         toggleList: function(e) {
             e.preventDefault();
+
+            this.initSearchIndex();
 
             var listtype = $(e.target).data('listtype');
 
