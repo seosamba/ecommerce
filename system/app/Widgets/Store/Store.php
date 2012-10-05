@@ -122,7 +122,9 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		if (isset($sessionHelper->storeCartSessionKey)){
 			$cartId = intval($sessionHelper->storeCartSessionKey);
             $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
-			unset($sessionHelper->storeCartSessionKey);
+            if(!isset($this->_options[1]) || $this->_options[1] != 'mailreport'){
+                unset($sessionHelper->storeCartSessionKey);
+            }
 			if ($cartSession instanceof Models_Model_CartSession){
 				$cartContent = $cartSession->getCartContent();
                 $productMapper = Models_Mapper_ProductMapper::getInstance();

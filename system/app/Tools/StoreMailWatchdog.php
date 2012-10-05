@@ -116,10 +116,16 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 
 	private function _sendNewcustomerMail(){
-		switch ($this->_options['recipient']) {
-			case self::RECIPIENT_SALESPERSON:
+		$systemConfig = $this->_configHelper->getConfig();
+        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
+        switch ($this->_options['recipient']) {
+           case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+						->setMailTo($adminEmail);
+				break;
+            case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel($this->_object->getFullName())
-						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				$this->_mailer->setMailToLabel($this->_object->getFullName())
@@ -133,7 +139,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         
         $this->_entityParser
 				->objectToDictionary($this->_object);
-		return $this->_send();
+        $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
+        $this->_entityParser->addToDictionary(array('website:url'=>$this->_websiteHelper->getUrl()));
+        $this->_addAddressToDictionary($this->_object);
+        return $this->_send();
 	}
 
 	private function _preparseEmailTemplate(){
@@ -169,11 +178,16 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	private function _sendNeworderMail() {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
-		switch ($this->_options['recipient']) {
+        $systemConfig = $this->_configHelper->getConfig();
+        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
+        switch ($this->_options['recipient']) {
 			case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+						->setMailTo($adminEmail);
+				break;
 			case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel('Sales person')
-						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				if ($customer && $customer->getEmail()){
@@ -194,17 +208,24 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				->objectToDictionary($this->_object, 'order');
         $dictionaryWithaddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId());
         if(isset($dictionaryWithaddress)){
-            $this->_entityParser->addToDictionary(array('customer:address'=>$dictionaryWithaddress));
+            $this->_entityParser->addToDictionary(array('order:shippingaddress'=>$dictionaryWithaddress));
         }
+        $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
 		return $this->_send();
 	}
 
 	private function _sendTrackingnumberMail(){
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
-		switch ($this->_options['recipient']) {
-			case self::RECIPIENT_SALESPERSON:
+		$systemConfig = $this->_configHelper->getConfig();
+        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
+        switch ($this->_options['recipient']) {
+			case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+						->setMailTo($adminEmail);
+				break;
+            case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel('Sales person')
-						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$this->_configHelper->getAdminEmail());
+						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				if ($customer && $customer->getEmail()){
@@ -226,7 +247,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 			->objectToDictionary($this->_object, 'order')
 			->objectToDictionary($customer);
-
+        $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
 		return $this->_send();
 	}
     
@@ -241,6 +262,12 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
            }
        }
         
+    }
+    
+    private function _addAddressToDictionary($address){
+        foreach($address->getAddresses() as $addressData){
+           $this->_entityParser->addToDictionary(array('customer:phone'=>$addressData['phone']));
+       }
     }
 
 }

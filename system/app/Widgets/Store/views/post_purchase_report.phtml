@@ -40,7 +40,7 @@
 		<tr>
             <td>
                 <?php if(isset($product['photo']) && $product['photo'] != ''):?>
-                    <img src="/media/<?php echo str_replace('/', '/product/', $product['photo']);?>" alt="<?php echo $product['name']; ?>"/>
+                    <img src="<?php echo $this->websiteUrl;?>/media/<?php echo str_replace('/', '/product/', $product['photo']);?>" alt="<?php echo $product['name']; ?>"/>
                 <?php else:?>
                     <img src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="<?php echo $product['name']; ?>"/>
                 <?php endif;?>
