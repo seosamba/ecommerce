@@ -281,16 +281,12 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 ?>
 
 <script id="tagTemplate" type="text/x-jquery-tmpl">
-	<input type="checkbox" name="tag[]" value="${id}"/>
-	<span class="tag-editable" title="Click to edit">${name}</span>
-	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
+
 </script>
 
 <script id="imgTemplate" type="text/x-jquery-tmpl">
 	{{each imageList}}
-	<div class="box">
-		<img class="lazy" src="" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
-	</div>
+
 	{{/each}}
 </script>
 
@@ -515,6 +511,10 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             </div>
             <div class="grid_4">
                 <select name="product-brand" id="product-brand" data-reflection="property">
+	                <option value="-1">select brand</option>
+                <?php foreach($this->brands as $brand): ?>
+		           	<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName(); ?></option>
+				<?php endforeach; ?>
                 </select>
             </div>
             <div class="grid_4">
@@ -574,6 +574,13 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         </div>
 
         <div id="product-tags" class="grid_12 h380" style="overflow-y: auto;">
+        <?php foreach ($this->tags as $tag): ?>
+			<div class="tag-widget">
+				<input type="checkbox" name="tag[]" value="<?php echo $tag->getId();?>" >
+				<span class="tag-editable" title="Click to edit"><?php echo $tag->getName(); ?></span>
+				<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete'); ?></span>
+			</div>
+		<?php endforeach; ?>
         </div>
 
     </div> <!-- #tag-tab -->

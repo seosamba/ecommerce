@@ -1,12 +1,12 @@
 define([
-	'underscore',
-	'backbone'
-], function(_, Backbone){
+	'backbone',
+    'text!../templates/tag.html'
+], function(Backbone, TagTmpl){
 	
 	var TagView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'tag-widget',
-		template: $('#tagTemplate').template(),
+		template: _.template(TagTmpl),
 		nameInput: null,
 		events: {
 			"click span.ui-icon-closethick": "kill",
@@ -19,7 +19,7 @@ define([
             this.model.on('destroy', this.remove, this);
 		},
 		render: function(){
-			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
+			$(this.el).html(this.template(this.model.toJSON()));
 			this.nameInput = this.$el.children('span.tag-editable');
 			return this;
 		},

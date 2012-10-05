@@ -3,16 +3,16 @@ define([
 	'../models/product',
     '../models/option',
     '../collections/productlist',
-    '../collections/tags',
-    '../collections/brands',
+//    '../collections/tags',
+//    '../collections/brands',
     '../collections/options',
-    './tag',
+//    './tag',
 	'./option',
 	'./productlist'
 ], function(Backbone,
             ProductModel, ProductOption,
-            ProductsCollection, TagsCollection, BrandsCollection, OptionsCollection,
-            TagView, ProductOptionView, ProductListView){
+            ProductsCollection, /* TagsCollection, BrandsCollection,*/ OptionsCollection,
+            /*TagView,*/ ProductOptionView, ProductListView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -69,7 +69,7 @@ define([
 
             $('#ajax_msg, #product-list').hide();
             $('#manage-product').show();
-            this.lazyInit();
+//            this.lazyInit();
 		},
         initProducts: function(){
             if (this.products === null) {
