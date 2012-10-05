@@ -120,15 +120,51 @@ class Widgets_Store_Store extends Widgets_Abstract {
 	protected function _makeOptionPostPurchaseReport() {
 		$sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
 		if (isset($sessionHelper->storeCartSessionKey)){
-			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(intval($sessionHelper->storeCartSessionKey));
+			$cartId = intval($sessionHelper->storeCartSessionKey);
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
 			unset($sessionHelper->storeCartSessionKey);
 			if ($cartSession instanceof Models_Model_CartSession){
-				$this->_view->cart = $cartSession;
+				$cartContent = $cartSession->getCartContent();
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+                foreach ($cartContent as $key=>$product){
+                    $productObject = $productMapper->find($product['product_id']);
+                    if(!empty($product['options'])){
+                        $optionsData = $this->_getOptions($product['product_id'], $product['options']);
+                        $cartContent[$key]['options'] = $optionsData;
+                    }
+                    if($productObject !=null){
+                        $cartContent[$key]['photo'] = $productObject->getPhoto();
+                    }
+                }
+                $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];
+                $this->_view->weightSign = $shoppingConfig['weightUnit'];
+                $this->_view->cartContent = $cartContent;
+                $this->_view->cart = $cartSession;
 				return $this->_view->render('post_purchase_report.phtml');
 			}
 			return;
 		}
 		$errmsg = 'store:postpurchasereport missing cart id';
 		return Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) ? '<b>'.$errmsg.'</b>' : '<!-- '.$errmsg.' -->' ;
+	}
+    
+    protected function _getOptions($productId, $options) {
+		$actualOptions  = array();
+		$product        = Models_Mapper_ProductMapper::getInstance()->find($productId);
+		$defaultOptions = $product->getDefaultOptions();
+		foreach($options as $optionId => $selectionId) {
+			foreach($defaultOptions as $defaultOption) {
+				if($optionId != $defaultOption['id']) {
+					continue;
+				}
+				$actualOptions = array_filter($defaultOption['selection'], function($selection) use($selectionId) {
+					if($selectionId == $selection['id']) {
+						return $selection;
+					}
+				});
+			}
+		}
+		return $actualOptions;
 	}
 }
