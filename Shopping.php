@@ -926,7 +926,6 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 
-			$this->_view->productForm = new Forms_Product();
 			if ($this->_request->has('id')){
 				$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
 				if ($id){
