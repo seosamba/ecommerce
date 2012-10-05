@@ -1143,6 +1143,13 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->orders = $orders;
 		}
 
+        $enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+        if($enabledInvoicePlugin != null){
+            if($enabledInvoicePlugin->getStatus() == 'enabled'){
+                $this->_view->invoicePlugin = 1;
+            }
+        }
+        
 		$content = $this->_view->render('profile.phtml');
 
 		if ($this->_request->isXmlHttpRequest()){

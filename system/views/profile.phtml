@@ -80,6 +80,9 @@
 					<th><?php echo $this->translate('Shipping price');?></th>
 					<th><?php echo $this->translate('Shipping via');?></th>
 					<th><?php echo $this->translate('Details');?></th>
+                    <?php if(isset($this->invoicePlugin)):?>
+                        <th><?php echo $this->translate('View/Download Invoice');?></th>
+                    <?php endif;?>
 				</tr>
 			</thead>
 			<tbody>
@@ -100,12 +103,28 @@
 							<a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
 						</p>
 						<?php endif;?>
-						<p class="textcentered">
-							<a target="_blank" class="tracking-link" href="<?php echo $this->websiteUrl;?>plugin/shopping/run/track/id/<?php echo $order->getId();?>"><?php echo $this->translate('Where is my order?');?></a>
-						</p>
+                        <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
+                            <?php if($order->getShippingTrackingId() != ''):?>
+                                <p class="textcentered">
+                                <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
+                            </p>
+                            <?php endif;?>
+                        <?php endif;?>
 					</td>
 					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
-				</tr>
+                    <?php if(isset($this->invoicePlugin)):?>
+                        <td>   
+                        <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
+                            <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
+                                <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
+                            </a>
+                            <a href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/1/">
+                                <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="Download invoice" title="Download invoice"/>    
+                            </a>
+                        <?php endif;?>
+                         </td>   
+                    <?php endif;?>
+                </tr>
 			<?php endforeach; ?>
 			<?php endif; ?>
 			</tbody>
