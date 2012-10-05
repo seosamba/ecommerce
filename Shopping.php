@@ -911,10 +911,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){
 
             $this->_view->generalConfig = $this->_configMapper->getConfigParams();
-
-            $templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
-            $templateList = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
-            $this->_view->templateList = $templateList;
+            $this->_view->templateList = Application_Model_Mappers_TemplateMapper::getInstance()->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
 
             $listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'].$this->_websiteConfig['media']);
             if (!empty ($listFolders)){
@@ -928,6 +925,14 @@ class Shopping extends Tools_Plugins_Abstract {
                     array_push($this->_view->plugins, $plugin->getName());
                 }
             }
+
+			$this->_view->productForm = new Forms_Product();
+			if ($this->_request->has('id')){
+				$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
+				if ($id){
+					$this->_view->product = Models_Mapper_ProductMapper::getInstance()->find($id);
+				}
+			}
 
             $this->_layout->content = $this->_view->render('product.phtml');
             echo $this->_layout->render();

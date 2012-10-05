@@ -1,4 +1,4 @@
-define([ './router' ], function(Router){
+define([ './views/app' ], function(AppView){
 	if (!window.console) {
 		window.console = {
 		log: function(){
@@ -9,8 +9,7 @@ define([ './router' ], function(Router){
 
 
     $(function(){
-        var router =  new Router;
-        Backbone.history.start();
-        window.app = router.app;
+        window.app = new AppView();
+        $(document).trigger('loaded.product');
     });
 });

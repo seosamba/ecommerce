@@ -17,6 +17,7 @@ define([
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
 		events: {
+            'click #new-product': 'newProduct',
             'click .show-list': 'toggleList',
 			'keypress input#new-tag': 'newTag',
 			'click #add-new-option-btn': 'newOption',
@@ -34,7 +35,15 @@ define([
             'submit form.binded-plugin': 'formSubmit',
             'click #massaction': 'massAction',
             'click #product-list-back-link': 'hideProductList',
-            'click a[href=#related-tab]': 'renderRelated'
+            'click a[data-role=editProduct]': function(e){
+                var pid = $(e.currentTarget).data('pid');
+                this.setProduct(pid);
+                if (window.history && window.history.pushState){
+                    var loc = window.location;
+                    window.history.pushState({}, document.title, loc.href.replace(/product.*$/, 'product/id/'+pid) );
+                }
+                return false;
+            }
 		},
         products: null,
         tags: null,
@@ -42,14 +51,8 @@ define([
         searchIndex: null,
 		websiteUrl: $('#website_url').val(),
 		initialize: function(){
-			$('#add-new-option-btn').button();
-            $('#ajax_msg, #product-list').hide();
-            $('#manage-product').show();
-
-            var self = this;
-            $(this.el).on('tabsselect', function(event, ui){
-                ui.index === 3 && self.renderRelated();
-            });
+            this.setProduct();
+            $('#add-new-option-btn').button();
 
             $('#product-list-search').ajaxStart(function(){
                 $(this).attr('disabled', 'disabled');
@@ -63,6 +66,10 @@ define([
                 itemSelector : '.box',
                 columnWidth : 118
             });
+
+            $('#ajax_msg, #product-list').hide();
+            $('#manage-product').show();
+            this.lazyInit();
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -89,27 +96,29 @@ define([
                 this.tags.fetch();
             }
 
-            if (this.searchindex === null) {
-                this.searchindex = _.once(functi)
-            }
         },
 		setProduct: function (productId) {
             this.model = new ProductModel();
 
             if (productId) {
-                if (this.products === null) {
-                    this.model.fetch({data: {id: productId}})
-                        .success(this.lazyInit.bind(this))
-                        .success(this.render.bind(this))
-                    ;
-                } else {
+                if (this.products !== null) {
                     this.model = this.products.get(productId);
+                    this.render();
+                } else {
+                    this.model.fetch({data: {id: productId}})
+                        .success(this.render.bind(this));
                 }
             }
-            this.render();
+
             this.model.on('change:related', this.renderRelated, this);
+
             $('#manage-product').tabs("select" , 0);
+            return this;
 		},
+        newProduct: function(e) {
+            e.preventDefault();
+            this.setProduct().render();
+        },
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
 		},
@@ -245,7 +254,7 @@ define([
 
             //populating selected tags
 			$('#product-tags').find('input:checkbox:checked').removeAttr('checked');
-			if (this.model.has('tags') && this.tags.size()){
+			if (this.model.has('tags')){
                 this.renderProductTags();
 			}
 
@@ -354,7 +363,7 @@ define([
                     if (self.products !== null) {
                         self.products.add(model);
                     }
-                    self.navigate('edit/'+model.id, true);
+//                    self.navigate('edit/'+model.id, true);
                     showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
                 }, error: this.processSaveError});
 			} else {
@@ -456,23 +465,20 @@ define([
                 var relateds = this.model.get('related'),
                     self = this;
 
-                _(relateds).each(function (pid) {
-                    pid = parseInt(pid);
-
-                    if (self.products !== null){
-                        var model = self.products.get(pid);
+                $.ajax({
+                    url: this.model.urlRoot,
+                    data: {id: relateds.join(',')},
+                    success: function(response){
+                        _.each(response, function(related){
+                            var view = new ProductListView({model: new ProductModel(related), showDelete: true});
+                            view.delegateEvents({
+                                'click span.ui-icon-closethick': function(){
+                                    self.removeRelated(this.model.get('id'));
+                                }
+                            })
+                            view.render().$el.css({cursor: 'default'}).appendTo('#related-holder');
+                        });
                     }
-                    if (!model) {
-                        var model = new ProductModel();
-                        model.fetch({data: {id: pid}});
-                    }
-                    var view = new ProductListView({model: model, showDelete: true});
-                    view.delegateEvents({
-                        'click span.ui-icon-closethick': function(){
-                            self.removeRelated(this.model.get('id'));
-                        }
-                    })
-                    view.render().$el.css({cursor: 'default'}).appendTo('#related-holder');
                 });
             }
             return false;

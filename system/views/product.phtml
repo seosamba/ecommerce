@@ -382,7 +382,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 	{{if showDelete}}
     <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
     {{else}}
-    <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" class="clearfix" style="text-align:center;">
+    <a href="<?php echo $this->url(array('id'=>null));?>/id/${id}" data-role="editProduct" data-pid="${id}" title="<?php echo $this->translate('Edit');?> ${name}" class="clearfix" style="text-align:center;">
     {{/if}}
         <p class="brand">${brand}</p>
 	    {{if showDelete}}
@@ -473,7 +473,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 	    ?>
         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.$title);?></a></li>
         <?php endforeach; ?>
-        <a href="#new" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="#new" id="new-product" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
         <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
     </ul>
     <!--------- MAIN INFO -------------->
@@ -493,7 +493,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 				<label for="product-enabled">This product is enabled</label>
 			</div>
             <div class="grid_7">
-	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
+	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" autofocus="autofocus" />
             </div>
 			<div class="grid_1">
 				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
@@ -605,3 +605,16 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         <input type="submit" name="submit" id="submit" value="Save"/>
     </div>
 </div>
+<script>
+$(function(){
+	$(document).one('loaded.product', function(){
+	<?php if ($this->product): ?>
+		app.model.set(<?php echo json_encode($this->product->toArray()) ;?>);
+		app.render();
+	<?php endif; ?>
+	});
+});
+
+
+
+</script>
