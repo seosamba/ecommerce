@@ -26,7 +26,7 @@ echo $this->noLayout ? $this->headLink() : '';
 			<div id="extra-filters-switch" class="cl" style="text-align: center; cursor:pointer;">show/hide advanced filters</div>
 			<div id="extra-filters">
 				<div class="ot">
-					<label>by price range</label>
+					<label>By price range</label>
 					<div class="ot"><label class="mt5px">from</label></div>
 					<div class="tt">
 						<input type="text" name="filter-from-amount" >
@@ -35,14 +35,14 @@ echo $this->noLayout ? $this->headLink() : '';
 					<div class="tt"><input class="ot" type="text" name="filter-to-amount" ></div>
 				</div>
 				<div class="ot">
-					<label class="cl">by dates</label>
+					<label class="cl">By date</label>
 					<div class="ot"><label class="mt5px">from</label></div>
 					<div class="tt"><input type="text" id="orders-filter-fromdate" name="filter-from-date"></div>
 					<div class="ot"><label class="mt5px">to</label></div>
 					<div class="tt"><input type="text" id="orders-filter-todate" name="filter-to-date"></div>
 				</div>
 				<div class="ot">
-					<label>by shipping desination</label>
+					<label>By shipping desination</label>
 					<?php
 					$countryList = Tools_Geo::getCountries(true);
 					array_unshift($countryList, '');
