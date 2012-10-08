@@ -4,6 +4,9 @@ $this->headTitle('Manage product');
 
 <style>
 <?php $this->headStyle()->captureStart();?>
+.ui-effects-transfer {
+	border: 2px dotted #778899;
+}
 .seotoaster #manage-product {
 	font-size: 11pt;
 }
@@ -18,7 +21,7 @@ div.box {
 div.box:hover {
 	box-shadow: 0 0 3px lightseagreen;
 }
-#product-tags .tag-widget {
+.product-tags .tag-widget {
     background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
     border: 2px solid white;
     -moz-border-radius: 3px 3px 3px 3px;
@@ -32,10 +35,10 @@ div.box:hover {
     width: 23%;
 	height:18px;
 }
-#product-tags .tag-widget span {
+.product-tags .tag-widget span {
 	cursor: pointer;
 }
-#product-tags .tag-widget span.tag-editable {
+.product-tags .tag-widget span.tag-editable {
 	float: left;
 	margin-left: 2%;
 	width: 81%;
@@ -43,13 +46,13 @@ div.box:hover {
 	overflow: hidden;
 	line-height: 1.2em;
 }
-#product-tags .tag-widget input {
+.product-tags .tag-widget input {
 	float: left;
 	margin-top: 2px;
 	margin-left: 1px;
 }
 
-#product-tags .tag-widget .ui-icon-closethick {
+.product-tags .tag-widget .ui-icon-closethick {
     float: right;
     margin: 0 0 0 3px;
 }
@@ -276,18 +279,21 @@ input#delete {
 <?php
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
         ->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js');
-$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/product/config'))
-        ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js')
+$this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
 ?>
 
-<script id="tagTemplate" type="text/x-jquery-tmpl">
-
+<script id="imgTemplate" type="text/template">
+	{{each imageList}}
+	<div class="box">
+	    <img class="lazy" src="" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
+	</div>
+	{{/each}}
 </script>
 
-<script id="imgTemplate" type="text/x-jquery-tmpl">
-	{{each imageList}}
-
-	{{/each}}
+<script id="tagTemplate" type="text/template">
+	<input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
+	<span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
+	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
 </script>
 
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
@@ -573,14 +579,10 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-        <div id="product-tags" class="grid_12 h380" style="overflow-y: auto;">
-        <?php foreach ($this->tags as $tag): ?>
-			<div class="tag-widget">
-				<input type="checkbox" name="tag[]" value="<?php echo $tag->getId();?>" >
-				<span class="tag-editable" title="Click to edit"><?php echo $tag->getName(); ?></span>
-				<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete'); ?></span>
-			</div>
-		<?php endforeach; ?>
+	    <div id="product-tags-current" class="product-tags grid_12" style="height: auto;">
+        </div>
+
+	    <div id="product-tags-available" class="product-tags grid_12 h380" style="overflow-y: auto;">
         </div>
 
     </div> <!-- #tag-tab -->
@@ -612,7 +614,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         <input type="submit" name="submit" id="submit" value="Save"/>
     </div>
 </div>
-<script>
+<script type="text/javascript">
 $(function(){
 	$(document).one('loaded.product', function(){
 	<?php if ($this->product): ?>
@@ -621,7 +623,7 @@ $(function(){
 	<?php endif; ?>
 	});
 });
-
-
-
 </script>
+
+<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"
+        data-main="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/modules/product/config"></script>

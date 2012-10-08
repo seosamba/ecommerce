@@ -8,8 +8,8 @@ define([ './views/app' ], function(AppView){
 	}
 
 
+    window.app = new AppView();
     $(function(){
-        window.app = new AppView();
         $(document).trigger('loaded.product');
     });
 });

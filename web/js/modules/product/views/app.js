@@ -3,16 +3,15 @@ define([
 	'../models/product',
     '../models/option',
     '../collections/productlist',
-//    '../collections/tags',
-//    '../collections/brands',
+    '../collections/tags_lazy',
     '../collections/options',
-//    './tag',
+    './tag',
 	'./option',
 	'./productlist'
 ], function(Backbone,
             ProductModel, ProductOption,
-            ProductsCollection, /* TagsCollection, BrandsCollection,*/ OptionsCollection,
-            /*TagView,*/ ProductOptionView, ProductListView){
+            ProductsCollection, TagsCollection, OptionsCollection,
+            TagView, ProductOptionView, ProductListView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -27,7 +26,7 @@ define([
 			'click div.box': 'setProductImage',
 			'change [data-reflection=property]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
-			'click input[name^=tag]': 'toggleTag',
+			'click div.tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
             'keypress input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
@@ -51,6 +50,7 @@ define([
         searchIndex: null,
 		websiteUrl: $('#website_url').val(),
 		initialize: function(){
+            var self = this;
             this.setProduct();
             $('#add-new-option-btn').button();
 
@@ -68,8 +68,11 @@ define([
             });
 
             $('#ajax_msg, #product-list').hide();
-            $('#manage-product').show();
-//            this.lazyInit();
+            this.$el.on('tabsselect', function(event, ui){
+                if (ui.index === 1){
+                    self.initTags();
+                }
+            }).show();
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -80,24 +83,16 @@ define([
 
             return this.products;
         },
-        lazyInit: function() {
-            if (this.brands === null){
-                this.brands = new BrandsCollection();
-                this.brands.on('add', this.renderBrand, this);
-                this.brands.on('reset', this.renderAllBrands, this);
-                this.brands.fetch();
-            }
-
+        initTags: function(){
             if (this.tags === null){
                 this.tags = new TagsCollection();
+                this.tags.template = _.template($('#tagTemplate').html());
                 this.tags.on('add', this.renderTag, this);
-                this.tags.on('reset', this.renderAllTags, this);
-                this.tags.on('reset', this.renderProductTags, this);
-                this.tags.fetch();
+                this.tags.on('reset', this.renderTags, this);
+                this.tags.pager();
             }
-
         },
-		setProduct: function (productId) {
+        setProduct: function (productId) {
             this.model = new ProductModel();
 
             if (productId) {
@@ -110,7 +105,9 @@ define([
                 }
             }
 
+            this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
+            this.model.on('error', this.processSaveError, this);
 
             $('#manage-product').tabs("select" , 0);
             return this;
@@ -123,26 +120,18 @@ define([
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
 		},
 		newTag: function(e){
-			var name = this.$('#new-tag').val();
+			var name = $.trim(e.currentTarget.value);
 			if (e.keyCode == 13 && name !== '') {
 			   this.tags.create({name: name}, {
+                   wait: true,
 				   success: function(model, response){
 					   $('#new-tag').val('').blur();
 				   },
 				   error: function(model, response){
-					   showMessage(response.responseText, true);
+                       showMessage(response.responseText, true);
 				   }
 			   });
 			}
-		},
-		toggleTag: function(e){
-			var self = this,
-                checkedTags = [];
-
-			_.each($('input[name^=tag]:checked'), function(el){
-				checkedTags.push(self.tags.get( el.value ).toJSON());
-			});
-			this.model.set('tags', checkedTags);
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
@@ -203,6 +192,8 @@ define([
 		},
 		render: function(){
             console.log('render: app.js', this.model.changedAttributes());
+
+            $('#product-list:visible').hide();
             $("#manage-product").tabs( "option", "ajaxOptions",
                 { data: {productId: this.model.get('id') } }
             );
@@ -227,12 +218,11 @@ define([
 			this.$('#product-mpn').val(this.model.get('mpn'));
 			this.$('#product-weight').val(this.model.get('weight'));
 
-            if (!_.isNull(this.brands)){
-                if (this.model.has('brand')){
-                    this.$('#product-brand').val(this.model.get('brand'));
-                } else {
-                    this.$('#product-brand').val(-1);
-                }
+
+            if (this.model.has('brand')){
+                this.$('#product-brand').val(this.model.get('brand'));
+            } else {
+                this.$('#product-brand').val(-1);
             }
 
 			this.$('#product-price').val(this.model.get('price'));
@@ -249,14 +239,8 @@ define([
 				});
 			}
 
-            //render related products
-//            this.renderRelated();
-
             //populating selected tags
-			$('#product-tags').find('input:checkbox:checked').removeAttr('checked');
-			if (this.model.has('tags')){
-                this.renderProductTags();
-			}
+			$('#product-tags-available:not(:empty)').find('div.tag-widget').show();
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
@@ -283,30 +267,82 @@ define([
             var view = new TagView({model: tag});
                 view.render();
             if (index instanceof Backbone.Collection){
-                $('#product-tags').prepend(view.$el);
+                $('#product-tags-available').prepend(view.$el);
             } else {
-                $('#product-tags').append(view.$el);
+                $('#product-tags-available').append(view.$el);
+            }
+            if ($('div.tagid-'+tag.get('id'), '#product-tags-current').size()){
+                view.$el.hide();
             }
         },
-        renderAllTags: function(){
-            $('#product-tags').empty();
+        renderTags: function(){
             this.tags.each(this.renderTag, this);
+            this.tagWaypoint();
+        },
+        toggleTag: function(e){
+            if (e.currentTarget.checked){
+                var tag = {
+                    id: e.currentTarget.value,
+                    name: $(e.currentTarget).next('span.tag-editable').text()
+                };
+                var current = this.model.get('tags') || [];
+                this.model.set('tags', _.union(current, tag));
+            }
+            return false;
+        },
+        tagWaypoint: function(){
+            var self = this;
+
+            $('#product-tags-available div.tag-widget:last').waypoint(function(){
+                $(this).waypoint('remove');
+
+                if ( self.tags.currentPage != self.tags.lastPage ){
+                    self.tags.requestNextPage();
+                }
+            }, {context: '#product-tags-available', offset: '170%' });
         },
         renderProductTags: function(){
+            console.log('renderProductTags');
             if (this.model && this.model.has('tags')){
-                var self = this;
+                var self = this,
+                    container = $('#product-tags-current').empty();
                 _.each(this.model.get('tags'), function(tag){
-                    $('#product-tags input:checkbox[name^=tag][value='+tag.id+']').attr('checked', 'checked');
+                    var view = new TagView({model: new Backbone.Model(tag)});
+                    view.delegateEvents({
+                        'change input:checkbox[name^=tag]': function(){
+                            var id = this.model.get('id');
+                            var newSet = _.reject(self.model.get('tags'), function(tag){
+                                return tag.id === id;
+                            });
+                            self.model.set('tags', newSet);
+                            $('div.tagid-'+id+':hidden', '#product-tags-available').show();
+                        }
+                    });
+                    view.render().$el
+                        .find('span.ui-icon-closethick').remove().end()
+                        .find('input:checkbox').attr('checked', 'checked').end()
+                        .appendTo(container);
+//                    $('#product-tags input:checkbox[name^=tag][value='+tag.id+']').attr('checked', 'checked');
+
+                    $('div.tagid-'+tag.id+':visible', '#product-tags-available').effect("transfer", {
+                        to: view.$el,
+                        className: 'ui-effects-transfer'
+                    }, 500).hide();
                 });
+
+                var ids = _.map(_.pluck(this.model.get('tags'), 'id'), function(id){
+                    return '.tagid-'+id;
+                });
+                console.log($(ids));
             }
         },
-        renderBrand: function(brand){
-            $.tmpl("<option value='${name}' {{if url}}data-url='${url}'{{/if}}>${name}</option>", brand.toJSON()).appendTo('#product-brand');
-        },
-        renderAllBrands: function(){
-            $('#product-brand').html('<option value="-1" disabled>Select a brand</option>');
-            _(this.brands.sortBy(function(brand){ return brand.get('name').toLowerCase();})).each(this.renderBrand, this);
-            $('#product-brand > option:first').attr('disabled', true);
+        renderBrands: function(brands){
+            var tmpl = _.template("<% _.each(brands, function(brand){ %><option value='<%= brand %>'><%= brand %></option><% }); %>");
+
+            $('#product-brand').html('<option value="-1" disabled>Select a brand</option>' +
+                tmpl({brands: _.sortBy(brands, function(v){ return v.toLowerCase();}) })
+            );
+
             if (this.model && this.model.has('brand')){
                 this.$('#product-brand').val(this.model.get('brand'));
             } else {
@@ -363,7 +399,6 @@ define([
                     if (self.products !== null) {
                         self.products.add(model);
                     }
-//                    self.navigate('edit/'+model.id, true);
                     showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
                 }, error: this.processSaveError});
 			} else {
@@ -494,16 +529,17 @@ define([
         },
         addNewBrand: function(newBrand){
             newBrand = $.trim(newBrand);
-            var currentList = this.brands.pluck('name').map(function(item){ return item.toLowerCase()});
-            if (!_.include(currentList, newBrand.toLowerCase())){
-                this.brands.add({name: newBrand});
+            var brandsList = _.map($('#product-brand option'), function(opt){ return opt.value; });
+
+            if (!_.include(_.map(brandsList, function(b){ return b.toLowerCase(); }), newBrand.toLowerCase())){
+                brandsList.push(newBrand);
             } else {
-                var brand = this.brands.find(function(item){
-                    return item.get('name').toLowerCase() == newBrand.toLowerCase();
+                newBrand = _.find(brandsList, function(item){
+                    return item.toLowerCase() == newBrand.toLowerCase();
                 });
-                newBrand = brand.get('name');
             }
             this.model.set({brand: newBrand});
+            this.renderBrands(brandsList);
             return this;
         },
         filterProducts: function(e, forceRun) {

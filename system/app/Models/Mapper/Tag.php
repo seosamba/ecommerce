@@ -4,6 +4,7 @@
  * Tag
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ * @method Models_Mapper_Tag getInstance() getInstance()  Returns an instance of itself
  */
 class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 
@@ -56,5 +57,30 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 		return false;
 	}
 		
+	public function find($id) {
+		$result = $this->getDbTable()->find($id);
+		if(0 == count($result)) {
+			return null;
+		} elseif (count($result) > 1) {
+			$list = array();
+			foreach ($result as $row) {
+				array_push($list, new $this->_model($row->toArray()));
+			}
+			return $list;
+		}
 
+		return new $this->_model( $result->current()->toArray());
+	}
+
+	public function fetchAll($where = null, $order = null, $offset = null, $limit = null){
+		$entries = array();
+		$resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
+		if(null === $resultSet) {
+			return null;
+		}
+		foreach ($resultSet as $row) {
+			$entries[] = new $this->_model($row->toArray());
+		}
+		return $entries;
+	}
 }
