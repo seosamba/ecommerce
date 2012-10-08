@@ -156,6 +156,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$photoUrlPart     = $data['mediaPath'] . $productPhotoData[0];
 			$shortDesc        = $product->getShortDescription();
 			$templatePrepend  = '<!--pid="' . $product->getId() . '"-->';
+            $price = (float)($product->getCurrentPrice() !== null?$product->getCurrentPrice():$product->getPrice());
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            if ((bool)$shoppingConfig['showPriceIncTax']){
+                $price += Tools_Tax_Tax::calculateProductTax($product);
+            }
 			//setting up the entity parser
 			$renderedContent .= $entityParser->setDictionary(array(
 				'$product:name'              => $product->getName(),
@@ -166,8 +171,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:photourl:large'    => $photoUrlPart . '/large/' . $productPhotoData[1],
                 '$product:photourl:original' => $photoUrlPart . '/original/' . $productPhotoData[1],
                 '$product:url'               => $product->getPage() ? $product->getPage()->getUrl() : null,
-                '$product:price'             => $currency->toCurrency((float)($product->getCurrentPrice() !== null?$product->getCurrentPrice():$product->getPrice())),
-                '$product:price:nocurrency'  => $product->getCurrentPrice() !== null ? $product->getCurrentPrice() : $product->getPrice(),
+                '$product:price'             => $currency->toCurrency($price),
+                '$product:price:nocurrency'  => $price,
                 '$product:brand'             => $product->getBrand(),
                 '$product:weight'            => $product->getWeight(),
                 '$product:mpn'               => $product->getMpn(),
