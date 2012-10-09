@@ -97,10 +97,15 @@
             <?php endif;?>
         </p>
         <p class="post-purchase-row cart-total-tax">
-            <?php if($this->showPriceIncTax == 1):?>
-                <span><?php echo $this->translate('Inc. Tax');?>:</span>
+            <?php if(Tools_Misc::getTaxName() != ''):?>
+                <?php $taxName = Tools_Misc::getTaxName();?> 
             <?php else:?>
-                <span><?php echo $this->translate('Total Tax');?>:</span>
+                <?php $taxName = 'Tax';?>
+            <?php endif;?>
+            <?php if($this->showPriceIncTax == 1):?>
+                <span><?php echo $this->translate('Inc. '.$taxName);?>:</span>
+            <?php else:?>
+                <span><?php echo $this->translate('Total '.$taxName);?>:</span>
             <?php endif;?>
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
@@ -217,10 +222,15 @@
             <?php endif;?>
         </p>
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <?php if($this->showPriceIncTax == 1):?>
-                <span><?php echo $this->translate('Inc. Tax');?>:</span>
+            <?php if(Tools_Misc::getTaxName() != ''):?>
+                <?php $taxName = Tools_Misc::getTaxName();?> 
             <?php else:?>
-                <span><?php echo $this->translate('Total Tax');?>:</span>
+                <?php $taxName = 'Tax';?>
+            <?php endif;?>
+            <?php if($this->showPriceIncTax == 1):?>
+                <span><?php echo $this->translate('Inc. '.$taxName);?>:</span>
+            <?php else:?>
+                <span><?php echo $this->translate('Total '.$taxName);?>:</span>
             <?php endif;?>
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>

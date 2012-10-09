@@ -12,7 +12,12 @@ class Tools_Misc {
      */
     const KEY_CURRENCY_LIST = 'currency_list';
 
-
+    /*
+     * Changes for name inc. Tax 
+     * Put in array country abbr and name for change 'AU'=>'GST'
+     */
+    public static $_taxName     = array('AU'=>'GST');
+    
 	public static $_weightUnits = array(
 		'kg' => 'Kilogram (kg)',
 		'lbs' => 'Pound (lbs)'
@@ -259,5 +264,14 @@ class Tools_Misc {
 
     public static function getCheckoutPage() {
         return Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_CHECKOUT, true);
+    }
+    
+    public static function getTaxName() {
+        $country = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country');
+        if(isset($country) && array_key_exists($country, self::$_taxName)){
+            return self::$_taxName[$country];
+        }else{
+            return '';
+        }
     }
 }
