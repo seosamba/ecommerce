@@ -285,7 +285,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 <script id="imgTemplate" type="text/template">
 	{{each imageList}}
 	<div class="box">
-	    <img class="lazy" src="" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
+	    <img class="lazy" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
 	</div>
 	{{/each}}
 </script>
@@ -294,6 +294,13 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 	<input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
 	<span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
 	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
+</script>
+
+<script id="optionLibraryTemplate" type="text/template">
+	<option value="-1" disabled="disabled" selected="selected">select from library</option>
+	<% _.each(items, function(item){ %>
+	<option value="<%= item.id %>" ><%= item.title %></option>
+	<% }); %>
 </script>
 
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
@@ -311,7 +318,6 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                 <option value="radio">Radio Switch</option>
                 <option value="text">Text Field</option>
                 <option value="date">Datepicker</option>
-<!--							<option value="file">Upload File</option>-->
             </select>
         </div>
     </div>
@@ -420,15 +426,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     </fieldset>
 </script>
 
-<script>
-    $(function(){
-	    $('div.seotoaster > div.ui-widget-header:first').remove();
-        $('#manage-product,#description-box').tabs();
-        $(".ui-tabs-nav, .ui-tabs-nav > *" )
-            .removeClass( "ui-corner-all" )
-            .addClass( "ui-corner-top" );
-    });
-</script>
+
 
 <div id="ajax_msg" class="smoke">
     <img style="vertical-align: middle;" src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" />
@@ -451,7 +449,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                 </label>
             </div>
         </div>
-        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h480" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
     </div>
 
     <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
@@ -579,10 +577,10 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-	    <div id="product-tags-current" class="product-tags grid_12" style="height: auto;">
+	    <div id="product-tags-current" class="product-tags grid_12" style="max-height: 200px; overflow-y: auto;">
         </div>
 
-	    <div id="product-tags-available" class="product-tags grid_12 h380" style="overflow-y: auto;">
+	    <div id="product-tags-available" class="product-tags grid_12" style="max-height: 200px; overflow-y: auto;">
         </div>
 
     </div> <!-- #tag-tab -->
@@ -614,11 +612,23 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         <input type="submit" name="submit" id="submit" value="Save"/>
     </div>
 </div>
+
+<script>
+	(function(){
+	    $('div.seotoaster > div.ui-widget-header:first').remove();
+	    $('#manage-product,#description-box').tabs();
+	    $(".ui-tabs-nav, .ui-tabs-nav > *" )
+	        .removeClass( "ui-corner-all" )
+	        .addClass( "ui-corner-top" );
+	})(window);
+</script>
+
 <script type="text/javascript">
 $(function(){
 	$(document).one('loaded.product', function(){
 	<?php if ($this->product): ?>
 		app.model.set(<?php echo json_encode($this->product->toArray()) ;?>);
+		app.model.get('options').reset(app.model.get('defaultOptions'));
 		app.render();
 	<?php endif; ?>
 	});

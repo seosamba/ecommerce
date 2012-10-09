@@ -9,7 +9,7 @@ define([
 	'./option',
 	'./productlist'
 ], function(Backbone,
-            ProductModel, ProductOption,
+            ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection,
             TagView, ProductOptionView, ProductListView){
 
@@ -34,15 +34,7 @@ define([
             'submit form.binded-plugin': 'formSubmit',
             'click #massaction': 'massAction',
             'click #product-list-back-link': 'hideProductList',
-            'click a[data-role=editProduct]': function(e){
-                var pid = $(e.currentTarget).data('pid');
-                this.setProduct(pid);
-                if (window.history && window.history.pushState){
-                    var loc = window.location;
-                    window.history.pushState({}, document.title, loc.href.replace(/product.*$/, 'product/id/'+pid) );
-                }
-                return false;
-            }
+            'click a[data-role=editProduct]': 'productAction'
 		},
         products: null,
         tags: null,
@@ -109,6 +101,11 @@ define([
             this.model.on('change:related', this.renderRelated, this);
             this.model.on('error', this.processSaveError, this);
 
+            if (this.model.has('options')){
+                this.model.get('options').on('add', this.renderOption, this);
+                this.model.get('options').on('reset', this.renderOptions, this);
+            }
+
             $('#manage-product').tabs("select" , 0);
             return this;
 		},
@@ -135,20 +132,18 @@ define([
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
-			var optWidget = new ProductOptionView({model: newOption});
+            newOption.get('selection').add({isDefault: 1});
 			this.model.get('options').add(newOption);
-			$('#options-holder').append(optWidget.render().el);
-			optWidget.addSelection();
 		},
         addOption: function(){
             var optId = this.$('#option-library').val();
             if (optId > 0 ){
-                var option = this.optionLibrary.get(optId).toJSON();
+                var option = this.optionLibrary.get(optId);
 
                 var newOption = new ProductOption({
-                    title: option.title,
-                    parentId: option.id,
-                    type: option.type
+                    title: option.get('title'),
+                    parentId: option.get('id'),
+                    type: option.get('type')
                 });
                 newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 this.model.get('options').add(newOption);
@@ -233,10 +228,7 @@ define([
 			// loading option onto frontend
 			$('#options-holder').empty();
 			if (this.model.has('options')) {
-				this.model.get('options').each(function(option){
-					var optWidget = new ProductOptionView({model: option});
-					optWidget.render().$el.appendTo('#options-holder');
-				});
+                this.renderOptions();
 			}
 
             //populating selected tags
@@ -277,7 +269,7 @@ define([
         },
         renderTags: function(){
             this.tags.each(this.renderTag, this);
-            this.tagWaypoint();
+            this.waypointTags();
         },
         toggleTag: function(e){
             if (e.currentTarget.checked){
@@ -289,17 +281,6 @@ define([
                 this.model.set('tags', _.union(current, tag));
             }
             return false;
-        },
-        tagWaypoint: function(){
-            var self = this;
-
-            $('#product-tags-available div.tag-widget:last').waypoint(function(){
-                $(this).waypoint('remove');
-
-                if ( self.tags.currentPage != self.tags.lastPage ){
-                    self.tags.requestNextPage();
-                }
-            }, {context: '#product-tags-available', offset: '170%' });
         },
         renderProductTags: function(){
             console.log('renderProductTags');
@@ -363,6 +344,8 @@ define([
         renderAllProducts: function(){
             this.$('#product-list-holder').empty();
             this.products.each(this.renderProduct, this);
+            console.log('aaa');
+            this.waypointProductlist();
         },
 		saveProduct: function(){
             var self = this;
@@ -481,10 +464,28 @@ define([
 
             return !error;
         },
+        productAction: function(e){
+            var pid = $(e.currentTarget).data('pid');
+            var type = $('#product-list-holder').data('type');
+            switch (type){
+                case 'edit':
+                    this.setProduct(pid);
+                    if (window.history && window.history.pushState){
+                        var loc = window.location;
+                        window.history.pushState({}, document.title, loc.href.replace(/product.*$/, 'product/id/'+pid) );
+                    }
+                    break;
+                case 'related':
+                    this.addRelated(pid);
+                    break;
+            }
+            $('#product-list').hide('slide');
+            return false;
+        },
 		addRelated: function( ids ) {
             if (_.isNull(ids) || _.isUndefined(ids)) return false;
 
-            var relateds = _(this.model.get('related')).map(function(id){ return parseInt(id) });
+            var relateds = _.map(this.model.get('related'), function(id){ return parseInt(id) });
                 relateds = _.union(relateds, ids);
 
             this.model.set({related: _.without(relateds, this.model.get('id'))});
@@ -504,6 +505,10 @@ define([
                     url: this.model.urlRoot,
                     data: {id: relateds.join(',')},
                     success: function(response){
+                        if (!response) return false;
+                        if (response && relateds.length == 1){
+                            response = [response];
+                        }
                         _.each(response, function(related){
                             var view = new ProductListView({model: new ProductModel(related), showDelete: true});
                             view.delegateEvents({
@@ -546,19 +551,25 @@ define([
             if (e.keyCode === 13 || forceRun === true) {
                 this.products.data.key = e.target.value;
                 this.products.reset().load([
-                    this.waypointCallback.bind(this),
+                    this.waypointProductlist.bind(this),
                     function(response){ if (response.length === 0) { $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>')} ; }
                 ]);
                 $(e.target).autocomplete('close');
             }
         },
+        renderOption: function(option){
+            var optWidget = new ProductOptionView({model: option});
+            optWidget.render().$el.appendTo('#options-holder');
+        },
+        renderOptions: function(){
+            if (!this.model.has('options')) return false;
+            this.model.get('options').each(this.renderOption, this);
+        },
         fetchOptionLibrary: function(){
             if (!_.has(this, 'optionLibrary')){
                 this.optionLibrary = new OptionsCollection();
                 this.optionLibrary.on('reset', function(collection){
-                    $('#option-library')
-                        .html('<option value="-1" disabled="disabled" selected="selected">select from library</option>')
-                        .append($.tmpl('<option value="${id}" >${title}</option>', collection.toJSON()));
+                    $('#option-library').html(_.template($('#optionLibraryTemplate').html(), {items: collection.toJSON()}));
                 }, this);
                 this.optionLibrary.fetch();
             }
@@ -634,32 +645,41 @@ define([
 
             this.initSearchIndex();
 
-            var listtype = $(e.target).data('listtype');
+            var listtype = $(e.currentTarget).data('listtype');
 
-            var callback = function(){
-                $('#product-list').show('slide');
-                $('#product-list-holder').data({type: listtype}).trigger('scroll');
-                var labels = $('#massaction').data('labels');
-                $('#massaction').text(labels[listtype]);
-            }
+            $('#product-list').show('slide');
+            $('#product-list-holder').data('type', listtype);
+            var labels = $('#massaction').data('labels');
+            $('#massaction').text(labels[listtype]);
 
             if (this.products === null) {
                 return this.initProducts().load([
-                    this.waypointCallback.bind(this),
-                    callback
+                    this.waypointProductlist.bind(this),
+                    function(){
+                        $('#product-list-holder').trigger('scroll');
+                    }
                 ]);
             }
-            callback();
         },
-        waypointCallback: function(){
+        waypointProductlist: function(){
             var self = this;
-            $('.productlisting:last', '#product-list-holder').waypoint(function(){
+            $('div.productlisting:last', '#product-list-holder').waypoint(function(){
                 $(this).waypoint('remove');
 
                 if (!self.products.paginator.last){
-                    self.products.load(self.waypointCallback.bind(self));
+                    self.products.load(self.waypointProductlist.bind(self));
                 }
-            }, {context: '#product-list-holder', offset: '130%' } );
+            }, {context: '#product-list-holder', offset: '150%'} );
+        },
+        waypointTags: function(){
+            var self = this;
+            $('div.tag-widget:last:visible', '#product-tags-available').waypoint(function(){
+                $(this).waypoint('remove');
+
+                if ( self.tags.currentPage != self.tags.lastPage ){
+                    self.tags.requestNextPage();
+                }
+            }, {context: '#product-tags-available', offset: '160%', onlyOnScroll: true });
         },
         hideProductList: function(){
             $('#product-list').hide('slide');
