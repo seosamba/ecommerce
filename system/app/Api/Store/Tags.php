@@ -31,10 +31,12 @@ class Api_Store_Tags extends Api_Service_Abstract {
 		} else {
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
 			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_VALIDATE_INT);
+			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
-			$data = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit);
-			if ($data){
-				return array_map(function($tag){ return $tag->toArray(); }, $data );
+
+			$result = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit, $count);
+			if ($result){
+				return array_map(function($tag){ return $tag->toArray(); }, $count ? $result['data'] : $result );
 			}
 		}
 		$this->_error(null, self::REST_STATUS_NOT_FOUND);

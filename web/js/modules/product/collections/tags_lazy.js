@@ -17,8 +17,9 @@ define([
             perPage: 40
         },
         server_api: {
-            'limit': function(){ return this.perPage; },
-            'offset': function(){ return this.currentPage * this.perPage; }
+            count: true,
+            limit: function(){ return this.perPage; },
+            offset: function(){ return this.currentPage * this.perPage; }
         }
     })
 	

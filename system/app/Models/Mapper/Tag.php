@@ -72,15 +72,41 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 		return new $this->_model( $result->current()->toArray());
 	}
 
-	public function fetchAll($where = null, $order = null, $offset = null, $limit = null){
+	public function fetchAll($where = null, $order = null, $offset = null, $limit = null, $count = false){
 		$entries = array();
-		$resultSet = $this->getDbTable()->fetchAll($where, $order, $limit, $offset);
-		if(null === $resultSet) {
+		$select = $this->getDbTable()->select();
+		if ($where) {
+			$select->where($where);
+		}
+
+		if ($order){
+			$select->order($order);
+		}
+
+		if ($count === false){
+			$select->limit($limit, $offset);
+		}
+
+		$resultSet = $this->getDbTable()->fetchAll($select);
+
+		if(count($resultSet) == 0) {
 			return null;
 		}
-		foreach ($resultSet as $row) {
-			$entries[] = new $this->_model($row->toArray());
+
+		$resultSet = $resultSet->toArray();
+
+		if ($count === true ){
+			$count = sizeof($resultSet);
+			$resultSet = array_slice($resultSet, $offset, $limit);
 		}
-		return $entries;
+
+		foreach ($resultSet as $model) {
+			$entries[] = new $this->_model($model);
+		}
+
+		return !$count ? $entries : array(
+				'totalCount'    => $count,
+				'data'          => $entries
+			);
 	}
 }

@@ -26,7 +26,7 @@ define([
 			'click div.box': 'setProductImage',
 			'change [data-reflection=property]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
-			'click div.tag-widget input[name^=tag]': 'toggleTag',
+			'click #product-tags-available div.tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
             'keypress input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
@@ -34,7 +34,39 @@ define([
             'submit form.binded-plugin': 'formSubmit',
             'click #massaction': 'massAction',
             'click #product-list-back-link': 'hideProductList',
-            'click a[data-role=editProduct]': 'productAction'
+            'click a[data-role=editProduct]': 'productAction',
+            'click #toggle-current-tags': function(e){
+                e.preventDefault();
+                $('#product-tags-current').slideToggle();
+            },
+            'click .paginator a.page': function(e){
+                var page = $(e.currentTarget).data('page');
+                var collection = $(e.currentTarget).parent('.paginator').data('collection');
+                if (!collection) return false;
+                if (_.has(this, collection)){
+                    collection = this[collection];
+                }
+                
+                switch (page) {
+                    case 'first':
+                        collection.goTo(collection.firstPage);
+                        break;
+                    case 'prev':
+                        collection.requestPreviousPage();
+                        break;
+                    case 'next':
+                        collection.requestNextPage();
+                        break;
+                    case 'last':
+                        collection.goTo(collection.lastPage);
+                        break;
+                    default:
+                        var pageId = parseInt(page);
+                        !_.isNaN(pageId) && collection.goTo(pageId);
+                        break;
+                }
+                return false;
+            }
 		},
         products: null,
         tags: null,
@@ -264,12 +296,21 @@ define([
                 $('#product-tags-available').append(view.$el);
             }
             if ($('div.tagid-'+tag.get('id'), '#product-tags-current').size()){
-                view.$el.hide();
+                view.$el.find('input:checkbox').attr({
+                    disabled: 'disabled',
+                    checked: 'checked'
+                });
             }
         },
         renderTags: function(){
+            $('#product-tags-available').empty();
             this.tags.each(this.renderTag, this);
-            this.waypointTags();
+            var paginatorData = {
+                collection : 'tags',
+                cssClass: [ 'textright' ]
+            };
+
+            $('#product-tags-available').next().html(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
         },
         toggleTag: function(e){
             if (e.currentTarget.checked){
@@ -280,7 +321,12 @@ define([
                 var current = this.model.get('tags') || [];
                 this.model.set('tags', _.union(current, tag));
             }
-            return false;
+            $(e.currentTarget).attr({
+                disabled: 'disabled'
+            }).parent('.tag-widget').effect("transfer", {
+               to: '#toggle-current-tags',
+               className: 'ui-effects-transfer'
+            }, 500);
         },
         renderProductTags: function(){
             console.log('renderProductTags');
@@ -296,19 +342,14 @@ define([
                                 return tag.id === id;
                             });
                             self.model.set('tags', newSet);
-                            $('div.tagid-'+id+':hidden', '#product-tags-available').show();
+                            $('div.tagid-'+id+' input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
                         }
                     });
                     view.render().$el
                         .find('span.ui-icon-closethick').remove().end()
                         .find('input:checkbox').attr('checked', 'checked').end()
                         .appendTo(container);
-//                    $('#product-tags input:checkbox[name^=tag][value='+tag.id+']').attr('checked', 'checked');
 
-                    $('div.tagid-'+tag.id+':visible', '#product-tags-available').effect("transfer", {
-                        to: view.$el,
-                        className: 'ui-effects-transfer'
-                    }, 500).hide();
                 });
 
                 var ids = _.map(_.pluck(this.model.get('tags'), 'id'), function(id){
@@ -669,7 +710,7 @@ define([
                 if (!self.products.paginator.last){
                     self.products.load(self.waypointProductlist.bind(self));
                 }
-            }, {context: '#product-list-holder', offset: '150%'} );
+            }, {context: $('#product-list-holder'), offset: '150%'} );
         },
         waypointTags: function(){
             var self = this;
@@ -679,7 +720,7 @@ define([
                 if ( self.tags.currentPage != self.tags.lastPage ){
                     self.tags.requestNextPage();
                 }
-            }, {context: '#product-tags-available', offset: '160%', onlyOnScroll: true });
+            }, {context: $('#product-tags-available'), offset: '160%' });
         },
         hideProductList: function(){
             $('#product-list').hide('slide');

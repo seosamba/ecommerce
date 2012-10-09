@@ -7,6 +7,29 @@ $this->headTitle('Manage product');
 .ui-effects-transfer {
 	border: 2px dotted #778899;
 }
+/* paginated block styles */
+.paginator {
+	background-color: white;
+	padding: 10px;
+	border-radius: 0 0 4px 4px;
+	box-shadow: 0 -2px 4px -3px #7c7c7c;
+}
+.paginator.textright {
+	text-align: right;
+}
+.paginator a.page{
+	color: #cd5c5c;
+	opacity: 0.75;
+}
+.paginator a.page:hover,
+.paginator a.page.current {
+    opacity: 1;
+}
+
+.paginator a.page span{
+
+}
+
 .seotoaster #manage-product {
 	font-size: 11pt;
 }
@@ -281,6 +304,31 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/
         ->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js');
 $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
 ?>
+
+<script id="paginatorTemplate" type="text/template">
+<div class="paginator <%= cssClass.join(' ') %>" data-collection="<%= collection %>" >
+<% if (firstPage != currentPage) { %> <a href="#" class="page" data-page="first">First</a><% } %>
+
+<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Previous</a><% } %>
+
+<% if (currentPage - 3 > firstPage) { %><span>...</span><% } %>
+
+<% for (var p=currentPage-3; p<=currentPage+3; p++) { %>
+    <% if (p < firstPage || p > lastPage) continue %>
+    <% if (currentPage == p) { %>
+        <span class="page selected"><%= p+1 %></span>
+    <% } else { %>
+        <a href="#" class="page" data-page="<%= p %>"><%= p+1 %></a>
+    <% } %>
+<% } %>
+
+<% if (currentPage + 3 < lastPage) { %><span>...</span><% } %>
+
+<% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next">Next</a><% } %>
+
+<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last">Last</a><% } %>
+</div>
+</script>
 
 <script id="imgTemplate" type="text/template">
 	{{each imageList}}
@@ -573,15 +621,23 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     </div>
 
     <div id="tag-tab" class="clearfix">
-        <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
+	    <div class="grid_3 mt10px textcentered">
+		    <a href="javascript" id="toggle-current-tags" >[ show only selected ] </a>
+	    </div>
+        <div class="grid_4 prefix_1 suffix_4 mb5px" style="text-align:center;">
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-	    <div id="product-tags-current" class="product-tags grid_12" style="max-height: 200px; overflow-y: auto;">
+	    <div id="product-tags-current" class="product-tags grid_12" style="display:none; max-height: 100px; overflow-y: auto;">
         </div>
 
-	    <div id="product-tags-available" class="product-tags grid_12" style="max-height: 200px; overflow-y: auto;">
-        </div>
+	    <div id="product-tags-available" class="h370 grid_12 product-tags" style="position: relative;">
+
+
+	    </div>
+	    <div class="grid_12">
+		    <!-- placeholder for pagination -->
+	    </div>
 
     </div> <!-- #tag-tab -->
 
