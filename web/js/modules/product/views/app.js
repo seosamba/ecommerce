@@ -2,7 +2,7 @@ define([
 	'backbone',
 	'../models/product',
     '../models/option',
-    '../collections/productlist',
+    '../collections/products_pager',
     '../collections/tags_lazy',
     '../collections/options',
     './tag',
@@ -102,7 +102,7 @@ define([
             if (this.products === null) {
                 this.products = new ProductsCollection();
                 this.products.bind('add', this.renderProduct, this);
-                this.products.bind('reset', this.renderAllProducts, this);
+                this.products.bind('reset', this.renderProducts, this);
             }
 
             return this.products;
@@ -382,11 +382,15 @@ define([
                 }).removeClass('lazy');
             }
         },
-        renderAllProducts: function(){
+        renderProducts: function(){
             this.$('#product-list-holder').empty();
             this.products.each(this.renderProduct, this);
-            console.log('aaa');
-            this.waypointProductlist();
+            var paginatorData = {
+                collection : 'products',
+                cssClass: [ 'textright' ]
+            };
+            paginatorData = _.extend(paginatorData, this.products.info());
+            this.$('#product-list-holder').after(_.template($('#paginatorTemplate').html(), paginatorData));
         },
 		saveProduct: function(){
             var self = this;
@@ -694,12 +698,7 @@ define([
             $('#massaction').text(labels[listtype]);
 
             if (this.products === null) {
-                return this.initProducts().load([
-                    this.waypointProductlist.bind(this),
-                    function(){
-                        $('#product-list-holder').trigger('scroll');
-                    }
-                ]);
+                return this.initProducts().pager();
             }
         },
         waypointProductlist: function(){

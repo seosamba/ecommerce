@@ -290,6 +290,9 @@ input#delete {
 .ui-autocomplete .ui-menu-item {
 	cursor: pointer;
 }
+#product-list div.paginator {
+	padding: 5px 10px;
+}
 #product-list-holder > p.nothing {
 	text-align: center;
 	padding: 5px;
@@ -497,7 +500,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                 </label>
             </div>
         </div>
-        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h480" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h460" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
     </div>
 
     <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
