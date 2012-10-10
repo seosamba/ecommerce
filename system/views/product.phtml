@@ -307,14 +307,14 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 
 <script id="paginatorTemplate" type="text/template">
 <div class="paginator <%= cssClass.join(' ') %>" data-collection="<%= collection %>" >
-<% if (firstPage != currentPage) { %> <a href="#" class="page" data-page="first">First</a><% } %>
+<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first">First</a><% } else { %><span>First</span><% } %>
 
 <% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Previous</a><% } %>
 
-<% if (currentPage - 3 > firstPage) { %><span>...</span><% } %>
+<% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
 
-<% for (var p=currentPage-3; p<=currentPage+3; p++) { %>
-    <% if (p < firstPage || p > lastPage) continue %>
+<% for (var p=currentPage-5; p<=currentPage+5; p++) { %>
+    <% if (p < firstPage || p > lastPage) continue; %>
     <% if (currentPage == p) { %>
         <span class="page selected"><%= p+1 %></span>
     <% } else { %>
@@ -322,11 +322,11 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     <% } %>
 <% } %>
 
-<% if (currentPage + 3 < lastPage) { %><span>...</span><% } %>
+<% if (currentPage + 5 < lastPage) { %><span>...</span><% } %>
 
 <% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next">Next</a><% } %>
 
-<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last">Last</a><% } %>
+<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last">Last</a><% } else { %><span>Last</span> <%} %>
 </div>
 </script>
 

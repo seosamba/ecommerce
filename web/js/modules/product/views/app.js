@@ -46,7 +46,7 @@ define([
                 if (_.has(this, collection)){
                     collection = this[collection];
                 }
-                
+
                 switch (page) {
                     case 'first':
                         collection.goTo(collection.firstPage);
@@ -58,7 +58,7 @@ define([
                         collection.requestNextPage();
                         break;
                     case 'last':
-                        collection.goTo(collection.lastPage);
+                        collection.goTo(collection.totalPages);
                         break;
                     default:
                         var pageId = parseInt(page);

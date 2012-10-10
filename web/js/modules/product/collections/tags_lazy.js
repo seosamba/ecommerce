@@ -20,6 +20,11 @@ define([
             count: true,
             limit: function(){ return this.perPage; },
             offset: function(){ return this.currentPage * this.perPage; }
+        },
+        parse: function(response, xhr){
+            this.totalCount = _.has(response, 'totalCount') ? response.totalCount : response.length;
+            this.totalPages = Math.floor(this.totalCount / this.perPage);
+            return _.has(response, 'data') ? response.data : response;
         }
     })
 	

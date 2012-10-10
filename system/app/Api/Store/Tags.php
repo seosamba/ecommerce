@@ -36,7 +36,12 @@ class Api_Store_Tags extends Api_Service_Abstract {
 
 			$result = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit, $count);
 			if ($result){
-				return array_map(function($tag){ return $tag->toArray(); }, $count ? $result['data'] : $result );
+				if ($count && isset($result['data'])){
+					$result['data'] = array_map(function($tag){ return $tag->toArray(); }, $result['data']);
+					return $result;
+				} else {
+					return array_map(function($tag){ return $tag->toArray(); }, $result);
+				}
 			}
 		}
 		$this->_error(null, self::REST_STATUS_NOT_FOUND);
