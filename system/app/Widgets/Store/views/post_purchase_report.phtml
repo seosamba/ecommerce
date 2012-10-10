@@ -89,7 +89,7 @@
     </div>
     <div class="post-purchase-report-summary">
         <p class="post-purchase-row cart-subtotal">
-            <span><?php echo $this->translate('Sub-Total');?></span>
+            <span><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
                 <span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal()+$this->cart->getTotalTax());?></span>
             <?php else:?>
@@ -110,11 +110,7 @@
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
         <p class="post-purchase-row cart-shipping">
-            <span><?php echo $this->translate('Shipping');?>
-                    <?php if ($this->cart->getShippingService()):?>
-                    <?php echo $this->translate(' via ') .$this->cart->getShippingService().': '.$this->cart->getShippingType(); ?>
-                    <?php endif;?>
-            </span>
+            <span><?php echo $this->translate('Shipping');?>:</span>
             <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
         </p>
         <p class="post-purchase-row cart-total">
@@ -214,7 +210,7 @@
     </div>
     <div style="float:left; width:35%; margin-bottom:15px;">
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <span><?php echo $this->translate('Sub-Total');?></span>
+            <span><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
                 <span ><?php echo $this->currency($this->cart->getSubTotal()+$this->cart->getTotalTax());?></span>
             <?php else:?>
@@ -235,11 +231,7 @@
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <span><?php echo $this->translate('Shipping');?>
-                    <?php if ($this->cart->getShippingService()):?>
-                    <?php echo $this->translate(' via ') .$this->cart->getShippingService().': '.$this->cart->getShippingType(); ?>
-                    <?php endif;?>
-            </span>
+            <span><?php echo $this->translate('Shipping');?>:</span>
             <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
         </p>
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold;">
