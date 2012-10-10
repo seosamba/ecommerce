@@ -307,7 +307,7 @@ define([
             this.tags.each(this.renderTag, this);
             var paginatorData = {
                 collection : 'tags',
-                cssClass: [ 'textright' ]
+                cssClass: [ 'textright padding5px' ]
             };
 
             $('#product-tags-available').next().html(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
@@ -390,7 +390,7 @@ define([
                 cssClass: [ 'textright' ]
             };
             paginatorData = _.extend(paginatorData, this.products.info());
-            this.$('#product-list-holder').after(_.template($('#paginatorTemplate').html(), paginatorData));
+            $('div.paginator', '#product-list').replaceWith(_.template($('#paginatorTemplate').html(), paginatorData));
         },
 		saveProduct: function(){
             var self = this;
@@ -594,11 +594,8 @@ define([
         },
         filterProducts: function(e, forceRun) {
             if (e.keyCode === 13 || forceRun === true) {
-                this.products.data.key = e.target.value;
-                this.products.reset().load([
-                    this.waypointProductlist.bind(this),
-                    function(response){ if (response.length === 0) { $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>')} ; }
-                ]);
+                this.products.key = e.currentTarget.value;
+                this.products.reset().goTo(this.products.firstPage);
                 $(e.target).autocomplete('close');
             }
         },

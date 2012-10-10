@@ -10,12 +10,14 @@ $this->headTitle('Manage product');
 /* paginated block styles */
 .paginator {
 	background-color: white;
-	padding: 10px;
 	border-radius: 0 0 4px 4px;
 	box-shadow: 0 -2px 4px -3px #7c7c7c;
 }
 .paginator.textright {
 	text-align: right;
+}
+.paginator .page{
+	padding: 2px 4px;
 }
 .paginator a.page{
 	color: #cd5c5c;
@@ -135,7 +137,7 @@ div.productlisting {
 	width: 11%;
 	border: 1px solid #fff;
 	height: 140px;
-	margin: 5px;
+	margin: 3px 5px;
 	float: left;
 	border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -291,7 +293,13 @@ input#delete {
 	cursor: pointer;
 }
 #product-list div.paginator {
-	padding: 5px 10px;
+	position: absolute;
+	bottom: 5px;
+	height: 20px;
+	padding: 0;
+	padding-top: 5px;
+	margin: 0 1%;
+	width: 98%;
 }
 #product-list-holder > p.nothing {
 	text-align: center;
@@ -500,7 +508,8 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                 </label>
             </div>
         </div>
-        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h460" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h450" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+	    <div class="paginator"><!-- placeholder for paginator --></div>
     </div>
 
     <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
@@ -631,10 +640,10 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-	    <div id="product-tags-current" class="product-tags grid_12" style="display:none; max-height: 100px; overflow-y: auto;">
+	    <div id="product-tags-current" class="product-tags mb5px grid_12 bottomdashed" style="display:none; max-height: 100px; overflow-y: auto;">
         </div>
 
-	    <div id="product-tags-available" class="h370 grid_12 product-tags" style="position: relative;">
+	    <div id="product-tags-available" class="h350 grid_12 product-tags" style="position: relative;">
 
 
 	    </div>
