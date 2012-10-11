@@ -5,12 +5,13 @@ define([
     '../collections/products_pager',
     '../collections/tags_lazy',
     '../collections/options',
+    '../collections/images',
     './tag',
 	'./option',
 	'./productlist'
 ], function(Backbone,
             ProductModel,  ProductOption,
-            ProductsCollection, TagsCollection, OptionsCollection,
+            ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
             TagView, ProductOptionView, ProductListView){
 
 	var AppView = Backbone.View.extend({
@@ -37,7 +38,7 @@ define([
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
-                $('#product-tags-current').slideToggle();
+                $('#product-tags-current, #product-tags-available, #product-tags-available-paginator').slideToggle();
             },
             'click .paginator a.page': function(e){
                 var page = $(e.currentTarget).data('page');
@@ -52,10 +53,18 @@ define([
                         collection.goTo(collection.firstPage);
                         break;
                     case 'prev':
-                        collection.requestPreviousPage();
+                        if (collection instanceof Backbone.Paginator.requestPager){
+                            collection.requestPreviousPage();
+                        } else {
+                            collection.previousPage();
+                        }
                         break;
                     case 'next':
-                        collection.requestNextPage();
+                        if (collection instanceof Backbone.Paginator.requestPager){
+                            collection.requestNextPage();
+                        } else {
+                            collection.nextPage();
+                        }
                         break;
                     case 'last':
                         collection.goTo(collection.totalPages);
@@ -97,6 +106,9 @@ define([
                     self.initTags();
                 }
             }).show();
+
+            this.images =  new ImagesCollection(),
+            this.images.on('reset', this.renderImages, this);
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -188,20 +200,23 @@ define([
 			if (folder == '0') {
 				return;
             }
-            $.post('/backend/backend_media/getdirectorycontent', {folder: folder}, function(response){
-				var $box = $('#image-list');
-				$box.empty();
-				if (response.hasOwnProperty('imageList') && response.imageList.length ){
-					var $images = $('#imgTemplate').tmpl(response);
-					$box.append($images).imagesLoaded(function(){
-                        $(this).masonry('reload')
-                            .find('img.lazy').lazyload();
-					});
-				} else {
-					$box.append('<p>Empty</p>');
-				}
-				$('#image-select-dialog').show('slide');
-			});
+            var self = this;
+
+            this.images.server_api.folder = folder;
+            this.images.flush().fetch({success: function(){ self.images.pager(); $('#image-select-dialog').show('slide'); }, silent: true});
+        },
+        renderImages: function(){
+            $('#image-list').empty();
+
+            $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}))
+                .imagesLoaded(function(){
+                    $(this).masonry('reload');
+                })
+            $('div.paginator', '#image-select-dialog').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(
+                this.images.paginator_ui,
+                this.images.info(),
+                {collection: 'images', cssClass: ''}
+            )));
         },
         setProductImage: function(e){
             var imgName = $(e.currentTarget).find('img').data('name');
@@ -307,7 +322,7 @@ define([
             this.tags.each(this.renderTag, this);
             var paginatorData = {
                 collection : 'tags',
-                cssClass: [ 'textright padding5px' ]
+                cssClass: 'textright padding5px'
             };
 
             $('#product-tags-available').next().html(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
@@ -329,7 +344,6 @@ define([
             }, 500);
         },
         renderProductTags: function(){
-            console.log('renderProductTags');
             if (this.model && this.model.has('tags')){
                 var self = this,
                     container = $('#product-tags-current').empty();
@@ -351,11 +365,6 @@ define([
                         .appendTo(container);
 
                 });
-
-                var ids = _.map(_.pluck(this.model.get('tags'), 'id'), function(id){
-                    return '.tagid-'+id;
-                });
-                console.log($(ids));
             }
         },
         renderBrands: function(brands){
@@ -387,7 +396,7 @@ define([
             this.products.each(this.renderProduct, this);
             var paginatorData = {
                 collection : 'products',
-                cssClass: [ 'textright' ]
+                cssClass: 'textright'
             };
             paginatorData = _.extend(paginatorData, this.products.info());
             $('div.paginator', '#product-list').replaceWith(_.template($('#paginatorTemplate').html(), paginatorData));
@@ -698,34 +707,14 @@ define([
                 return this.initProducts().pager();
             }
         },
-        waypointProductlist: function(){
-            var self = this;
-            $('div.productlisting:last', '#product-list-holder').waypoint(function(){
-                $(this).waypoint('remove');
-
-                if (!self.products.paginator.last){
-                    self.products.load(self.waypointProductlist.bind(self));
-                }
-            }, {context: $('#product-list-holder'), offset: '150%'} );
-        },
-        waypointTags: function(){
-            var self = this;
-            $('div.tag-widget:last:visible', '#product-tags-available').waypoint(function(){
-                $(this).waypoint('remove');
-
-                if ( self.tags.currentPage != self.tags.lastPage ){
-                    self.tags.requestNextPage();
-                }
-            }, {context: $('#product-tags-available'), offset: '160%' });
-        },
         hideProductList: function(){
             $('#product-list').hide('slide');
-            var term = $('#product-list-search').val();
-            if (term != this.products.data.key){
+            var term = $.trim($('#product-list-search').val());
+            if (term != this.products.key){
                 if (term == ''){
                     $('#product-list-search').trigger('keypress', true);
                 } else {
-                    $('#product-list-search').val(this.products.data.key);
+                    $('#product-list-search').val(this.products.key);
                 }
             }
         }

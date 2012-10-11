@@ -10,10 +10,7 @@ $this->headTitle('Manage product');
 /* paginated block styles */
 .paginator {
 	background-color: white;
-	border-radius: 0 0 4px 4px;
 	box-shadow: 0 -2px 4px -3px #7c7c7c;
-}
-.paginator.textright {
 	text-align: right;
 }
 .paginator .page{
@@ -36,6 +33,7 @@ $this->headTitle('Manage product');
 	font-size: 11pt;
 }
 div.box {
+	display: inline-block;
 	background-color: white;
 	margin: 3px 0;
 	padding: 5px 5px 0;
@@ -265,7 +263,13 @@ input#delete {
 	background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
 }
 #image-list {
-	height:460px !important;
+	height: 450px !important;
+}
+#image-list-dialog div.paginator {
+	position: absolute;
+	bottom: 0;
+	width: 98%;
+	margin: 0 1%;
 }
 #ajax_msg {
 	line-height: 50px;
@@ -317,7 +321,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 ?>
 
 <script id="paginatorTemplate" type="text/template">
-<div class="paginator <%= cssClass.join(' ') %>" data-collection="<%= collection %>" >
+<div class="paginator <%= cssClass %>" data-collection="<%= collection %>" >
 <% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first">First</a><% } else { %><span>First</span><% } %>
 
 <% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Previous</a><% } %>
@@ -327,9 +331,9 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 <% for (var p=currentPage-5; p<=currentPage+5; p++) { %>
     <% if (p < firstPage || p > lastPage) continue; %>
     <% if (currentPage == p) { %>
-        <span class="page selected"><%= p+1 %></span>
+        <span class="page selected"><%= p %></span>
     <% } else { %>
-        <a href="#" class="page" data-page="<%= p %>"><%= p+1 %></a>
+        <a href="#" class="page" data-page="<%= p %>"><%= p %></a>
     <% } %>
 <% } %>
 
@@ -342,11 +346,11 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 </script>
 
 <script id="imgTemplate" type="text/template">
-	{{each imageList}}
+<% _.each(images, function(img){ %>
 	<div class="box">
-	    <img class="lazy" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
+	    <img class="lazy" src="<%= img.src %>" width="100px" data-name="<%= img.name %>" title="<%= img.name %>"/>
 	</div>
-	{{/each}}
+<% }) %>
 </script>
 
 <script id="tagTemplate" type="text/template">
@@ -515,9 +519,10 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
         <div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
             <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');$('#product-image-folder').val('0');">&nbsp;&laquo; back</a>
-            <span style="margin-left: 30%"><?php echo $this->translate('select image for product');?></span>
+            <span style="margin-left: 35%"><?php echo $this->translate('select image for product');?></span>
         </div>
-        <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
+        <div id="image-list" style="overflow-x: hidden; overflow-y: auto;"></div>
+	    <div class="paginator"></div>
     </div>
 	<div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
 
@@ -640,14 +645,14 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-	    <div id="product-tags-current" class="product-tags mb5px grid_12 bottomdashed" style="display:none; max-height: 100px; overflow-y: auto;">
+	    <div id="product-tags-current" class="product-tags mb5px grid_12 bottomdashed" style="display:none; max-height: 120px; overflow-y: auto;">
         </div>
 
 	    <div id="product-tags-available" class="h350 grid_12 product-tags" style="position: relative;">
 
 
 	    </div>
-	    <div class="grid_12">
+	    <div class="grid_12" id="product-tags-available-paginator">
 		    <!-- placeholder for pagination -->
 	    </div>
 
