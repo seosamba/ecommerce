@@ -57,6 +57,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const OPTION_THANKYOU       = 'option_storethankyou';
 
+    const KEY_CHECKOUT_SIGNUP    = 'signup';
 	const KEY_CHECKOUT_ADDRESS   = 'address';
 	const KEY_CHECKOUT_SHIPPER   = 'shipper';
 
