@@ -31,7 +31,7 @@
     <table class="post-purchase-report">
         <thead>
             <tr>
-                <th><?php echo $this->translate('Product'); ?></th>
+                <th colspan="2"><?php echo $this->translate('Product'); ?></th>
                 <th><?php echo $this->translate('Price'); ?></th>
                 <th><?php echo $this->translate('Qty'); ?></th>
                 <th><?php echo $this->translate('Total'); ?></th>
@@ -48,18 +48,20 @@
                     <?php else:?>
                         <img src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="<?php echo $product['name']; ?>"/>
                     <?php endif;?>
-                    <?php echo $product['name']; ?>
+                 </td>
+                 <td>
+                    <span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
                     <?php if(!empty($product['options'])):?>
                         <?php foreach($product['options'] as $optData): ?>
-                            <p>
-                            <?php echo $optData['title']; ?>
+                           <span class="post-purchase-report-product-options">
+                           <?php echo $optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
                                 <span>(<?php echo $optData['priceSign'], $optData['priceValue']; ?>)</span>
                            <?php endif; ?>
-                                <?php if(intval($optData['weightValue'])): ?>
+                           <?php if(intval($optData['weightValue'])): ?>
                                 <span>(<?php echo $optData['weightSign'], ' ', $optData['weightValue'],' ', $this->weightSign; ?>)</span>
                            <?php endif; ?>
-                            </p>
+                           </span>
                         <?php endforeach; ?>
                     <?php endif;?>
                 </td>
@@ -122,6 +124,7 @@
         </p>
     </div>
 </div>
+
 <?php else:?>
 <div style="color:#444444; font-family:arial">
     <div style="float:left; width:50%;">
@@ -154,7 +157,7 @@
     <table width="100%" style="margin-bottom:15px; border:1px solid #dddddd;">
         <thead>
             <tr style="background:#ddd;">
-                <th style="padding:5px;"><?php echo $this->translate('Product'); ?></th>
+                <th colspan="2" style="padding:5px;"><?php echo $this->translate('Product'); ?></th>
                 <th style="padding:5px;"><?php echo $this->translate('Price'); ?></th>
                 <th style="padding:5px;"><?php echo $this->translate('Qty'); ?></th>
                 <th style="padding:5px;"><?php echo $this->translate('Total'); ?></th>
@@ -171,10 +174,12 @@
                     <?php else:?>
                         <img style="width:60px;" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="<?php echo $product['name']; ?>"/>
                     <?php endif;?>
-                    <?php echo $product['name']; ?>
+                 </td>
+                 <td valign="middle">
+                 <span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
                     <?php if(!empty($product['options'])):?>
                         <?php foreach($product['options'] as $optData): ?>
-                            <p>
+                           <span class="post-purchase-report-product-options">
                             <?php echo $optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
                                 <span>(<?php echo $optData['priceSign'], $optData['priceValue']; ?>)</span>
@@ -182,7 +187,7 @@
                                 <?php if(intval($optData['weightValue'])): ?>
                                 <span>(<?php echo $optData['weightSign'], ' ', $optData['weightValue'],' ', $this->weightSign; ?>)</span>
                            <?php endif; ?>
-                            </p>
+                           </span>
                         <?php endforeach; ?>
                     <?php endif;?>
                 </td>
@@ -193,7 +198,7 @@
             <?php endforeach; ?>
         </tbody>
     </table>
-    <div style="float:left; width:65%;">
+    <div style="float:left; width:65%; margin-right:3%">
         <span class="title" style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Shipping Address');?>:</span>
         <p style="color:#444444;">
         <?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
@@ -213,16 +218,16 @@
                 <?php endif;?>
         </p>
     </div>
-    <div style="float:left; width:35%; margin-bottom:15px;">
-        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <span><?php echo $this->translate('Sub-Total');?>:</span>
+    <div style="float:left; width:30%; margin-bottom:15px; margin-right:2%;">
+        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
+            <span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
                 <span ><?php echo $this->currency($this->cart->getSubTotal()+$this->cart->getTotalTax());?></span>
             <?php else:?>
                 <span><?php echo $this->currency($this->cart->getSubTotal());?></span>
             <?php endif;?>
         </p>
-        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
+        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
             <?php if(Tools_Misc::getTaxName() != ''):?>
                 <?php $taxName = Tools_Misc::getTaxName();?> 
             <?php else:?>
@@ -231,16 +236,16 @@
             <?php if($this->showPriceIncTax == 1):?>
                 <span><?php echo $this->translate('Inc. '.$taxName);?>:</span>
             <?php else:?>
-                <span><?php echo $this->translate('Total '.$taxName);?>:</span>
+                <span  style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total '.$taxName);?>:</span>
             <?php endif;?>
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
-        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <span><?php echo $this->translate('Shipping');?>:</span>
+        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
+            <span  style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Shipping');?>:</span>
             <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
         </p>
-        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold;">
-            <span><?php echo $this->translate('Total');?>:</span>
+        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right;">
+            <span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total');?>:</span>
             <span><?php echo $this->currency($this->cart->getTotal());?></span>
         </p>
     </div>
