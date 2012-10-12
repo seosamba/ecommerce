@@ -56,6 +56,13 @@ class Forms_Signup extends Zend_Form {
             'decorators' => array('ViewHelper')
         )));
 
+        $this->setElementDecorators(array(
+            'ViewHelper',
+            'Errors',
+            'Label',
+            array('HtmlTag', array('tag' => 'p'))
+        ));
+
     }
 
 }
