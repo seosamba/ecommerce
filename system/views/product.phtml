@@ -13,8 +13,12 @@ $this->headTitle('Manage product');
 	box-shadow: 0 -2px 4px -3px #7c7c7c;
 	text-align: right;
 }
-.paginator .page{
-	padding: 2px 4px;
+.paginator > *{
+	padding: 5px;
+	display: inline-block;
+}
+*+html .paginator > *{
+	display: inline;
 }
 .paginator a.page{
 	color: #cd5c5c;
@@ -311,6 +315,18 @@ input#delete {
 	font-size: 150%;
 	margin-top: 20%;
 }
+
+div.spinner {
+    position: absolute;
+	width: 48px;
+	height: 48px;
+	top: 45%;
+	left: 50%;
+	background: url('<?php echo $this->websiteUrl; ?>system/images/spinner.gif');
+}
+div.spinner.bg {
+	background: url('<?php echo $this->websiteUrl; ?>system/images/spinner_bg.gif');
+}
 <?php $this->headStyle()->captureEnd();?>
 </style>
 
@@ -324,7 +340,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 <div class="paginator <%= cssClass %>" data-collection="<%= collection %>" >
 <% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first">First</a><% } else { %><span>First</span><% } %>
 
-<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Previous</a><% } %>
+<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Pevious</a><% } %>
 
 <% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
 
@@ -474,16 +490,16 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     {{/if}}
 </script>
 
-<script id="quickPreviewTemplate" type="text/x-jquery-tmpl">
+<script id="quickPreviewTemplate" type="text/template">
 	<fieldset style="background-image:none; background-color: white; height:272px;">
 	    <legend><?php echo $this->translate('Preview');?></legend>
-		<div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
-		<a href="{{= $('#website_url').val() + page.url }}" target="_blank" style="text-decoration: none; color: inherit;">
-	        <img src="{{= $('#website_url').val() +'media/'+ photo.replace('/','/product/') }}" style="float:left; padding: 15px; max-height: 120px"/>
-	        <p style="text-align:center; font-weight: bold;">${name}</p>
-	        <p class="mt10px" style="height: 160px;">${ shortDescription.length > 300 ? shortDescription.slice(0,299)+'...' : shortDescription }</p>
+		<a href="<%= websiteUrl + product.page.url %>" target="_blank" style="text-decoration: none; color: inherit;">
+            <div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
+            <img src="<%= websiteUrl +'media/'+ product.photo.replace('/','/product/') %>" style="float:left; padding: 15px; max-height: 120px"/>
+	        <p style="text-align:center; font-weight: bold;"><%= product.name %></p>
+	        <p class="mt10px" style="height: 160px;"><%= product.shortDescription.length > 300 ? product.shortDescription.slice(0,299)+'...' : product.shortDescription %></p>
 	        <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-	        ${price}&nbsp;${ $('#currency-unit').text() }
+	        <%= product.price + '&nbsp;' + currency %>
 	        </p>
         </a>
     </fieldset>
@@ -649,13 +665,11 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         </div>
 
 	    <div id="product-tags-available" class="h350 grid_12 product-tags" style="position: relative;">
-
-
+			<div class="spinner bg"></div>
 	    </div>
-	    <div class="grid_12" id="product-tags-available-paginator">
+	    <div class="paginator">
 		    <!-- placeholder for pagination -->
 	    </div>
-
     </div> <!-- #tag-tab -->
 
     <div id="options-tab" class="clearfix">

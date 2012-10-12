@@ -14,13 +14,14 @@ define(['backbone', 'backbone.paginator'], function(Backbone){
             firstPage: 1,
             currentPage: 1,
             totalPages: 10,
-            perPage: 40
+            perPage: 30
         },
         server_api: {
             folder: null
         },
         flush: function(){
             this.models = [];
+            this.currentPage = this.firstPage;
             if (_.has(this, 'origModels')){
                 this.origModels = undefined;
             }

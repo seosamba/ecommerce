@@ -93,7 +93,7 @@ define([
                 $(this).removeAttr('disabled');
             });
 
-            this.quickPreviewTmpl = $('#quickPreviewTemplate').template();
+            this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
 
             $('#image-list').masonry({
                 itemSelector : '.box',
@@ -202,12 +202,12 @@ define([
             }
             var self = this;
 
+            $('#image-list').html('<div class="spinner"></div>');
             this.images.server_api.folder = folder;
-            this.images.flush().fetch({success: function(){ self.images.pager(); $('#image-select-dialog').show('slide'); }, silent: true});
+            this.images.flush().fetch({success: function(){ self.images.pager(); }, silent: true});
+            $('#image-select-dialog').show('slide');
         },
         renderImages: function(){
-            $('#image-list').empty();
-
             $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}))
                 .imagesLoaded(function(){
                     $(this).masonry('reload');
@@ -297,7 +297,13 @@ define([
 			}
 
             if (!this.model.isNew()){
-                $('#quick-preview').html($.tmpl(this.quickPreviewTmpl, this.model.toJSON()));
+                var st = Date.now();
+                $('#quick-preview').html(this.quickPreviewTmpl({
+                    product: this.model.toJSON(),
+                    websiteUrl: this.websiteUrl,
+                    currency: this.$('#currency-unit').text()
+                }));
+                console.log((Date.now() - st)+' ms' );
             }
 
 			$('div#ajax_msg:visible').hide('fade');
@@ -322,10 +328,10 @@ define([
             this.tags.each(this.renderTag, this);
             var paginatorData = {
                 collection : 'tags',
-                cssClass: 'textright padding5px'
+                cssClass: 'grid_12'
             };
 
-            $('#product-tags-available').next().html(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
+            $('div.paginator', '#tag-tab').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
         },
         toggleTag: function(e){
             if (e.currentTarget.checked){
@@ -704,6 +710,7 @@ define([
             $('#massaction').text(labels[listtype]);
 
             if (this.products === null) {
+                $('#product-list-holder').html('<div class="spinner"></div>');
                 return this.initProducts().pager();
             }
         },
