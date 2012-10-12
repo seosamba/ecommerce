@@ -64,6 +64,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	const SHIPPING_FREESHIPPING = 'freeshipping';
 
 	const SHIPPING_PICKUP       = 'pickup';
+    
+    const SHIPPING_MARKUP       = 'markup';
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -253,9 +255,15 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
-
-		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+        $markupConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_MARKUP);
+        $markupForm = new Forms_Shipping_MarkupShipping();
+        if(isset($markupConfig['config']) && !empty($markupConfig['config'])){
+            $markupForm->populate($markupConfig['config']);
+        }
+        //$markupForm->getElement('price')->setValue($value);
+      	$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$this->_view->freeForm = new Forms_Shipping_FreeShipping();
+        $this->_view->markupForm = $markupForm;
 
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
@@ -1216,7 +1224,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$name = filter_var($this->_request->getParam('shipper'), FILTER_SANITIZE_STRING);
 		$bundledShippers = array(
 			self::SHIPPING_FREESHIPPING,
-			self::SHIPPING_PICKUP
+			self::SHIPPING_PICKUP,
+            self::SHIPPING_MARKUP
 		);
 
 		if (!in_array($name, $bundledShippers)){
@@ -1230,6 +1239,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					break;
 				case self::SHIPPING_PICKUP:
 //					$form = new Forms_Shipping_Pickup();
+					break;
+                case self::SHIPPING_MARKUP:
+					$form = new Forms_Shipping_MarkupShipping();
 					break;
 				default:
 					break;

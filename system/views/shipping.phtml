@@ -71,6 +71,7 @@ ul.ui-tabs-nav li.disabled a {
 <div id="shipping-config" class="container_12">
 	<div id="shippers" class="mt10px mb10px clearfix">
 		<ul class="grid_4 omega">
+            <li><a href="#markup" data-plugin="markup"><?php echo $this->translate('Markup');?></a></li>
 			<li><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup');?></a></li>
 			<li><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping');?></a></li>
 		<?php foreach($this->shippingPlugins as $plugin):?>
@@ -79,6 +80,22 @@ ul.ui-tabs-nav li.disabled a {
 		</ul>
 		<div id="pane-container" class="grid_8 relative">
 
+            <div id="markup">
+                <header><?php echo $this->translate('Markup Configuration');?></header>
+                <?php $this->markupForm->setAction($this->url(array('run' => 'bundledshipper')));?>
+                <form class="clearfix" action="<?php echo $this->markupForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
+					<?php echo $this->markupForm->getElement('shipper')->renderViewHelper(); ?>
+					<label class="grid_3 mt5px textright" for="currency"><?php echo $this->markupForm->getElement('currency')->getLabel();?></label>
+					<div class="grid_3 relative">
+						<?php echo $this->markupForm->getElement('currency')->renderViewHelper();?>
+						<label class="unit-over"><?php echo $this->config['currency'];?></label>
+					</div>
+					<label class="grid_2 mt5px textcentered"><?php echo $this->markupForm->getElement('price')->getLabel();?></label>
+					<div class="grid_3">
+						<?php echo $this->markupForm->getElement('price')->renderViewHelper();?>
+					</div>
+				</form>
+            </div>
 			<div id="pickup">
 				<label style="display: block;margin: 10px; text-align: justify">When this option is checked user will not be able to fill the shipping address on checkout stage.</label>
 			</div>

@@ -16,7 +16,7 @@ class Tools_Misc {
      * Changes for name inc. Tax 
      * Put in array country abbr and name for change 'AU'=>'GST'
      */
-    public static $_taxName     = array('AU'=>'GST');
+    public static $_taxName     = array('AU'=>'GST', 'FR'=>'TVA');
     
 	public static $_weightUnits = array(
 		'kg' => 'Kilogram (kg)',

@@ -138,7 +138,8 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['options'] = $optionsData;
                     }
                     if($productObject !=null){
-                        $cartContent[$key]['photo'] = $productObject->getPhoto();
+                        $cartContent[$key]['photo']      = $productObject->getPhoto();
+                        $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
                     }
                 }
                 $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];

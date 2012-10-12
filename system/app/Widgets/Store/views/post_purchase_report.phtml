@@ -1,5 +1,6 @@
 <?php if(!isset($this->mailReport)):?>
 <div class="post-purchase">
+    <p class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></p>
     <div class="post-purchase-report-customer-info">
         <span class="title"><?php echo $this->translate('Sold to');?>:</span>
         <?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
@@ -7,8 +8,8 @@
             <p class="customer-name"><?php echo $billingAddress['firstname'];?> <?php echo $billingAddress['lastname'];?></p>
         <?php endif;?>
     </div>
-
-
+   
+    
     <div class="post-purchase-report-billing">
     <span class="title"><?php echo $this->translate('Billing Address');?>:</span>
         <p class="post-purchase-report-billing-address">
@@ -41,7 +42,9 @@
             <tr>
                 <td>
                     <?php if(isset($product['photo']) && $product['photo'] != ''):?>
-                        <img src="<?php echo $this->websiteUrl;?>/media/<?php echo str_replace('/', '/product/', $product['photo']);?>" alt="<?php echo $product['name']; ?>"/>
+                        <a class="page-teaser-image" href="<?php echo $this->websiteUrl . $product['productUrl'];?>" title="<?php echo $product['name'];?>" target="_blank">
+                            <img src="<?php echo $this->websiteUrl;?>/media/<?php echo str_replace('/', '/product/', $product['photo']);?>" alt="<?php echo $product['name']; ?>"/>
+                        </a>
                     <?php else:?>
                         <img src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="<?php echo $product['name']; ?>"/>
                     <?php endif;?>
@@ -89,7 +92,7 @@
     </div>
     <div class="post-purchase-report-summary">
         <p class="post-purchase-row cart-subtotal">
-            <span><?php echo $this->translate('Sub-Total');?></span>
+            <span><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
                 <span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal()+$this->cart->getTotalTax());?></span>
             <?php else:?>
@@ -110,11 +113,7 @@
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
         <p class="post-purchase-row cart-shipping">
-            <span><?php echo $this->translate('Shipping');?>
-                    <?php if ($this->cart->getShippingService()):?>
-                    <?php echo $this->translate(' via ') .$this->cart->getShippingService().': '.$this->cart->getShippingType(); ?>
-                    <?php endif;?>
-            </span>
+            <span><?php echo $this->translate('Shipping');?>:</span>
             <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
         </p>
         <p class="post-purchase-row cart-total">
@@ -166,7 +165,9 @@
             <tr>
                 <td valign="middle">
                     <?php if(isset($product['photo']) && $product['photo'] != ''):?>
+                    <a class="page-teaser-image" href="<?php echo $this->websiteUrl . $product['productUrl'];?>" title="<?php echo $product['name'];?>" target="_blank">
                         <img style="width:60px; vertical-align:middle" src="<?php echo $this->websiteUrl;?>/media/<?php echo str_replace('/', '/product/', $product['photo']);?>" alt="<?php echo $product['name']; ?>"/>
+                    </a>
                     <?php else:?>
                         <img style="width:60px;" src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="<?php echo $product['name']; ?>"/>
                     <?php endif;?>
@@ -214,7 +215,7 @@
     </div>
     <div style="float:left; width:35%; margin-bottom:15px;">
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <span><?php echo $this->translate('Sub-Total');?></span>
+            <span><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
                 <span ><?php echo $this->currency($this->cart->getSubTotal()+$this->cart->getTotalTax());?></span>
             <?php else:?>
@@ -235,11 +236,7 @@
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444;">
-            <span><?php echo $this->translate('Shipping');?>
-                    <?php if ($this->cart->getShippingService()):?>
-                    <?php echo $this->translate(' via ') .$this->cart->getShippingService().': '.$this->cart->getShippingType(); ?>
-                    <?php endif;?>
-            </span>
+            <span><?php echo $this->translate('Shipping');?>:</span>
             <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
         </p>
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold;">
