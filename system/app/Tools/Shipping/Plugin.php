@@ -22,28 +22,20 @@ class Tools_Shipping_Plugin extends Tools_Plugins_Abstract implements Interfaces
 			$vault = array();
 		}
 		$shipperName = strtolower(get_called_class());
-		$vault[$shipperName] = $rates;
-
-		$this->_sessionHelper->shippingRatesVault = $vault;
-
-		return $this;
-	}
-
-    /**
-     * Method that add markup price 
-     */
-    
-    protected function _addMarkup($rates){
         $config = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_MARKUP);
-        if (isset($config['enabled']) && isset($config['config']['price']) && $config['enabled'] == 1) {
+        if (isset($config['enabled']) && isset($config['config']['price']) && isset($rates[0]['price']) && $config['enabled'] == 1) {
             foreach($rates as $key=>$rate){
                 $rates[$key]['price'] = $rate['price'] + $config['config']['price'];
             }
         }
-        return $rates;
-    }
-    
-	/**
+		$vault[$shipperName] = $rates;
+
+		$this->_sessionHelper->shippingRatesVault = $vault;
+
+		return $rates;
+	}
+
+   	/**
 	 * Method that called from checkout process to calculate rates
 	 * Should implements main calculation and/or remote API calls
 	 * @return JSON collection of available shipping methods
