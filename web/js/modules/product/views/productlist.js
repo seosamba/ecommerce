@@ -6,43 +6,25 @@ define([
 	var ProductView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'productlisting',
-		template: $('#productListingTemplate').template(),
+		template:_.template($('#productListingTemplate').html()),
         container: $('#product-list-holder'),
-		events: {
-            'change input.marker': 'mark',
-            'click #product-list-holder a[href^=#edit]': 'runAction'
-		},
+		events: {},
 		initialize: function(){
 			this.model.on('change', this.render, this);
             this.model.on('remove', this.remove, this);
 		},
 		render: function(){
-			var data = this.model.toJSON();
-            data.websiteUrl = $('#website_url').val();
-			if (this.options.hasOwnProperty('showDelete')){
-				data.showDelete = this.options.showDelete;
-			}
+            var data = {
+                websiteUrl: $('#website_url').val(),
+                showDelete: _.has(this.options, 'showDelete') ? this.options.showDelete : false
+            };
             if (!this.model.has('rendered')){
                 data.lazy = true;
-                this.model.set('rendered', true);
+                this.model.set({rendered: true}, {silent: true});
             }
-			$(this.el).html($.tmpl(this.template, data));
+			$(this.el).html(this.template(_.extend(data, this.model.toJSON())));
 			return this;
-		},
-        mark: function(e){
-            if (e.target.checked){
-                this.model.set({marked: true});
-            } else {
-                this.model.has('marked') && this.model.unset('marked');
-            }
-        },
-        runAction: function(e){
-            if ($('#product-list-holder').data('type') === 'related'){
-                app.addRelated(this.model.get('id'));
-                $('#product-list:visible').hide('slide');
-                return false;
-            }
-        }
+		}
 	});
 	
 	return ProductView;

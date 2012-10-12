@@ -33,49 +33,15 @@ define([
             'keypress #product-list-search': 'filterProducts',
             'mouseover #option-library': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
+            'change #product-list-holder input.marker': 'markProducts',
             'click #massaction': 'massAction',
             'click #product-list-back-link': 'hideProductList',
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
-                $('#product-tags-current, #product-tags-available, #product-tags-available-paginator').slideToggle();
+                $('#product-tags-current, #product-tags-available, div.paginator', '#tag-tab').slideToggle();
             },
-            'click .paginator a.page': function(e){
-                var page = $(e.currentTarget).data('page');
-                var collection = $(e.currentTarget).parent('.paginator').data('collection');
-                if (!collection) return false;
-                if (_.has(this, collection)){
-                    collection = this[collection];
-                }
-
-                switch (page) {
-                    case 'first':
-                        collection.goTo(collection.firstPage);
-                        break;
-                    case 'prev':
-                        if (collection instanceof Backbone.Paginator.requestPager){
-                            collection.requestPreviousPage();
-                        } else {
-                            collection.previousPage();
-                        }
-                        break;
-                    case 'next':
-                        if (collection instanceof Backbone.Paginator.requestPager){
-                            collection.requestNextPage();
-                        } else {
-                            collection.nextPage();
-                        }
-                        break;
-                    case 'last':
-                        collection.goTo(collection.totalPages);
-                        break;
-                    default:
-                        var pageId = parseInt(page);
-                        !_.isNaN(pageId) && collection.goTo(pageId);
-                        break;
-                }
-                return false;
-            }
+            'click .paginator a.page': 'paginatorAction'
 		},
         products: null,
         tags: null,
@@ -371,6 +337,8 @@ define([
                         .appendTo(container);
 
                 });
+            } else {
+                $('#product-tags-current').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>');
             }
         },
         renderBrands: function(brands){
@@ -390,22 +358,30 @@ define([
             var productView = new ProductListView({model: product});
 
             this.$('#product-list-holder').append(productView.render().el);
-            if (this.$('#product-list-holder').children().size() === this.products.size()){
-                this.$('#product-list-holder').find('img.lazy').lazyload({
-                    container: this.$('#product-list-holder'),
-                    effect: 'fadeIn'
-                }).removeClass('lazy');
+            if (_.has(this.products, 'checked') && _.contains(this.products.checked, product.get('id'))){
+                productView.$el.find('input.marker').attr('checked', 'checked');
             }
+//            disabled lazy load because don't needed for now
+//            if (this.$('#product-list-holder').children().size() === this.products.size()){
+//                this.$('#product-list-holder').find('img.lazy').lazyload({
+//                    container: this.$('#product-list-holder'),
+//                    effect: 'fadeIn'
+//                }).removeClass('lazy');
+//            }
         },
         renderProducts: function(){
-            this.$('#product-list-holder').empty();
-            this.products.each(this.renderProduct, this);
-            var paginatorData = {
-                collection : 'products',
-                cssClass: 'textright'
-            };
-            paginatorData = _.extend(paginatorData, this.products.info());
-            $('div.paginator', '#product-list').replaceWith(_.template($('#paginatorTemplate').html(), paginatorData));
+            if (this.products.size()){
+                this.$('#product-list-holder').empty();
+                this.products.each(this.renderProduct, this);
+                var paginatorData = {
+                    collection : 'products',
+                    cssClass: 'textright'
+                };
+                paginatorData = _.extend(paginatorData, this.products.info());
+                $('div.paginator', '#product-list').replaceWith(_.template($('#paginatorTemplate').html(), paginatorData));
+            } else {
+                $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>');
+            }
         },
 		saveProduct: function(){
             var self = this;
@@ -609,8 +585,9 @@ define([
         },
         filterProducts: function(e, forceRun) {
             if (e.keyCode === 13 || forceRun === true) {
+                $('#product-list-holder').html('<div class="spinner"></div>');
                 this.products.key = e.currentTarget.value;
-                this.products.reset().goTo(this.products.firstPage);
+                this.products.goTo(this.products.firstPage);
                 $(e.target).autocomplete('close');
             }
         },
@@ -646,23 +623,35 @@ define([
             });
             return false;
         },
+        markProducts:  function(e){
+            var checked = _.has(this.products, 'checked') ? this.products.checked : [],
+                pid = parseInt(e.currentTarget.value);
+            if (e.currentTarget.checked){
+                checked = _.union(checked, pid);
+            } else {
+                checked = _.without(checked, pid);
+            }
+            this.products.checked = checked;
+            console.log(checked);
+        },
         massAction: function() {
-            var type = $('#product-list-holder').data('type'),
-                prodlist = this.products.filter(function(prod){ return prod.has('marked'); }),
-                ids = _.pluck(prodlist, 'id');
+            var type = $('#product-list-holder').data('type');
+
+            if (!_.has(this.products, 'checked') || _.isEmpty(this.products.checked)){
+                return false;
+            }
 
             switch (type){
                 case 'edit':
-                    this.massDelete(ids);
+                    this.massDelete(this.products.checked);
                     break;
                 case 'related':
-                    this.addRelated(ids);
+                    this.addRelated(this.products.checked);
                     $('#product-list').hide('slide');
-                    _.each(prodlist, function(prod){
-                        prod.unset('marked');
-                    })
                     break;
             }
+            $('div.productlisting input.marker:checked', '#product-list-holder').removeAttr('checked');
+            this.products.checked = [];
 
             return false;
         },
@@ -724,6 +713,42 @@ define([
                     $('#product-list-search').val(this.products.key);
                 }
             }
+        },
+        paginatorAction:  function(e){
+            var page = $(e.currentTarget).data('page');
+            var collection = $(e.currentTarget).parent('.paginator').data('collection');
+            if (!collection) return false;
+            if (_.has(this, collection)){
+                collection = this[collection];
+            }
+
+            switch (page) {
+                case 'first':
+                    collection.goTo(collection.firstPage);
+                    break;
+                case 'prev':
+                    if (collection instanceof Backbone.Paginator.requestPager){
+                        collection.requestPreviousPage();
+                    } else {
+                        collection.previousPage();
+                    }
+                    break;
+                case 'next':
+                    if (collection instanceof Backbone.Paginator.requestPager){
+                        collection.requestNextPage();
+                    } else {
+                        collection.nextPage();
+                    }
+                    break;
+                case 'last':
+                    collection.goTo(collection.totalPages);
+                    break;
+                default:
+                    var pageId = parseInt(page);
+                    !_.isNaN(pageId) && collection.goTo(pageId);
+                    break;
+            }
+            return false;
         }
 	});
 

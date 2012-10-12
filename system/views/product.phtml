@@ -466,28 +466,27 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
-	{{if showDelete}}
+	<% if (showDelete) { %>
     <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
-    {{else}}
-    <a href="<?php echo $this->url(array('id'=>null));?>/id/${id}" data-role="editProduct" data-pid="${id}" title="<?php echo $this->translate('Edit');?> ${name}" class="clearfix" style="text-align:center;">
-    {{/if}}
-        <p class="brand">${brand}</p>
-	    {{if showDelete}}
-        <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-        {{else}}
-	    {{if rendered}}
-        <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-        {{else}}
-	    <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-	    {{/if}}
-        {{/if}}
-        <p class="name">${name}</p>
-        <p class="sku">${sku}</p>
-    {{if showDelete}}
-    {{else}}
+    <% } else { %>
+    <a href="<?php echo $this->url(array('id'=>null));?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit');?> <%= name %>" class="clearfix" style="text-align:center;">
+    <% } %>
+        <p class="brand"><%= brand %></p>
+	    <% if (showDelete) { %>
+        <img src="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <% } else { %>
+		<% if (rendered) { %>
+        <img src="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <% } else { %>
+	    <img class="lazy" src="" data-original="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+	    <% } %>
+	    <% } %>
+        <p class="name"><%= name %></p>
+        <p class="sku"><%= sku %></p>
+    <% if (!showDelete) { %>
     </a>
-    <input class="marker" type=checkbox {{if marked}}checked="checked"{{/if}} />
-    {{/if}}
+    <input type="checkbox" class="marker" name="marker" value=<%= id %> >
+    <% } %>
 </script>
 
 <script id="quickPreviewTemplate" type="text/template">
