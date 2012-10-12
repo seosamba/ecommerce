@@ -4,10 +4,40 @@ $this->headTitle('Manage product');
 
 <style>
 <?php $this->headStyle()->captureStart();?>
+.ui-effects-transfer {
+	border: 2px dotted #778899;
+}
+/* paginated block styles */
+.paginator {
+	background-color: white;
+	box-shadow: 0 -2px 4px -3px #7c7c7c;
+	text-align: right;
+}
+.paginator > *{
+	padding: 5px;
+	display: inline-block;
+}
+*+html .paginator > *{
+	display: inline;
+}
+.paginator a.page{
+	color: #cd5c5c;
+	opacity: 0.75;
+}
+.paginator a.page:hover,
+.paginator a.page.current {
+    opacity: 1;
+}
+
+.paginator a.page span{
+
+}
+
 .seotoaster #manage-product {
 	font-size: 11pt;
 }
 div.box {
+	display: inline-block;
 	background-color: white;
 	margin: 3px 0;
 	padding: 5px 5px 0;
@@ -18,7 +48,7 @@ div.box {
 div.box:hover {
 	box-shadow: 0 0 3px lightseagreen;
 }
-#product-tags .tag-widget {
+.product-tags .tag-widget {
     background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
     border: 2px solid white;
     -moz-border-radius: 3px 3px 3px 3px;
@@ -32,10 +62,10 @@ div.box:hover {
     width: 23%;
 	height:18px;
 }
-#product-tags .tag-widget span {
+.product-tags .tag-widget span {
 	cursor: pointer;
 }
-#product-tags .tag-widget span.tag-editable {
+.product-tags .tag-widget span.tag-editable {
 	float: left;
 	margin-left: 2%;
 	width: 81%;
@@ -43,13 +73,13 @@ div.box:hover {
 	overflow: hidden;
 	line-height: 1.2em;
 }
-#product-tags .tag-widget input {
+.product-tags .tag-widget input {
 	float: left;
 	margin-top: 2px;
 	margin-left: 1px;
 }
 
-#product-tags .tag-widget .ui-icon-closethick {
+.product-tags .tag-widget .ui-icon-closethick {
     float: right;
     margin: 0 0 0 3px;
 }
@@ -109,7 +139,7 @@ div.productlisting {
 	width: 11%;
 	border: 1px solid #fff;
 	height: 140px;
-	margin: 5px;
+	margin: 3px 5px;
 	float: left;
 	border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -237,7 +267,13 @@ input#delete {
 	background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
 }
 #image-list {
-	height:460px !important;
+	height: 450px !important;
+}
+#image-list-dialog div.paginator {
+	position: absolute;
+	bottom: 0;
+	width: 98%;
+	margin: 0 1%;
 }
 #ajax_msg {
 	line-height: 50px;
@@ -264,11 +300,32 @@ input#delete {
 .ui-autocomplete .ui-menu-item {
 	cursor: pointer;
 }
+#product-list div.paginator {
+	position: absolute;
+	bottom: 5px;
+	height: 20px;
+	padding: 0;
+	padding-top: 5px;
+	margin: 0 1%;
+	width: 98%;
+}
 #product-list-holder > p.nothing {
 	text-align: center;
 	padding: 5px;
 	font-size: 150%;
 	margin-top: 20%;
+}
+
+div.spinner {
+    position: absolute;
+	width: 48px;
+	height: 48px;
+	top: 45%;
+	left: 50%;
+	background: url('<?php echo $this->websiteUrl; ?>system/images/spinner.gif');
+}
+div.spinner.bg {
+	background: url('<?php echo $this->websiteUrl; ?>system/images/spinner_bg.gif');
 }
 <?php $this->headStyle()->captureEnd();?>
 </style>
@@ -276,22 +333,53 @@ input#delete {
 <?php
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
         ->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js');
-$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/product/config'))
-        ->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js')
+$this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
 ?>
 
-<script id="tagTemplate" type="text/x-jquery-tmpl">
-	<input type="checkbox" name="tag[]" value="${id}"/>
-	<span class="tag-editable" title="Click to edit">${name}</span>
+<script id="paginatorTemplate" type="text/template">
+<div class="paginator <%= cssClass %>" data-collection="<%= collection %>" >
+<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first">First</a><% } else { %><span>First</span><% } %>
+
+<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Pevious</a><% } %>
+
+<% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
+
+<% for (var p=currentPage-5; p<=currentPage+5; p++) { %>
+    <% if (p < firstPage || p > lastPage) continue; %>
+    <% if (currentPage == p) { %>
+        <span class="page selected"><%= p %></span>
+    <% } else { %>
+        <a href="#" class="page" data-page="<%= p %>"><%= p %></a>
+    <% } %>
+<% } %>
+
+<% if (currentPage + 5 < lastPage) { %><span>...</span><% } %>
+
+<% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next">Next</a><% } %>
+
+<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last">Last</a><% } else { %><span>Last</span> <%} %>
+</div>
+</script>
+
+<script id="imgTemplate" type="text/template">
+<% _.each(images, function(img){ %>
+	<div class="box">
+	    <img class="lazy" src="<%= img.src %>" width="100px" data-name="<%= img.name %>" title="<%= img.name %>"/>
+	</div>
+<% }) %>
+</script>
+
+<script id="tagTemplate" type="text/template">
+	<input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
+	<span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
 	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete');?></span>
 </script>
 
-<script id="imgTemplate" type="text/x-jquery-tmpl">
-	{{each imageList}}
-	<div class="box">
-		<img class="lazy" src="" data-original="${src}" width="100px" data-name="${name}" title="${name}"/>
-	</div>
-	{{/each}}
+<script id="optionLibraryTemplate" type="text/template">
+	<option value="-1" disabled="disabled" selected="selected">select from library</option>
+	<% _.each(items, function(item){ %>
+	<option value="<%= item.id %>" ><%= item.title %></option>
+	<% }); %>
 </script>
 
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
@@ -309,7 +397,6 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                 <option value="radio">Radio Switch</option>
                 <option value="text">Text Field</option>
                 <option value="date">Datepicker</option>
-<!--							<option value="file">Upload File</option>-->
             </select>
         </div>
     </div>
@@ -379,54 +466,45 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
-	{{if showDelete}}
+	<% if (showDelete) { %>
     <span class="ui-icon ui-icon-closethick" style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
-    {{else}}
-    <a href="#edit/${id}" title="<?php echo $this->translate('Edit');?> ${name}" class="clearfix" style="text-align:center;">
-    {{/if}}
-        <p class="brand">${brand}</p>
-	    {{if showDelete}}
-        <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-        {{else}}
-	    {{if rendered}}
-        <img src="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-        {{else}}
-	    <img class="lazy" src="" data-original="{{if photo}}${'/media/'+photo.replace('/', '/product/')}{{else}}/system/images/noimage.png{{/if}}" alt="${name}" />
-	    {{/if}}
-        {{/if}}
-        <p class="name">${name}</p>
-        <p class="sku">${sku}</p>
-    {{if showDelete}}
-    {{else}}
+    <% } else { %>
+    <a href="<?php echo $this->url(array('id'=>null));?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit');?> <%= name %>" class="clearfix" style="text-align:center;">
+    <% } %>
+        <p class="brand"><%= brand %></p>
+	    <% if (showDelete) { %>
+        <img src="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <% } else { %>
+		<% if (rendered) { %>
+        <img src="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <% } else { %>
+	    <img class="lazy" src="" data-original="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+	    <% } %>
+	    <% } %>
+        <p class="name"><%= name %></p>
+        <p class="sku"><%= sku %></p>
+    <% if (!showDelete) { %>
     </a>
-    <input class="marker" type=checkbox {{if marked}}checked="checked"{{/if}} />
-    {{/if}}
+    <input type="checkbox" class="marker" name="marker" value=<%= id %> >
+    <% } %>
 </script>
 
-<script id="quickPreviewTemplate" type="text/x-jquery-tmpl">
+<script id="quickPreviewTemplate" type="text/template">
 	<fieldset style="background-image:none; background-color: white; height:272px;">
 	    <legend><?php echo $this->translate('Preview');?></legend>
-		<div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
-		<a href="{{= $('#website_url').val() + page.url }}" target="_blank" style="text-decoration: none; color: inherit;">
-	        <img src="{{= $('#website_url').val() +'media/'+ photo.replace('/','/product/') }}" style="float:left; padding: 15px; max-height: 120px"/>
-	        <p style="text-align:center; font-weight: bold;">${name}</p>
-	        <p class="mt10px" style="height: 160px;">${ shortDescription.length > 300 ? shortDescription.slice(0,299)+'...' : shortDescription }</p>
+		<a href="<%= websiteUrl + product.page.url %>" target="_blank" style="text-decoration: none; color: inherit;">
+            <div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
+            <img src="<%= websiteUrl +'media/'+ product.photo.replace('/','/product/') %>" style="float:left; padding: 15px; max-height: 120px"/>
+	        <p style="text-align:center; font-weight: bold;"><%= product.name %></p>
+	        <p class="mt10px" style="height: 160px;"><%= product.shortDescription.length > 300 ? product.shortDescription.slice(0,299)+'...' : product.shortDescription %></p>
 	        <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-	        ${price}&nbsp;${ $('#currency-unit').text() }
+	        <%= product.price + '&nbsp;' + currency %>
 	        </p>
         </a>
     </fieldset>
 </script>
 
-<script>
-    $(function(){
-	    $('div.seotoaster > div.ui-widget-header:first').remove();
-        $('#manage-product,#description-box').tabs();
-        $(".ui-tabs-nav, .ui-tabs-nav > *" )
-            .removeClass( "ui-corner-all" )
-            .addClass( "ui-corner-top" );
-    });
-</script>
+
 
 <div id="ajax_msg" class="smoke">
     <img style="vertical-align: middle;" src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" />
@@ -449,15 +527,17 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                 </label>
             </div>
         </div>
-        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h490" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h450" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+	    <div class="paginator"><!-- placeholder for paginator --></div>
     </div>
 
     <div id="image-select-dialog" class="ui-helper-reset" style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
         <div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
             <a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');$('#product-image-folder').val('0');">&nbsp;&laquo; back</a>
-            <span style="margin-left: 30%"><?php echo $this->translate('select image for product');?></span>
+            <span style="margin-left: 35%"><?php echo $this->translate('select image for product');?></span>
         </div>
-        <div id="image-list" style="height: 460px; overflow-x: hidden; overflow-y: auto;"></div>
+        <div id="image-list" style="overflow-x: hidden; overflow-y: auto;"></div>
+	    <div class="paginator"></div>
     </div>
 	<div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
 
@@ -473,7 +553,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 	    ?>
         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.$title);?></a></li>
         <?php endforeach; ?>
-        <a href="#new" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="#new" id="new-product" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
         <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
     </ul>
     <!--------- MAIN INFO -------------->
@@ -493,7 +573,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 				<label for="product-enabled">This product is enabled</label>
 			</div>
             <div class="grid_7">
-	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" />
+	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" autofocus="autofocus" />
             </div>
 			<div class="grid_1">
 				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
@@ -515,6 +595,10 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             </div>
             <div class="grid_4">
                 <select name="product-brand" id="product-brand" data-reflection="property">
+	                <option value="-1">select brand</option>
+                <?php foreach($this->brands as $brand): ?>
+		           	<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName(); ?></option>
+				<?php endforeach; ?>
                 </select>
             </div>
             <div class="grid_4">
@@ -569,13 +653,22 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
     </div>
 
     <div id="tag-tab" class="clearfix">
-        <div class="grid_4 prefix_4 suffix_4 mb5px" style="text-align:center;">
+	    <div class="grid_3 mt10px textcentered">
+		    <a href="javascript" id="toggle-current-tags" >[ show only selected ] </a>
+	    </div>
+        <div class="grid_4 prefix_1 suffix_4 mb5px" style="text-align:center;">
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag');?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-        <div id="product-tags" class="grid_12 h380" style="overflow-y: auto;">
+	    <div id="product-tags-current" class="product-tags mb5px grid_12 bottomdashed" style="display:none; max-height: 120px; overflow-y: auto;">
         </div>
 
+	    <div id="product-tags-available" class="h350 grid_12 product-tags" style="position: relative;">
+			<div class="spinner bg"></div>
+	    </div>
+	    <div class="paginator">
+		    <!-- placeholder for pagination -->
+	    </div>
     </div> <!-- #tag-tab -->
 
     <div id="options-tab" class="clearfix">
@@ -605,3 +698,28 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         <input type="submit" name="submit" id="submit" value="Save"/>
     </div>
 </div>
+
+<script>
+	(function(){
+	    $('div.seotoaster > div.ui-widget-header:first').remove();
+	    $('#manage-product,#description-box').tabs();
+	    $(".ui-tabs-nav, .ui-tabs-nav > *" )
+	        .removeClass( "ui-corner-all" )
+	        .addClass( "ui-corner-top" );
+	})(window);
+</script>
+
+<script type="text/javascript">
+$(function(){
+	$(document).one('loaded.product', function(){
+	<?php if ($this->product): ?>
+		app.model.set(<?php echo json_encode($this->product->toArray()) ;?>);
+		app.model.get('options').reset(app.model.get('defaultOptions'));
+		app.render();
+	<?php endif; ?>
+	});
+});
+</script>
+
+<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"
+        data-main="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/modules/product/config"></script>

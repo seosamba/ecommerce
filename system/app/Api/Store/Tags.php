@@ -17,16 +17,34 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 * by the 'id' value.
 	 */
 	public function getAction() {
-//		sleep(3);
-		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
+		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
+
 		if ($id) {
-			$result = Models_Mapper_Tag::getInstance()->find($id);
-			if ($result !== null){
-				return $result->toArray();
+			$data = Models_Mapper_Tag::getInstance()->find($id);
+			if ($data instanceof Models_Model_Tag){
+				return $data->toArray();
+			} elseif (is_array($data) && !empty($data)){
+				return array_map(function($tag){ return $tag->toArray(); }, $data);
+			} else {
+
+			}
+		} else {
+			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
+			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_VALIDATE_INT);
+			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+
+
+			$result = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit, $count);
+			if ($result){
+				if ($count && isset($result['data'])){
+					$result['data'] = array_map(function($tag){ return $tag->toArray(); }, $result['data']);
+					return $result;
+				} else {
+					return array_map(function($tag){ return $tag->toArray(); }, $result);
+				}
 			}
 		}
-
-		return array_map(function($tag){ return $tag->toArray(); }, Models_Mapper_Tag::getInstance()->fetchAll(null, array('name')) );
+		$this->_error(null, self::REST_STATUS_NOT_FOUND);
 	}
 
 	/**

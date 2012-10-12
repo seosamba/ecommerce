@@ -4,6 +4,7 @@
  * Tag
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ * @method Models_Mapper_Tag getInstance() getInstance()  Returns an instance of itself
  */
 class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 
@@ -56,5 +57,56 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 		return false;
 	}
 		
+	public function find($id) {
+		$result = $this->getDbTable()->find($id);
+		if(0 == count($result)) {
+			return null;
+		} elseif (count($result) > 1) {
+			$list = array();
+			foreach ($result as $row) {
+				array_push($list, new $this->_model($row->toArray()));
+			}
+			return $list;
+		}
 
+		return new $this->_model( $result->current()->toArray());
+	}
+
+	public function fetchAll($where = null, $order = null, $offset = null, $limit = null, $count = false){
+		$entries = array();
+		$select = $this->getDbTable()->select();
+		if ($where) {
+			$select->where($where);
+		}
+
+		if ($order){
+			$select->order($order);
+		}
+
+		if ($count === false){
+			$select->limit($limit, $offset);
+		}
+
+		$resultSet = $this->getDbTable()->fetchAll($select);
+
+		if(count($resultSet) == 0) {
+			return null;
+		}
+
+		$resultSet = $resultSet->toArray();
+
+		if ($count === true ){
+			$count = sizeof($resultSet);
+			$resultSet = array_slice($resultSet, $offset, $limit);
+		}
+
+		foreach ($resultSet as $model) {
+			$entries[] = new $this->_model($model);
+		}
+
+		return !$count ? $entries : array(
+				'totalCount'    => $count,
+				'data'          => $entries
+			);
+	}
 }
