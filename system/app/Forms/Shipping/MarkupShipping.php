@@ -10,12 +10,8 @@ class Forms_Shipping_MarkupShipping extends Zend_Form {
 			'value' => Shopping::SHIPPING_MARKUP
 		));
 
-		$this->addElement('text', 'currency', array(
-			'label' => 'Currency'
-		));
-
 		$this->addElement('text', 'price', array(
-			'label' => 'Markup Price'
+			'label' => 'Markup amount'
 		));
 	}
 
