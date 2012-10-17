@@ -125,6 +125,10 @@ define([
         newProduct: function(e) {
             e.preventDefault();
             this.initProduct().render();
+            if (window.history && window.history.pushState){
+                var loc = window.location;
+                window.history.pushState({}, document.title, loc.href.replace(/id.*$/, '') );
+            }
         },
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
@@ -438,19 +442,14 @@ define([
         },
 		deleteProduct: function(){
 			var self = this;
-                model  = this.model;
-			if (model.isNew()){
+			if (this.model.isNew()){
                 showMessage('Product is not saved yet', true);
 				return false;
 			}
             showConfirm('Dragons ahead! Are you sure?', function(){
-                model.destroy({
+                self.model.destroy({
                     success: function(model, response){
-                        self.brands.fetch()
-                        self.navigate('new', true);
-                    },
-                    error: function(model, response){
-                        showMessage('Oops! Something went wrong!', true);
+                        $('#new-product').trigger('click');
                     }
                 });
 			});

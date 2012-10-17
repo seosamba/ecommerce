@@ -88,13 +88,13 @@ class Api_Store_Products extends Api_Service_Abstract {
 		));
 
         if (!$validator->isValid($srcData['sku'])){
-	        $this->_error($this->_translator->translate('You already have a product with this SKU'), RestService_Abstract::REST_STATUS_OK);
+	        $this->_error($this->_translator->translate('You already have a product with this SKU'), self::REST_STATUS_OK);
         }
 
         try {
             $newProduct = $this->_productMapper->save($srcData);
         } catch (Exception $e){
-	        $this->_error($e->getMessage(), RestService_Abstract::REST_STATUS_OK);
+	        $this->_error($e->getMessage(), self::REST_STATUS_OK);
         }
 
 		if ($newProduct instanceof Models_Model_Product){
@@ -177,7 +177,7 @@ class Api_Store_Products extends Api_Service_Abstract {
             }
 			return $results;
 		} else {
-			$this->_error('Requested product not found', RestService_Abstract::REST_STATUS_NOT_FOUND);
+			$this->_error('Requested product not found', self::REST_STATUS_NOT_FOUND);
 		}
 	}
 
