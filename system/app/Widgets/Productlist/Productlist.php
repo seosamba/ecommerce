@@ -229,9 +229,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 *
 	 * @return array
 	 */
-	private function _loadProducts() {
+	private function _loadProducts($enabled = true) {
+        $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 		if(empty($this->_options)) {
-			return $this->_productMapper->fetchAll(null, array('created_at DESC'), 0, self::DEFAULT_OFFSET);
+			return $this->_productMapper->fetchAll($enabledOnly, array('created_at DESC'), 0, self::DEFAULT_OFFSET);
 		}
 		$filters = array(
 			'tags'      => null,
@@ -248,7 +249,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$filters['order'] = array_map(function($field){ return trim($field)==='brand'? 'b.name' : 'p.'.$field; }, $filters['order']);
 		}
 
-		return $this->_productMapper->fetchAll(null, $filters['order'], null, null, null, $filters['tags'], $filters['brands']);
+		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'], null, null, null, $filters['tags'], $filters['brands']);
 	}
 
 	/**
