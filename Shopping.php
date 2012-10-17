@@ -60,6 +60,7 @@ class Shopping extends Tools_Plugins_Abstract {
     const KEY_CHECKOUT_SIGNUP    = 'signup';
 	const KEY_CHECKOUT_ADDRESS   = 'address';
 	const KEY_CHECKOUT_SHIPPER   = 'shipper';
+	const KEY_CHECKOUT_PICKUP    = 'pickup';
 
 	const SHIPPING_FREESHIPPING = 'freeshipping';
 
