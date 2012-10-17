@@ -50,7 +50,7 @@ define([
 		websiteUrl: $('#website_url').val(),
 		initialize: function(){
             var self = this;
-            this.setProduct();
+            this.initProduct();
             $('#add-new-option-btn').button();
 
             $('#product-list-search').ajaxStart(function(){
@@ -75,6 +75,8 @@ define([
 
             this.images =  new ImagesCollection(),
             this.images.on('reset', this.renderImages, this);
+
+            this.render()
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -94,36 +96,35 @@ define([
                 this.tags.pager();
             }
         },
-        setProduct: function (productId) {
+        initProduct: function () {
             this.model = new ProductModel();
-
-            if (productId) {
-                if (this.products !== null) {
-                    this.model = this.products.get(productId);
-                    this.render();
-                } else {
-                    this.model.fetch({data: {id: productId}})
-                        .success(this.render.bind(this));
-                }
-            } else {
-                this.render();
-            }
 
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
+            this.model.on('sync', function(){
+                if (this.model.has('options')){
+                    this.model.get('options').on('add', this.renderOption, this);
+                    this.model.get('options').on('reset', this.renderOptions, this);
+                }
+                if (this.products !== null){
+                    var product = this.products.get(this.model.get('id'));
+                    !_.isUndefined(product) && product.set(this.model.toJSON());
+                }
+                this.render();
+                showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
+            }, this);
             this.model.on('error', this.processSaveError, this);
 
-            if (this.model.has('options')){
-                this.model.get('options').on('add', this.renderOption, this);
-                this.model.get('options').on('reset', this.renderOptions, this);
-            }
+//            if (this.model.has('options')){
+            this.model.get('options').on('add', this.renderOption, this);
+            this.model.get('options').on('reset', this.renderOptions, this);
+//            }
 
-            $('#manage-product').tabs("select" , 0);
             return this;
 		},
         newProduct: function(e) {
             e.preventDefault();
-            this.setProduct().render();
+            this.initProduct().render();
         },
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
@@ -202,11 +203,11 @@ define([
 		},
 		render: function(){
             console.log('render: app.js', this.model.changedAttributes());
-
-            $('#product-list:visible').hide();
-            $("#manage-product").tabs( "option", "ajaxOptions",
+            this.$el.tabs("select" , 0).tabs( "option", "ajaxOptions",
                 { data: {productId: this.model.get('id') } }
             );
+
+            $('#product-list:visible').hide();
 
             $('#quick-preview').empty(); //clening preview content
 
@@ -265,13 +266,11 @@ define([
 			}
 
             if (!this.model.isNew()){
-                var st = Date.now();
                 $('#quick-preview').html(this.quickPreviewTmpl({
                     product: this.model.toJSON(),
                     websiteUrl: this.websiteUrl,
                     currency: this.$('#currency-unit').text()
                 }));
-                console.log((Date.now() - st)+' ms' );
             }
 
 			$('div#ajax_msg:visible').hide('fade');
@@ -415,19 +414,20 @@ define([
                 this.addNewBrand(newBrandName).$('#new-brand').val('');
             }
 
-			if (this.model.isNew()){
-				this.model.save(null, {success: function(model, response){
-                    if (self.products !== null) {
-                        self.products.add(model);
-                    }
-                    showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
-                }, error: this.processSaveError});
-			} else {
-				this.model.save(null, {success: function(model, response){
-					showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
-                    self.render();
-				}, error: this.processSaveError});
-			}
+            this.model.save();
+//			if (this.model.isNew()){
+//				this.model.save(null, {success: function(model, response){
+//                    if (self.products !== null) {
+//                        self.products.add(model);
+//                    }
+//                    showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
+//                }, error: this.processSaveError});
+//			} else {
+//				this.model.save(null, {success: function(model, response){
+//					showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
+//                    self.render();
+//				}, error: this.processSaveError});
+//			}
 
             if (newInLibrary && self.hasOwnProperty('optionLibrary')){
                 self.optionLibrary.fetch();
@@ -507,7 +507,8 @@ define([
             var type = $('#product-list-holder').data('type');
             switch (type){
                 case 'edit':
-                    this.setProduct(pid);
+                    this.model.clear({silent:true}).set(this.products.get(pid).toJSON());
+                    this.render();
                     if (window.history && window.history.pushState){
                         var loc = window.location;
                         window.history.pushState({}, document.title, loc.href.replace(/product.*$/, 'product/id/'+pid) );
@@ -544,9 +545,10 @@ define([
                     data: {id: relateds.join(',')},
                     success: function(response){
                         if (!response) return false;
-                        if (response && relateds.length == 1){
+                        if (response && !_.isArray(response)){
                             response = [response];
                         }
+                        $('#related-holder').empty();
                         _.each(response, function(related){
                             var view = new ProductListView({model: new ProductModel(related), showDelete: true});
                             view.delegateEvents({
