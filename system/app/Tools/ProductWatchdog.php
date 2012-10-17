@@ -135,7 +135,17 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 	}
 
 	protected function _runOnDelete() {
-		//TODO: implement today
+		$cacheTags = array(
+			'productlist',
+			'productListWidget',
+			'productindex',
+			'prodid_'.$this->_object->getId()
+		);
+		if (($page = $this->_object->getPage()) instanceof Application_Model_Models_Page){
+			$cacheTags[] = 'pageid_'.$page->getId();
+			$this->_cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
+		}
+		$this->_cacheHelper->clean(false, false, $cacheTags);
 	}
 
 }

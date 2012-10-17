@@ -5,6 +5,11 @@
  */
 class Api_Store_Products extends Api_Service_Abstract {
 
+	/**
+	 * @var Models_Mapper_ProductMapper
+	 */
+	private $_productMapper;
+
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
@@ -27,7 +32,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 		$data = array();
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (!empty($id)) {
-			$product              = $this->_productMapper->find($id);
+			$product = $this->_productMapper->find($id);
 
 			if ($product instanceof Models_Model_Product) {
 				$data = $product->toArray();

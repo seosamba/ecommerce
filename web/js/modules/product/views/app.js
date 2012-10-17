@@ -449,6 +449,7 @@ define([
             showConfirm('Dragons ahead! Are you sure?', function(){
                 self.model.destroy({
                     success: function(model, response){
+                        self.products && self.products.pager();
                         $('#new-product').trigger('click');
                     }
                 });
