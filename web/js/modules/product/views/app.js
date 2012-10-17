@@ -105,6 +105,8 @@ define([
                     this.model.fetch({data: {id: productId}})
                         .success(this.render.bind(this));
                 }
+            } else {
+                this.render();
             }
 
             this.model.on('change:tags', this.renderProductTags, this);

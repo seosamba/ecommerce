@@ -81,19 +81,16 @@ ul.ui-tabs-nav li.disabled a {
 		<div id="pane-container" class="grid_8 relative">
 
             <div id="markup">
-                <header><?php echo $this->translate('Markup Configuration');?></header>
+                <header><?php echo $this->translate('Shipping markup configuration');?></header>
                 <?php $this->markupForm->setAction($this->url(array('run' => 'bundledshipper')));?>
                 <form class="clearfix" action="<?php echo $this->markupForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
 					<?php echo $this->markupForm->getElement('shipper')->renderViewHelper(); ?>
-					<label class="grid_3 mt5px textright" for="currency"><?php echo $this->markupForm->getElement('currency')->getLabel();?></label>
-					<div class="grid_3 relative">
-						<?php echo $this->markupForm->getElement('currency')->renderViewHelper();?>
-						<label class="unit-over"><?php echo $this->config['currency'];?></label>
-					</div>
-					<label class="grid_2 mt5px textcentered"><?php echo $this->markupForm->getElement('price')->getLabel();?></label>
+					<label class="grid_3 mt5px textcentered"><?php echo $this->markupForm->getElement('price')->getLabel();?></label>
 					<div class="grid_3">
 						<?php echo $this->markupForm->getElement('price')->renderViewHelper();?>
 					</div>
+                    <label class="grid_1 mt5px textright"><?php echo $this->translate('Currency');?>:</label>
+                    <label class="grid_1 mt5px textright"><?php echo $this->config['currency'];?></label>
 				</form>
             </div>
 			<div id="pickup">
