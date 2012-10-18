@@ -40,16 +40,17 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 				'lastname',
 				'company',
 				'email',
-				'address1',
-				'address2'
-			),
-			'rcol' => array(
-				'country',
-				'city',
-				'state',
-				'zip',
 				'phone',
 				'mobile'
+
+			),
+			'rcol' => array(
+				'address1',
+				'address2',
+				'city',
+				'zip',
+				'country',
+				'state'
 			)
 		));
 
