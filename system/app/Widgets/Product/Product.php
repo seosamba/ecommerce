@@ -238,11 +238,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
         if (empty($ids)){
             return null;
         }
-//        $where = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('id IN (?)', $ids);
         $related = $this->_productMapper->find($ids);
 
         if ($related !== null) {
-            $this->_view->related = $related;
+            $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
             $this->_view->withImg = (isset($this->_options[0]) && $this->_options[0] == 'img') ? true : false;
             return $this->_view->render('related.phtml');
         }
