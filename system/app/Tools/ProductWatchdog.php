@@ -81,10 +81,11 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
                         Tools_Filesystem_Tools::deleteFile($savePath.$file);
                     }
                 }
+                $pathToCropPreview = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'] . 'crop';
                 $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . str_replace('/', '/small/' , $this->_object->getPhoto());
                 $pagePreviewImg = $savePath.strtolower($uniqName).'.'.pathinfo($productImg, PATHINFO_EXTENSION);
                 if (is_file($productImg) && copy($productImg, $pagePreviewImg)) {
-                    Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, null, true);
+                    Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, $pathToCropPreview, true);
                 }
             }
 		} else {
