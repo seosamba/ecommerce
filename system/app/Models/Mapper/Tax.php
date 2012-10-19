@@ -31,6 +31,10 @@ class Models_Mapper_Tax extends Application_Model_Mappers_Abstract{
 		return $this->_findWhere($where);
 	}
 
+	public function getDefaultRule(){
+		return $this->_findWhere("isDefault='1'");
+	}
+
 	public function delete($id) {
 		if (is_array($id)){
 			foreach ($id as $_id){

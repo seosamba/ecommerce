@@ -1,8 +1,7 @@
 define([
-	'Underscore',
-	'Backbone',
-    'text!modules/manage-products/templates/productrow.html'
-], function(_, Backbone, ProductRowTemplate){
+	'backbone',
+    'text!../templates/productrow.html'
+], function(Backbone, ProductRowTemplate){
     var ProductRowView = Backbone.View.extend({
         tagName: 'tr',
         events: {

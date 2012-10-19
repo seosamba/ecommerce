@@ -1,0 +1,14 @@
+<div title="Assign product page template">
+    <select name="page-tmpl">
+        <!--<option value="-1" disabled="disabled" selected="selected">select page template</option>-->
+        <% _.each(templates, function(template){ %>
+        <option value="<%= template.name %>"><%= template.name %></option>
+        <% }); %>
+    </select>
+    <% if (totalProducts) { %>
+    <hr />
+    <label>
+        <input type="checkbox" name="applyToAll"> Apply to all <%= totalProducts %> products
+    </label>
+    <% } %>
+</div>

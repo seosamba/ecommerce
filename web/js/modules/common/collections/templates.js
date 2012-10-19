@@ -1,7 +1,4 @@
-define([
-	'Underscore',
-	'Backbone'
-], function(_, Backbone){
+define([ 'backbone' ], function(Backbone){
     var templateModel = Backbone.Model.extend({});
 
 	var tempaltesCollellection = Backbone.Collection.extend({

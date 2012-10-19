@@ -1,0 +1,19 @@
+<div title="Manage tags">
+    <div class="clearfix">
+        <% _.each(tags, function(tag){ %>
+        <div style="float:left; margin: 0 5px;">
+            <label class="<% if (used[tag.name] && used[tag.name] < prodCount) { %>partial<% } %>">
+                <input class="tags <% if (used[tag.name] && used[tag.name] < prodCount) { %>partial<% } %>" type="checkbox" name="<%= tag.name %>" id="" value="<%= tag.id %>" <% if (used[tag.name]){ %>checked="checked"<% } %> >
+                <%= tag.name %>
+            </label>
+        </div>
+        <% }); %>
+    </div>
+    <% if (totalProducts) { %>
+    <hr />
+    <label>
+        <input type="checkbox" name="applyToAll"> Apply to all <%= totalProducts %> products
+    </label>
+    <% } %>
+</div>
+        

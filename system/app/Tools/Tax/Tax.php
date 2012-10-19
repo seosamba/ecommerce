@@ -15,13 +15,21 @@ class Tools_Tax_Tax {
 
 	public static function calculateProductTax(Models_Model_Product $product) {
 		if(($taxClass = $product->getTaxClass()) != 0) {
-			$zoneId = self::getZoneId();
-			if($zoneId) {
-				$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
-				if($tax !== null) {
-					$rateMethodName = 'getRate' . $taxClass;
-					return ($product->getPrice() / 100) * $tax->$rateMethodName();
+			$rateMethodName = 'getRate' . $taxClass;
+
+			if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))){
+				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
+				$zoneId = self::getZone($destinationAddress);
+				if ($zoneId) {
+					$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
 				}
+			} else {
+				self::getZone();
+				$tax = Models_Mapper_Tax::getInstance()->getDefaultRule();
+			}
+
+			if (isset($tax) && $tax !== null) {
+				return ($product->getPrice() / 100) * $tax->$rateMethodName();
 			}
 		}
 		return 0;
@@ -32,23 +40,32 @@ class Tools_Tax_Tax {
 	 *
 	 * @return int
 	 */
-	public static function getZoneId() {
+	public static function getZone($address = null) {
+		if (is_null($address)){
+			$address = Tools_Misc::clenupAddress(Models_Mapper_ShoppingConfig::getInstance()->getConfigParams());
+		}
 		$zones = Models_Mapper_Zone::getInstance()->fetchAll();
 		if(is_array($zones) && !empty($zones)) {
+			$zoneMatch = 0;
+			$maxRate = 0;
 			foreach($zones as $zone) {
-				$zoneIdByZip     = self::getZoneIdByType($zone, self::ZONE_TYPE_ZIP);
-				if($zoneIdByZip) {
-					return $zoneIdByZip;
+				$matchRate = 0;
+				var_dump($zone->toArray());
+				if (!empty($address['zip']) && $zone->getZip() && in_array($address['zip'], $zone->getZip())){
+					$matchRate++;
 				}
-				$zoneIdByState   = self::getZoneIdByType($zone, self::ZONE_TYPE_STATE);
-				if($zoneIdByState) {
-					return $zoneIdByState;
+				if (!empty($address['state']) && $zone->getStates() && array_key_exists($address['state'], $zone->getStates())){
+					$matchRate++;
 				}
-				$zoneIdByCountry = self::getZoneIdByType($zone, self::ZONE_TYPE_COUNTRY);
-				if($zoneIdByCountry) {
-					return $zoneIdByCountry;
+				if (in_array($address['country'], $zone->getCountries(true))){
+					$matchRate++;
+				}
+				if ($matchRate && $matchRate > $maxRate){
+					$maxRate = $matchRate;
+					$zoneMatch = $zone->getId();
 				}
 			}
+			return $zoneMatch;
 		}
 		return 0;
 	}
@@ -60,8 +77,8 @@ class Tools_Tax_Tax {
 	 * @param string $type
 	 * @return int
 	 */
-	public static function getZoneIdByType(Models_Model_Zone $zone, $type = self::ZONE_TYPE_ZIP) {
-		$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+	public static function getZoneIdByType(Models_Model_Zone $zone, $type = self::ZONE_TYPE_ZIP, $address = null) {
+//		$address = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$zoneParts = array();
 		switch($type) {
 			case self::ZONE_TYPE_ZIP:
@@ -77,12 +94,12 @@ class Tools_Tax_Tax {
 		if(is_array($zoneParts) && !empty($zoneParts)) {
 			if($type == self::ZONE_TYPE_STATE) {
 				foreach($zoneParts as $zonePart) {
-					if($zonePart['id'] == $shoppingConfig['state']) {
+					if($zonePart['id'] == $address['state']) {
 						return $zone->getId();
 					}
 				}
 			}
-			if(in_array($shoppingConfig[$type], $zoneParts)) {
+			if(in_array($address[$type], $zoneParts)) {
 				return $zone->getId();
 			}
 		}

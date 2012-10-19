@@ -1,11 +1,10 @@
 define([
-	'Underscore',
-	'Backbone',
-    'libs/backbone/backbone.paginator',
-    'modules/product/models/product'
-], function(_, Backbone, Paginator, ProductModel){
+	'backbone',
+    '../../product/models/product',
+    'backbone.paginator'
+], function(Backbone, ProductModel){
 
-    var ProductCollection = Paginator.requestPager.extend({
+    var ProductCollection = Backbone.Paginator.requestPager.extend({
         model: ProductModel,
         paginator_core: {
             type: 'GET',
