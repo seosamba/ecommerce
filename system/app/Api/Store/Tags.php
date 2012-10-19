@@ -30,7 +30,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 			}
 		} else {
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
-			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_VALIDATE_INT);
+			$limit  = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
 			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
 
