@@ -50,7 +50,7 @@ class Tools_Tax_Tax {
 			$maxRate = 0;
 			foreach($zones as $zone) {
 				$matchRate = 0;
-				var_dump($zone->toArray());
+//				var_dump($zone->toArray());
 				if (!empty($address['zip']) && $zone->getZip() && in_array($address['zip'], $zone->getZip())){
 					$matchRate++;
 				}
