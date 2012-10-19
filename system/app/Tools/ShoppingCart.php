@@ -68,7 +68,7 @@ class Tools_ShoppingCart {
 		if ($currentUser->getId()) {
 			$customer = Models_Mapper_CustomerMapper::getInstance()->find($currentUser->getId());
 		} elseif ($this->getCustomerId()) {
-			$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->getCustomerId())
+			$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->getCustomerId());
 		}
 
 		if (!isset($customer) || $customer === null) {
