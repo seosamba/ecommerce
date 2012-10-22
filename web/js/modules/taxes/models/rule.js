@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 
     var ruleModel = Backbone.Model.extend({
@@ -8,9 +8,9 @@ define([
         defaults: {
             isDefault: 0,
             zoneId: null,
-            rate1: null,
-            rate2: null,
-            rate3: null
+            rate1: 0,
+            rate2: 0,
+            rate3: 0
         }
     })
 	

@@ -1,9 +1,10 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/taxes/collections/rules',
-    'modules/taxes/views/rule',
-], function(_, Backbone, RulesCollection, RuleView){
+	'underscore',
+	'backbone',
+    '../collections/rules',
+    '../../zones/collections/zones',
+    './rule',
+], function(_, Backbone, RulesCollection, ZonesCollection, RuleView){
 
     var rulesListView = Backbone.View.extend({
         el: $('#manage-taxes'),
@@ -13,16 +14,19 @@ define([
         },
         initialize: function(){
             $('#price-inc-tax').on('change', this.changeTaxConfig)
+
             this.rulesCollection = new RulesCollection;
             this.rulesCollection.on('add', this.render, this);
             this.rulesCollection.on('remove', this.render, this);
             this.rulesCollection.on('reset', this.render, this);
+
+            this.zones  = new ZonesCollection();
         },
         render: function(){
             $('#rules').empty();
             this.rulesCollection.each(function(rule){
                 var view = new RuleView({model: rule});
-                view.render().$el.appendTo('#rules');
+                $('#rules').append(view.render().el);
             });
         },
         save: function() {

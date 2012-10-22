@@ -1,7 +1,7 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/common/views/listitem'
+	'underscore',
+	'backbone',
+    './listitem'
 ], function(_, Backbone, ListItemView){
 
     var countriesListView = Backbone.View.extend({

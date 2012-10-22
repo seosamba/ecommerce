@@ -1,12 +1,13 @@
 <?php
-$this->headTitle($this->translate('Manage taxes'));
-$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/zones.js'));
+    $this->headTitle($this->translate('Manage zones'));
+    $this->headScript()->setAllowArbitraryAttributes(true)
+        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js'));
 ?>
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_6 suffix_6 mb10px">
-		<label for="" class="grid_3 mt5px alpha">Zone Name:</label>
-		<input type="text" class="zone-name grid_9 alpha omega" value="${name}" placeholder="enter name for zone"/>
+		<label for="" class="grid_3 mt5px alpha"><?php echo $this->translate('Zone Name');?>:</label>
+		<input type="text" class="zone-name grid_9 alpha omega" value="<%= name %>" placeholder="enter name for zone"/>
 	</div>
 	<div class="countries grid_6">
 		<div class="ui-widget-header ui-corner-top padding5px">
@@ -17,7 +18,6 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         </ul>
 		<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
 			<button class="open-dialog" data-name="add-country">Add Country</button>
-<!--					<button>Add Region</button>-->
 		</div>
 	</div>
 	<div class="states grid_6">
@@ -29,7 +29,6 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 		</ul>
 		<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
 			<button class="open-dialog" data-name="add-state">Add State</button>
-<!--					<button>Add Region</button>-->
 		</div>
 	</div>
 	<div class="grid_12 mt10px">
@@ -39,7 +38,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             <span style="font-weight:normal; margin-left:160px;">Insert list of zip/postal codes: one per line</span>
         </div>
             <div class="ui-widget-content" style="text-align: center">
-            <textarea style="width: 99%; height: 180px; resize: none;" class="zone-zip">${zip.join('\n')}</textarea>
+            <textarea style="width: 99%; height: 180px; resize: none;" class="zone-zip"><%= zip.join('\n') %></textarea>
 		</div>
 	</div>
 </script>
@@ -143,7 +142,44 @@ li.add-new-zone:hover {
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
-	$('div.seotoaster > div.ui-widget-header:first').remove();
+    $('div.seotoaster > div.ui-widget-header:first').remove();
     $('#zones').tabs();
+    $(document).one('zones:loaded', function() {
+        app.states.reset(<?php echo Zend_Json::encode($this->states); ?>);
+        app.countries.reset(<?php echo Zend_Json::encode($this->countries); ?>);
+        app.view.zonesCollection.reset(<?php echo Zend_Json::encode($this->zones); ?>);
+
+        $('#add-country-dialog').dialog({
+            modal     :  true,
+            autoOpen  : false,
+            resizable : false,
+            height    : 300,
+            width     : 500,
+            create    : function(){
+                app.views.countryList.collection = _(app.countries.toJSON()).sortBy(function(c){
+                    return c.name.toLowerCase()
+                });
+                app.views.countryList.render();
+            },
+            close: function(event, ui){
+                $('#country-filter').val('');
+                $('#country-list > li').show();
+            }
+        });
+
+        $('#add-state-dialog').dialog({
+            modal     : true,
+            autoOpen  : false,
+            resizable : false,
+            height    : 410,
+            width     : 600,
+            create    : function(){
+                app.views.statesList.collection = app.states.toJSON();
+                app.views.statesList.render();
+            }
+        });
+
+        $('#ajax_msg').hide();
+    })
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 	var countryModel = Backbone.Model.extend({
 

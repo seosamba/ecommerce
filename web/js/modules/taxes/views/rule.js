@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 	var ruleView = Backbone.View.extend({
         className: 'taxrule grid_12 ui-corner-all',
@@ -9,9 +9,10 @@ define([
             'click .delete-rule': 'remove',
             'change [data-reflection=property]': 'setProperty'
         },
-        template: $('#ruleTemplate').template(),
+        template: _.template($('#ruleTemplate').text()),
         render: function(){
-            $(this.el).html($.tmpl(this.template, this.model.toJSON()));
+            console.log(this.model);
+            $(this.el).html(this.template(this.model.toJSON()));
             return this;
         },
         remove: function(){
@@ -19,13 +20,10 @@ define([
         },
         setProperty: function(e){
             var value = e.target.value,
-                property = e.target.name;
-
+            property = e.target.name;
             var data = {};
             data[property] = value;
             this.model.set(data);
-
-            console.log(this.model.toJSON());
         },
         setDefault: function(){
             this.model.set({isDefault: 1});

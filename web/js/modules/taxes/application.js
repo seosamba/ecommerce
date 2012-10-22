@@ -1,9 +1,9 @@
 define([
-    'Underscore',
-    'Backbone',
-    'modules/taxes/views/app',
-    'modules/zones/collections/zones'
-], function(_, Backbone, AppView, ZonesCollection ){
+    'underscore',
+    'backbone',
+    './views/app'
+    //'../zones/collections/zones'
+], function(_, Backbone, AppView){
 	if (!window.console) {
 		window.console = {
 		log: function(){
@@ -11,23 +11,9 @@ define([
 			}
 		};
 	}
+    window.app = new AppView();
+    $(function(){
+        $(document).trigger('taxes:loaded');
+    });
 
-	var initialize = function(){
-		window.app = {
-            view: new AppView,
-            zones: new ZonesCollection
-        };
-
-        app.view.render();
-
-        $.when(
-            app.zones.fetch()
-        ).done(function(){
-            app.view.rulesCollection.fetch()
-        });
-	}
-
-	return { 
-		initialize: initialize
-	};
 });
