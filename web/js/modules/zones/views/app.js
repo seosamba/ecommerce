@@ -1,9 +1,9 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/zones/collections/zones',
-    'modules/zones/views/zone',
-    'modules/zones/models/zone'
+	'underscore',
+	'backbone',
+    '../collections/zones',
+    './zone',
+    '../models/zone'
 ], function(_, Backbone, ZonesCollection, ZoneView, ZoneModel){
 
     var appView = Backbone.View.extend({
@@ -16,6 +16,7 @@ define([
             'click .open-dialog': 'openDialog'
         },
         initialize: function(){
+
             this.zonesCollection = new ZonesCollection;
             this.zonesCollection.on('add', this.renderZone, this);
             this.zonesCollection.on('reset', this.resetZones, this);
@@ -38,14 +39,13 @@ define([
             }
         },
         renderZone: function(zone){
-            console.log(zone);
             var view = new ZoneView({model: zone}),
-                id = '#zone-'+zone.cid;
+                id   = '#zone-'+zone.cid;
             this.zoneHolder.tabs('add', id, zone.get('name'));
             view.render().$el.appendTo(id);
         },
         resetZones: function(){
-            this.zonesCollection.each(this.renderZone, this)
+            this.zonesCollection.each(this.renderZone, this);
         },
         saveZones: function(){
             $('#ajax_msg').show('fade');
@@ -60,7 +60,7 @@ define([
             $(id).dialog('open');
         },
         render: function(){
-
+            return this;
         }
     })
 	

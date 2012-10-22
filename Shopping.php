@@ -439,8 +439,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @todo better response
 	 */
 	protected function zonesAction(){
+        $zonesMapper = Models_Mapper_Zone::getInstance();
 		if ($this->_request->isPost()){
-			$zonesMapper = Models_Mapper_Zone::getInstance();
 			$toRemove = $this->_request->getParam('toRemove');
 			if (is_array($toRemove) && !empty ($toRemove)){
 				$deleted = $zonesMapper->delete($toRemove);
@@ -459,6 +459,11 @@ class Shopping extends Tools_Plugins_Abstract {
 				'deleted' => isset($deleted) ? $deleted : null
 				));
 		}
+        $this->_view->zones     = array_map(function($zone){
+            return $zone->toArray();
+        }, $zonesMapper->fetchAll());
+        $this->_view->states    = Tools_Geo::getState();
+        $this->_view->countries = Tools_Geo::getCountries();
 		$this->_layout->content = $this->_view->render('zones.phtml');
 		echo $this->_layout->render();
 	}
@@ -469,7 +474,13 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	protected function taxesAction() {
 		$this->_view->priceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
-		$this->_layout->content = $this->_view->render('taxes.phtml');
+        $this->_view->rules       = array_map(function($rule){
+            return $rule->toArray();
+        }, Models_Mapper_Tax::getInstance()->fetchAll());
+        $this->_view->zones       = array_map(function($zone){
+            return $zone->toArray();
+        }, Models_Mapper_Zone::getInstance()->fetchAll());
+		$this->_layout->content   = $this->_view->render('taxes.phtml');
 		echo $this->_layout->render();
 	}
 

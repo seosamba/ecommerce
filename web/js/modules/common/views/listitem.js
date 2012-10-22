@@ -1,6 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
+	'underscore',
+	'backbone'
 ], function(_, Backbone){
 
     var listItemView = Backbone.View.extend({
@@ -11,11 +11,12 @@ define([
             'click .remove-item': 'removeItem'
         },
         templates:{
-            country: '${name}',
-            state: '${app.countries.findByCode(country).get("name")}: ${name}'
+            country: '<%= name %>',
+            state: '<%= app.countries.findByCode(country).get("name") %>: <%= name %>'
         },
         render: function(template, mode, listName){
-            this.$el.html($.tmpl(template, this.model));
+            var template = _.template(template);
+            this.$el.html(template(this.model));
             if (listName){
                 this.$el.data('listname', listName);
             }

@@ -1,49 +1,34 @@
-<?php $this->headTitle($this->translate('Manage taxes')); ?>
-<style>
-    .taxrule {
-	    margin-top: 5px;
-	    color: #5F9EA0;
-	    padding: 6px 0px;
-	    background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
-    }
-    .ui-widget-header label {
-      display: inline;
-      vertical-align: bottom;
-    }
-    #price-inc-tax {margin-top:2px;}
-	#rules input[type=text] {
-		width: 70%;
-		margin-right:-22px;
-		padding-right:22px;
-	}
-</style>
-
 <?php
-$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/taxes.js'));
+    $this->headTitle($this->translate('Manage taxes'));
+    $this->headScript()->setAllowArbitraryAttributes(true)
+        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/taxes.js'));
+    echo $this->headScript();
 ?>
 
-<script id="ruleTemplate" type="text/x-jquery-tmpl">
-	{{if id}}
-    <input type="hidden" name="rule-id" value="${id}"/>
-    {{/if}}
+<script id="ruleTemplate" type="text/template">
+	<% if (!(typeof(id) == 'undefined')) { %>
+        <input type="hidden" name="rule-id" value="<%= id %>" />
+    <% } %>
     <div class="grid_1 textcentered mt8px">
-        <input type="radio" name="default" {{if isDefault == 1}}checked="checked"{{/if}} />
+        <input type="radio" name="default" <% if (isDefault == 1) { %> checked="checked" <% } %> />
     </div>
     <div class="grid_4">
         <select name="zoneId" data-reflection="property" style="width: 95%">
         <option value="-1"><?php echo $this->translate('Select zone');?></option>
-        {{tmpl '#zoneListTemplate'}}
+            <% _.each(app.zones.toJSON(), function(zone) { %>
+                <option value="<%= zone.id %>" <% if(zone.id == zoneId) { %>selected="selected"<% } %> ><%= zone.name %></option>
+            <% }) %>
         </select>
     </div>
     <div class="grid_6 omega" style="white-space:nowrap; font-weight:bold;">
         <div class="grid_4">
-            <input type="text" name="rate1" data-reflection="property" value="${rate1}" placeholder="0"/>%
+            <input type="text" name="rate1" data-reflection="property" value="<%= rate1 %>" placeholder="0"/>%
         </div>
         <div class="grid_4 ">
-            <input type="text" name="rate2" data-reflection="property" value="${rate2}" placeholder="0"/>%
+            <input type="text" name="rate2" data-reflection="property" value="<%= rate2 %>" placeholder="0"/>%
         </div>
         <div class="grid_4">
-            <input type="text" name="rate3" data-reflection="property" value="${rate3}" placeholder="0"/>%
+            <input type="text" name="rate3" data-reflection="property" value="<%= rate3 %>" placeholder="0"/>%
         </div>
     </div>
     <div class="grid_1 textcentered mt8px">
@@ -52,16 +37,10 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
         </a>
     </div>
 </script>
-<script id="zoneListTemplate" type="text/x-jquery-tmpl">
-    {{each app.zones.toJSON()}}
-	<option value="${id}" {{if zoneId}}{{if zoneId == id}}selected{{/if}}{{/if}}>${name}</option>
-	{{/each}}
-</script>
-
 <?php
 $this->placeholder('headerContent')->captureStart();
-echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
-echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'));
+    echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
+    echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'));
 $this->placeholder('headerContent')->captureEnd();
 ?>
 
@@ -78,7 +57,7 @@ $this->placeholder('headerContent')->captureEnd();
 		<div class="grid_1">&nbsp;</div>
 	</div>
 
-	<div id="rules" class="ui-widget-content ui-helper-clearfix h450" style="overflow-x: hidden; overflow-y: auto;">
+	<div id="rules" class="ui-widget-content ui-helper-clearfix h430" style="overflow-x: hidden; overflow-y: auto;">
 		<!-- container for rules -->
 	</div>
 
@@ -87,3 +66,33 @@ $this->placeholder('headerContent')->captureEnd();
 		<button id="save-btn" style="float:right;"><?php echo $this->translate('Save and close');?></button>
 	</div>
 </div>
+
+<script type="text/javascript">
+    $(function() {
+        $(document).one('taxes:loaded', function(){
+            app.zones.reset(<?php echo Zend_Json::encode($this->zones); ?>);
+            app.rulesCollection.reset(<?php echo Zend_Json::encode($this->rules); ?>);
+
+        })
+    })
+</script>
+
+
+<style type="text/css">
+    .taxrule {
+        margin-top: 5px;
+        color: #5F9EA0;
+        padding: 6px 0px;
+        background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
+    }
+    .ui-widget-header label {
+        display: inline;
+        vertical-align: bottom;
+    }
+    #price-inc-tax {margin-top:2px;}
+    #rules input[type=text] {
+        width: 70%;
+        margin-right:-22px;
+        padding-right:22px;
+    }
+</style>

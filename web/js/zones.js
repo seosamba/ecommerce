@@ -1,15 +1,14 @@
 require.config({
-	paths: {
-        Underscore: 'libs/underscore/underscore',
-        Backbone: 'libs/backbone/backbone'
+    deps: ['modules/zones/application'],
+    paths: {
+        'underscore'         : '/plugins/shopping/web/js/libs/underscore/underscore-min',
+        'backbone'           : '/plugins/shopping/web/js/libs/backbone/backbone-min'
+    },
+    shim: {
+        'underscore': {exports: '_'},
+        'backbone' : {
+            deps: ['underscore'],
+            exports: 'Backbone'
+        }
     }
 });
-
-require([
-	'modules/zones/application',
-    'order!libs/underscore/underscore-min',
-    'order!libs/backbone/backbone-min'
-    ], function(App){
-		App.initialize();
-	}
-);
