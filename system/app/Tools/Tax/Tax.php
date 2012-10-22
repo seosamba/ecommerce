@@ -51,13 +51,21 @@ class Tools_Tax_Tax {
 			$maxRate = 0;
 			foreach($zones as $zone) {
 				$matchRate = 0;
-				if ($zone->getZip() && !empty($address['zip'])){
-					if (in_array($address['zip'], $zone->getZip())){
+
+				if (empty($address['coutry']) && empty($address['state']) && empty($address['zip'])){
+					continue;
+				}
+
+				$countries = $zone->getCountries(true);
+				if ($zone->getZip() && !empty($address['zip'])) {
+					if (in_array($address['zip'], $zone->getZip()) && in_array($address['country'], $countries) ){
 						$matchRate += 5;
-					} else { continue; }
+					} else {
+						continue;
+					}
 				}
 				if ($zone->getStates()){
-					if (!empty($address['state'])){
+					if (!empty($address['state'])) {
 						$states = array_map(function($state){ return $state['id'];}, $zone->getStates());
 						if (in_array($address['state'], $states)) {
 							$matchRate += 3;
@@ -66,8 +74,7 @@ class Tools_Tax_Tax {
 				} else {
 					$matchRate++;
 				}
-				$countries = $zone->getCountries(true);
-				if (!empty($countries)){
+				if (!empty($countries)) {
 					if (in_array($address['country'], $countries)){
 						$matchRate += 1;
 					}
