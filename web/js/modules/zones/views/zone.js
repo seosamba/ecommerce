@@ -1,11 +1,11 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/common/views/listitem'
+	'underscore',
+	'backbone',
+    '../../common/views/listitem'
 ], function(_, Backbone, ListItemView){
 
     var zoneTabView = Backbone.View.extend({
-        template: $('#zoneTemplate').template(),
+        template: _.template($('#zoneTemplate').text()),
         events: {
             'click .clearprop': 'clearProperty',
             'change .zone-name': 'setName',
@@ -17,7 +17,7 @@ define([
             this.model.on('destroy', this.remove, this);
         },
         render: function(){
-            $(this.el).html($.tmpl(this.template, this.model.toJSON()));
+            $(this.el).html(this.template(this.model.toJSON()));
             //rendering list of countries for zone
             var countriesList = this.$el.find('.zone-countries');
             _.each(this.model.get('countries'), function(country){

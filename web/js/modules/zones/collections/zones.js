@@ -1,7 +1,7 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/zones/models/zone'
+	'underscore',
+	'backbone',
+    '../models/zone'
 ], function(_, Backbone, ZoneModel){
 
     var zoneCollection = Backbone.Collection.extend({

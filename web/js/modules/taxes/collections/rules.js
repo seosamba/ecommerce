@@ -1,7 +1,7 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/taxes/models/rule'
+	'underscore',
+	'backbone',
+    '../models/rule'
 ], function(_, Backbone, RuleModel){
 
     var rulesCollection = Backbone.Collection.extend({

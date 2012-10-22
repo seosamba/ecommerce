@@ -1,7 +1,7 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/common/models/country'
+	'underscore',
+	'backbone',
+    '../models/country'
 ], function(_, Backbone, CountryModel){
 	var countriesCollection = Backbone.Collection.extend({
         url: $('#website_url').val()+'plugin/shopping/run/getdata/type/countryList/',
