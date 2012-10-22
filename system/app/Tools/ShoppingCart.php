@@ -154,6 +154,7 @@ class Tools_ShoppingCart {
 			    'weight'           => $this->_calculateItemWeight($item, $options),
 			    'tax'              => $itemTax,
 			    'taxPrice'         => $itemPrice + $itemTax,
+			    'taxClass'         => $item->getTaxClass(),
 			    'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
 			    'note'             => ''
 		    );
@@ -193,13 +194,23 @@ class Tools_ShoppingCart {
 	public function calculate() {
 		$summary = array('subTotal' => 0, 'totalTax' => 0, 'shipping' => 0, 'total' => 0, 'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']);
 		if(is_array($this->_content) && !empty($this->_content)) {
-			foreach($this->_content as $storageKey => $cartItem) {
+			if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))){
+				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
+			} else {
+				$destinationAddress = null;
+			}
+
+			foreach($this->_content as $storageKey => &$cartItem) {
+				$product = new Models_Model_Product(array(
+					'price'     => $cartItem['price'],
+					'taxClass'  => $cartItem['taxClass']
+				));
+
+				$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
+				$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
 				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
 				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
 			}
-//			if ($summary['showPriceIncTax']){
-//				$summary['subTotal'] += $summary['totalTax'];
-//			}
 			$summary['shipping'] = 0;
 			if (($shipping = $this->getShippingData()) !== null){
 				$summary['shipping'] = floatval($shipping['price']);
