@@ -13,18 +13,16 @@ class Tools_Tax_Tax {
 
 	const ZONE_TYPE_COUNTRY      = 'country';
 
-	public static function calculateProductTax(Models_Model_Product $product) {
+	public static function calculateProductTax(Models_Model_Product $product, $destinationAddress = null) {
 		if(($taxClass = $product->getTaxClass()) != 0) {
 			$rateMethodName = 'getRate' . $taxClass;
 
-			if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))){
-				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
+			if (null !== $destinationAddress){
 				$zoneId = self::getZone($destinationAddress);
 				if ($zoneId) {
 					$tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
 				}
 			} else {
-				self::getZone();
 				$tax = Models_Mapper_Tax::getInstance()->getDefaultRule();
 			}
 
@@ -41,29 +39,46 @@ class Tools_Tax_Tax {
 	 * @return int
 	 */
 	public static function getZone($address = null) {
-		if (is_null($address)){
-			$address = Tools_Misc::clenupAddress(Models_Mapper_ShoppingConfig::getInstance()->getConfigParams());
+		if (is_null($address) || empty($address)){
+			return 0;
+		} else {
+			$address = Tools_Misc::clenupAddress($address);
 		}
+
 		$zones = Models_Mapper_Zone::getInstance()->fetchAll();
 		if(is_array($zones) && !empty($zones)) {
 			$zoneMatch = 0;
 			$maxRate = 0;
 			foreach($zones as $zone) {
 				$matchRate = 0;
-//				var_dump($zone->toArray());
-				if (!empty($address['zip']) && $zone->getZip() && in_array($address['zip'], $zone->getZip())){
+				if ($zone->getZip() && !empty($address['zip'])){
+					if (in_array($address['zip'], $zone->getZip())){
+						$matchRate += 5;
+					} else { continue; }
+				}
+				if ($zone->getStates()){
+					if (!empty($address['state'])){
+						$states = array_map(function($state){ return $state['id'];}, $zone->getStates());
+						if (in_array($address['state'], $states)) {
+							$matchRate += 3;
+						}
+					}
+				} else {
 					$matchRate++;
 				}
-				if (!empty($address['state']) && $zone->getStates() && array_key_exists($address['state'], $zone->getStates())){
-					$matchRate++;
+				$countries = $zone->getCountries(true);
+				if (!empty($countries)){
+					if (in_array($address['country'], $countries)){
+						$matchRate += 1;
+					}
 				}
-				if (in_array($address['country'], $zone->getCountries(true))){
-					$matchRate++;
-				}
+
 				if ($matchRate && $matchRate > $maxRate){
 					$maxRate = $matchRate;
 					$zoneMatch = $zone->getId();
 				}
+
+				unset($countries, $states);
 			}
 			return $zoneMatch;
 		}
