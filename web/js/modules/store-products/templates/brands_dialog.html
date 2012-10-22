@@ -1,0 +1,15 @@
+<div title="Assign brand">
+    <select name="brands">
+        <option value="-1" disabled="disabled" selected="selected">select brand</option>
+        <% _.each(brands, function(brand){ %>
+        <option value="<%= brand.name %>" ><%= brand.name %></option>
+        <% }); %>
+    </select>
+    <input name="newbrand" type="text" placeholder="or create new" />
+    <% if (totalProducts) { %>
+    <hr />
+    <label>
+        <input type="checkbox" name="applyToAll"> Apply to all <%= totalProducts %> products
+    </label>
+    <% } %>
+</div>

@@ -1,23 +1,22 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/manage-products/collections/productlist',
-    'modules/product/collections/brands',
-    'modules/product/collections/tags',
-    'modules/common/collections/templates',
-    'modules/manage-products/views/productrow',
-    'text!modules/manage-products/templates/paginator.html',
-    'text!modules/manage-products/templates/tax_dialog.html',
-    'text!modules/manage-products/templates/brands_dialog.html',
-    'text!modules/manage-products/templates/tags_dialog.html',
-    'text!modules/manage-products/templates/template_dialog.html',
-    'text!modules/manage-products/templates/toggle_dialog.html',
-    'text!modules/manage-products/templates/delete_dialog.html'
-], function(_, Backbone, ProductsCollection, BrandsCollection, TagsCollection, TemplatesCollection,
+	'backbone',
+    '../collections/productlist',
+    '../../product/collections/brands',
+    '../../product/collections/tags',
+    '../../common/collections/templates',
+    './productrow',
+    'text!../templates/paginator.html',
+    'text!../templates/tax_dialog.html',
+    'text!../templates/brands_dialog.html',
+    'text!../templates/tags_dialog.html',
+    'text!../templates/template_dialog.html',
+    'text!../templates/toggle_dialog.html',
+    'text!../templates/delete_dialog.html'
+], function(Backbone, ProductsCollection, BrandsCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
             PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl){
     var MainView = Backbone.View.extend({
-        el: $('#manage-products table.products-table'),
+        el: $('#store-products table.products-table'),
         events: {
             'change input[name="check-all"]': function(e) {
                 this.products.each(function(prod){
@@ -41,7 +40,6 @@ define([
             $.extend($.ui.dialog.prototype.options, {
                 modal: true,
                 resizable: false,
-//                draggable: false,
                 minWidth: 300,
                 close: function(){
                     $(this).remove();
@@ -95,8 +93,8 @@ define([
         },
         taxAction: function(products){
             var self    = this,
-                dialog  = $.tmpl(TaxDialogTmpl, {});
-            dialog.dialog({
+                dialog  = _.template(TaxDialogTmpl, { totalProducts: this.products.totalRecords });
+            $(dialog).dialog({
                 dialogClass: 'seotoaster',
                 buttons: {
                     "Apply": function(){
@@ -114,10 +112,11 @@ define([
                 this.brands = new BrandsCollection();
                 this.brands.fetch({async: false});
             }
-            var dialog = $.tmpl(BrandsDialogTmpl, {
-                brands: this.brands.toJSON()
+            var dialog = _.template(BrandsDialogTmpl, {
+                brands: this.brands.toJSON(),
+                totalProducts: this.products.totalRecords
             });
-            dialog.dialog({
+            $(dialog).dialog({
                 dialogClass: 'seotoaster',
                 buttons: {
                     "Apply": function(){
@@ -150,18 +149,19 @@ define([
                     });
                 }
             });
-            var dialog = $.tmpl(TagsDialogTmpl, {
+            var dialog = _.template(TagsDialogTmpl, {
                 tags: this.tags.toJSON(),
                 used: used,
-                prodCount: products.length
+                prodCount: products.length,
+                totalProducts: this.products.totalRecords
             });
-            dialog.on('change', 'input.partial', function(e){
+            $(dialog).on('change', 'input.partial', function(e){
                 if (e.currentTarget.checked === false){
                     $(e.currentTarget).removeClass('partial').parent('label.partial').removeClass('partial');
                 }
                 return false;
             });
-            dialog.dialog({
+            $(dialog).dialog({
                 dialogClass: 'seotoaster',
                 buttons: {
                     "Apply": function(){
@@ -183,8 +183,8 @@ define([
         },
         deleteAction: function(products){
             var self = this,
-                dialog = $.tmpl(DeleteDialogTmpl, {});
-            dialog.dialog({
+                dialog = _.template(DeleteDialogTmpl, { totalProducts: this.products.totalRecords });
+            $(dialog).dialog({
                 width: 350,
                 dialogClass: 'seotoaster',
                 buttons: {
@@ -212,8 +212,12 @@ define([
                 return false;
             }
 
-            var dialog = $.tmpl(TemplateDialogTmpl, {templates: this.pageTemplates.toJSON()});
-            dialog.dialog({
+            var dialog = _.template(TemplateDialogTmpl, {
+                templates: this.pageTemplates.toJSON(),
+                totalProducts: this.products.totalRecords
+            });
+
+            $(dialog).dialog({
                 width: 350,
                 dialogClass: 'seotoaster',
                 buttons: {
@@ -232,9 +236,10 @@ define([
         },
         toggleAction: function(products){
             var self = this;
-            var dialog = $.tmpl(ToggleDialogTmpl, {});
-            dialog.dialog({
+            var dialog = _.template(ToggleDialogTmpl, { totalProducts: this.products.totalRecords });
+            $(dialog).dialog({
                 width: 350,
+                height: 140,
                 dialogClass: 'seotoaster',
                 buttons: {
                     "Enable": function(){

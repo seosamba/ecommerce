@@ -22,6 +22,8 @@ class Tools_ShoppingCart {
 
 	protected $_cartId          = null;
 
+	protected $_customerId      = null;
+
 	protected $_shippingAddressKey  = null;
 
 	protected $_billingAddressKey   = null;
@@ -65,6 +67,8 @@ class Tools_ShoppingCart {
 
 		if ($currentUser->getId()) {
 			$customer = Models_Mapper_CustomerMapper::getInstance()->find($currentUser->getId());
+		} elseif ($this->getCustomerId()) {
+			$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->getCustomerId());
 		}
 
 		if (!isset($customer) || $customer === null) {
@@ -292,6 +296,9 @@ class Tools_ShoppingCart {
 		if (isset($this->_session->cartId)) {
 			$this->setCartId($this->_session->cartId);
 		}
+		if (isset($this->_session->customerId)) {
+			$this->setCustomerId($this->_session->customerId);
+		}
 		if (isset($this->_session->shippingData)) {
 			$this->setShippingData(unserialize($this->_session->shippingData));
 		}
@@ -305,6 +312,7 @@ class Tools_ShoppingCart {
     private function _save() {
         $this->_session->cartContent = serialize($this->getContent());
 	    $this->_session->cartId      = $this->getCartId();
+	    $this->_session->customerId  = $this->getCustomerId();
 	    $this->_session->shippingAddressKey = $this->_shippingAddressKey;
 	    $this->_session->billingAddressKey  = $this->_billingAddressKey;
 	    $this->_session->shippingData  = serialize($this->getShippingData());
@@ -476,6 +484,15 @@ class Tools_ShoppingCart {
 
 	public function getShippingData() {
 		return $this->_shippingData;
+	}
+
+	public function setCustomerId($customerId) {
+		$this->_customerId = $customerId;
+		return $this;
+	}
+
+	public function getCustomerId() {
+		return $this->_customerId;
 	}
 
 }

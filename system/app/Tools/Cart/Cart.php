@@ -16,7 +16,7 @@ abstract class Tools_Cart_Cart extends Tools_Plugins_Abstract {
 
 	}
 
-	protected function _makeOptionSummary() {
+	protected function _makeOptionCartsummary() {
 
 	}
 

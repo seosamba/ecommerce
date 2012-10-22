@@ -2,9 +2,8 @@
 
 <?php
     $this->headScript()->setAllowArbitraryAttributes(true)
-		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
             ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
-			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/manage_products.js'));
+			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-products/config'));
 
 	echo $this->noLayout ? $this->headScript() : '';
 
@@ -12,7 +11,7 @@
 	echo $this->noLayout ? $this->headLink() : '';
 ?>
 
-<div id="manage-products">
+<div id="store-products" class="store-widget">
 	<table class="products-table" style="width: 100%">
 		<thead>
 			<tr class="ui-helper-hidden">

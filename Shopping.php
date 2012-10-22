@@ -149,8 +149,10 @@ class Shopping extends Tools_Plugins_Abstract {
 			    && Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('forceSSLCheckout')){
 		    $this->_redirector->gotoUrlAndExit(Zend_Controller_Request_Http::SCHEME_HTTPS.'://'.$this->_websiteConfig['url'].$checkoutPage->getUrl());
 	    }
-
-	    if (!Zend_Registry::isRegistered('Zend_Currency')){
+        
+        $this->_addVersionToAdminPanel();
+        
+        if (!Zend_Registry::isRegistered('Zend_Currency')){
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 	        $locale = Zend_Locale::getLocaleToTerritory($shoppingConfig['country']);
 	        try {
@@ -398,6 +400,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
+					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
 					$customer->setId($newCustomerId);
 					$session->storeIsNewCustomer = true;
 				}
@@ -1323,4 +1326,12 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_redirector->gotoUrl($thankyouPage->getUrl());
 	}
+    
+    protected function _addVersionToAdminPanel(){
+        $shoppingVersion = $this->_configMapper->getConfigParam('version');
+        if($shoppingVersion != null && $shoppingVersion != ''){
+            $this->_view->shoppingVersion = ' + Shopping version '.$shoppingVersion;
+            $this->_injectContent($this->_view->render('shoppingVersion.phtml'));
+        }
+    }
 }

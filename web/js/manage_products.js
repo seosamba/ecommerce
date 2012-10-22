@@ -6,7 +6,7 @@ require.config({
 });
 
 require([
-	'modules/manage-products/application',
+	'modules/store-products/application',
     'order!libs/underscore/underscore-min',
     'order!libs/backbone/backbone-min'
     ], function(App){

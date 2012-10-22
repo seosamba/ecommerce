@@ -33,7 +33,7 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 
 	public function getCountries($codesOnly = false) {
 		if ($codesOnly) {
-			return array_keys($this->_countries);
+			return array_map(function($country){ return $country['country']; }, $this->_countries);
 		}
 		return $this->_countries;
 	}
