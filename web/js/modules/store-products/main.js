@@ -11,11 +11,7 @@ define([ './views/app' ], function(AppView){
         window.Toastr = {}
     }
 
-//    $(function(){
-        Toastr.StoreProductsWidget = new AppView();
-//    });
-    $(function(){
-        alert(123);
-    })
+    Toastr.StoreProductsWidget = new AppView();
+
     return Toastr;
 });
