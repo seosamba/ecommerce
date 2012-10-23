@@ -11,7 +11,7 @@
 ?>
 
 <div id="store-products" class="store-widget">
-	<table class="products-table widget"
+	<table class="products-table widget">
 		<thead>
 			<tr class="ui-helper-hidden search-line">
 				<th colspan="2" class="gray-bg">
@@ -32,7 +32,7 @@
 				</th>
 			</tr>
 			<tr>
-				<th><label><input type="checkbox" name="check-all" ><?php echo $this->translate('Select all');?></label></th>
+				<th><input type="checkbox" name="check-all" title="<?php echo $this->translate('Select all');?>"></th>
 				<th><?php echo $this->translate('Name');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
