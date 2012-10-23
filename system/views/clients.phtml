@@ -1,85 +1,11 @@
 <?php $this->headTitle($this->translate('Manage customers')); ?>
-<style>
-	#clients {
-	}
-	#clients table{
-	}
-	#clients table#clients-table tr{
-	}
-	#clients table#clients-table tr.search-line th{
-	    padding: 5px 20px 10px;
-	    text-align: left;
-	}
-	#clients table#clients-table tr.search-line th input{
-		margin-left:10px;
-		width:250px;
-	}
-	#clients table#clients-table tr.title-table{
-		background:#666;
-		color:#eee;
-	}
-	#clients table#clients-table tr.title-table th{
-	}
-	#clients table#clients-table th, #clients table#clients-table td{
-		vertical-align:middle;
-		text-align:center;
-		padding:5px;
-	}
-	#clients table#clients-table th{
-	}
-	#clients table#clients-table td{
-	}
-	#clients table#clients-table td.full-name, #clients table#clients-table td.email{
-		text-align:left;
-	}
-	#clients table#clients-table th.sortable {
-		white-space: nowrap;
-		cursor: pointer;
-	}
-	#clients table#clients-table th.sortable::after{
-	    content: " \21D5";
-	    display: inline;
-    }
-	#clients table#clients-table th.sortUp::after{
-	    content: " \21E7";
-    }
-	#clients table#clients-table th.sortDown::after{
-        content: " \21E9";
-    }
-	#clients table#clients-table tbody tr:hover{
-        background-color: rgba(220,220,220,0.8);
-    }
-	#clients table#clients-table td.check-td{
-		border-left:none;
-	}
-	#clients table#clients-table td.total{
-		border-right:none;
-	}
-	#clients table#clients-table tfoot td, #clients table#clients-table tfoot th{
-		border:none;
-		padding-top:10px;
-	}
-	#clients table#clients-table tfoot td:first-child{
-		text-align:left;
-	}
-	#clients table#clients-table tfoot #clients-previous {
-		margin-right:10px;
-	}
-	#clients #customer-details{
-	}
-	#clients #customer-details .toolbar{
-		border-bottom: 2px solid #a9a9a9;
-		margin-bottom:10px;
-		padding:5px 10px;
-	}
-</style>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
     <td class="check-td textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
-    <td class="full-name"><a href="javascript:;" class="details">${full_name}</a></td>
-    <td class="email"><a href="mailto:${email}">${email}</a></td>
-    <td class="date">${reg_date}</td>
-    <td class="total text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
+    <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
+    <td class="email text-left"><a href="mailto:${email}">${email}</a></td>
+    <td class="date textcentered">${reg_date}</td>
+    <td class="total textcentered"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
 
 <script id="customerDetailsTemplate" type="text/x-jquery-tmpl">
@@ -107,53 +33,53 @@
 
 	echo $this->noLayout ? $this->headScript() : '';
 ?>
-
-
+<?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="clients" class="ui-helper-clearfix">
-    <table id="clients-table" style="width: 100%">
+    <table id="clients-table" class="widget" style="width: 100%">
         <thead>
             <tr class="search-line">
-	            <th colspan="5">
-	            <?php echo $this->translate('Search');?>&nbsp;<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
+				<th colspan="5" class="gray-bg">
+					<label><?php echo $this->translate('Search');?></label>
+					<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
                 </th>
             </tr>
             <tr class="title-table">
-	            <th><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
+	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
 	            <th class="sortable" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
             </tr>
         </thead>
+        <tbody id="customer-list">
+            <tr>
+	            <td colspan="5" class=" textcentered"><img src="<?php echo $this->websiteUrl;?>/system/images/loading.gif"/></td>
+            </tr>
+        </tbody>
         <tfoot>
             <tr>
-	            <td colspan="3" class="ui-resizable">
+	            <td colspan="3" class="ui-resizable text-left">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
-		            <select id="mass-action" style="width: 250px">
+		            <select id="mass-action">
 			            <option value="0"><?php echo $this->translate('nothing');?></option>
 			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
 		            </select>
 	            </td>
-	            <td>
+	            <td class="textcentered">
 		            <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a></form>
 	            </td>
-	            <th>
-		            <a href="#" id="clients-previous" class="table-nav">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
+	            <td class="textcentered">
+		            <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
 		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
-	            </th>
+	            </td>
             </tr>
         </tfoot>
-        <tbody id="customer-list">
-            <tr>
-	            <td colspan="5" class="text-center"><img src="<?php echo $this->websiteUrl;?>/system/images/loading.gif"/></td>
-            </tr>
-        </tbody>
     </table>
 
 	<div id="customer-details">
 		<div class="toolbar">
-			<a href="javascript:;" class="link textcentered">&#8678; back to clients list</a>
+			<a href="javascript:;" class="link btn-text">[ &#8678; back to clients list ]</a>
 		</div>
 		<div id="profile">
 

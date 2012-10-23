@@ -1,4 +1,6 @@
 <?php $countryList = Tools_Geo::getCountries(true); ?>
+<link type="text/css" rel="stylesheet" media="screen" href="<?php echo $this->websiteUrl; ?>system/css/reset-widgets.css">
+<link type="text/css" rel="stylesheet" media="screen" href="<?php echo $this->websiteUrl; ?>plugins/shopping/web/css/profile.css">
 <script>
 	$.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
 </script>
@@ -8,8 +10,8 @@
 			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
 		</div>
 		<div class="tt profile-main-info vcard">
-			<h1 class="fn"><?php echo $this->customer->getFullName();?></h1>
-			<h3><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><?php echo $this->customer->getEmail();?></a></h3>
+			<h2 class="client-name"><?php echo $this->customer->getFullName();?></h2>
+			<h4><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><?php echo $this->customer->getEmail();?></a></h4>
 			<p><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
 			<p><?php
 				if ($this->customer->getLastLogin()) {
@@ -69,7 +71,7 @@
 	</ul>
 
 	<div id="profile-orders-list" class="clearfix">
-		<table id="orders-table" border="1">
+		<table id="orders-table" border="1" class="widget">
 			<thead>
 				<tr class="title-table">
 					<th>#</th>
@@ -99,7 +101,7 @@
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
 						<?php if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)):?>
 						<p>
-							<u>Tracking ID</u>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+							<i>Tracking ID</i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
 							<a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
 						</p>
 						<?php endif;?>
@@ -135,7 +137,7 @@
 	<?php $addressList = $this->customer->getAddresses(); ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
-	<div class="ot">
+	<div>
 		<div class="adr">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
@@ -207,120 +209,3 @@
 		});
 	});
 </script>
-<style>
-	.oh,.ot,.tt{float:left;margin:1%;width:48%}.ot{width:31%}.tt{width:65%}.cl{clear:both}
-	#profile ul {
-		margin: 0;
-		padding: 0;
-	}
-	#profile ul li {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-	#profile .profile-actions {
-		border-left: 1px solid #e6e6fa;
-	}
-	#profile ul.profile-nav li a {
-		font-variant: small-caps;
-		font-weight: bold;
-	}
-    #profile #profile-content.ui-tabs .ui-tabs-nav li.ui-tabs-selected,
-    #profile #profile-content.ui-tabs .ui-tabs-panel {
-	    background: #ffffff;
-    }
-	#profile #profile-content.ui-tabs .ui-tabs-panel {
-		padding: 5px;
-		font-size: 14px;
-		border: 1px solid #CACACA;
-	}
-
-	#profile #profile-address-list div.adr {
-		padding: 5px;
-		position: relative;
-		border: 1px solid #e6e6fa;
-		border-radius: 8px 0 8px 8px;
-	}
-	#profile div.adr a.delete-lnk {
-		position: absolute;
-		top: 2px;
-		right: 2px;
-	}
-	#profile td.shipping-data p {
-		margin: 5px 0;
-	}
-
-	/* sidebar stats  */
-	#profile .profile-header p.title {
-		line-height: 24px;
-		background-color: #cccccc;
-		color: #666;
-		text-transform: uppercase;
-		font-weight: bold;
-		/*font-variant: small-caps;*/
-		border: none;
-	}
-
-	#profile .profile-header ul.stats li {
-		text-align: center;
-		vertical-align: middle;
-		padding: 10px 0;
-		margin: 1%;
-		border-radius: 4px;
-		color: #f5f5f5;
-		font-weight: bold;
-		font-variant: small-caps;
-		cursor: pointer;
-	}
-	#profile .profile-header ul.stats li.total {
-		background-color: #87ceeb;
-	}
-	#profile .profile-header ul.stats li.new {
-		background-color: #32cd32;
-	}
-	#profile .profile-header ul.stats li.completed {
-		background-color: #666666;
-	}
-	#profile .profile-header ul.stats li.pending {
-		background-color: #ff7f50;
-	}
-
-	/* orders table */
-	#profile table {
-		width: 100%
-	}
-	#profile table thead tr {
-		background:#666;
-		color:#eee;
-		text-shadow: 0 0 2px #333;
-	}
-	#profile table thead th:not(.sorting_disabled) {
-		cursor: pointer;
-	}
-	#profile table thead th::after {
-	    display: inline;
-	}
-	#profile table thead th.sorting::after {
-		content: "\00A0\21D5";
-	}
-	#profile table thead th.sorting_asc::after {
-		content: "\00A0\21E7";
-	}
-	#profile table thead th.sorting_desc::after {
-		content: "\00A0\21E9";
-	}
-	#profile table th, #profile table td{
-		border: 1px solid #e6e6fa;
-		vertical-align:middle;
-		text-align:center;
-		padding:5px;
-	}
-	#profile table th:first-child,
-	#profile table td:first-child {
-		border-left: none
-	}
-	#profile table th:last-child,
-	#profile table td:last-child {
-		border-right: none;
-	}
-</style>

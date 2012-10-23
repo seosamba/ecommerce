@@ -2,47 +2,52 @@
 $this->headScript()->setAllowArbitraryAttributes(true)
 		->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
 		->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/addresschain.jquery.js');
-$this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
+$this->headLink()
+	->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
+	->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 echo $this->noLayout ? $this->headLink() : '';
 ?>
 <style>
-	.oh,.ot,.tt{float:left;margin:1%;width:48%}.ot{width:31%}.tt{width:65%}.cl{clear:both}
-	#store-orders select.filter {
-		width: 90%;
+	#store-orders select.filter, .chzn-container-single .chzn-search input{
+		width: 100% !important;
 	}
 </style>
 <div id="store-orders" class="clearfix">
 	<div>
 		<form class="filters cl clearfix">
-			<div class="oh">
-				<div class="ot"><label>Search</label></div>
-				<div class="tt">
-					<input type="text" class="filter" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+			<div class="fl-left w500 mb10px">
+				<label class="mr5px fl-left wAuto bold">Search</label>
+				<div class="wrap fl-none wAuto">
+					<input type="text" class="filter w200 margin0px mr10px" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+					<input type="text" class="filter w200 margin0px" name="filter-product-key" placeholder="by product name, sku, mpn">
 				</div>
 			</div>
-			<div class="oh">
-				<input type="text" class="filter" name="filter-product-key" placeholder="by product name, sku, mpn">
-			</div>
-			<div id="extra-filters-switch" class="cl" style="text-align: center; cursor:pointer;">show/hide advanced filters</div>
-			<div id="extra-filters">
+			<div id="extra-filters-switch" class="mt3px fl-right" style="cursor:pointer;">[ show/hide advanced filters ]</div>
+            <div id="extra-filters" class="both">
 				<div class="ot">
-					<label>By price range</label>
-					<div class="ot"><label class="mt5px">from</label></div>
-					<div class="tt">
-						<input type="text" name="filter-from-amount" >
-					</div>
-					<div class="ot"><label class="mt5px">to</label></div>
-					<div class="tt"><input class="ot" type="text" name="filter-to-amount" ></div>
+					<label class="block wGrid100 bold">By price range</label>
+					<div class="oh">
+                            <label class="mr5px fl-left wAuto">from</label>
+                            <div class="wrap"><input type="text" name="filter-from-amount" class="wGrid90"></div>
+                    </div>
+                    <div class="oh">
+                            <label class="mr5px fl-left wAuto">to</label>
+                            <div class="wrap"><input class="wGrid90" type="text" name="filter-to-amount" ></div>
+                    </div>
 				</div>
 				<div class="ot">
-					<label class="cl">By date</label>
-					<div class="ot"><label class="mt5px">from</label></div>
-					<div class="tt"><input type="text" id="orders-filter-fromdate" name="filter-from-date"></div>
-					<div class="ot"><label class="mt5px">to</label></div>
-					<div class="tt"><input type="text" id="orders-filter-todate" name="filter-to-date"></div>
+					<label class="block wGrid100 bold">By date</label>
+					<div class="oh">
+                        <label class="mr5px fl-left wAuto">from</label>
+                        <div class="wrap"><input type="text" id="orders-filter-fromdate" name="filter-from-date" class="wGrid90"></div>
+                    </div>
+                    <div class="oh">
+                        <label class="mr5px fl-left wAuto">to</label>
+                        <div class="wrap"><input type="text" id="orders-filter-todate" name="filter-to-date" class="wGrid90"></div>
+                    </div>
 				</div>
 				<div class="ot">
-					<label>By shipping desination</label>
+					<label class="block wGrid100 bold mb3px">By shipping desination</label>
 					<?php
 					$countryList = Tools_Geo::getCountries(true);
 					array_unshift($countryList, '');
@@ -51,13 +56,13 @@ echo $this->noLayout ? $this->headLink() : '';
 					<?php echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => 'shipping state'), array('') ); ?>
 					<?php echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), array('') ); ?>
 				</div>
-				<div class="cl" style="text-align:right;">
-					<input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="Apply filter" >
-				</div>
+	            <div class="fl-right mb10px mrGrid1">
+                    <input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="Apply filter" >
+                </div>
 			</div>
 		</form>
 	</div>
-	<table id="orders-table" class="ui-helper-reset">
+	<table id="orders-table" class="ui-helper-reset widget">
 		<thead>
 			<tr class="title-table">
 				<th>#</th>
@@ -81,17 +86,15 @@ echo $this->noLayout ? $this->headLink() : '';
 			</td>
 		</tbody>
 		<tfoot>
-			<td colspan="8"></td>
-			<td colspan="2" class="paginator"></td>
+			<td colspan="10" class="paginator"></td>
 		</tfoot>
 	</table>
     <?php if(isset($this->invoicePlugin)):?>
         <input type="hidden" value="enabled" name="invoiceEnable" id="invoiceEnable"/>
     <?php endif;?>
-	<?php //var_dump($this->orders); ?>
 </div>
 
-<script>
+<script type="text/javascript">
 $(function(){
 	$('select.filter', '#store-orders').chosen();
 	var filterFromDate = $('#orders-filter-fromdate', '#store-orders'),
