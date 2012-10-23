@@ -5,32 +5,30 @@
             ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
 			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-products/config'));
 
-	echo $this->noLayout ? $this->headScript() : '';
-
-	$this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
+	$this->headLink()
+			->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
+			->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
 
 <div id="store-products" class="store-widget">
-	<table class="products-table" style="width: 100%">
+	<table class="products-table widget"
 		<thead>
-			<tr class="ui-helper-hidden">
-				<th colspan="2">
-					<?php echo $this->translate('Search');?>:
+			<tr class="ui-helper-hidden search-line">
+				<th colspan="2" class="gray-bg">
+					<label><?php echo $this->translate('Search');?>:</label>
 					<input type="text" class="pfilter" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
 				</th>
-				<th colspan="6">
-					<div>
-						<select class="pfilter" style="width: 100%" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
-							<?php foreach($this->brands as $brand):?>
-							<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
-							<?php endforeach;?>
-						</select>
-						<select class="pfilter" style="width: 100%" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
-							<?php foreach($this->tags as $tag):?>
-							<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
-							<?php endforeach;?>
-						</select>
-					</div>
+				<th colspan="6" class="gray-bg text-right">
+					<select class="pfilter w150" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
+						<?php foreach($this->brands as $brand):?>
+						<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
+						<?php endforeach;?>
+					</select>
+					<select class="pfilter w150" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
+						<?php foreach($this->tags as $tag):?>
+						<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
+						<?php endforeach;?>
+					</select>
 				</th>
 			</tr>
 			<tr>
@@ -49,14 +47,14 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td colspan="8" style="text-align:center;">
+				<td colspan="8">
 					<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading..." />
 				</td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="5">
+				<td colspan="5" class="text-left">
 					<?php echo $this->translate('with selected');?>:&nbsp;
 					<select name="product-mass-action" id="">
 						<option value="0"><?php echo $this->translate('select mass action');?></option>
@@ -68,7 +66,7 @@
 						<option value="toggle"><?php echo $this->translate('enable/disable');?></option>
 					</select>
 				</td>
-				<td id="paginator" colspan="3" class="textcentered">
+				<td id="paginator" colspan="3" class="paginator">
 
 				</td>
 			</tr>
@@ -76,16 +74,3 @@
 	</table>
 
 </div>
-
-<style>
-	table.products-table tbody tr:hover {
-		background-color: #dddddd;
-	}
-	table.products-table td.editable:hover {
-		cursor: pointer;
-	}
-
-	.seotoaster label.partial {
-	    color: #999999 !important;
-	}
-</style>
