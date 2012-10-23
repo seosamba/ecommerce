@@ -254,7 +254,7 @@ define([
         loadStats: function(){
             var self = this;
             $.ajax({
-                url: $('#website_url').val()+'storeapi/v1/stats',
+                url: $('#website_url').val()+'api/store/stats',
                 data: {id: this.products.pluck('id').join(',')},
                 success: function(response){
                     if (_.isArray(response)){

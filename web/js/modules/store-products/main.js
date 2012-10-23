@@ -7,5 +7,15 @@ define([ './views/app' ], function(AppView){
 		};
 	}
 
-    window.StoreProductsWidget = new AppView();
+    if (!window.Toastr){
+        window.Toastr = {}
+    }
+
+//    $(function(){
+        Toastr.StoreProductsWidget = new AppView();
+//    });
+    $(function(){
+        alert(123);
+    })
+    return Toastr;
 });

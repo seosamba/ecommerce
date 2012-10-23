@@ -1,4 +1,4 @@
-<?php $this->headTitle($this->translate('Manage products')); ?>
+<?php !$this->headTitle() && $this->headTitle($this->translate('Manage products')); ?>
 
 <?php
     $this->headScript()->setAllowArbitraryAttributes(true)
@@ -8,7 +8,6 @@
 	echo $this->noLayout ? $this->headScript() : '';
 
 	$this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
-	echo $this->noLayout ? $this->headLink() : '';
 ?>
 
 <div id="store-products" class="store-widget">

@@ -1072,9 +1072,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @return string Widget html content
 	 */
 	protected function _makeOptionProducts() {
-		//if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
-		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){	
-            $this->_view->noLayout = true;
+		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			return $this->_view->render('manage_products.phtml');
