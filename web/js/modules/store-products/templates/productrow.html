@@ -1,9 +1,9 @@
 <td><input type="checkbox" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> /></td>
-<td class="editable" data-prop="name">
+<td class="editable text-left" data-prop="name">
     <a href="javascript:;" title="Click to open editor" class="tpopup" data-url="<%= $('#website_url').val() %>plugin/shopping/run/product#edit/<%= id%>"><%= name %></a>
 </td>
 <td><%= brand %></td>
-<td class="editable" data-prop="sku"><%= sku %></td>
+<td class="editable " data-prop="sku"><%= sku %></td>
 <td class="editable" data-prop="mpn"><%= mpn %></td>
 <td class="editable" data-prop="weight"><%= weight %></td>
 <td class="editable" data-prop="price"><%= price %></td>
