@@ -263,9 +263,13 @@ class Shopping extends Tools_Plugins_Abstract {
         if(isset($markupConfig['config']) && !empty($markupConfig['config'])){
             $markupForm->populate($markupConfig['config']);
         }
-        //$markupForm->getElement('price')->setValue($value);
-      	$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-		$this->_view->freeForm = new Forms_Shipping_FreeShipping();
+        $freeShippingForm = new Forms_Shipping_FreeShipping();
+        $freeShippingConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_FREESHIPPING);
+        if(isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])){
+            $freeShippingForm->populate($freeShippingConfig['config']);
+        }
+       	$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+		$this->_view->freeForm = $freeShippingForm;
         $this->_view->markupForm = $markupForm;
 
 		$this->_view->shippingPlugins  = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function($plugin){
