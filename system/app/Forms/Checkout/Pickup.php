@@ -8,7 +8,7 @@ class Forms_Checkout_Pickup extends Zend_Form {
 	public function init(){
 		parent::init();
 
-		$this->setLegend('Pick up person')
+		$this->setLegend('Enter pick up information')
             ->setAttribs(array(
             'id'     => 'checkout-pickup',
             'class'  => array('toaster-checkout'),

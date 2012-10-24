@@ -10,7 +10,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 	public function init() {
 		parent::init();
 
-		$this->setLegend('Enter your address')
+		$this->setLegend('Enter your shipping address')
 			->setAttribs(array(
 				'id'     => 'checkout-user-address',
 				'class'  => array('toaster-checkout', 'address-form'),
