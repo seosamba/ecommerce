@@ -10,7 +10,60 @@
             <img src="<?php echo $src; ?>" alt="<?php echo $product->getName(); ?>" title="<?php echo $product->getName(); ?>" />
         </a>
         <?php endif; ?>
-        <a href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>"><?php echo $product->getName(); ?></a>
+        <a class="related-product-title" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>"><?php echo $product->getName(); ?></a>
+        <p class="related-product-description"><?php echo $product->getFullDescription();?></p>
+        <p class="related-product-price"><?php echo $this->currency($product->getPrice());?></p>
+        <?php if(isset($this->checkoutPageUrl)):?>
+           <a class="related-cart-add" href="javascript:;" data-pid="<?php echo $product->getId();?>"><?php echo $this->translate('Add to cart');?></a>
+        <?php endif;?>
     </li>
     <?php endforeach ; ?>
 </ul>
+<?php if(isset($this->checkoutPageUrl)):?>
+    <script type="text/javascript">
+        $(function() {
+            $(document).on('click', '.related-cart-add', function(e) {
+                e.preventDefault();
+                var pid  = $(this).data('pid');
+                $.post('<?php echo $this->websiteUrl;?>plugin/cart/run/cart/', {
+                    pid     : pid
+                }, function() {
+                    window.location.href = '<?php echo $this->websiteUrl, $this->checkoutPageUrl; ?>';
+                })
+            })
+        });
+    </script>
+<?php endif;?>
+<style>
+    ul.related-products{
+        margin:0;
+    }    
+    ul.related-products li{
+        display:inline-block;
+        width:30%;
+        margin:1%;
+        list-style: none;
+        vertical-align: top;
+        overflow: hidden;
+    }
+    *+html ul.related-products li{
+        display: inline;
+    }
+    ul.related-products .page-teaser-image, ul.related-products .related-product-title{
+        display:block;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    ul.related-products .page-teaser-image img{
+        width:100%;
+    }
+    ul.related-products .related-product-description{
+        margin:5px 0 10px;
+    }
+    ul.related-products .related-product-price{
+        float:left;
+    }
+    ul.related-products .related-cart-add{
+        float:right;
+    }
+</style>

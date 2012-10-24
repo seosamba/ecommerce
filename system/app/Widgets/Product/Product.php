@@ -239,10 +239,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
             return null;
         }
         $related = $this->_productMapper->find($ids);
-
+        $checkoutPage = Tools_Misc::getCheckoutPage();
+        $checkoutPageUrl = $checkoutPage != null?$checkoutPage->getUrl():'';
         if ($related !== null) {
             $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
             $this->_view->withImg = (isset($this->_options[0]) && $this->_options[0] == 'img') ? true : false;
+            if(isset($this->_options[0]) && $this->_options[0] == 'addtocart'){
+               $this->_view->checkoutPageUrl = $checkoutPageUrl;
+            }
             return $this->_view->render('related.phtml');
         }
         return false;
