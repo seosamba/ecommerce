@@ -116,7 +116,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		        return '<div style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
 				        $this->_translator->translate('This product is disabled').
 				        '</span>'.$parser->parse().'</div>';
-	        }
+	        }else{
+                return '';
+            }
         }
 
         throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
