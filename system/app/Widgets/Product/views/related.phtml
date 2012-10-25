@@ -1,10 +1,10 @@
 <ul class="related-products">
     <?php foreach ($this->related as $product) : ?>
     <li>
-        <?php if ($this->withImg && $product->getPhoto()) : ?>
+        <?php if ($product->getPhoto()) : ?>
         <?php
             $photo = explode('/', $product->getPhoto());
-            $src = $this->websiteUrl.'media/'.$photo[0].'/product/'.$photo[1];
+            $src = $this->websiteUrl.'media/'.$photo[0].'/'.$this->imageSize.'/'.$photo[1];
         ?>
         <a class="page-teaser-image" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>">
             <img src="<?php echo $src; ?>" alt="<?php echo $product->getName(); ?>" title="<?php echo $product->getName(); ?>" />
@@ -55,7 +55,7 @@
         font-weight: bold;
     }
     ul.related-products .page-teaser-image img{
-        width:100%;
+        max-width: 100%;
     }
     ul.related-products .related-product-description{
         margin:5px 0 10px;
