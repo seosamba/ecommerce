@@ -109,7 +109,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
             unset($themeConfig);
 
             $parser = new Tools_Content_Parser($templatePrepend . $template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
-            return $parser->parse();
+
+	        if ((bool)$this->_product->getEnabled()){
+		        return $parser->parse();
+	        } elseif (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
+		        return '<div style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
+				        $this->_translator->translate('This product is disabled').
+				        '</span>'.$parser->parse().'</div>';
+	        }
         }
 
         throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');

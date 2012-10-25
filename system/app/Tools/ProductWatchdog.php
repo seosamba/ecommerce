@@ -130,22 +130,40 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 				));
 			}
 
-			$this->_cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
-			$this->_cacheHelper->clean(false, false, array('prodid_'.$this->_object->getId(), 'pageid_'.$page->getId()));
+			$this->_cleanUpCache();
 		}
 	}
 
 	protected function _runOnDelete() {
+		$this->_cleanUpCache();
+	}
+
+	protected function _cleanUpCache(){
 		$cacheTags = array(
-			'productlist',
-			'productListWidget',
-			'productindex',
-			'prodid_'.$this->_object->getId()
+			'prodid_all',
+			'prodbrand_'.$this->_object->getBrand(),
+			'prodid_'.$this->_object->getId(),
 		);
 		if (($page = $this->_object->getPage()) instanceof Application_Model_Models_Page){
 			$cacheTags[] = 'pageid_'.$page->getId();
 			$this->_cacheHelper->clean('Widgets_Product_Product_byPage_'.$page->getId(), 'store_');
 		}
+
+		$tags = $this->_object->getTags();
+		if (!empty($tags)){
+			foreach ($tags as $tag){
+				array_push($cacheTags, 'prodtag_'.$tag['id']);
+			}
+		}
+
+		if ($this->_params['action'] == Tools_System_GarbageCollector::CLEAN_ONDELETE){
+			$cacheTags = array_merge($cacheTags, array(
+				'productlist',
+				'productListWidget',
+				'productindex',
+			));
+		}
+
 		$this->_cacheHelper->clean(false, false, $cacheTags);
 	}
 
