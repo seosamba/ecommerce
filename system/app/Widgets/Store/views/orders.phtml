@@ -82,12 +82,20 @@ echo $this->noLayout ? $this->headLink() : '';
 			</tr>
 		</thead>
 		<tbody id="orders-list">
-			<td colspan="10" style="text-align:center;">
+            <?php if(isset($this->invoicePlugin)):?>	
+                <td colspan="11" style="text-align:center;">
+            <?php else:?>
+                <td colspan="10" style="text-align:center;">
+            <?php endif;?>  
 				<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading...">
 			</td>
 		</tbody>
 		<tfoot>
-			<td colspan="10" class="paginator"></td>
+            <?php if(isset($this->invoicePlugin)):?>
+                <td colspan="11" class="paginator"></td>
+            <?php else:?>
+                <td colspan="10" class="paginator"></td>
+            <?php endif;?>  
 		</tfoot>
 	</table>
     <?php if(isset($this->invoicePlugin)):?>
