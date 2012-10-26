@@ -234,9 +234,9 @@
                 <?php $taxName = 'Tax';?>
             <?php endif;?>
             <?php if($this->showPriceIncTax == 1):?>
-                <span><?php echo $this->translate('Inc. '.$taxName);?>:</span>
+                <span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Inc. '.$taxName);?>:</span>
             <?php else:?>
-                <span  style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total '.$taxName);?>:</span>
+                <span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total '.$taxName);?>:</span>
             <?php endif;?>
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
         </p>
