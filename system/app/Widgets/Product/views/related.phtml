@@ -6,15 +6,15 @@
             $photo = explode('/', $product->getPhoto());
             $src = $this->websiteUrl.'media/'.$photo[0].'/'.$this->imageSize.'/'.$photo[1];
         ?>
-        <a class="page-teaser-image" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>">
+        <a class="product-image" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>">
             <img src="<?php echo $src; ?>" alt="<?php echo $product->getName(); ?>" title="<?php echo $product->getName(); ?>" />
         </a>
         <?php endif; ?>
-        <a class="related-product-title" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>"><?php echo $product->getName(); ?></a>
-        <p class="related-product-description"><?php echo $product->getFullDescription();?></p>
-        <p class="related-product-price"><?php echo $this->currency($product->getPrice());?></p>
+        <a class="product-title" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>"><?php echo $product->getName(); ?></a>
+        <p class="product-description"><?php echo $product->getFullDescription();?></p>
+        <p class="product-price"><?php echo $this->currency($product->getPrice());?></p>
         <?php if(isset($this->checkoutPageUrl)):?>
-           <a class="related-cart-add" href="javascript:;" data-pid="<?php echo $product->getId();?>"><?php echo $this->translate('Add to cart');?></a>
+           <a class="tcart-add related-cart-add" href="javascript:;" data-pid="<?php echo $product->getId();?>"><?php echo $this->translate('Add to cart');?></a>
         <?php endif;?>
     </li>
     <?php endforeach ; ?>
@@ -34,36 +34,3 @@
         });
     </script>
 <?php endif;?>
-<style>
-    ul.related-products{
-        margin:0;
-    }    
-    ul.related-products li{
-        display:inline-block;
-        width:30%;
-        margin:1%;
-        list-style: none;
-        vertical-align: top;
-        overflow: hidden;
-    }
-    *+html ul.related-products li{
-        display: inline;
-    }
-    ul.related-products .page-teaser-image, ul.related-products .related-product-title{
-        display:block;
-        font-size: 16px;
-        font-weight: bold;
-    }
-    ul.related-products .page-teaser-image img{
-        max-width: 100%;
-    }
-    ul.related-products .related-product-description{
-        margin:5px 0 10px;
-    }
-    ul.related-products .related-product-price{
-        float:left;
-    }
-    ul.related-products .related-cart-add{
-        float:right;
-    }
-</style>
