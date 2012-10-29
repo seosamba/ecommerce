@@ -88,6 +88,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
                     Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, $pathToCropPreview, true);
                 }
             }
+            $this->_cleanUpCache();
 		} else {
 			error_log('Can not create page for product #'. $this->_object->getId());
 		}
@@ -143,6 +144,9 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			'prodid_all',
 			'prodbrand_'.$this->_object->getBrand(),
 			'prodid_'.$this->_object->getId(),
+            'productlist',
+			'productListWidget',
+            'productindex'
 		);
 		if (($page = $this->_object->getPage()) instanceof Application_Model_Models_Page){
 			$cacheTags[] = 'pageid_'.$page->getId();
@@ -154,14 +158,6 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			foreach ($tags as $tag){
 				array_push($cacheTags, 'prodtag_'.$tag['id']);
 			}
-		}
-
-		if ($this->_params['action'] == Tools_System_GarbageCollector::CLEAN_ONDELETE){
-			$cacheTags = array_merge($cacheTags, array(
-				'productlist',
-				'productListWidget',
-				'productindex',
-			));
 		}
 
 		$this->_cacheHelper->clean(false, false, $cacheTags);

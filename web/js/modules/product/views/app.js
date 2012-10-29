@@ -107,8 +107,10 @@ define([
                     this.model.get('options').on('reset', this.renderOptions, this);
                 }
                 if (this.products !== null){
-                    var product = this.products.get(this.model.get('id'));
-                    !_.isUndefined(product) && product.set(this.model.toJSON());
+//                    var product = this.products.get(this.model.get('id'));
+//                    !_.isUndefined(product) && product.set(this.model.toJSON());
+                    this.products.pager();
+    
                 }
                 this.render();
                 showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
