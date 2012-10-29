@@ -23,6 +23,11 @@ define(['backbone'], function(Backbone){
                     this.shippers.add(plugin);
                 }
                 var status = plugin.get('enabled') === 1 ? 0 : 1;
+                if(status){
+                    $(e.currentTarget).parent('li').removeClass('disabled').addClass('enabled').find('span.icon-minus').removeClass('icon-minus').addClass('icon-checkmark');
+                }else{
+                    $(e.currentTarget).parent('li').removeClass('enabled').addClass('disabled').find('span.icon-checkmark').removeClass('icon-checkmark').addClass('icon-minus');
+                }
                 plugin.set('enabled', status);
                 console.log(plugin.save());
                 $(e.currentTarget).replaceWith(_.template(this.templates.button, plugin.toJSON()));
@@ -45,6 +50,8 @@ define(['backbone'], function(Backbone){
                 } else {
                     $(this).after('<span class="unit-over" role="switch">Enable</span>').closest('li').addClass('disabled');
                 }
+                $(this).closest('li.enabled').prepend('<span class="icon-checkmark"></span>');
+                $(this).closest('li.disabled').prepend('<span class="icon-minus"></span>');
             });
         },
         saveShipperConfig: function(){
