@@ -50,7 +50,7 @@ define([
             $('ul.ui-tabs-nav a[href=#zone-'+ this.model.cid +'] span').text(this.model.get('name'));
         },
         setZip: function(e){
-            this.model.set('zip', e.target.value.match(/^[0-9*?]{2,7}$/gm));
+            this.model.set('zip', e.target.value.match(/^[\-0-9A-z*?]{2,10}$/gm));
         }
     })
 	
