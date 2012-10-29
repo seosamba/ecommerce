@@ -11,7 +11,10 @@ echo $this->noLayout ? $this->headLink() : '';
 	#store-orders select.filter, .chzn-container-single .chzn-search input{
 		width: 100% !important;
         float: none;
-	}
+    }
+    .filters .chzn-container .chzn-results {
+        max-height: 170px;
+    }
 </style>
 <div id="store-orders" class="clearfix">
 	<div>
@@ -48,7 +51,7 @@ echo $this->noLayout ? $this->headLink() : '';
                     </div>
 				</div>
 				<div class="ot">
-					<label class="block wGrid100 bold mb3px">By shipping desination</label>
+					<label class="block wGrid100 bold mb3px">By shipping destination</label>
 					<?php
 					$countryList = Tools_Geo::getCountries(true);
 					array_unshift($countryList, '');
