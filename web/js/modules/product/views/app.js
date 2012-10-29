@@ -453,6 +453,7 @@ define([
                     success: function(model, response){
                         self.products && self.products.pager();
                         $('#new-product').trigger('click');
+                        showMessage('Product deleted');
                     }
                 });
 			});
