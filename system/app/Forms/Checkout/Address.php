@@ -33,6 +33,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		$this->getElement('email')->setRequired(true)
 				->setAttrib('class', 'required')
 				->setValidators(array('EmailAddress'));
+		$this->getElement('zip')->setRequired(true);
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(
@@ -69,10 +70,11 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		$this->setElementDecorators(array(
 			'ViewHelper',
 			'Label',
+			'Errors',
 			array('HtmlTag', array('tag' => 'div'))
 		));
 
-		$this->addElement('hidden', 'check', array(
+		$this->addElement('hidden', 'step', array(
 			'value' => Shopping::KEY_CHECKOUT_ADDRESS,
 			'decorators' => array('ViewHelper')
 		));

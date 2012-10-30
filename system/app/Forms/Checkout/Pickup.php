@@ -50,7 +50,7 @@ class Forms_Checkout_Pickup extends Zend_Form {
             'class'    => array('required')
         )));
 
-        $this->addElement('hidden', 'check', array(
+        $this->addElement('hidden', 'step', array(
             'value' => Shopping::KEY_CHECKOUT_PICKUP,
             'decorators' => array('ViewHelper')
         ));
