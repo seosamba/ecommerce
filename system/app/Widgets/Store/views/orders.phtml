@@ -53,12 +53,12 @@ echo $this->noLayout ? $this->headLink() : '';
 				<div class="ot">
 					<label class="block wGrid100 bold mb3px">By shipping destination</label>
 					<?php
-					$countryList = Tools_Geo::getCountries(true);
-					array_unshift($countryList, '');
-					?>
+                        $countryList = Tools_Geo::getCountries(true);
+                        $countryList = array_merge(array('AA'=>'shipping country'), $countryList);
+                    ?>
 					<?php echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => 'shipping country'), $countryList ); ?>
 					<?php echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => 'shipping state'), array('') ); ?>
-					<?php echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), array('') ); ?>
+					<?php echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), $this->shippingServices ); ?>
 				</div>
 	            <div class="fl-right mb10px mrGrid1">
                     <input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="Apply filter" >
@@ -112,7 +112,7 @@ $(function(){
 	var filterFromDate = $('#orders-filter-fromdate', '#store-orders'),
 		filterToDate = $('#orders-filter-todate', '#store-orders');
 	filterFromDate.datepicker({
-	    dateFormat: 'yy-mm-dd',
+	    dateFormat: 'd-M-yy',
         defaultDate: "+1w",
 	    changeMonth: true,
 	    changeYear: true,
@@ -122,7 +122,7 @@ $(function(){
 	    }
     });
     filterToDate.datepicker({
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'd-M-yy',
         defaultDate: "+1w",
         changeMonth: true,
 	    changeYear: true,
@@ -132,7 +132,7 @@ $(function(){
         }
     });
 	$('#filter-state').on('addressChain:updated', function(){
-		$(this).trigger('liszt:updated');
+        $(this).trigger('liszt:updated');
 	})
 	$('#extra-filters').addressChain({
 		countrySelector: $('#filter-country'),

@@ -103,6 +103,15 @@ class Widgets_Store_Store extends Widgets_Abstract {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			$this->_view->shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            $shippingPlugins = Models_Mapper_ShippingConfigMapper::getInstance()->fetchAll();
+            $shippingServices = array('');
+            if(!empty($shippingPlugins)){
+                foreach($shippingPlugins as $shippingPlugin){
+                   $shippingServices[$shippingPlugin['name']] = $shippingPlugin['name'];
+                }
+                $shippingServices = array_merge(array(''=>'shipping carrier'), $shippingServices);
+            }
+            $this->_view->shippingServices = $shippingServices;
             $enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
             if($enabledInvoicePlugin != null){
                 if($enabledInvoicePlugin->getStatus() == 'enabled'){

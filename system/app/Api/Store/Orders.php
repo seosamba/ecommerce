@@ -47,7 +47,19 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
 			$order = filter_var_array($this->_request->getParam('order', array()), FILTER_SANITIZE_STRING);
 			if (is_array($filter)){
-				$filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
+				if($filter['country'] == 'AA'){
+                     $filter['country'] = 0;
+                }
+                if($filter['state'] == 'null'){
+                    $filter['state'] = 0;
+                }
+                if($filter['date-from'] != ''){
+                    $filter['date-from'] = date("Y-m-d", strtotime($filter['date-from']));
+                }
+                if($filter['date-to'] != ''){  
+                    $filter['date-to']   = date("Y-m-d", strtotime($filter['date-to']));
+                }
+                $filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
 				$filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
 				return $orderMapper->fetchAll($filter, $order, $limit, $offset);
 			} else {
