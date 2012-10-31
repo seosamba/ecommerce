@@ -49,7 +49,8 @@ class Forms_Signup extends Zend_Form {
 
         $this->addElement('hidden', 'step', array(
             'value' => Shopping::KEY_CHECKOUT_SIGNUP,
-            'decorators' => array('ViewHelper')
+            'decorators' => array('ViewHelper'),
+	        'ignore'    => true
         ));
 
         $this->addElement(new Zend_Form_Element_Submit(array(

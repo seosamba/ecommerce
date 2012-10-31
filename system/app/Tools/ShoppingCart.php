@@ -335,7 +335,7 @@ class Tools_ShoppingCart {
 	 * @param $customer
 	 * @return Tools_ShoppingCart
 	 */
-	public function saveCartSession($customer) {
+	public function saveCartSession($customer = null) {
 		if (null === $customer) {
 			$customer = $this->getCustomer();
 		}

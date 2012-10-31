@@ -28,11 +28,12 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 				'navName'		=> Shopping::PRODUCT_CATEGORY_NAME,
 				'templateId'	=> Application_Model_Models_Template::ID_DEFAULT,
 				'parentId'		=> 0,
-				'system'		=> 1,
+				'system'		=> 0,
 				'is404page'		=> 0,
 				'protected'		=> 0,
 				'memLanding'	=> 0,
-				'showInMenu'	=> 0,
+				'showInMenu'	=> 1,
+				'draft'         => 1,
 				'targetedKey'	=> Shopping::PRODUCT_CATEGORY_NAME
 			));
 			$pageMapper->save($productCategoryPage);
@@ -59,7 +60,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			->setTeaserText(strip_tags($this->_object->getShortDescription()))
 			->setLastUpdate(date(DATE_ATOM))
 			->setIs404page(0)
-			->setShowInMenu(0)
+			->setShowInMenu(1)
 			->setSiloId(0)
 			->setTargetedKeyPhrase(Shopping::PRODUCT_CATEGORY_NAME)
 			->setProtected(0)
