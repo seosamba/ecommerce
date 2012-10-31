@@ -76,7 +76,8 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 
 		$this->addElement('hidden', 'step', array(
 			'value' => Shopping::KEY_CHECKOUT_ADDRESS,
-			'decorators' => array('ViewHelper')
+			'decorators' => array('ViewHelper'),
+			'ignore'    => true
 		));
 
 		$this->addElement(new Zend_Form_Element_Submit(array(

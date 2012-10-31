@@ -52,7 +52,8 @@ class Forms_Checkout_Pickup extends Zend_Form {
 
         $this->addElement('hidden', 'step', array(
             'value' => Shopping::KEY_CHECKOUT_PICKUP,
-            'decorators' => array('ViewHelper')
+            'decorators' => array('ViewHelper'),
+	        'ignore'    => true 
         ));
 
         $this->addElement('submit', 'submitpickup', array(
