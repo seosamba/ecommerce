@@ -409,7 +409,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
-					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
+//					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
 					$customer->setId($newCustomerId);
 					$session->storeIsNewCustomer = true;
 				}
