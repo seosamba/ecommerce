@@ -46,7 +46,12 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * Default cache id for checkout page
 	 */
 	const CHECKOUT_PAGE_CACHE_ID = 'cart_checkoutpage';
-
+    
+    /**
+	 * Option for the client page
+	 */
+    const OPTION_STORE_CLIENT_LOGIN = 'option_storeclientlogin';
+    
     /**
      * Option for the page options system.
      */

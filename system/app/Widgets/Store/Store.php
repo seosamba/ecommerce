@@ -181,4 +181,19 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		}
 		return $actualOptions;
 	}
+    
+    /**
+	 * Generates login form for client
+	 * @return string 
+	 */
+	protected function _makeOptionClientLogin() {
+        $clientPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_STORE_CLIENT_LOGIN, true);
+        if($clientPage != null){
+            return '{$member:login:'.$clientPage->getUrl().'}'; 
+        }else{
+            return '';
+        }
+        
+        
+    }
 }
