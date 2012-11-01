@@ -5,10 +5,11 @@
     if (($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) && !empty($option['selection'])){
         $options = array();
         $defaultId = null;
+	    $template = $option['type'] === Models_Model_Option::TYPE_RADIO ? ' <span>(%s%s)</span>' : ' (%s%s)';
         foreach ($option['selection'] as $item) {
-            $options[$item['id']] = $item['title'];
+            $options[$item['id']] = Models_Model_Option::TYPE_RADIO ? $this->escape($item['title']) : $item['title'];
             if (floatval($item['priceValue']) != 0){
-                $options[$item['id']] .= sprintf(' (%s%s)',$item['priceSign'], ($item['priceType'] === 'unit'?$this->currency($item['priceValue']):$item['priceValue'].'%'));
+                $options[$item['id']] .= sprintf($template, $item['priceSign'], ($item['priceType'] === 'unit'?$this->currency($item['priceValue']):$item['priceValue'].'%'));
             }
             if ($item['isDefault']) $defaultId = $item['id'];
         }
@@ -20,7 +21,7 @@
         <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_RADIO): ?>
         <div>
-        <?php echo  $this->formRadio($uniqName, $defaultId, null, $options, ''); ?>
+        <?php echo  $this->formRadio($uniqName, $defaultId, array('escape'=>false), $options, ''); ?>
         </div>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXT): ?>
         <input type="text" name="<?php echo  $uniqName;?>" id="" />
