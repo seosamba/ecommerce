@@ -21,7 +21,7 @@
                 <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
                 <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
                 <br />
-                <span><?php echo $countryList[$billingAddress['country']];?></span>
+                <span><?php echo $billingAddress['country'];?></span>
             <?php else:?>
                 <span><?php echo $this->translate('not provided');?></span>
             <?php endif;?>
@@ -147,7 +147,7 @@
                 <span><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
                 <span><?php echo $billingAddress['zip'];?></span>
                 <br />
-                <span><?php echo $countryList[$billingAddress['country']];?></span>
+                <span><?php echo $billingAddress['country'];?></span>
             <?php else:?>
                 <span><?php echo $this->translate('not provided');?></span>
             <?php endif;?>
