@@ -254,7 +254,11 @@ define([
 			}
 
             //populating selected tags
-			$('#product-tags-available:not(:empty)').find('div.tag-widget').show();
+            if (!this.model.has('tags')) {
+                $('#product-tags-current').empty();
+                $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
+            }
+//			$('#product-tags-available:not(:empty)').find('div.tag-widget').show();
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
@@ -338,6 +342,8 @@ define([
                             $('div.tagid-'+id+' input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
                         }
                     });
+                    $('div.tagid-'+tag.id+' input:checkbox', '#product-tags-available').attr('checked', 'checked').attr('disabled', 'disabled');
+
                     view.render().$el
                         .find('span.ui-icon-closethick').remove().end()
                         .find('input:checkbox').attr('checked', 'checked').end()
