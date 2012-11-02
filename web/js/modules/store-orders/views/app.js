@@ -10,6 +10,7 @@ define(['backbone',
         el: $('#store-orders'),
         events: {
             'click #extra-filters-switch': function(){ $('#extra-filters', this.el).slideToggle(); } ,
+            'change input.filter': 'applyFilter',
             'click #orders-filter-apply-btn': 'applyFilter',
             'click td.paginator a.page': 'navigate'
         },

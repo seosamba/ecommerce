@@ -38,9 +38,14 @@
     <table id="clients-table" class="widget" style="width: 100%">
         <thead>
             <tr class="search-line">
-				<th colspan="5" class="gray-bg">
-					<label><?php echo $this->translate('Search');?></label>
+				<th colspan="4" class="gray-bg">
+					<label class="mt5px"><?php echo $this->translate('Search');?></label>
 					<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
+                </th>
+	            <th class="gray-bg">
+                    <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post">
+	                    <a href="javascript:;" class="textcentered" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
+                    </form>
                 </th>
             </tr>
             <tr class="title-table">
@@ -58,7 +63,7 @@
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="3" class="ui-resizable text-left">
+	            <td colspan="4" class="ui-resizable text-left">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
 		            <select id="mass-action">
@@ -66,9 +71,7 @@
 			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
 		            </select>
 	            </td>
-	            <td class="textcentered">
-		            <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post"><a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a></form>
-	            </td>
+
 	            <td class="textcentered">
 		            <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
 		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
