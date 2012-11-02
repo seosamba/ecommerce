@@ -191,7 +191,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
         if($clientPage != null){
             return '{$member:login:'.$clientPage->getUrl().'}'; 
         }else{
-            return '';
+            return '{$member:login:index.html}';
         }
         
         
