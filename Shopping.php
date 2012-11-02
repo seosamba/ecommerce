@@ -1337,7 +1337,7 @@ class Shopping extends Tools_Plugins_Abstract {
     protected function _addVersionToAdminPanel(){
         $shoppingVersion = $this->_configMapper->getConfigParam('version');
         if($shoppingVersion != null && $shoppingVersion != ''){
-            $this->_view->shoppingVersion = ' + Shopping version '.$shoppingVersion;
+            $this->_view->shoppingVersion = ' + Store '.$shoppingVersion;
             $this->_injectContent($this->_view->render('shoppingVersion.phtml'));
         }
     }
