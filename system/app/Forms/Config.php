@@ -13,7 +13,7 @@ class Forms_Config extends Zend_Form {
 			'FormElements'
 				));
 		$general = new Forms_GeneralSettings();
-		$display = new Forms_DisplaySettings();
+		$display = new Forms_BasicsSettings();
 
 		$this->addSubForms(array(
 			'general' => $general,

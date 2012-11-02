@@ -28,8 +28,6 @@ class Forms_GeneralSettings extends Zend_Form {
 			'label' => 'Address 2'
 		));
 		
-		$coutryList  = Tools_Geo::getCountries();
-		
 		$this->addElement('select', 'country', array(
 			'label' => 'Country',
 			'multiOptions' => Tools_Geo::getCountries(true)
