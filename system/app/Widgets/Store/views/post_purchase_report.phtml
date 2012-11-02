@@ -73,7 +73,11 @@
         </tbody>
     </table>
     <div class="post-purchase-report-shipping">
-        <span class="title"><?php echo $this->translate('Shipping Address');?>:</span>
+        <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP):?>
+            <span class="title"><?php echo $this->translate('Pickup information');?>:</span>
+        <?php else:?>
+            <span class="title"><?php echo $this->translate('Shipping Address');?>:</span>
+        <?php endif;?>
         <p class="post-purchase-report-shipping-address">
         <?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
         <?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
@@ -86,7 +90,7 @@
                     <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
                     <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
                     <br />
-                    <span><?php echo $countryList[$shippingAddress['country']];?></span>
+                    <span><?php echo $shippingAddress['country'];?></span>
                 <?php else:?>
                     <span><?php echo $this->translate('not provided');?></span>
                 <?php endif;?>
@@ -199,7 +203,11 @@
         </tbody>
     </table>
     <div style="float:left; width:65%; margin-right:3%">
-        <span class="title" style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Shipping Address');?>:</span>
+        <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP):?>
+            <span class="title" style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Pickup information');?>:</span>
+        <?php else:?>
+            <span class="title" style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Shipping Address');?>:</span>
+        <?php endif;?>
         <p style="color:#444444;">
         <?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
         <?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
@@ -212,7 +220,7 @@
                     <span><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
                     <span><?php echo $shippingAddress['zip'];?></span>
                     <br />
-                    <span><?php echo $countryList[$shippingAddress['country']];?></span>
+                    <span><?php echo $shippingAddress['country'];?></span>
                 <?php else:?>
                     <span><?php echo $this->translate('not provided');?></span>
                 <?php endif;?>
