@@ -1,17 +1,16 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/product/collections/brands',
-    'modules/brandlogos/views/brandlogo'
-], function(_, Backbone, BrandList, BrandView){
+	'backbone',
+    '../../product/collections/brands',
+    './brandlogo'
+], function(Backbone, BrandsCollection, BrandView){
 
     var brandLogosListView = Backbone.View.extend({
         el: $('#manage-logos'),
-        events: {
-
-        },
+        filename: '',
+        events: {},
         initialize: function(){
-            this.brands = new BrandList();
+            $('#progressbar').progressbar();
+            this.brands = new BrandsCollection();
             this.brands.on('reset', this.render, this);
         },
         render: function(){
@@ -28,7 +27,13 @@ define([
                     brand.set({src: ( _.isObject(image) ? image.get('src').replace('product', 'small') : $('#website_url').val()+'system/images/noimage.png')});
                 }
                 var view = new BrandView({model: brand});
-                view.render().$el.appendTo('#manage-logos ul.brand-list').addClass(((i+1)%6==0)?'omega':'');
+                view.render().$el
+                    .on('click', function(){
+                        self.filename = brand.get('name');
+                        $('#brand-logo-uploader-pickfiles').trigger('click');
+                    })
+                    .appendTo('#manage-logos ul.brand-list')
+                    .addClass(((i+1)%6==0)?'omega':'');
             })
         },
         fetchImages: function() {
@@ -38,6 +43,11 @@ define([
                 {folder: $('#things-select-folder').val()},
                 function(response){ self.images = new Backbone.Collection(response.imageList); }
             );
+        },
+        triggerUpload: function() {
+            console.log(arguments, this);
+            this.filename =
+            $('#brand-logo-uploader-pickfiles').trigger('click');
         }
     })
 	

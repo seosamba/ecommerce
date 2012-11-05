@@ -1,6 +1,6 @@
 <?php
 $this->headTitle('Manage brand logos');
-$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require/require.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/brandlogos.js'));
+$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/brandlogos/main'));
 $this->placeholder('headerContent')->set($this->translate('Manage brand logos'));
 ?>
 
@@ -19,11 +19,11 @@ $this->placeholder('headerContent')->set($this->translate('Manage brand logos'))
 </div>
 
 <div id="manage-logos">
-	<div id="progressbar">
+	<div id="progressbar" style="display: none;">
 		<span class="label"><?php echo $this->translate('Uploading');?>&nbsp;<b class="value">0</b></span>
 	</div>
 	<ul class="brand-list clearfix h500">
-
+		<li><img src="<?php echo $this->websiteUrl; ?>/plugins/shopping/web/images/spinner.gif" style="width: 48px;" alt=""></li>
 	</ul>
 </div>
 <style type="text/css">
@@ -102,28 +102,3 @@ $this->placeholder('headerContent')->set($this->translate('Manage brand logos'))
 		color: #666666;
 	}
 </style>
-<script type="text/javascript">
-	$(function(){
-		$('#progressbar').hide().progressbar();
-		jsBrandLogoUploader.bind('BeforeUpload', function(uploader, file){
-			$('#progressbar').fadeIn().progressbar({value: 0});
-//			var ext = /\.jpe?g|\.gif|\.png$/i.exec(file.name);
-			file.name = app.filename+'.png';
-		});
-		jsBrandLogoUploader.bind('FileUploaded', function(uploader, file){
-			var timestamp = new Date().getTime();
-				newSrc = $('#website_url').val()+'media/brands/small/'+file.name+'?'+timestamp,
-				brand = app.view.brands.find(function(brand){ return brand.get('name') === app.filename; });
-			console.log(newSrc,brand);
-			if (brand !== undefined){
-				brand.set('src', newSrc);
-			}
-			brand.trigger('change');
-			$('#progressbar').delay(800).fadeOut();
-		});
-		jsBrandLogoUploader.bind('UploadProgress', function(up, file) {
-			$('#progressbar').progressbar({value: file.percent});
-			$('#progressbar .value').text(file.percent);
-		});
-	})
-</script>
