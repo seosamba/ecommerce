@@ -210,6 +210,12 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         if(isset($dictionaryWithaddress)){
             $this->_entityParser->addToDictionary(array('order:shippingaddress'=>$dictionaryWithaddress));
         }
+        $currency = '';
+        if(Zend_Registry::isRegistered('Zend_Currency')){
+            $currencyHelper = Zend_Registry::get('Zend_Currency');
+            $currency = $currencyHelper->getSymbol();
+        }
+        $this->_entityParser->addToDictionary(array('order:currency'=>$currency));
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
 		return $this->_send();
 	}
