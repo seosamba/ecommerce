@@ -40,6 +40,8 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 		}
 
 		$page = new Application_Model_Models_Page();
+		$page->registerObserver(new Tools_Search_Watchdog());
+
 		$uniqName = array_map(function($str){
             $filter = new Zend_Filter_PregReplace(array(
                    'match'   => '/[^\w]+/u',
@@ -89,6 +91,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
                     Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, $pathToCropPreview, true);
                 }
             }
+			$page->notifyObservers();
             $this->_cleanUpCache();
 		} else {
 			error_log('Can not create page for product #'. $this->_object->getId());
@@ -110,7 +113,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			}
 
             $page = $pageMapper->find($pageId);
-            $isModified = false;
+			$isModified = false;
 
 			if (!is_null($this->_object->getPageTemplate()) && $this->_object->getPageTemplate() !== $page->getTemplateId()){
 				$page->setTemplateId($this->_object->getPageTemplate());
