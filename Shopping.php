@@ -1192,7 +1192,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($this->_request->isXmlHttpRequest()){
 			echo $content;
 		} else {
-			$this->_layout->content = '<div id="profile" class="bg-content">'.$content.'</div>';
+			$this->_layout->content = '<div id="profile" class="toaster-widget bg-content">'.$content.'</div>';
 			echo $this->_layout->render();
 		}
 	}

@@ -1,7 +1,7 @@
 <?php $this->placeholder('headerContent')->set('Order #'.$this->order->getId() ) ; ?>
 <?php $countryList = Tools_Geo::getCountries(true); ?>
 <div class="h550" style="overflow-y: auto;">
-	<div id="order-view" class="clearfix">
+	<div id="order-view" class="toaster-widget clearfix">
 		<div class="grid_12">
 			<div class="title padding5px">Summary</div>
 			<div><?php echo $this->translate("Placed on %1\$s", date('d M, Y', strtotime($this->order->getCreatedAt())));?></div>
