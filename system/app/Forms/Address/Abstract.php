@@ -5,7 +5,14 @@
  */
 abstract class Forms_Address_Abstract extends Zend_Form {
 
+	public static $_zipLabel = array(
+		'default' => 'ZIP Code',
+		'AU' => 'Postcode'
+	);
+
 	public function init() {
+		$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
 		$this->setMethod(Zend_Form::METHOD_POST);
 
 		$this->addElement(new Zend_Form_Element_Text(array(
@@ -57,7 +64,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'zip',
-			'label'    => 'ZIP Code',
+			'label'    => self::$_zipLabel[!empty($shoppingConfig['country']) && array_key_exists($shoppingConfig['country'], self::$_zipLabel) ? $shoppingConfig['country'] : 'default' ]
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
@@ -73,7 +80,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 		$this->getElement('state')->addValidator(new Zend_Validate_Db_RecordExists(array(
 			'table' => 'shopping_list_state',
 			'field' => 'id'
-		)),true);
+		)), true);
 	}
 
 	public function setDefault($name, $value) {
@@ -94,4 +101,23 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 		}
 		parent::setDefault($name, $value);
 	}
+
+	public function isValid($data) {
+		$valid = parent::isValid($data);
+
+		foreach ($this->getElements() as $element) {
+			if ($element->hasErrors()){
+				$currentClass = $element->getAttrib('class');
+				if (!empty($currentClass)){
+					$element->setAttrib('class', $currentClass.' notvalid');
+				} else {
+					$element->setAttrib('class', 'notvalid');
+				}
+			}
+		}
+
+		return $valid;
+	}
+
+
 }
