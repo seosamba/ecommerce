@@ -142,9 +142,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_walk($products, function($product) use(&$renderedContent, $entityParser, $currency, $data, &$cacheTags) {
 			array_push($cacheTags, 'prodid_'.$product->getId());
 			if (strpos($data['templateContent'], '$store:addtocart') !== false ){
-				$storeWidget = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
+				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
 			}
-			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
+            if (strpos($data['templateContent'], '$store:addtocart:checkbox') !== false ){
+				$storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId(), 'checkbox'));
+			}
+            //media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
 			if($data['mediaServersAllowed']) {
 				$mediaServer = Tools_Content_Tools::getMediaServer();
 				if($mediaServer) {
@@ -160,6 +163,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
             if ((bool)$shoppingConfig['showPriceIncTax']){
                 $price += Tools_Tax_Tax::calculateProductTax($product);
+            }
+            if (strpos($data['templateContent'], '$product:options') !== false ){
+                $view = new Zend_View(array('scriptPath' => dirname(__DIR__) . '/Product/views/'));
+                $view->product = $product;
+                $productOptionsView = $view->render('options.phtml');
             }
 			//setting up the entity parser
 			$renderedContent .= $entityParser->setDictionary(array(
@@ -181,7 +189,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description:short' => nl2br($shortDesc),
                 '$product:description'       => nl2br($shortDesc),
                 '$product:description:full'  => nl2br($product->getFullDescription()),
-				'$store:addtocart'           => isset($storeWidget) ? $storeWidget->render() : ''
+				'$store:addtocart'           => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:checkbox'  => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox ->render() : '',
+                '$product:options'           => isset($productOptionsView) ? $productOptionsView : ''
 			))->parse($templatePrepend . $data['templateContent']);
 			unset($storeWidget);
 		});
