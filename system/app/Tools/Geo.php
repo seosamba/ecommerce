@@ -83,7 +83,7 @@ class Tools_Geo {
 		return null;
 	}
 
-	public static function generateStaticGmaps($markers, $width = 900, $height = 500){
+	public static function generateStaticGmaps($markers, $width = 640, $height = 640){
 		if (is_array($markers) && !is_array(current($markers))){
 			$markers = array($markers);
 		}
