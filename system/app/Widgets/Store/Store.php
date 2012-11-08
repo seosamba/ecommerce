@@ -140,6 +140,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 				$cartContent = $cartSession->getCartContent();
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
                 $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+				$this->_view->shoppingConfig = $shoppingConfig;
                 foreach ($cartContent as $key=>$product){
                     $productObject = $productMapper->find($product['product_id']);
                     if(!empty($product['options'])){

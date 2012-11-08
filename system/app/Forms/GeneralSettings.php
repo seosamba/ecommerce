@@ -45,6 +45,10 @@ class Forms_GeneralSettings extends Zend_Form {
 		$this->addElement('text', 'zip', array(
 			'label' => 'Zip/Postal Code'
 		));
+
+		$this->addElement('text', 'phone', array(
+			'label' => 'Phone'
+		));
 	}
 
 	public function setDefault($name, $value) {

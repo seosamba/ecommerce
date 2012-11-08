@@ -8,8 +8,7 @@
             <p class="customer-name"><?php echo $billingAddress['firstname'];?> <?php echo $billingAddress['lastname'];?></p>
         <?php endif;?>
     </div>
-   
-    
+
     <div class="post-purchase-report-billing">
     <span class="title"><?php echo $this->translate('Billing Address');?>:</span>
         <p class="post-purchase-report-billing-address">
@@ -73,28 +72,42 @@
         </tbody>
     </table>
     <div class="post-purchase-report-shipping">
-        <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP):?>
-            <span class="title"><?php echo $this->translate('Pickup information');?>:</span>
-        <?php else:?>
-            <span class="title"><?php echo $this->translate('Shipping Address');?>:</span>
+        <span class="title"><?php echo $this->translate( $this->cart->getShippingService() === Shopping::SHIPPING_PICKUP ? 'Pickup information' : 'Shipping Address'); ?>:</span>
+		<div class="post-purchase-report-shipping-address">
+	<?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
+			<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
+            <span><?php echo $shippingAddress['firstname'];?></span>
+            <span><?php echo $shippingAddress['lastname'];?></span>
+	        <br/>
+		<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP) : ?>
+	        <span><?php echo $shippingAddress['phone'];?></span>
+        </div>
+        <span class="title"><?php echo $this->translate('Pickup location'); ?>:</span>
+        <div>
+		    <span class="company"><?php echo $this->shoppingConfig['company'];?></span><br />
+		    <span class="phone"><?php echo $this->translate('Phone').': '.$this->shoppingConfig['phone'];?></span><br />
+		    <span class="street-address"><?php echo $this->shoppingConfig['address1'].' '. $this->shoppingConfig['address2'];?></span>
+            <br/>
+            <span class="locality"><?php echo $this->shoppingConfig['city'].($this->shoppingConfig['city']&&($this->shoppingConfig['state'] || $this->shoppingConfig['zip'])?',':'');?></span>
+            <span class="region"><?php $state = Tools_Geo::getStateById($this->shoppingConfig['state']); echo $state['state']; ?></span>
+            <span class="postal-code"><?php echo $this->shoppingConfig['zip'];?></span>
+            <br />
+            <span><?php echo $this->shoppingConfig['country'];?></span>
+            <br />
+            <img src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig); ?>" alt="">
+			<?php else : ?>
+	        <span class="street-address"><?php echo $shippingAddress['address1'].' '. $shippingAddress['address2'];?></span>
+	        <br/>
+	        <span class="locality"><?php echo $shippingAddress['city'].($shippingAddress['city']&&($shippingAddress['state'] || $shippingAddress['zip'])?',':'');?></span>
+            <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+            <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
+            <br />
+            <span><?php echo $shippingAddress['country'];?></span>
+            <?php endif;?>
+		<?php else:?>
+        <span><?php echo $this->translate('not provided');?></span>
         <?php endif;?>
-        <p class="post-purchase-report-shipping-address">
-        <?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
-        <?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
-        <span><?php echo $shippingAddress['firstname'];?></span>
-        <span><?php echo $shippingAddress['lastname'];?></span>
-        <br/>
-        <span class="street-address"><?php echo $shippingAddress['address1'].' '. $shippingAddress['address2'];?></span>
-                    <br/>
-                    <span class="locality"><?php echo $shippingAddress['city'].($shippingAddress['city']&&($shippingAddress['state'] || $shippingAddress['zip'])?',':'');?></span>
-                    <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
-                    <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
-                    <br />
-                    <span><?php echo $shippingAddress['country'];?></span>
-                <?php else:?>
-                    <span><?php echo $this->translate('not provided');?></span>
-                <?php endif;?>
-        </p>
+        </div>
     </div>
     <div class="post-purchase-report-summary">
         <p class="post-purchase-row cart-subtotal">

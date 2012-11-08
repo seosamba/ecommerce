@@ -83,4 +83,35 @@ class Tools_Geo {
 		return null;
 	}
 
+	public static function generateStaticGmaps($markers, $width = 900, $height = 500){
+		if (is_array($markers) && !is_array(current($markers))){
+			$markers = array($markers);
+		}
+		$params = array(
+			'sensor'    => 'false',
+			'size'      => intval($width).'x'.intval($height),
+			'markers'   => array()
+		);
+		$countries = Tools_Geo::getCountries(true);
+
+		foreach ($markers as $marker) {
+			$marker = Tools_Misc::clenupAddress($marker);
+			$state = Tools_Geo::getStateById($marker['state']);
+
+			$addressLine = implode(', ', array_filter(array(
+				$countries[$marker['country']],
+				$marker['address1'],
+				$marker['address2'],
+				$marker['city'],
+				$state['state'],
+				$marker['zip'],
+			)));
+			$params['markers'][] = $addressLine;
+		}
+
+		$params['markers'] = implode('|', $params['markers']);
+
+		return 'https://maps.googleapis.com/maps/api/staticmap?'.http_build_query($params);
+	}
+
 }
