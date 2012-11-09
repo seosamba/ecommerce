@@ -50,8 +50,8 @@
                 </td>
                 <td class="product-info">
                     <span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
-                    <?php if(!empty($product['options'])):?>
-                        <?php foreach($product['options'] as $optData): ?>
+	                <?php if(!empty($product['options'])):?>
+	                    <?php foreach($product['options'] as $optData): ?>
                            <span class="post-purchase-report-product-options">
                            <?php echo $optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
@@ -94,7 +94,7 @@
             <br />
             <span><?php echo $this->shoppingConfig['country'];?></span>
             <br />
-            <img src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig); ?>" alt="">
+            <img src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig, 640, 300); ?>" alt="">
 			<?php else : ?>
 	        <span class="street-address"><?php echo $shippingAddress['address1'].' '. $shippingAddress['address2'];?></span>
 	        <br/>
@@ -110,6 +110,7 @@
         </div>
     </div>
     <div class="post-purchase-report-summary">
+	    <h3 class="summary-title"><?php echo $this->translate('Summary'); ?></h3>
         <div class="post-purchase-row cart-subtotal">
             <span><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
