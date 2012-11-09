@@ -27,19 +27,19 @@
         </p>
     </div>
     <p style="clear:both"></p>
-    <table class="post-purchase-report">
+    <table class="post-purchase-report cart-content">
         <thead>
             <tr>
-                <th colspan="2"><?php echo $this->translate('Product'); ?></th>
-                <th><?php echo $this->translate('Price'); ?></th>
-                <th><?php echo $this->translate('Qty'); ?></th>
-                <th><?php echo $this->translate('Total'); ?></th>
+                <th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
+                <th class="product-unit-price"><?php echo $this->translate('Price'); ?></th>
+                <th class="product-qty"><?php echo $this->translate('Qty'); ?></th>
+                <th class="product-price"><?php echo $this->translate('Total'); ?></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($this->cartContent as $product) :?>
             <tr>
-                <td>
+                <td class="product-img">
                     <?php if(isset($product['photo']) && $product['photo'] != ''):?>
                         <a class="page-teaser-image" href="<?php echo $this->websiteUrl . $product['productUrl'];?>" title="<?php echo $product['name'];?>" target="_blank">
                             <img src="<?php echo $this->websiteUrl;?>/media/<?php echo str_replace('/', '/product/', $product['photo']);?>" alt="<?php echo $product['name']; ?>"/>
@@ -47,8 +47,8 @@
                     <?php else:?>
                         <img src="<?php echo $this->websiteUrl;?>system/images/noimage.png" alt="<?php echo $product['name']; ?>"/>
                     <?php endif;?>
-                 </td>
-                 <td>
+                </td>
+                <td class="product-info">
                     <span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
                     <?php if(!empty($product['options'])):?>
                         <?php foreach($product['options'] as $optData): ?>
@@ -64,9 +64,9 @@
                         <?php endforeach; ?>
                     <?php endif;?>
                 </td>
-                <td><?php echo $this->currency($product['tax_price']); ?></td>
-                <td><?php echo $product['qty']; ?></td>
-                <td><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
+                <td class="product-unit-price"><?php echo $this->currency($product['tax_price']); ?></td>
+                <td class="product-qty"><?php echo $product['qty']; ?></td>
+                <td class="product-price"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>
