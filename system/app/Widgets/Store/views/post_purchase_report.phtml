@@ -33,7 +33,7 @@
                 <th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
                 <th class="product-unit-price"><?php echo $this->translate('Price'); ?></th>
                 <th class="product-qty"><?php echo $this->translate('Qty'); ?></th>
-                <th class="product-price"><?php echo $this->translate('Total'); ?></th>
+                <th class="product-total"><?php echo $this->translate('Total'); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -66,7 +66,7 @@
                 </td>
                 <td class="product-unit-price"><?php echo $this->currency($product['tax_price']); ?></td>
                 <td class="product-qty"><?php echo $product['qty']; ?></td>
-                <td class="product-price"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
+                <td class="product-total"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>
