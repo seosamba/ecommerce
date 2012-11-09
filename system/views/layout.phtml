@@ -41,9 +41,13 @@
         </noscript>
         <?php echo $this->formHidden('website_url', $this->websiteUrl);?>
         <div class="seotoaster container_12 rounded3px">
-	        <div class="ui-widget-header ui-corner-top" style="height: 22px; padding: 7px 0 2px 8px;">
+	        <div class="ui-widget-header ui-corner-top header" style="height: 22px; padding: 7px 0 2px 8px;">
 		        <?php echo $this->placeholder('headerContent'); ?>
-		        <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
+                <div class="closebutton">
+                    <span class="help"><?php echo $this->toasterHelp($this->layout()->sectionId, Tools_Misc::$_helpHashMap)?></span>
+                    <span class="close"><?php echo $this->translate('Close'); ?></span>
+                </div>
+                
 	        </div>
             <?php echo $this->layout()->content; ?>
         </div>

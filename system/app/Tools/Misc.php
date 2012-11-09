@@ -12,6 +12,18 @@ class Tools_Misc {
      */
     const KEY_CURRENCY_LIST = 'currency_list';
 
+    const SECTION_STORE_MANAGEZONES     = 'zones';
+    
+    const SECTION_STORE_TAXES           = 'taxes';
+    
+    const SECTION_STORE_CONFIG          = 'storeconfig';
+    
+    const SECTION_STORE_SHIPPINGCONFIG  = 'shippingconfig';
+    
+    const SECTION_STORE_ADDEDITPRODUCT  = 'addproduct';
+    
+    const SECTION_STORE_BRANDLOGOS      = 'brandlogos';
+    
     /*
      * Changes for name inc. Tax 
      * Put in array country abbr and name for change 'AU'=>'GST'
@@ -23,6 +35,17 @@ class Tools_Misc {
 		'lbs' => 'Pound (lbs)'
 	);
 
+    
+    public static $_helpHashMap  = array(
+        self::SECTION_STORE_MANAGEZONES     => 'shopping-cart-shipping-tax-zones.html',
+        self::SECTION_STORE_TAXES           => 'shopping-cart-tax-calculation.html',
+        self::SECTION_STORE_CONFIG          => 'setup-online-shopping-cart.html',
+        self::SECTION_STORE_SHIPPINGCONFIG  => 'shopping-cart-shipping-calculator.html',
+        self::SECTION_STORE_ADDEDITPRODUCT  => 'how-to-add-or-edit-a-product-to-your-store.html',
+        self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html'
+       
+    );
+    
     /**
      * @var array Supported currencies
      */

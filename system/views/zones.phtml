@@ -97,6 +97,9 @@ li.add-new-zone:hover {
 	margin: 2px 3px 4px;
 	text-indent: -5000em;
 }
+.seotoaster .help a {
+    color: #E7E7E7;
+}
 </style>
 
 
@@ -106,7 +109,14 @@ li.add-new-zone:hover {
 
 <div id="manage-zones">
     <div id="zones" class="ui-helper-clearfix h530">
-	    <div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
+        
+            <div class="closebutton">
+                    <span class="help">
+                        <?php echo $this->toasterHelp(Tools_Misc::SECTION_STORE_MANAGEZONES, Tools_Misc::$_helpHashMap);?>
+                    </span>
+                    <span class="close"><?php echo $this->translate('Close'); ?></span>
+            </div>
+        
         <ul>
 	        <li class="add-new-zone">
 		        <button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>

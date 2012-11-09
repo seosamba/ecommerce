@@ -249,6 +249,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->form       = $form;
         $this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
 		$this->_layout->content  = $this->_view->render('config.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
 		echo $this->_layout->render();
 	}
 
@@ -282,6 +283,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			return $reflection->implementsInterface('Interfaces_Shipping');
 		});
 		$this->_layout->content  = $this->_view->render('shipping.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_SHIPPINGCONFIG;
 		echo $this->_layout->render();
 	}
 
@@ -493,6 +495,7 @@ class Shopping extends Tools_Plugins_Abstract {
             return $zone->toArray();
         }, Models_Mapper_Zone::getInstance()->fetchAll());
 		$this->_layout->content   = $this->_view->render('taxes.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_TAXES;
 		echo $this->_layout->render();
 	}
 
@@ -969,6 +972,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
             $this->_layout->content = $this->_view->render('product.phtml');
+            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             echo $this->_layout->render();
         }
 	}
@@ -1235,6 +1239,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	public function brandlogosAction(){
 		$this->_layout->content = $this->_view->render('brandlogos.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_BRANDLOGOS;
 		echo $this->_layout->render();
 	}
 

@@ -327,6 +327,9 @@ div.spinner {
 div.spinner.bg {
 	background: url('<?php echo $this->websiteUrl; ?>plugins/shopping/web/images/spinner_bg.gif');
 }
+.seotoaster .help a {
+    color: #E7E7E7;
+}
 <?php $this->headStyle()->captureEnd();?>
 </style>
 
@@ -539,8 +542,13 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         <div id="image-list" style="overflow-x: hidden; overflow-y: auto;"></div>
 	    <div class="paginator"></div>
     </div>
-	<div class="closebutton"><span class="close"><?php echo $this->translate('Close'); ?></span></div>
-
+    
+	<div class="closebutton">
+        <span class="help">
+                <?php echo $this->toasterHelp(Tools_Misc::SECTION_STORE_ADDEDITPRODUCT, Tools_Misc::$_helpHashMap);?>
+        </span>
+        <span class="close"><?php echo $this->translate('Close'); ?></span></div>
+            
     <ul>
         <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
         <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
