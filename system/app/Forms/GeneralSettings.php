@@ -13,11 +13,11 @@ class Forms_GeneralSettings extends Zend_Form {
 		
 		
 		$this->addElement('text', 'company', array(
-			'label' => 'Company name'
+			'label' => 'Store front name'
 		));
 		
 		$this->addElement('text', 'email', array(
-			'label' => 'Company e-mail'
+			'label' => 'Store front e-mail'
 		));
 		
 		$this->addElement('text', 'address1', array(
