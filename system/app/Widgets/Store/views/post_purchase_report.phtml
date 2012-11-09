@@ -1,8 +1,8 @@
 <?php if(!isset($this->mailReport)):?>
 <div class="post-purchase">
-    <p class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></p>
+    <h3 class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></h3>
     <div class="post-purchase-report-customer-info">
-        <span class="title"><?php echo $this->translate('Sold to');?>:</span>
+        <h4 class="title"><?php echo $this->translate('Sold to');?>:</h4>
         <?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
             <?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId);?>
             <p class="customer-name"><?php echo $billingAddress['firstname'];?> <?php echo $billingAddress['lastname'];?></p>
@@ -10,8 +10,8 @@
     </div>
 
     <div class="post-purchase-report-billing">
-    <span class="title"><?php echo $this->translate('Billing Address');?>:</span>
-        <p class="post-purchase-report-billing-address">
+        <h4 class="title"><?php echo $this->translate('Billing Address');?>:</h4>
+        <div class="post-purchase-report-billing-address">
             <?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
                 <?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId);?>
                 <span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
@@ -24,10 +24,10 @@
             <?php else:?>
                 <span><?php echo $this->translate('not provided');?></span>
             <?php endif;?>
-        </p>
+        </div>
     </div>
-    <p style="clear:both"></p>
-    <table class="post-purchase-report cart-content">
+
+	<table class="post-purchase-report cart-content">
         <thead>
             <tr>
                 <th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
@@ -72,7 +72,7 @@
         </tbody>
     </table>
     <div class="post-purchase-report-shipping">
-        <span class="title"><?php echo $this->translate( $this->cart->getShippingService() === Shopping::SHIPPING_PICKUP ? 'Pickup information' : 'Shipping Address'); ?>:</span>
+        <h4 class="title"><?php echo $this->translate( $this->cart->getShippingService() === Shopping::SHIPPING_PICKUP ? 'Pickup information' : 'Shipping Address'); ?>:</h4>
 		<div class="post-purchase-report-shipping-address">
 	<?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
 			<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
@@ -82,7 +82,7 @@
 		<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP) : ?>
 	        <span><?php echo $shippingAddress['phone'];?></span>
         </div>
-        <span class="title"><?php echo $this->translate('Pickup location'); ?>:</span>
+        <h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
         <div>
 		    <span class="company"><?php echo $this->shoppingConfig['company'];?></span><br />
 		    <span class="phone"><?php echo $this->translate('Phone').': '.$this->shoppingConfig['phone'];?></span><br />
@@ -110,15 +110,15 @@
         </div>
     </div>
     <div class="post-purchase-report-summary">
-        <p class="post-purchase-row cart-subtotal">
+        <div class="post-purchase-row cart-subtotal">
             <span><?php echo $this->translate('Sub-Total');?>:</span>
             <?php if($this->showPriceIncTax == 1):?>
                 <span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal()+$this->cart->getTotalTax());?></span>
             <?php else:?>
                 <span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal());?></span>
             <?php endif;?>
-        </p>
-        <p class="post-purchase-row cart-total-tax">
+        </div>
+        <div class="post-purchase-row cart-total-tax">
             <?php if(Tools_Misc::getTaxName() != ''):?>
                 <?php $taxName = Tools_Misc::getTaxName();?> 
             <?php else:?>
@@ -130,15 +130,15 @@
                 <span><?php echo $this->translate('Total '.$taxName);?>:</span>
             <?php endif;?>
                 <span><?php echo $this->currency($this->cart->getTotalTax());?></span>
-        </p>
-        <p class="post-purchase-row cart-shipping">
+        </div>
+        <div class="post-purchase-row cart-shipping">
             <span><?php echo $this->translate('Shipping');?>:</span>
             <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
-        </p>
-        <p class="post-purchase-row cart-total">
+        </div>
+        <div class="post-purchase-row cart-total">
             <span><?php echo $this->translate('Total');?>:</span>
             <span><?php echo $this->currency($this->cart->getTotal());?></span>
-        </p>
+        </div>
     </div>
 </div>
 
