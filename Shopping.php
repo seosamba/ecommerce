@@ -103,11 +103,10 @@ class Shopping extends Tools_Plugins_Abstract {
             'zones',
             //'product',
 	        'shipping',
-	        'clients',
-	        'brandlogos'
+	        'clients'
         ),
 	    Tools_Security_Acl::ROLE_ADMIN => array(
-		    'brandlogos'
+		   
 	    ),
 	    Tools_Security_Acl::ROLE_GUEST => array(
 
@@ -1242,9 +1241,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	public function brandlogosAction(){
-		$this->_layout->content = $this->_view->render('brandlogos.phtml');
-        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_BRANDLOGOS;
-		echo $this->_layout->render();
+		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){
+            $this->_layout->content = $this->_view->render('brandlogos.phtml');
+            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_BRANDLOGOS;
+            echo $this->_layout->render();
+        }
 	}
 
 	/**
