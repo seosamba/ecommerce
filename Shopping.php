@@ -1010,21 +1010,21 @@ class Shopping extends Tools_Plugins_Abstract {
 		if(!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
-		$products = $this->_request->getParam('products');
-		$offset   = $this->_request->getParam('offset');
-		if(empty($products)) {
-			$this->_responseHelper->success(array('content' => ''));
+		$content = '';
+		$page = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+		$order = $this->_request->getParam('order');
+		$tags = $this->_request->getParam('tags');
+		$brands = $this->_request->getParam('brands');
+
+		$offset = intval($page) * Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll(null, $order, $offset, Widgets_Productlist_Productlist::DEFAULT_LIMIT, null, $tags, $brands );
+		if (!empty($products)){
+			$template = $this->_request->getParam('template');
+			$widget   = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + Widgets_Productlist_Productlist::DEFAULT_LIMIT));
+			$content  = $widget->setProducts($products)->setCleanListOnly(true)->render();
+			unset($widget);
 		}
-		$products = array_map(function($item) {
-			$product = new Models_Model_Product($item);
-			$product->setPage(new Application_Model_Models_Page($item['page']));
-			return $product;
-		}, $products);
-		$template = $this->_request->getParam('template');
-		$widget   = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + Widgets_Productlist_Productlist::DEFAULT_OFFSET));
-		$content  = $widget->setProducts($products)->setCleanListOnly(true)->render();
-		$widget->setProducts(array());
-		$this->_responseHelper->success(array('content' => $content));
+		echo $content;
 	}
 
 	protected function _renderPaymentZone() {

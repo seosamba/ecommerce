@@ -27,7 +27,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	/**
 	 * Product list default offset (used for portional load)
 	 */
-	const DEFAULT_OFFSET        = 100;
+	const DEFAULT_LIMIT     = 50;
 
 	/**
 	 * Seotoaster website action helper
@@ -78,7 +78,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	public function _load() {
         $this->_view             = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
         $this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
-        $this->_view->limit      = self::DEFAULT_OFFSET;
+        $this->_view->limit      = self::DEFAULT_LIMIT;
         $this->_websiteHelper    = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
         $this->_view->websiteUrl = $this->_websiteHelper->getUrl();
         $this->_productMapper    = Models_Mapper_ProductMapper::getInstance();
@@ -95,7 +95,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->productTemplate = $this->_productTemplate->getName();
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 		if(!isset($this->_options[0])) {
-			$this->_view->offset = self::DEFAULT_OFFSET;
+			$this->_view->offset = self::DEFAULT_LIMIT;
 		} else if(!intval($this->_options[0])) {
 			return $this->_view->render('productlist.phtml');
 		} else {
@@ -119,6 +119,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
+		$this->_view->totalCount = sizeof($products);
 		$wesiteData  = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
 		// init variables we will use in closure
@@ -134,7 +135,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		);
 
         if(empty($products)) {
-            return '<!-- you do not have products -->';
+            return '';
         }
 
 		$cacheTags = array();
@@ -190,6 +191,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:description'       => nl2br($shortDesc),
                 '$product:description:full'  => nl2br($product->getFullDescription()),
 				'$store:addtocart'           => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+				'$store:addtocart:'.$product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:checkbox'  => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox ->render() : '',
                 '$product:options'           => isset($productOptionsView) ? $productOptionsView : ''
 			))->parse($templatePrepend . $data['templateContent']);
@@ -243,7 +245,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 		if(empty($this->_options)) {
 			array_push($this->_cacheTags, 'prodid_all');
-			return $this->_productMapper->fetchAll($enabledOnly, array('created_at DESC'), 0, self::DEFAULT_OFFSET);
+			return $this->_productMapper->fetchAll($enabledOnly, array('created_at DESC'), 0, self::DEFAULT_LIMIT);
 		}
 		$filters = array(
 			'tags'      => null,
@@ -272,7 +274,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 		}
 
-		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'], null, null, null, $filters['tags'], $filters['brands']);
+		$this->_view->filters = $filters;
+
+		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
+			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null),  self::DEFAULT_LIMIT,
+			null, $filters['tags'], $filters['brands']);
 	}
 
 	/**

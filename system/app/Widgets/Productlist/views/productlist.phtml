@@ -1,40 +1,33 @@
+<?php $id = uniqid('pl-'); ?>
 <div class="product-list">
 	<?php echo $this->plContent; ?>
+	<?php if ($this->totalCount >= $this->limit): ?>
+    <a href="#" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
+	<?php endif; ?>
 </div>
-<?php if(isset($this->offset)): ?>
-	<?php $this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js'); ?>
-	<script type="text/javascript">
-		var offset = <?php echo $this->offset; ?>;
-		$(function() {
-			wpcallback();
+<?php if ($this->totalCount >= $this->limit): ?>
+<script>
+	$('#<?php echo $id; ?>').on('click', function(e){
+        e.preventDefault();
+
+        var self = this,
+	        nextpage = $(this).data('nextpage') || 1,
+		    filters = $.extend({
+			    template: '<?php echo $this->productTemplate; ?>',
+			    nextpage: nextpage
+		    }, <?php echo json_encode(array_filter($this->filters)); ?>);
+
+		showSpinner();
+
+		$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
+            hideSpinner();
+            if (response) {
+                $(self).before(response);
+				$(self).data('nextpage', ++nextpage);
+            } else {
+	            $(self).remove();
+            }
 		});
-
-		function loadList(callback) {
-			var productTemplate = '<?php echo $this->productTemplate; ?>';
-			showSpinner();
-			$.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/product/', {
-				offset : offset,
-				limit  : <?php echo $this->limit; ?>
-			}, function(response) {
-				$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', {
-					products  : response,
-					template  : productTemplate,
-					offset    : offset
-				},
-				function(response) {
-					$('.product-list').append(response.responseText.content);
-					offset += <?php echo $this->limit; ?>;
-					hideSpinner();
-					wpcallback();
-				}, 'json');
-			});
-		}
-
-		function wpcallback() {
-			$('.product-thumb:last').waypoint(function() {
-				$(this).waypoint('remove');
-		        loadList(wpcallback);
-			}, {'offset' : '30%'});
-		}
-	</script>
+	});
+</script>
 <?php endif; ?>
