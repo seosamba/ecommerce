@@ -359,7 +359,7 @@ class Tools_ShoppingCart {
 			);
 
 			foreach ($item['options'] as $option) {
-				$data['options'][$option['option_id']] = $option['id'];
+				$data['options'][$option['option_id']] = isset($option['id']) ? $option['id'] : $option['title'];
 			}
 			array_push($cartSessionContent, $data);
 		}
@@ -420,20 +420,37 @@ class Tools_ShoppingCart {
 		if(!empty($options)) {
 			$defaultOptions = $item->getDefaultOptions();
 			foreach($defaultOptions as $defaultOption) {
-				foreach($options as $optionId => $selectionId) {
-					if($defaultOption['id'] != $optionId) {
-						continue;
-					}
-					$defaultSelections = $defaultOption['selection'];
-					if(empty($defaultSelections)) {
-						return array();
-					}
-					foreach($defaultSelections as $defaultSelection) {
-						if($defaultSelection['id'] != $selectionId) {
-							continue;
+				switch ($defaultOption['type']){
+					case Models_Model_Option::TYPE_DROPDOWN:
+					case Models_Model_Option::TYPE_RADIO:
+						foreach($options as $optionId => $selectionId) {
+							if($defaultOption['id'] != $optionId) {
+								continue;
+							}
+							$defaultSelections = $defaultOption['selection'];
+							if(empty($defaultSelections)) {
+								return array();
+							}
+							foreach($defaultSelections as $defaultSelection) {
+								if($defaultSelection['id'] != $selectionId) {
+									continue;
+								}
+								$modifiers[$defaultOption['title']] = $defaultSelection;
+							}
 						}
-						$modifiers[$defaultOption['title']] = $defaultSelection;
-					}
+						break;
+					case Models_Model_Option::TYPE_DATE:
+					case Models_Model_Option::TYPE_TEXT:
+						$modifiers[$defaultOption['title']] = array(
+							'option_id' => $defaultOption['id'],
+							'title'     => $options[$defaultOption['id']],
+							'priceSign' => null,
+							'priceType' => null,
+							'priceValue' => null,
+							'weightSign' => null,
+							'weightValue' => null
+						);
+						break;
 				}
 			}
 		}
