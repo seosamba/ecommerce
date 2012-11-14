@@ -458,3 +458,12 @@ INSERT INTO `shopping_zone_state` (`zone_id`, `state_id`) VALUES
 (2, 62),
 (2, 63),
 (2, 64);
+
+INSERT INTO `email_triggers_recipient` (`recipient`) VALUES
+('customer'),
+('sales person');
+
+INSERT INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
+('1', 'store_newcustomer', 'Tools_StoreMailWatchdog'),
+('1', 'store_neworder', 'Tools_StoreMailWatchdog'),
+('1', 'store_trackingnumber', 'Tools_StoreMailWatchdog');
