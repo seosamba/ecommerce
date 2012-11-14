@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS `shopping_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `shopping_config` (`name`, `value`) VALUES
-('address1', ''),
-('address2', ''),
+('address1', '827 Shrader St.'),
+('address2', 'Suite 400'),
 ('cartPlugin', 'cart'),
 ('city', 'San Francisco'),
 ('company', 'Demo Store'),
@@ -133,9 +133,11 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('currency', 'USD'),
 ('email', 'demostore@example.com'),
 ('forceSSLCheckout', '0'),
+('phone', '415 899 3455'),
 ('showPriceIncTax', '1'),
 ('state', '5'),
-('weightUnit', 'kg');
+('weightUnit', 'kg'),
+('zip', '94117');
 
 CREATE TABLE IF NOT EXISTS `shopping_product` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
