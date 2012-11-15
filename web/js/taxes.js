@@ -1,8 +1,8 @@
 require.config({
     deps: ['modules/taxes/application'],
     paths: {
-        'underscore'         : '/plugins/shopping/web/js/libs/underscore/underscore-min',
-        'backbone'           : '/plugins/shopping/web/js/libs/backbone/backbone-min'
+        'underscore'         : './libs/underscore/underscore-min',
+        'backbone'           : './libs/backbone/backbone-min'
     },
     shim: {
         'underscore': {exports: '_'},

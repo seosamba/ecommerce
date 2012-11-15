@@ -226,9 +226,9 @@ define([
 
 			//setting model properties to view
 			if (this.model.has('photo')){
-				this.$('#product-image').attr('src', this.websiteUrl+'media/'+this.model.get('photo').replace('/', '/small/'));
+				this.$('#product-image').attr('src', $('#website_url').val()+'media/'+this.model.get('photo').replace('/', '/small/'));
 			} else {
-				this.$('#product-image').attr('src', this.websiteUrl+'system/images/noimage.png');
+				this.$('#product-image').attr('src', $('#website_url').val()+'system/images/noimage.png');
 			}
 			this.$('#product-name').val(this.model.get('name'));
 			this.$('#product-sku').val(this.model.get('sku'));
@@ -278,7 +278,7 @@ define([
             if (!this.model.isNew()){
                 $('#quick-preview').html(this.quickPreviewTmpl({
                     product: this.model.toJSON(),
-                    websiteUrl: this.websiteUrl,
+                    websiteUrl: $('#website_url').val(),
                     currency: this.$('#currency-unit').text()
                 }));
             }
@@ -688,7 +688,7 @@ define([
             });
         },
         initSearchIndex: _.once(function(){
-            $.getJSON('/plugin/shopping/run/searchindex', function(response){
+            $.getJSON($('#website_url').val() + '/plugin/shopping/run/searchindex', function(response){
                 self.searchIndex = response;
                 $('#product-list-search').autocomplete({
                     minLength: 2,

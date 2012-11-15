@@ -1,12 +1,11 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/clients/models/customer_row'
-], function(_, Backbone, CustomerRowModel){
+	'backbone',
+    '../models/customer_row'
+], function(Backbone, CustomerRowModel){
 
     var CustomersCollection = Backbone.Collection.extend({
         model: CustomerRowModel,
-        urlRoot: $('#website_url').val()+'plugin/shopping/run/getdata/type/customer/',
+        urlRoot: 'api/store/customers/',
         paginator: {
             limit: 30,
             offset: 0,
@@ -31,21 +30,19 @@ define([
             if (this.searchTerm) {
                 url += '&search='+this.searchTerm;
             }
-            return url + '&id=';
+            return $('#website_url').val() + url + '&id=';
         },
         next: function(callback) {
             if (!this.paginator.last) {
                 this.paginator.offset += this.paginator.limit;
                 return this.fetch().done(callback);
             }
-            console.log('Last reached');
         },
         previous: function(callback) {
             if (this.paginator.offset >= this.paginator.limit){
                 this.paginator.offset -= this.paginator.limit;
                 return this.fetch().done(callback);
             }
-            console.log('First reached');
         },
         updatePaginator: function(collection) {
             if (this.length === 0){

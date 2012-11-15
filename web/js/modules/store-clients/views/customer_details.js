@@ -3,15 +3,13 @@
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 define([
-	'Underscore',
-	'Backbone'
-], function(_, Backbone){
+	'backbone'
+], function(Backbone){
 
     var customerDetailsView = Backbone.View.extend({
         template: $('#customerDetailsTemplate').template(),
         tagName: 'tr',
-        events: {
-        },
+        events: {},
         render: function(){
             var data = {};
             if (this.model.has('defaultbillingaddressid')){

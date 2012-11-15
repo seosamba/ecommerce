@@ -1,9 +1,8 @@
 define([
-	'Underscore',
-	'Backbone',
-    'modules/clients/collections/customers',
-    'modules/clients/views/customer_row'
-], function(_, Backbone, CustomersCollection, CustomerRowView){
+	'backbone',
+    '../collections/customers',
+    './customer_row'
+], function(Backbone, CustomersCollection, CustomerRowView){
 
     var AppView = Backbone.View.extend({
         el: $('#clients'),
@@ -86,17 +85,17 @@ define([
                 return false;
             }
             showConfirm('Are you sure?', function(){
-                var ids = _(checked).pluck('id');
-                console.log(ids);
+                var self = this,
+                    ids = _(checked).pluck('id');
                 Backbone.sync('delete', null, {
-                    url: app.customers.urlRoot,
+                    url: self.customers.urlRoot,
                     data: JSON.stringify({ids: ids}),
                     success: function(response){
-                        app.customers.fetch().done(function(){
+                        self.customers.fetch().done(function(){
                             var msg = '';
                             _(response).each(function(status, id){
                                if (status === false) {
-                                   var model = app.customers.get(id);
+                                   var model = self.customers.get(id);
                                    if (model) {
                                        msg += (msg.length ? ', ' : '') + model.get('full_name');
                                        model.set('checked', true);

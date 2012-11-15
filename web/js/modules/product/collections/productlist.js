@@ -6,7 +6,7 @@ define([
 
 	var ProductList = Backbone.Collection.extend({
 		model: ProductModel,
-		urlOriginal: '/api/store/products/',
+		urlOriginal:  'api/store/products/',
         paginator: {
             limit: 32,
             offset: 0,
@@ -17,9 +17,9 @@ define([
         },
         url: function() {
             if (!_.isEmpty(this.paginator)){
-                return this.urlOriginal + 'offset/'+this.paginator.offset+'/limit/'+this.paginator.limit;
+                return $('#website_url').val() + this.urlOriginal + 'offset/'+this.paginator.offset+'/limit/'+this.paginator.limit;
             }
-            return this.urlOriginal;
+            return $('#website_url').val() + this.urlOriginal;
         },
 		initialize: function(){
             this.bind('reset', this.resetPaginator, this);

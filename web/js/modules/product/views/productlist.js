@@ -6,7 +6,7 @@ define([
 	var ProductView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'productlisting',
-		template:_.template($('#productListingTemplate').html()),
+		template: _.template($('#productListingTemplate').html()),
         container: $('#product-list-holder'),
 		events: {},
 		initialize: function(){

@@ -5,7 +5,9 @@ define([
 
     var BrandList = Backbone.Collection.extend({
         model: BrandModel,
-        url: '/api/store/brands/'
+        url: function(){
+            return $('#website_url').val() + 'api/store/brands/';
+        }
     });
 	return BrandList;
 });

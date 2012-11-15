@@ -1,13 +1,9 @@
 define([
-	'Underscore',
-	'Backbone'
-], function(_, Backbone){
+	'backbone'
+], function(Backbone){
 
     var CustomerModel = Backbone.Model.extend({
-        urlRoot: $('#website_url').val()+'plugin/shopping/run/getdata/type/customer/',
-        initialize: function(){
-
-        },
+        urlRoot: function(){ return $('#website_url').val()+'api/store/customers/id/'; },
         parse: function(response){
 
             var AddressModel = Backbone.Model.extend({}),
@@ -17,7 +13,6 @@ define([
             if (response.hasOwnProperty('addresses')){
                 response.addresses = new AddressCollection(response.addresses);
             }
-            console.log(response);
             return response;
         }
     });

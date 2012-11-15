@@ -1,7 +1,6 @@
 define([
-	'Underscore',
-	'Backbone'
-], function(_, Backbone){
+	'backbone'
+], function(Backbone){
 
     var customerRowView = Backbone.View.extend({
         template: $('#tableRowTemplate').template(),
@@ -18,7 +17,7 @@ define([
             return this;
         },
         details: function(){
-            app.showCustomerDetails(this.model.get('id'));
+            Toastr.StoreClientsWidget.showCustomerDetails(this.model.get('id'));
         },
         toggle: function(e) {
             this.model.set({checked: e.target.checked});

@@ -8,7 +8,9 @@ define(['backbone', 'backbone.paginator'], function(Backbone){
         paginator_core: {
             'type': 'POST',
             'dataType': 'json',
-            'url': '/backend/backend_media/getdirectorycontent'
+            'url': function(){
+                $('#website_url').val() + 'backend/backend_media/getdirectorycontent'
+            }
         },
         paginator_ui: {
             firstPage: 1,

@@ -1,9 +1,7 @@
 define([ './views/app' ], function(AppView){
 	if (!window.console) {
 		window.console = {
-		log: function(){
-				return false;
-			}
+		    log: function(){ return false; }
 		};
 	}
 

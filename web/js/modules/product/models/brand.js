@@ -4,7 +4,9 @@ define([
 ], function(_, Backbone){
 	
 	var BrandModel = Backbone.Model.extend({
-        urlRoot: 'plugin/shopping/run/getdata/type/brands',
+        urlRoot: function(){
+            return $('#website_url').val() + 'plugin/shopping/run/getdata/type/brands'
+        },
 		defaults: {
             name: ''
 		}

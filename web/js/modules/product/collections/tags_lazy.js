@@ -9,7 +9,9 @@ define([
         paginator_core: {
             type: 'GET',
             dataType: 'json',
-            url: '/api/store/tags/'
+            url: function(){
+                return $('#website_url').val() + 'api/store/tags/'
+            }
         },
         paginator_ui: {
             firstPage: 1,

@@ -6,7 +6,7 @@
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_6 suffix_6 mb10px">
-		<label for="" class="grid_3 mt5px alpha"><?php echo $this->translate('Zone Name');?>:</label>
+		<label class="grid_3 mt5px alpha"><?php echo $this->translate('Zone Name');?>:</label>
 		<input type="text" class="zone-name grid_9 alpha omega" value="<%= name %>" placeholder="enter name for zone"/>
 	</div>
 	<div class="countries grid_6">
@@ -60,7 +60,7 @@ li.entry-row .ui-icon {
     cursor: pointer;
 }
 li.entry-row .ui-icon:hover {
-    background-image: url("/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png");
+    background-image: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png");
 }
 #ajax_msg {
     line-height: 50px;
@@ -80,16 +80,16 @@ li.add-new-zone {
 	-moz-border-radius:3px 3px 0 0;
 	-webkit-border-radius:3px 3px 0 0;
 	border-radius:3px 3px 0 0;
-	background: url("/system/uithemes/seotoasterui/images/ui-bg_highlight-soft_50_dedede_1x100.png") repeat-x scroll 50% 50% #E8E8E8;
+	background: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-bg_highlight-soft_50_dedede_1x100.png") repeat-x scroll 50% 50% #E8E8E8;
 	border: 1px solid #D6D6D6;
 	display: inline-block;
 }
 li.add-new-zone:hover {
-	background: url("/system/uithemes/seotoasterui/images/ui-bg_inset-soft_50_e6e6fa_1x100.png") repeat-x scroll 50% 50% #E6E6FA;
+	background: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-bg_inset-soft_50_e6e6fa_1x100.png") repeat-x scroll 50% 50% #E6E6FA;
 	border: 1px solid #D3D3D3;
 }
 #new-zone-btn {
-	background: url("/system/uithemes/seotoasterui/images/ui-icons_444444_256x240.png") -12px -125px no-repeat;
+	background: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-icons_444444_256x240.png") -12px -125px no-repeat;
 	border: none;
 	height: 1.3em;
 	width: 1.5em;

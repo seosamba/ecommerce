@@ -49,7 +49,7 @@ div.box:hover {
 	box-shadow: 0 0 3px lightseagreen;
 }
 .product-tags .tag-widget {
-    background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
+    background: url("<?php echo $this->websiteUrl;?>/system/images/bg-strip.png") repeat scroll 0 0 transparent;
     border: 2px solid white;
     -moz-border-radius: 3px 3px 3px 3px;
     -webkit-border-radius: 3px 3px 3px 3px;
@@ -94,7 +94,7 @@ div.box:hover {
 	vertical-align:top;
 }
 .tag-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
-	background-image: url(/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
+	background-image: url(<?php echo $this->websiteUrl;?>/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
 }
 #options-holder .option-content .option-modifier-select {
 	width: 50px;
@@ -264,7 +264,7 @@ input#delete {
 	background: #3d6075;
 }
 .ui-widget.ui-button.remove-option span.ui-icon {
-	background-image: url(/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
+	background-image: url(<?php echo $this->websiteUrl;?>/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
 }
 #image-list {
 	height: 450px !important;
@@ -288,7 +288,7 @@ input#delete {
 	overflow-y: auto;
 	overflow-x: hidden;
 	padding-right: 5px;
-	background: url('/system/images/bg-strip.png');
+	background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
 	box-shadow: rgb(153, 153, 153) 0px 4px 10px;
 }
 /* IE 6 doesn't support max-height
@@ -476,12 +476,12 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     <% } %>
         <p class="brand"><%= brand %></p>
 	    <% if (showDelete) { %>
-        <img src="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <img src="<?php echo $this->websiteUrl;?><%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
         <% } else { %>
 		<% if (rendered) { %>
-        <img src="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <img src="<?php echo $this->websiteUrl;?><%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
         <% } else { %>
-	    <img class="lazy" src="" data-original="<%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+	    <img class="lazy" src="" data-original="<?php echo $this->websiteUrl;?><%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
 	    <% } %>
 	    <% } %>
         <p class="name"><%= name %></p>
@@ -530,7 +530,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                 </label>
             </div>
         </div>
-        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h450" style="overflow-x: hidden; overflow-y: auto; background: url('/system/images/bg-strip.png');"></div>
+        <div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h450" style="overflow-x: hidden; overflow-y: auto; background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');"></div>
 	    <div class="paginator"><!-- placeholder for paginator --></div>
     </div>
 
