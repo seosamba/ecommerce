@@ -1346,9 +1346,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
     
     protected function _addVersionToAdminPanel(){
-        $shoppingVersion = $this->_configMapper->getConfigParam('version');
+        $shoppingVersion = Tools_Filesystem_Tools::getFile(__DIR__ . DIRECTORY_SEPARATOR .'version.txt');
         if($shoppingVersion != null && $shoppingVersion != ''){
-            $this->_view->shoppingVersion = ' + Store '.$shoppingVersion;
+            $this->_view->shoppingVersion = str_replace("\n",'', '+ Store '.$shoppingVersion);
             $this->_injectContent($this->_view->render('shoppingVersion.phtml'));
         }
     }
