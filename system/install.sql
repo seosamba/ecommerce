@@ -156,6 +156,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `tax_class` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `base_price` DECIMAL(10,2) NULL DEFAULT NULL,
+  `inventory` VARCHAR(50) NULL DEFAULT NULL COLLATE utf8_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -259,8 +261,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `sub_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total',
-  `total_tax` double(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Total Tax',
+  `total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Total Tax',
   `total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total + Total Tax + Shipping',
+  `notes` TEXT NULL DEFAULT NULL COMMENT 'Comment for order',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -355,7 +358,8 @@ ALTER TABLE `shopping_tax`
 INSERT INTO `page_option` (`id`, `title`, `context`, `active`) VALUES
 ('option_checkout', 'The cart checkout page', 'Cart and checkout', 1),
 ('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1),
-('option_storeclientlogin', 'Store client landing page', 'Cart and checkout', 1);
+('option_storeclientlogin', 'Store client landing page', 'Cart and checkout', 1),
+('option_storeshippingterms', 'Shipping terms and conditions', 'Cart and checkout', 1);
 
 INSERT INTO `shopping_zone` (`id`, `name`) VALUES
 (1, 'US'),
