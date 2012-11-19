@@ -88,15 +88,17 @@
 				<?php endif; ?>
 				</tbody>
 				<tfoot>
-					<tr>
-						<td colspan="5"></td>
-						<td class="text-right">Subtotal:</td>
+                   	<tr>
+						<td class="floatLeft"><?php echo $this->translate("Delivery comments:");?></td>
+                        <td class="floatLeft"><span class="order-notes"><?php echo $this->order->getNotes();?></span></td>
+                        <td colspan="4"></td>
+                        <td class="text-right">Subtotal:</td>
 						<td><?php echo $this->currency($this->order->getSubTotal());?></td>
 					</tr>
 					<tr>
 						<td colspan="5"></td>
 						<td class="text-right">Shipping:</td>
-						<td><?php echo $this->currency($this->order->getShippingPrice());?></td>
+                        <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
 					</tr>
 					<tr>
 						<td colspan="5"></td>
@@ -106,8 +108,8 @@
 				</tfoot>
 			</table>
 		</div>
+        </div>
 	</div>
-</div>
 <style>
 	.seotoaster {
 		background-color: #ffffff;
@@ -145,6 +147,9 @@
 	}
 	table tfoot td.text-right {
 		text-align:right;
+	}
+    table tfoot td.floatLeft {
+		float:left;
 	}
 </style>
 <script>
