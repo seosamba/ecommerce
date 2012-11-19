@@ -673,7 +673,7 @@ define([
             showConfirm('Oh man... Really?', function(){
                 if (!_.isEmpty(ids)) {
                     $.ajax({
-                        url: self.products.urlOriginal +'id/'+ids.join(','),
+                        url: self.products.paginator_core.url()+'id/'+ids.join(','),
                         type: 'DELETE',
                         dataType: 'json',
                         statusCode: {
