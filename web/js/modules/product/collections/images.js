@@ -9,7 +9,7 @@ define(['backbone', 'backbone.paginator'], function(Backbone){
             'type': 'POST',
             'dataType': 'json',
             'url': function(){
-                $('#website_url').val() + 'backend/backend_media/getdirectorycontent'
+                return $('#website_url').val() + 'backend/backend_media/getdirectorycontent';
             }
         },
         paginator_ui: {
