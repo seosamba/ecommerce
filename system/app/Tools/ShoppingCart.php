@@ -29,6 +29,8 @@ class Tools_ShoppingCart {
 	protected $_billingAddressKey   = null;
 
 	protected $_shippingData    = null;
+    
+    protected $_notes           = null;
 
     private function __construct() {
         $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
@@ -313,6 +315,9 @@ class Tools_ShoppingCart {
 		if (isset($this->_session->shippingData)) {
 			$this->setShippingData(unserialize($this->_session->shippingData));
 		}
+        if (isset($this->_session->notes)) {
+			$this->setNotes($this->_session->notes);
+		}
 
 		$this->_shippingAddressKey  = $this->_session->shippingAddressKey;
 		$this->_billingAddressKey   = $this->_session->billingAddressKey;
@@ -327,6 +332,7 @@ class Tools_ShoppingCart {
 	    $this->_session->shippingAddressKey = $this->_shippingAddressKey;
 	    $this->_session->billingAddressKey  = $this->_billingAddressKey;
 	    $this->_session->shippingData  = serialize($this->getShippingData());
+        $this->_session->notes      = $this->getNotes();
     }
 
 	/**
@@ -382,6 +388,10 @@ class Tools_ShoppingCart {
 				->setShippingType($shippingData['type'])
 				->setShippingService($shippingData['service']);
 		}
+        
+        if($this->getNotes()){
+            $cartSession->setNotes($this->getNotes());
+        }
 
 		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
 		if ($result && $this->getCartId() === null){
@@ -521,6 +531,15 @@ class Tools_ShoppingCart {
 
 	public function getCustomerId() {
 		return $this->_customerId;
+	}
+    
+    public function setNotes($notes) {
+		$this->_notes = $notes;
+		return $this;
+	}
+
+	public function getNotes() {
+		return $this->_notes;
 	}
 
 }

@@ -22,7 +22,32 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		$this->setElementFilters(array(
 			new Zend_Filter_StripTags()
 		));
-
+        $websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
+        
+        $termsAndConditionsPage = current(Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_STORE_SHIPPING_TERMS));
+        $notesLabel = 'I authorized the parsel to be left at the delivery address without signature.';
+        if(!empty($termsAndConditionsPage)){
+            $notesLabel .= ' <a href="'.$websiteUrl.$termsAndConditionsPage->getUrl().'" target = _blank class="terms-page" title="Shipping Policy">Shipping Policy</a>';
+        }
+        
+        $this->addElement(new Zend_Form_Element_Checkbox(array(
+			'name'          => 'shippingNotes',
+			'label'         => $notesLabel,
+            'required'      => true,
+            'checkedValue'  => 1,
+            'allowEmpty'    => false,
+            'uncheckedValue'=> null
+        )));
+        
+        $this->addElement(new Zend_Form_Element_Textarea(array(
+			'name'     => 'notes',
+			'label'    => 'Dilivery comments',
+            'rows'     => '3',
+            'cols'     => '45'
+		)));
+               
+        $this->getElement('notes')->addFilter('StripTags');
+                
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'mobile',
 			'label'    => 'Mobile'
@@ -34,6 +59,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 				->setAttrib('class', 'required')
 				->setValidators(array('EmailAddress'));
 		$this->getElement('zip')->setRequired(true);
+        $this->getElement('shippingNotes')->setRequired(true)->setAttrib('class', 'required');
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(
@@ -42,8 +68,8 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 				'company',
 				'email',
 				'phone',
-				'mobile'
-
+				'mobile',
+                'notes'
 			),
 			'rcol' => array(
 				'address1',
@@ -51,8 +77,9 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 				'city',
 				'zip',
 				'country',
-				'state'
-			)
+				'state',
+                'shippingNotes'
+    		)
 		));
 
 		$lcol = $this->getDisplayGroup('lcol')
@@ -73,6 +100,8 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'Errors',
 			array('HtmlTag', array('tag' => 'div'))
 		));
+        
+        $this->getElement('shippingNotes')->getDecorator('Label')->setOption('escape',false);
 
 		$this->addElement('hidden', 'step', array(
 			'value' => Shopping::KEY_CHECKOUT_ADDRESS,

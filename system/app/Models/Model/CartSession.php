@@ -48,6 +48,9 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	protected $_createdAt;
 
 	protected $_updatedAt;
+    
+    protected $_notes = null;
+    
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -214,6 +217,15 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getReferer() {
 		return $this->_referer;
+	}
+    
+    public function setNotes($notes) {
+		$this->_notes = $notes;
+		return $this;
+	}
+
+	public function getNotes() {
+		return $this->_notes;
 	}
 
 }

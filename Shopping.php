@@ -56,6 +56,8 @@ class Shopping extends Tools_Plugins_Abstract {
      * Option for the page options system.
      */
     const OPTION_CHECKOUT       = 'option_checkout';
+    
+    const OPTION_STORE_SHIPPING_TERMS  = 'option_storeshippingterms';
 
 	/**
 	 * Option for the page options system
