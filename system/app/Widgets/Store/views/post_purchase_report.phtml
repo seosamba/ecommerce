@@ -134,7 +134,7 @@
         </div>
         <div class="post-purchase-row cart-shipping">
             <span><?php echo $this->translate('Shipping');?>:</span>
-            <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
+            <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice());?></span>
         </div>
         <div class="post-purchase-row cart-total">
             <span><?php echo $this->translate('Total');?>:</span>
