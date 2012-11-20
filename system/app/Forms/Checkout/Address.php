@@ -24,9 +24,10 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		));
         $websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
         
-        $termsAndConditionsPage = current(Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_STORE_SHIPPING_TERMS));
+        $termsAndConditionsPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_STORE_SHIPPING_TERMS);
         $notesLabel = 'I authorize the parsel to be left at the delivery address without signature.';
         if(!empty($termsAndConditionsPage)){
+	        $termsAndConditionsPage = current($termsAndConditionsPage);
             $notesLabel .= ' <a href="'.$websiteUrl.$termsAndConditionsPage->getUrl().'" target = _blank class="terms-page" title="Shipping Policy">Shipping Policy</a>';
         }
         
@@ -41,7 +42,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
         
         $this->addElement(new Zend_Form_Element_Textarea(array(
 			'name'     => 'notes',
-			'label'    => 'for delivery comments',
+			'label'    => 'For delivery comments',
             'rows'     => '3',
             'cols'     => '45'
 		)));
