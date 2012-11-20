@@ -5,7 +5,7 @@ define([
 	
 	var BrandModel = Backbone.Model.extend({
         urlRoot: function(){
-            return $('#website_url').val() + 'plugin/shopping/run/getdata/type/brands'
+            return $('#website_url').val() + 'api/store/brands'
         },
 		defaults: {
             name: ''

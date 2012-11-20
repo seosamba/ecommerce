@@ -111,7 +111,7 @@
 			        .on('click', '#btn-create', this.insertList);
 			    $('.pselect').chosen().change(function() {
 					uiTab.offset = 0;
-				    uiTab.loadStoreData('product', true)
+				    uiTab.loadStoreData('products', true)
 			    });
 		    },
 		    launch: function() {
@@ -133,7 +133,7 @@
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');
-				    uiTab.loadStoreData('product')
+				    uiTab.loadStoreData('products')
 			    }
 		    },
 		    insertSingleProduct: function() {
@@ -167,7 +167,7 @@
                     return false;
                 }
                 var utab = this;
-			    $.getJSON('<?php echo $this->websiteUrl; ?>plugin/shopping/run/getdata/type/' + dataType,
+			    $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
 				    this.getParams(filter),
 				function(response) {
                     if(response.length) {
@@ -176,13 +176,13 @@
                             case 'brands':
 	                        	uiTab.parseTagsAndBrands(response, dataType);
                             break;
-                            case 'product':
+                            case 'products':
 	                            uiTab.parseProducts(response, filter);
 								if(!$('#tags').val() && !$('#brands').val()) {
 		                            $('.productlisting:last-child').waypoint(function() {
 										$(this).waypoint('remove');
 										utab.offset += 30;
-										uiTab.loadStoreData('product')
+										uiTab.loadStoreData('products')
 									},
 									{
 										context: '#product-products',
@@ -208,8 +208,12 @@
                     data.limit = this.limit;
                 }
                 if(typeof filter != 'undefined' && filter) {
-                    data.ftag = $('#tags').val();
-                    data.fbrand = $('#brands').val();
+	                if ($('#tags').val()) {
+                        data.ftag = $('#tags').val();
+	                }
+	                if ($('#brands').val()) {
+                        data.fbrand = $('#brands').val();
+	                }
                 }
 			    return data;
 		    },
