@@ -2,7 +2,7 @@
 <div class="product-list">
 	<?php echo $this->plContent; ?>
 	<?php if ($this->totalCount >= $this->limit): ?>
-    <a href="#" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
+    <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
 	<?php endif; ?>
 </div>
 <?php if ($this->totalCount >= $this->limit): ?>
@@ -15,7 +15,7 @@
 		    filters = $.extend({
 			    template: '<?php echo $this->productTemplate; ?>',
 			    nextpage: nextpage
-		    }, <?php echo json_encode(array_filter($this->filters)); ?>);
+		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>);
 
 		showSpinner();
 
