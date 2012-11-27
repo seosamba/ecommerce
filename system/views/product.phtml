@@ -476,12 +476,12 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     <% } %>
         <p class="brand"><%= brand %></p>
 	    <% if (showDelete) { %>
-        <img src="<?php echo $this->websiteUrl;?><%= photo ? '/' + mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <img src="<?php echo $this->websiteUrl;?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
         <% } else { %>
 		<% if (rendered) { %>
-        <img src="<?php echo $this->websiteUrl;?><%= photo ? '/' + mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <img src="<?php echo $this->websiteUrl;?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
         <% } else { %>
-	    <img class="lazy" src="" data-original="<?php echo $this->websiteUrl;?><%= photo ? '/' + mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+	    <img class="lazy" src="" data-original="<?php echo $this->websiteUrl;?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
 	    <% } %>
 	    <% } %>
         <p class="name"><%= name %></p>
