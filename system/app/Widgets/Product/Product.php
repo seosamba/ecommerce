@@ -145,13 +145,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPhotourl() {
-		$photoSrc = $this->_product->getPhoto();
+		$websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $photoSrc      = $this->_product->getPhoto();
 		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
             $photoSrc = str_replace('/', '/'.$this->_options[0].'/', $photoSrc);
         } else {
             $photoSrc = str_replace('/', '/product/', $photoSrc);
         }
-        return $this->_websiteUrl .'media/' . $photoSrc;
+        return $this->_websiteUrl . $websiteHelper->getMedia() . $photoSrc;
 	}
 	
 	private function _renderPrice() {
