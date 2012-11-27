@@ -48,6 +48,7 @@ define([
         brands: null,
         searchIndex: null,
 		websiteUrl: $('#website_url').val(),
+        mediaPath: $('#media-path').val(),
 		initialize: function(){
             var self = this;
             this.initProduct();
@@ -197,7 +198,7 @@ define([
             var imgName = $(e.currentTarget).find('img').data('name');
             var fldrName = this.$('#product-image-folder').val();
             this.model.set({photo: fldrName+'/'+imgName });
-            this.$('#product-image').attr('src', '/media/'+this.model.get('photo').replace('/', '/small/'));
+            this.$('#product-image').attr('src', '/' + this.mediaPath + this.model.get('photo').replace('/', '/small/'));
             this.$('#image-select-dialog').hide('slide');
             this.$('#product-image-folder').val('0');
         },
@@ -226,7 +227,7 @@ define([
 
 			//setting model properties to view
 			if (this.model.has('photo')){
-				this.$('#product-image').attr('src', $('#website_url').val()+'media/'+this.model.get('photo').replace('/', '/small/'));
+				this.$('#product-image').attr('src', $('#website_url').val()+ this.mediaPath + this.model.get('photo').replace('/', '/small/'));
 			} else {
 				this.$('#product-image').attr('src', $('#website_url').val()+'system/images/noimage.png');
 			}

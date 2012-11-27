@@ -531,6 +531,8 @@ class Shopping extends Tools_Plugins_Abstract {
 				}
 			}
 
+            $this->_view->websiteConfig = $this->_websiteConfig;
+
             $this->_layout->content = $this->_view->render('product.phtml');
             $this->_layout->sectionId = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             echo $this->_layout->render();

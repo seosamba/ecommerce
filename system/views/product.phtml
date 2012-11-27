@@ -565,6 +565,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
     </ul>
     <!--------- MAIN INFO -------------->
+    <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path" />
     <div id="main-tab" class="clearfix">
         <div class="grid_8">
             <fieldset>
