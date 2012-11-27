@@ -16,6 +16,7 @@ define([
 		render: function(){
             var data = {
                 websiteUrl: $('#website_url').val(),
+                mediaPath: $('#media-path').val(),
                 showDelete: _.has(this.options, 'showDelete') ? this.options.showDelete : false
             };
             if (!this.model.has('rendered')){

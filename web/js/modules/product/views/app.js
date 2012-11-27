@@ -280,6 +280,7 @@ define([
                 $('#quick-preview').html(this.quickPreviewTmpl({
                     product: this.model.toJSON(),
                     websiteUrl: $('#website_url').val(),
+                    mediaPath: this.mediaPath,
                     currency: this.$('#currency-unit').text()
                 }));
             }
