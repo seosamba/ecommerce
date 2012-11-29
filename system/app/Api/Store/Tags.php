@@ -1,6 +1,9 @@
 <?php
 /**
  * Tags.php
+ *
+ * @package Store
+ * @since 2.0.0
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Api_Store_Tags extends Api_Service_Abstract {
@@ -12,11 +15,33 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Find product tag by ID
+	 *
+	 * Resourse:
+	 * : /api/store/tags/id/:id
+	 *
+	 * Method:
+	 * : GET
+	 *
+	 * ## Parameters:
+	 * id (type *mixed*)
+	 * : Tag ID or comma separated list of IDs
+	 *
+	 * limit (type *int*)
+	 * : Specifies the number of records to retrieve. If omitted, will return all existing records.
+	 *
+	 * offset (type *int*)
+	 * : Number of records to skip. Used for pagination result set.
+	 *
+	 * count (type *boolean*)
+	 * : When set to true, 1 or non empty string total number of records will be returned in response in 'totalCount' key
+	 *
+	 * @return json Single tag or set of tags
 	 */
 	public function getAction() {
+		/**
+		 * @var mixed ID or comma-separated list of IDs
+		 */
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 
 		if ($id) {
@@ -48,8 +73,9 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Create new product tag
+	 *
+	 * @return json
 	 */
 	public function postAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
@@ -67,9 +93,9 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Update an existing product tag
+	 *
+	 * @return json
 	 */
 	public function putAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
@@ -87,9 +113,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Delete product tag by ID
 	 */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
