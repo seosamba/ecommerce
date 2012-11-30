@@ -1,5 +1,6 @@
 <ul class="related-products">
     <?php foreach ($this->related as $product) : ?>
+	<?php if (!$product->getEnabled()) continue; ?>
     <li>
         <?php if ($product->getPhoto()) : ?>
         <?php

@@ -245,9 +245,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderRelated() {
         $ids = $this->_product->getRelated();
-        if (empty($ids)){
+	    if (empty($ids)){
             return null;
-        }
+        } else {
+		    foreach($ids as $id) {
+			    array_push($this->_cacheTags, 'prodid_'.$id);
+		    }
+	    }
         $related = $this->_productMapper->find($ids);
         $checkoutPage = Tools_Misc::getCheckoutPage();
         $checkoutPageUrl = $checkoutPage != null?$checkoutPage->getUrl():'';
@@ -262,6 +266,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
         }
         return false;
     }
+
+	private function  _renderInventory() {
+		$inventoryCount = $this->_product->getInventory();
+		if (is_null($inventoryCount)){
+			return 'Unlimited';
+		}
+		return $inventoryCount;
+	}
 
     public static function getAllowedOptions() {
 		$translator = Zend_Registry::get('Zend_Translate');
