@@ -18,8 +18,9 @@ define([
                 taxClass: 1,
                 related: [],
                 photo: null,
-                options: new ProductOptions()
-		    }
+                options: new ProductOptions(),
+                inventory: null
+            }
         },
 		initialize: function (){
             this.on('error', function(model, error) { showMessage(error, true); });

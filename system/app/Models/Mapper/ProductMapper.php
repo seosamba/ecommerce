@@ -70,7 +70,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'short_description'	=> $model->getShortDescription(),
 			'full_description'  => $model->getFullDescription(),
 			'price'             => $model->getPrice(),
-			'tax_class'         => $model->getTaxClass()
+			'tax_class'         => $model->getTaxClass(),
+			'inventory'         => is_numeric($model->getInventory()) ? $model->getInventory() : null
 		);
 
 		if ($model->getId()){

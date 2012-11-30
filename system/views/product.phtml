@@ -493,7 +493,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 </script>
 
 <script id="quickPreviewTemplate" type="text/template">
-	<fieldset style="background-image:none; background-color: white; height:272px;">
+	<fieldset style="background-image:none; background-color: white; height:226px;">
 	    <legend><?php echo $this->translate('Preview');?></legend>
 		<a href="<%= websiteUrl + product.page.url %>" target="_blank" style="text-decoration: none; color: inherit;">
             <div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
@@ -582,28 +582,28 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 				<label for="product-enabled">This product is enabled</label>
 			</div>
             <div class="grid_7">
-	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" autofocus="autofocus" />
+	            <input type="text" id="product-name" data-reflection="name" placeholder="enter name of product" autofocus="autofocus" />
             </div>
 			<div class="grid_1">
 				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
 			</div>
             <div class="grid_2">
                 <label for="product-sku">SKU</label>
-                <input type="text" id="product-sku" data-reflection="property" placeholder="item id" />
+                <input type="text" id="product-sku" data-reflection="sku" placeholder="item id" />
             </div>
             <div class="grid_3">
                 <label for="product-mpn">MPN</label>
-                <input type="text" id="product-mpn" data-reflection="property" placeholder="manufacturer partnumber" />
+                <input type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber" />
             </div>
             <div class="grid_3">
                 <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
-                <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
+                <input type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
             </div>
             <div class="grid_8">
                 <label for="product-brand">Brand</label>
             </div>
             <div class="grid_4">
-                <select name="product-brand" id="product-brand" data-reflection="property">
+                <select name="product-brand" id="product-brand" data-reflection="brand">
 	                <option value="-1">select brand</option>
                 <?php foreach($this->brands as $brand): ?>
 		           	<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName(); ?></option>
@@ -623,10 +623,10 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                         <li><a href="#full-description-tab">Full description</a></li>
                     </ul>
                     <div id="short-description-tab">
-                    <textarea id="product-shortDescription" class="h170" data-reflection="property" placeholder="Short description"></textarea>
+                    <textarea id="product-shortDescription" class="h170" data-reflection="shortDescription" placeholder="Short description"></textarea>
                     </div>
                     <div id="full-description-tab">
-                    <textarea id="product-fullDescription" class="h170" data-reflection="property" placeholder="Full description"></textarea>
+                    <textarea id="product-fullDescription" class="h170" data-reflection="shortDescription" placeholder="Full description"></textarea>
                     </div>
                 </div>
             </div>
@@ -634,22 +634,32 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         <!--End grid_8-->
 		<div class="grid_4">
 		<fieldset>
-			<div class="grid_6 alpha">
-                <label for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
-                <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
+			<div class="grid_5 alpha">
+                <label class="mt5px" for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
+			</div>
+            <div class="grid_7">
+                <input type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
             </div>
-            <div class="grid_6">
-                <label for="product-taxClass"><?php echo $this->translate('Taxes');?></label>
-                <select name="taxes" id="product-taxClass" data-reflection="property" >
+            <div class="grid_5 alpha">
+                <label class="mt5px" for="product-taxClass"><?php echo $this->translate('Taxes');?></label>
+            </div>
+            <div class="grid_7">
+                <select name="taxes" id="product-taxClass" data-reflection="taxClass" >
                     <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
                     <option value="1"><?php echo $this->translate('Default');?></option>
                     <option value="2"><?php echo $this->translate('Alternative');?></option>
                     <option value="3"><?php echo $this->translate('Alternative 2');?></option>
                 </select>
             </div>
+			<div class="grid_5 alpha">
+                <label class="mt5px" for="product-inventory"><?php echo $this->translate('Stock amount');?></label>
+			</div>
+			<div class="grid_7">
+                <input type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
+			</div>
             <div class="grid_12 alpha">
                 <label for="product-pageTemplate">Select a product page template</label>
-                <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
+                <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
                     <option value="-1" disabled="disable">Select Template</option>
                     <?php foreach ($this->templateList as $tmpl) : ?>
                     <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>

@@ -25,7 +25,7 @@ define([
 			'click #submit': 'saveProduct',
 			'change #product-image-folder': 'imageChange',
 			'click div.box': 'setProductImage',
-			'change [data-reflection=property]': 'setProperty',
+			'change :input[data-reflection]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
 			'click #product-tags-available div.tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
@@ -108,10 +108,7 @@ define([
                     this.model.get('options').on('reset', this.renderOptions, this);
                 }
                 if (this.products !== null){
-//                    var product = this.products.get(this.model.get('id'));
-//                    !_.isUndefined(product) && product.set(this.model.toJSON());
                     this.products.pager();
-    
                 }
                 this.render();
                 showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
@@ -203,10 +200,8 @@ define([
             this.$('#product-image-folder').val('0');
         },
 		setProperty: function(e){
-			var propName = e.currentTarget.id.replace('product-', '');
-			var data = {};
-			data[propName] = e.currentTarget.value;
-			this.model.set(data);
+			var propName = $(e.currentTarget).data('reflection');
+			this.model.set(propName, _.isNaN(e.currentTarget.value) ? null : e.currentTarget.value) ;
 		},
 		render: function(){
             console.log('render: app.js', this.model.changedAttributes());
@@ -231,17 +226,13 @@ define([
 			} else {
 				this.$('#product-image').attr('src', $('#website_url').val()+'system/images/noimage.png');
 			}
-			this.$('#product-name').val(this.model.get('name'));
-			this.$('#product-sku').val(this.model.get('sku'));
-			this.$('#product-mpn').val(this.model.get('mpn'));
-			this.$('#product-weight').val(this.model.get('weight'));
 
+            this.$('#product-brand').val(-1); //reseting brand field
 
-            if (this.model.has('brand')){
-                this.$('#product-brand').val(this.model.get('brand'));
-            } else {
-                this.$('#product-brand').val(-1);
-            }
+            var self = this;
+            _.each(this.model.toJSON(), function(value, name){
+                self.$('[data-reflection='+name+']').val(value);
+            });
 
             if (this.model.has('related')){
                 _.isEmpty(this.model.get('related')) && this.$('#related-holder').empty();
@@ -252,13 +243,6 @@ define([
 			if (this.model.has('options')) {
                 this.renderOptions();
 			}
-
-            //populating selected tags
-            if (!this.model.has('tags')) {
-                $('#product-tags-current').empty();
-                $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
-            }
-//			$('#product-tags-available:not(:empty)').find('div.tag-widget').show();
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
@@ -328,6 +312,7 @@ define([
             }, 500);
         },
         renderProductTags: function(){
+            console.log('render product tags');
             if (this.model && this.model.has('tags')){
                 var self = this,
                     container = $('#product-tags-current').empty();
@@ -353,6 +338,7 @@ define([
                 });
             } else {
                 $('#product-tags-current').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>');
+                $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
             }
         },
         renderBrands: function(brands){

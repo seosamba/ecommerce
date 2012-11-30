@@ -49,6 +49,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
 	protected $_extraProperties = array();
 
+	protected $_inventory;
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -256,4 +258,12 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 		return $this->_pageTemplate;
 	}
 
+	public function setInventory($inventory) {
+		$this->_inventory = $inventory;
+		return $this;
+	}
+
+	public function getInventory() {
+		return $this->_inventory;
+	}
 }
