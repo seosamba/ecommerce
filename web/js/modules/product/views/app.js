@@ -243,10 +243,9 @@ define([
                 this.$('#product-brand').val(-1);
             }
 
-			this.$('#product-price').val(this.model.get('price'));
-			this.$('#product-taxClass').val(this.model.get('taxClass'));
-			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
-			this.$('#product-fullDescription').val(this.model.get('fullDescription'));
+            if (this.model.has('related')){
+                _.isEmpty(this.model.get('related')) && this.$('#related-holder').empty();
+            }
 
 			// loading option onto frontend
 			$('#options-holder').empty();
@@ -552,7 +551,7 @@ define([
                     self = this;
 
                 $.ajax({
-                    url: this.model.urlRoot,
+                    url: this.model.urlRoot(),
                     data: {id: relateds.join(',')},
                     success: function(response){
                         if (!response) return false;
