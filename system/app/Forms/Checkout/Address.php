@@ -30,15 +30,17 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 	        $termsAndConditionsPage = current($termsAndConditionsPage);
             $notesLabel .= ' <a href="'.$websiteUrl.$termsAndConditionsPage->getUrl().'" target = _blank class="terms-page" title="Shipping Policy">Shipping Policy</a>';
         }
-        
-        $this->addElement(new Zend_Form_Element_Checkbox(array(
+
+		$checkbox = new Zend_Form_Element_Checkbox(array(
 			'name'          => 'shippingNotes',
 			'label'         => $notesLabel,
-            'required'      => true,
-            'checkedValue'  => 1,
-            'allowEmpty'    => false,
-            'uncheckedValue'=> null
-        )));
+	        'required'      => true,
+	        'checkedValue'  => 1,
+	        'allowEmpty'    => false,
+	        'uncheckedValue'=> null
+	    ));
+		$checkbox->addErrorMessage('This field is required');
+        $this->addElement($checkbox);
         
         $this->addElement(new Zend_Form_Element_Textarea(array(
 			'name'     => 'notes',
@@ -54,11 +56,17 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'label'    => 'Mobile'
 		)));
 
+		$emailValidator = new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL);
+		$emailValidator->setMessages(array(
+			Zend_Validate_EmailAddress::INVALID_FORMAT => "'%value%' is not a valid email address",
+		));
+
 		// setting required fields
 		$this->getElement('lastname')->setRequired(true)->setAttrib('class', 'required');
 		$this->getElement('email')->setRequired(true)
 				->setAttrib('class', 'required')
-				->setValidators(array('EmailAddress'));
+				->setValidators(array($emailValidator));
+
 		$this->getElement('zip')->setRequired(true);
         $this->getElement('shippingNotes')->setRequired(true)->setAttrib('class', 'required');
 
