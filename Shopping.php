@@ -73,6 +73,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	const SHIPPING_PICKUP       = 'pickup';
     
     const SHIPPING_MARKUP       = 'markup';
+
+	const SHIPPING_TOC_STATUS   = 'checkoutShippingTocRequire';
+
+	const SHIPPING_TOC_LABEL    = 'checkoutShippingTocLabel';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -264,6 +269,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $shippingData));
 			$this->_jsonHelper->direct($shippingData);
 		}
+		$this->_view->shoppingConfig = $this->_configMapper->getConfigParams();
+
         $markupConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_MARKUP);
         $markupForm = new Forms_Shipping_MarkupShipping();
         if(isset($markupConfig['config']) && !empty($markupConfig['config'])){
