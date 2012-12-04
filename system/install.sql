@@ -102,7 +102,15 @@ INSERT INTO `shopping_list_state` (`id`, `country`, `state`, `name`) VALUES
 (61, 'CA', 'PE', 'Prince Edward Island'),
 (62, 'CA', 'QC', 'Quebec'),
 (63, 'CA', 'SK', 'Saskatchewan'),
-(64, 'CA', 'YT', 'Yukon Territory');
+(64, 'CA', 'YT', 'Yukon Territory'),
+(65, 'AU', 'ACT', 'Australian Capital Territory'),
+(66, 'AU', 'NSW', 'New South Wales'),
+(67, 'AU', 'NT', 'Northern Territory'),
+(68, 'AU', 'QLD', 'Queensland'),
+(69, 'AU', 'SA', 'South Australia'),
+(70, 'AU', 'TAS', 'Tasmania'),
+(71, 'AU', 'VIC', 'Victoria'),
+(72, 'AU', 'WA', 'Western Australia');
 
 CREATE TABLE IF NOT EXISTS `shopping_brands` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
