@@ -184,7 +184,7 @@
 		                            $('.productlisting:last-child').waypoint(function() {
 										$(this).waypoint('remove');
 			                            uiTab.offset += 30;
-										uiTab.loadStoreData('products')
+										uiTab.loadStoreData('products', filter)
 									},
 									{
 										context: '#product-products',
@@ -228,28 +228,30 @@
 		    },
 		    parseProducts: function(productsResponse, filter) {
 			    var productsContainer = $('#product-products');
-			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
-				    $(productsContainer).empty();
-			    }
+//			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
+//				    productsContainer.empty();
+//			    }
 			    //media servers
 			    var mediaServers = <?php echo Tools_Content_Tools::getMediaServers(true); ?>;
 			    var srcPart      = '<?php echo $this->websiteUrl;?>';
+			    var productItemsHtml = '';
 			    $.each(productsResponse, function() {
 				    var srcPart = '<?php echo $this->websiteUrl;?>';
 			        <?php if($this->mediaServersAllowed): ?>
 	                    srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
 	                <?php endif; ?>
-                    productItem = '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
+                    productItemsHtml += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
                                 '<p class="brand">' + this.brand + '</p>' +
                                 '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
-	                $(productsContainer).append(productItem);
-	                hideSpinner();
                 });
+			    if (this.offset === 0) productsContainer.empty(productItemsHtml);
+                productsContainer.append(productItemsHtml);
                 $('img.lazy').lazyload({
-                    container: $(productsContainer),
+                    container: productsContainer,
                     effect: 'fadeIn'
                 });
-		    }
+                hideSpinner();
+            }
 	    };
 	    // end uiTab
 	    uiTab.init();
