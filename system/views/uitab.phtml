@@ -100,6 +100,7 @@
     $(function() {
 	    // uiTab object
 	    var uiTab = {
+		    limit: parseInt('<?php echo Shopping::PRODUCT_DEFAULT_LIMIT; ?>'),
 		    offset: 0,
 		    init: function() {
 				//init chosen plugin
@@ -166,9 +167,10 @@
                 if($('#' + dataType + ' option').length) {
                     return false;
                 }
-                var utab = this;
+                var utab = this,
+		            params = this.getParams(filter);
 			    $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
-				    this.getParams(filter),
+				    params,
 				function(response) {
                     if(response.length) {
                         switch(dataType) {
@@ -178,7 +180,8 @@
                             break;
                             case 'products':
 	                            uiTab.parseProducts(response, filter);
-								if(!$('#tags').val() && !$('#brands').val()) {
+		                            console.log(utab === uiTab);
+								if(response.length >= utab.limit) {
 		                            $('.productlisting:last-child').waypoint(function() {
 										$(this).waypoint('remove');
 										utab.offset += 30;
