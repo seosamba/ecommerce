@@ -244,8 +244,11 @@
                                 '<p class="brand">' + this.brand + '</p>' +
                                 '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
                 });
-			    if (this.offset === 0) productsContainer.empty(productItemsHtml);
-                productsContainer.append(productItemsHtml);
+			    if (this.offset === 0) {
+				    productsContainer.html(productItemsHtml).scrollTop(0);
+                } else {
+                    productsContainer.append(productItemsHtml);
+			    }
                 $('img.lazy').lazyload({
                     container: productsContainer,
                     effect: 'fadeIn'
