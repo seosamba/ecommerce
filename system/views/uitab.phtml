@@ -168,7 +168,7 @@
                     return false;
                 }
                 var utab = this,
-		            params = this.getParams(filter);
+		            params = uiTab.getParams(filter);
 			    $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
 				    params,
 				function(response) {
