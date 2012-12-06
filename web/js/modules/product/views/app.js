@@ -313,6 +313,7 @@ define([
         },
         renderProductTags: function(){
             console.log('render product tags');
+            $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
             if (this.model && this.model.has('tags')){
                 var self = this,
                     container = $('#product-tags-current').empty();
@@ -338,7 +339,6 @@ define([
                 });
             } else {
                 $('#product-tags-current').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>');
-                $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
             }
         },
         renderBrands: function(brands){
