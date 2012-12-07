@@ -304,7 +304,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	/**
 	 * Checkout action
-	 *
+	 * @deprecated
 	 * @throws Exceptions_SeotoasterPluginException
 	 */
 	public function checkoutAction() {
@@ -381,6 +381,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_responseHelper->success($responseData);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private function _applyCustomerShipping($data) {
 		foreach ($this->_sessionHelper->tmpShippingRates as $item){
 			if (isset($item['service']) && $item['service'] === $data['service']){
@@ -575,37 +578,50 @@ class Shopping extends Tools_Plugins_Abstract {
 		if(!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
-		$content = '';
-		$page = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
-		$order = $this->_request->getParam('order');
-		$tags = $this->_request->getParam('tags');
-		$brands = $this->_request->getParam('brands');
+		$content    = '';
+		$nextPage       = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+		$order      = $this->_request->getParam('order');
+		$tags       = $this->_request->getParam('tags');
+		$brands     = $this->_request->getParam('brands');
 
-		$offset = intval($page) * Widgets_Productlist_Productlist::DEFAULT_LIMIT;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll(null, $order, $offset, Widgets_Productlist_Productlist::DEFAULT_LIMIT, null, $tags, $brands );
+		$offset     = intval($nextPage) * Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+		$products   = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, Widgets_Productlist_Productlist::DEFAULT_LIMIT, null, $tags, $brands );
 		if (!empty($products)){
 			$template = $this->_request->getParam('template');
 			$widget   = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + Widgets_Productlist_Productlist::DEFAULT_LIMIT));
 			$content  = $widget->setProducts($products)->setCleanListOnly(true)->render();
 			unset($widget);
 		}
+		if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))){
+			$page = Application_Model_Mappers_PageMapper::getInstance()->find($pageId);
+			if ($page instanceof Application_Model_Models_Page && !empty($content)){
+				$content = $this->_renderViaParser($content, $page);
+			}
+		}
 		echo $content;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	protected function _renderPaymentZone() {
 		$paymentZoneTmpl = isset($this->_sessionHelper->paymentZoneTmpl) ? $this->_sessionHelper->paymentZoneTmpl : null;
 		if ($paymentZoneTmpl !== null) {
-			$themeData = Zend_Registry::get('theme');
-			$extConfig = Zend_Registry::get('extConfig');
-			$parserOptions = array(
-				'websiteUrl'   => $this->_websiteHelper->getUrl(),
-				'websitePath'  => $this->_websiteHelper->getPath(),
-				'currentTheme' => $extConfig['currentTheme'],
-				'themePath'    => $themeData['path'],
-			);
-			$parser = new Tools_Content_Parser($paymentZoneTmpl, Tools_Misc::getCheckoutPage()->toArray(), $parserOptions);
-			return $parser->parse();
+			return $this->_renderViaParser($paymentZoneTmpl, Tools_Misc::getCheckoutPage());
 		}
+	}
+
+	private function _renderViaParser($content, Application_Model_Models_Page $page) {
+		$themeData = Zend_Registry::get('theme');
+		$extConfig = Zend_Registry::get('extConfig');
+		$parserOptions = array(
+			'websiteUrl'   => $this->_websiteHelper->getUrl(),
+			'websitePath'  => $this->_websiteHelper->getPath(),
+			'currentTheme' => $extConfig['currentTheme'],
+			'themePath'    => $themeData['path'],
+		);
+		$parser = new Tools_Content_Parser($content, $page->toArray(), $parserOptions);
+		return $parser->parse();
 	}
 
 	protected function _getOption($option) {

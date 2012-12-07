@@ -13,6 +13,7 @@
         var self = this,
 	        nextpage = $(this).data('nextpage') || 1,
 		    filters = $.extend({
+			    pageId: '<?php echo $this->pageId; ?>',
 			    template: '<?php echo $this->productTemplate; ?>',
 			    nextpage: nextpage
 		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>);
@@ -25,7 +26,7 @@
                 $(self).before(response);
 				$(self).data('nextpage', ++nextpage);
             } else {
-	            $(self).remove();
+	            $(self).replaceWith('<span><?php echo $this->translate('No more products found'); ?></span>');
             }
 		});
 	});

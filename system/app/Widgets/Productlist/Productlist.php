@@ -91,6 +91,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		if($this->_cleanListOnly) {
 			return $content;
 		}
+		$this->_view->pageId          = $this->_toasterOptions['id'];
 		$this->_view->plContent       = $content;
 		$this->_view->productTemplate = $this->_productTemplate->getName();
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
@@ -245,7 +246,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 		if(empty($this->_options)) {
 			array_push($this->_cacheTags, 'prodid_all');
-			return $this->_productMapper->fetchAll($enabledOnly, array('created_at DESC'), 0, self::DEFAULT_LIMIT);
+			return $this->_productMapper->fetchAll($enabledOnly, null, 0, self::DEFAULT_LIMIT);
 		}
 		$filters = array(
 			'tags'      => null,
