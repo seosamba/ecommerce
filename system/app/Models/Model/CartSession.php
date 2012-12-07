@@ -1,19 +1,46 @@
 <?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
+	/**
+	 * New cart registered in system.
+	 */
 	const CART_STATUS_NEW           = 'new';
 
+	/**
+	 * Payment information have been sent to payment gateway but needs to be verified or awaiting confirmation on gateway.
+	 * This status will also be used by offline payment options.
+	 */
 	const CART_STATUS_PENDING       = 'pending';
 
+	/**
+	 * Payment information have been sent to payment gateway and waiting for instant response.
+	 */
 	const CART_STATUS_PROCESSING    = 'processing';
 
+	/**
+	 * Payment has been applied on payment gateway or successful transaction notification for pending operation received.
+	 */
 	const CART_STATUS_COMPLETED     = 'completed';
 
+	/**
+	 *
+	 */
 	const CART_STATUS_UNPROCESSED   = 'unprocessed';
 
+	/**
+	 * Payment transaction has been denied/cancelled.
+	 */
 	const CART_STATUS_CANCELED      = 'canceled';
 
+	/**
+	 * Error occured during payment processing.
+	 */
 	const CART_STATUS_ERROR         = 'error';
+
+	/**
+	 * Order has been sent via shipping service.
+	 */
+	const CART_STATUS_SHIPPED       = 'shipped';
 
 	protected $_cartContent = null;
 
