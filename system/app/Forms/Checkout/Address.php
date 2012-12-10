@@ -7,6 +7,8 @@
 
 class Forms_Checkout_Address extends Forms_Address_Abstract {
 
+	const CSS_CLASS_REQUIRED = 'required';
+
 	public function init() {
 		parent::init();
 
@@ -70,9 +72,11 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		));
 
 		// setting required fields
-		$this->getElement('lastname')->setRequired(true);
-		$this->getElement('email')->setRequired(true)->setValidators(array($emailValidator));
-		$this->getElement('zip')->setRequired(true);
+		// @deprecated
+//		$this->getElement('lastname')->setRequired(true);
+//		$this->getElement('email')->setRequired(true)->setValidators(array($emailValidator));
+//		$this->getElement('zip')->setRequired(true);
+		$this->getElement('email')->setValidators(array($emailValidator));
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(
@@ -131,16 +135,38 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'decorators' => array('ViewHelper')
 		)));
 
-		foreach ($this->getElements() as $element){
-			if ($element->isRequired()) {
-				$currentClass = $element->getAttrib('class');
-				if (!empty($currentClass)){
-					$element->setAttrib('class', $currentClass.' required');
-				} else {
-					$element->setAttrib('class', 'required');
+		$this->resetRequiredFields(array(
+			'lastname', 'email', 'zip', 'shippingToc'
+		));
+	}
+
+	public function resetRequiredFields($fields) {
+		if (empty($fields)) return $this;
+
+		if (!is_array($fields)){
+			$fields = array($fields);
+		}
+
+		foreach ($this->getElements() as $element) {
+			if (in_array($element->getName(), $fields)){
+				$element->setRequired(true);
+			} else {
+				$element->setRequired(false);
+			}
+
+			$cssClass = $element->getAttrib('class');
+			if ($element->isRequired()){
+				$cssClass .= strpos($cssClass, self::CSS_CLASS_REQUIRED) !== false ? '' : ' '.self::CSS_CLASS_REQUIRED;
+			} else {
+				if (!empty($cssClass)){
+					$cssClass = str_replace(self::CSS_CLASS_REQUIRED, '', $cssClass);
 				}
 			}
+
+			$element->setAttrib('class', trim($cssClass));
 		}
+
+		return $this;
 	}
 
 }
