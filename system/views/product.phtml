@@ -339,11 +339,15 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/
 $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
 ?>
 
+<?php
+$firstPageCaption = $this->translate('First');
+$lastPageCaption = $this->translate('Last');
+?>
 <script id="paginatorTemplate" type="text/template">
 <div class="paginator <%= cssClass %>" data-collection="<%= collection %>" >
-<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first">First</a><% } else { %><span>First</span><% } %>
+<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first"><?php echo $firstPageCaption;?></a><% } else { %><span><?php echo $firstPageCaption;?></span><% } %>
 
-<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Pevious</a><% } %>
+<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev"><?php echo $this->translate('Previous'); ?></a><% } %>
 
 <% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
 
@@ -358,9 +362,9 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 
 <% if (currentPage + 5 < lastPage) { %><span>...</span><% } %>
 
-<% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next">Next</a><% } %>
+<% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next"><?php echo $this->translate('Next');?></a><% } %>
 
-<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last">Last</a><% } else { %><span>Last</span> <%} %>
+<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last"><?php echo $lastPageCaption;?></a><% } else { %><span><?php echo $lastPageCaption;?></span> <%} %>
 </div>
 </script>
 
