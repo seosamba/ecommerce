@@ -89,6 +89,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
 					foreach ($customers as $user) {
 						$data[$user->getId()] = (bool)Application_Model_Mappers_UserMapper::getInstance()->delete($user);
 					}
+                    return $data;
 				} else {
 					$this->_error(null, self::REST_STATUS_NOT_FOUND);
 				}

@@ -91,7 +91,7 @@ define([
                     url: $('#website_url').val()+'api/store/customers/',
                     data: JSON.stringify({ids: ids}),
                     success: function(response){
-                        self.customers.fetch().done(function(){
+                        //self.customers.fetch().done(function(){
                             var msg = '';
                             _(response).each(function(status, id){
                                if (status === false) {
@@ -100,12 +100,16 @@ define([
                                        msg += (msg.length ? ', ' : '') + model.get('full_name');
                                        model.set('checked', true);
                                    }
+                               }else{
+                                   $('#customer-list input[value='+id+']').parent().parent().remove();
                                }
                             });
                             if (msg.length) {
                                 showMessage('Unable to remove following users: '+msg, true);
+                            }else{
+                                showMessage('Users deleted');
                             }
-                        });
+                        //});
                     },
                     error: function(xhr, error, msg){
                         if (xhr.status === 404) {
