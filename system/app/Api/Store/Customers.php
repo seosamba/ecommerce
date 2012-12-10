@@ -8,6 +8,12 @@ class Api_Store_Customers extends Api_Service_Abstract {
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'delete')
+		),
+        Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get', 'delete')
+		),
+        Shopping::ROLE_SALESPERSON => array(
+			'allow' => array('get', 'delete')
 		)
 	);
 

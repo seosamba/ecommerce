@@ -88,7 +88,7 @@ define([
                 var self = this,
                     ids = _(checked).pluck('id');
                 Backbone.sync('delete', null, {
-                    url: self.customers.urlRoot,
+                    url: $('#website_url').val()+'api/store/customers/',
                     data: JSON.stringify({ids: ids}),
                     success: function(response){
                         self.customers.fetch().done(function(){
