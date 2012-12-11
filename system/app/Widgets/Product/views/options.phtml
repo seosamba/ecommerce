@@ -9,7 +9,17 @@
         foreach ($option['selection'] as $item) {
             $options[$item['id']] = Models_Model_Option::TYPE_RADIO ? $this->escape($item['title']) : $item['title'];
             if (floatval($item['priceValue']) != 0){
-                $options[$item['id']] .= sprintf($template, $item['priceSign'], ($item['priceType'] === 'unit'?$this->currency($item['priceValue']):$item['priceValue'].'%'));
+	            if ($item['priceType'] === 'unit'){
+		            $price = floatval($item['priceValue']);
+		            if ($this->taxRate){
+			            $price = $price + round(( $this->taxRate * $price) / 100, 2);
+		            }
+		            $item['priceValue'] = $this->currency($price);
+		            unset($price);
+	            } else {
+		            $item['priceValue'] .= '%';
+	            }
+                $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
             }
             if ($item['isDefault']) $defaultId = $item['id'];
         }

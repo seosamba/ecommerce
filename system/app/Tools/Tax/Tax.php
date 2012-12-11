@@ -13,7 +13,14 @@ class Tools_Tax_Tax {
 
 	const ZONE_TYPE_COUNTRY      = 'country';
 
-	public static function calculateProductTax(Models_Model_Product $product, $destinationAddress = null) {
+	/**
+	 * Calculates product tax price according to configured rules
+	 * @param Models_Model_Product $product             Product model
+	 * @param null                 $destinationAddress  If not specified uses default tax rule for calculation
+	 * @param bool                 $taxRateOnly         If true returns only appropriate tax rate
+	 * @return float|int
+	 */
+	public static function calculateProductTax(Models_Model_Product $product, $destinationAddress = null, $taxRateOnly = false) {
 		if(($taxClass = $product->getTaxClass()) != 0) {
 			$rateMethodName = 'getRate' . $taxClass;
 
@@ -27,7 +34,7 @@ class Tools_Tax_Tax {
 			}
 
 			if (isset($tax) && $tax !== null) {
-				return round(($product->getPrice() / 100) * $tax->$rateMethodName(), 2);
+				return $taxRateOnly ? $tax->$rateMethodName() : round(($product->getPrice() / 100) * $tax->$rateMethodName(), 2);
 			}
 		}
 		return 0;

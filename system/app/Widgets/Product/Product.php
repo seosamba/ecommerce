@@ -188,6 +188,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderOptions() {
+		$this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
 		return $this->_view->render('options.phtml');
 	}
 	
