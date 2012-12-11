@@ -64,7 +64,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			->setIs404page(0)
 			->setShowInMenu(1)
 			->setSiloId(0)
-			->setTargetedKeyPhrase(Shopping::PRODUCT_CATEGORY_NAME)
+			->setTargetedKeyPhrase($this->_object->getName())
 			->setProtected(0)
 			->setSystem(0)
 			->setDraft((bool)$this->_object->getEnabled()?'0':'1')
