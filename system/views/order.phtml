@@ -27,6 +27,7 @@
 				<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
 				<br />
 				<span><?php echo $countryList[$billingAddress['country']];?></span>
+                <span class="phone"><?php echo $billingAddress['phone'];?></span>
 				<?php else:?>
 					<p>not provided</p>
 				<?php endif;?>
@@ -51,6 +52,7 @@
 				<span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
 				<br />
 				<span><?php echo $countryList[$shippingAddress['country']];?></span>
+                <span class="phone"><?php echo $shippingAddress['phone'];?></span>
 				<?php else:?>
 					<p>not provided</p>
 				<?php endif;?>
