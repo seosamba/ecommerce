@@ -20,13 +20,11 @@ $(function() {
             if($('input[name=product-option-calculated-price-'+$(this).val()+']').length>0){
                 var optionPriceValue = $('input[name=product-option-calculated-price-'+$(this).val()+']').val();
                 var optionPriceModifier = $('input[name=product-option-calculated-price-'+$(this).val()+']').attr('data-modifier');
-                console.log(optionPriceModifier);
                 if(optionPriceModifier == '-'){
                     productBasePrice -= parseFloat(optionPriceValue);
                 }
                 if(optionPriceModifier == '+'){
                     productBasePrice += parseFloat(optionPriceValue);
-                    console.log(productBasePrice);
                 }
             }
         });

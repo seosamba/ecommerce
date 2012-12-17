@@ -40,7 +40,7 @@
     <input type="hidden" class="product-option-original-currency" name="product-option-original-currency" value="<?php echo preg_replace('/0\.00/','',$this->currency(0)); ?>"/>
     <div class="product-option option-<?php echo strtolower(preg_replace('/[^\w\d]/i', '', $option['title']));?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
          <?php foreach($optionPrices as $optionId => $optionData):?>
-            <input type="hidden" name="product-option-calculated-price-<?php echo $optionId;?>" value="<?php echo $optionData['price'];?>" data-modifier="<?php echo $optionData['modifier'];?>"/>
+            <input type="hidden" name="product-option-calculated-price-<?php echo $optionId;?>" value="<?php echo number_format($optionData['price'], 2, '.', '');?>" data-modifier="<?php echo $optionData['modifier'];?>"/>
          <?php endforeach;?>
         <label for="<?php echo $uniqName; ?>" ><?php echo $option['title'];?></label>
         <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
