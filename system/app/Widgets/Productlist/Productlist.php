@@ -168,6 +168,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
             if (strpos($data['templateContent'], '$product:options') !== false ){
                 $view = new Zend_View(array('scriptPath' => dirname(__DIR__) . '/Product/views/'));
+                $view->taxRate = Tools_Tax_Tax::calculateProductTax($product, null, true);
                 $view->product = $product;
                 $productOptionsView = $view->render('options.phtml');
             }
