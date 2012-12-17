@@ -2,7 +2,7 @@
 <?php $productPrice = $this->product->getPrice();?>
 <?php $showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');?>
 <?php if ((bool)$showWithTax):?>
-    <?php $productPrice += Tools_Tax_Tax::calculateProductTax($this->product->getPrice());?>
+    <?php $productPrice += Tools_Tax_Tax::calculateProductTax($this->product);?>
 <?php endif;?>
 
 <?php foreach ($this->product->getDefaultOptions() as $option): ?>
