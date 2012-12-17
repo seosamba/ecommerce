@@ -1,9 +1,16 @@
 <div class="product-options-listing" data-productId="<?php echo  $this->product->getId();?>">
+<?php $productPrice = $this->product->getPrice();?>
+<?php $showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');?>
+<?php if ((bool)$showWithTax):?>
+    <?php $productPrice += Tools_Tax_Tax::calculateProductTax($this->product->getPrice());?>
+<?php endif;?>
+
 <?php foreach ($this->product->getDefaultOptions() as $option): ?>
     <?php $uniqName = 'product-'.$this->product->getId().'-option-'.$option['id']; ?>
     <?php
     if (($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) && !empty($option['selection'])){
         $options = array();
+        $optionPrices = array();
         $defaultId = null;
 	    $template = $option['type'] === Models_Model_Option::TYPE_RADIO ? ' <span>(%s%s)</span>' : ' (%s%s)';
         foreach ($option['selection'] as $item) {
@@ -15,9 +22,13 @@
 			            $price = $price + round(( $this->taxRate * $price) / 100, 2);
 		            }
 		            $item['priceValue'] = $this->currency($price);
+                    $optionPrices[$item['id']] = array('price'=>$price, 'modifier'=>$item['priceSign']);
 		            unset($price);
 	            } else {
 		            $item['priceValue'] .= '%';
+                    $price = round((floatval($productPrice) / 100) * $item['priceValue'], 2);
+                    $optionPrices[$item['id']] = array('price'=>$price, 'modifier'=>$item['priceSign']);
+                    unset($price);
 	            }
                 $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
             }
@@ -25,7 +36,12 @@
         }
     }
     ?>
+    <input type="hidden" id="product-option-original-price-<?php echo $this->product->getId();?>" name="product-option-original-price-<?php echo $this->product->getId();?>" value="<?php echo $productPrice;?>"/>
+    <input type="hidden" class="product-option-original-currency" name="product-option-original-currency" value="<?php echo preg_replace('/0\.00/','',$this->currency(0)); ?>"/>
     <div class="product-option option-<?php echo strtolower(preg_replace('/[^\w\d]/i', '', $option['title']));?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
+         <?php foreach($optionPrices as $optionId => $optionData):?>
+            <input type="hidden" name="product-option-calculated-price-<?php echo $optionId;?>" value="<?php echo $optionData['price'];?>" data-modifier="<?php echo $optionData['modifier'];?>"/>
+         <?php endforeach;?>
         <label for="<?php echo $uniqName; ?>" ><?php echo $option['title'];?></label>
         <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
         <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>

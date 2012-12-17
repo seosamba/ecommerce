@@ -157,7 +157,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	
 	private function _renderPrice() {
 		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
+        $lifeReload = (strtolower(end($this->_options)) === 'lifereload');
 		if ($noCurrency === true){
+			array_pop($this->_options);
+		}
+        if ($lifeReload === true){
 			array_pop($this->_options);
 		}
 
@@ -179,7 +183,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		if ((bool)self::$_shoppingConfig['showPriceIncTax']){
 			$price += Tools_Tax_Tax::calculateProductTax($this->_product);
 		}
-
+        if($lifeReload){
+            return '<span class="price-lifereload-'.$this->_product->getId().'">'.$this->_currency->toCurrency($price).'</span>';
+        }
 		return !$noCurrency ? $this->_currency->toCurrency($price): $price;
 	}
 	

@@ -183,6 +183,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:url'               => $product->getPage() ? $product->getPage()->getUrl() : null,
                 '$product:price'             => $currency->toCurrency($price),
                 '$product:price:nocurrency'  => $price,
+                '$product:price:lifereload'  => '<span class="price-lifereload-'.$product->getId().'">'.$currency->toCurrency($price).'</span>',
                 '$product:brand'             => $product->getBrand(),
                 '$product:weight'            => $product->getWeight(),
                 '$product:mpn'               => $product->getMpn(),

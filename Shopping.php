@@ -200,6 +200,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
         Zend_Registry::set('acl', $acl);
+        
+  		$layout = Zend_Layout::getMvcInstance();
+		$layout->getView()->headScript()->appendFile($this->_websiteUrl.'plugins/shopping/web/js/product-options.js');
+	
     }
 
 	public function run($requestedParams = array()) {
