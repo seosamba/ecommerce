@@ -19,7 +19,7 @@
 	            if ($item['priceType'] === 'unit'){
 		            $price = floatval($item['priceValue']);
 		            if ($this->taxRate){
-			            $price = $price + round(( $this->taxRate * $price) / 100, 2);
+			            $price = $price + round(( $this->taxRate * $price) / 100, 2, PHP_ROUND_HALF_DOWN);
 		            }
 		            $item['priceValue'] = $this->currency($price);
                     $optionPrices[$item['id']] = array('price'=>$price, 'modifier'=>$item['priceSign']);
