@@ -45,7 +45,8 @@ $(function() {
             var currency = $('.product-option-original-currency').val();
         }
         if($('.price-lifereload-'+productId).length>0){
-           $('.price-lifereload-'+productId).text(currency+productBasePrice);
+           var precision = (productBasePrice).toFixed(2);
+           $('.price-lifereload-'+productId).text(currency+precision);
         }
        
     }
