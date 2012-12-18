@@ -124,6 +124,18 @@ class Tools_ShoppingCart {
 		return array_shift(array_filter($this->_content, array($this, '_filterCallback')));
 	}
 
+    /**
+     *
+     * @param Models_Model_Product $item
+     * @param type $options
+     * @return itemPrice 
+     */
+    public function calculateProductPrice(Models_Model_Product $item, $options = array()){
+        $options   = $this->_parseOptions($item, $options);
+		$itemPrice = $this->_calculateItemPrice($item, $options);
+        return $itemPrice;
+    }
+    
 	/**
 	 * Add an item to the storage
 	 *

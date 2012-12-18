@@ -172,6 +172,18 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $view->product = $product;
                 $productOptionsView = $view->render('options.phtml');
             }
+            //preparing default price with applied default options 
+            $itemDefaultOptionsArray = array();
+            foreach($product->getDefaultOptions() as $option){
+                foreach ($option['selection'] as $item) {
+                    if($item['isDefault'] == 1){
+                        $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                    }
+                }
+            }
+            $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $itemDefaultOptionsArray);
+            
+            
 			//setting up the entity parser
 			$renderedContent .= $entityParser->setDictionary(array(
 				'$product:name'              => $product->getName(),
@@ -184,7 +196,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:url'               => $product->getPage() ? $product->getPage()->getUrl() : null,
                 '$product:price'             => $currency->toCurrency($price),
                 '$product:price:nocurrency'  => $price,
-                '$product:price:lifereload'  => '<span class="price-lifereload-'.$product->getId().'">'.$currency->toCurrency($price).'</span>',
+                '$product:price:realtimeupdate' => '<span class="price-lifereload-'.$product->getId().'">'.$currency->toCurrency($price).'</span>',
                 '$product:brand'             => $product->getBrand(),
                 '$product:weight'            => $product->getWeight(),
                 '$product:mpn'               => $product->getMpn(),
