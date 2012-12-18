@@ -131,9 +131,10 @@ class Tools_ShoppingCart {
      * @return itemPrice 
      */
     public function calculateProductPrice(Models_Model_Product $item, $options = array()){
+        $itemTax   = Tools_Tax_Tax::calculateProductTax($item);
         $options   = $this->_parseOptions($item, $options);
 		$itemPrice = $this->_calculateItemPrice($item, $options);
-        return $itemPrice;
+        return $itemPrice + $itemTax;
     }
     
 	/**
