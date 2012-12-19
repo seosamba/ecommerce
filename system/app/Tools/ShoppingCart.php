@@ -133,8 +133,14 @@ class Tools_ShoppingCart {
     public function calculateProductPrice(Models_Model_Product $item, $options = array()){
         $itemTax   = Tools_Tax_Tax::calculateProductTax($item);
         $options   = $this->_parseOptions($item, $options);
-		$itemPrice = $this->_calculateItemPrice($item, $options);
-        return $itemPrice + $itemTax;
+        $showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');
+        if((bool)$showWithTax){
+            $itemPrice = $this->_calculateItemPriceWithTax($item, $options);
+            return $itemPrice + $itemTax;
+        }else{
+            $itemPrice = $this->_calculateItemPrice($item, $options);
+            return $itemPrice;
+        }
     }
     
 	/**
@@ -196,6 +202,22 @@ class Tools_ShoppingCart {
 		if(!empty($modifiers)) {
 			foreach($modifiers as $modifier) {
 				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($item->getPrice() / 100) * $modifier['priceValue']);
+				$price    = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
+            }
+		}
+		return $price;
+	}
+    
+    private function _calculateItemPriceWithTax(Models_Model_Product $item, $modifiers) {
+		$price = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+        $taxRate = Tools_Tax_Tax::calculateProductTax($item, null, true);
+        if(!empty($modifiers)) {
+			foreach($modifiers as $modifier) {
+				if ($taxRate){
+			        $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(( $taxRate * $modifier['priceValue']) / 100, 2, PHP_ROUND_HALF_DOWN) : ($item->getPrice() / 100) * $modifier['priceValue']);
+		        }else{
+		            $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($item->getPrice() / 100) * $modifier['priceValue']);
+                }
 				$price    = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
             }
 		}
