@@ -10,7 +10,14 @@ class Api_Store_Products extends Api_Service_Abstract {
 	 */
 	private $_productMapper;
 
-	protected $_accessList = array(
+    /**
+     * Language helper
+     *
+     * @var Helpers_Action_Language
+     */
+    private $_translator = null;
+
+    protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
 		),
@@ -26,6 +33,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 		parent::init();
 		$this->_productMapper   = Models_Mapper_ProductMapper::getInstance();
 		$this->_cacheHelper     = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+        $this->_translator      = Zend_Controller_Action_HelperBroker::getStaticHelper('language');
 	}
 
 	public function getAction() {

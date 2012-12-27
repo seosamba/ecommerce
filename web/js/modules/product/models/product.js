@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, ProductOptions){
 	
 	var Product = Backbone.Model.extend({
-		urlRoot: function(){ return $('#website_url').val() + '/api/store/products/id/'; },
+		urlRoot: function(){ return $('#website_url').val() + 'api/store/products/id/'; },
 		defaults: function(){
             return {
                 name: '',
