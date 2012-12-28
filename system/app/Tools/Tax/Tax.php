@@ -34,7 +34,8 @@ class Tools_Tax_Tax {
 			}
 
 			if (isset($tax) && $tax !== null) {
-				return $taxRateOnly ? $tax->$rateMethodName() : round(($product->getPrice() / 100) * $tax->$rateMethodName(), 2);
+				//return $taxRateOnly ? $tax->$rateMethodName() : round(($product->getPrice() / 100) * $tax->$rateMethodName(), 2);
+                return $taxRateOnly ? $tax->$rateMethodName() : ($product->getPrice() / 100) * $tax->$rateMethodName();
 			}
 		}
 		return 0;

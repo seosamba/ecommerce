@@ -150,6 +150,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
                     if($productObject !=null){
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
+                        $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                     }
                 }
                 $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];

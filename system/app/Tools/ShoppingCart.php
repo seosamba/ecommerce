@@ -214,7 +214,7 @@ class Tools_ShoppingCart {
         if(!empty($modifiers)) {
 			foreach($modifiers as $modifier) {
 				if ($taxRate){
-			        $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(( $taxRate * $modifier['priceValue']) / 100, 2, PHP_ROUND_HALF_DOWN) : ($item->getPrice() / 100) * $modifier['priceValue']);
+			        $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(( $taxRate * $modifier['priceValue']) / 100, 2) : ($item->getPrice() / 100) * $modifier['priceValue']);
 		        }else{
 		            $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($item->getPrice() / 100) * $modifier['priceValue']);
                 }
