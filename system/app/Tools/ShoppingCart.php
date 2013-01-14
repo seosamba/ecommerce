@@ -37,7 +37,9 @@ class Tools_ShoppingCart {
         $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
         if ($this->_session === null){
-            $this->_session = new Zend_Session_Namespace($this->_websiteHelper->getUrl().'cart');
+	        $websiteConfig = Zend_Registry::get('website');
+            $this->_session = new Zend_Session_Namespace('cart_'.$websiteConfig['url']);
+	        unset($websiteConfig);
         }
         $this->_load();
     }
