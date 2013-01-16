@@ -580,57 +580,61 @@ $lastPageCaption = $this->translate('Last');
                 </div>
             </div>
             <div class="grid_4">
-                <label for="product-name">Product Name</label>
+                <label for="product-name"><?php echo $this->translate('Product Name'); ?></label>
             </div>
 			<div class="grid_4" style="text-align: right;">
-				<label for="product-enabled">This product is enabled</label>
+				<label for="product-enabled"><?php echo $this->translate('This product is enabled');?></label>
 			</div>
             <div class="grid_7">
-	            <input type="text" id="product-name" data-reflection="name" placeholder="enter name of product" autofocus="autofocus" />
+	            <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product');?>" autofocus="autofocus" />
             </div>
 			<div class="grid_1">
 				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
 			</div>
             <div class="grid_2">
                 <label for="product-sku">SKU</label>
-                <input type="text" id="product-sku" data-reflection="sku" placeholder="item id" />
+                <input type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id');?>" />
             </div>
             <div class="grid_3">
                 <label for="product-mpn">MPN</label>
                 <input type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber" />
             </div>
             <div class="grid_3">
-                <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
+                <label for="product-weight"><?php echo $this->translate("Weight (in %1\$s)", $this->generalConfig['weightUnit']); ?></label>
                 <input type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
             </div>
             <div class="grid_8">
-                <label for="product-brand">Brand</label>
+                <label for="product-brand"><?php echo $this->translate('Brand');?></label>
             </div>
             <div class="grid_4">
                 <select name="product-brand" id="product-brand" data-reflection="brand">
-	                <option value="-1">select brand</option>
+	                <option value="-1"><?php echo $this->translate('select brand');?></option>
                 <?php foreach($this->brands as $brand): ?>
 		           	<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName(); ?></option>
 				<?php endforeach; ?>
                 </select>
             </div>
             <div class="grid_4">
-                <input type="text" name="" id="new-brand" placeholder="or create new">
+                <input type="text" name="" id="new-brand" placeholder="<?php echo $this->translate('or create new');?>">
             </div>
             <div class="clear"></div>
             </fieldset>
 
             <div class="mt5px">
                 <div id="description-box">
+	                <?php
+	                $lexemShortDescription = $this->translate('Short description');
+	                $lexemFullDescription = $this->translate('Full description');
+					?>
                     <ul>
-                        <li><a href="#short-description-tab">Short description</a></li>
-                        <li><a href="#full-description-tab">Full description</a></li>
+                        <li><a href="#short-description-tab"><?php echo $lexemShortDescription;?></a></li>
+                        <li><a href="#full-description-tab"><?php echo $lexemFullDescription;?></a></li>
                     </ul>
                     <div id="short-description-tab">
-                    <textarea id="product-shortDescription" class="h170" data-reflection="shortDescription" placeholder="Short description"></textarea>
+                    <textarea id="product-shortDescription" class="h170" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription;?>"></textarea>
                     </div>
                     <div id="full-description-tab">
-                    <textarea id="product-fullDescription" class="h170" data-reflection="fullDescription" placeholder="Full description"></textarea>
+                    <textarea id="product-fullDescription" class="h170" data-reflection="fullDescription" placeholder="<?php echo $lexemFullDescription;?>"></textarea>
                     </div>
                 </div>
             </div>

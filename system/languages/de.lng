@@ -1,5 +1,8 @@
 <?php
-/*** Seotoaster Übersetzung von Ronny Kumke, ronny@lxcars.de ***/
+/**
+ * German translation for shopping plugin
+ * @contibutors Ronny Kumke /ronny@lxcars.de/
+ */
 return array(
 	'Add/edit product'							=> 'Artikel hinzufügen od. bearbeiten',
 	'Manage brand logos'						=> 'Hersteller-Logos verwalten',
@@ -16,7 +19,7 @@ return array(
 	'enter name of product'						=> 'Artikelbezeichnung eingeben',
 	'SKU'										=> 'Lagerhaltungsnummer',
 	'MPN'										=> 'MPN',
-	'Weight (in kg)'							=> 'Gewicht (in kg)',
+	"Weight (in %1\$s)"   						=> 'Gewicht (in %1\$s)',
 	'Brand'										=> 'Marke',
 	'select brand'								=> 'Marke wählen',
 	'or create new'								=> 'oder neue Marke erstellen',
