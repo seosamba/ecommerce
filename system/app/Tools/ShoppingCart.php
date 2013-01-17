@@ -152,6 +152,7 @@ class Tools_ShoppingCart {
 	 * @param $options array of toaster products optionsId => selectionId
 	 * @param int $qty Items quantity
 	 * @throws Exceptions_SeotoasterPluginException
+	 * @return string Item storage key
 	 */
     public function add(Models_Model_Product $item, $options = array(), $qty = 1) {
 	    if(!$item instanceof Models_Model_Product)  {
@@ -187,6 +188,8 @@ class Tools_ShoppingCart {
 	    }
 	    unset($item);
 	    $this->_save();
+
+	    return $itemKey;
     }
 
 	private function _calculateItemWeight(Models_Model_Product $item, $modifiers) {
