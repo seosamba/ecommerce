@@ -56,6 +56,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			error_log($e->getTraceAsString());
 			return false;
 		}
+		$model->notifyObservers();
 
 		return $model;
 	}

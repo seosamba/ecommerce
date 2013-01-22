@@ -42,6 +42,11 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	 */
 	const CART_STATUS_SHIPPED       = 'shipped';
 
+	/**
+	 * Order was canceled after successfull payment and money was sent back to customer
+	 */
+	const CART_STATUS_REFUNDED      = 'refunded';
+
 	protected $_cartContent = null;
 
 	protected $_ipAddress   = '';

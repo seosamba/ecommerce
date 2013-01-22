@@ -16,7 +16,9 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
 		$gateway = get_called_class();
 
 		$cart = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
-
+		$cart->registerObserver(
+			new Tools_InventoryObserver($cart->getStatus())
+		);
 		if ($cart !== null) {
 			$cart->setStatus($status);
 			$cart->setGateway($gateway);

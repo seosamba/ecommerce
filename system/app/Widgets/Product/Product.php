@@ -287,7 +287,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		if (is_null($inventoryCount)){
 			return 'Unlimited';
 		}
-		return $inventoryCount;
+		return $inventoryCount > 0 ? $inventoryCount : 'Out of stock' ;
 	}
 
     public static function getAllowedOptions() {
