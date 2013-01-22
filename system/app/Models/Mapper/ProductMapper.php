@@ -179,7 +179,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$select->limit($limit, $offset);
 		}
 
-		error_log($select->__toString());
+		Tools_System_Tools::debugMode() && error_log($select->__toString());
 		$resultSet = $this->getDbTable()->fetchAll($select);
 
 		if(count($resultSet) === 0) {
