@@ -307,106 +307,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
 
 	/**
-	 * Checkout action
-	 * @deprecated
-	 * @throws Exceptions_SeotoasterPluginException
-	 */
-	public function checkoutAction() {
-		if($this->_request->isGet()) {
-			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
-		}
-		if ($this->_request->isPut()) {
-			$data = Zend_Json::decode($this->_request->getRawBody());
-			if (!empty($data) && isset($this->_sessionHelper->tmpShippingRates)){
-				if ($this->_applyCustomerShipping($data)) {
-					$this->_responseHelper->success(array(
-						'callback' => 'renderPaymentZone',
-						'data'     => $this->_renderPaymentZone()
-					));
-				}
-			}
-			$this->_responseHelper->fail('Undefined error');
-		}
-		$shippingType = $this->_configMapper->getConfigParam('shippingType');
-		if ($shippingType !== Tools_Shipping_Shipping::SHIPPING_TYPE_PICKUP) {
-			$form = new Forms_Checkout_Shipping();
-			$addressType = Models_Model_Customer::ADDRESS_TYPE_SHIPPING;
-		} else {
-			$form = new Forms_Checkout_Billing();
-			$addressType = Models_Model_Customer::ADDRESS_TYPE_BILLING;
-		}
-
-		if ($form->isValid($this->_request->getParams())){
-			$shoppingCart = Tools_ShoppingCart::getInstance();
-
-			$formData = $form->getValues();
-
-			$customer = $this->_processCustomer($formData);
-
-			$addressId = Models_Mapper_CustomerMapper::getInstance()->addAddress($customer, $formData, $addressType);
-
-			$shoppingCart->setAddressKey($addressType, $addressId);
-
-			$shippingCalc = new Tools_Shipping_Shipping($this->_getConfig());
-			try {
-				$shippingData = $shippingCalc->calculateShipping();
-				if (is_array($shippingData) && !empty($shippingData)){
-					if (sizeof($shippingData) === 1 && sizeof($shippingData[0]['rates']) === 1){
-						$shippingData = reset($shippingData);
-
-						$shippingData['rates'] = reset($shippingData['rates']);
-						$shoppingCart->setShippingData(array(
-							'service' => $shippingData['service'],
-							'type' => $shippingData['rates']['type'],
-							'price' => $shippingData['rates']['price']
-						));
-						$responseData = array(
-							'callback' => 'renderPaymentZone',
-							'data'     => $this->_renderPaymentZone()
-						);
-
-					} else {
-						$this->_sessionHelper->tmpShippingRates = $shippingData;
-						$responseData = array(
-							'callback' => 'showShippingDialog',
-							'data'     => $shippingData
-						);
-					}
-				}
-			} catch (Exceptions_SeotoasterPluginException $spe) {
-				$this->_responseHelper->fail($spe->getMessage());
-			}
-			//saving cart to session and db
-			$shoppingCart->save()->saveCartSession($customer);
-		} else {
-			$this->_responseHelper->fail(Tools_Content_Tools::proccessFormMessagesIntoHtml($form->getMessages(),get_class($form)));
-		}
-
-		$this->_responseHelper->success($responseData);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	private function _applyCustomerShipping($data) {
-		foreach ($this->_sessionHelper->tmpShippingRates as $item){
-			if (isset($item['service']) && $item['service'] === $data['service']){
-				if (isset($item['rates'][$data['index']])){
-					Tools_ShoppingCart::getInstance()->setShippingData(
-						array(
-							'service'   => $item['service'],
-							'type'      => $item['rates'][$data['index']]['type'],
-							'price'     => $item['rates'][$data['index']]['price']
-						))->save()->saveCartSession(null);
-					unset($this->_sessionHelper->tmpShippingRates);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Method creates customer or returns existing one
 	 * @static
 	 * @param $data array Customer details
@@ -605,16 +505,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		echo $content;
 	}
 
-	/**
-	 * @deprecated
-	 */
-	protected function _renderPaymentZone() {
-		$paymentZoneTmpl = isset($this->_sessionHelper->paymentZoneTmpl) ? $this->_sessionHelper->paymentZoneTmpl : null;
-		if ($paymentZoneTmpl !== null) {
-			return $this->_renderViaParser($paymentZoneTmpl, Tools_Misc::getCheckoutPage());
-		}
-	}
-
 	private function _renderViaParser($content, Application_Model_Models_Page $page) {
 		$themeData = Zend_Registry::get('theme');
 		$extConfig = Zend_Registry::get('extConfig');
@@ -675,72 +565,6 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			return $this->_view->render('manage_products.phtml');
 		}
-	}
-
-	/**
-	 * @deprecated
-	 */
-	private function _customerRESTService() {
-		$data = array();
-		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
-		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
-		$for = isset($this->_requestedParams['for']) ? filter_var($this->_requestedParams['for'], FILTER_SANITIZE_STRING) : false;
-		switch (strtolower($this->_request->getMethod())){
-			default:
-			case 'get':
-				if ($for === 'dashboard'){
-					$order = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
-					$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
-					$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
-					$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
-
-					$c = Zend_Registry::get('Zend_Currency');
-					$data = array_map(function($row) use ($c){
-							$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
-							$row['total_amount'] = $c->toCurrency($row['total_amount']);
-							return $row;
-						},
-						$customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset, $search));
-				} else {
-					if ($id) {
-						$result = $customerMapper->find($id);
-						if ($result) {
-							$data = $result->toArray();
-						}
-					} else {
-						$result = $customerMapper->fetchAll();
-						if ($result){
-							$data = array_map(function($model){ return $model->toArray(); }, $result);
-						}
-					}
-				}
-	            break;
-	        case 'post':
-	            break;
-			case 'put':
-				break;
-			case 'delete':
-				$rawBody = Zend_Json::decode($this->_request->getRawBody());
-				if (isset($rawBody['ids'])){
-					$ids = filter_var_array($rawBody['ids'], FILTER_SANITIZE_NUMBER_INT);
-					if (!empty($ids)){
-						$customers = $customerMapper->fetchAll(array('id IN (?)' => $ids, 'role_id <> ?' => Tools_Security_Acl::ROLE_SUPERADMIN));
-						if ( !empty($customers) ) {
-							foreach ($customers as $user) {
-								$data[$user->getId()] = (bool)Application_Model_Mappers_UserMapper::getInstance()->delete($user);
-							}
-						} else {
-							$data = array(
-								'error'		=> true,
-								'code'		=> 404,
-								'message'	=> 'Requested users not found'
-							);
-						}
-					}
-				}
-				break;
-	    }
-		return $data;
 	}
 
 	public function profileAction(){
@@ -834,16 +658,6 @@ class Shopping extends Tools_Plugins_Abstract {
         }
 	}
 
-	/**
-	 * @deprecated
-	 */
-	protected function _statsRESTService(){
-		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
-		if (is_array($id) && !empty($id)){
-			return Models_Mapper_ProductMapper::getInstance()->fetchProductSalesCount($id);
-		}
-	}
-
 	public function bundledshipperAction(){
 		$name = filter_var($this->_request->getParam('shipper'), FILTER_SANITIZE_STRING);
 		$bundledShippers = array(
@@ -901,13 +715,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer){
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
-                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $userData = $userMapper->find($cartSession->getUserId());
                 $newCustomerPassword = uniqid('customer_' . time());
                 $userData->setPassword($newCustomerPassword);
                 $newCustomerId = $userMapper->save($userData);
-                $customer = $customerMapper->find($cartSession->getUserId());
+                $customer = Models_Mapper_CustomerMapper::getInstance()->find($cartSession->getUserId());
                 $customer->setPassword($newCustomerPassword);
                 //$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 				$customer->registerObserver(new Tools_Mail_Watchdog(array(

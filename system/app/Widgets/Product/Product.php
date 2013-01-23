@@ -285,9 +285,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	private function  _renderInventory() {
 		$inventoryCount = $this->_product->getInventory();
 		if (is_null($inventoryCount)){
-			return 'Unlimited';
+			return $this->_translator->translate('In stock');
 		}
-		return $inventoryCount > 0 ? $inventoryCount : 'Out of stock' ;
+		return $inventoryCount > 0 ? $inventoryCount : $this->_translator->translate('Out of stock');
 	}
 
     public static function getAllowedOptions() {
