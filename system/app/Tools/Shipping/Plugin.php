@@ -25,7 +25,19 @@ class Tools_Shipping_Plugin extends Tools_Plugins_Abstract implements Interfaces
         $config = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_MARKUP);
         if (isset($config['enabled']) && isset($config['config']['price']) && isset($rates[0]['price']) && $config['enabled'] == 1) {
             foreach($rates as $key=>$rate){
-                $rates[$key]['price'] = $rate['price'] + $config['config']['price'];
+                if($config['config']['modifierSign'] == '+'){
+                    if($config['config']['modifierType'] == 'unit'){
+                        $rates[$key]['price'] = $rate['price'] + $config['config']['price'];
+                    }else{
+                        $rates[$key]['price'] = $rate['price'] + round($rate['price']*$config['config']['price']/100, 2);
+                    }
+                }else{
+                    if($config['config']['modifierType'] == 'unit'){
+                        $rates[$key]['price'] = $rate['price'] - $config['config']['price'];
+                    }else{
+                        $rates[$key]['price'] = $rate['price'] - round($rate['price']*$config['config']['price']/100, 2);
+                    }
+                }
             }
         }
 		$vault[$shipperName] = $rates;

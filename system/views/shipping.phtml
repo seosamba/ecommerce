@@ -112,11 +112,17 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
                 <form class="clearfix" action="<?php echo $this->markupForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
 					<?php echo $this->markupForm->getElement('shipper')->renderViewHelper(); ?>
                     <label class="grid_3 mt5px textright" for="cartamount"><?php echo $this->markupForm->getElement('price')->getLabel();?></label>
-					<div class="grid_3 relative">
+					<div class="grid_2 relative">
+                        <?php echo $this->markupForm->getElement('modifierSign')->renderViewHelper();?>
+                    </div>
+                    <div class="grid_2 relative">
 						<?php echo $this->markupForm->getElement('price')->renderViewHelper();?>
-						<label class="unit-over"><?php echo $this->config['currency'];?></label>
+						<label class="unit-over"><?php //echo $this->config['currency'];?></label>
 					</div>
-				</form>
+                    <div class="grid_2 relative">
+                        <?php echo $this->markupForm->getElement('modifierType')->renderViewHelper();?>
+                    </div>
+                 </form>
             </div>
 			<div id="pickup">
 				<label style="display: block;margin: 10px; text-align: justify"><?php echo $this->translate('When this option is checked user will be given the option to pick their stuff up at your store location.'); ?></label>
