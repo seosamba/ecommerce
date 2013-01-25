@@ -32,8 +32,8 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 				'is404page'		=> 0,
 				'protected'		=> 0,
 				'memLanding'	=> 0,
-				'showInMenu'	=> 1,
-				'draft'         => 1,
+				'showInMenu'	=> 0,
+				'draft'         => 0,
 				'targetedKey'	=> Shopping::PRODUCT_CATEGORY_NAME
 			));
 			$pageMapper->save($productCategoryPage);
