@@ -169,6 +169,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$actualOptions  = array();
 		$product        = Models_Mapper_ProductMapper::getInstance()->find($productId);
 		$defaultOptions = $product->getDefaultOptions();
+        $resultOptions = array();
 		foreach($options as $optionId => $selectionId) {
 			foreach($defaultOptions as $defaultOption) {
 				if($optionId != $defaultOption['id']) {
@@ -179,9 +180,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
 						return $selection;
 					}
 				});
+                $resultOptions = array_merge($actualOptions, $resultOptions);
+                $resultOptions[0]['optionTitle'] = $defaultOption['title'];
 			}
 		}
-		return $actualOptions;
+		return $resultOptions;
 	}
     
     /**

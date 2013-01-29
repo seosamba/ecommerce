@@ -53,7 +53,7 @@
 	                <?php if(!empty($product['options'])):?>
 	                    <?php foreach($product['options'] as $optData): ?>
                            <span class="post-purchase-report-product-options">
-                           <?php echo $optData['title']; ?>
+                           <?php echo $optData['optionTitle'].' '.$optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
                              <?php if((bool)$product['taxRate'] && $this->showPriceIncTax == 1):?>
                                     <span>(<?php echo $optData['priceSign'], round($optData['priceValue'] + round(( $product['taxRate'] * $optData['priceValue']) / 100, 2), 2); ?>)</span>
@@ -202,7 +202,7 @@
                     <?php if(!empty($product['options'])):?>
                         <?php foreach($product['options'] as $optData): ?>
                            <span class="post-purchase-report-product-options">
-                            <?php echo $optData['title']; ?>
+                           <?php echo $optData['optionTitle'].' '.$optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
                                 <?php if((bool)$product['taxRate'] && $this->showPriceIncTax == 1):?>
                                     <span>(<?php echo $optData['priceSign'], round($optData['priceValue'] + round(( $product['taxRate'] * $optData['priceValue']) / 100, 2), 2); ?>)</span>
