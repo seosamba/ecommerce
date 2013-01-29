@@ -136,6 +136,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
             }else{
                 unset($sessionHelper->storeCartSessionKey);
             }
+            if(isset($this->_options[2]) && $this->_options[2] != ''){
+                $additionalTableRows = explode(',', $this->_options[2]);
+                $this->_view->additionalTableRows = $additionalTableRows;
+            }
+            
 			if ($cartSession instanceof Models_Model_CartSession){
 				$cartContent = $cartSession->getCartContent();
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
@@ -148,6 +153,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['options'] = $optionsData;
                     }
                     if($productObject !=null){
+                        $cartContent[$key]['mpn']      = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
                         $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);

@@ -31,6 +31,11 @@
         <thead>
             <tr>
                 <th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
+                <?php if(isset($this->additionalTableRows)):?>
+                    <?php foreach($this->additionalTableRows as $tableRow):?>
+                        <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                    <?php endforeach;?>
+                <?php endif; ?>
                 <th class="product-unit-price"><?php echo $this->translate('Price'); ?></th>
                 <th class="product-qty"><?php echo $this->translate('Qty'); ?></th>
                 <th class="product-total"><?php echo $this->translate('Total'); ?></th>
@@ -68,6 +73,13 @@
                         <?php endforeach; ?>
                     <?php endif;?>
                 </td>
+                <?php if(isset($this->additionalTableRows)):?>
+                    <?php foreach($this->additionalTableRows as $tableRow):?>
+                       <?php if(isset($product[$tableRow])):?>
+                            <td class="product-unit-additional-row"><?php echo $product[$tableRow]; ?></td>
+                       <?php endif;?>
+                    <?php endforeach;?>
+                <?php endif; ?>
                 <td class="product-unit-price"><?php echo $this->currency($product['tax_price']); ?></td>
                 <td class="product-qty"><?php echo $product['qty']; ?></td>
                 <td class="product-total"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
@@ -180,6 +192,11 @@
         <thead>
             <tr style="background:#ddd;">
                 <th colspan="2" style="padding:5px;"><?php echo $this->translate('Product'); ?></th>
+                <?php if(isset($this->additionalTableRows)):?>
+                    <?php foreach($this->additionalTableRows as $tableRow):?>
+                        <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                    <?php endforeach;?>
+                <?php endif; ?>
                 <th style="padding:5px;"><?php echo $this->translate('Price'); ?></th>
                 <th style="padding:5px;"><?php echo $this->translate('Qty'); ?></th>
                 <th style="padding:5px;"><?php echo $this->translate('Total'); ?></th>
@@ -217,6 +234,13 @@
                         <?php endforeach; ?>
                     <?php endif;?>
                 </td>
+                <?php if(isset($this->additionalTableRows)):?>
+                    <?php foreach($this->additionalTableRows as $tableRow):?>
+                       <?php if(isset($product[$tableRow])):?>
+                            <td valign="middle" align="center"><?php echo $product[$tableRow]; ?></td>
+                       <?php endif;?>
+                    <?php endforeach;?>
+                <?php endif; ?>
                 <td valign="middle" align="center"><?php echo $this->currency($product['tax_price']); ?></td>
                 <td valign="middle" align="center"><?php echo $product['qty']; ?></td>
                 <td valign="middle" align="center"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
