@@ -158,13 +158,21 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	private function _renderPrice() {
 		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
         $lifeReload = (strtolower(end($this->_options)) === 'realtimeupdate');
+        $currency = (strtolower($this->_options[0]) === 'currency');
 		if ($noCurrency === true){
 			array_pop($this->_options);
 		}
         if ($lifeReload === true){
 			array_pop($this->_options);
 		}
-
+        if ($currency === true){
+			if(!isset($this->_options[1]) && $this->_options[1] == ''){
+                return false;
+            }
+            $newCurrency = strtoupper($this->_options[1]);
+            $this->_options = array();
+        }
+        
 		if (empty($this->_options)){
 			$price = $this->_product->getCurrentPrice() !== null ? $this->_product->getCurrentPrice() : $this->_product->getPrice();
 		} else {
@@ -190,7 +198,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
         }
       
         $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($this->_product, $itemDefaultOptionsArray);
-        
+        if($currency === true){
+            if (null === ($changedPrice = $this->_cache->load('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_'))){
+                $cacheCurrencyTime = (24*60*60) + (strtotime(date('m/d/Y', time())) - strtotime("now"));
+                $changedPrice = Tools_Misc::getConvertedPriceByCurrency($price, $newCurrency);
+                $this->_cache->save('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
+            }
+            return $changedPrice;
+        }
         if($lifeReload){
             return '<span class="price-lifereload-'.$this->_product->getId().'">'.$this->_currency->toCurrency($price).'</span>';
         }

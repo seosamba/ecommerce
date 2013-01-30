@@ -297,4 +297,18 @@ class Tools_Misc {
             return '';
         }
     }
+    
+    public static function getConvertedPriceByCurrency($price, $currency) {
+        $amount = number_format($price,2,".",",");
+        $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
+        $googleCalculatorUrl = "http://www.google.com/ig/calculator?hl=en&q=".$amount."".$shoppingCurrency."=?".$currency;
+        $ch = curl_init();
+        curl_setopt ($ch, CURLOPT_URL, $googleCalculatorUrl);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $result = explode('"', $result);
+        return number_format(floatval($result['3']),2);
+    }
 }

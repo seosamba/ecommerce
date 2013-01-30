@@ -182,10 +182,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
             }
             $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $itemDefaultOptionsArray);
-            
-            
+                        
+                        
 			//setting up the entity parser
-			$renderedContent .= $entityParser->setDictionary(array(
+			$entityParser->addToDictionary(array(
 				'$product:name'              => $product->getName(),
                 '$product:photourl'          => $photoUrlPart . '/product/' . $productPhotoData[1],
                 '$product:photourl:product'  => $photoUrlPart . '/product/' . $productPhotoData[1],
@@ -209,8 +209,25 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				'$store:addtocart:'.$product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:checkbox'  => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox ->render() : '',
                 '$product:options'           => isset($productOptionsView) ? $productOptionsView : ''
-			))->parse($templatePrepend . $data['templateContent']);
-			unset($storeWidget);
+			));
+            
+            $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+            if (preg_match_all('~(\$product:price:currency:)([A-Z]{3})~', $data['templateContent'], $matches)){
+                 if(isset($matches[0]) && isset($matches[2])){
+                     foreach($matches[2] as $key => $newCurrency){
+                         $newCurrency = strtoupper($newCurrency);
+                         if (null === ($changedPrice = $cacheHelper->load('product_prodid_'.$product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_'))){
+                            $cacheCurrencyTime = (24*60*60) + (strtotime(date('m/d/Y', time())) - strtotime("now"));
+                            $changedPrice = Tools_Misc::getConvertedPriceByCurrency($price, $newCurrency);
+                            $cacheHelper->save('product_prodid_'.$product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
+                         }
+                         $entityParser->addToDictionary(array($matches[0][$key]=>$changedPrice));
+                          
+                     }
+                 }
+            }
+            $renderedContent .=  $entityParser->parse($templatePrepend . $data['templateContent']);
+           	unset($storeWidget);
 		});
 		$this->_cacheTags = array_merge($this->_cacheTags, $cacheTags);
 		return $renderedContent;
