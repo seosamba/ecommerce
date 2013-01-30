@@ -23,11 +23,6 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	const CART_STATUS_COMPLETED     = 'completed';
 
 	/**
-	 *
-	 */
-	const CART_STATUS_UNPROCESSED   = 'unprocessed';
-
-	/**
 	 * Payment transaction has been denied/cancelled.
 	 */
 	const CART_STATUS_CANCELED      = 'canceled';
@@ -41,6 +36,11 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	 * Order has been sent via shipping service.
 	 */
 	const CART_STATUS_SHIPPED       = 'shipped';
+
+	/**
+	 * Order has been delivered
+	 */
+	const CART_STATUS_DELIVERED     = 'delivered';
 
 	/**
 	 * Order was canceled after successfull payment and money was sent back to customer

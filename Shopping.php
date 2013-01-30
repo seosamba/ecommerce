@@ -622,6 +622,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (!$order) {
 				throw new Exceptions_SeotoasterPluginException('Order not found');
 			}
+
 			if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)){
 				if ((int)$order->getUserId() !== (int)$customer->getId()) {
 					throw new Exceptions_SeotoasterPluginException('Not allowed action');
@@ -629,12 +630,15 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if ($this->_request->isPost()) {
+				$order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
+
 				$params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
 
-				if ($order->getShippingTrackingId() !== $params['shippingTrackingId']){
+				if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']){
 					$order->registerObserver(new Tools_Mail_Watchdog(array(
 						'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
 					)));
+					$params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
 				}
 
 				$order->setOptions($params);

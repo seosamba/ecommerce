@@ -76,12 +76,12 @@
 				<tr class="title-table">
 					<th>#</th>
 					<th><?php echo $this->translate('Purchased On');?></th>
-					<th><?php echo $this->translate('Status');?></th>
 					<th><?php echo $this->translate('Products in cart');?></th>
-					<th><?php echo $this->translate('Total Price');?></th>
-					<th><?php echo $this->translate('Shipping price');?></th>
-					<th><?php echo $this->translate('Shipping via');?></th>
-					<th><?php echo $this->translate('Details');?></th>
+                    <th><?php echo $this->translate('Total Price');?></th>
+                    <th><?php echo $this->translate('Shipping price');?></th>
+                    <th><?php echo $this->translate('Shipping via');?></th>
+                    <th style="width: 180px;"><?php echo $this->translate('Status');?></th>
+                    <th><?php echo $this->translate('Details');?></th>
                     <?php if(isset($this->invoicePlugin)):?>
                         <th><?php echo $this->translate('View/Download Invoice');?></th>
                     <?php endif;?>
@@ -93,7 +93,6 @@
 				<tr data-role="cart" data-id="<?php echo $order->getId();?>">
 					<td><?php echo $order->getId();?></td>
 					<td><?php echo date('d M, Y', strtotime($order->getCreatedAt()));?></td>
-					<td><?php echo $order->getStatus();?></td>
 					<td><?php echo sizeof($order->getCartContent());?></td>
 					<td><?php echo $this->currency(floatval($order->getTotal()));?></td>
 					<td><?php echo $this->currency(floatval($order->getShippingPrice()));?></td>
@@ -113,6 +112,7 @@
                             <?php endif;?>
                         <?php endif;?>
 					</td>
+					<td class="current-status"><?php echo $order->getStatus();?></td>
 					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
                     <?php if(isset($this->invoicePlugin)):?>
                         <td>   
@@ -202,9 +202,70 @@
 						if (response.hasOwnProperty('responseText')){
 							$(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
 							$(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
+							$(self).closest('tr').find('td.current-status').text(response.responseText.status);
 						}
 					}
 				});
+			}
+		});
+	});
+	$('#orders-table').on('mouseenter', 'td.current-status', function(){
+		var self    = this,
+			id      = parseInt($(this).closest('tr').data('id')),
+			currentStatus = $(this).text();
+
+		$(this).data('currentStatus', $(this).text());
+
+		var buttons = {
+			'refunded'  : '<button class="change-status btn btn-small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+			'completed' : '<button class="change-status btn btn-small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+			'canceled'  : '<button class="change-status btn btn-small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+			'delivered' : '<button class="change-status btn btn-small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+		}
+
+		var html = ''
+		switch (currentStatus){
+			case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
+				html += buttons['refunded']
+				break;
+			case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
+				html += buttons['completed'];
+                html += buttons['canceled'];
+                break;
+			case '<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>':
+				html += buttons['delivered'];
+				html += buttons['refunded'];
+				break;
+		}
+
+		if (html.length){
+			var popup = $('<div></div>')
+					.css({"white-space": "nowrap"})
+					.html(html);
+			$(this).html(popup);
+		}
+
+
+	});
+	$('#orders-table').on('mouseleave', 'td.current-status', function(){
+		$(this).text($(this).data('currentStatus'));
+	});
+
+	$('#orders-table').on('click', 'td.current-status .change-status', function(){
+		var self    = this,
+			id      = parseInt($(this).closest('tr').data('id')),
+			currentStatus = $(this).data('status');
+
+		$.ajax({
+			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+			data: {status: currentStatus},
+			type: 'POST',
+			dataType: 'json',
+			success: function(response) {
+				showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+				if (!response.error && response.hasOwnProperty('responseText')){
+					$(self).closest('td').text(response.responseText.status);
+				}
 			}
 		});
 	});
