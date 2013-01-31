@@ -751,9 +751,9 @@ class Shopping extends Tools_Plugins_Abstract {
     
     protected function _addVersionToAdminPanel(){
         $shoppingVersion = Tools_Filesystem_Tools::getFile(__DIR__ . DIRECTORY_SEPARATOR .'version.txt');
-        if($shoppingVersion != null && $shoppingVersion != ''){
-            $this->_view->shoppingVersion = str_replace("\n",'', '+ Store '.$shoppingVersion);
-            $this->_injectContent($this->_view->render('shoppingVersion.phtml'));
+        if(!empty($shoppingVersion)){
+            $shoppingVersion = str_replace(array("\r\n", "\n", "\r"), '', '+ Store '.$shoppingVersion);
+	        Zend_Layout::getMvcInstance()->getView()->placeholder(Tools_System_Tools::PLACEHOLDER_SYSTEM_VERSION)->append($shoppingVersion);
         }
     }
 }
