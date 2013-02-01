@@ -1,10 +1,16 @@
 <?php
 /**
- * Customers.php
+ * Customers REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Customers extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'delete')
@@ -18,9 +24,22 @@ class Api_Store_Customers extends Api_Service_Abstract {
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Get customers data
+	 *
+	 * Resourse:
+	 * : /api/store/customers/id/:id
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * ## Parameters:
+     * type (type string)
+     * : Type of data. Possible values: country, state
+	 *
+	 * pairs (type sting)
+	 * : If given data will be returned as key-value array
+	 *
+	 * @return JSON List of customers
 	 */
 	public function getAction() {
 		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
@@ -57,26 +76,33 @@ class Api_Store_Customers extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Reserved for future usage
 	 */
 	public function postAction() {
 		// TODO: Implement postAction() method.
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Delete customer
+	 *
+	 * Resourse:
+	 * : /api/store/customers/
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * ## Parameters:
+     * ids (type string)
+     * : List of customer IDs to delete
+	 *
+	 * @return JSON Result of operations
 	 */
 	public function deleteAction() {
 		$customerMapper = Models_Mapper_CustomerMapper::getInstance();

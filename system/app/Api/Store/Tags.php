@@ -1,13 +1,17 @@
 <?php
 /**
- * Tags.php
+ * Product Tags REST API controller
  *
  * @package Store
  * @since 2.0.0
+ *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Api_Store_Tags extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
@@ -20,7 +24,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 * Resourse:
 	 * : /api/store/tags/id/:id
 	 *
-	 * Method:
+	 * HttpMethod:
 	 * : GET
 	 *
 	 * ## Parameters:
@@ -36,7 +40,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 * count (type *boolean*)
 	 * : When set to true, 1 or non empty string total number of records will be returned in response in 'totalCount' key
 	 *
-	 * @return json Single tag or set of tags
+	 * @return JSON Single tag or set of tags
 	 */
 	public function getAction() {
 		/**
@@ -75,7 +79,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	/**
 	 * Create new product tag
 	 *
-	 * @return json
+	 * @return JSON
 	 */
 	public function postAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
@@ -95,7 +99,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	/**
 	 * Update an existing product tag
 	 *
-	 * @return json
+	 * @return JSON Returns updated models representations
 	 */
 	public function putAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
@@ -113,7 +117,17 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * Delete product tag by ID
+	 * Deletes product tag by tag id
+	 *
+	 * Resourse:
+	 * : /api/store/tags/
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * ## Parameters:
+	 * id (type integer) Tag id
+	 *
 	 */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);

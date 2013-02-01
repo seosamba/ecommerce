@@ -1,10 +1,16 @@
 <?php
 /**
- * Orders.php
+ * Orders REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Orders extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
@@ -18,9 +24,36 @@ class Api_Store_Orders extends Api_Service_Abstract {
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Get orders by giving contitions
+	 *
+	 * Resourse:
+	 * : /api/store/orders/id/:id
+	 *
+	 * Method:
+	 * : GET
+	 *
+	 * ## Parameters:
+	 * id (type string)
+	 * : Order id to fetch single product
+	 *
+	 * ## Optional parameters (оnly if ID is not defined)
+	 *
+	 * productid (type integer)
+	 * : Filter orders that contains products with given id
+	 *
+	 * filter (type array)
+	 * : Set of filters. Possible arguments: country, state, date-from, date-to, product-id
+	 *
+	 * limit (type integer)
+	 * : Maximum number of results
+	 *
+	 * offset (type integer)
+	 * : Number of results to skip
+	 *
+	 * order (type string)
+	 * : Sorting fields
+	 *
+	 * @return JSON List of orders
 	 */
 	public function getAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
@@ -70,26 +103,21 @@ class Api_Store_Orders extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Reserved for future usage
 	 */
 	public function postAction() {
 		// TODO: Implement postAction() method.
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function deleteAction() {
 		// TODO: Implement deleteAction() method.
