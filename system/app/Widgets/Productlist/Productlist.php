@@ -308,6 +308,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$this->_view->filters = $filters;
 
+        //if no filters passed in the product list we will check if it is a PL of product ids
+        if(preg_match('~[0-9,]+~', $this->_options[0])) {
+            $idsWhere    = 'p.id IN (' . $this->_options[0] . ')';
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
+
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null),  self::DEFAULT_LIMIT,
 			null, $filters['tags'], $filters['brands']);

@@ -195,13 +195,26 @@
                 }
                 //listing template
                 shortCode += $('#templates').val();
-                //tags filter
-                shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
-                //brands filter
-                shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
-                //ordering
-                shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
-                $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+
+                if(($('#search').val() != '')) {
+                    var ids = [];
+                    $.each($('a.currproduct'), function() {
+                        ids.push($(this).attr('id'));
+                    });
+                    if(!ids.length) {
+                        showMessage('There is nothing to put in the list. Search different criteria and try again', true);
+                        return false;
+                    }
+                    shortCode += ':' + ids.join(',') + '}';
+                } else {
+                    //tags filter
+                    shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
+                    //brands filter
+                    shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
+                    //ordering
+                    shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
+                }
+                    $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
 		    },
 		    loadStoreData : function(dataType, filter, force) {
                 showSpinner();
