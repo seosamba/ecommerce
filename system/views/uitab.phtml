@@ -1,18 +1,24 @@
 <?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
 <div class="container_12">
 	<!-- Product listing selector -->
-	<div id="template-selector" class="grid_12 mt10px mb5px">
-		<?php if(isset($this->productTemplates) && !empty($this->productTemplates)): ?>
-			<select id="templates" class="templates" style="width:260px;margin: 3px;float:left;" data-placeholder="Select a product listing template...">
-				<option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
-				<?php foreach($this->productTemplates as $template): ?>
-					<option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
-				<?php endforeach; ?>
-			</select>
-		<?php else: ?>
-			<h3 class="grid_12"><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
-		<?php endif; ?>
-	</div>
+    <div class="grid_12">
+        <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
+            <h3><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
+        <?php else: ?>
+            <div id="template-selector" class="grid_6 mt10px mb5px">
+				<select id="templates" class="templates" data-placeholder="Select a product listing template...">
+                    <option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
+                    <?php foreach($this->productTemplates as $template): ?>
+                    <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="grid_6">
+                <?php echo $this->formText('search', '', array('placeholder' => 'search by name, sku or tags')); ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
@@ -91,6 +97,19 @@
         overflow: hidden;
         background-color:#fff;
     }
+    .ui-autocomplete {
+        max-height: 180px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+        background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
+        box-shadow: rgb(153, 153, 153) 0px 4px 10px;
+    }
+    #search {
+        margin-top: 12px;
+        padding: 6px 5px;
+
+    }
 </style>
 <?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
 <?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js'); ?>
@@ -105,6 +124,7 @@
 		    init: function() {
 				//init chosen plugin
 			    $('.pselect').chosen();
+
 			    //init jqueryui button
 			    $('#btn-create').button();
 			    $('.ui-tabs-nav-item a').click(this.launch);
@@ -114,6 +134,28 @@
 					uiTab.offset = 0;
 				    uiTab.loadStoreData('products', true)
 			    });
+
+
+                var self = this;
+                $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
+                    $('#search').autocomplete({
+                        minLength: 2,
+                        source: response,
+                        select: function(event, ui){
+                            self.loadStoreData('products', {
+                                key: ui.item.value
+                            }, true);
+                        }
+                    });
+                });
+
+                $(document).on('keypress', '#search', function(e) {
+                    if(e.keyCode == 13) {
+                        self.loadStoreData('products');
+                    }
+                    })
+
+
 		    },
 		    launch: function() {
 			    $('#product-products').html('');
@@ -161,15 +203,21 @@
                 shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
                 $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
 		    },
-		    loadStoreData : function(dataType, filter) {
+		    loadStoreData : function(dataType, filter, force) {
                 showSpinner();
                 //if data type already loaded - return
                 if($('#' + dataType + ' option').length) {
                     return false;
                 }
-                var utab = this,
+
+                if(!force) {
+                    var utab = this,
 		            params = uiTab.getParams(filter);
-			    $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
+                } else {
+                    params = filter;
+                }
+
+                $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
 				    params,
 				function(response) {
                     if(response.length) {
