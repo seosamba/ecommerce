@@ -248,13 +248,16 @@
 
 	});
 	$('#orders-table').on('mouseleave', 'td.current-status', function(){
-		$(this).text($(this).data('currentStatus'));
+		var oldStatus = $(this).data('currentStatus');
+		if (oldStatus) $(this).text(oldStatus);
 	});
 
 	$('#orders-table').on('click', 'td.current-status .change-status', function(){
-		var self    = this,
+		var statusTd    = $(this).closest('td'),
 			id      = parseInt($(this).closest('tr').data('id')),
 			currentStatus = $(this).data('status');
+
+		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
 
 		$.ajax({
 			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
@@ -264,7 +267,8 @@
 			success: function(response) {
 				showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
 				if (!response.error && response.hasOwnProperty('responseText')){
-					$(self).closest('td').text(response.responseText.status);
+                    console.log(response);
+                    $(statusTd).text(response.responseText.status).data('currentStatus', response.responseText.status);
 				}
 			}
 		});
