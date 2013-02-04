@@ -151,9 +151,9 @@
 
                 $(document).on('keypress', '#search', function(e) {
                     if(e.keyCode == 13) {
-                        self.loadStoreData('products');
+                        self.loadStoreData('products', {key: $(e.currentTarget).val()}, true);
                     }
-                    })
+                })
 
 
 		    },
