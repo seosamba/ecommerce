@@ -229,6 +229,7 @@
                 if(!force) {
 		            params = uiTab.getParams(filter);
                 } else {
+                    console.log(utab.searchTerm);
                     if(!utab.searchTerm) {
                         utab.searchTerm = filter;
                         params          = filter;
