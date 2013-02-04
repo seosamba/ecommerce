@@ -228,7 +228,8 @@
                 var utab = this;
                 console.log(filter);
                 console.log(force);
-                if(!force) {
+                console.log(utab.searchTerm);
+                if((!force || typeof(force) == 'undefined') && !utab.searchTerm) {
 		            params = uiTab.getParams(filter);
                 } else {
                     console.log(utab.searchTerm);
