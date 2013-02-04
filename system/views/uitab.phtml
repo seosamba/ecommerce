@@ -121,6 +121,7 @@
 	    var uiTab = {
 		    step: parseInt('<?php echo Shopping::PRODUCT_DEFAULT_LIMIT; ?>'),
 		    offset: 0,
+            searchTerm: null,
 		    init: function() {
 				//init chosen plugin
 			    $('.pselect').chosen();
@@ -142,6 +143,7 @@
                         minLength: 2,
                         source: response,
                         select: function(event, ui){
+                            self.searchTerm = null;
                             self.loadStoreData('products', {
                                 key: ui.item.value
                             }, true);
@@ -151,12 +153,12 @@
 
                 $(document).on('keypress', '#search', function(e) {
                     if(e.keyCode == 13) {
+                        self.searchTerm = null;
                         self.loadStoreData('products', {key: $(e.currentTarget).val()}, true);
                     }
                 })
 
-
-		    },
+    	    },
 		    launch: function() {
 			    $('#product-products').html('');
 			    $('ul.chzn-choices').removeClass('ui-corner-top').addClass('ui-corner-all');
@@ -223,11 +225,16 @@
                     return false;
                 }
 
+                var utab = this;
                 if(!force) {
-                    var utab = this,
 		            params = uiTab.getParams(filter);
                 } else {
-                    params = filter;
+                    if(!utab.searchTerm) {
+                        utab.searchTerm = filter;
+                        params          = filter;
+                    } else {
+                        params = utab.searchTerm;
+                    }
                 }
 
                 $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
