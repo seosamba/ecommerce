@@ -132,8 +132,13 @@
 			    $(document).on('click', '.currproduct', this.insertSingleProduct)
 			        .on('click', '#btn-create', this.insertList);
 			    $('.pselect').chosen().change(function() {
-					uiTab.offset = 0;
-				    uiTab.loadStoreData('products', true)
+					uiTab.offset    = 0;
+
+                    //cleaning the search params before filtering
+                    self.searchTerm = null;
+                    $('#search').val('');
+
+                    uiTab.loadStoreData('products', true)
 			    });
 
 
@@ -153,6 +158,7 @@
 
                 $(document).on('keypress', '#search', function(e) {
                     if(e.keyCode == 13) {
+                        $('.ui-autocomplete').hide()
                         self.searchTerm = null;
                         self.loadStoreData('products', {key: $(e.currentTarget).val()}, true);
                     }
@@ -199,15 +205,31 @@
                 shortCode += $('#templates').val();
 
                 if(($('#search').val() != '')) {
-                    var ids = [];
-                    $.each($('a.currproduct'), function() {
-                        ids.push($(this).attr('id'));
-                    });
-                    if(!ids.length) {
-                        showMessage('There is nothing to put in the list. Search different criteria and try again', true);
-                        return false;
+                    var ids             = [];
+                    var visibleProducts = $('a.currproduct');
+                    if(visibleProducts.length < uiTab.step) {
+                        $.each(visibleProducts, function(key, productContainer) {
+                            ids.push($(productContainer).attr('id'));
+                        });
+                        shortCode += ':' + ids.join(',') + '}';
+                        $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                    } else {
+                        showSpinner();
+                        $.when($.getJSON($('#website_url').val() + 'api/store/products/offset/0/limit/1000000/', {key: $('#search').val()}, function(response) {
+                            //console.log(response);
+                            hideSpinner();
+                            if(!response.length) {
+                                showMessage('There is nothing to put in the list. Search different criteria and try again', true);
+                                return false;
+                            }
+                            $.each(response, function(key, product) {
+                                ids.push(product.id);
+                            });
+                        })).done(function() {
+                            shortCode += ':' + ids.join(',') + '}';
+                            $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                        });
                     }
-                    shortCode += ':' + ids.join(',') + '}';
                 } else {
                     //tags filter
                     shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
@@ -215,8 +237,9 @@
                     shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                     //ordering
                     shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
-                }
                     $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                }
+
 		    },
 		    loadStoreData : function(dataType, filter, force) {
                 showSpinner();
