@@ -38,7 +38,7 @@ define([
             return false;
         },
         sort: function(e) {
-            var $el = $(e.target)
+            var $el = $(e.target),
                 key = $el.data('sortkey');
 
             $el.siblings('.sortable').removeClass('sortUp').removeClass('sortDown');
