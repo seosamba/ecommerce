@@ -55,6 +55,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 					'billing_address1' => 'address1',
 					'billing_address2' => 'address2'
 				))
+				->joinLeft(array('u' => 'user'), 'u.id = order.user_id', array(
+					'full_name', 'email'
+				))
 				->group('order.id');
 
 		if ($where){
@@ -62,7 +65,11 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 			$this->_parseWhere($select, $where);
 		}
 
-		APPLICATION_ENV === 'development' && error_log($select->__toString());
+		if (!empty($order)){
+			$select->order($order);
+		}
+
+		Tools_System_Tools::debugMode() && error_log($select->__toString());
 
 		if (self::$_lastQueryResultCount){
 			$data = $this->getDbTable()->fetchAll($select)->toArray();

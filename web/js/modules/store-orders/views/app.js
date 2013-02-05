@@ -12,7 +12,9 @@ define(['backbone',
             'click #extra-filters-switch': function(){ $('#extra-filters', this.el).slideToggle(); } ,
             'change input.filter': 'applyFilter',
             'click #orders-filter-apply-btn': 'applyFilter',
-            'click td.paginator a.page': 'navigate'
+            'click td.paginator a.page': 'navigate',
+            'click th.sortable': 'sort',
+            'click button.change-status': 'changeStatus'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -76,6 +78,52 @@ define(['backbone',
                         break;
                 }
             }
+        },
+        sort: function(e){
+            var $el = $(e.currentTarget),
+                key = $el.data('sortkey');
+
+            $el.siblings('.sortable').removeClass('sortUp').removeClass('sortDown');
+
+            if (!!key) {
+                if (!$el.hasClass('sortUp') && !$el.hasClass('sortDown')){
+                    $el.addClass('sortUp');
+                    key += ' ASC';
+                } else {
+                    if ($el.hasClass('sortUp')){
+                        key += ' DESC';
+                    }
+                    if ($el.hasClass('sortDown')){
+                        key += ' ASC';
+                    }
+                    $el.toggleClass('sortUp').toggleClass('sortDown');
+                }
+                this.orders.server_api.order = key;
+                this.orders.pager();
+            }
+        },
+        changeStatus: function(event){
+            var self        = this,
+                el          = $(event.currentTarget),
+                id          = parseInt(el.closest('div').data('order-id'));
+
+            var model = this.orders.get(id);
+
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                data: {status: el.data('status')},
+                type: 'POST',
+                dataType: 'json',
+                beforeSend: function(){
+                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+                },
+                success: function(response) {
+                    showMessage('Saved', response.hasOwnProperty('error') && response.error);
+                    if (!response.error && response.hasOwnProperty('responseText')){
+                        model.set('status', response.responseText.status);
+                    }
+                }
+            });
         }
     });
 

@@ -70,13 +70,13 @@ echo $this->noLayout ? $this->headLink() : '';
 		<thead>
 			<tr class="title-table">
 				<th>#</th>
-				<th><?php echo $this->translate('Customer name');?></th>
-				<th><?php echo $this->translate('Email');?></th>
-				<th><?php echo $this->translate('Purchased on');?></th>
-				<th><?php echo $this->translate('Status');?></th>
-				<th><?php echo $this->translate('Products in cart');?></th>
-				<th><?php echo $this->translate('Total price');?></th>
-				<th><?php echo $this->translate('Shipping price');?></th>
+				<th class="sortable" data-sortkey="name"><?php echo $this->translate('Customer name');?></th>
+				<th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
+				<th class="sortable sortDown" data-sortkey="date"><?php echo $this->translate('Purchased on');?></th>
+				<th class="sortable" data-sortkey="status" style="min-width: 180px;"><?php echo $this->translate('Status');?></th>
+				<th class="sortable" data-sortkey="products"><?php echo $this->translate('Products in cart');?></th>
+				<th class="sortable" data-sortkey="total"><?php echo $this->translate('Total price');?></th>
+				<th class="sortable" data-sortkey="shipping_price"><?php echo $this->translate('Shipping price');?></th>
 				<th><?php echo $this->translate('Shipping via');?></th>
 				<th><?php echo $this->translate('Details');?></th>
                 <?php if(isset($this->invoicePlugin)):?>

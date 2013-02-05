@@ -78,7 +78,22 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			$filter = $this->_request->getParam('filter');
 			$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
-			$order = filter_var_array($this->_request->getParam('order', array()), FILTER_SANITIZE_STRING);
+			$sortOrder = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
+
+			if ($sortOrder){
+				$sortOrder = strtr($sortOrder, array(
+					'name'  => 'u.full_name',
+					'email' => 'u.email',
+					'date'  => 'order.created_at',
+					'status' => 'order.status',
+					'products' => 'total_products',
+					'total' => 'order.total',
+					'shipping_price' => 'order.shipping_price'
+				));
+			} else {
+				$sortOrder = 'order.created_at DESC';
+			}
+
 			if (is_array($filter)){
 				if($filter['country'] == 'AA'){
                      $filter['country'] = 0;
@@ -94,7 +109,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
                 }
                 $filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
 				$filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
-				return $orderMapper->fetchAll($filter, $order, $limit, $offset);
+				return $orderMapper->fetchAll($filter, $sortOrder, $limit, $offset);
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}

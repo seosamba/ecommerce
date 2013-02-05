@@ -2,7 +2,7 @@
 <td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
 <td><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
 <td><%= created_at %></td>
-<td><%= status %></td>
+<td class="status-change"><%= status %></td>
 <td><%= total_products %></td>
 <td><%= total %></td>
 <td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
