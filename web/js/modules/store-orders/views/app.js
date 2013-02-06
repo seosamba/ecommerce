@@ -131,7 +131,6 @@ define(['backbone',
                 el      = $(event.currentTarget),
                 id      = parseInt(el.closest('tr').find('td.order-id').text());
             var model = this.orders.get(id);
-            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
 
             if (!model) {
                 return false;
@@ -149,6 +148,7 @@ define(['backbone',
                         type: 'POST',
                         dataType: 'json',
                         beforeSend: function(){
+                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
                         },
                         success: function(response) {
                             console.log(model.toJSON());
