@@ -31,10 +31,18 @@
         <thead>
             <tr>
                 <th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
-                <?php if(isset($this->additionalTableRows)):?>
-                    <?php foreach($this->additionalTableRows as $tableRow):?>
-                        <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
-                    <?php endforeach;?>
+                <?php if(!isset($this->renamedTableRows)):?>
+                    <?php if(isset($this->additionalTableRows)):?>
+                        <?php foreach($this->additionalTableRows as $tableRow):?>
+                            <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                        <?php endforeach;?>
+                    <?php endif; ?>
+                <?php else:?>
+                    <?php if(isset($this->renamedTableRows)):?>
+                        <?php foreach($this->renamedTableRows as $tableRow):?>
+                            <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                        <?php endforeach;?>
+                    <?php endif; ?>       
                 <?php endif; ?>
                 <th class="product-unit-price"><?php echo $this->translate('Price'); ?></th>
                 <th class="product-qty"><?php echo $this->translate('Qty'); ?></th>
@@ -192,10 +200,18 @@
         <thead>
             <tr style="background:#ddd;">
                 <th colspan="2" style="padding:5px;"><?php echo $this->translate('Product'); ?></th>
-                <?php if(isset($this->additionalTableRows)):?>
-                    <?php foreach($this->additionalTableRows as $tableRow):?>
-                        <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
-                    <?php endforeach;?>
+                <?php if(!isset($this->renamedTableRows)):?>
+                    <?php if(isset($this->additionalTableRows)):?>
+                        <?php foreach($this->additionalTableRows as $tableRow):?>
+                            <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                        <?php endforeach;?>
+                    <?php endif; ?>
+                <?php else:?>
+                    <?php if(isset($this->renamedTableRows)):?>
+                        <?php foreach($this->renamedTableRows as $tableRow):?>
+                            <th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                        <?php endforeach;?>
+                    <?php endif; ?>
                 <?php endif; ?>
                 <th style="padding:5px;"><?php echo $this->translate('Price'); ?></th>
                 <th style="padding:5px;"><?php echo $this->translate('Qty'); ?></th>

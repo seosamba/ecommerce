@@ -141,6 +141,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 $this->_view->additionalTableRows = $additionalTableRows;
             }
             
+            if(isset($this->_options[2]) && $this->_options[2] != '' && isset($this->_options[3]) && $this->_options[3] != ''){
+                $renamedTableRows = explode(',', $this->_options[3]);
+                $this->_view->renamedTableRows = $renamedTableRows;
+            }
+            
 			if ($cartSession instanceof Models_Model_CartSession){
 				$cartContent = $cartSession->getCartContent();
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
