@@ -571,6 +571,7 @@ define([
                             view.render().$el.css({cursor: 'default'}).appendTo('#set-holder');
                         });
                         $('#product-price').val(setPrice.toFixed(2));
+                        self.model.set({price: setPrice});
                     }
                 });
             }
