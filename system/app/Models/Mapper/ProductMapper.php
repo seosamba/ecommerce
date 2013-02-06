@@ -111,9 +111,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$this->_processRelated($model);
 		}
 
-        if($model->getParts()) {
-            $this->_processParts($model);
-        }
+        //proccess product parts if any
+        $this->_processParts($model);
 
 		$model->notifyObservers();
 
@@ -367,7 +366,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $productHasPartDbTable = new Models_DbTable_ProductHasPart();
         $where                 = $productHasPartDbTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
         $productHasPartDbTable->delete($where);
-
+        if(!$parts) {
+            return;
+        }
         foreach($parts as $partId) {
             $productHasPartDbTable->insert(array(
                 'product_id' => $model->getId(),
