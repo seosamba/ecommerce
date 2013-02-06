@@ -98,12 +98,12 @@
 					<td><?php echo $this->currency(floatval($order->getShippingPrice()));?></td>
 					<td class="shipping-data">
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
-						<?php if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)):?>
 						<p>
-							<i>Tracking ID</i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
-							<a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
+	                        <i>Tracking ID</i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+							<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                            <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
+							<?php endif;?>
 						</p>
-						<?php endif;?>
                         <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
                             <?php if($order->getShippingTrackingId() != ''):?>
                                 <p class="textcentered">
@@ -182,6 +182,9 @@
 			oTable.fnFilter(filter, 2);
 		});
 	});
+
+	<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+
 	$('a.tracking-dialog').on('click', function(e){
 		e.preventDefault();
 		var self = this,
@@ -209,6 +212,7 @@
 			}
 		});
 	});
+
 	$('#orders-table').on('mouseenter', 'td.current-status', function(){
 		var self    = this,
 			id      = parseInt($(this).closest('tr').data('id')),
@@ -273,4 +277,6 @@
 			}
 		});
 	});
+	<?php endif;?>
+	
 </script>

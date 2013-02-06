@@ -15,6 +15,9 @@ echo $this->noLayout ? $this->headLink() : '';
     .filters .chzn-container .chzn-results {
         max-height: 170px;
     }
+	table#orders-table tbody td {
+		min-height: 24px;
+	}
 </style>
 <div id="store-orders" class="toaster-widget clearfix">
 	<div>
@@ -77,7 +80,7 @@ echo $this->noLayout ? $this->headLink() : '';
 				<th class="sortable" data-sortkey="products"><?php echo $this->translate('Products in cart');?></th>
 				<th class="sortable" data-sortkey="total"><?php echo $this->translate('Total price');?></th>
 				<th class="sortable" data-sortkey="shipping_price"><?php echo $this->translate('Shipping price');?></th>
-				<th><?php echo $this->translate('Shipping via');?></th>
+				<th style="min-width: 110px;"><?php echo $this->translate('Shipping via');?></th>
 				<th><?php echo $this->translate('Details');?></th>
                 <?php if(isset($this->invoicePlugin)):?>
                     <th><?php echo $this->translate('View/Download Invoice');?></th>
