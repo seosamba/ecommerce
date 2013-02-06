@@ -14,7 +14,8 @@ define(['backbone',
             'click #orders-filter-apply-btn': 'applyFilter',
             'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
-            'click button.change-status': 'changeStatus'
+            'click button.change-status': 'changeStatus',
+            'click td.shipping-service .setTracking': 'changeTracking'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -124,6 +125,46 @@ define(['backbone',
                     }
                 }
             });
+        },
+        changeTracking: function(event){
+            var self    = this,
+                el      = $(event.currentTarget),
+                id      = parseInt(el.closest('tr').find('td.order-id').text());
+            var model = this.orders.get(id);
+
+            if (!model) {
+                return false;
+            }
+
+            smoke.prompt('Insert tracking code for this order', function(value){
+                if (value === false) {
+                    return value;
+                }
+                value = $.trim(value);
+                if (model.get('shipping_tracking_id') !== value) {
+                    $.ajax({
+                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                        data: {shippingTrackingId: value},
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function(){
+                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+                        },
+                        success: function(response) {
+                            console.log(model.toJSON());
+                            if (response.hasOwnProperty('error') && !response.error){
+                                showMessage('Saved');
+                            }
+                            if (response.hasOwnProperty('responseText')){
+                                model.set({
+                                    'status': response.responseText.status,
+                                    'shipping_tracking_id': response.responseText.shippingTrackingId
+                                });
+                            }
+                        }
+                    });
+                }
+            }, {value: model.get('shipping_tracking_id')});
         }
     });
 
