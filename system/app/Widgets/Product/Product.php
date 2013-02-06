@@ -158,7 +158,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	private function _renderPrice() {
 		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
         $lifeReload = (strtolower(end($this->_options)) === 'realtimeupdate');
-        $currency = (strtolower($this->_options[0]) === 'currency');
+        $currency   = (strtolower($this->_options[0]) === 'currency');
+
 		if ($noCurrency === true){
 			array_pop($this->_options);
 		}

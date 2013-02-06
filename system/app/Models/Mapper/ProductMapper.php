@@ -111,6 +111,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$this->_processRelated($model);
 		}
 
+        if($model->getParts()) {
+            $this->_processParts($model);
+        }
+
 		$model->notifyObservers();
 
 		return $model;
@@ -273,6 +277,16 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$entity->setRelated($related);
 		}
 
+        //fetching product parts
+        $partsSet = $row->findDependentRowset('Models_DbTable_ProductHasPart');
+        if($partsSet->count()) {
+            $parts = array();
+            foreach($partsSet as $partsRow) {
+                array_push($parts, $partsRow->part_id);
+            }
+            $entity->setParts($parts);
+        }
+
 		//fetching product page
 		if ($row->page_id){
 			$page = Application_Model_Mappers_PageMapper::getInstance()->find($row->page_id);
@@ -347,6 +361,20 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 
 	}
+
+    private function _processParts(Models_Model_Product $model) {
+        $parts                 = $model->getParts();
+        $productHasPartDbTable = new Models_DbTable_ProductHasPart();
+        $where                 = $productHasPartDbTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+        $productHasPartDbTable->delete($where);
+
+        foreach($parts as $partId) {
+            $productHasPartDbTable->insert(array(
+                'product_id' => $model->getId(),
+                'part_id'    => intval($partId)
+            ));
+        }
+    }
 
 	/**
 	 * Find product which contains given tags

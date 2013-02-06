@@ -43,6 +43,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_related;
 
+    protected $_parts = null;
+
 	protected $_createdAt;
 
 	protected $_updatedAt;
@@ -266,4 +268,13 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	public function getInventory() {
 		return $this->_inventory;
 	}
+
+    public function setParts($parts) {
+        $this->_parts = $parts;
+        return $this;
+    }
+
+    public function getParts() {
+        return $this->_parts;
+    }
 }
