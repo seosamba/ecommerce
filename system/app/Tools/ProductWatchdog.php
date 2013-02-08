@@ -165,6 +165,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 		}
 
 		$this->_cacheHelper->clean(false, false, $cacheTags);
+		$this->_cacheHelper->clean('products', Helpers_Action_Cache::PREFIX_SITEMAPS);
 	}
 
 }

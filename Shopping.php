@@ -756,4 +756,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	        Zend_Layout::getMvcInstance()->getView()->placeholder(Tools_System_Tools::PLACEHOLDER_SYSTEM_VERSION)->append($shoppingVersion);
         }
     }
+
+	public static function getSitemapProducts(){
+		return Tools_FeedGenerator::getInstance()->generateProductFeed();
+	}
 }
