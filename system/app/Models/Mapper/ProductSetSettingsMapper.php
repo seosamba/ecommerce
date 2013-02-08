@@ -13,7 +13,7 @@ class Models_Mapper_ProductSetSettingsMapper extends Application_Model_Mappers_A
             $productId = $model['productId'];
         }
 
-        if($productId) {
+        if($this->find($productId)) {
             $this->getDbTable()->update($model, array('productId=?' => $productId));
         } else {
             $model['productId'] = $productId;
@@ -27,7 +27,7 @@ class Models_Mapper_ProductSetSettingsMapper extends Application_Model_Mappers_A
         if(!$row) {
             return null;
         }
-        return $row->current()->toArray();
+        return $row->toArray();
     }
 
     public function fetchAll($where = null, $order = array()) {

@@ -5,9 +5,9 @@
             <?php echo $this->formCheckbox('autoCalculateSetPrice', $this->autoCalculatePrice, array('id' => 'auto-calculate-set-price'), array(1, 0)); ?>
         </label>
         <!-- manual set price -->
-        <label>
+        <label <?php echo ($this->autoCalculatePrice) ? 'style="display:none;"' : ''; ?>>
             <span><?php echo $this->translate('Specify set price manualy'); ?></span>
-            <input type="text" <?php echo ($this->autoCalculatePrice) ? 'style="display:none;"' : ''; ?>  name="manualSetPrice" id="manual-set-price" value="<?php echo $this->currentSetPrice; ?>" />
+            <input type="text" name="manualSetPrice" id="manual-set-price" value="<?php echo $this->currentSetPrice; ?>" />
         </label>
 
     </div>
@@ -54,7 +54,7 @@
             }
 
         }).on('change', '#auto-calculate-set-price', function() {
-            $('#manual-set-price').toggle();
+            $('#manual-set-price').parent('label').toggle();
 
             var checked = $(this).prop('checked') ? 1 : 0 ;
             $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setSettings/', {
