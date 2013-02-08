@@ -23,6 +23,7 @@ class Models_Mapper_ProductSetSettingsMapper extends Application_Model_Mappers_A
 
     public function find($id) {
         $row = $this->getDbTable()->find($id);
+        $row = $row->current();
         if(!$row) {
             return null;
         }
