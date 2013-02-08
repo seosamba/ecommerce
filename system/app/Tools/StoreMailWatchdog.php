@@ -117,15 +117,38 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	private function _sendNewcustomerMail(){
 		$systemConfig = $this->_configHelper->getConfig();
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
+        $customerBccArray = array();
         $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
         switch ($this->_options['recipient']) {
            case Tools_Security_Acl::ROLE_ADMIN:
                 $this->_mailer->setMailToLabel('Admin')
 						->setMailTo($adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);
+                if(!empty($adminUsers)){
+                    foreach($adminUsers as $admin){
+                        array_push($adminBccArray, $admin->getEmail());
+                    }
+                    if(!empty($adminBccArray)){
+                        $this->_mailer->setMailBcc($adminBccArray);
+                    }
+                }
 				break;
             case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel($this->_object->getFullName())
 						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if(!empty($salesPersons)){
+                    foreach($salesPersons as $salesPerson){
+                        array_push($customerBccArray, $salesPerson->getEmail());
+                    }
+                    if(!empty($customerBccArray)){
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				$this->_mailer->setMailToLabel($this->_object->getFullName())
@@ -178,16 +201,39 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	private function _sendNeworderMail() {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
+        $customerBccArray = array();
         $systemConfig = $this->_configHelper->getConfig();
         $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
         switch ($this->_options['recipient']) {
 			case Tools_Security_Acl::ROLE_ADMIN:
                 $this->_mailer->setMailToLabel('Admin')
 						->setMailTo($adminEmail);
-				break;
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);
+                if(!empty($adminUsers)){
+                    foreach($adminUsers as $admin){
+                        array_push($adminBccArray, $admin->getEmail());
+                    }
+                    if(!empty($adminBccArray)){
+                        $this->_mailer->setMailBcc($adminBccArray);
+                    }
+                }
+                break;
 			case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel('Sales person')
 						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if(!empty($salesPersons)){
+                    foreach($salesPersons as $salesPerson){
+                        array_push($customerBccArray, $salesPerson->getEmail());
+                    }
+                    if(!empty($customerBccArray)){
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				if ($customer && $customer->getEmail()){
@@ -222,16 +268,39 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	private function _sendTrackingnumberMail(){
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
+        $customerBccArray = array();
 		$systemConfig = $this->_configHelper->getConfig();
         $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
         switch ($this->_options['recipient']) {
 			case Tools_Security_Acl::ROLE_ADMIN:
                 $this->_mailer->setMailToLabel('Admin')
 						->setMailTo($adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);;
+                if(!empty($adminUsers)){
+                    foreach($adminUsers as $admin){
+                        array_push($adminBccArray, $admin->getEmail());
+                    }
+                    if(!empty($adminBccArray)){
+                        $this->_mailer->setMailBcc($adminBccArray);
+                    }
+                }
 				break;
             case self::RECIPIENT_SALESPERSON:
 				$this->_mailer->setMailToLabel('Sales person')
 						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if(!empty($salesPersons)){
+                    foreach($salesPersons as $salesPerson){
+                        array_push($customerBccArray, $salesPerson->getEmail());
+                    }
+                    if(!empty($customerBccArray)){
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
 				break;
 			case self::RECIPIENT_CUSTOMER:
 				if ($customer && $customer->getEmail()){
