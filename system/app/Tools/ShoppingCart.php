@@ -140,14 +140,12 @@ class Tools_ShoppingCart {
         //if product is a set of products and autocalculateSetPrice is on => product price becomes a set of products prices
         $parts = $item->getParts();
         if((is_array($parts) && !empty($parts)) && $this->_shoppingConfig['autocalculateSetPrice']) {
-//            return array_reduce($parts, function($price, $partId) {
-//                $partItem = Models_Mapper_ProductMapper::getInstance()->find($partId);
-//                $price    += self::calculateProductPrice($partItem, $partItem->getDefaultOptions());
-//                return $price;
-//            });
             $price = 0;
             foreach($parts as $partId) {
                 $partItem = Models_Mapper_ProductMapper::getInstance()->find($partId);
+                if(!$partItem instanceof Models_Model_Product) {
+                    continue;
+                }
                 $price    += $this->calculateProductPrice($partItem, $partItem->getDefaultOptions());
             }
             return $price;
