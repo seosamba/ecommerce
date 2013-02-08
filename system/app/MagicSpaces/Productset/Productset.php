@@ -4,24 +4,82 @@
  */
 class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
-    protected function _run() {
+    protected $_view        = null;
 
-        try {
-            $product = $this->_invokeProduct();
-        } catch(Exceptions_SeotoasterException $se) {
-           return $this->_spaceContent = $se->getMessage();
-        }
-        $parts = $this->_getPartsFromContent();
-        if($parts) {
-            $product->setParts($parts);
-            Models_Mapper_ProductMapper::getInstance()->save($product);
-        }
-        return $this->_spaceContent;
+    protected function _init() {
+        $this->_view        = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
     }
 
+    protected function _run() {
+        //if nothing inside the magic space, return it back
+        if(!$this->_spaceContent) {
+            return $this->_spaceContent;
+        }
+
+        //Get the product (main set product) for the current product page
+        try {
+            $product = $this->_invokeProduct();
+        } catch (Exception $e) {
+            if(Tools_System_Tools::debugMode()) {
+                error_log($e->getMessage());
+            }
+            return $e->getMessage();
+        }
+
+        //get the set settings
+        $setSettings        = Models_Mapper_ProductSetSettingsMapper::getInstance()->find($product->getId());
+        $autoCalculatePrice = (isset($setSettings['autoCalculatePrice']) && $setSettings['autoCalculatePrice']);
+
+        //Get all parts for this product  from the content ant attach them
+        $parts = $this->_getPartsFromContent();
+        if($parts) {
+            //set parts
+            $product->setParts($parts);
+
+            if($autoCalculatePrice) {
+                //set new price
+                $cart   = Tools_ShoppingCart::getInstance();
+                $price  = 0;
+                $mapper = Models_Mapper_ProductMapper::getInstance();
+                foreach($parts as $partId) {
+                    $part = $mapper->find($partId);
+                    if(!$part instanceof Models_Model_Product) {
+                        continue;
+                    }
+                    $price += $cart->calculateProductPrice($part, $part->getDefaultOptions());
+                }
+                if($price) {
+                    $product->setPrice($price);
+                }
+
+                Models_Mapper_ProductMapper::getInstance()->save($product);
+            }
+        }
+
+        //if current user has no permissions to edit content we return only magic space content
+        if(!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
+            return $this->_spaceContent;
+        }
+
+        $this->_view->autoCalculatePrice = $autoCalculatePrice;
+        $this->_view->currentSetPrice    = $product->getPrice();
+        $this->_view->currentSetId       = $product->getId();
+
+
+        //return magic space content wrapped into a small controll panel
+        $this->_view->content = $this->_spaceContent;
+        return $this->_view->render('cpanel.phtml');
+
+    }
+
+    /**
+     * Finding the product that corresponds to this product page
+     *
+     * @return Models_Model_Product
+     * @throws Exceptions_SeotoasterException
+     */
     private function _invokeProduct() {
-        $mapper  = Models_Mapper_ProductMapper::getInstance();
-        $product = $mapper->findByPageId($this->_toasterData['id']);
+        $product = Models_Mapper_ProductMapper::getInstance()->findByPageId($this->_toasterData['id']);
         if(!$product instanceof Models_Model_Product) {
             throw new Exceptions_SeotoasterException('Cannot load product. This magic space (' . $this->_name . ') can be used only on product pages.');
         }
@@ -29,16 +87,22 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
     }
 
     private function _getPartsFromContent() {
-        preg_match_all('~<!--pid="([0-9]+)"-->~u', $this->_spaceContent, $found);
-        if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
-            preg_match_all('~data-productId="([0-9]+)"~u', $this->_spaceContent, $found);
-            if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
-                preg_match_all('~data-pid="([0-9]+)"~u', $this->_spaceContent, $found);
-                if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
-                    return false;
-                }
+        $foundParts        = array();
+        $productIdPatterns = array(
+            '<!--pid="([0-9]+)"-->',
+            'data-productId="([0-9]+)"',
+            '~data-pid="([0-9]+)"'
+        );
+
+        foreach($productIdPatterns as $pattern) {
+            if(preg_match_all('~' . $pattern . '~u', $this->_spaceContent, $foundParts)) {
+                break;
             }
         }
-        return $found[1];
+
+        if(!empty($foundParts) && isset($foundParts[1])) {
+            return $foundParts[1];
+        }
+        return $foundParts;
     }
 }

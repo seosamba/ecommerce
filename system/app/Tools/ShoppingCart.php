@@ -137,20 +137,6 @@ class Tools_ShoppingCart {
         $options   = $this->_parseOptions($item, $options);
         $showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');
 
-        //if product is a set of products and autocalculateSetPrice is on => product price becomes a set of products prices
-        $parts = $item->getParts();
-        if((is_array($parts) && !empty($parts)) && $this->_shoppingConfig['autocalculateSetPrice']) {
-            $price = 0;
-            foreach($parts as $partId) {
-                $partItem = Models_Mapper_ProductMapper::getInstance()->find($partId);
-                if(!$partItem instanceof Models_Model_Product) {
-                    continue;
-                }
-                $price    += $this->calculateProductPrice($partItem, $partItem->getDefaultOptions());
-            }
-            return $price;
-        }
-
         if((bool)$showWithTax){
             $itemPrice = $this->_calculateItemPriceWithTax($item, $options);
             return $itemPrice + $itemTax;

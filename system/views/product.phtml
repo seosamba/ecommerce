@@ -558,7 +558,6 @@ $lastPageCaption = $this->translate('Last');
         <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
         <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
         <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
-        <li><a href="#set-tab"><?php echo $this->translate('Product as set'); ?></a></li>
         <?php foreach ($this->plugins as $plugin) : ?>
 		<?php
         $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
@@ -717,19 +716,6 @@ $lastPageCaption = $this->translate('Last');
             <a href="javascript:;" data-listtype="related" class="show-list" title="<?php echo $this->translate('Add related'); ?>">&#10010; <?php echo $this->translate('Add related'); ?></a>
         </div>
         <div id="related-holder" class="grid_12">
-
-        </div>
-    </div>
-
-    <div id="set-tab" class="clearfix">
-        <div class="grid_12 mb5px">
-            <a style="float:left;" href="javascript:;" data-listtype="set" class="show-list" title="<?php echo $this->translate('Add product(s)'); ?>">&#10010; <?php echo $this->translate('Add product(s)'); ?></a>
-            <label style="float:left; padding: 0;margin-left: 10px;">
-                <span><?php echo $this->translate('Automated price calculation'); ?></span>
-                <?php echo $this->formCheckbox('autoPriceCalc', $this->generalConfig['autocalculateSetPrice'], array('id' => 'automated-set-price'), array(1, 0)); ?>
-            </label>
-        </div>
-        <div id="set-holder" class="grid_12">
 
         </div>
     </div>

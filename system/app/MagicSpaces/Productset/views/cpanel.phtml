@@ -1,0 +1,67 @@
+<div class="product-set-wrap">
+    <div class="product-set-controlls">
+        <label>
+            <span><?php echo $this->translate('Autocalculate set price'); ?></span>
+            <?php echo $this->formCheckbox('autoCalculateSetPrice', $this->autoCalculatePrice, array('id' => 'auto-calculate-set-price'), array(1, 0)); ?>
+        </label>
+        <!-- manual set price -->
+        <label>
+            <span><?php echo $this->translate('Specify set price manualy'); ?></span>
+            <input type="text" <?php echo ($this->autoCalculatePrice) ? 'style="display:none;"' : ''; ?>  name="manualSetPrice" id="manual-set-price" value="<?php echo $this->currentSetPrice; ?>" />
+        </label>
+
+    </div>
+    <?php echo $this->content; ?>
+</div>
+<style type="text/css">
+    .product-set-wrap {
+        overflow: hidden;
+        border: 1px dashed #eee;
+        width: 100%;
+    }
+    .product-set-controlls {
+        overflow: hidden;
+        background: #e0e0e0;
+        padding: 10px;
+    }
+    .product-set-controlls label {
+        float: left;
+    }
+    .product-set-controlls label {
+        margin-right: 10px;
+        width: 215px;
+    }
+    .product-set-controlls input[type="text"] {
+        width: 30px;
+    }
+</style>
+<script type="text/javascript">
+        $(document).on('keypress', '#manual-set-price', function(e) {
+            var self = this;
+            if(e.keyCode == 13 && $(self).val()) {
+                $.ajax({
+                    url: '<?php echo $this->websiteUrl;?>api/store/products/id/<?php echo $this->currentSetId; ?>',
+                    type: 'put',
+                    beforeSend: showSpinner,
+                    data: JSON.stringify({
+                        price: $(self).val()
+                    }),
+                    dataType: 'json'
+                }).success(function() {
+                    hideSpinner();
+                    showMessage('Set price updated');
+                });
+            }
+
+        }).on('change', '#auto-calculate-set-price', function() {
+            $('#manual-set-price').toggle();
+
+            var checked = $(this).prop('checked') ? 1 : 0 ;
+            $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setSettings/', {
+                'settings': {
+                    productId          : '<?php echo $this->currentSetId; ?>',
+                    autoCalculatePrice : checked
+                }
+            });
+        });
+</script>

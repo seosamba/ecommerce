@@ -363,6 +363,18 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
 
+    public function setSettingsAction() {
+        $status = false;
+        if ($this->_request->isPost()){
+            $setSettingsMapper = Models_Mapper_ProductSetSettingsMapper::getInstance();
+            $settingsParams    = $this->_request->getParam('settings');
+            if ($settingsParams && is_array($settingsParams) && !empty ($settingsParams)){
+                $status = $setSettingsMapper->save($settingsParams);
+            }
+        }
+        $this->_jsonHelper->direct(array('done' => $status));
+    }
+
 	/**
 	 * Method renders zones screen and handling zone saving
 	 * @return html|json

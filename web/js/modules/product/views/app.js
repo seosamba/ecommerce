@@ -104,9 +104,6 @@ define([
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
 
-            //product as set func
-            this.model.on('change:parts', this.renderParts, this);
-
             this.model.on('sync', function(){
                 if (this.model.has('options')){
                     this.model.get('options').on('add', this.renderOption, this);
@@ -533,50 +530,6 @@ define([
 
             this.model.set({related: _.without(relateds, this.model.get('id'))});
 		},
-
-        //product as set functionality
-        addPart: function(ids) {
-            if (_.isNull(ids) || _.isUndefined(ids)) return false;
-            var inSet = _.map(this.model.get('parts'), function(id) { return parseInt(id); });
-                inSet = _.union(inSet, ids);
-            this.model.set({parts: _.without(inSet, this.model.get('id'))});
-        },
-        removePart: function(id) {
-            var setItems = _(this.model.get('parts')).map(function(id){ return parseInt(id) });
-            this.model.set({parts: _.without(setItems, parseInt(id))});
-        },
-        renderParts: function() {
-            $('#set-holder').empty();
-            if (this.model.has('parts') && this.model.get('parts').length) {
-                var productSet = this.model.get('parts'),
-                    self = this;
-                $.ajax({
-                    url: this.model.urlRoot(),
-                    data: {id: productSet.join(',')},
-                    success: function(response){
-                        if (!response) return false;
-                        if (response && !_.isArray(response)){
-                            response = [response];
-                        }
-                        var setPrice = 0;
-                        $('#set-holder').empty();
-                        _.each(response, function(setItem) {
-                            var view = new ProductListView({model: new ProductModel(setItem), showDelete: true});
-                            view.delegateEvents({
-                                'click span.ui-icon-closethick': function(){
-                                    self.removePart(this.model.get('id'));
-                                }
-                            })
-                            setPrice += parseFloat(setItem.price);
-                            view.render().$el.css({cursor: 'default'}).appendTo('#set-holder');
-                        });
-                        $('#product-price').val(setPrice.toFixed(2));
-                        self.model.set({price: setPrice});
-                    }
-                });
-            }
-            return false;
-        },
 
         toggleSetPriceConfig: function(e) {
             var checked = ($(e.currentTarget).prop('checked')) ? 1 : 0;
