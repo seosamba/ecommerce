@@ -65,7 +65,8 @@
                     <span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
 	                <?php if(!empty($product['options'])):?>
 	                    <?php foreach($product['options'] as $optData): ?>
-                           <span class="post-purchase-report-product-options">
+                           <br/>
+                            <span class="post-purchase-report-product-options">
                            <?php echo $optData['optionTitle'].' '.$optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
                              <?php if((bool)$product['taxRate'] && $this->showPriceIncTax == 1):?>
@@ -234,6 +235,7 @@
                  <span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
                     <?php if(!empty($product['options'])):?>
                         <?php foreach($product['options'] as $optData): ?>
+                           <br/>
                            <span class="post-purchase-report-product-options">
                            <?php echo $optData['optionTitle'].' '.$optData['title']; ?>
                            <?php if(intval($optData['priceValue'])): ?>
