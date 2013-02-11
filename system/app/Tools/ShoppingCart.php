@@ -122,8 +122,9 @@ class Tools_ShoppingCart {
 	 * @return mixed
 	 */
 	public function find($id) {
-		$this->_filterId = $id;
-		return array_shift(array_filter($this->_content, array($this, '_filterCallback')));
+        $this->_filterId = $id;
+        $filteredContent = array_filter($this->_content, array($this, '_filterCallback'));
+        return array_shift($filteredContent);
 	}
 
     /**
