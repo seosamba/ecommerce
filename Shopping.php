@@ -606,7 +606,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					})
 				),
 				'completed' => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED; })),
-				'pending'   => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING; }))
+				'pending'   => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING; })),
+                'shipped'   => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED; })),
+                'delivered'   => sizeof(array_filter($orders, function($order){ return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED; }))
 			);
 			$this->_view->orders = $orders;
 		}

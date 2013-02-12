@@ -179,7 +179,7 @@
 		$('ul.stats').on('click', 'li', function(e){
 			var filter = $(this).data('sort');
 			if (filter === 'total') filter = '';
-			oTable.fnFilter(filter, 2);
+			oTable.fnFilter(filter);
 		});
 	});
 
