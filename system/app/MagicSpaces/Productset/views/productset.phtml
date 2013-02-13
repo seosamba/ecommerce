@@ -1,5 +1,6 @@
-<div class="product-set-wrap">
+<div class="seotoaster product-set-wrap">
     <div class="product-set-controlls">
+        <h4>Magic space: Productset</h4>
         <label>
             <span><?php echo $this->translate('Autocalculate set price'); ?></span>
             <?php echo $this->formCheckbox('autoCalculateSetPrice', $this->autoCalculatePrice, array('id' => 'auto-calculate-set-price'), array(1, 0)); ?>
@@ -9,30 +10,48 @@
             <span><?php echo $this->translate('Specify set price manualy'); ?></span>
             <input type="text" name="manualSetPrice" id="manual-set-price" value="<?php echo $this->currentSetPrice; ?>" />
         </label>
-
     </div>
-    <?php echo $this->content; ?>
+    <div class="product-set-content"><?php echo $this->content; ?></div>
 </div>
+
 <style type="text/css">
-    .product-set-wrap {
+
+    .seotoaster.product-set-wrap,
+    .seotoaster.product-set-wrap div.product-set-controlls,
+    .seotoaster.product-set-wrap div.product-set-content {
         overflow: hidden;
-        border: 1px dashed #eee;
+        background-color: #fff;
+    }
+    .seotoaster.product-set-wrap {
         width: 100%;
-    }
-    .product-set-controlls {
         overflow: hidden;
-        background: #e0e0e0;
-        padding: 10px;
+        position: relative;
+        border: 3px dashed #eee;
     }
-    .product-set-controlls label {
+    .seotoaster.product-set-wrap div.product-set-controlls {
+        background: rgba(248, 248, 248, 1);
+        padding: 10px 5px 5px 5px;
+        min-height: 30px;
+    }
+    .seotoaster.product-set-wrap div.product-set-controlls label {
         float: left;
-    }
-    .product-set-controlls label {
+        font-size: 14px;
+        color: #ccc;
+        font-weight: normal;
+        width: auto;
+        padding: 13px 5px 3px 5px;
         margin-right: 10px;
-        width: 215px;
+        height: 30px;
     }
-    .product-set-controlls input[type="text"] {
-        width: 30px;
+    .seotoaster.product-set-wrap div.product-set-controlls h4 {
+        padding: 3px;
+        color: #ccc;
+        text-transform: uppercase;
+    }
+    .seotoaster.product-set-wrap div.product-set-controlls input[type="text"] {width: 150px;padding: 3px;}
+    .seotoaster.product-set-wrap div.product-set-content {
+        padding: 5px;
+        background: background: rgba(250, 250, 250, 1);
     }
 </style>
 <script type="text/javascript">
@@ -54,7 +73,7 @@
             }
 
         }).on('change', '#auto-calculate-set-price', function() {
-            $('#manual-set-price').parent('label').toggle();
+            $('#manual-set-price').parent('label').fadeToggle();
 
             var checked = $(this).prop('checked') ? 1 : 0 ;
             $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setSettings/', {

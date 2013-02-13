@@ -4,7 +4,7 @@
  */
 class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
-    protected $_view        = null;
+    protected $_view = null;
 
     protected function _init() {
         $this->_view        = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
@@ -32,27 +32,29 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
         //Get all parts for this product  from the content ant attach them
         $parts = $this->_getPartsFromContent();
+
         if($parts) {
             //set parts
             $product->setParts($parts);
 
             if($autoCalculatePrice) {
-                //set new price
-                $cart   = Tools_ShoppingCart::getInstance();
-                $price  = 0;
+
+                //set the new price for a product
+                $price  = $product->getPrice();
                 $mapper = Models_Mapper_ProductMapper::getInstance();
-                foreach($parts as $partId) {
+
+                array_walk($parts, function($partId) use(&$price, $mapper) {
                     $part = $mapper->find($partId);
-                    if(!$part instanceof Models_Model_Product) {
-                        continue;
+                    if($part instanceof Models_Model_Product) {
+                        $price += Tools_ShoppingCart::getInstance()->calculateProductPrice($part, $part->getDefaultOptions());
                     }
-                    $price += $cart->calculateProductPrice($part, $part->getDefaultOptions());
-                }
-                if($price) {
+                });
+
+                //if price changed during the calculation we're setting the new price
+                if($price != $product->getPrice()) {
                     $product->setPrice($price);
                 }
-
-                Models_Mapper_ProductMapper::getInstance()->save($product);
+                $product = $mapper->save($product);
             }
         }
 
@@ -68,7 +70,7 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
         //return magic space content wrapped into a small controll panel
         $this->_view->content = $this->_spaceContent;
-        return $this->_view->render('cpanel.phtml');
+        return $this->_view->render('productset.phtml');
 
     }
 
@@ -86,12 +88,19 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
         return $product;
     }
 
+    /**
+     * Get parts of the product set based on the product template content
+     *
+     * @return array
+     */
     private function _getPartsFromContent() {
         $foundParts        = array();
+
+        //available templates
         $productIdPatterns = array(
             '<!--pid="([0-9]+)"-->',
             'data-productId="([0-9]+)"',
-            '~data-pid="([0-9]+)"'
+            'data-pid="([0-9]+)"'
         );
 
         foreach($productIdPatterns as $pattern) {
