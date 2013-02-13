@@ -40,10 +40,11 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
             if($autoCalculatePrice) {
 
                 //set the new price for a product
-                $price  = $product->getPrice();
+                //$price  = $product->getPrice();
+                $price  = 0;
                 $mapper = Models_Mapper_ProductMapper::getInstance();
 
-                array_walk($parts, function($partId) use($price, $mapper) {
+                array_walk($parts, function($partId) use(&$price, $mapper) {
                     $part = $mapper->find($partId);
                     if($part instanceof Models_Model_Product) {
                         $price += Tools_ShoppingCart::getInstance()->calculateProductPrice($part, $part->getDefaultOptions());
