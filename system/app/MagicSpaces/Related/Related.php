@@ -1,9 +1,23 @@
 <?php
 class MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 
-	protected function _run() {
+    protected $_view = null;
+
+    protected function _init() {
+        $this->_view        = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
+    }
+
+    protected function _run() {
 		$this->_saveRelatedProducts();
-		return $this->_spaceContent;
+
+        //if current user has no permissions to edit content we return only magic space content
+        if(!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
+            return $this->_spaceContent;
+        }
+
+        //return magic space content wrapped into a small controll panel
+        $this->_view->content = $this->_spaceContent;
+        return $this->_view->render('related.phtml');
 	}
 
 	private function _saveRelatedProducts() {
@@ -17,8 +31,6 @@ class MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 			}
 			return false;
 		}
-
-
 
 		preg_match_all('~<!--pid="([0-9]+)"-->~u', $this->_spaceContent, $found);
 		if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
