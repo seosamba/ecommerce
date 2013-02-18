@@ -2,6 +2,7 @@
 <?php $countries = Tools_Geo::getCountries(true);?>
 <div class="post-purchase">
     <h3 class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></h3>
+       <span class="createdOrderDate"><?php echo date("d-M-Y", strtotime($this->cart->getCreatedAt()));?></span>
        <div class="post-purchase-report-billing">
         <h4 class="title"><?php echo $this->translate('Billing Address');?>:</h4>
         <div class="post-purchase-report-billing-address">
