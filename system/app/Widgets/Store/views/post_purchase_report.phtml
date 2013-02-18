@@ -1,4 +1,5 @@
 <?php if(!isset($this->mailReport)):?>
+<?php $countries = Tools_Geo::getCountries(true);?>
 <div class="post-purchase">
     <h3 class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></h3>
        <div class="post-purchase-report-billing">
@@ -9,10 +10,27 @@
                 <span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
                 <br/>
                 <span class="locality"><?php echo $billingAddress['city'].($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');?></span>
-                <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+                <?php $state = Tools_Geo::getStateById($billingAddress['state']);?>
+                <?php if(isset($state['state']) && $state['state'] != ''):?>
+                      <span class="region"><?php echo $state['state'].',';?></span>  
+                <?php endif;?>
                 <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
                 <br />
-                <span><?php echo $billingAddress['country'];?></span>
+                <span><?php echo $countries[$billingAddress['country']];?></span>
+                <br />
+                <?php if(isset($billingAddress['phone']) && $billingAddress['phone'] != ''):?>
+                    <span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone'];?></span>
+                    <br />
+                <?php endif;?>
+                <?php if(isset($billingAddress['mobile']) && $billingAddress['mobile'] != ''):?>
+                    <span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile'];?></span>
+                    <br />
+                <?php endif;?>
+                <?php if(isset($billingAddress['email']) && $billingAddress['email'] != ''):?>
+                    <span><?php echo $this->translate('Email');?>: <?php echo $billingAddress['email'];?></span>
+                    <br />
+                <?php endif;?>
+                <span><?php echo $this->translate('Payment Method');?>: <?php echo $this->cart->getGateway();?></span>
             <?php else:?>
                 <span><?php echo $this->translate('not provided');?></span>
             <?php endif;?>
@@ -47,10 +65,13 @@
 	        <span class="street-address"><?php echo $shippingAddress['address1'].' '. $shippingAddress['address2'];?></span>
 	        <br/>
 	        <span class="locality"><?php echo $shippingAddress['city'].($shippingAddress['city']&&($shippingAddress['state'] || $shippingAddress['zip'])?',':'');?></span>
-            <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+            <?php $state = Tools_Geo::getStateById($shippingAddress['state']);?>
+            <?php if(isset($state['state']) && $state['state'] != ''):?>
+                <span class="region"><?php echo $state['state'].','; ?></span>
+            <?php endif;?>
             <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
             <br />
-            <span><?php echo $shippingAddress['country'];?></span>
+            <span><?php echo $countries[$shippingAddress['country']];?></span>
             <?php endif;?>
 		<?php else:?>
         <span><?php echo $this->translate('not provided');?></span>
@@ -172,10 +193,27 @@
                 <span><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
                 <br/>
                 <span><?php echo $billingAddress['city'].($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');?></span>
-                <span><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+                <?php $state = Tools_Geo::getStateById($billingAddress['state']);?>
+                <?php if(isset($state['state']) && $state['state'] != ''):?>
+                   <span><?php echo $state['state'].',';?></span> 
+                <?php endif;?>
                 <span><?php echo $billingAddress['zip'];?></span>
                 <br />
-                <span><?php echo $billingAddress['country'];?></span>
+                <span><?php echo $countries[$billingAddress['country']];?></span>
+                <br />
+                <?php if(isset($billingAddress['phone']) && $billingAddress['phone'] != ''):?>
+                    <span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone'];?></span>
+                    <br />
+                <?php endif;?>
+                <?php if(isset($billingAddress['mobile']) && $billingAddress['mobile'] != ''):?>
+                    <span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile'];?></span>
+                    <br />
+                <?php endif;?>
+                <?php if(isset($billingAddress['email']) && $billingAddress['email'] != ''):?>
+                    <span><?php echo $this->translate('Email');?>: <?php echo $billingAddress['email'];?></span>
+                    <br />
+                <?php endif;?>
+                <span><?php echo $this->translate('Payment Method');?>: <?php echo $this->cart->getGateway();?></span>
             <?php else:?>
                 <span><?php echo $this->translate('not provided');?></span>
             <?php endif;?>
@@ -197,10 +235,13 @@
         <span><?php echo $shippingAddress['address1'].' '. $shippingAddress['address2'];?></span>
                     <br/>
                     <span><?php echo $shippingAddress['city'].($shippingAddress['city']&&($shippingAddress['state'] || $shippingAddress['zip'])?',':'');?></span>
-                    <span><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+                    <?php $state = Tools_Geo::getStateById($shippingAddress['state']);?>
+                    <?php if(isset($state['state']) && $state['state'] != ''):?>
+                        <span><?php echo $state['state'].',';?></span> 
+                    <?php endif;?>
                     <span><?php echo $shippingAddress['zip'];?></span>
                     <br />
-                    <span><?php echo $shippingAddress['country'];?></span>
+                    <span><?php echo $countries[$shippingAddress['country']];?></span>
                 <?php else:?>
                     <span><?php echo $this->translate('not provided');?></span>
                 <?php endif;?>
