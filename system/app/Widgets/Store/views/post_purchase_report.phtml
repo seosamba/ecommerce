@@ -1,5 +1,5 @@
-<?php if(!isset($this->mailReport)):?>
 <?php $countries = Tools_Geo::getCountries(true);?>
+<?php if(!isset($this->mailReport)):?>
 <div class="post-purchase">
     <h3 class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></h3>
        <p class="createdOrderDate"><?php echo date("d-M-Y", strtotime($this->cart->getCreatedAt()));?></p>
@@ -73,6 +73,15 @@
             <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
             <br />
             <span><?php echo $countries[$shippingAddress['country']];?></span>
+            <br />
+            <?php if(isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''):?>
+                <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+                <br />
+            <?php endif;?>
+            <?php if(isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''):?>
+                <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+                <br />
+            <?php endif;?>
             <?php endif;?>
 		<?php else:?>
         <span><?php echo $this->translate('not provided');?></span>
@@ -243,6 +252,15 @@
                     <span><?php echo $shippingAddress['zip'];?></span>
                     <br />
                     <span><?php echo $countries[$shippingAddress['country']];?></span>
+                     <br />
+                    <?php if(isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''):?>
+                        <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+                        <br />
+                    <?php endif;?>
+                    <?php if(isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''):?>
+                        <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+                        <br />
+                    <?php endif;?>
                 <?php else:?>
                     <span><?php echo $this->translate('not provided');?></span>
                 <?php endif;?>
