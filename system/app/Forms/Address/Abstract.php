@@ -47,19 +47,21 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Select(array(
 			'name'         => 'country',
+            'class'        => 'country',
 			'label'        => 'Country',
-			'multiOptions' =>  Tools_Geo::getCountries(true),
+			'multiOptions' =>  Tools_Geo::getCountries(true)
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'city',
-			'label'    => 'City',
+			'label'    => 'City'
 		)));
 
 		$this->addElement(new Zend_Form_Element_Select(array(
 			'name'         => 'state',
 			'label'        => 'State',
-			'multiOptions' =>  Tools_Geo::getState(null, true),
+            'class'        => 'state',
+			'multiOptions' =>  Tools_Geo::getState(null, true)
 		)));
 
 		$this->addElement(new Zend_Form_Element_Text(array(

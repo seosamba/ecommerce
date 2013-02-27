@@ -22,7 +22,7 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 		$this->getElement('lastname')->setRequired(true)->setAttrib('class', 'required');
 		$this->getElement('email')->setRequired(true)->setAttrib('class', 'required');
 		$this->getElement('address1')->setRequired(true)->setAttrib('class', 'required');
-		$this->getElement('country')->setRequired(true)->setAttrib('class', 'required');
+		$this->getElement('country')->setRequired(true)->setAttrib('class', 'country required');
 		$this->getElement('city')->setRequired(true)->setAttrib('class', 'required');
 		$this->getElement('zip')->setRequired(true)->setAttrib('class', 'required');
 
