@@ -47,6 +47,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Select(array(
 			'name'         => 'country',
+            'class'        => 'country',
 			'label'        => 'Country',
 			'multiOptions' =>  Tools_Geo::getCountries(true),
 		)));
@@ -59,6 +60,7 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 		$this->addElement(new Zend_Form_Element_Select(array(
 			'name'         => 'state',
 			'label'        => 'State',
+            'class'        => 'state',
 			'multiOptions' =>  Tools_Geo::getState(null, true),
 		)));
 
@@ -118,6 +120,4 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		return $valid;
 	}
-
-
 }
