@@ -1,0 +1,41 @@
+<?php $id = uniqid('store-coupon-'); ?>
+<div>
+<?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
+    <h3 class="checkout-widget-title"><?php echo $this->translate('Enter coupon');?></h3>
+	<a href="<?php echo $this->url();?>" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>"><?php echo $this->translate('Edit coupons');?></a>
+<?php else: ?>
+    <h3 class="checkout-widget-title"><?php echo $this->translate('Enter coupon');?></h3>
+    <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/coupon/" method="post">
+	    <input type="text" name="code">
+	    <input type="submit" value="<?php echo $this->translate('Apply'); ?>">
+	</form>
+	<?php if (isset($this->errors)): ?>
+	<ul class="errors">
+		<?php foreach($this->errors as $err): ?>
+			<li><?php echo $this->translate($err); ?></li>
+		<?php endforeach; ?>
+	</ul>
+	<?php endif; ?>
+<?php endif; ?>
+</div>
+<script>
+$(function(){
+	$('#<?php echo $id; ?>').on('submit', function(e){
+        e.preventDefault();
+
+        var self = this;
+
+		$.ajax({
+			url: $('#website_url').val()+'plugin/shopping/run/coupon/',
+			data: $(this).serialize(),
+			type: 'POST',
+			dataType: 'json',
+			success: function(response){
+                console.log(response);
+                $(self).remove();
+                refreshCartSummary();
+			}
+		})
+	});
+});
+</script>

@@ -774,4 +774,32 @@ class Shopping extends Tools_Plugins_Abstract {
 	public static function getSitemapProducts(){
 		return Tools_FeedGenerator::getInstance()->generateProductFeed();
 	}
+
+	public function merchandisingAction(){
+		$this->_view->currency = $this->_configMapper->getConfigParam('currency');
+
+		$this->_view->couponTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
+
+
+		$this->_layout->content = $this->_view->render('merchandising.phtml');
+		echo $this->_layout->render();
+	}
+
+	public function couponAction(){
+		if ($this->_request->isPost()){
+			$code = filter_var($this->_request->getParam('code'), FILTER_SANITIZE_STRING);
+
+			if (empty($code)){
+				return false;
+			}
+
+			$code = array_unique(explode(' ', $code));
+
+			$coupons = Store_Mapper_CouponMapper::getInstance()->findByCode($code);
+
+			Tools_ShoppingCart::getInstance()->setCoupons(Tools_CouponTools::validateCoupons($coupons))->save();
+
+			$this->_responseHelper->success();
+		}
+	}
 }

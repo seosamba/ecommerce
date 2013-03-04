@@ -212,4 +212,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
         
         
     }
+
+	protected function _makeOptionCoupon() {
+		if (!Tools_ShoppingCart::getInstance()->getCustomerId()){
+			return null;
+		}
+		return $this->_view->render('coupon.phtml');
+	}
 }
