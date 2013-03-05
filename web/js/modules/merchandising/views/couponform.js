@@ -7,6 +7,13 @@ define([
             'submit': 'submit',
             'change :input[data-validator]': 'validate',
             'change [data-action=render]': 'render',
+            'change #enable-coupon-limit': function(e){
+                if (e.currentTarget.checked){
+                    $('#scope').removeAttr('disabled');
+                } else {
+                    $('#scope').attr('disabled', 'disabled');
+                }
+            },
             'click #genCoupon': 'genCoupon'
         },
         templates: {
@@ -42,12 +49,6 @@ define([
                     break;
             }
             $('#coupon-action').html(couponActionTmpl);
-
-            if ($('#enable-coupon-limit').attr('checked')) {
-                $('#scope').removeAttr('disabled');
-            } else {
-                $('#scope').attr('disabled', 'disabled');
-            }
         },
         submit: function(e){
             e.preventDefault();
@@ -67,13 +68,13 @@ define([
             }
 
             $.ajax({
-                url: this.app.coupons.url(),
+                url: this.app.couponsTable.coupons.paginator_core.url(),
                 data: this.$el.serialize(),
                 type: 'POST',
                 dataType: 'json',
                 success: function(response){
                     form.trigger('reset');
-                    self.app.coupons.add(response);
+                    self.app.couponsTable.coupons.add(response);
                 }
             });
         },

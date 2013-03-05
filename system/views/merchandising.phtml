@@ -92,7 +92,7 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
             </div>
 			<div class="grid_6">
 				<label>
-                    <input type="checkbox" id="enable-coupon-limit" data-action="render">
+                    <input type="checkbox" id="enable-coupon-limit">
 					<?php echo $this->translate('One use per');?></label>
                     <input type="hidden" name="scope" value="">
 					<?php
@@ -112,7 +112,7 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 		</form>
 
 		<div class="toaster-widget">
-            <table style="width: 100%" class="mt10px widget">
+            <table id="coupon-table" style="width: 100%" class="mt10px widget">
                 <thead>
                 <tr>
                     <th>#</th>
