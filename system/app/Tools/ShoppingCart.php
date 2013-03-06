@@ -245,10 +245,14 @@ class Tools_ShoppingCart {
 			}
 
 			foreach($this->_content as $storageKey => &$cartItem) {
-				$product = new Models_Model_Product(array(
-					'price'     => $cartItem['price'],
-					'taxClass'  => $cartItem['taxClass']
-				));
+				if(isset($cartItem['sid'])) {
+                    $product = new Models_Model_Product(array(
+                        'price'     => $cartItem['price'],
+                        'taxClass'  => $cartItem['taxClass']
+                    ));
+                } else {
+                    $product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
+                }
 
 				$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
 				$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
@@ -398,12 +402,12 @@ class Tools_ShoppingCart {
 		$cartSessionContent = array();
 		foreach ($this->getContent() as $uniqKey => $item) {
 			$data = array(
-				'product_id'    => $item['id'],
+				'product_id'    => isset($item['product_id']) ? $item['product_id'] : $item['id'],
 				'price'         => $item['price'],
 				'qty'           => $item['qty'],
 				'tax'           => $item['tax'],
 				'tax_price'     => $item['taxPrice'],
-				'options'       => array()
+				'options'       => isset($item['options']) ? $item['options'] : array()
 			);
 
 			foreach ($item['options'] as $option) {
@@ -510,7 +514,10 @@ class Tools_ShoppingCart {
 	}
 
 	private function _filterCallback($item) {
-		return (isset($item['id']) && $item['id'] == $this->_filterId);
+        if(!isset($item['product_id']) || $item['product_id'] != $this->_filterId) {
+            return (isset($item['id']) && $item['id'] == $this->_filterId);
+        }
+        return true;
 	}
 
 	public function setCartId($cartId) {

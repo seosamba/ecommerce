@@ -64,22 +64,22 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 	private function _processCartContent(Models_Model_CartSession $cartSession){
 		$cartSessionContentDbTable = new Models_DbTable_CartSessionContent();
 		$content = $cartSession->getCartContent();
-		if (!empty($content)) {
-			$cartSessionContentDbTable->getAdapter()->beginTransaction();
-			$cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSession->getId() ));
-			foreach ($content as $item) {
-				$item['options'] = http_build_query($item['options']);
-				$item['cart_id'] = $cartSession->getId();
 
-				unset($item['sku']);
-				unset($item['name']);
-				unset($item['original_price']);
+        $cartSessionContentDbTable->getAdapter()->beginTransaction();
+        $cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSession->getId() ));
+        if (!empty($content)) {
+            foreach ($content as $item) {
+                $item['options'] = http_build_query($item['options']);
+                $item['cart_id'] = $cartSession->getId();
 
-				$cartSessionContentDbTable->insert($item);
-			}
+                unset($item['sku']);
+                unset($item['name']);
+                unset($item['original_price']);
 
-			$cartSessionContentDbTable->getAdapter()->commit();
-		}
+                $cartSessionContentDbTable->insert($item);
+            }
+        }
+        $cartSessionContentDbTable->getAdapter()->commit();
 	}
 
 	/**
