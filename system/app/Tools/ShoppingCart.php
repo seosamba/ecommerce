@@ -250,8 +250,10 @@ class Tools_ShoppingCart {
                         'price'     => $cartItem['price'],
                         'taxClass'  => $cartItem['taxClass']
                     ));
+
                 } else {
                     $product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
+                    $product->setPrice($cartItem['price']);
                 }
 
 				$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
