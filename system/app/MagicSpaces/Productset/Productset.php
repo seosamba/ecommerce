@@ -27,14 +27,23 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
         }
 
         //get the set settings
-        $setSettings        = Models_Mapper_ProductSetSettingsMapper::getInstance()->find($product->getId());
-        $autoCalculatePrice = (isset($setSettings['autoCalculatePrice']) && $setSettings['autoCalculatePrice']);
+        $settingsMapper =  Models_Mapper_ProductSetSettingsMapper::getInstance();
+        $setSettings    = $settingsMapper->find($product->getId());
+        if($setSettings === null) {
+            $autoCalculatePrice = true;
+            $settingsMapper->save(array('productId' => $product->getId(), 'autoCalculatePrice' => true));
+        } else {
+            $autoCalculatePrice = (isset($setSettings['autoCalculatePrice']) && $setSettings['autoCalculatePrice']);
+        }
+
 
         //Get all parts for this product  from the content ant attach them
         $parts = $this->_getPartsFromContent();
 
         if($parts) {
             //set parts
+            $mapper = Models_Mapper_ProductMapper::getInstance();
+
             $product->setParts($parts);
 
             if($autoCalculatePrice) {
@@ -42,8 +51,6 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
                 //set the new price for a product
                 //$price  = $product->getPrice();
                 $price  = 0;
-                $mapper = Models_Mapper_ProductMapper::getInstance();
-
                 array_walk($parts, function($partId) use(&$price, $mapper) {
                     $part = $mapper->find($partId);
                     if($part instanceof Models_Model_Product) {
@@ -53,10 +60,15 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
                 //if price changed during the calculation we're setting the new price
                 if($price != $product->getPrice()) {
+
+                    $oldPrice = $product->getPrice();
+                    $this->_content = str_replace($oldPrice, $price, $this->_content);
+
                     $product->setPrice($price);
                 }
-                $product = $mapper->save($product);
             }
+            $product = $mapper->save($product);
+            Zend_Controller_Action_HelperBroker::getStaticHelper('cache')->clean(null, null, array('prodid_' . $product->getId()));
         }
 
         //if current user has no permissions to edit content we return only magic space content
