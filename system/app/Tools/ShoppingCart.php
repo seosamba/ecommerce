@@ -125,8 +125,12 @@ class Tools_ShoppingCart {
 	 */
 	public function find($id) {
         $filteredContent = array_filter($this->_content, function($item) use ($id){
-	        return (isset($item['id']) && $item['id'] == $id);
+	        if(!isset($item['product_id']) || $item['product_id'] != $id) {
+                return (isset($item['id']) && $item['id'] == $id);
+            }
+            return true;
         });
+
         return reset($filteredContent);
 	}
 
