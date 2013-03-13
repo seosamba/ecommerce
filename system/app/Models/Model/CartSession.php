@@ -82,6 +82,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	protected $_updatedAt;
     
     protected $_notes = null;
+
+	protected $_discount = 0;
     
 
 	public function setCartContent($cartContent) {
@@ -258,6 +260,15 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getNotes() {
 		return $this->_notes;
+	}
+
+	public function setDiscount($discount) {
+		$this->_discount = $discount;
+		return $this;
+	}
+
+	public function getDiscount() {
+		return $this->_discount;
 	}
 
 }

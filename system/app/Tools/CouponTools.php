@@ -5,34 +5,127 @@
  */
 class Tools_CouponTools {
 
-	public static function validateCoupons($coupons, $triggerApply = false){
-		$validCoupons = array();
+	const STATUS_FAIL_COMBINATION   = '';
 
-		$now = new DateTime();
+	const STATUS_FAIL_EXISTS        = '';
+
+	const STATUS_FAIL_NOT_ACTIVE    = '';
+
+	const STATUS_FAIL_EXPIRED       = '';
+
+	const STATUS_FAIL_PRODUCTS_MISSING = '';
+
+	const STATUS_FAIL_NOT_REUSABLE  = '';
+
+	const STATUS_APPLIED            = true;
+
+
+	public static function applyCoupons($coupons){
+		$status = array();
+
 		foreach ($coupons as $coupon){
-			if (sizeof($coupons) > 1 && (bool)$coupon->getAllowCombination() === false) {
-				continue;
+			if (is_string($coupon)){
+				$status[$coupon] = self::applyCoupon($coupon);
+			} elseif ($coupon instanceof Store_Model_Coupon){
+				$status[$coupon->getCode()] = self::applyCoupon($coupon);
 			}
-			$startDate  = new DateTime($coupon->getStartDate());
-			$endDate    = new DateTime($coupon->getEndDate());
-
-			if ($startDate > $now || $now > $endDate){
-				continue;
-			}
-
-			if ($coupon->getScope() === Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT){
-				if (Store_Mapper_CouponMapper::getInstance()->checkCouponByClientId($coupon->getId(), Tools_ShoppingCart::getInstance()->getCustomerId())){
-					continue;
-				}
-			}
-
-			array_push($validCoupons, $coupon);
 		}
 
-		return $triggerApply === false ? $validCoupons : self::applyCoupons($validCoupons);
+		return $status;
 	}
 
-	public static function applyCoupons($coupons, $filter = null){
+	public static function applyCoupon($coupon){
+		if (empty($coupon)){
+			return false;
+		}
+
+		if (!$coupon instanceof Store_Model_Coupon){
+			if (is_string($coupon)){
+				$coupon = Store_Mapper_CouponMapper::getInstance()->findByCode($coupon);
+				return self::applyCoupon($coupon);
+			} elseif (is_array($coupon)){
+				return self::applyCoupons($coupon);
+			}
+		}
+
+
+		//initial values
+
+		$now = new DateTime();
+
+		//getting cart instance
+		$cart = Tools_ShoppingCart::getInstance();
+
+		//getting currently used coupons
+		$currentCoupons = $cart->getCoupons();
+		if (is_null($currentCoupons)){
+			$currentCoupons = array();
+		}
+
+		//fetching coupon codes array
+		$currentCodes = array();
+		if (!empty($currentCoupons)){
+			$currentCodes = array_map(function($coupon) { return $coupon->getCode(); }, $currentCoupons);
+		}
+
+		//checking if we already have coupon that doesn't allow combination
+		if (count($currentCoupons) === 1){
+			$currentCoupon = reset($currentCoupons);
+			if ($coupon->getAllowCombination() === false){
+				return self::STATUS_FAIL_COMBINATION;
+			}
+			unset ($currentCoupon);
+		}
+
+		// validating coupon
+		if (!empty($currentCodes)){
+			if (in_array($coupon->getCode(), $currentCodes)){
+				return self::STATUS_FAIL_EXISTS;
+			} elseif ( (bool)$coupon->getAllowCombination() === false){
+				return self::STATUS_FAIL_COMBINATION;
+			}
+		}
+
+		$startDate  = new DateTime($coupon->getStartDate());
+		$endDate    = new DateTime($coupon->getEndDate());
+
+		if ($startDate > $now) {
+			return self::STATUS_FAIL_NOT_ACTIVE;
+		} elseif ($now > $endDate){
+			return self::STATUS_FAIL_EXPIRED;
+		}
+
+		if (null !== ($products = $coupon->getProducts())){
+			$isValid = false;
+			foreach($products as $productId){
+				if ($cart->find($productId)){
+					$isValid = true;
+				}
+			}
+			if (false === $isValid){
+				return self::STATUS_FAIL_PRODUCTS_MISSING;
+			}
+		}
+
+		if ($coupon->getScope() === Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT){
+			if (Store_Mapper_CouponMapper::getInstance()->checkCouponByClientId($coupon->getId(), $cart->getCustomerId())){
+				return self::STATUS_FAIL_NOT_REUSABLE;
+				$status[$coupon->getCode()] = 'Coupon can not be used again';
+			}
+		}
+
+		// saving coupon to cart session and recalculating cart
+		array_push($currentCoupons, $coupon);
+		$cart->setCoupons($currentCoupons);
+		$cart->calculate(true);
+		$cart->save();
+
+		return self::STATUS_APPLIED;
+	}
+
+	public static function processCoupons($coupons, $filter = null){
+		$status = true;
+
 		if (!is_null($filter)){
 			$coupons = self::filterCoupons($coupons, $filter);
 		}
@@ -44,11 +137,11 @@ class Tools_CouponTools {
 		foreach ($coupons as $coupon) {
 			$methodName = 'process'.strtolower($coupon->getType()).'Coupon';
 			if (method_exists(__CLASS__, $methodName)){
-				self::$methodName($coupon);
+				$status = $status && self::$methodName($coupon);
 			}
 		}
 
-		return true;
+		return $status;
 	}
 
 	public static function filterCoupons($coupons, $filter = null){
@@ -69,7 +162,7 @@ class Tools_CouponTools {
 		$discount = 0;
 
 		if ($orderAmount >= $coupon->getMinOrderAmount()){
-			switch ($coupon->getDiscountUnits()){
+			switch ($coupon->getDiscountUnit()){
 				case Store_Model_Coupon::DISCOUNT_PERCENTS:
 					$discount = $orderAmount * $coupon->getDiscountAmount() / 100;
 					break;

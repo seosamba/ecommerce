@@ -1,11 +1,12 @@
 <?php $id = uniqid('store-coupon-'); ?>
 <div>
-<?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
-    <h3 class="checkout-widget-title"><?php echo $this->translate('Enter coupon');?></h3>
-	<a href="<?php echo $this->url();?>" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>"><?php echo $this->translate('Edit coupons');?></a>
-<?php else: ?>
-    <h3 class="checkout-widget-title"><?php echo $this->translate('Enter coupon');?></h3>
-    <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/coupon/" method="post">
+    <h3 class="checkout-widget-title">
+	    <?php echo $this->translate('Enter coupon');?>
+	    <?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
+        <a href="<?php echo $this->url();?>?step=shipping" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+	    <?php endif; ?>
+    </h3>
+    <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo trim($this->websiteUrl, '/').$_SERVER['REQUEST_URI']; ?>" method="post">
 	    <input type="text" name="code">
 	    <input type="submit" value="<?php echo $this->translate('Apply'); ?>">
 	</form>
@@ -16,7 +17,6 @@
 		<?php endforeach; ?>
 	</ul>
 	<?php endif; ?>
-<?php endif; ?>
 </div>
 <script>
 $(function(){
@@ -31,8 +31,10 @@ $(function(){
 			type: 'POST',
 			dataType: 'json',
 			success: function(response){
-                console.log(response);
-                $(self).remove();
+				console.log(response);
+				var notify = $("<p></p>", {"class": "store-coupon-notify"}).html(response.responseText.join('<br>'))
+						.on('click', function(){ $(this).remove(); });
+				$(self).trigger('reset').after(notify);
                 refreshCartSummary();
 			}
 		})

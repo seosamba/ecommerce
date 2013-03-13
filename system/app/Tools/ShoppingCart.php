@@ -404,7 +404,8 @@ class Tools_ShoppingCart {
 			$setter = 'set' . $this->_normalizeOptionsKey($name);
 
 			if ($reflection->hasMethod($setter) && isset($this->_session->{$name}) ){
-				$this->$setter($this->_session->{$name});
+				$value = @unserialize($this->_session->{$name});
+				$this->$setter($value === false ? $this->_session->{$name} : $value);
 			}
 		}
 
@@ -449,7 +450,8 @@ class Tools_ShoppingCart {
             $getter = 'get' . $this->_normalizeOptionsKey($name);
 
             if ( $reflection->hasMethod($getter) ){
-                $this->_session->__set($name, $this->$getter());
+	            $value = $this->$getter();
+                $this->_session->__set($name, is_array($value) ? serialize($value) :  $value );
             }
         }
 
@@ -505,9 +507,9 @@ class Tools_ShoppingCart {
 			}
 			array_push($cartSessionContent, $data);
 		}
-		$cartSession->setCartContent($cartSessionContent);
-		$cartSession->setIpAddress($_SERVER['REMOTE_ADDR']);
-		$cartSession->setOptions($this->calculate());
+		$cartSession->setCartContent($cartSessionContent)
+					->setIpAddress($_SERVER['REMOTE_ADDR'])
+					->setOptions($this->calculate());
 
 		if ($customer->getId() !== null) {
 			$cartSession->setUserId($customer->getId())

@@ -789,17 +789,32 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($this->_request->isPost()){
 			$code = filter_var($this->_request->getParam('code'), FILTER_SANITIZE_STRING);
 
-			if (empty($code)){
-				return false;
+			if (!empty($code)){
+				$code = array_unique(explode(' ', $code));
+				$numCodeReceived = count($code);
+
+				$coupons = Store_Mapper_CouponMapper::getInstance()->findByCode($code);
+
+				$msg = array();
+
+				if (!empty($coupons)){
+					$status = Tools_CouponTools::applyCoupons($coupons);
+					if (!empty($status)){
+						$discount = Tools_ShoppingCart::getInstance()->getDiscount();
+						if ($discount){
+							$msg[] = 'Congratulations, you save '.$this->_view->currency($discount).' on this order. Proceed to checkout now.';
+						}
+						//processing freeshipping coupons
+						if (Tools_CouponTools::processCoupons(Tools_ShoppingCart::getInstance()->getCoupons(), Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)){
+							$msg[] = 'Congratulations, your order is now available for free shipping. Please proceed to checkout.';
+						}
+					} else {
+						$msg[] = 'Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.';
+					}
+				}
 			}
 
-			$code = array_unique(explode(' ', $code));
-
-			$coupons = Store_Mapper_CouponMapper::getInstance()->findByCode($code);
-
-			Tools_ShoppingCart::getInstance()->setCoupons(Tools_CouponTools::validateCoupons($coupons))->save();
-
-			$this->_responseHelper->success();
+			$this->_responseHelper->success($msg);
 		}
 	}
 }

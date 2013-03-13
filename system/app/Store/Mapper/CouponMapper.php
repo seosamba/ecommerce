@@ -91,6 +91,7 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 
 	public function fetchAll($where = null, $order = array()) {
 		$coupons = parent::fetchAll($where, $order);
+
 		if (!empty($coupons)){
 			$coupons = array_map(array($this, '_loadCouponData'), $coupons);    //loading additional data
 		}
@@ -99,10 +100,24 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 	}
 
 	private function _loadCouponData(Store_Model_Coupon $coupon){
+		$this->_loadCouponProducts($coupon);
+
 		$methodName = '_load'.ucfirst(strtolower($coupon->getType())).'CouponData';
 		if (method_exists($this, $methodName)){
 			return $this->$methodName($coupon);
 		}
+		return $coupon;
+	}
+
+	private function _loadCouponProducts(Store_Model_Coupon $coupon){
+		$dbTable = new Store_DbTable_CouponProduct();
+
+		$select = $dbTable->select()->from('shopping_coupon_product', array('product_id'))->where('coupon_id = ?', $coupon->getId());
+		$productCoupons = $dbTable->getAdapter()->fetchCol($select);
+		if (!empty($productCoupons)){
+			$coupon->setProducts(array_values($productCoupons));
+		}
+
 		return $coupon;
 	}
 
