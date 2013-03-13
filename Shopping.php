@@ -32,7 +32,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	const RESOURCE_API  = 'api';
 
 	/**
-	 * Resource descibes store management widgets and screens
+	 * Resource describes store management widgets and screens
 	 */
 	const RESOURCE_STORE_MANAGEMENT = 'storemanagement';
 
@@ -776,15 +776,18 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	public function merchandisingAction(){
-		$this->_view->currency = $this->_configMapper->getConfigParam('currency');
+		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)){
+			$this->_view->currency = $this->_configMapper->getConfigParam('currency');
+			$this->_view->couponTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
 
-		$this->_view->couponTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
-
-
-		$this->_layout->content = $this->_view->render('merchandising.phtml');
-		echo $this->_layout->render();
+			$this->_layout->content = $this->_view->render('merchandising.phtml');
+			echo $this->_layout->render();
+		}
 	}
 
+	/**
+	 * Action receives and apply coupon codes submitted by user
+	 */
 	public function couponAction(){
 		if ($this->_request->isPost()){
 			$code = filter_var($this->_request->getParam('code'), FILTER_SANITIZE_STRING);
