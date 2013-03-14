@@ -52,25 +52,23 @@
 <script type="text/javascript">
 
     $(document).on('keypress', '#manual-set-price', function(e) {
-        var self = this;
-        if(e.keyCode == 13 && $(self).val()) {
+        var newPrice = parseFloat($(this).val()).toFixed(2);
+        if(e.keyCode == 13 && newPrice) {
             $.ajax({
-                url: '<?php echo $this->websiteUrl;?>api/store/products/id/<?php echo $this->currentSetId; ?>',
-                type: 'put',
-                beforeSend: showSpinner,
-                data: JSON.stringify({
-                    price: $(self).val()
-                }),
-                dataType: 'json'
-            }).success(function() {
+                url        : '<?php echo $this->websiteUrl;?>api/store/products/id/<?php echo $this->currentSetId; ?>',
+                type       : 'put',
+                beforeSend : showSpinner,
+                data       : JSON.stringify({price: newPrice}),
+                dataType   : 'json'
+            }).done(function(response) {
                 hideSpinner();
-                showMessage('Set price updated');
+                var oldPrice = $('*[itemprop="price"]').text();
+                $('*[itemprop="price"]').text(oldPrice.replace(/[0-9,.]+/g, newPrice));
+                showMessage('<?php echo $this->translate('Set price updated'); ?>');
             });
         }
-
     }).on('change', '#auto-calculate-set-price', function() {
         $('#manual-set-price').parent('label').fadeToggle();
-
         var checked = $(this).prop('checked') ? 1 : 0 ;
         $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setSettings/', {
             'settings': {
