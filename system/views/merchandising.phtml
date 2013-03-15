@@ -5,41 +5,8 @@ $this->placeholder('headerContent')->set('Merchandising');
 $this->headLink()->appendStylesheet($this->websiteUrl.'system/css/reset-widgets.css');
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
-<style type="text/css">
-#edit-coupon label{
-	display: inline-block;
-}
-#edit-coupon input,
-#edit-coupon select,
-#edit-coupon textarea {
-	width: 100px;
-}
-#edit-coupon input[type=checkbox],
-#edit-coupon input[type=radio] {
-    width: auto;
-	margin: 0 5px;
-	vertical-align: middle;
-}
-#merchandising .input-auto {
-	width: auto;
-}
-#merchandising .input-micro {
-	width: 40px;
-}
-#merchandising .input-mini {
-    width: 60px;
-}
-#merchandising .input-normal {
-    width: 80px;
-}
-#merchandising .input-medium {
-	width: 100px;
-}
-#merchandising .input-large {
-	width: 140px;
-}
 
-</style>
+
 <div id="merchandising" class="grid_12 mb10px">
     <ul>
         <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
@@ -47,94 +14,8 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 	<div id="coupons">
 		<p><?php echo $this->translate('Product specific coupons can be found under the "add/edit product" screen');?></p>
 		<p><?php echo $this->translate('Set cart level coupons from this screen');?></p>
-		<form id="edit-coupon" class="clearfix">
-			<?php echo $this->formHidden('id');?>
 
-			<div class="clearfix grid_4">
-                <label><?php echo $this->translate('Type');?></label>
-				<?php echo $this->formSelect('type', null, array(
-						'style'         => 'width: auto',
-						'data-action'   => 'render',
-						'id'            => 'coupon-type'
-					), $this->couponTypes ); ?>
-			</div>
-
-            <div class="grid_4">
-	            <label><?php echo $this->translate('Code');?></label>
-	            <?php echo $this->formText('code', null, array(
-					'class'          => 'input-large',
-	                'data-validator' => array('notempty'),
-	                'placeholder'    => $this->translate('Enter coupon code')
-                )); ?>
-	            <a id="genCoupon" style="cursor:pointer;">[<?php echo $this->translate('new'); ?>]</a>
-            </div>
-
-			<div class="grid_4">
-                <label><?php echo $this->translate('From');?></label>
-				<?php echo $this->formText('startDate', date('Y-m-d'), array(
-					'class' => 'datepicker input-normal'
-				)); ?>
-<!--			</div>-->
-<!--			<div class="grid_3">-->
-                <label><?php echo $this->translate('to');?></label>
-				<?php echo $this->formText('endDate', date('Y-m-d', strtotime('+1 month')), array(
-					'class' => 'datepicker input-normal'
-				)); ?>
-			</div>
-
-			<div class="grid_12 mt5px clearfix"></div>
-
-            <div class="grid_5">
-				<label class="mt5px">
-		            <?php echo $this->formCheckbox('allowCombination'); ?>
-		            <?php echo $this->translate('Allow in combination with other coupons');?>
-	            </label>
-            </div>
-			<div class="grid_6">
-				<label>
-                    <input type="checkbox" id="enable-coupon-limit">
-					<?php echo $this->translate('One use per');?></label>
-                    <input type="hidden" name="scope" value="">
-					<?php
-					echo $this->formSelect('scope', null, null, array(
-						Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT   => $this->translate('client'),
-						Store_Model_Coupon::DISCOUNT_SCOPE_ORDER    => $this->translate('order')
-					) ); ?>
-            </div>
-
-			<div class="grid_12 mt5px clearfix" id="coupon-action">
-
-			</div>
-
-			<div class="grid_12 textright">
-				<input class="blue-btn" type="submit" value="<?php echo $this->translate('Create'); ?>"/>
-			</div>
-		</form>
-
-		<div class="toaster-widget">
-            <table id="coupon-table" style="width: 100%" class="mt10px widget">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th><?php echo $this->translate('Coupon Type');?></th>
-                    <th><?php echo $this->translate('Code');?></th>
-                    <th><?php echo $this->translate('Start date');?></th>
-                    <th><?php echo $this->translate('End date');?></th>
-                    <th><?php echo $this->translate('Allow combinations');?></th>
-                    <th><?php echo $this->translate('Use scope');?></th>
-                    <th><?php echo $this->translate('Action');?></th>
-                    <th>&nbsp;</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-	                    <td colspan="10">
-		                    <img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="<?php echo $this->translate('Loading...');?>">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-		</div>
+		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	</div>
 </div>
 
@@ -147,24 +28,4 @@ $(function(){
 <script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"
         data-main="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/modules/merchandising/config"></script>
 
-<script id="actionDiscountFreeshippingTmpl" type="text/template">
-	<% if (type === 'discount'){ %>
-	<div id="discount-units-holder" style="display: inline-block">
-		<label><?php echo $this->translate('Discount amount:');?></label>
-		<?php echo $this->formText('data[discountAmount]'); ?>
-		<?php echo $this->formSelect('data[discountUnits]', null, array(
-			'class' => 'input-auto'
-		), array(
-			Store_Model_Coupon::DISCOUNT_UNITS       => $this->currency,
-			Store_Model_Coupon::DISCOUNT_PERCENTS    => '%'
-		));?>
-	</div>
-    <label><?php echo $this->translate('for orders over');?></label>
-	<% } else { %>
-    <label><?php echo $this->translate('Free shipping for orders over');?></label>
-	<% } %>
-	<?php echo $this->formText('data[minOrderAmount]', 0, array(
-		'class' => 'input-mini'
-	)); ?>
-	<span class="unit"><?php echo $this->currency; ?></span>
-</script>
+<?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->currency)); ?>

@@ -28,7 +28,14 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 		if ($id){
 			// return $model;
 		} else {
-			return array_map(function($coupon){ return $coupon->toArray(); }, Store_Mapper_CouponMapper::getInstance()->fetchAll());
+			$productId = filter_var($this->getRequest()->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+			$where = array();
+			if ($productId){
+				$data = Store_Mapper_CouponMapper::getInstance()->findByProductId($productId);
+			} else {
+				$data = Store_Mapper_CouponMapper::getInstance()->fetchAll();
+			}
+			return array_map(function($coupon){ return $coupon->toArray(); }, $data);
 		}
 	}
 

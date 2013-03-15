@@ -14,13 +14,11 @@ define([
             this.coupons = new CouponsCollection();
             this.coupons.on('reset', this.renderCoupons, this);
             this.coupons.on('add', this.renderCoupon, this);
-            this.coupons.pager();
         },
         render: function(){
-
+            this.coupons.pager();
         },
         renderCoupons: function(coupons){
-            console.log(this.el);
             var tbody = this.$el.find('tbody');
             tbody.html(coupons.size() ? '' : '<tr><td colspan="'+this.$el.find('thead th').size()+'">You don&#39;t have any coupon yet.</td></tr>');
             coupons.each(this.renderCoupon, this);

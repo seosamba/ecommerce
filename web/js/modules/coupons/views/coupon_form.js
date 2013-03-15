@@ -20,10 +20,11 @@ define([
 
         },
         initialize: function(){
+            this.$el.attr('action', $('#website_url').val()+'api/store/coupons');
             $('#startDate').datepicker({
                 showOtherMonths: true,
                 selectOtherMonths: false,
-                dateFormat: 'yy-mm-dd',
+                dateFormat: 'yy-M-dd',
                 onClose: function(selectedDate){
                     $('#endDate').datepicker("option", "minDate", selectedDate);
                 }
@@ -31,11 +32,13 @@ define([
             $('#endDate').datepicker({
                 showOtherMonths: true,
                 selectOtherMonths: false,
-                dateFormat: 'yy-mm-dd',
+                dateFormat: 'yy-M-dd',
                 onClose: function(selectedDate){
                     $('#startDate').datepicker("option", "maxDate", selectedDate);
                 }
             });
+            //disabling use scope by default
+            $('#scope').attr('disabled', 'disabled');
         },
         render: function(){
             var couponActionTmpl = '',
@@ -49,6 +52,8 @@ define([
                     break;
             }
             $('#coupon-action').html(couponActionTmpl);
+
+            return this;
         },
         submit: function(e){
             e.preventDefault();
@@ -68,13 +73,13 @@ define([
             }
 
             $.ajax({
-                url: this.app.couponsTable.coupons.paginator_core.url(),
+                url: this.$el.attr('action'),
                 data: this.$el.serialize(),
                 type: 'POST',
                 dataType: 'json',
                 success: function(response){
-                    form.trigger('reset');
-                    self.app.couponsTable.coupons.add(response);
+                    self.$el.trigger('reset');
+                    self.$el.trigger('coupon:created');
                 }
             });
         },

@@ -8,11 +8,13 @@ define([
     '../collections/images',
     './tag',
 	'./option',
-	'./productlist'
+	'./productlist',
+    '../../coupons/views/coupon_form',
+    '../../coupons/views/coupons_table'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -70,8 +72,17 @@ define([
 
             $('#ajax_msg, #product-list').hide();
             this.$el.on('tabsselect', function(event, ui){
-                if (ui.index === 1){
-                    self.initTags();
+                console.log(arguments);
+                switch (ui.index){
+                    case 1:
+                        self.initTags();
+                    break;
+                    case 4:
+                        if (self.model.isNew()){
+                            showMessage('You need to save product before', true);
+                            return false;
+                        }
+                    break;
                 }
             }).show();
 
@@ -79,6 +90,11 @@ define([
             this.images.on('reset', this.renderImages, this);
 
             this.render()
+
+            this.couponForm = new CouponFormView();
+            this.couponGrid = new CouponGridView();
+
+            this.couponForm.render();
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -103,6 +119,7 @@ define([
 
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
+            this.model.on('change:id', this.setProductIdForCoupon, this);
 
             this.model.on('sync', function(){
                 if (this.model.has('options')){
@@ -764,6 +781,12 @@ define([
                     break;
             }
             return false;
+        },
+        setProductIdForCoupon: function(){
+            var productId = this.model.get('id');
+            this.couponForm.$el.find('input#data-products').val(productId);
+            this.couponGrid.coupons.server_api.productId = productId;
+            this.couponGrid.render();
         }
 	});
 

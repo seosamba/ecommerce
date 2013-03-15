@@ -43,7 +43,36 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 			$this->$extraMethod($model);
 		}
 
+		$this->_saveCouponToProduct($model);
+
 		return $model;
+	}
+
+	/**
+	 * Method saves coupon to product relations if any
+	 * @param Store_Model_Coupon $coupon
+	 * @return mixed
+	 */
+	protected function _saveCouponToProduct(Store_Model_Coupon $coupon){
+		$products = $coupon->getProducts();
+
+		if ($products){
+			$dbTable = new Store_DbTable_CouponProduct();
+
+			if (!is_array($products)){
+				$products = array($products);
+			}
+			$dbTable->delete(array('coupon_id = ?' => $coupon->getId()));
+			$data = array();
+			foreach ($products as $pid) {
+				$dbTable->insert(array(
+					'coupon_id' => intval($coupon->getId()),
+					'product_id' => intval($pid)
+				));
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -196,6 +225,27 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 		$where = $this->getDbTable()->getAdapter()->quoteInto('code IN (?)', $code);
 
 		return $this->fetchAll($where);
+	}
+
+	public function findByProductId($productId){
+		if (!is_array($productId)){
+			$productId = array($productId);
+		}
+
+		$select = $this->getDbTable()->getAdapter()->select()->from(array('c' => 'shopping_coupon'))
+				->join(array('cp' => 'shopping_coupon_product'), 'c.id = cp.coupon_id', null)
+				->where('cp.product_id IN (?)', $productId);
+
+		$rawResults = $this->getDbTable()->getAdapter()->fetchAll($select);
+
+		$coupons = array();
+		if (!empty($rawResults)){
+			foreach ($rawResults as $coupon) {
+				array_push($coupons, new $this->_model($coupon));
+			}
+			$coupons = array_map(array($this, '_loadCouponData'), $coupons);    //loading additional data
+		}
+		return $coupons;
 	}
 
 	/**
