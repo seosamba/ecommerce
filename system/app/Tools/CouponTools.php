@@ -5,17 +5,17 @@
  */
 class Tools_CouponTools {
 
-	const STATUS_FAIL_COMBINATION   = '';
+	const STATUS_FAIL_COMBINATION   = 'fail_combination';
 
-	const STATUS_FAIL_EXISTS        = '';
+	const STATUS_FAIL_EXISTS        = 'fail_exists';
 
-	const STATUS_FAIL_NOT_ACTIVE    = '';
+	const STATUS_FAIL_NOT_ACTIVE    = 'fail_not_active';
 
-	const STATUS_FAIL_EXPIRED       = '';
+	const STATUS_FAIL_EXPIRED       = 'fail_expired';
 
-	const STATUS_FAIL_PRODUCTS_MISSING = '';
+	const STATUS_FAIL_PRODUCTS_MISSING = 'fail_products_missing';
 
-	const STATUS_FAIL_NOT_REUSABLE  = '';
+	const STATUS_FAIL_NOT_REUSABLE  = 'fail_not_reusable';
 
 	const STATUS_APPLIED            = true;
 
@@ -110,7 +110,6 @@ class Tools_CouponTools {
 		if ($coupon->getScope() === Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT){
 			if (Store_Mapper_CouponMapper::getInstance()->checkCouponByClientId($coupon->getId(), $cart->getCustomerId())){
 				return self::STATUS_FAIL_NOT_REUSABLE;
-				$status[$coupon->getCode()] = 'Coupon can not be used again';
 			}
 		}
 

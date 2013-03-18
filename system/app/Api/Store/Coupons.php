@@ -50,12 +50,24 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 			$this->_error('Missing mandatory code parameter');
 		}
 
-		if (isset($data['startDate']) && empty($data['startDate'])){
-			unset($data['startDate']);
+		if (isset($data['startDate'])){
+			if (!empty($data['startDate'])){
+				$data['startDate'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($data['startDate']));
+			} else {
+				unset($data['startDate']);
+			}
+		} else {
+			$this->_error('Coupon start date should be specified');
 		}
 
-		if (isset($data['endDate']) && empty($data['endDate'])){
-			unset($data['endDate']);
+		if (isset($data['endDate'])){
+			if (!empty($data['endDate'])){
+				$data['endDate'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($data['endDate']));
+			} else {
+				unset($data['endDate']);
+			}
+		} else {
+			$this->_error('Coupon end date should be specified');
 		}
 
 		if (isset($data['scope']) && empty($data['scope'])){

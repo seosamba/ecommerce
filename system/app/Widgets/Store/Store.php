@@ -217,6 +217,9 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		if (!Tools_ShoppingCart::getInstance()->getCustomerId()){
 			return null;
 		}
+
+		$this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();
+
 		return $this->_view->render('coupon.phtml');
 	}
 }
