@@ -8,6 +8,7 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
     protected function _init() {
         $this->_view        = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
+
     }
 
     protected function _run() {
@@ -60,10 +61,9 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
                 //if price changed during the calculation we're setting the new price
                 if($price != $product->getPrice()) {
-
-                    $oldPrice = $product->getPrice();
-                    $this->_content = str_replace($oldPrice, $price, $this->_content);
-
+                    $currency       = Zend_Registry::get('Zend_Currency');
+                    $oldPrice       = $product->getPrice();
+                    $this->_content = str_replace($currency->toCurrency($oldPrice), $currency->toCurrency($price), $this->_content);
                     $product->setPrice($price);
                 }
             }
