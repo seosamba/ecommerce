@@ -43,12 +43,14 @@ define([
         render: function(){
             var couponActionTmpl = '',
                 couponType       = $('#coupon-type').val();
+
+            couponActionTmpl = _.template($('#actionDiscountFreeshippingTmpl').html(), {type: couponType});
             switch (couponType){
-                case 'discount':
                 case 'freeshipping':
-                    couponActionTmpl = _.template($('#actionDiscountFreeshippingTmpl').html(), {type: couponType});
+                    $('#scope option[value="order"]').attr('disabled', 'disabled');
                     break;
                 default:
+                    $('#scope option[value="order"]').removeAttr('disabled');
                     break;
             }
             $('#coupon-action').html(couponActionTmpl);

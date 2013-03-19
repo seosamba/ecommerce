@@ -79,7 +79,7 @@ define([
                     break;
                     case 4:
                         if (self.model.isNew()){
-                            showMessage('You need to save product before', true);
+                            showMessage('Please save product information first', true);
                             return false;
                         }
                     break;

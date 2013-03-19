@@ -1,7 +1,8 @@
 define([
 	'backbone',
     '../collections/coupons',
-    './coupon_row'
+    './coupon_row',
+    $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
             CouponsCollection,
             CouponRowView){
@@ -22,11 +23,9 @@ define([
             var tbody = this.$el.find('tbody');
             tbody.html(coupons.size() ? '' : '<tr><td colspan="'+this.$el.find('thead th').size()+'">You don&#39;t have any coupon yet.</td></tr>');
             coupons.each(this.renderCoupon, this);
+            this.$el.dataTable();
         },
         renderCoupon: function(coupon){
-            if (this.coupons.size()){
-
-            }
             var view = new CouponRowView({model: coupon});
             this.$el.find('tbody').append(view.render().$el);
         }
