@@ -396,8 +396,11 @@ $lastPageCaption = $this->translate('Last');
     </div>
 
     <div id="coupon-tab" class="clearfix">
-	    <p><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
-	    <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+	    <div class="padding5px">
+		    <p><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
+		    <br>
+		    <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+	    </div>
     </div>
 
     <div class="grid_12 mb10px">

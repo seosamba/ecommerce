@@ -23,7 +23,9 @@ define([
             var tbody = this.$el.find('tbody');
             tbody.html(coupons.size() ? '' : '<tr><td colspan="'+this.$el.find('thead th').size()+'">You don&#39;t have any coupon yet.</td></tr>');
             coupons.each(this.renderCoupon, this);
-            this.$el.dataTable();
+            this.$el.dataTable({
+                'sDom': 't'
+            });
         },
         renderCoupon: function(coupon){
             var view = new CouponRowView({model: coupon});
