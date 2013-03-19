@@ -60,9 +60,13 @@ class Tools_FeedGenerator {
 			return false;
 		}
 		foreach ($products as $product) {
+            $productPage = $product->getPage();
+            if(!$productPage instanceof Application_Model_Models_Page) {
+                continue;
+            }
 			$item = $feed->createElement('item');
 			$item->appendChild($feed->createElement('title', htmlentities($product->getName())));
-			$item->appendChild($feed->createElement('link', $websiteUrl.$product->getPage()->getUrl()));
+			$item->appendChild($feed->createElement('link', $websiteUrl.$productPage->getUrl()));
 			$item->appendChild($feed->createElement('description', htmlentities($product->getShortDescription())));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
