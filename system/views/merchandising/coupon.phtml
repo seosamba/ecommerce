@@ -57,13 +57,15 @@
 	<div class="grid_4">
         <label><?php echo $this->translate('From');?></label>
 		<?php echo $this->formText('startDate', date('Y-M-d'), array(
-			'class' => 'datepicker input-medium'
+			'class' => 'datepicker',
+			'style' => 'width: 90px'
 		)); ?>
 <!--			</div>-->
 <!--			<div class="grid_3">-->
         <label><?php echo $this->translate('to');?></label>
 		<?php echo $this->formText('endDate', date('Y-M-d', strtotime('+1 month')), array(
-			'class' => 'datepicker input-medium'
+			'class' => 'datepicker',
+			'style' => 'width: 90px'
 		)); ?>
 	</div>
 

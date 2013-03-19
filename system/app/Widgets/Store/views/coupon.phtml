@@ -1,5 +1,5 @@
 <?php $id = uniqid('store-coupon-'); ?>
-<div>
+<div id="cart-coupon-form">
     <h3 class="checkout-widget-title">
 	    <?php echo $this->translate('Enter coupon');?>
 	    <?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
@@ -10,13 +10,9 @@
 	    <input type="text" name="code" required>
 	    <input type="submit" value="<?php echo $this->translate('Apply'); ?>">
 	</form>
-	<?php if (isset($this->errors)): ?>
-	<ul class="errors">
-		<?php foreach($this->errors as $err): ?>
-			<li><?php echo $this->translate($err); ?></li>
-		<?php endforeach; ?>
-	</ul>
-	<?php endif; ?>
+	<div class="coupon-msg">
+
+	</div>
 </div>
 <script>
 $(function(){
@@ -37,15 +33,16 @@ $(function(){
 			type: 'POST',
 			dataType: 'json',
 			success: function(r){
-				console.log(r);
+				var $msgContainer = $('#cart-coupon-form div.coupon-msg');
 				if (!!r.error){
 					showMessage(r.responseText, true);
 				} else {
+					$msgContainer.empty();
 					if (typeof  r.responseText === 'object'){
 						$.each(r.responseText, function(key, msg) {
 							$("<p></p>", { "class": "store-coupon-notify" }).html(msg)
 									.on('click', function(){ $(this).remove(); })
-									.insertAfter(self);
+									.append($msgContainer);
 						});
 					}
 				}

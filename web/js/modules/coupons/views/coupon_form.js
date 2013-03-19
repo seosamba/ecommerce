@@ -80,6 +80,9 @@ define([
                 success: function(response){
                     self.$el.trigger('reset');
                     self.$el.trigger('coupon:created');
+                },
+                error: function(response){
+                    showMessage(response.responseText, true);
                 }
             });
         },
