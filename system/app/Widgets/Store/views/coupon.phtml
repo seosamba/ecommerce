@@ -42,7 +42,7 @@ $(function(){
 						$.each(r.responseText, function(key, msg) {
 							$("<p></p>", { "class": "store-coupon-notify" }).html(msg)
 									.on('click', function(){ $(this).remove(); })
-									.append($msgContainer);
+									.appendTo($msgContainer);
 						});
 					}
 				}
