@@ -73,7 +73,7 @@ define([
                 showMessage('Missing required field', true);
                 return false;
             }
-
+            showSpinner();
             $.ajax({
                 url: this.$el.attr('action'),
                 data: this.$el.serialize(),
@@ -82,8 +82,10 @@ define([
                 success: function(response){
                     self.$el.trigger('reset');
                     self.$el.trigger('coupon:created');
+                    hideSpinner();
                 },
                 error: function(response){
+                    hideSpinner();
                     showMessage(response.responseText, true);
                 }
             });
