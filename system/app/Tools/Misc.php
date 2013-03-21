@@ -309,6 +309,7 @@ class Tools_Misc {
         $result = curl_exec($ch);
         curl_close($ch);
         $result = explode('"', $result);
-        return number_format(floatval($result['3']),2);
+	    $price = preg_replace('/[^\.\d\s]/', '', $result['3']);
+	    return number_format(floatval($price), 2);
     }
 }

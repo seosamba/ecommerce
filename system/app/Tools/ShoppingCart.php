@@ -6,6 +6,21 @@
  */
 class Tools_ShoppingCart {
 
+	/**
+	 * @deprecated
+	 */
+	const ZONETYPE_ZIP          = 'zip';
+
+	/**
+	 * @deprecated
+	 */
+	const ZONETYPE_STATE        = 'state';
+
+	/**
+	 * @deprecated
+	 */
+	const ZONETYPE_COUNTRY      = 'country';
+
     protected static $_instance = null;
 
 	protected $_content         = array();
@@ -215,13 +230,14 @@ class Tools_ShoppingCart {
 	}
 
 	private function _calculateItemPrice(Models_Model_Product $item, $modifiers) {
-		$price = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+		$originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+		$price = $originalPrice;
 		if(!empty($modifiers)) {
 			foreach($modifiers as $modifier) {
 				if (!is_array($modifier) || empty($modifier)){
 					continue;
 				}
-				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($item->getPrice() / 100) * $modifier['priceValue']);
+				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
 				$price    = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
             }
 		}
@@ -229,14 +245,15 @@ class Tools_ShoppingCart {
 	}
     
     private function _calculateItemPriceWithTax(Models_Model_Product $item, $modifiers) {
-		$price = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+	    $originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+	    $price = $originalPrice;
         $taxRate = Tools_Tax_Tax::calculateProductTax($item, null, true);
         if(!empty($modifiers)) {
 			foreach($modifiers as $modifier) {
 				if ($taxRate){
-			        $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(( $taxRate * $modifier['priceValue']) / 100, 2) : ($item->getPrice() / 100) * $modifier['priceValue']);
+			        $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(( $taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue']);
 		        }else{
-		            $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($item->getPrice() / 100) * $modifier['priceValue']);
+		            $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
                 }
 				$price    = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
             }
