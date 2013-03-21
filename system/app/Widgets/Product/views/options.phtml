@@ -1,5 +1,5 @@
 <div class="product-options-listing" data-productId="<?php echo  $this->product->getId();?>">
-<?php $productPrice = $this->product->getPrice();?>
+<?php $productPrice = is_null($this->product->getCurrentPrice()) ? $this->product->getPrice() : $this->product->getCurrentPrice(); ?>
 <?php $showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');?>
 <?php if ((bool)$showWithTax):?>
     <?php $productPrice += Tools_Tax_Tax::calculateProductTax($this->product);?>

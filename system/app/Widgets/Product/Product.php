@@ -9,6 +9,12 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     const TYPE_PRODUCTLISTING = 'productlisting';
 
+	const PRICE_MODE_NOCURRENCY = 'nocurrency';
+
+	const PRICE_MODE_LIFERELOAD = 'realtimeupdate';
+
+	const PRICE_MODE_CURRENCY   = 'currency';
+
 	/**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -156,36 +162,49 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPrice() {
-		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
-        $lifeReload = (strtolower(end($this->_options)) === 'realtimeupdate');
-        $currency   = (strtolower($this->_options[0]) === 'currency');
+		$noCurrency = array_search(self::PRICE_MODE_NOCURRENCY, $this->_options);
+		$lifeReload = array_search(self::PRICE_MODE_LIFERELOAD, $this->_options);
+        $currency   = array_search(self::PRICE_MODE_CURRENCY, $this->_options);
 
-		if ($noCurrency === true){
-			array_pop($this->_options);
+		if ($noCurrency !== false){
+			unset($this->_options[$noCurrency]);
+			$noCurrency = true;
 		}
-        if ($lifeReload === true){
-			array_pop($this->_options);
+        if ($lifeReload !== false){
+	        unset($this->_options[$lifeReload]);
+	        $lifeReload = true;
 		}
-        if ($currency === true){
-			if(!isset($this->_options[1]) && $this->_options[1] == ''){
+        if ($currency !== false){
+	        $currencyCode =  $currency + 1;
+			if(!isset($this->_options[$currency]) || empty($this->_options[$currency])){
                 return false;
             }
-            $newCurrency = strtoupper($this->_options[1]);
-            $this->_options = array();
+            $newCurrency = strtoupper($this->_options[$currencyCode]);
+	        unset($this->_options[$currency], $this->_options[$currencyCode], $currencyCode);
+            $currency = true;
         }
         
-		if (empty($this->_options)){
-			$price = $this->_product->getCurrentPrice() !== null ? $this->_product->getCurrentPrice() : $this->_product->getPrice();
-		} else {
+		if (!empty($this->_options)){
             $pluginName = strtolower($this->_options[0]);
 			if ($pluginName === 'original'){
-				$price = !$noCurrency ? $this->_currency->toCurrency($this->_product->getPrice()) : $this->_product->getPrice() ;
+				if (!is_null($this->_product->getCurrentPrice())){
+					$this->_product->setCurrentPrice(null);
+				}
 			} else {
-	            $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
-	            if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
-	                return Tools_Factory_PluginFactory::createPlugin($plugin->getName(), array('price', $this->_product->getId()), $this->_toasterOptions)->run();
-	            }
-				return false;
+				$plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
+			    if ($plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
+				    $price = Tools_Factory_PluginFactory::createPlugin($pluginName, array('price', $this->_product->getId()), $this->_toasterOptions)->run();
+				    if (is_numeric($price)){
+					    $price = floatval($price);
+					    $this->_product->setCurrentPrice($price);
+				    }
+				    unset($price);
+			    } else {
+				    if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)){
+					    throw new Exceptions_SeotoasterWidgetException('Plugin '.$pluginName. ' does not exists');
+				    }
+				    return false;
+			    }
 			}
         }
 
@@ -201,16 +220,22 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($this->_product, $itemDefaultOptionsArray);
         if($currency === true){
             if (null === ($changedPrice = $this->_cache->load('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_'))){
-                $cacheCurrencyTime = (24*60*60) + (strtotime(date('m/d/Y', time())) - strtotime("now"));
+                $cacheCurrencyTime = strtotime('tomorrow') - strtotime('now');
                 $changedPrice = Tools_Misc::getConvertedPriceByCurrency($price, $newCurrency);
                 $this->_cache->save('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
             }
-            return $changedPrice;
+            $price = $changedPrice;
+	        $noCurrency = true;     // disabling wrapping converted values
+	        $lifeReload = false;    // life reload is not allowed
         }
+
+		$price = !$noCurrency ? $this->_currency->toCurrency($price): $price;
+
         if($lifeReload){
-            return '<span class="price-lifereload-'.$this->_product->getId().'">'.$this->_currency->toCurrency($price).'</span>';
+            return '<span class="price-lifereload-'.$this->_product->getId().'">'.$price.'</span>';
         }
-		return !$noCurrency ? $this->_currency->toCurrency($price): $price;
+
+		return $price;
 	}
 	
 	private function _renderBrand() {
