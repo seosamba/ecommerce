@@ -3,16 +3,14 @@
     <h3 class="checkout-widget-title">
 	    <?php echo $this->translate('Enter coupon');?>
 	    <?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
-        <a href="<?php echo $this->websiteUrl . $this->returnUrl;?>?step=shipping" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+        <a href="<?php echo $this->websiteUrl . $this->returnUrl ;?>?step=signup" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
 	    <?php endif; ?>
     </h3>
     <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo trim($this->websiteUrl, '/').$_SERVER['REQUEST_URI']; ?>" method="post">
 	    <input type="text" name="code" required>
 	    <input type="submit" value="<?php echo $this->translate('Apply'); ?>">
 	</form>
-	<div class="coupon-msg">
-
-	</div>
+	<div class="coupon-msg"></div>
 </div>
 <script>
 $(function(){
