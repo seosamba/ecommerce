@@ -1,11 +1,9 @@
 define([
 	'backbone',
     '../collections/coupons',
-//    './coupon_row',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
             CouponsCollection
-            //, CouponRowView
             ){
 
     var CouponTableView = Backbone.View.extend({
@@ -30,22 +28,17 @@ define([
             this.coupons.pager();
         },
         renderCoupons: function(){
-//            var tbody = this.$el.find('tbody');
-//            tbody.html(coupons.size() ? '' : '<tr><td colspan="'+this.$el.find('thead th').size()+'">You don&#39;t have any coupon yet.</td></tr>');
             this.$el.fnClearTable();
             this.coupons.each(this.renderCoupon, this);
         },
         renderCoupon: function(coupon){
-//            var view = new CouponRowView({model: coupon});
-//            this.$el.find('tbody').append(view.render().$el);
-//            this.$el.fnDraw(true);
             this.$el.fnAddData([
                 coupon.get('id'),
                 coupon.get('type'),
                 coupon.get('code'),
                 coupon.get('startDate'),
                 coupon.get('endDate'),
-                !!coupon.get('allowCombination'),
+                coupon.get('allowCombination') === '1' ? 'yes' : 'no',
                 coupon.get('scope'),
                 coupon.get('action'),
                 '<a data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;">[x]</a>'

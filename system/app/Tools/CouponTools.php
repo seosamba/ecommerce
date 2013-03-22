@@ -71,7 +71,7 @@ class Tools_CouponTools {
 		//checking if we already have coupon that doesn't allow combination
 		if (count($currentCoupons) === 1){
 			$currentCoupon = reset($currentCoupons);
-			if ($coupon->getAllowCombination() === false){
+			if ((bool)$currentCoupon->getAllowCombination() === false){
 				return self::STATUS_FAIL_COMBINATION;
 			}
 			unset ($currentCoupon);
