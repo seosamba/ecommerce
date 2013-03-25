@@ -187,7 +187,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		if (!empty($this->_options)){
             $pluginName = strtolower($this->_options[0]);
 			if ($pluginName === 'original'){
-				if (!is_null($this->_product->getCurrentPrice())){
+				if (is_null($this->_product->getCurrentPrice())){
+					return null;
+				} else {
 					$this->_product->setCurrentPrice(null);
 				}
 			} else {
