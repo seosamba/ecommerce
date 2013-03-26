@@ -181,7 +181,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					}
 				}
 			}
-			$price = Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $itemDefaultOptionsArray);
+//			$price = Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $itemDefaultOptionsArray);
 
 
 			//setting up the entity parser
@@ -217,9 +217,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				foreach ($productPriceWidgets[1] as $key => $widgetData) {
 					$args = array_filter(explode(':', $widgetData));
 					array_unshift($args, 'price');
-					$widg = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
+					$priceWidget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
 					$key = trim($productPriceWidgets[0][$key], '{}');
-					$replacements[$key] = $widg->render();
+					$replacements[$key] = $priceWidget->render();
 				}
 				if (!empty($replacements)) {
 					$entityParser->addToDictionary($replacements);
