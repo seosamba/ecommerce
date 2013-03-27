@@ -1,16 +1,39 @@
-<div class="product-options-listing" data-productId="<?php echo  $this->product->getId();?>">
-<?php $productPrice = is_null($this->product->getCurrentPrice()) ? $this->product->getPrice() : $this->product->getCurrentPrice(); ?>
-<?php $showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');?>
-<?php if ((bool)$showWithTax):?>
-    <?php $productPrice += Tools_Tax_Tax::calculateProductTax($this->product);?>
-<?php endif;?>
-
+<div id="product-<?php echo $this->product->getId();?>-options-listing" class="product-options-listing" data-productId="<?php echo  $this->product->getId();?>" >
+<?php
+$showWithTax = (bool) Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');
+$originalPrice  = $this->product->getPrice();
+$currentPrice   = is_null($this->product->getCurrentPrice()) ? $this->product->getPrice() : $this->product->getCurrentPrice();
+if ($showWithTax){
+	$originalPrice += round(( $this->taxRate * floatval($originalPrice)) / 100, 2);
+	$currentPrice  += round(( $this->taxRate * floatval($currentPrice)) / 100, 2);
+}
+/**
+ * @var $cur Zend_Currency
+ */
+$cur = $this->currency()->getCurrency();
+$format = strtr($cur->toCurrency(0), array('0' => 'x', '.'=> '', ',' => '', $cur->getSymbol() => '%s' ));
+$format = preg_replace('/x+/', '%v', $format);
+$pricesData     = array(
+	'format'    => array(
+		'decimal' => preg_replace('/.*0([\.,])0.*/u', '$1', $cur->toCurrency(0) ),
+		'thousand' => preg_replace('/.*1(.?)000.*/u', '$1', $cur->toCurrency(1000)),
+		'symbol' => $cur->getSymbol(),
+		'format' => $format
+	),
+	'original'  => array(
+		'price' => $originalPrice
+	),
+	'current'   => array(
+		'price' => $currentPrice
+	)
+);
+unset($cur, $format);
+?>
 <?php foreach ($this->product->getDefaultOptions() as $option): ?>
     <?php $uniqName = 'product-'.$this->product->getId().'-option-'.$option['id']; ?>
     <?php
     if (($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) && !empty($option['selection'])){
         $options = array();
-        $optionPrices = array();
         $defaultId = null;
 	    $template = $option['type'] === Models_Model_Option::TYPE_RADIO ? ' <span>(%s%s)</span>' : ' (%s%s)';
         foreach ($option['selection'] as $item) {
@@ -22,13 +45,13 @@
 			            $price = $price + round(( $this->taxRate * $price) / 100, 2);
 		            }
 		            $item['priceValue'] = $this->currency($price);
-                    $optionPrices[$item['id']] = array('price'=>$price, 'modifier'=>$item['priceSign']);
+		            $pricesData['original'][$item['id']] = $item['priceSign'] . $price;
+                    $pricesData['current'][$item['id']] = $item['priceSign'] . $price;
 		            unset($price);
 	            } else {
 		            $item['priceValue'] .= '%';
-                    $price = round((floatval($productPrice) / 100) * $item['priceValue'], 2);
-                    $optionPrices[$item['id']] = array('price'=>$price, 'modifier'=>$item['priceSign']);
-                    unset($price);
+		            $pricesData['original'][$item['id']] = $item['priceSign'] . round($originalPrice / 100 * $item['priceValue'], 2);
+		            $pricesData['current'][$item['id']] = $item['priceSign'] . round($currentPrice / 100 * $item['priceValue'], 2);
 	            }
                 $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
             }
@@ -36,12 +59,8 @@
         }
     }
     ?>
-    <input type="hidden" id="product-option-original-price-<?php echo $this->product->getId();?>" name="product-option-original-price-<?php echo $this->product->getId();?>" value="<?php echo $productPrice;?>"/>
-    <input type="hidden" class="product-option-original-currency" name="product-option-original-currency" value="<?php echo preg_replace('/0\.00/','',$this->currency(0)); ?>"/>
+
     <div class="product-option option-<?php echo strtolower(preg_replace('/[^\w\d]/i', '', $option['title']));?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
-         <?php foreach($optionPrices as $optionId => $optionData):?>
-            <input type="hidden" name="product-option-calculated-price-<?php echo $optionId;?>" value="<?php echo number_format($optionData['price'], 2, '.', '');?>" data-modifier="<?php echo $optionData['modifier'];?>"/>
-         <?php endforeach;?>
         <label for="<?php echo $uniqName; ?>" ><?php echo $option['title'];?></label>
         <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
         <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
@@ -50,7 +69,7 @@
         <?php echo  $this->formRadio($uniqName, $defaultId, array('escape'=>false), $options, ''); ?>
         </div>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXT): ?>
-        <input type="text" name="<?php echo  $uniqName;?>" id="" />
+        <input type="text" name="<?php echo  $uniqName;?>" />
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_DATE): ?>
 		    <div>
 				<input type="date" name="<?php echo  $uniqName;?>" onmouseover="if (window.jQuery && jQuery.ui) $(this).datepicker() ;" />
@@ -63,3 +82,11 @@
     </div>
 <?php endforeach; ?>
 </div>
+
+<?php if (!empty($pricesData)):?>
+<script type="text/javascript">
+	$(function(){
+		$('#product-<?php echo $this->product->getId();?>-options-listing').data('prices', <?php echo json_encode($pricesData);?>);
+	})
+</script>
+<?php endif; ?>

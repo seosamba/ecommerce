@@ -173,6 +173,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         if ($lifeReload !== false){
 	        unset($this->_options[$lifeReload]);
 	        $lifeReload = true;
+	        $lifeReloadClass = array();
 		}
         if ($currency !== false){
 	        $currencyCode =  $currency + 1;
@@ -187,7 +188,12 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		if (!empty($this->_options)){
             $pluginName = strtolower($this->_options[0]);
 			if ($pluginName === 'original'){
-				if (!is_null($this->_product->getCurrentPrice())){
+				if (is_null($this->_product->getCurrentPrice())){
+					return null;
+				} else {
+					if ($lifeReload){
+						array_push($lifeReloadClass, 'original-price');
+					}
 					$this->_product->setCurrentPrice(null);
 				}
 			} else {
@@ -232,7 +238,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		$price = !$noCurrency ? $this->_currency->toCurrency($price): $price;
 
         if($lifeReload){
-            return '<span class="price-lifereload-'.$this->_product->getId().'">'.$price.'</span>';
+	        $lifeReloadClass = implode(' ', $lifeReloadClass);
+            return '<span class="price-lifereload-'.$this->_product->getId().' '.$lifeReloadClass.'">'.$price.'</span>';
         }
 
 		return $price;

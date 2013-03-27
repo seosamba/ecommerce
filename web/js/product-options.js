@@ -1,53 +1,33 @@
-$(function() {
-    $(document).on('change', '.product-options-listing select', function() {
-        var optionId         = $(this).find('option:selected').val();
-        var productId        = $(this).closest('.product-options-listing').attr('data-productid');
-        calculateOptionPrice(optionId, productId);
-      
-    });
-    
-    $(document).on('click', '.product-options-listing input[type="radio"]', function() {
-        var optionId         = $(this).find('option:selected').val();
-        var productId        = $(this).closest('.product-options-listing').attr('data-productid');
-        calculateOptionPrice(optionId, productId);
-    });
-    
-    function calculateOptionPrice(optionId, productId){
-        var productBasePrice = parseFloat($('#product-option-original-price-'+productId).val());
-        var productOptionsSelect = $('div[data-productid=' + productId + '] *').find('option:selected');
-        var productOptionsRadio  = $('div[data-productid=' + productId + '] *').find('input[type="radio"]:checked');
-        $('div[data-productid=' + productId + '] *').find('option:selected').each(function(){
-            if($('input[name=product-option-calculated-price-'+$(this).val()+']').length>0){
-                var optionPriceValue = $('input[name=product-option-calculated-price-'+$(this).val()+']').val();
-                var optionPriceModifier = $('input[name=product-option-calculated-price-'+$(this).val()+']').attr('data-modifier');
-                if(optionPriceModifier == '-'){
-                    productBasePrice -= parseFloat(optionPriceValue);
-                }
-                if(optionPriceModifier == '+'){
-                    productBasePrice += parseFloat(optionPriceValue);
-                }
-            }
-        });
-        $('div[data-productid=' + productId + '] *').find('input[type="radio"]:checked').each(function(){
-            if($('input[name=product-option-calculated-price-'+$(this).val()+']').length>0){
-                var optionPriceValue = $('input[name=product-option-calculated-price-'+$(this).val()+']').val();
-                var optionPriceModifier = $('input[name=product-option-calculated-price-'+$(this).val()+']').attr('data-modifier');
-                if(optionPriceModifier == '-'){
-                    productBasePrice -= parseFloat(optionPriceValue);
-                }
-                if(optionPriceModifier == '+'){
-                    productBasePrice += parseFloat(optionPriceValue);
-                }
-            }
-            
-        });
-        if($('.product-option-original-currency').length>0){
-            var currency = $('.product-option-original-currency').val();
-        }
-        if($('.price-lifereload-'+productId).length>0){
-           var precision = (productBasePrice).toFixed(2);
-           $('.price-lifereload-'+productId).text(currency+precision);
-        }
-       
+$(function () {
+    if (!window.accounting) {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';// script.async = true;
+        script.src = $('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js';
+        var scr = document.getElementsByTagName('script')[0];
+        scr.parentNode.insertBefore(script, scr);
     }
+
+    $(document).on('change', '.product-options-listing select, .product-options-listing input[type="radio"]', function () {
+        var productId = $(this).closest('.product-options-listing').data('productid');
+
+        var prices = $(this).closest('.product-options-listing').data('prices');
+        if (prices) {
+            var newOriginalPrice = prices.original.price,
+                newCurrentPrice = prices.current.price;
+
+            $('div.product-options-listing[data-productid=' + productId + '] *').find('option:selected, input[type="radio"]:checked').each(function () {
+                var index = $(this).val();
+                if (prices.original.hasOwnProperty(index)) {
+                    newOriginalPrice += prices.original[index];
+                    newCurrentPrice += prices.current[index];
+                }
+            });
+
+            newOriginalPrice = eval(newOriginalPrice);
+            newCurrentPrice = eval(newCurrentPrice);
+            console.log(prices.format);
+            $('.price-lifereload-' + productId + '.original-price').text(accounting.formatMoney(newOriginalPrice, prices.format));
+            $('.price-lifereload-' + productId + ':not(.original-price)').text(accounting.formatMoney(newCurrentPrice, prices.format));
+        }
+    });
 });
