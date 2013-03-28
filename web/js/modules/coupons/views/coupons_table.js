@@ -34,7 +34,7 @@ define([
         renderCoupon: function(coupon){
             this.$el.fnAddData([
                 coupon.get('id'),
-                coupon.get('type'),
+                (coupon.get('type') === 'freeshipping' ? 'free shipping' : coupon.get('type') ),
                 coupon.get('code'),
                 coupon.get('startDate'),
                 coupon.get('endDate'),
