@@ -86,7 +86,7 @@ unset($cur, $format);
 <?php if (!empty($pricesData)):?>
 <script type="text/javascript">
 	$(function(){
-		$('#product-<?php echo $this->product->getId();?>-options-listing').data('prices', <?php echo json_encode($pricesData);?>);
+		$('.product-options-listing[data-productId="<?php echo  $this->product->getId();?>"]').data('prices', <?php echo json_encode($pricesData);?>);
 	})
 </script>
 <?php endif; ?>

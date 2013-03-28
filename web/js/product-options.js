@@ -8,14 +8,15 @@ $(function () {
     }
 
     $(document).on('change', '.product-options-listing select, .product-options-listing input[type="radio"]', function () {
-        var productId = $(this).closest('.product-options-listing').data('productid');
+        var $container = $(this).closest('.product-options-listing'),
+            productId = $container.data('productid');
 
         var prices = $(this).closest('.product-options-listing').data('prices');
         if (prices) {
             var newOriginalPrice = prices.original.price,
                 newCurrentPrice = prices.current.price;
 
-            $('div.product-options-listing[data-productid=' + productId + '] *').find('option:selected, input[type="radio"]:checked').each(function () {
+            $container.find('option:selected, input[type="radio"]:checked').each(function () {
                 var index = $(this).val();
                 if (prices.original.hasOwnProperty(index)) {
                     newOriginalPrice += prices.original[index];
@@ -25,9 +26,11 @@ $(function () {
 
             newOriginalPrice = eval(newOriginalPrice);
             newCurrentPrice = eval(newCurrentPrice);
-            console.log(prices.format);
-            $('.price-lifereload-' + productId + '.original-price').text(accounting.formatMoney(newOriginalPrice, prices.format));
-            $('.price-lifereload-' + productId + ':not(.original-price)').text(accounting.formatMoney(newCurrentPrice, prices.format));
+
+            var $contextProductList = $(this).closest('.product-list').size() ? $(this).closest('.product-list') : 'body';
+
+            $('.price-lifereload-' + productId + '.original-price', $contextProductList).text(accounting.formatMoney(newOriginalPrice, prices.format));
+            $('.price-lifereload-' + productId + ':not(.original-price)', $contextProductList).text(accounting.formatMoney(newCurrentPrice, prices.format));
         }
     });
 });

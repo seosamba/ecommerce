@@ -41,6 +41,16 @@ class Widgets_Product_Product extends Widgets_Abstract {
      */
     private $_currency = null;
 
+	protected function _init(){
+		parent::_init();
+
+		if (in_array('options', $this->_options)){
+			$layout = Zend_Layout::getMvcInstance();
+			$websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
+			$layout->getView()->headScript()->appendFile($websiteUrl.'plugins/shopping/web/js/product-options.js');
+		}
+	}
+
 	protected function _load(){
 		if (empty($this->_options)){
 			throw new Exceptions_SeotoasterWidgetException('No options provided');

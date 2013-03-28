@@ -73,6 +73,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		if ($this->_productTemplate === null) {
 			throw new Exceptions_SeotoasterWidgetException('Product template doesn\'t exist');
 		}
+		$layout = Zend_Layout::getMvcInstance();
+		$layout->getView()->headScript()->appendFile(Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl()
+				.'plugins/shopping/web/js/product-options.js');
 	}
 
 	public function _load() {
