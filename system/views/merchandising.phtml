@@ -12,8 +12,8 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
         <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
 	</ul>
 	<div id="coupons">
-		<p><?php echo $this->translate('Set parameters for promotional coupons applicable to the entire cart from this screen.');?></p>
-		<p><?php echo $this->translate('Product specific coupons can be found under the "add/edit product" screen. Set cart level coupons from this screen');?></p>
+		<p style="text-align: center;"><?php echo $this->translate('Set parameters for promotional coupons applicable to the entire cart from this screen.');?></p>
+		<p style="text-align: center;"><?php echo $this->translate('Product specific coupons can be found under the "add/edit product" screen.');?></p>
 		<br>
 		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	</div>
