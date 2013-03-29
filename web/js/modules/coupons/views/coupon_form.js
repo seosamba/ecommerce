@@ -24,7 +24,7 @@ define([
             $('#startDate').datepicker({
                 showOtherMonths: true,
                 selectOtherMonths: false,
-                dateFormat: 'yy-M-dd',
+                dateFormat: 'dd-M-yy',
                 onClose: function(selectedDate){
                     $('#endDate').datepicker("option", "minDate", selectedDate);
                 }
@@ -32,7 +32,7 @@ define([
             $('#endDate').datepicker({
                 showOtherMonths: true,
                 selectOtherMonths: false,
-                dateFormat: 'yy-M-dd',
+                dateFormat: 'dd-M-yy',
                 onClose: function(selectedDate){
                     $('#startDate').datepicker("option", "maxDate", selectedDate);
                 }

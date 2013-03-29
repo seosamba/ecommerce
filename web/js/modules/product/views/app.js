@@ -92,7 +92,7 @@ define([
             this.render()
 
             this.couponForm = new CouponFormView();
-            this.couponGrid = new CouponGridView();
+            this.couponGrid = new CouponGridView({hideProductColumn: true});
             this.couponForm.$el.on('coupon:created', _.bind(this.couponGrid.render, this.couponGrid));
             this.couponForm.render();
 		},

@@ -1,4 +1,9 @@
 <style type="text/css">
+#edit-coupon {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	position: relative;
+}
 #edit-coupon label{
 	display: inline-block;
 }
@@ -13,22 +18,27 @@
 	margin: 0 5px;
 	vertical-align: middle;
 }
-#merchandising .input-auto {
+#edit-coupon input.blue-btn[type=submit]{
+	position: absolute;
+	bottom: 5px;
+	right: 10px;
+}
+#edit-coupon .input-auto {
 	width: auto;
 }
-#merchandising .input-micro {
+#edit-coupon .input-micro {
 	width: 40px;
 }
-#merchandising .input-mini {
+#edit-coupon .input-mini {
     width: 60px;
 }
-#merchandising .input-normal {
+#edit-coupon .input-normal {
     width: 80px;
 }
-#merchandising .input-medium {
+#edit-coupon .input-medium {
 	width: 100px;
 }
-#merchandising .input-large {
+#edit-coupon .input-large {
 	width: 140px;
 }
 
@@ -41,7 +51,7 @@
 	padding-left: 10px;
 }
 </style>
-<form id="edit-coupon" class="clearfix">
+<form id="edit-coupon" class="grid_12 clearfix">
 	<?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
 
 	<div class="clearfix grid_4">
@@ -65,14 +75,14 @@
 
 	<div class="grid_4">
         <label><?php echo $this->translate('From');?></label>
-		<?php echo $this->formText('startDate', date('Y-M-d'), array(
+		<?php echo $this->formText('startDate', date('d-M-Y'), array(
 			'class' => 'datepicker',
 			'style' => 'width: 90px'
 		)); ?>
 <!--			</div>-->
 <!--			<div class="grid_3">-->
         <label><?php echo $this->translate('to');?></label>
-		<?php echo $this->formText('endDate', date('Y-M-d', strtotime('+1 month')), array(
+		<?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
 			'class' => 'datepicker',
 			'style' => 'width: 90px'
 		)); ?>
@@ -102,13 +112,10 @@
 
 	</div>
 
-	<div class="grid_12 textright mb5px">
-		<input class="blue-btn" type="submit" value="<?php echo $this->translate('Create'); ?>"/>
-	</div>
+	<input class="blue-btn" type="submit" value="<?php echo $this->translate('Create'); ?>"/>
 </form>
 
-<div class="toaster-widget h230 mb5px">
-<!--	<div class="mt10px clearfix"></div>-->
+<div class="toaster-widget h230 mt5px grid_12">
     <table id="coupon-table" style="width: 100%;" class="widget">
         <thead>
         <tr>
@@ -119,6 +126,7 @@
             <th><?php echo $this->translate('End date');?></th>
             <th><?php echo $this->translate('Combinable?');?></th>
             <th><?php echo $this->translate('Use scope');?></th>
+            <th><?php echo $this->translate('Products');?></th>
             <th><?php echo $this->translate('Action');?></th>
             <th>&nbsp;</th>
         </tr>

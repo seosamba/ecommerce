@@ -20,7 +20,7 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 
 	protected $_code;
 
-//	protected $_productId;
+	protected $_products;
 
 	protected $_startDate;
 
@@ -63,15 +63,6 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 		return $this->_endDate;
 	}
 
-	public function setProductId($productId) {
-		$this->_productId = $productId;
-		return $this;
-	}
-
-	public function getProductId() {
-		return $this->_productId;
-	}
-
 	public function setStartDate($startDate) {
 		$this->_startDate = $startDate;
 		return $this;
@@ -98,6 +89,16 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 	public function getScope() {
 		return $this->_scope;
 	}
+
+	public function setProducts($products) {
+		$this->_products = $products;
+		return $this;
+	}
+
+	public function getProducts() {
+		return $this->_products;
+	}
+
 
 	public function __call($name, $arguments) {
 		$prefix     = strtolower(substr($name, 0, 3));

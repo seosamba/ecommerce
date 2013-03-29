@@ -26,6 +26,9 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 		if (isset($data['action'])){
 			unset($data['action']);
 		}
+		if (isset($data['products'])){
+			unset($data['products']);
+		}
 
 		if ($model->getId()){
 			$this->getDbTable()->update($data, array('id = ?', $model->getId()));
