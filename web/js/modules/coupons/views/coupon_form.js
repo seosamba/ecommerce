@@ -37,22 +37,13 @@ define([
                     $('#startDate').datepicker("option", "maxDate", selectedDate);
                 }
             });
-            //disabling use scope by default
-            $('#scope').attr('disabled', 'disabled');
         },
         render: function(){
             var couponActionTmpl = '',
                 couponType       = $('#coupon-type').val();
 
             couponActionTmpl = _.template($('#actionDiscountFreeshippingTmpl').html(), {type: couponType});
-            switch (couponType){
-                case 'freeshipping':
-                    $('#scope option[value="order"]').attr('disabled', 'disabled');
-                    break;
-                default:
-                    $('#scope option[value="order"]').removeAttr('disabled');
-                    break;
-            }
+
             $('#coupon-action').html(couponActionTmpl);
 
             return this;

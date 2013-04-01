@@ -91,21 +91,19 @@
 	<div class="grid_12 mt5px clearfix"></div>
 
     <div class="grid_5">
-		<label class="mt5px">
+		<label>
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
         </label>
     </div>
 	<div class="grid_6">
 		<label>
-            <input type="checkbox" id="enable-coupon-limit">
-			<?php echo $this->translate('One use per');?></label>
-            <input type="hidden" name="scope" value="">
-			<?php
-			echo $this->formSelect('scope', null, null, array(
-				Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT   => $this->translate('client'),
-				Store_Model_Coupon::DISCOUNT_SCOPE_ORDER    => $this->translate('order')
-			) ); ?>
+			<?php echo $this->formCheckbox('scope', 'client', null, array(
+			    'checked' => 'client',
+			    'unChecked' => ''
+			)); ?>
+			<?php echo $this->translate('One use per client');?>
+		</label>
     </div>
 
 	<div class="grid_12 mt5px clearfix" id="coupon-action">
