@@ -49,9 +49,9 @@ unset($cur, $format);
                     $pricesData['current'][$item['id']] = $item['priceSign'] . $price;
 		            unset($price);
 	            } else {
-		            $item['priceValue'] .= '%';
 		            $pricesData['original'][$item['id']] = $item['priceSign'] . round($originalPrice / 100 * $item['priceValue'], 2);
 		            $pricesData['current'][$item['id']] = $item['priceSign'] . round($currentPrice / 100 * $item['priceValue'], 2);
+		            $item['priceValue'] = number_format($item['priceValue'], 2).'%';
 	            }
                 $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
             }
