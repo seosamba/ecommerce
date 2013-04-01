@@ -72,10 +72,6 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		));
 
 		// setting required fields
-		// @deprecated
-//		$this->getElement('lastname')->setRequired(true);
-//		$this->getElement('email')->setRequired(true)->setValidators(array($emailValidator));
-//		$this->getElement('zip')->setRequired(true);
 		$this->getElement('email')->setValidators(array($emailValidator));
 
 		$this->addDisplayGroups(array(
@@ -140,6 +136,11 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		));
 	}
 
+	/**
+	 * Reset form required fields
+	 * @param $fields array List of required fields names
+	 * @return $this
+	 */
 	public function resetRequiredFields($fields) {
 		if (empty($fields)) return $this;
 
