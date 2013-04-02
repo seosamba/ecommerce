@@ -776,6 +776,15 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->currency = $this->_configMapper->getConfigParam('currency');
 			$this->_view->couponTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
 
+			$this->_view->plugins = array();
+            foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin){
+	            $tags = $plugin->getTags();
+                if (!empty($tags) && in_array('merchandising', $tags)) {
+                    array_push($this->_view->plugins, $plugin->getName());
+                }
+	            unset($tags);
+            }
+
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}

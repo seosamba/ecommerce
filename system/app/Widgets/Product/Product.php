@@ -172,6 +172,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPrice() {
+		array_push($this->_cacheTags, 'product_price');
+
 		$noCurrency = array_search(self::PRICE_MODE_NOCURRENCY, $this->_options);
 		$lifeReload = array_search(self::PRICE_MODE_LIFERELOAD, $this->_options);
         $currency   = array_search(self::PRICE_MODE_CURRENCY, $this->_options);
@@ -213,6 +215,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 				    if (is_numeric($price)){
 					    $price = floatval($price);
 					    $this->_product->setCurrentPrice($price);
+				    } else {
+					    return null;
 				    }
 				    unset($price);
 			    } else {

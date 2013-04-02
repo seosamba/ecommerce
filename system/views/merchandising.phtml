@@ -5,11 +5,24 @@ $this->placeholder('headerContent')->set('Merchandising');
 $this->headLink()->appendStylesheet($this->websiteUrl.'system/css/reset-widgets.css');
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
-
+<style>
+#merchandising .ui-tabs-panel {
+	overflow: hidden;
+}
+</style>
 
 <div id="merchandising" class="grid_12 mb10px h470">
     <ul>
         <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
+	    <?php if (isset($this->plugins) && !empty($this->plugins)):?>
+			    <?php foreach ($this->plugins as $plugin) :?>
+			    <?php
+	            $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+	            $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+	            ?>
+	    <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
+				<?php endforeach; ?>
+		    <?php endif; ?>
 	</ul>
 	<div id="coupons" class="h430 clearfix" style="padding: 5px">
 		<p style="text-align: center;"><?php echo $this->translate('Set parameters for promotional coupons applicable to the entire cart from this screen.');?></p>
