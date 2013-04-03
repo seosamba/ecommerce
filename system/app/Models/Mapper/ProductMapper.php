@@ -481,4 +481,14 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$result = $this->getDbTable()->getAdapter()->fetchAll($select);
 		return $result;
 	}
+
+    public function countProductsWithoutWeight(){
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array('count' => 'COUNT(id)'))
+            ->where('weight = 0 OR weight IS NULL');
+        $result = $this->getDbTable()->getAdapter()->fetchAll($select);
+        return $result[0]['count'];
+    }
+
 }
