@@ -75,7 +75,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			}
 			return $order;
 		} else {
-			$filter = $this->_request->getParam('filter');
+			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
 			$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
 			$sortOrder = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
@@ -95,18 +95,20 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			}
 
 			if (is_array($filter)){
-				if($filter['country'] == 'AA'){
-                     $filter['country'] = 0;
-                }
-                if($filter['state'] == 'null'){
-                    $filter['state'] = 0;
-                }
-                if($filter['date-from'] != ''){
-                    $filter['date-from'] = date("Y-m-d", strtotime($filter['date-from']));
-                }
-                if($filter['date-to'] != ''){  
-                    $filter['date-to']   = date("Y-m-d", strtotime($filter['date-to']));
-                }
+				if (isset($filter['country'])) {
+					if (!preg_match('/[A-Z]{2}/', $filter['country'])) {
+	                     unset($filter['country']);
+	                }
+				}
+				if (isset($filter['state']) && $filter['state'] === '0') {
+					unset($filter['state']);
+				}
+				if (isset($filter['date-from']) && !empty($filter['date-from'])) {
+					$filter['date-from'] = date("Y-m-d", strtotime($filter['date-from']));
+				}
+				if (isset($filter['date-to']) && !empty($filter['date-to'])) {
+					$filter['date-to'] = date("Y-m-d", strtotime($filter['date-to']));
+				}
                 $filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
 				$filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
 				return $orderMapper->fetchAll($filter, $sortOrder, $limit, $offset);
