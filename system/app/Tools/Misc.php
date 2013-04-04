@@ -23,6 +23,8 @@ class Tools_Misc {
     const SECTION_STORE_ADDEDITPRODUCT  = 'addproduct';
     
     const SECTION_STORE_BRANDLOGOS      = 'brandlogos';
+
+	const SECTION_STORE_MERCHANDISING   = 'merchandising';
     
     /*
      * Changes for name inc. Tax 
@@ -42,8 +44,8 @@ class Tools_Misc {
         self::SECTION_STORE_CONFIG          => 'setup-online-shopping-cart.html',
         self::SECTION_STORE_SHIPPINGCONFIG  => 'shopping-cart-shipping-calculator.html',
         self::SECTION_STORE_ADDEDITPRODUCT  => 'how-to-add-or-edit-a-product-to-your-store.html',
-        self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html'
-       
+        self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html',
+		self::SECTION_STORE_MERCHANDISING   => 'ecommerce-marketing.html'
     );
     
     /**

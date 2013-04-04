@@ -785,6 +785,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	            unset($tags);
             }
 
+			$this->_layout->sectionId = Tools_Misc::SECTION_STORE_MERCHANDISING;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}
