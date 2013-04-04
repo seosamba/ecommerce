@@ -17,6 +17,12 @@ class Api_Store_Geo extends Api_Service_Abstract {
 		),
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get')
+		),
+		Shopping::ROLE_SALESPERSON => array(
+			'allow' => array('get')
 		)
 	);
 
