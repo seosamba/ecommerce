@@ -1,10 +1,17 @@
 $(function () {
     if (!window.accounting) {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';// script.async = true;
-        script.src = $('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js';
-        var scr = document.getElementsByTagName('script')[0];
-        scr.parentNode.insertBefore(script, scr);
+        //if we have require.js loaded on page then we use it
+        if (typeof define === 'function' && define.amd) {
+            require([$('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js'], function (a) {
+                window.accounting = a;
+            });
+        } else { //otherwise we load accounting.js in old-school manner
+            var script = document.createElement('script');
+            script.type = 'text/javascript';// script.async = true;
+            script.src = $('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js';
+            var scr = document.getElementsByTagName('script')[0];
+            scr.parentNode.insertBefore(script, scr);
+        }
     }
 
     $(document).on('change', '.product-options-listing select, .product-options-listing input[type="radio"]', function () {
