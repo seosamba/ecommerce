@@ -3,9 +3,9 @@
  * Product Tags REST API controller
  *
  * @package Store
- * @since 2.0.0
+ * @since   2.0.0
  *
- * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ * @author  Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Api_Store_Tags extends Api_Service_Abstract {
 
@@ -14,6 +14,9 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Tools_Security_Acl::ROLE_ADMIN      => array(
 			'allow' => array('get', 'post', 'put', 'delete')
 		)
 	);
@@ -50,26 +53,32 @@ class Api_Store_Tags extends Api_Service_Abstract {
 
 		if ($id) {
 			$data = Models_Mapper_Tag::getInstance()->find($id);
-			if ($data instanceof Models_Model_Tag){
+			if ($data instanceof Models_Model_Tag) {
 				return $data->toArray();
-			} elseif (is_array($data) && !empty($data)){
-				return array_map(function($tag){ return $tag->toArray(); }, $data);
+			} elseif (is_array($data) && !empty($data)) {
+				return array_map(function ($tag) {
+					return $tag->toArray();
+				}, $data);
 			} else {
 
 			}
 		} else {
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
-			$limit  = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
-			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+			$limit = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
+			$count = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
 
 			$result = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit, $count);
-			if ($result){
-				if ($count && isset($result['data'])){
-					$result['data'] = array_map(function($tag){ return $tag->toArray(); }, $result['data']);
+			if ($result) {
+				if ($count && isset($result['data'])) {
+					$result['data'] = array_map(function ($tag) {
+						return $tag->toArray();
+					}, $result['data']);
 					return $result;
 				} else {
-					return array_map(function($tag){ return $tag->toArray(); }, $result);
+					return array_map(function ($tag) {
+						return $tag->toArray();
+					}, $result);
 				}
 			}
 		}
@@ -83,13 +92,13 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 */
 	public function postAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
-		if (!empty($rawData)){
+		if (!empty($rawData)) {
 			$rawData['name'] = ucfirst($rawData['name']);
 			$result = Models_Mapper_Tag::getInstance()->save($rawData);
 		} else {
 			$this->_error();
 		}
-		if ($result === null){
+		if ($result === null) {
 			$this->_error('This tag already exists', self::REST_STATUS_BAD_REQUEST);
 		} else {
 			return $result->toArray();
@@ -103,13 +112,13 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 */
 	public function putAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
-		if (!empty($rawData)){
+		if (!empty($rawData)) {
 			$rawData['name'] = ucfirst($rawData['name']);
 			$result = Models_Mapper_Tag::getInstance()->save($rawData);
 		} else {
 			$this->_error();
 		}
-		if ($result === null){
+		if ($result === null) {
 			$this->_error('This tag already exists', self::REST_STATUS_BAD_REQUEST);
 		} else {
 			return $result->toArray();
@@ -131,7 +140,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	 */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
-		if ($id !== false){
+		if ($id !== false) {
 			return Models_Mapper_Tag::getInstance()->delete($id);
 		} else {
 			$this->_error(null, self::REST_STATUS_NOT_FOUND);
