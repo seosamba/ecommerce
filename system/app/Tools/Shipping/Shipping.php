@@ -1,7 +1,7 @@
 <?php
 /**
  * iamne Eugene I. Nezhuta <eugene@seotoaster.com>
- *
+ * @deprecated
  */
 
 class Tools_Shipping_Shipping {
