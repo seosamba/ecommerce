@@ -191,7 +191,8 @@ class Tools_ShoppingCart {
 			    'taxPrice'         => $itemPrice + $itemTax,
 			    'taxClass'         => $item->getTaxClass(),
 			    'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
-			    'note'             => ''
+			    'note'             => '',
+                'freeShipping'     => $item->getFreeShipping()
 		    );
 	    }
 	    else {
@@ -340,15 +341,21 @@ class Tools_ShoppingCart {
 		return false;
 	}
 
-	public function calculateCartWeight() {
+	public function calculateCartWeight($withFreeShipping = false) {
 		$totalWeight = 0;
-		if(is_array($this->_content) && !empty($this->_content)) {
-			foreach($this->_content as $cartItem) {
-				$totalWeight += $cartItem['weight'] * $cartItem['qty'];
-			}
-		}
-		return $totalWeight;
-	}
+        if(is_array($this->_content) && !empty($this->_content)) {
+            foreach($this->_content as $cartItem) {
+                if(!$withFreeShipping){
+                    if($cartItem['freeShipping'] == 0){
+                        $totalWeight += $cartItem['weight'] * $cartItem['qty'];
+                    }
+                }else{
+                    $totalWeight += $cartItem['weight'] * $cartItem['qty'];
+                }
+            }
+        }
+        return $totalWeight;
+    }
 
 	public function calculateCartPrice() {
 		$totalPrice = 0;

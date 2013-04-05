@@ -595,13 +595,17 @@ $lastPageCaption = $this->translate('Last');
                 <label for="product-sku">SKU</label>
                 <input type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id');?>" />
             </div>
-            <div class="grid_3">
+            <div class="grid_2">
                 <label for="product-mpn">MPN</label>
                 <input type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber" />
             </div>
-            <div class="grid_3">
-                <label for="product-weight"><?php echo $this->translate("Weight (in %1\$s)", $this->generalConfig['weightUnit']); ?></label>
+            <div class="grid_2">
+                <label style="width:87px;" for="product-weight"><?php echo $this->translate("Weight (in %1\$s)", $this->generalConfig['weightUnit']); ?></label>
                 <input type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
+            </div>
+            <div class="grid_2">
+                <label style="text-align: center" for="free-shipping">Free Ship</label>
+                <input style="margin: 10px 40px;" id="free-shipping" type="checkbox" />
             </div>
             <div class="grid_8">
                 <label for="product-brand"><?php echo $this->translate('Brand');?></label>

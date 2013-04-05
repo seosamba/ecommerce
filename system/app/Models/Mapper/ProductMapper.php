@@ -71,7 +71,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'full_description'  => $model->getFullDescription(),
 			'price'             => $model->getPrice(),
 			'tax_class'         => $model->getTaxClass(),
-			'inventory'         => is_numeric($model->getInventory()) ? $model->getInventory() : null
+			'inventory'         => is_numeric($model->getInventory()) ? $model->getInventory() : null,
+            'free_shipping'     => $model->getFreeShipping()
 		);
 
 		if ($model->getId()){

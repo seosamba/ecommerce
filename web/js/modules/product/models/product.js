@@ -15,6 +15,7 @@ define([
                 shortDescription: '',
                 fullDescription: '',
                 enabled: 1,
+                freeShipping: 0,
                 taxClass: 1,
                 related: [],
                 photo: null,

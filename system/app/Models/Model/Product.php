@@ -53,6 +53,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
 	protected $_inventory;
 
+    protected $_freeShipping;
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -193,7 +195,15 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	public function setEnabled($_enabled) {
 		$this->_enabled = $_enabled;
 	}
-	
+
+    public function getFreeShipping() {
+        return $this->_freeShipping;
+    }
+
+    public function setFreeShipping($_freeShipping) {
+        $this->_freeShipping = $_freeShipping;
+    }
+
 	public function toArray() {
 		$vars = array();
 		$methods = get_class_methods($this);

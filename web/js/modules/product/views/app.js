@@ -27,6 +27,7 @@ define([
 			'click div.box': 'setProductImage',
 			'change :input[data-reflection]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
+            'change #free-shipping': 'toggleFreeShipping',
 			'click #product-tags-available div.tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
             'keypress input#new-brand': 'newBrand',
@@ -135,6 +136,9 @@ define([
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
 		},
+        toggleFreeShipping: function(e){
+            this.model.set({freeShipping: this.$('#free-shipping').prop('checked') ? 1 :0 });
+        },
 		newTag: function(e){
 			var name = $.trim(e.currentTarget.value);
 			if (e.keyCode == 13 && name !== '') {
@@ -252,6 +256,13 @@ define([
 			} else {
 				this.$('#product-enabled').removeAttr('checked');
 			}
+
+            //toggle free-shipping flag
+            if (parseInt(this.model.get('freeShipping'))){
+                this.$('#free-shipping').attr('checked', 'checked');
+            } else {
+                this.$('#free-shipping').removeAttr('checked');
+            }
 
 			if (this.model.has('pageTemplate')){
 				this.$('#product-pageTemplate').val(this.model.get('pageTemplate'));
