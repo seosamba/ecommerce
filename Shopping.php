@@ -738,7 +738,6 @@ class Shopping extends Tools_Plugins_Abstract {
                 $newCustomerId = $userMapper->save($userData);
                 $customer = Models_Mapper_CustomerMapper::getInstance()->find($cartSession->getUserId());
                 $customer->setPassword($newCustomerPassword);
-                //$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 				$customer->registerObserver(new Tools_Mail_Watchdog(array(
 					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
 				)));
@@ -823,6 +822,8 @@ class Shopping extends Tools_Plugins_Abstract {
 					if (Tools_CouponTools::processCoupons(Tools_ShoppingCart::getInstance()->getCoupons(), Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)){
 						$msg[] = $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.');
 					}
+				} else {
+					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
 				}
 			}
 
