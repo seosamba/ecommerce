@@ -270,59 +270,59 @@ class Tools_ShoppingCart {
 		if (($shipping = $this->getShippingData()) !== null){
 			$shippingPrice = floatval($shipping['price']);
 		}
+        if($recalculate) {
+            $summary = array(
+                'subTotal'  => 0,
+                'discount'  => 0,
+                'totalTax'  => 0,
+                'shipping'  => 0,
+                'total'     => 0,
+                'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
+            );
+            $this->_applySummary($summary);
 
-		if($recalculate === true && is_array($this->_content) && !empty($this->_content)) {
-			$summary = array(
-				'subTotal'  => 0,
-				'discount'  => 0,
-				'totalTax'  => 0,
-				'shipping'  => 0,
-				'total'     => 0,
-				'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
-			);
+            if(is_array($this->_content) && !empty($this->_content)) {
 
-			if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))){
-				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
-			}
-
-			foreach($this->_content as $storageKey => &$cartItem) {
-				if(isset($cartItem['sid'])) {
-                    $product = new Models_Model_Product(array(
-                        'price'     => $cartItem['price'],
-                        'taxClass'  => $cartItem['taxClass']
-                    ));
-
-                } else {
-                    $product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
-                    $product->setPrice($cartItem['price']);
+                if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))){
+                    $destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
                 }
 
-				$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
-				$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
-				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
-				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
-			}
-			$summary['shipping'] = $shippingPrice;
+                foreach($this->_content as $storageKey => &$cartItem) {
+                    if(isset($cartItem['sid'])) {
+                        $product = new Models_Model_Product(array(
+                            'price'     => $cartItem['price'],
+                            'taxClass'  => $cartItem['taxClass']
+                        ));
 
-			$summary['total'] = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
+                    } else {
+                        $product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
+                        $product->setPrice($cartItem['price']);
+                    }
 
-			foreach ($summary as $key => $value){
-				$methodName = 'set'.ucfirst($key);
-				if (method_exists($this, $methodName)){
-					$this->$methodName($value);
-				}
-			}
+                    $cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
+                    $cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
+                    $summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
+                    $summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
+                }
+                $summary['shipping'] = $shippingPrice;
 
-			//process discount coupons
-			$discountCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_DISCOUNT);
-			foreach ($discountCoupons as $coupon) {
-				$summary['discount'] +=  Tools_CouponTools::processDiscountCoupon($coupon);
-			}
-			$summary['total'] -= $summary['discount'];
+                $summary['total'] = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
 
-			$this->setDiscount($summary['discount'])
-				 ->setTotal($summary['total']);
-		}
+                $this->_applySummary($summary);
+
+                //process discount coupons
+                $discountCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_DISCOUNT);
+                foreach ($discountCoupons as $coupon) {
+                    $summary['discount'] +=  Tools_CouponTools::processDiscountCoupon($coupon);
+                }
+                $summary['total'] -= $summary['discount'];
+
+                $this->setDiscount($summary['discount'])
+                     ->setTotal($summary['total']);
+            } else {
+                return $summary;
+            }
+        }
 		return array(
 			'subTotal'  => $this->getSubTotal(),
 			'discount'  => $this->getDiscount(),
@@ -457,6 +457,18 @@ class Tools_ShoppingCart {
 //
 //		return $this;
 	}
+
+    private function _applySummary($summary) {
+        if(!is_array($summary) || empty($summary)) {
+            return false;
+        }
+        foreach ($summary as $key => $value){
+            $methodName = 'set'.ucfirst($key);
+            if (method_exists($this, $methodName)){
+                $this->$methodName($value);
+            }
+        }
+    }
 
     private function _save() {
 	    $reflection = new Zend_Reflection_Class(__CLASS__);
