@@ -267,22 +267,24 @@ class Tools_ShoppingCart {
 	}
 
 	public function calculate($recalculate = false) {
+
+        $summary = array(
+            'subTotal'        => 0,
+            'discount'        => 0,
+            'totalTax'        => 0,
+            'total'           => 0,
+            'shipping'        => 0,
+            'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
+        );
+
 		$shippingPrice = 0;
 		if (($shipping = $this->getShippingData()) !== null) {
 			$shippingPrice = floatval($shipping['price']);
 		}
 
 		if ($recalculate === true) {
-			$summary = array(
-				'subTotal'        => 0,
-				'discount'        => 0,
-				'totalTax'        => 0,
-				'shipping'        => 0,
-				'total'           => 0,
-				'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
-			);
 
-			if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))) {
+            if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))) {
 				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
 			}
 
@@ -307,8 +309,7 @@ class Tools_ShoppingCart {
 			}
 
 			$summary['shipping'] = $shippingPrice;
-
-			$summary['total'] = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
+			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
 
 			foreach ($summary as $key => $value) {
 				$methodName = 'set' . ucfirst($key);
@@ -332,8 +333,8 @@ class Tools_ShoppingCart {
 			'discount'        => $this->getDiscount(),
 			'totalTax'        => $this->getTotalTax(),
 			'total'           => $this->getTotal(),
-			'shipping'        => $shippingPrice,
-			'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
+			'shipping'        => $shippingPrice
+			//'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
 		);
 	}
 
@@ -437,31 +438,6 @@ class Tools_ShoppingCart {
 		}
 
 		return $this;
-
-//		if (isset($this->_session->cartContent)) {
-//			$this->setContent(unserialize($this->_session->cartContent));
-//		}
-//		if (isset($this->_session->cartId)) {
-//			$this->setCartId($this->_session->cartId);
-//		}
-//		if (isset($this->_session->customerId)) {
-//			$this->setCustomerId($this->_session->customerId);
-//		}
-//		if (isset($this->_session->shippingData)) {
-//			$this->setShippingData(unserialize($this->_session->shippingData));
-//		}
-//        if (isset($this->_session->notes)) {
-//			$this->setNotes($this->_session->notes);
-//		}
-//
-//		if (isset($this->_session->coupons)) {
-//			$this->setCoupons(unserialize($this->_session->coupons));
-//		}
-//
-//		$this->_shippingAddressKey  = $this->_session->shippingAddressKey;
-//		$this->_billingAddressKey   = $this->_session->billingAddressKey;
-//
-//		return $this;
 	}
 
 	private function _save() {
@@ -483,17 +459,6 @@ class Tools_ShoppingCart {
 		}
 
 		return $this;
-
-//        return $this;
-//
-//        $this->_session->_cartContent = serialize($this->getContent());
-//	    $this->_session->cartId      = $this->getCartId();
-//	    $this->_session->customerId  = $this->getCustomerId();
-//	    $this->_session->shippingAddressKey = $this->_shippingAddressKey;
-//	    $this->_session->billingAddressKey  = $this->_billingAddressKey;
-//	    $this->_session->shippingData  = serialize($this->getShippingData());
-//        $this->_session->notes      = $this->getNotes();
-//	    $this->_session->coupons     = serialize($this->getCoupons());
 	}
 
 	protected function _normalizeOptionsKey($key) {

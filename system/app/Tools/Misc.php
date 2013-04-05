@@ -238,6 +238,23 @@ class Tools_Misc {
         return $data;
     }
 
+    /**
+     * Get current format for the currency such as decimal separator, thousand separator, symbol and format
+     *
+     * @return array
+     */
+    public static function getCurrencyFormat() {
+        $currency = Zend_Registry::get('Zend_Currency');
+        $format   = strtr($currency->toCurrency(0), array('0' => 'x', '.'=> '', ',' => '', $currency->getSymbol() => '%s' ));
+        return array(
+            'decimal'   => preg_replace('/.*0([\.,])0.*/u', '$1', $currency->toCurrency(0) ),
+            'thousand'  => preg_replace('/.*1(.?)000.*/u', '$1', $currency->toCurrency(1000)),
+            'symbol'    => $currency->getSymbol(),
+            'format'    => preg_replace('/x+/', '%v', $format),
+            'precision' => 2
+        );
+    }
+
 	public static function clenupAddress($address) {
 		$_addressTmpl   = array(
 			'address_type'  => '',
