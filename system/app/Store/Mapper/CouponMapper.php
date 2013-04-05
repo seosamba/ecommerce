@@ -258,8 +258,32 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 	 * @return bool Result
 	 */
 	public function checkCouponByClientId($couponId, $clientId) {
-		$dbTable = new Zend_Db_Table('shopping_coupon_customer');
+		$select = $this->getDbTable()->getAdapter()->select()
+				->from(array('u' => 'shopping_coupon_usage'))
+				->join(array('c' => 'shopping_cart_session'), 'c.id = u.cart_id')
+				->where('c.user_id = ?', $clientId)
+				->where('c.status != ?', Models_Model_CartSession::CART_STATUS_NEW );
 
-		return (bool)$dbTable->find($couponId, $clientId)->count();
+		$results = $this->getDbTable()->getAdapter()->fetchAll($select);
+
+		return (bool)sizeof($results);
+	}
+
+	public function saveCouponsToCart(Tools_ShoppingCart $cart) {
+		$dbTable = new Zend_Db_Table('shopping_coupon_usage');
+		$coupons = $cart->getCoupons();
+
+		$dbTable->delete(array('cart_id' => $cart->getCartId()));
+		foreach ($coupons as $coupon) {
+			if ($coupon->getScope() === Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT ){
+				try {
+					$dbTable->insert(array('coupon_id' => $coupon->getId(), 'cart_id' => $cart->getCartId() ));
+				} catch (Exception $e) {
+					Tools_System_Tools::debugMode() && error_log($e->getMessage());
+				}
+			}
+		}
+
+		return true;
 	}
 }

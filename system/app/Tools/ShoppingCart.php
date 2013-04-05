@@ -529,6 +529,11 @@ class Tools_ShoppingCart {
 			$this->setCartId($cartSession->getId())->save();
 		}
 
+		//saving "one use per client" coupons to DB
+		if (sizeof($this->getCoupons())){
+			Store_Mapper_CouponMapper::getInstance()->saveCouponsToCart($this);
+		}
+
 		return $this;
 	}
 
