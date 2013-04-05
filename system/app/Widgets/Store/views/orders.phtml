@@ -21,7 +21,7 @@ echo $this->noLayout ? $this->headLink() : '';
 </style>
 <div id="store-orders" class="toaster-widget clearfix">
 	<div>
-		<form class="filters cl clearfix">
+		<form class="filters clearfix">
 			<div class="fl-left w600 mb10px">
 				<label class="mr5px fl-left wAuto bold">Search</label>
 				<div class="wrap fl-none wAuto">
@@ -31,7 +31,7 @@ echo $this->noLayout ? $this->headLink() : '';
 			</div>
 			<div id="extra-filters-switch" class="mt3px fl-right" style="cursor:pointer;">[ show/hide advanced filters ]</div>
             <div id="extra-filters" class="both">
-				<div class="ot">
+				<div class="grid_3">
 					<label class="block wGrid100 bold">By order amount</label>
 					<div class="oh">
                             <label class="mr5px fl-left wAuto">from</label>
@@ -42,7 +42,7 @@ echo $this->noLayout ? $this->headLink() : '';
                             <div class="wrap"><input class="wGrid90" type="text" name="filter-to-amount" ></div>
                     </div>
 				</div>
-				<div class="ot">
+				<div class="grid_3">
 					<label class="block wGrid100 bold">By date</label>
 					<div class="oh">
                         <label class="mr5px fl-left wAuto">from</label>
@@ -53,19 +53,37 @@ echo $this->noLayout ? $this->headLink() : '';
                         <div class="wrap"><input type="text" id="orders-filter-todate" name="filter-to-date" class="wGrid90"></div>
                     </div>
 				</div>
-				<div class="ot">
-					<label class="block wGrid100 bold mb3px">By shipping destination</label>
+	            <div class="grid_2">
+		            <label class="block wGrid100 bold mb10px">By order status</label>
+		            <?php echo $this->formSelect('filter-status', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => 'show all'
+                    ), array(
+                        '',
+                        Models_Model_CartSession::CART_STATUS_NEW => $this->translate(Models_Model_CartSession::CART_STATUS_NEW),
+                        Models_Model_CartSession::CART_STATUS_PENDING => $this->translate(Models_Model_CartSession::CART_STATUS_PENDING),
+                        Models_Model_CartSession::CART_STATUS_COMPLETED => $this->translate(Models_Model_CartSession::CART_STATUS_COMPLETED),
+                        Models_Model_CartSession::CART_STATUS_SHIPPED => $this->translate(Models_Model_CartSession::CART_STATUS_SHIPPED),
+                        Models_Model_CartSession::CART_STATUS_CANCELED => $this->translate(Models_Model_CartSession::CART_STATUS_CANCELED),
+                        Models_Model_CartSession::CART_STATUS_REFUNDED => $this->translate(Models_Model_CartSession::CART_STATUS_REFUNDED)
+                    )); ?>
+	            </div>
+				<div class="grid_4">
+					<label class="block wGrid100 bold mb10px">By shipping destination</label>
 					<?php
-                        $countryList = Tools_Geo::getCountries(true);
-                        $countryList = array_merge(array('AA'=>'shipping country'), $countryList);
-                    ?>
-					<?php echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => 'shipping country'), $countryList ); ?>
-					<?php echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => 'shipping state'), array('') ); ?>
-					<?php echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), $this->shippingServices ); ?>
+                    $countryList = Tools_Geo::getCountries(true);
+                    $countryList = array_merge(array('_' => ''), $countryList);
+					echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => 'shipping country'), $countryList );
+					echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => 'shipping state'), array('') );
+
+					$shippingServices = array_merge(array(''), $this->shippingServices);
+					echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), $shippingServices );
+					?>
 				</div>
 	            <div class="fl-right mb10px mrGrid1">
                     <input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="Apply filter" >
-                </div>
+		            <input type="button" class="blue-btn" name="filter-reset" id="orders-filter-reset-btn" value="Reset all filters" >
+	            </div>
 			</div>
 		</form>
 	</div>
@@ -111,7 +129,9 @@ echo $this->noLayout ? $this->headLink() : '';
 
 <script type="text/javascript">
 $(function(){
-	$('select.filter', '#store-orders').chosen();
+	$('select.filter', '#store-orders').chosen({
+		allow_single_deselect: true
+	});
 	var filterFromDate = $('#orders-filter-fromdate', '#store-orders'),
 		filterToDate = $('#orders-filter-todate', '#store-orders');
 	filterFromDate.datepicker({
@@ -135,7 +155,7 @@ $(function(){
         }
     });
 	$('#filter-state').on('addressChain:updated', function(){
-        $(this).trigger('liszt:updated');
+		$(this).prepend('<option value="0"></option>').trigger('liszt:updated');
 	})
 	$('#extra-filters').addressChain({
 		countrySelector: $('#filter-country'),

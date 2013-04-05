@@ -15,7 +15,8 @@ define(['backbone',
             'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
-            'click td.shipping-service .setTracking': 'changeTracking'
+            'click td.shipping-service .setTracking': 'changeTracking',
+            'click #orders-filter-reset-btn': 'resetFilter'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -27,6 +28,7 @@ define(['backbone',
                 'filter': function() {
                     return {
                         'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),
+                        'status': $('select[name=filter-status]', '#store-orders form.filters').val(),
                         'country': $('select[name=filter-country]', '#store-orders form.filters').val(),
                         'state': $('select[name=filter-state]', '#store-orders form.filters').val(),
                         'carrier': $('select[name=filter-carrier]', '#store-orders form.filters').val(),
@@ -56,6 +58,12 @@ define(['backbone',
         },
         applyFilter: function(){
             this.orders.pager();
+        },
+        resetFilter: function(e){
+            var $form = $(e.currentTarget).closest('form');
+            $form.find('input:text').val('').end()
+                 .find('select.filter').val('0').trigger('liszt:updated');
+            this.applyFilter();
         },
         navigate: function(e){
             e.preventDefault();
