@@ -348,6 +348,19 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		return $inventoryCount > 0 ? $inventoryCount : $this->_translator->translate('Out of stock');
 	}
 
+    private function _renderFreeShipping() {
+        $freeShippingInfo = '';
+        $freeShipping = $this->_product->getFreeShipping();
+        if($freeShipping == 1){
+            if(isset($this->_options[0])){
+                $freeShippingInfo = $this->_options[0];
+            }
+            return '<span class="product-free-shipping">'.$freeShippingInfo.'</span>';
+        }
+        return '';
+
+    }
+
     public static function getAllowedOptions() {
 		$translator = Zend_Registry::get('Zend_Translate');
 	    $allowedOptions = array();
