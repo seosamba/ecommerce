@@ -1,7 +1,7 @@
 <td class="order-id"><%= id %></td>
 <td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
 <td><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
-<td><%= created_at %></td>
+<td><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(created_at.replace(/\-/g, '/')))) %></td>
 <td class="status-change"><%= status %></td>
 <td><%= total_products %></td>
 <td><%= total %></td>
