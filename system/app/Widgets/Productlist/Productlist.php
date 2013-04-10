@@ -215,12 +215,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			));
 
 			// fetching $product:price widgets and rendering them via native widget
-			if (preg_match_all('~{\$product:price:?(.*)}~', $data['templateContent'], $productPriceWidgets)) {
+			if (preg_match_all('~{\$product:(price|freeshipping):?(.*)}~', $data['templateContent'], $productPriceWidgets)) {
 				$replacements = array();
-				foreach ($productPriceWidgets[1] as $key => $widgetData) {
+				foreach ($productPriceWidgets[2] as $key => $widgetData) {
 					$args = array_filter(explode(':', $widgetData));
-					array_unshift($args, 'price');
-					$priceWidget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
+					array_unshift($args, $productPriceWidgets[1][$key]);
+                   	$priceWidget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
 					$key = trim($productPriceWidgets[0][$key], '{}');
 					$replacements[$key] = $priceWidget->render();
 				}
@@ -230,6 +230,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				}
 			}
 
+            // fetching $product:freeShipping widgets and rendering them via native widget
+            //if (preg_match_all('~{\$product:freeShipping:?(.*)}~', $data['templateContent'], $freeShippingWidgets)) {
+                //$replacements = $this->_prepareReplacements($freeShippingWidgets, 'freeShipping', $product);
+                //if (!empty($replacements)) {
+                   // $entityParser->addToDictionary($replacements);
+                   // unset($replacements, $freeShippingWidgets);
+                //}
+           // }
 
 //            $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
 //            if (preg_match_all('~(\$product:price:currency:)([A-Z]{3})~', $data['templateContent'], $matches)){
