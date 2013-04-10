@@ -75,7 +75,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 		$layout = Zend_Layout::getMvcInstance();
 		$layout->getView()->headScript()->appendFile(Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl()
-				.'plugins/shopping/web/js/product-options.js');
+				. 'plugins/shopping/web/js/product-options.js');
 	}
 
 	public function _load() {
@@ -164,11 +164,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$photoUrlPart = $data['mediaPath'] . $productPhotoData[0];
 			$shortDesc = $product->getShortDescription();
 			$templatePrepend = '<!--pid="' . $product->getId() . '"-->';
-//            $price = (float)($product->getCurrentPrice() !== null?$product->getCurrentPrice():$product->getPrice());
-//            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-//            if ((bool)$shoppingConfig['showPriceIncTax']){
-//                $price += Tools_Tax_Tax::calculateProductTax($product);
-//            }
+
 			if (strpos($data['templateContent'], '$product:options') !== false) {
 				$view = new Zend_View(array('scriptPath' => dirname(__DIR__) . '/Product/views/'));
 				$view->taxRate = Tools_Tax_Tax::calculateProductTax($product, null, true);
@@ -184,8 +180,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					}
 				}
 			}
-//			$price = Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $itemDefaultOptionsArray);
-
 
 			//setting up the entity parser
 			$entityParser->addToDictionary(array(
@@ -197,9 +191,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				'$product:photourl:large'               => $photoUrlPart . '/large/' . $productPhotoData[1],
 				'$product:photourl:original'            => $photoUrlPart . '/original/' . $productPhotoData[1],
 				'$product:url'                          => $product->getPage() ? $product->getPage()->getUrl() : null,
-//                '$product:price'             => $currency->toCurrency($price),
-//                '$product:price:nocurrency'  => $price,
-//                '$product:price:realtimeupdate' => '<span class="price-lifereload-'.$product->getId().'">'.$currency->toCurrency($price).'</span>',
 				'$product:brand'                        => $product->getBrand(),
 				'$product:weight'                       => $product->getWeight(),
 				'$product:mpn'                          => $product->getMpn(),
@@ -214,13 +205,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				'$product:options'                      => isset($productOptionsView) ? $productOptionsView : ''
 			));
 
-			// fetching $product:price widgets and rendering them via native widget
-			if (preg_match_all('~{\$product:(price|freeshipping):?(.*)}~', $data['templateContent'], $productPriceWidgets)) {
+			// fetching $product:price and $product:freeshipping widgets and rendering them via native widget
+			if (preg_match_all('~{\$product:((?:price|freeshipping):?[^}]*)}~', $data['templateContent'], $productPriceWidgets)) {
 				$replacements = array();
-				foreach ($productPriceWidgets[2] as $key => $widgetData) {
+				foreach ($productPriceWidgets[1] as $key => $widgetData) {
 					$args = array_filter(explode(':', $widgetData));
-					array_unshift($args, $productPriceWidgets[1][$key]);
-                   	$priceWidget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
+					$priceWidget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
 					$key = trim($productPriceWidgets[0][$key], '{}');
 					$replacements[$key] = $priceWidget->render();
 				}
@@ -230,30 +220,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				}
 			}
 
-            // fetching $product:freeShipping widgets and rendering them via native widget
-            //if (preg_match_all('~{\$product:freeShipping:?(.*)}~', $data['templateContent'], $freeShippingWidgets)) {
-                //$replacements = $this->_prepareReplacements($freeShippingWidgets, 'freeShipping', $product);
-                //if (!empty($replacements)) {
-                   // $entityParser->addToDictionary($replacements);
-                   // unset($replacements, $freeShippingWidgets);
-                //}
-           // }
-
-//            $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
-//            if (preg_match_all('~(\$product:price:currency:)([A-Z]{3})~', $data['templateContent'], $matches)){
-//                 if(isset($matches[0]) && isset($matches[2])){
-//                     foreach($matches[2] as $key => $newCurrency){
-//                         $newCurrency = strtoupper($newCurrency);
-//                         if (null === ($changedPrice = $cacheHelper->load('product_prodid_'.$product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_'))){
-//                            $cacheCurrencyTime = (24*60*60) + (strtotime(date('m/d/Y', time())) - strtotime("now"));
-//                            $changedPrice = Tools_Misc::getConvertedPriceByCurrency($price, $newCurrency);
-//                            $cacheHelper->save('product_prodid_'.$product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
-//                         }
-//                         $entityParser->addToDictionary(array($matches[0][$key]=>$changedPrice));
-//
-//                     }
-//                 }
-//            }
 			$renderedContent .= $entityParser->parse($templatePrepend . $data['templateContent']);
 			unset($storeWidget);
 		});
