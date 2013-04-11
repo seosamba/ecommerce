@@ -491,20 +491,22 @@ class Tools_ShoppingCart {
 		}
 
 		$cartSessionContent = array();
-		foreach ($this->getContent() as $uniqKey => $item) {
-			$data = array(
-				'product_id' => isset($item['product_id']) ? $item['product_id'] : $item['id'],
-				'price'      => $item['price'],
-				'qty'        => $item['qty'],
-				'tax'        => $item['tax'],
-				'tax_price'  => $item['taxPrice'],
-				'options'    => isset($item['options']) ? $item['options'] : array()
-			);
+		if ($this->getContent()){
+			foreach ($this->getContent() as $uniqKey => $item) {
+				$data = array(
+					'product_id' => isset($item['product_id']) ? $item['product_id'] : $item['id'],
+					'price'      => $item['price'],
+					'qty'        => $item['qty'],
+					'tax'        => $item['tax'],
+					'tax_price'  => $item['taxPrice'],
+					'options'    => isset($item['options']) ? $item['options'] : array()
+				);
 
-			foreach ($item['options'] as $option) {
-				$data['options'][$option['option_id']] = isset($option['id']) ? $option['id'] : $option['title'];
+				foreach ($item['options'] as $option) {
+					$data['options'][$option['option_id']] = isset($option['id']) ? $option['id'] : $option['title'];
+				}
+				array_push($cartSessionContent, $data);
 			}
-			array_push($cartSessionContent, $data);
 		}
 		$cartSession->setCartContent($cartSessionContent)
 				->setIpAddress($_SERVER['REMOTE_ADDR'])
@@ -558,7 +560,7 @@ class Tools_ShoppingCart {
 			//			}
 
 			$this->setCartId($cartSession->getId())
-					->setContent($cartSession->getCartContent())
+					->setContent(is_null($cartSession->getCartContent()) ? array() : $cartSession->getCartContent())
 					->save();
 		}
 	}
