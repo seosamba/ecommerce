@@ -78,9 +78,11 @@ class Tools_Tax_Tax {
 						if (in_array($address['state'], $states)) {
 							$matchRate += 3;
 						}
-					} else {
-                        $matchRate++;
-                    }
+					}
+//@todo Review this scoring algoryhtm. It looks like we don't need this
+//                    else {
+//                        $matchRate++;
+//                    }
 				}
 				if (!empty($countries)) {
 					if (in_array($address['country'], $countries)){
