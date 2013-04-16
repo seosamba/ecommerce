@@ -12,8 +12,8 @@ define([
             last: false
         },
         order: {
-            by: null,
-            asc: true
+            by: 'reg_date',
+            asc: false
         },
         searchTerm: '',
         cached: {}, //@todo add caching mecanism

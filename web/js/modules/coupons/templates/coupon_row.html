@@ -1,0 +1,11 @@
+<td><%= coupon.get('id') %></td>
+<td><%= coupon.get('type') %></td>
+<td><%= coupon.get('code') %></td>
+<td><%= coupon.has('startDate') ? coupon.get('startDate') : '-' %></td>
+<td><%= coupon.has('endDate') ? coupon.get('endDate') : '-' %></td>
+<td><%= coupon.get('allowCombination') == '1' ? 'yes' : 'no' %></td>
+<td><%= coupon.has('scope') ? 'one per '+coupon.get('scope') : '-' %></td>
+<td><%= coupon.get('action') %></td>
+<td>
+    <a data-role="delete" href="javascript:;">[x]</a>
+</td>

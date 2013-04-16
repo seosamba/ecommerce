@@ -1,0 +1,26 @@
+<?php
+/**
+ * This is partial view that should have assigned 'currency'
+ */
+?>
+<script id="actionDiscountFreeshippingTmpl" type="text/template">
+<% if (type === 'discount'){ %>
+	<div id="discount-units-holder" style="display: inline-block">
+		<label><?php echo $this->translate('Discount amount:');?></label>
+		<?php echo $this->formText('data[discountAmount]'); ?>
+		<?php echo $this->formSelect('data[discountUnits]', null, array(
+			'class' => 'input-auto'
+		), array(
+			Store_Model_Coupon::DISCOUNT_UNITS       => $this->currency,
+			Store_Model_Coupon::DISCOUNT_PERCENTS    => '%'
+		));?>
+	</div>
+    <label><?php echo $this->translate('for orders over');?></label>
+<% } else { %>
+    <label><?php echo $this->translate('Free shipping for orders over');?></label>
+<% } %>
+	<?php echo $this->formText('data[minOrderAmount]', 0, array(
+		'class' => 'input-mini'
+	)); ?>
+	<span class="unit"><?php echo $this->currency; ?></span>
+</script>

@@ -34,7 +34,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'sub_total'             => $model->getSubTotal(),
 			'total_tax'             => $model->getTotalTax(),
 			'total'                 => $model->getTotal(),
-            'notes'                 => $model->getNotes()
+            'notes'                 => $model->getNotes(),
+			'discount'              => $model->getDiscount()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

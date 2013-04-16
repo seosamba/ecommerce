@@ -72,15 +72,17 @@ class Tools_Tax_Tax {
 						continue;
 					}
 				}
-				if ($zone->getStates()){
-					if (!empty($address['state'])) {
+				if (!empty($address['state'])){
+					if ($zone->getStates()) {
 						$states = array_map(function($state){ return $state['id'];}, $zone->getStates());
 						if (in_array($address['state'], $states)) {
 							$matchRate += 3;
 						}
 					}
-				} else {
-					$matchRate++;
+//@todo Review this scoring algoryhtm. It looks like we don't need this
+//                    else {
+//                        $matchRate++;
+//                    }
 				}
 				if (!empty($countries)) {
 					if (in_array($address['country'], $countries)){

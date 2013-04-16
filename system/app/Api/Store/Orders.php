@@ -104,14 +104,14 @@ class Api_Store_Orders extends Api_Service_Abstract {
 					unset($filter['state']);
 				}
 				if (isset($filter['date-from']) && !empty($filter['date-from'])) {
-					$filter['date-from'] = date("Y-m-d", strtotime($filter['date-from']));
+					$filter['date-from'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-from']));
 				}
 				if (isset($filter['date-to']) && !empty($filter['date-to'])) {
-					$filter['date-to'] = date("Y-m-d", strtotime($filter['date-to']));
+					$filter['date-to'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-to']));
 				}
                 $filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
 				$filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
-				return $orderMapper->fetchAll($filter, $sortOrder, $limit, $offset);
+				$orderList = $orderMapper->fetchAll($filter, $sortOrder, $limit, $offset);
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}
