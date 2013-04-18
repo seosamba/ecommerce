@@ -625,6 +625,9 @@ class Tools_ShoppingCart {
 		return $this->_cartId;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setAddressKey($type, $addressKey) {
 		switch ($type) {
 			case Models_Model_Customer::ADDRESS_TYPE_BILLING:
@@ -638,6 +641,9 @@ class Tools_ShoppingCart {
 		return $this;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getAddressKey($type) {
 		switch ($type) {
 			case Models_Model_Customer::ADDRESS_TYPE_BILLING:
@@ -725,6 +731,24 @@ class Tools_ShoppingCart {
 
 	public function getTotalTax() {
 		return $this->_totalTax;
+	}
+
+	public function setBillingAddressKey($billingAddressKey) {
+		$this->_billingAddressKey = $billingAddressKey;
+		return $this;
+	}
+
+	public function getBillingAddressKey() {
+		return $this->_billingAddressKey;
+	}
+
+	public function setShippingAddressKey($shippingAddressKey) {
+		$this->_shippingAddressKey = $shippingAddressKey;
+		return $this;
+	}
+
+	public function getShippingAddressKey() {
+		return $this->_shippingAddressKey;
 	}
 
 
