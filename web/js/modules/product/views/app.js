@@ -10,11 +10,12 @@ define([
 	'./option',
 	'./productlist',
     '../../coupons/views/coupon_form',
-    '../../coupons/views/coupons_table'
+    '../../coupons/views/coupons_table',
+    '../../groups/views/group_price'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -96,6 +97,9 @@ define([
             this.couponGrid = new CouponGridView({hideProductColumn: true});
             this.couponForm.$el.on('coupon:created', _.bind(this.couponGrid.render, this.couponGrid));
             this.couponForm.render();
+
+            this.groupsPrice = new GroupsPriceView();
+
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -120,7 +124,7 @@ define([
 
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
-            this.model.on('change:id', this.setProductIdForCoupon, this);
+            this.model.on('change:id', this.setProductIdForCouponAndGroup, this);
 
             this.model.on('sync', function(){
                 if (this.model.has('options')){
@@ -793,11 +797,14 @@ define([
             }
             return false;
         },
-        setProductIdForCoupon: function(){
+        setProductIdForCouponAndGroup: function(){
             var productId = this.model.get('id');
             this.couponForm.$el.find('input#data-products').val(productId);
             this.couponGrid.coupons.server_api.productId = productId;
             this.couponGrid.render();
+            this.groupsPrice.$el.find('input#group-products-id').val(productId);
+            this.groupsPrice.groups.server_api.productId = productId;
+            this.groupsPrice.render();
         }
 	});
 

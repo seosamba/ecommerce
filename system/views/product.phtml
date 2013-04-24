@@ -233,6 +233,7 @@ $lastPageCaption = $this->translate('Last');
         <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
         <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
         <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
+        <li><a href="#group-pricing-tab"><?php echo $this->translate('Group price'); ?></a></li>
         <?php foreach ($this->plugins as $plugin) : ?>
 		<?php
         $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
@@ -404,6 +405,13 @@ $lastPageCaption = $this->translate('Last');
 		    <p style="text-align: center"><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
 		    <?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	    </div>
+    </div>
+
+    <div id="group-pricing-tab" class="clearfix">
+        <div class="padding5px">
+            <p style="text-align: center"><?php echo $this->translate('Set group pricing for product'); ?></p>
+            <?php echo $this->partial('product/grouping-price.phtml'); ?>
+        </div>
     </div>
 
     <div class="grid_12 mb10px">

@@ -27,7 +27,8 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		$data = array(
 			'user_id'               => $customer->getId(),
 			'default_shipping_address_id'   => $customer->getDefaultShippingAddressId(),
-			'default_billing_address_id'    => $customer->getDefaultBillingAddressId()
+			'default_billing_address_id'    => $customer->getDefaultBillingAddressId(),
+            'group_id'                      => $customer->getGroupId()
 		);
 		$userInfo = $this->getDbTable()->find($customer->getId());
 		if(!$userInfo->current()) {
@@ -155,6 +156,12 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 						'total_amount' => 'SUM(cart.total)',
 						'total_orders'=>'COUNT(cart.id)'
 					))
+                ->joinLeft(
+                    array('customerinfo' => 'shopping_customer_info'),
+                   ('customerinfo.user_id = user.id'),
+                    array(
+                        'group_id' => 'customerinfo.group_id',
+                   ))
 				->group('user.id');
 
 		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {

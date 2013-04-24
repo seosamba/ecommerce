@@ -13,13 +13,13 @@ class Api_Store_Customers extends Api_Service_Abstract {
 	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
-			'allow' => array('get', 'delete')
+			'allow' => array('get', 'post', 'put', 'delete')
 		),
         Tools_Security_Acl::ROLE_ADMIN => array(
-			'allow' => array('get', 'delete')
+			'allow' => array('get', 'post', 'put', 'delete')
 		),
         Shopping::ROLE_SALESPERSON => array(
-			'allow' => array('get', 'delete')
+			'allow' => array('get', 'post', 'put', 'delete')
 		)
 	);
 
@@ -76,17 +76,56 @@ class Api_Store_Customers extends Api_Service_Abstract {
 	}
 
 	/**
-	 * Reserved for future usage
+	 * Attaching user group for customers if groupId exist
+     *
 	 */
 	public function postAction() {
-		// TODO: Implement postAction() method.
+        $userId = filter_var($this->_request->getParam('userId'), FILTER_VALIDATE_INT);
+        $groupId = filter_var($this->_request->getParam('groupId'), FILTER_VALIDATE_INT);
+        $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+
+        if(!isset($userId)){
+            $this->_error();
+        }
+
+        if(isset($groupId)){
+            $customerInfoDbTable = new Models_DbTable_CustomerInfo();
+            if($groupId == 0){
+                $groupId = null;
+            }
+            $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id = ?', $userId);
+            $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+            $cache->clean('', '', array('0'=>'product_price'));
+            $cache->clean('products_groups_price', 'store_');
+            $cache->clean('customers_groups', 'store_');
+        }
+
 	}
 
 	/**
 	 * Reserved for future usage
 	 */
 	public function putAction() {
-		// TODO: Implement putAction() method.
+        $groupId     = filter_var($this->_request->getParam('groupId'), FILTER_SANITIZE_NUMBER_INT);
+        $customerIds = filter_var($this->_request->getParam('customerIds'), FILTER_SANITIZE_STRING);
+        $allGroups = filter_var($this->_request->getParam('allGroups'), FILTER_SANITIZE_NUMBER_INT);
+        $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+        $customersIdsArray = explode(',', $customerIds);
+        if(!isset($groupId) || !is_array($customersIdsArray)){
+            $this->_error();
+        }
+        $customerInfoDbTable = new Models_DbTable_CustomerInfo();
+
+        if($allGroups == 1){
+            $updateField = $customerInfoDbTable->getAdapter()->quoteInto('group_id =?', $groupId);
+            $customerInfoDbTable->getAdapter()->query('UPDATE `shopping_customer_info` SET '.$updateField);
+        }else{
+            $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
+            $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+        }
+
+        $cache->clean('products_groups_price', 'store_');
+        $cache->clean('customers_groups', 'store_');
 	}
 
 	/**

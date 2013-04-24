@@ -1,8 +1,10 @@
 define([
 	'backbone',
     '../collections/customers',
-    './customer_row'
-], function(Backbone, CustomersCollection, CustomerRowView){
+    './customer_row',
+    '../../groups/collections/group',
+    'text!../../groups/templates/groups_dialog.html'
+    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl){
 
     var AppView = Backbone.View.extend({
         el: $('#clients'),
@@ -14,7 +16,8 @@ define([
             'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details').toggle()},
             'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
-            'keyup #clients-search': 'searchClient'
+            'keyup #clients-search': 'searchClient',
+            'change select[name=groups]': 'assignGroup'
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -128,6 +131,76 @@ define([
             self.searching = setTimeout(function(){
                 self.customers.search(term);
             }, 600);
+        },
+        assignGroup: function(e){
+            var groupId = $(e.target).val();
+            var userId = $(e.target).closest('tr').find('input[name="select[]"]').val();
+            $.ajax({
+                url: $('#website_url').val()+'api/store/customers/',
+                data: {
+                    groupId:groupId,
+                    userId:userId
+                },
+                type: 'POST',
+                dataType: 'json',
+                success: function(response){
+                    showMessage('Group saved');
+                }
+            });
+        },
+        assignGroups: function(){
+            var self = this;
+
+            var checkedCustomers = this.customers.checked();
+            var allCustomers = this.customers;
+
+            if(checkedCustomers.length == 0){
+                return false;
+            }
+
+            if (!this.groups){
+                this.groups = new GroupsCollection();
+                this.groups.fetch({async: false});
+            }
+
+            var dialog = _.template(GroupsDialogTmpl, {
+                groups: this.groups.toJSON(),
+                totalCustomers: this.customers.length
+            });
+            $(dialog).dialog({
+                dialogClass: 'seotoaster',
+                buttons: {
+                    "Apply": function(){
+                        var groupId = $(this).find($("select option:selected")).val();
+                        if(groupId == -1){
+                            return false;
+                        }
+                        var allGroups = 0;
+                        var customerIds = '';
+                        if($(this).find('input[name="applyToAll"]').attr('checked')){
+                            allGroups = 1;
+                            checkedCustomers = allCustomers.models;
+                        }
+
+                        $.each(checkedCustomers, function(index, value) {
+                            customerIds += value.id+',';
+                        });
+                        customerIds = customerIds.substring(0, customerIds.length - 1);
+
+                        $.ajax({
+                            url: $('#website_url').val()+'api/store/customers/groupId/'+groupId+'/customerIds/'+customerIds+'/allGroups/'+allGroups,
+                            type: 'PUT',
+                            dataType: 'json',
+                            success: function(response){
+                                top.location.reload();
+                            }
+                        });
+                        $(this).dialog('close');
+
+                    }
+                }
+            });
+            return false;
         }
     });
 	

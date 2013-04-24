@@ -1,0 +1,37 @@
+<div class="group-price-row group-id-<%= group.get('id') %> clearfix">
+<input type="hidden" name="groupId" value="<%= group.get('id') %>"/>
+<input class="grid_2" disabled type="text" name="groupName" value="<%= group.get('groupName') %>"/>
+<% if (group.has('priceValue')) {%>
+    <input class="grid_2" type="text" name="priceValue" value="<%= group.get('priceValue') %>"/>
+<% } else {%>
+    <input class="grid_2" type="text" name="priceValue" value=""/>
+<% } %>
+
+    <select class="grid_1" name="priceSign" >
+        <% if (group.has('priceSign') && group.get('priceSign') == 'plus') {%>
+            <option selected="selected" value="plus">+</option>
+        <% } else {%>
+            <option value="plus">+</option>
+        <% } %>
+        <% if (group.has('priceSign') && group.get('priceSign') == 'minus') {%>
+            <option selected="selected" value="minus">-</option>
+        <% } else {%>
+            <option value="minus">-</option>
+        <% } %>
+
+    </select>
+    <select class="grid_1 groupPriceType" name="priceType" >
+        <% if (group.has('priceType') && group.get('priceType') == 'percent') {%>
+            <option selected="selected" value="percent">%</option>
+        <% } else {%>
+            <option value="percent">%</option>
+        <% } %>
+        <% if (group.has('priceType') && group.get('priceType') == 'unit') {%>
+            <option selected="selected" value="unit">unit</option>
+        <% } else {%>
+            <option value="unit">unit</option>
+        <% } %>
+    </select>
+    <a class="grid_2 mt10px" data-role="delete" data-cid="<%= group.get('id') %>" href="javascript:;">[x]</a>
+
+</div>

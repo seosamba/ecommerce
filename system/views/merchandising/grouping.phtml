@@ -1,0 +1,78 @@
+<style type="text/css">
+#edit-group {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	position: relative;
+}
+#edit-group label{
+	display: inline-block;
+}
+#edit-group input,
+#edit-group select,
+#edit-group textarea {
+	width: 185px;
+    text-align: center;
+}
+#edit-group input[type=checkbox],
+#edit-group input[type=radio] {
+    width: auto;
+	margin: 0 5px;
+	vertical-align: middle;
+}
+#edit-group input.blue-btn[type=submit]{
+	float:none;
+    width: 210px;
+}
+#edit-group .input-auto {
+	width: auto;
+}
+#edit-group .input-micro {
+	width: 40px;
+}
+#edit-group .input-mini {
+    width: 60px;
+}
+#edit-group .input-normal {
+    width: 80px;
+}
+#edit-group .input-medium {
+	width: 100px;
+}
+#edit-group .input-large {
+	width: 140px;
+}
+
+#group-table_paginate a[role="button"] {
+	display: inline-block;
+	cursor: pointer;
+	padding: 4px 0;
+}
+#group-table_paginate a[role="button"]:not(:first-child) {
+	padding-left: 10px;
+}
+</style>
+
+
+<form id="edit-group" class="grid_12 clearfix">
+    <div class="grid_3">
+        <?php echo $this->formText('groupName', null, array(
+            'class'          => 'new-group-name',
+            'placeholder'    => $this->translate('Enter group name')
+        )); ?>
+    </div>
+    <input class="blue-btn" type="submit" value="<?php echo $this->translate('Create new group'); ?>"/>
+
+</form>
+
+<div class="toaster-widget mt5px grid_12">
+    <table id="group-table" style="width: 50%;" class="widget">
+        <thead>
+        <tr>
+            <th><?php echo $this->translate('Group Name');?></th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>

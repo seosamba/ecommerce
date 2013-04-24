@@ -557,6 +557,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		//if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
 			$this->_view->noLayout = true;
+            $allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
+            $this->_view->allGroups = $allGroups;
 			return $this->_view->render('clients.phtml');
 		}
 	}

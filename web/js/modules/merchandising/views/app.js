@@ -1,10 +1,14 @@
 define([
 	'backbone',
     '../../coupons/views/coupon_form',
-    '../../coupons/views/coupons_table'
+    '../../coupons/views/coupons_table',
+    '../../groups/views/group_form',
+    '../../groups/views/group_table'
 ], function(Backbone,
             CouponFormView,
-            CouponsTableView){
+            CouponsTableView,
+            GroupFormView,
+            GroupsTableView){
     var MainView = Backbone.View.extend({
         el: $('#merchandising'),
         events: {
@@ -18,6 +22,13 @@ define([
             this.couponsTable = new CouponsTableView();
             this.couponsTable.render();
 
+            this.groupForm = new GroupFormView();
+            this.groupForm.render();
+
+            this.groupsTable = new GroupsTableView();
+            this.groupsTable.render();
+
+            this.groupForm.$el.on('group:created', _.bind(this.groupsTable.render, this.groupsTable));
             this.couponForm.$el.on('coupon:created', _.bind(this.couponsTable.render, this.couponsTable));
         },
         formSubmit: function(e) {
