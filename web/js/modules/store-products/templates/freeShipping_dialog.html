@@ -1,0 +1,13 @@
+<div title="Assign free shipping">
+    <select name="freeShipping">
+        <option value="-1" disabled="disabled" selected="selected">select</option>
+        <option value="0" >no free shipping</option>
+        <option value="1" >free shipping</option>
+    </select>
+    <% if (totalProducts) { %>
+    <hr />
+    <label>
+        <input type="checkbox" name="applyToAll"> Apply to all <%= totalProducts %> products
+    </label>
+    <% } %>
+</div>

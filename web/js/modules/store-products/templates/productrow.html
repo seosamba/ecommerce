@@ -5,6 +5,12 @@
 <td><%= brand %></td>
 <td class="editable " data-prop="sku"><%= sku %></td>
 <td class="editable" data-prop="mpn"><%= mpn %></td>
+<% if (freeShipping == '0'){%>
+    <td>no</td>
+<% } %>
+<% if (freeShipping == '1'){%>
+    <td>yes</td>
+<% } %>
 <td class="editable" data-prop="weight"><%= weight %></td>
 <td class="editable" data-prop="price"><%= price %></td>
 <td class="textcentered">
