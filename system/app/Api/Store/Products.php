@@ -187,22 +187,27 @@ class Api_Store_Products extends Api_Service_Abstract {
 		$data = array();
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		$srcData = json_decode($this->_request->getRawBody(), true);
-		if (!empty($id) && !empty($srcData)){
+		if (empty($srcData)){
+			$this->_error('Empty data');
+		}
+		if (!empty($id)){
 			$products = $this->_productMapper->find($id);
 			!is_array($products) && $products = array($products);
 			if (isset($srcData['id'])){
 				unset($srcData['id']);
 			}
-		} elseif(!empty($srcData)) {
-			$key    = filter_var($this->_request->getParam('key'), FILTER_SANITIZE_STRING);
-			$tags   = filter_var_array($this->_request->getParam('ftag', array()), FILTER_SANITIZE_NUMBER_INT);
-			$brands  = filter_var_array($this->_request->getParam('fbrand', array()), FILTER_SANITIZE_STRING);
-			if (empty($key) && empty($tags) && empty($brands)){
-				return array(
-					'error'		=> true,
-					'code'		=> 400,
-					'message'	=> 'Bad request'
-				);
+		} else {
+			$key    = $this->_request->getParam('key');
+			if (!is_null($key)){
+				$key = filter_var($key, FILTER_SANITIZE_STRING);
+			}
+			$tags   = $this->_request->getParam('ftag');
+			if ($tags){
+				$tags = filter_var_array($tags, FILTER_SANITIZE_NUMBER_INT);
+			}
+			$brands  = $this->_request->getParam('fbrand');
+			if ($brands){
+				$brands = filter_var_array($brands, FILTER_SANITIZE_STRING);
 			}
 
 			$products = $this->_productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands);
