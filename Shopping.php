@@ -885,7 +885,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
                 'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
                 'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
-                'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE productI_id IN (" . $productsIds . ")"
+                'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
             )
         );
     }
