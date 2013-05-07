@@ -557,8 +557,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		//if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
 			$this->_view->noLayout = true;
-            $allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
-            $this->_view->allGroups = $allGroups;
+			$allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
+			$this->_view->allGroups = $allGroups;
 			return $this->_view->render('clients.phtml');
 		}
 	}
@@ -840,53 +840,62 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
-    /**
-     * Export hook for the website backup
-     *
-     */
-    public static function exportWebsiteData() {
+	/**
+	 * Export hook for the website backup
+	 *
+	 */
+	public static function exportWebsiteData() {
 
-        // fetching the pages
-        $pages    = array();
-        $category = Application_Model_Mappers_PageMapper::getInstance()->findByUrl(self::PRODUCT_CATEGORY_URL);
+		// fetching the pages
+		$pages = array();
+		$category = Application_Model_Mappers_PageMapper::getInstance()->findByUrl(self::PRODUCT_CATEGORY_URL);
 
-        if(!$category instanceof Application_Model_Models_Page) {
-            return array('pages' => $pages);
-        }
+		if (!$category instanceof Application_Model_Models_Page) {
+			return array('pages' => $pages);
+		}
 
-        // fetching all product pages
-        $pagesSql  = "SELECT * FROM `page` WHERE system = '0' AND draft = '0' AND `parent_id` = " . $category->getId() . " ORDER BY `order` ASC;";
-        $dbAdapter = Zend_Registry::get('dbAdapter');
+		// fetching all product pages
+		$pagesSql = "SELECT * FROM `page` WHERE system = '0' AND draft = '0' AND (`id` = " . $category->getId() . " OR `parent_id` = " . $category->getId() . ")  ORDER BY `order` ASC;";
+		$dbAdapter = Zend_Registry::get('dbAdapter');
 
-        try {
-            $pages = $dbAdapter->fetchAll($pagesSql);
-        } catch (Exception $e) {
-            if(Tools_System_Tools::debugMode()) {
-                error_log($e->getMessage());
-            }
-            return array('pages' => $pages);
-        }
+		try {
+			$pages = $dbAdapter->fetchAll($pagesSql);
+		} catch (Exception $e) {
+			if (Tools_System_Tools::debugMode()) {
+				error_log($e->getMessage());
+			}
+			return array('pages' => $pages);
+		}
 
-        $productsSql = "SELECT * FROM `shopping_product` WHERE `page_id` IN (" . implode(',', array_map(function($page) { return $page['id']; }, $pages)) . ");";
-        $productsIds = implode(',', array_map(function($product) {
-            return $product['id'];
-        }, $dbAdapter->fetchAll($productsSql)));
+		$productsSql = "SELECT * FROM `shopping_product` WHERE `page_id` IN (" . implode(',', array_map(function ($page) {
+			return $page['id'];
+		}, $pages)) . ");";
+		$productsIds = implode(',', array_map(function ($product) {
+			return $product['id'];
+		}, $dbAdapter->fetchAll($productsSql)));
 
-        // return prepared data to the toaster
-        return array(
-            'pages'  => $pages,
-            'tables' => array(
-                'shopping_product'                  => $productsSql,
-                'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
-                'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
-                'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
-                'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
-                'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
-                'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
-                'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
-                'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
-                'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
-            )
-        );
-    }
+		//fetch list of product images
+		$productImages = $dbAdapter->fetchCol("SELECT DISTINCT photo FROM `shopping_product`");
+
+		// return prepared data to the toaster
+		return array(
+			'pages'  => $pages,
+			'tables' => array(
+				'shopping_product'                  => $productsSql,
+				'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
+				'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
+				'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
+				'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
+				'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
+				'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
+				'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
+				'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
+				'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
+			),
+			'media'  => empty($productImages) ? null : array_map(function ($img) {
+				list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
+				return implode(DIRECTORY_SEPARATOR, array($folder, 'original', $file));
+			}, $productImages)
+		);
+	}
 }
