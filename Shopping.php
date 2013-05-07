@@ -894,7 +894,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			),
 			'media'  => empty($productImages) ? null : array_map(function ($img) {
 				list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
-				return implode(DIRECTORY_SEPARATOR, array($folder, 'original', $file));
+				return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
 			}, $productImages)
 		);
 	}
