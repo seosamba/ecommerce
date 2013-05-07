@@ -4,11 +4,18 @@
  */
 class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
-    protected $_view = null;
+    protected $_view   = null;
+
+    /**
+     * Shopping config
+     *
+     * @var null|array
+     */
+    protected $_config = null;
 
     protected function _init() {
-        $this->_view        = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
-
+        $this->_view   = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
+        $this->_config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
     }
 
     protected function _run() {
@@ -21,9 +28,7 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
         try {
             $product = $this->_invokeProduct();
         } catch (Exception $e) {
-            if(Tools_System_Tools::debugMode()) {
-                error_log($e->getMessage());
-            }
+            Tools_System_Tools::debugMode() && error_log($e->getMessage());
             return $e->getMessage();
         }
 
@@ -51,11 +56,18 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 
                 //set the new price for a product
                 //$price  = $product->getPrice();
-                $price  = 0;
-                array_walk($parts, function($partId) use(&$price, $mapper) {
+                $price       = 0;
+                $taxIncluded = isset($this->_config['showPriceIncTax']) && $this->_config['showPriceIncTax'];
+                array_walk($parts, function($partId) use(&$price, $mapper, $taxIncluded) {
                     $part = $mapper->find($partId);
                     if($part instanceof Models_Model_Product) {
                         $price += Tools_ShoppingCart::getInstance()->calculateProductPrice($part, $part->getDefaultOptions());
+
+                        // because calculateProductPrice gives price with tax (if proper settings is on) we will subtract
+                        // tax of each part from the final set price
+                        if($taxIncluded) {
+                            $price -= Tools_Tax_Tax::calculateProductTax($part);
+                        }
                     }
                 });
 
