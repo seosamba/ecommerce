@@ -74,9 +74,12 @@ class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
                 //if price changed during the calculation we're setting the new price
                 if($price != $product->getPrice()) {
                     $currency       = Zend_Registry::get('Zend_Currency');
-                    $oldPrice       = $product->getPrice();
-                    $this->_content = str_replace($currency->toCurrency($oldPrice), $currency->toCurrency($price), $this->_content);
+                    $oldPrice       = Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $product->getDefaultOptions());
+
                     $product->setPrice($price);
+
+                    $this->_content = str_replace($currency->toCurrency($oldPrice), $currency->toCurrency($price + Tools_Tax_Tax::calculateProductTax($product)), $this->_content);
+
                 }
             }
             $product = $mapper->save($product);
