@@ -1,5 +1,6 @@
 <div class="group-price-row group-id-<%= group.get('id') %> clearfix">
 <input type="hidden" name="groupId" value="<%= group.get('id') %>"/>
+
 <div class="grid_2 mt10px"><%= group.get('groupName') %></div>
 
     <select class="grid_1" name="priceSign" >
@@ -34,6 +35,7 @@
             <option value="unit">unit</option>
         <% } %>
     </select>
+    <div class="grid_2 group-price-final mt10px" style="width:85px;"></div>
     <a class="grid_2 mt10px" data-role="delete" data-cid="<%= group.get('id') %>" href="javascript:;">[x]</a>
 
 </div>

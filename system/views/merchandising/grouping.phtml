@@ -21,7 +21,8 @@
 }
 #edit-group input.blue-btn[type=submit]{
 	float:none;
-    width: 210px;
+    width: 230px;
+    margin-left: 10px;
 }
 #edit-group .input-auto {
 	width: auto;
@@ -52,7 +53,7 @@
 }
 </style>
 
-
+<input type="hidden" name="group-currency" class="group-currency" value="<?php echo Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');?>"/>
 <form id="edit-group" class="grid_12 clearfix">
     <div class="grid_3">
         <?php echo $this->formText('groupName', null, array(
@@ -60,16 +61,38 @@
             'placeholder'    => $this->translate('Enter group name')
         )); ?>
     </div>
-    <input class="blue-btn" type="submit" value="<?php echo $this->translate('Create new group'); ?>"/>
+
+    <div class="grid_1">
+       <?php echo $this->formSelect('priceSign', null, array(
+            'style'         => 'width: auto',
+            'id'            => 'group-sign',),
+            array('plus' => '+', 'minus' => '-')); ?>
+
+    </div>
+    <div class="grid_3">
+        <?php echo $this->formText('priceValue', null, array(
+            'class'          => 'new-group-price-value'
+        )); ?>
+    </div>
+    <div class="grid_1">
+        <?php echo $this->formSelect('priceType', null, array(
+                'style'         => 'width: auto',
+                'id'            => 'group-price-type',),
+            array( 'percent' => '%', 'unit' => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency'))); ?>
+
+    </div>
+
+    <input class="blue-btn" type="submit" value="<?php echo $this->translate('Create or update group'); ?>"/>
 
 </form>
 
 <div class="toaster-widget mt5px grid_12">
-    <table id="group-table" style="width: 50%;" class="widget">
+    <table id="group-table" style="width: 95%;" class="widget">
         <thead>
         <tr>
             <th><?php echo $this->translate('Group Name');?></th>
-            <th>&nbsp;</th>
+            <th><?php echo $this->translate('Default price modifier');?></th>
+            <th><?php echo $this->translate('Action');?></th>
         </tr>
         </thead>
         <tbody>

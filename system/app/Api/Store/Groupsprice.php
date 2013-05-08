@@ -41,7 +41,10 @@ class Api_Store_Groupsprice extends Api_Service_Abstract {
         }else{
             $allGroup = array();
             foreach($allGroups as $group){
-                $allGroup[$group->getId()]['groupName'] =  $group->getGroupName();
+                $allGroup[$group->getId()]['groupName']  = $group->getGroupName();
+                $allGroup[$group->getId()]['priceValue'] = $group->getPriceValue();
+                $allGroup[$group->getId()]['priceSign']  = $group->getPriceSign();
+                $allGroup[$group->getId()]['priceType']  = $group->getPriceType();
                 $allGroup[$group->getId()]['id'] = $group->getId();
             }
             foreach($data as $groupProduct){

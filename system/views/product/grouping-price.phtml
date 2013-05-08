@@ -11,7 +11,10 @@
 
 
 <div id="editing-grouping-price" class="grid_12 mt10px clearfix">
+    <p style="text-align: center; margin-bottom: 10px; font-weight: bold;"><?php echo $this->translate('Regular price = ');?><span id="group-regular-price"></span></p>
     <input type="hidden" id="group-products-id" name="group-products-id" value=""/>
+    <input type="hidden" id="group-products-price" name="group-products-price" value=""/>
+    <input type="hidden" id="group-products-price-symbol" name="group-products-price-symbol" value="<?php echo Zend_Registry::get('Zend_Currency')->getSymbol();?>"/>
 
 </div>
 

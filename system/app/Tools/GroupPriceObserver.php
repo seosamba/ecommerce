@@ -32,18 +32,27 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
             $allProductsWithGroups = Store_Mapper_GroupPriceMapper::getInstance()->fetchAssocAll();
             $this->_cache->save('products_groups_price',  $allProductsWithGroups, 'store_', is_array($this->_cacheTags) ? $this->_cacheTags : array());
         }
+        if (null === ($allProductsGroups = $this->_cache->load('products_groups', 'store_'))){
+            $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+            $this->_cache->save('products_groups',  $allProductsGroups, 'store_', is_array($this->_cacheTags) ? $this->_cacheTags : array());
+        }
         $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
         $currentUser = $sessionHelper->getCurrentUser()->getId();
         if(isset($currentUser)){
             if(array_key_exists($currentUser, $allCustomersGroups)){
                 $groupId = $allCustomersGroups[$currentUser]['group_id'];
-                $productId = $object->getId();
-                $groupProductKey = $groupId.'_'.$productId;
-                if(array_key_exists($groupProductKey, $allProductsWithGroups)){
+                if(isset($allProductsGroups[$groupId])){
+                    $productId = $object->getId();
+                    $groupProductKey = $groupId.'_'.$productId;
                     $priceNow = $object->getPrice();
-                    $priceValue = $allProductsWithGroups[$groupProductKey]['priceValue'];
-                    $priceSign  = $allProductsWithGroups[$groupProductKey]['priceSign'];
-                    $priceType  = $allProductsWithGroups[$groupProductKey]['priceType'];
+                    $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                    $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                    $priceType  = $allProductsGroups[$groupId]['priceType'];
+                    if(array_key_exists($groupProductKey, $allProductsWithGroups)){
+                        $priceValue = $allProductsWithGroups[$groupProductKey]['priceValue'];
+                        $priceSign  = $allProductsWithGroups[$groupProductKey]['priceSign'];
+                        $priceType  = $allProductsWithGroups[$groupProductKey]['priceType'];
+                    }
                     if($priceType == 'percent'){
                         $priceModificationValue = $priceNow*$priceValue/100;
                     }

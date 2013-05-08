@@ -94,7 +94,15 @@ class Api_Store_Customers extends Api_Service_Abstract {
                 $groupId = null;
             }
             $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id = ?', $userId);
-            $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+            $existingCustomerInfo = $customerInfoDbTable->find($userId)->current();
+            if($existingCustomerInfo !== null){
+                $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+            }else{
+                $data['user_id']  = $userId;
+                $data['group_id'] = $groupId;
+                $customerInfoDbTable->insert($data);
+            }
+
             $cache->clean('', '', array('0'=>'product_price'));
             $cache->clean('products_groups_price', 'store_');
             $cache->clean('customers_groups', 'store_');

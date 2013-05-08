@@ -799,10 +799,13 @@ define([
         },
         setProductIdForCouponAndGroup: function(){
             var productId = this.model.get('id');
+            var productPrice = this.model.get('price');
             this.couponForm.$el.find('input#data-products').val(productId);
             this.couponGrid.coupons.server_api.productId = productId;
             this.couponGrid.render();
+            this.groupsPrice.$el.find('input#group-products-price').val(productPrice);
             this.groupsPrice.$el.find('input#group-products-id').val(productId);
+            this.groupsPrice.$el.find('#group-regular-price').html(' '+$('#group-products-price-symbol').val()+parseFloat(productPrice).toFixed(2));
             this.groupsPrice.groups.server_api.productId = productId;
             this.groupsPrice.render();
         }

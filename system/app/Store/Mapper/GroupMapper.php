@@ -27,8 +27,12 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
 			unset($data['action']);
 		}
 
-        if ($model->getId()){
-            $this->getDbTable()->update($data, array('id = ?', $model->getId()));
+        $where = $this->getDbTable()->getAdapter()->quoteInto('`groupName` = ?', $model->getGroupName());
+        $existGroup = parent::fetchAll($where);
+
+        if (!empty($existGroup)){
+            unset($data['id']);
+            $this->getDbTable()->update($data, $where);
         } else {
             $id = $this->getDbTable()->insert($data);
             if ($id){
@@ -69,7 +73,7 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
 
     public function fetchAssocAll(){
         $dbTable = new Store_DbTable_Group();
-        $select = $dbTable->select()->from('shopping_group', array('id', 'groupName'));
+        $select = $dbTable->select()->from('shopping_group', array('id', 'groupName', 'priceSign', 'priceType', 'priceValue'));
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 

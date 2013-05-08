@@ -26,11 +26,13 @@ class Api_Store_Groups extends Api_Service_Abstract {
 	public function getAction() {
 		$groupId = filter_var($this->_request->getParam('groupId'), FILTER_SANITIZE_STRING);
 		if ($groupId) {
-		    $data = Store_Mapper_GroupMapper::getInstance()->find($groupId);
+            $storeMapper = Store_Mapper_GroupMapper::getInstance();
+            $where = $storeMapper->getDbTable()->getAdapter()->quoteInto('id=?', $groupId);
+            $data = $storeMapper->fetchAll($where);
 		} else {
 			$data = Store_Mapper_GroupMapper::getInstance()->fetchAll();
 		}
-		return array_map(function ($group) {
+        return array_map(function ($group) {
 				return $group->toArray();
 		}, $data);
 
@@ -40,7 +42,7 @@ class Api_Store_Groups extends Api_Service_Abstract {
 		$data = filter_var_array($this->getRequest()->getPost(), FILTER_SANITIZE_STRING);
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
 
-		if (empty($data)) {
+		if (!isset($data['groupName']) && !isset($data['groupPriceValue'])) {
 			$this->_error();
 		}
 
@@ -48,16 +50,15 @@ class Api_Store_Groups extends Api_Service_Abstract {
             $this->_error('Group Name Can\'t be empty');
         }
 
+        if(!is_numeric($data['priceValue'])){
+            $this->_error('Price Value must be numeric');
+        }
+
+        if(trim($data['priceValue']) == ''){
+            $this->_error('Price Value Can\'t be empty');
+        }
+
         $data['groupName'] = trim($data['groupName']);
-
-		$validator = new Zend_Validate_Db_RecordExists(array(
-		    'table' => 'shopping_group',
-			'field' => 'groupName'
-		));
-
-		if ($validator->isValid($data['groupName'])) {
-		    $this->_error('Group with such name already exists');
-		}
 
 		$model = new Store_Model_Group($data);
 		if (is_array($data) && isset($data['groupName'])) {
