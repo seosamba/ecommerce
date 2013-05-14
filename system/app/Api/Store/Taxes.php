@@ -15,7 +15,10 @@ class Api_Store_Taxes extends Api_Service_Abstract {
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
-		)
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
 	);
 
 	/**

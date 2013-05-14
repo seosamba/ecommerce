@@ -18,6 +18,9 @@ class Api_Store_Tags extends Api_Service_Abstract {
 		),
 		Tools_Security_Acl::ROLE_ADMIN      => array(
 			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Shopping::ROLE_SALESPERSON      => array(
+			'allow' => array('get')
 		)
 	);
 

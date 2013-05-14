@@ -13,7 +13,10 @@ class Api_Store_Templates extends Api_Service_Abstract {
 	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
-			'allow' => array('get', 'post')
+			'allow' => array('get')
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get')
 		)
 	);
 
