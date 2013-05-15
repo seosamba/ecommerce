@@ -23,6 +23,24 @@ class Api_Store_Groups extends Api_Service_Abstract {
 		)
 	);
 
+    /**
+     * Get groups data
+     *
+     * Resourse:
+     * : /api/store/groups/id/:id
+     *
+     * HttpMethod:
+     * : GET
+     *
+     * ## Parameters:
+     * groupId (type string)
+     * : Group Id
+     *
+     * pairs (type sting)
+     * : If given data will be returned as key-value array
+     *
+     * @return JSON List of groups
+     */
 	public function getAction() {
 		$groupId = filter_var($this->_request->getParam('groupId'), FILTER_SANITIZE_STRING);
 		if ($groupId) {
@@ -38,6 +56,17 @@ class Api_Store_Groups extends Api_Service_Abstract {
 
 	}
 
+    /**
+     * New group creation
+     *
+     * Resourse:
+     * : /api/store/groups/
+     *
+     * HttpMethod:
+     * : POST
+     *
+     * @return JSON New group model
+     */
 	public function postAction() {
 		$data = filter_var_array($this->getRequest()->getPost(), FILTER_SANITIZE_STRING);
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
@@ -80,6 +109,21 @@ class Api_Store_Groups extends Api_Service_Abstract {
 
     }
 
+    /**
+     * Delete group
+     *
+     * Resourse:
+     * : /api/store/groups/
+     *
+     * HttpMethod:
+     * : DELETE
+     *
+     * ## Parameters:
+     * id (type integer)
+     * : group ID to delete
+     *
+     * @return JSON Result of operations
+     */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');

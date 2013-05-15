@@ -23,6 +23,24 @@ class Api_Store_Groupsprice extends Api_Service_Abstract {
 		)
 	);
 
+    /**
+     * Get groups price data
+     *
+     * Resourse:
+     * : /api/store/groupsprice/
+     *
+     * HttpMethod:
+     * : GET
+     *
+     * ## Parameters:
+     * * productId (type integer)
+     * : productID
+     *
+     * pairs (type sting)
+     * : If given data will be returned as key-value array
+     *
+     * @return JSON List of groups price
+     */
 	public function getAction() {
 		$productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
         $groupPriceMapper = Store_Mapper_GroupPriceMapper::getInstance();
@@ -62,6 +80,17 @@ class Api_Store_Groupsprice extends Api_Service_Abstract {
 
 	}
 
+    /**
+     * New group price creation
+     *
+     * Resourse:
+     * : /api/store/groupsprice/
+     *
+     * HttpMethod:
+     * : POST
+     *
+     * @return JSON New group price model
+     */
 	public function postAction() {
 		$data = filter_var_array($this->getRequest()->getPost(), FILTER_SANITIZE_STRING);
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
@@ -73,14 +102,12 @@ class Api_Store_Groupsprice extends Api_Service_Abstract {
             return false;
         }
 
-
         $model = new Store_Model_GroupPrice($data);
 		if (is_array($data)) {
 			foreach ($data as $key => $value) {
 				$model->{'set' . ucfirst($key)}($value);
 			}
 		}
-
 
 		Store_Mapper_GroupPriceMapper::getInstance()->save($model);
         $cache->clean('', '', array('0'=>'product_price', '1'=>'prodid_'.$data['productId']));
@@ -92,6 +119,24 @@ class Api_Store_Groupsprice extends Api_Service_Abstract {
 	public function putAction() {
 	}
 
+    /**
+     * Delete group price
+     *
+     * Resourse:
+     * : /api/store/groupsprice/
+     *
+     * HttpMethod:
+     * : DELETE
+     *
+     * ## Parameters:
+     * id (type integer)
+     * : Group Id
+     *
+     * productId (type integer)
+     * : product Id
+     *
+     * @return JSON Result of operations
+     */
 	public function deleteAction() {
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
         $groupId = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
