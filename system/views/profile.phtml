@@ -116,7 +116,7 @@
 					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
                     <?php if(isset($this->invoicePlugin)):?>
                         <td>   
-                        <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
+                        <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
                             <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
                                 <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
                             </a>
