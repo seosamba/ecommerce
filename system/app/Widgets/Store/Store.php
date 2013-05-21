@@ -153,11 +153,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
 				$this->_view->shoppingConfig = $shoppingConfig;
                 foreach ($cartContent as $key=>$product){
                     $productObject = $productMapper->find($product['product_id']);
-                    if(!empty($product['options'])){
-                        $optionsData = $this->_getOptions($product['product_id'], $product['options']);
-                        $cartContent[$key]['options'] = $optionsData;
-                    }
-                    if($productObject !=null){
+//                    if(!empty($product['options'])){
+//                        $optionsData = $this->_getOptions($product['product_id'], $product['options']);
+//                        $cartContent[$key]['options'] = $optionsData;
+//                    }
+                    if($productObject !== null){
                         $cartContent[$key]['mpn']      = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();

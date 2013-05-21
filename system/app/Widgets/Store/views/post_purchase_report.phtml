@@ -137,10 +137,10 @@
 				<td class="product-info">
 					<span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
-						<?php foreach ($product['options'] as $optData): ?>
+						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
 							<br/>
 							<span class="post-purchase-report-product-options">
-                           <?php echo $optData['optionTitle'] . ' ' . $optData['title']; ?>
+                           <?php echo $optionTitle . ': ' . $optData['title']; ?>
 								<?php if (intval($optData['priceValue'])): ?>
 									<?php if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1): ?>
 										<span>(<?php echo $optData['priceSign'], round($optData['priceValue'] + round(($product['taxRate'] * $optData['priceValue']) / 100, 2), 2); ?>
@@ -165,7 +165,7 @@
 						<?php endif; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
-				<td class="product-unit-price"><?php echo $this->currency($product['tax_price']); ?></td>
+				<td class="product-unit-price"><?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?></td>
 				<td class="product-qty"><?php echo $product['qty']; ?></td>
 				<td class="product-total"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
 			</tr>
@@ -338,10 +338,10 @@
 						<span class="post-purchase-report-product-name"
 						      style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
-						<?php foreach ($product['options'] as $optData): ?>
+						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
 							<br/>
 							<span class="post-purchase-report-product-options">
-                           <?php echo $optData['optionTitle'] . ' ' . $optData['title']; ?>
+                           <?php echo $optionTitle . ': ' . $optData['title']; ?>
 								<?php if (intval($optData['priceValue'])): ?>
 									<?php if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1): ?>
 										<span>(<?php echo $optData['priceSign'], round($optData['priceValue'] + round(($product['taxRate'] * $optData['priceValue']) / 100, 2), 2); ?>
