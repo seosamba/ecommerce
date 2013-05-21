@@ -67,17 +67,40 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		$content = $cartSession->getCartContent();
 
         $cartSessionContentDbTable->getAdapter()->beginTransaction();
-        $cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSession->getId() ));
+//        $cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSession->getId() ));
+		$cartSessionId = $cartSession->getId();
         if (!empty($content)) {
             foreach ($content as $item) {
-                $item['options'] = http_build_query($item['options']);
-                $item['cart_id'] = $cartSession->getId();
+	            $productId = isset($item['product_id']) ? $item['product_id'] : $item['id'];
 
-                unset($item['sku']);
-                unset($item['name']);
-                unset($item['original_price']);
+	            $select = $cartSessionContentDbTable->select()
+			            ->where('cart_id = ?', $cartSessionId)
+			            ->where('product_id = ?', $productId );
 
-                $cartSessionContentDbTable->insert($item);
+	            $itemRow = $cartSessionContentDbTable->fetchRow($select);
+	            if (is_null($itemRow)) {
+		            $itemRow = $cartSessionContentDbTable->createRow();
+	            }
+
+	            $data = array(
+		            'cart_id' => $cartSessionId,
+		            'product_id' => $productId,
+		            'price' => $item['price'],
+		            'qty' => $item['qty'],
+		            'tax' => $item['tax'],
+		            'tax_price' => $item['taxPrice']
+	            );
+	            if (isset($item['options']) && !empty($item['options'])) {
+		            $options = array();
+		            foreach ($item['options'] as $optName => $opt) {
+			            $options[$opt['option_id']] = isset($opt['id']) ? $opt['id'] : $opt['title'];
+		            }
+		            $data['options'] = http_build_query($options);
+		            unset($options);
+	            }
+
+	            $itemRow->setFromArray($data);
+	            $r = $itemRow->save();
             }
         }
         $cartSessionContentDbTable->getAdapter()->commit();
@@ -120,11 +143,17 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 				->join(array('prod' => 'shopping_product'), 'prod.id = c.product_id', array('name', 'sku', 'original_price'=>'price'))
 				->where('cart_id = ?', $model->getId());
 		$content = $contentTable->fetchAll($select)->toArray();
-//		$content = $row->findDependentRowset('Models_DbTable_CartSessionContent')->toArray();
 		if (!empty($content)){
-			array_walk($content, function(&$item){
-				parse_str($item['options'],$item['options']);
-			});
+			$cartId = $model->getId();
+
+			foreach ($content as &$item) {
+				if (!empty($item['options'])) {
+					parse_str($item['options'], $tmpOptions);
+					$options = $this->_restoreOptionsForCartSession($tmpOptions);
+					$item['options'] = empty($options) ? null : $options;
+				}
+			}
+
 			$model->setCartContent($content);
 		}
 
@@ -140,5 +169,35 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 		APPLICATION_ENV === 'development' && error_log($select->__toString());
 		return $this->getDbTable()->fetchAll($select)->toArray();
+	}
+
+	protected function _restoreOptionsForCartSession($mapping){
+		if (!is_array($mapping) || empty($mapping)) {
+			throw new Exceptions_SeotoasterException('Wrong parameters passed');
+		}
+
+		$options = Models_Mapper_OptionMapper::getInstance()->find(array_keys($mapping));
+
+		$result = array();
+		foreach ($options as $option) {
+			$value = $mapping[$option->getId()];
+			switch ($option->getType()){
+				case Models_Model_Option::TYPE_DATE:
+				case Models_Model_Option::TYPE_TEXT:
+					$result[$option->getTitle()] = $value;
+					break;
+				default:
+					$selections = $option->getSelection();
+					if (empty($selections)){
+						continue;
+					}
+					$result[$option->getTitle()] = current(array_filter($selections, function($sel) use ($value) {
+						return $sel['id'] === $value;
+					}));
+					break;
+			}
+		}
+
+		return $result;
 	}
 }
