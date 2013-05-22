@@ -14,6 +14,17 @@ $(function () {
         }
     }
 
+    if ($('.option-datepicker').size()) {
+        var datepickers = $('.option-datepicker');
+        if (datepickers[0].type !== 'date') {
+            if (window.jQuery && jQuery.ui) {
+                $(this).datepicker();
+            } else {
+                window.console && console.log('no jQuery loaded in this context');
+            }
+        }
+    }
+
     $(document).on('change', '.product-options-listing select, .product-options-listing input[type="radio"]', function () {
         var $container = $(this).closest('.product-options-listing'),
             productId = $container.data('productid');

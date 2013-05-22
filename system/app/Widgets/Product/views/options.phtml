@@ -72,7 +72,7 @@ unset($cur, $format);
         <input type="text" name="<?php echo  $uniqName;?>" />
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_DATE): ?>
 		    <div>
-				<input type="date" name="<?php echo  $uniqName;?>" onmouseover="if (window.jQuery && jQuery.ui) $(this).datepicker() ;" />
+				<input type="date" class="option-datepicker" name="<?php echo  $uniqName;?>" />
 		        <span class="icon-calendar icon16" onclick="$('input[name=<?php echo  $uniqName;?>]').focus();"></span>
 		    </div>
 	    <?php if(!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PAGE_PROTECTED)): ?>
