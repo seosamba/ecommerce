@@ -184,7 +184,15 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			switch ($option->getType()){
 				case Models_Model_Option::TYPE_DATE:
 				case Models_Model_Option::TYPE_TEXT:
-					$result[$option->getTitle()] = $value;
+					$result[$option->getTitle()] = array(
+						'option_id'   => $option->getId(),
+						'title'       => $value,
+						'priceSign'   => null,
+						'priceType'   => null,
+						'priceValue'  => null,
+						'weightSign'  => null,
+						'weightValue' => null
+					);
 					break;
 				default:
 					$selections = $option->getSelection();

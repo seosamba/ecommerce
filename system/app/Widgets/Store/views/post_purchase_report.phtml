@@ -139,22 +139,24 @@
 					<?php if (!empty($product['options'])): ?>
 						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
 							<br/>
-							<span class="post-purchase-report-product-options">
-                           <?php echo $optionTitle . ': ' . $optData['title']; ?>
-								<?php if (intval($optData['priceValue'])): ?>
-									<?php if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1): ?>
-										<span>(<?php echo $optData['priceSign'], round($optData['priceValue'] + round(($product['taxRate'] * $optData['priceValue']) / 100, 2), 2); ?>
-											)</span>
-									<?php else: ?>
-										<span>(<?php echo $optData['priceSign'], round($optData['priceValue'], 2); ?>
-											)</span>
-									<?php endif; ?>
-								<?php endif; ?>
-								<?php if (intval($optData['weightValue'])): ?>
-									<span>(<?php echo $optData['weightSign'], ' ', $optData['weightValue'], ' ', $this->weightSign; ?>
-										)</span>
-								<?php endif; ?>
-                           </span>
+							<?php
+							if (is_array($optData)) {
+								$optionStr = $optionTitle . ': ' . $optData['title'];
+								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
+										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
+									} else {
+										$optPriceMod = $optData['priceValue'];
+									}
+									$optionStr .= '<span>(&nbsp;' . $optData['priceSign'] . $this->currency($optPriceMod) .'&nbsp;)</span>';
+								}
+								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+									$optionStr .= '<span>(&nbsp;' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . '&nbsp;)</span>' ;
+								}
+							} else {
+								$optionStr = $optionTitle . ': ' . $optData;
+							} ?>
+							<span class="post-purchase-report-product-options"><?php echo $optionStr; ?></span>
 						<?php endforeach; ?>
 					<?php endif;?>
 				</td>
@@ -335,27 +337,28 @@
 					<?php endif;?>
 				</td>
 				<td valign="middle">
-						<span class="post-purchase-report-product-name"
-						      style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
+						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
 						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
 							<br/>
-							<span class="post-purchase-report-product-options">
-                           <?php echo $optionTitle . ': ' . $optData['title']; ?>
-								<?php if (intval($optData['priceValue'])): ?>
-									<?php if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1): ?>
-										<span>(<?php echo $optData['priceSign'], round($optData['priceValue'] + round(($product['taxRate'] * $optData['priceValue']) / 100, 2), 2); ?>
-											)</span>
-									<?php else: ?>
-										<span>(<?php echo $optData['priceSign'], round($optData['priceValue'], 2); ?>
-											)</span>
-									<?php endif; ?>
-								<?php endif; ?>
-								<?php if (intval($optData['weightValue'])): ?>
-									<span>(<?php echo $optData['weightSign'], ' ', $optData['weightValue'], ' ', $this->weightSign; ?>
-										)</span>
-								<?php endif; ?>
-                           </span>
+							<?php
+							if (is_array($optData)) {
+								$optionStr = $optionTitle . ': ' . $optData['title'];
+								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
+										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
+									} else {
+										$optPriceMod = $optData['priceValue'];
+									}
+									$optionStr .= '<span>(&nbsp;' . $optData['priceSign'] . $this->currency($optPriceMod) .'&nbsp;)</span>';
+								}
+								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+									$optionStr .= '<span>(&nbsp;' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . '&nbsp;)</span>' ;
+								}
+							} else {
+								$optionStr = $optionTitle . ': ' . $optData;
+							} ?>
+							<span class="post-purchase-report-product-options"><?php echo $optionStr; ?></span>
 						<?php endforeach; ?>
 					<?php endif;?>
 				</td>

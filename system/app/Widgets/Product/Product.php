@@ -124,6 +124,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
             );
             unset($themeConfig);
 
+	        if (!$this->_product->getPage() instanceof Application_Model_Models_Page){
+	            if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)){
+		            throw new Exceptions_SeotoasterWidgetException('Cannot render product widget. Product page is missing.');
+	            } else {
+		            return '';
+	            }
+	        }
+
             $parser = new Tools_Content_Parser($templatePrepend . $template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
 
 	        if ((bool)$this->_product->getEnabled()){

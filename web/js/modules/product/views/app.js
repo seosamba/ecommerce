@@ -178,6 +178,7 @@ define([
 			var newOption = new ProductOption();
             newOption.get('selection').add({isDefault: 1});
 			this.model.get('options').add(newOption);
+            this.renderOptions();
 		},
         addOption: function(){
             var optId = this.$('#option-library').val();
@@ -266,10 +267,10 @@ define([
             }
 
 			// loading option onto frontend
-			$('#options-holder').empty();
-			if (this.model.has('options')) {
-                this.renderOptions();
-			}
+//			$('#options-holder').empty();
+//			if (this.model.has('options')) {
+            this.renderOptions();
+//			}
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
@@ -639,6 +640,7 @@ define([
             optWidget.render().$el.appendTo('#options-holder');
         },
         renderOptions: function(){
+            $('#options-holder').empty();
             if (!this.model.has('options')) return false;
             this.model.get('options').each(this.renderOption, this);
         },
