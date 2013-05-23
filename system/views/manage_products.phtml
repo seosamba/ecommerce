@@ -9,7 +9,6 @@
 			->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
 			->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
-
 <div id="store-products" class="toaster-widget store-widget">
 	<table class="products-table widget">
 		<thead>
@@ -74,5 +73,8 @@
 			</tr>
 		</tfoot>
 	</table>
-
 </div>
+<!-- chosen init fix -->
+<style type="text/css">
+    .chzn-container-multi {min-width: 300px}
+</style>

@@ -91,7 +91,7 @@ define([
             this.images =  new ImagesCollection(),
             this.images.on('reset', this.renderImages, this);
 
-            this.render()
+            this.render();
 
             this.couponForm = new CouponFormView();
             this.couponGrid = new CouponGridView({hideProductColumn: true});
@@ -232,7 +232,7 @@ define([
 		},
 		render: function(){
             console.log('render: app.js', this.model.changedAttributes());
-            this.$el.tabs("select" , 0).tabs( "option", "ajaxOptions",
+            this.$el.tabs({ active: 0 }).tabs( "option", "ajaxOptions",
                 { data: {productId: this.model.get('id') } }
             );
 

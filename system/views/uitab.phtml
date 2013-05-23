@@ -9,7 +9,7 @@
 				<select id="templates" class="templates" data-placeholder="Select a product listing template...">
                     <option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
                     <?php foreach($this->productTemplates as $template): ?>
-                    <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
+                        <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -22,7 +22,7 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
+		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
 	</div>
 	<div class="grid_4">
 		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands');?>..."></select>
@@ -110,11 +110,15 @@
         padding: 6px 5px;
 
     }
+    .chzn-container-multi {min-width: 200px}
 </style>
-<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
-<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js'); ?>
-<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js'); ?>
-<?php echo $this->headScript(); ?>
+
+<?php
+    echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+        ->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
+        ->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
+?>
+
 <script type="text/javascript" charset="utf-8">
     $(function() {
 	    // uiTab object
@@ -123,8 +127,9 @@
 		    offset: 0,
             searchTerm: null,
 		    init: function() {
-				//init chosen plugin
-			    $('.pselect').chosen();
+
+                //init chosen plugin
+                $('.pselect').chosen();
 
 			    //init jqueryui button
 			    $('#btn-create').button();
@@ -158,7 +163,7 @@
 
                 $(document).on('keypress', '#search', function(e) {
                     if(e.keyCode == 13) {
-                        $('.ui-autocomplete').hide()
+                        $('.ui-autocomplete').hide();
                         self.searchTerm = null;
                         self.loadStoreData('products', {key: $(e.currentTarget).val()}, true);
                     }
