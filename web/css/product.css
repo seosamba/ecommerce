@@ -284,6 +284,7 @@ input#delete {
 	padding-right: 5px;
 	background: url("/system/images/bg-strip.png");
 	box-shadow: rgb(153, 153, 153) 0px 4px 10px;
+    z-index: 9999;
 }
 /* IE 6 doesn't support max-height
 * we use height instead, but this forces the menu to always be this tall

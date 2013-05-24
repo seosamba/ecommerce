@@ -173,13 +173,13 @@ $lastPageCaption = $this->translate('Last');
 <script id="quickPreviewTemplate" type="text/template">
 	<fieldset style="background-image:none; background-color: white; height:226px;">
 	    <legend><?php echo $this->translate('Preview');?></legend>
-		<a href="<%= websiteUrl + product.page.url %>" target="_blank" style="text-decoration: none; color: inherit;">
+		<a href="<%= (_.isObject(product.page) ? product.page.url : '#') %>" target="_blank" style="text-decoration: none; color: inherit;">
             <div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
             <img src="<%= websiteUrl + mediaPath + product.photo.replace('/','/product/') %>" style="float:left; padding: 15px; max-height: 120px"/>
 	        <p style="text-align:center; font-weight: bold;"><%= product.name %></p>
 	        <p class="mt10px" style="height: 160px;"><%= product.shortDescription.length > 300 ? product.shortDescription.slice(0,299)+'...' : product.shortDescription %></p>
 	        <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-	        <%= product.price + '&nbsp;' + currency %>
+	        <%= parseFloat(product.price).toFixed(2) + '&nbsp;' + currency %>
 	        </p>
         </a>
     </fieldset>

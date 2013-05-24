@@ -59,10 +59,10 @@ define([
             this.initProduct();
             $('#add-new-option-btn').button();
 
-            $('#product-list-search').ajaxStart(function(){
-                $(this).attr('disabled', 'disabled');
+            $(document).ajaxStart(function(){
+                $('#product-list-search').attr('disabled', 'disabled');
             }).ajaxStop(function(){
-                $(this).removeAttr('disabled');
+                $('#product-list-search').removeAttr('disabled');
             });
 
             this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
@@ -73,13 +73,18 @@ define([
             });
 
             $('#ajax_msg, #product-list').hide();
-            this.$el.on('tabsselect', function(event, ui){
-                console.log(arguments);
-                switch (ui.index){
-                    case 1:
+            this.$el.tabs({
+                beforeLoad: function(event, ui){
+                    ui.ajaxSettings.url += '?'+$.param({productId : self.model.get('id')}); // TODO find a right way
+                }
+            });
+            this.$el.on('tabsbeforeactivate', function(event, ui){
+                switch (ui.newPanel.selector){
+                    case '#tag-tab':
                         self.initTags();
                     break;
-                    case 4:
+                    case '#coupon-tab':
+                    case '#group-pricing-tab':
                         if (self.model.isNew()){
                             showMessage('Please save product information first', true);
                             return false;
@@ -233,9 +238,7 @@ define([
 		},
 		render: function(){
             console.log('render: app.js', this.model.changedAttributes());
-            this.$el.tabs({ active: 0 }).tabs( "option", "ajaxOptions",
-                { data: {productId: this.model.get('id') } }
-            );
+            this.$el.tabs({ active: 0 });
 
             $('#product-list:visible').hide();
 
@@ -724,11 +727,12 @@ define([
             });
         },
         initSearchIndex: _.once(function(){
-            $.getJSON($('#website_url').val() + '/plugin/shopping/run/searchindex', function(response){
+            var self = this;
+            $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
                 self.searchIndex = response;
                 $('#product-list-search').autocomplete({
                     minLength: 2,
-                    source: response,
+                    source: self.searchIndex,
                     select: function(event, ui){
                         $('#product-list-search').val(ui.item.value).trigger('keypress', true);
                     }
