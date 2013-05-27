@@ -32,13 +32,13 @@ define([
             return this;
         },
         addItem: function(e){
-            var index = app.view.zoneHolder.tabs('option', 'selected'),
+            var index = app.view.zoneHolder.tabs('option', 'active'),
                 currentZone = app.view.zonesCollection.at(index);
                 currentZone.addItem(this.$el.data('listname'), this.model);
             $(e.target).parent('li').hide('slide');
         },
         removeItem: function(e){
-            var index = app.view.zoneHolder.tabs('option', 'selected'),
+            var index = app.view.zoneHolder.tabs('option', 'active'),
                 currentZone = app.view.zonesCollection.at(index);
                 currentZone.removeItem(this.$el.data('listname'), this.model);
         }

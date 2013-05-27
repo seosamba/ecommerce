@@ -6,6 +6,7 @@ define([
 
     var zoneTabView = Backbone.View.extend({
         template: _.template($('#zoneTemplate').text()),
+        tagName: 'div',
         events: {
             'click .clearprop': 'clearProperty',
             'change .zone-name': 'setName',
@@ -35,6 +36,8 @@ define([
                 statesList.append(view.render(view.templates.state, 'delete', 'states').$el);
             });
             this.$el.find('.delete-zone').button();
+
+            this.el.id = this.model.cid;
             return this;
         },
         clearProperty: function(e){
@@ -43,11 +46,10 @@ define([
                 _.isArray(this.model.get(propName)) && this.model.set(propName, []);
                 _.isString(this.model.get(propName)) && this.model.set(propName, '');
             }
-            console.log(this.model.toJSON());
         },
         setName: function(e){
             this.model.set('name', e.target.value);
-            $('ul.ui-tabs-nav a[href=#zone-'+ this.model.cid +'] span').text(this.model.get('name'));
+            $('ul.ui-tabs-nav a[href=#'+ this.model.cid +']').text(this.model.get('name'));
         },
         setZip: function(e){
             this.model.set('zip', e.target.value.match(/^[\-0-9A-z*?]{2,10}$/gm));
