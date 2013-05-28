@@ -13,7 +13,14 @@ class Tools_Tax_Tax {
 
 	const ZONE_TYPE_COUNTRY      = 'country';
 
-	public static function calculateProductTax(Models_Model_Product $product, $destinationAddress = null) {
+	/**
+	 * Calculates product tax price according to configured rules
+	 * @param Models_Model_Product $product             Product model
+	 * @param null                 $destinationAddress  If not specified uses default tax rule for calculation
+	 * @param bool                 $taxRateOnly         If true returns only appropriate tax rate
+	 * @return float|int
+	 */
+	public static function calculateProductTax(Models_Model_Product $product, $destinationAddress = null, $taxRateOnly = false) {
 		if(($taxClass = $product->getTaxClass()) != 0) {
 			$rateMethodName = 'getRate' . $taxClass;
 
@@ -27,7 +34,8 @@ class Tools_Tax_Tax {
 			}
 
 			if (isset($tax) && $tax !== null) {
-				return round(($product->getPrice() / 100) * $tax->$rateMethodName(), 2);
+				$productPrice = is_null($product->getCurrentPrice()) ? $product->getPrice() : $product->getCurrentPrice();
+                return $taxRateOnly ? $tax->$rateMethodName() : ($productPrice / 100) * $tax->$rateMethodName();
 			}
 		}
 		return 0;
@@ -64,15 +72,17 @@ class Tools_Tax_Tax {
 						continue;
 					}
 				}
-				if ($zone->getStates()){
-					if (!empty($address['state'])) {
+				if (!empty($address['state'])){
+					if ($zone->getStates()) {
 						$states = array_map(function($state){ return $state['id'];}, $zone->getStates());
 						if (in_array($address['state'], $states)) {
 							$matchRate += 3;
 						}
 					}
-				} else {
-					$matchRate++;
+//@todo Review this scoring algoryhtm. It looks like we don't need this
+//                    else {
+//                        $matchRate++;
+//                    }
 				}
 				if (!empty($countries)) {
 					if (in_array($address['country'], $countries)){

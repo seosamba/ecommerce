@@ -70,7 +70,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'short_description'	=> $model->getShortDescription(),
 			'full_description'  => $model->getFullDescription(),
 			'price'             => $model->getPrice(),
-			'tax_class'         => $model->getTaxClass()
+			'tax_class'         => $model->getTaxClass(),
+			'inventory'         => is_numeric($model->getInventory()) ? $model->getInventory() : null,
+            'free_shipping'     => $model->getFreeShipping()
 		);
 
 		if ($model->getId()){
@@ -109,6 +111,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		if ($model->getRelated()){
 			$this->_processRelated($model);
 		}
+
+        //proccess product parts if any
+        $this->_processParts($model);
 
 		$model->notifyObservers();
 
@@ -178,7 +183,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$select->limit($limit, $offset);
 		}
 
-		error_log($select->__toString());
+		Tools_System_Tools::debugMode() && error_log($select->__toString());
 		$resultSet = $this->getDbTable()->fetchAll($select);
 
 		if(count($resultSet) === 0) {
@@ -272,6 +277,16 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$entity->setRelated($related);
 		}
 
+        //fetching product parts
+        $partsSet = $row->findDependentRowset('Models_DbTable_ProductHasPart');
+        if($partsSet->count()) {
+            $parts = array();
+            foreach($partsSet as $partsRow) {
+                array_push($parts, $partsRow->part_id);
+            }
+            $entity->setParts($parts);
+        }
+
 		//fetching product page
 		if ($row->page_id){
 			$page = Application_Model_Mappers_PageMapper::getInstance()->find($row->page_id);
@@ -346,6 +361,22 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 
 	}
+
+    private function _processParts(Models_Model_Product $model) {
+        $parts                 = $model->getParts();
+        $productHasPartDbTable = new Models_DbTable_ProductHasPart();
+        $where                 = $productHasPartDbTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+        $productHasPartDbTable->delete($where);
+        if(!$parts) {
+            return;
+        }
+        foreach($parts as $partId) {
+            $productHasPartDbTable->insert(array(
+                'product_id' => $model->getId(),
+                'part_id'    => intval($partId)
+            ));
+        }
+    }
 
 	/**
 	 * Find product which contains given tags
@@ -451,4 +482,14 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		$result = $this->getDbTable()->getAdapter()->fetchAll($select);
 		return $result;
 	}
+
+    public function countProductsWithoutWeight(){
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array('count' => 'COUNT(id)'))
+            ->where('weight = 0 OR weight IS NULL');
+        $result = $this->getDbTable()->getAdapter()->fetchAll($select);
+        return $result[0]['count'];
+    }
+
 }

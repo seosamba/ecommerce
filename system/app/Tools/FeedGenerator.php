@@ -25,21 +25,17 @@ class Tools_FeedGenerator {
     }
 
 	public function generateProductFeed(){
-		if (!file_exists($this->_websiteHelper->getPath().'products.xml') || !is_writable($this->_websiteHelper->getPath().'products.xml') ){
-			error_log(__CLASS__.': missing "products.xml" in website root directory');
-			return false;
-		}
-
 		$websiteUrl = $this->_websiteHelper->getUrl();
 
 		$indexPage = Application_Model_Mappers_PageMapper::getInstance()->findByUrl('index.html');
 		$feedData = array(
 			'title' => $indexPage->getHeaderTitle(),
-			'link' => $this->_websiteHelper->getUrl().'products.xml',
+			'link' => $this->_websiteHelper->getUrl().'sitemapproducts.xml',
 			'description' => $indexPage->getMetaDescription(),
 			'lastBuildDate' => date(DATE_RFC822),
-			'generator' => 'SEOTOASTER CMS 2.0 (http://www.seotoaster.com/)'
+			'generator' => 'SEOTOASTER CMS 2.0 ('.Tools_System_Tools::REMOTE_TOASTER_URL.')'
 		);
+		unset($indexPage);
 
 		$feed = new DOMDocument('1.0', 'utf-8');
 		$feed->formatOutput = true;
@@ -64,9 +60,13 @@ class Tools_FeedGenerator {
 			return false;
 		}
 		foreach ($products as $product) {
+            $productPage = $product->getPage();
+            if(!$productPage instanceof Application_Model_Models_Page) {
+                continue;
+            }
 			$item = $feed->createElement('item');
 			$item->appendChild($feed->createElement('title', htmlentities($product->getName())));
-			$item->appendChild($feed->createElement('link', $websiteUrl.$product->getPage()->getUrl()));
+			$item->appendChild($feed->createElement('link', $websiteUrl.$productPage->getUrl()));
 			$item->appendChild($feed->createElement('description', htmlentities($product->getShortDescription())));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
@@ -112,7 +112,7 @@ class Tools_FeedGenerator {
 			unset($item, $product);
 		}
 
-		Tools_Filesystem_Tools::saveFile($this->_websiteHelper->getPath().'products.xml', $feed->saveXml());
+		return $feed->saveXML();
 	}
 
 	private function _parseExtendedPropeties($feed, $item, $properties){

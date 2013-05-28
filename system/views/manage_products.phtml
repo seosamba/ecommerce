@@ -9,7 +9,6 @@
 			->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
 			->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
-
 <div id="store-products" class="toaster-widget store-widget">
 	<table class="products-table widget">
 		<thead>
@@ -18,7 +17,7 @@
 					<label><?php echo $this->translate('Search');?>:</label>
 					<input type="text" class="pfilter" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
 				</th>
-				<th colspan="6" class="gray-bg text-right">
+				<th colspan="7" class="gray-bg text-right">
 					<select class="pfilter w150" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
 						<?php foreach($this->brands as $brand):?>
 						<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
@@ -37,6 +36,7 @@
 				<th><?php echo $this->translate('Brand');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
 				<th><?php echo $this->translate('Mpn');?></th>
+                <th><?php echo $this->translate('Free shipping');?></th>
 				<th><?php echo $this->translate('Weight');?></th>
 				<th><?php echo $this->translate('Price');?></th>
 				<th><?php echo $this->translate('Sales count');?></th>
@@ -54,13 +54,14 @@
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="5" class="text-left">
+				<td colspan="6" class="text-left">
 					<?php echo $this->translate('with selected');?>:&nbsp;
 					<select name="product-mass-action" id="">
 						<option value="0"><?php echo $this->translate('select mass action');?></option>
 						<option value="brand"><?php echo $this->translate('assign brand');?></option>
 						<option value="template"><?php echo $this->translate('assign page template');?></option>
 						<option value="tax"><?php echo $this->translate('assign tax');?></option>
+                        <option value="freeshipping"><?php echo $this->translate('assign free shipping');?></option>
 						<option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
 						<option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
 						<option value="toggle"><?php echo $this->translate('enable/disable');?></option>
@@ -72,5 +73,8 @@
 			</tr>
 		</tfoot>
 	</table>
-
 </div>
+<!-- chosen init fix -->
+<style type="text/css">
+    .chzn-container-multi {min-width: 300px}
+</style>

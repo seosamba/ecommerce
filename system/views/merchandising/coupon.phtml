@@ -1,0 +1,135 @@
+<style type="text/css">
+#edit-coupon {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	position: relative;
+}
+#edit-coupon label{
+	display: inline-block;
+}
+#edit-coupon input,
+#edit-coupon select,
+#edit-coupon textarea {
+	width: 100px;
+}
+#edit-coupon input[type=checkbox],
+#edit-coupon input[type=radio] {
+    width: auto;
+	margin: 0 5px;
+	vertical-align: middle;
+}
+#edit-coupon input.blue-btn[type=submit]{
+	position: absolute;
+	bottom: 5px;
+	right: 10px;
+}
+#edit-coupon .input-auto {
+	width: auto;
+}
+#edit-coupon .input-micro {
+	width: 40px;
+}
+#edit-coupon .input-mini {
+    width: 60px;
+}
+#edit-coupon .input-normal {
+    width: 80px;
+}
+#edit-coupon .input-medium {
+	width: 100px;
+}
+#edit-coupon .input-large {
+	width: 140px;
+}
+
+#coupon-table_paginate a[role="button"] {
+	display: inline-block;
+	cursor: pointer;
+	padding: 4px 0;
+}
+#coupon-table_paginate a[role="button"]:not(:first-child) {
+	padding-left: 10px;
+}
+</style>
+<form id="edit-coupon" class="grid_12 clearfix">
+	<?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
+
+	<div class="clearfix grid_4">
+        <label><?php echo $this->translate('Type');?></label>
+		<?php echo $this->formSelect('type', null, array(
+				'style'         => 'width: auto',
+				'data-action'   => 'render',
+				'id'            => 'coupon-type'
+			), Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true) ); ?>
+	</div>
+
+    <div class="grid_4">
+        <label><?php echo $this->translate('Code');?></label>
+        <?php echo $this->formText('code', null, array(
+			'class'          => 'input-large',
+            'data-validator' => array('notempty'),
+            'placeholder'    => $this->translate('Enter coupon code')
+        )); ?>
+        <a id="genCoupon" style="cursor:pointer;">[<?php echo $this->translate('new'); ?>]</a>
+    </div>
+
+	<div class="grid_4">
+        <label><?php echo $this->translate('From');?></label>
+		<?php echo $this->formText('startDate', date('d-M-Y'), array(
+			'class' => 'datepicker',
+			'style' => 'width: 90px'
+		)); ?>
+<!--			</div>-->
+<!--			<div class="grid_3">-->
+        <label><?php echo $this->translate('to');?></label>
+		<?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
+			'class' => 'datepicker',
+			'style' => 'width: 90px'
+		)); ?>
+	</div>
+
+	<div class="grid_12 mt5px clearfix"></div>
+
+    <div class="grid_5">
+		<label>
+            <?php echo $this->formCheckbox('allowCombination'); ?>
+            <?php echo $this->translate('Allow in combination with other coupons');?>
+        </label>
+    </div>
+	<div class="grid_6">
+		<label>
+			<?php echo $this->formCheckbox('scope', 'client', null, array(
+			    'checked' => 'client',
+			    'unChecked' => ''
+			)); ?>
+			<?php echo $this->translate('One use per client');?>
+		</label>
+    </div>
+
+	<div class="grid_12 mt5px clearfix" id="coupon-action">
+
+	</div>
+
+	<input class="blue-btn" type="submit" value="<?php echo $this->translate('Create'); ?>"/>
+</form>
+
+<div class="toaster-widget mt5px grid_12">
+    <table id="coupon-table" style="width: 100%;" class="widget">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th><?php echo $this->translate('Type');?></th>
+            <th><?php echo $this->translate('Code');?></th>
+            <th><?php echo $this->translate('Start');?></th>
+            <th><?php echo $this->translate('End');?></th>
+            <th><?php echo $this->translate('Combine?');?></th>
+            <th><?php echo $this->translate('One use');?></th>
+            <th><?php echo $this->translate('Target');?></th>
+            <th><?php echo $this->translate('Action');?></th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>

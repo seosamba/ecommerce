@@ -1,20 +1,36 @@
 <?php
 /**
- * Taxes.php
+ * Tax rules REST API controller
+ *
+ * @package Store
+ * @since 2.0.0
+ *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Api_Store_Taxes extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
-		)
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Fetch list of tax rules by id or get a full list
+	 *
+	 * Resourse:
+	 * : /api/store/templates/id/:id
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * @return JSON Returns list of tax rules
 	 */
 	public function getAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
@@ -32,8 +48,19 @@ class Api_Store_Taxes extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Saves tax rules into database
+	 *
+	 * Resourse:
+	 * : /api/store/taxes/
+	 *
+	 * HttpMethod:
+	 * : POST
+	 *
+	 * ## Parameters:
+     * rules (type string)
+     * : List of to save
+	 *
+	 * @return JSON Paththrough list of tax rules
 	 */
 	public function postAction() {
 		$rules = $this->_request->getParam('rules', null);
@@ -47,18 +74,24 @@ class Api_Store_Taxes extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Deletes tax rule
+	 *
+	 * Resourse:
+	 * : /api/store/taxes/
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * ## Parameters:
+	 * id (type integer)
+	 *
 	 */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);

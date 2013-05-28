@@ -6,60 +6,83 @@
  */
 class Tools_ShoppingCart {
 
-	const ZONETYPE_ZIP          = 'zip';
+	/**
+	 * @deprecated
+	 */
+	const ZONETYPE_ZIP = 'zip';
 
-	const ZONETYPE_STATE        = 'state';
+	/**
+	 * @deprecated
+	 */
+	const ZONETYPE_STATE = 'state';
 
-	const ZONETYPE_COUNTRY      = 'country';
+	/**
+	 * @deprecated
+	 */
+	const ZONETYPE_COUNTRY = 'country';
 
-    protected static $_instance = null;
+	protected static $_instance = null;
 
-	protected $_content         = array();
+	protected $_content = array();
 
-	protected $_session         = null;
+	protected $_session = null;
 
-	protected $_filterId        = 0;
+	protected $_cartId = null;
 
-	protected $_cartId          = null;
+	protected $_customerId = null;
 
-	protected $_customerId      = null;
+	protected $_shippingAddressKey = null;
 
-	protected $_shippingAddressKey  = null;
+	protected $_billingAddressKey = null;
 
-	protected $_billingAddressKey   = null;
+	protected $_shippingData = null;
 
-	protected $_shippingData    = null;
+	protected $_notes = null;
 
-    private function __construct() {
-        $this->_websiteHelper   = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
-        $this->_shoppingConfig  = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+	protected $_coupons = null;
 
-        if ($this->_session === null){
-            $this->_session = new Zend_Session_Namespace($this->_websiteHelper->getUrl().'cart');
-        }
-        $this->_load();
-    }
+	protected $_subTotal = 0;
 
-    private function __clone() { }
+	protected $_totalTax = 0;
 
-    private function __wakeup() { }
+	protected $_total = 0;
 
-    /**
-     * Returns instance of Shopping Cart
-     * @return Tools_ShoppingCart
-     */
-    public static function getInstance() {
-        if (is_null(self::$_instance)){
-            self::$_instance = new Tools_ShoppingCart();
-        }
+	protected $_discount = 0;
 
-        return self::$_instance;
-    }
+	private function __construct() {
+		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
-    public function setContent($content) {
-        $this->_content = $content;
-	    return $this;
-    }
+		if ($this->_session === null) {
+			$websiteConfig = Zend_Registry::get('website');
+			$this->_session = new Zend_Session_Namespace('cart_' . $websiteConfig['url']);
+			unset($websiteConfig);
+		}
+		$this->_load();
+	}
+
+	private function __clone() {
+	}
+
+	private function __wakeup() {
+	}
+
+	/**
+	 * Returns instance of Shopping Cart
+	 * @return Tools_ShoppingCart
+	 */
+	public static function getInstance() {
+		if (is_null(self::$_instance)) {
+			self::$_instance = new Tools_ShoppingCart();
+		}
+
+		return self::$_instance;
+	}
+
+	public function setContent($content) {
+		$this->_content = $content;
+		return $this;
+	}
 
 	public function getCustomer() {
 		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
@@ -83,9 +106,9 @@ class Tools_ShoppingCart {
 		return $this;
 	}
 
-    public function getContent() {
-        return $this->_content;
-    }
+	public function getContent() {
+		return $this->_content;
+	}
 
 	/**
 	 * Tries to find storage ID using real product item ID
@@ -95,7 +118,7 @@ class Tools_ShoppingCart {
 	 */
 	public function findSidById($id) {
 		$item = $this->find($id);
-		if(is_array($item) && isset($item['sid'])) {
+		if (is_array($item) && isset($item['sid'])) {
 			return $item['sid'];
 		}
 		return false;
@@ -118,58 +141,90 @@ class Tools_ShoppingCart {
 	 * @return mixed
 	 */
 	public function find($id) {
-		$this->_filterId = $id;
-		return array_shift(array_filter($this->_content, array($this, '_filterCallback')));
+		$filteredContent = array_filter($this->_content, function ($item) use ($id) {
+			if (!isset($item['product_id']) || $item['product_id'] != $id) {
+				return (isset($item['id']) && $item['id'] == $id);
+			}
+			return true;
+		});
+
+		return reset($filteredContent);
+	}
+
+	/**
+	 *
+	 * @param Models_Model_Product $item
+	 * @param type                 $options
+	 * @return itemPrice
+	 */
+	public function calculateProductPrice(Models_Model_Product $item, $options = array()) {
+		$itemTax = Tools_Tax_Tax::calculateProductTax($item);
+		$options = $this->_parseOptions($item, $options);
+		$showWithTax = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax');
+
+		if ((bool)$showWithTax) {
+			$itemPrice = $this->_calculateItemPriceWithTax($item, $options);
+			return $itemPrice + $itemTax;
+		} else {
+			$itemPrice = $this->_calculateItemPrice($item, $options);
+			return $itemPrice;
+		}
 	}
 
 	/**
 	 * Add an item to the storage
 	 *
 	 * @param Models_Model_Product $item
-	 * @param $options array of toaster products optionsId => selectionId
-	 * @param int $qty Items quantity
+	 * @param                      $options array of toaster products optionsId => selectionId
+	 * @param int                  $qty     Items quantity
 	 * @throws Exceptions_SeotoasterPluginException
+	 * @return string Item storage key
 	 */
-    public function add(Models_Model_Product $item, $options = array(), $qty = 1) {
-	    if(!$item instanceof Models_Model_Product)  {
-		    throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
-	    }
-	    $itemKey = $this->_generateStorageKey($item, $options);
-	    if(!array_key_exists($itemKey, $this->_content)) {
-		    $itemTax   = Tools_Tax_Tax::calculateProductTax($item);
-		    $options   = $this->_parseOptions($item, $options);
-		    $itemPrice = $this->_calculateItemPrice($item, $options, $itemTax);
-		    $this->_content[$itemKey] = array(
-			    'qty'              => $qty,
-			    'photo'            => $item->getPhoto(),
-			    'name'             => $item->getName(),
-			    'sku'              => $item->getSku(),
-			    'mpn'              => $item->getMpn(),
-			    'description'      => $item->getFullDescription(),
-			    'shortDescription' => $item->getShortDescription(),
-			    'sid'              => $itemKey,
-			    'options'          => $options,
-			    'id'               => $item->getId(),
-			    'price'            => $itemPrice,
-			    'weight'           => $this->_calculateItemWeight($item, $options),
-			    'tax'              => $itemTax,
-			    'taxPrice'         => $itemPrice + $itemTax,
-			    'taxClass'         => $item->getTaxClass(),
-			    'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
-			    'note'             => ''
-		    );
-	    }
-	    else {
-		    $this->_content[$itemKey]['qty'] += $qty;
-	    }
-	    unset($item);
-	    $this->_save();
-    }
+	public function add(Models_Model_Product $item, $options = array(), $qty = 1) {
+		if (!$item instanceof Models_Model_Product) {
+			throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
+		}
+		$itemKey = $this->_generateStorageKey($item, $options);
+		if (!array_key_exists($itemKey, $this->_content)) {
+			$options = $this->_parseOptions($item, $options);
+			$itemPrice = $this->_calculateItemPrice($item, $options);
+			$item->setCurrentPrice($itemPrice);
+			$itemTax = Tools_Tax_Tax::calculateProductTax($item);
+			$this->_content[$itemKey] = array(
+				'qty'              => $qty,
+				'photo'            => $item->getPhoto(),
+				'name'             => $item->getName(),
+				'sku'              => $item->getSku(),
+				'mpn'              => $item->getMpn(),
+				'description'      => $item->getFullDescription(),
+				'shortDescription' => $item->getShortDescription(),
+				'sid'              => $itemKey,
+				'options'          => $options,
+				'id'               => $item->getId(),
+				'price'            => $itemPrice,
+				'weight'           => $this->_calculateItemWeight($item, $options),
+				'tax'              => $itemTax,
+				'taxPrice'         => $itemPrice + $itemTax,
+				'taxClass'         => $item->getTaxClass(),
+				'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
+				'note'             => '',
+                'freeShipping'     => $item->getFreeShipping()
+			);
+		} else {
+			$this->_content[$itemKey]['qty'] += $qty;
+		}
+		unset($item);
+
+		$this->calculate(true);
+		$this->_save();
+
+		return $itemKey;
+	}
 
 	private function _calculateItemWeight(Models_Model_Product $item, $modifiers) {
 		$weight = $item->getWeight();
-		if(!empty($modifiers)) {
-			foreach($modifiers as $modifier) {
+		if (!empty($modifiers)) {
+			foreach ($modifiers as $modifier) {
 				$weight = (($modifier['weightSign'] == '+') ? $weight + $modifier['weightValue'] : $weight - $modifier['weightValue']);
 			}
 		}
@@ -177,12 +232,33 @@ class Tools_ShoppingCart {
 	}
 
 	private function _calculateItemPrice(Models_Model_Product $item, $modifiers) {
-		$price = $item->getPrice();
-		if(!empty($modifiers)) {
-			foreach($modifiers as $modifier) {
-				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($price / 100) * $modifier['priceValue']);
-				$price    = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
-            }
+		$originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+		$price = $originalPrice;
+		if (!empty($modifiers)) {
+			foreach ($modifiers as $modifier) {
+				if (!is_array($modifier) || empty($modifier)) {
+					continue;
+				}
+				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+				$price = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
+			}
+		}
+		return $price;
+	}
+
+	private function _calculateItemPriceWithTax(Models_Model_Product $item, $modifiers) {
+		$originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
+		$price = $originalPrice;
+		$taxRate = Tools_Tax_Tax::calculateProductTax($item, null, true);
+		if (!empty($modifiers)) {
+			foreach ($modifiers as $modifier) {
+				if ($taxRate) {
+					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue']);
+				} else {
+					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+				}
+				$price = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
+			}
 		}
 		return $price;
 	}
@@ -191,105 +267,155 @@ class Tools_ShoppingCart {
 		return $this->_generateStorageKey($item, $options);
 	}
 
-	public function calculate() {
-		$summary = array('subTotal' => 0, 'totalTax' => 0, 'shipping' => 0, 'total' => 0, 'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']);
-		if(is_array($this->_content) && !empty($this->_content)) {
-			if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))){
-				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
-			} else {
-				$destinationAddress = null;
-			}
+	public function calculate($recalculate = false) {
 
-			foreach($this->_content as $storageKey => &$cartItem) {
-				$product = new Models_Model_Product(array(
-					'price'     => $cartItem['price'],
-					'taxClass'  => $cartItem['taxClass']
-				));
+        $summary = array(
+            'subTotal'        => 0,
+            'discount'        => 0,
+            'totalTax'        => 0,
+            'total'           => 0,
+            'shipping'        => 0,
+            'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
+        );
 
-				$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
-				$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
-				$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
-				$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
-			}
-			$summary['shipping'] = 0;
-			if (($shipping = $this->getShippingData()) !== null){
-				$summary['shipping'] = floatval($shipping['price']);
-			}
-			$summary['total'] = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
-
+		$shippingPrice = 0;
+		if (($shipping = $this->getShippingData()) !== null) {
+			$shippingPrice = floatval($shipping['price']);
 		}
-		return $summary;
+
+		if ($recalculate === true) {
+
+            if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))) {
+				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
+			}
+
+			if (is_array($this->_content) && !empty($this->_content)) {
+				foreach ($this->_content as $storageKey => &$cartItem) {
+					if (isset($cartItem['sid'])) {
+						$product = new Models_Model_Product(array(
+							'price'    => $cartItem['price'],
+							'taxClass' => $cartItem['taxClass']
+						));
+
+					} else {
+						$product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
+						$product->setPrice($cartItem['price']);
+					}
+
+					$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
+					$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
+					$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
+					$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
+				}
+			}
+
+			$summary['shipping'] = $shippingPrice;
+			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
+
+			foreach ($summary as $key => $value) {
+				$methodName = 'set' . ucfirst($key);
+				if (method_exists($this, $methodName)) {
+					$this->$methodName($value);
+				}
+			}
+
+			//process discount coupons
+			$discountCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_DISCOUNT);
+			foreach ($discountCoupons as $coupon) {
+				$summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
+			}
+			$summary['total'] -= $summary['discount'];
+
+			$this->setDiscount($summary['discount'])
+					->setTotal($summary['total']);
+		}
+		return array(
+			'subTotal'        => $this->getSubTotal(),
+			'discount'        => $this->getDiscount(),
+			'totalTax'        => $this->getTotalTax(),
+			'total'           => $this->getTotal(),
+			'shipping'        => $shippingPrice
+			//'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
+		);
 	}
 
 	/**
 	 * Remove item from the storage
 	 *
 	 * @param string|Models_Model_Product $item
-	 * @param boolean $complete Remove completely or just decrease item qty
+	 * @param boolean                     $complete Remove completely or just decrease item qty
 	 * @return boolean
 	 * @throws Exceptions_SeotoasterException
 	 */
-    public function remove($item, $complete = true) {
-	    if(is_string($item)) {
-		    $storageKey = $item;
-	    } else if($item instanceof Models_Model_Product) {
-		    $storageKey = $this->findSidById($item->getId());
-	    } else {
-		    throw new Exceptions_SeotoasterException('Shopping cart storage key or Models_Model_Product object expected.');
-	    }
-	    if(array_key_exists($storageKey, $this->_content)) {
-			if($complete) {
-		        unset($this->_content[$storageKey]);
-			} else {
-			    $this->_content[$storageKey]['qty']--;
-		    }
-			$this->_save();
-			return true;
+	public function remove($item, $complete = true) {
+		if (is_string($item)) {
+			$storageKey = $item;
+		} elseif ($item instanceof Models_Model_Product) {
+			$storageKey = $this->findSidById($item->getId());
+		} else {
+			throw new Exceptions_SeotoasterException('Shopping cart storage key or Models_Model_Product object expected.');
 		}
-	    return false;
-    }
-
-	/**
-	 * Recount item qty
-	 *
-	 * @param string|Models_Model_Product $item
-	 * @param integer $newQty
-	 * @return boolean
-	 * @throws Exceptions_SeotoasterException
-	 */
-	public function updateQty($item, $newQty) {
-		if(is_string($item)) {
-		    $storageKey = $item;
-	    } else if($item instanceof Models_Model_Product) {
-		    $storageKey = $this->findSidById($item->getId());
-	    } else {
-		    throw new Exceptions_SeotoasterException('Shopping cart storage key or Models_Model_Product object expected.');
-	    }
-		if(array_key_exists($storageKey, $this->_content)) {
-			$this->_content[$storageKey]['qty'] += ($newQty - $this->_content[$storageKey]['qty']);
-			if($this->_content[$storageKey]['qty'] <= 0) {
+		if (array_key_exists($storageKey, $this->_content)) {
+			if ($complete) {
 				unset($this->_content[$storageKey]);
+			} else {
+				$this->_content[$storageKey]['qty']--;
 			}
+			$this->calculate(true);
 			$this->_save();
 			return true;
 		}
 		return false;
 	}
 
-	public function calculateCartWeight() {
-		$totalWeight = 0;
-		if(is_array($this->_content) && !empty($this->_content)) {
-			foreach($this->_content as $cartItem) {
-				$totalWeight += $cartItem['weight'] * $cartItem['qty'];
-			}
+	/**
+	 * Recount item qty
+	 *
+	 * @param string|Models_Model_Product $item
+	 * @param integer                     $newQty
+	 * @return boolean
+	 * @throws Exceptions_SeotoasterException
+	 */
+	public function updateQty($item, $newQty) {
+		if (is_string($item)) {
+			$storageKey = $item;
+		} else if ($item instanceof Models_Model_Product) {
+			$storageKey = $this->findSidById($item->getId());
+		} else {
+			throw new Exceptions_SeotoasterException('Shopping cart storage key or Models_Model_Product object expected.');
 		}
-		return $totalWeight;
+		if (array_key_exists($storageKey, $this->_content)) {
+			$this->_content[$storageKey]['qty'] += ($newQty - $this->_content[$storageKey]['qty']);
+			if ($this->_content[$storageKey]['qty'] <= 0) {
+				unset($this->_content[$storageKey]);
+			}
+			$this->calculate(true);
+			$this->_save();
+			return true;
+		}
+		return false;
 	}
+
+	public function calculateCartWeight($withFreeShipping = false) {
+		$totalWeight = 0;
+        if(is_array($this->_content) && !empty($this->_content)) {
+            foreach($this->_content as $cartItem) {
+                if(!$withFreeShipping){
+                    if($cartItem['freeShipping'] == 0){
+                        $totalWeight += $cartItem['weight'] * $cartItem['qty'];
+                    }
+                }else{
+                    $totalWeight += $cartItem['weight'] * $cartItem['qty'];
+                }
+            }
+        }
+        return $totalWeight;
+    }
 
 	public function calculateCartPrice() {
 		$totalPrice = 0;
-		if(is_array($this->_content) && !empty($this->_content)) {
-			foreach($this->_content as $cartItem) {
+		if (is_array($this->_content) && !empty($this->_content)) {
+			foreach ($this->_content as $cartItem) {
 				$totalPrice += $cartItem['price'] * $cartItem['qty'];
 			}
 		}
@@ -301,36 +427,53 @@ class Tools_ShoppingCart {
 	}
 
 	private function _load() {
-		if (isset($this->_session->cartContent)) {
-			$this->setContent(unserialize($this->_session->cartContent));
-		}
-		if (isset($this->_session->cartId)) {
-			$this->setCartId($this->_session->cartId);
-		}
-		if (isset($this->_session->customerId)) {
-			$this->setCustomerId($this->_session->customerId);
-		}
-		if (isset($this->_session->shippingData)) {
-			$this->setShippingData(unserialize($this->_session->shippingData));
-		}
+		$reflection = new Zend_Reflection_Class(__CLASS__);
+		foreach ($reflection->getProperties() as $prop) {
+			$name = $prop->getName();
+			/**
+			 * @var $prop Zend_Reflection_Property
+			 */
+			if ($prop->isStatic()) {
+				continue;
+			}
+			$setter = 'set' . $this->_normalizeOptionsKey($name);
 
-		$this->_shippingAddressKey  = $this->_session->shippingAddressKey;
-		$this->_billingAddressKey   = $this->_session->billingAddressKey;
+			if ($reflection->hasMethod($setter) && isset($this->_session->{$name})) {
+				$value = @unserialize($this->_session->{$name});
+				$this->$setter($value === false ? $this->_session->{$name} : $value);
+			}
+		}
 
 		return $this;
 	}
 
-    private function _save() {
-        $this->_session->cartContent = serialize($this->getContent());
-	    $this->_session->cartId      = $this->getCartId();
-	    $this->_session->customerId  = $this->getCustomerId();
-	    $this->_session->shippingAddressKey = $this->_shippingAddressKey;
-	    $this->_session->billingAddressKey  = $this->_billingAddressKey;
-	    $this->_session->shippingData  = serialize($this->getShippingData());
-    }
+	private function _save() {
+		$reflection = new Zend_Reflection_Class(__CLASS__);
+		foreach ($reflection->getProperties() as $prop) {
+			$name = $prop->getName();
+			/**
+			 * @var $prop Zend_Reflection_Property
+			 */
+			if ($prop->isStatic()) {
+				continue;
+			}
+			$getter = 'get' . $this->_normalizeOptionsKey($name);
+
+			if ($reflection->hasMethod($getter)) {
+				$value = $this->$getter();
+				$this->_session->__set($name, is_array($value) ? serialize($value) : $value);
+			}
+		}
+
+		return $this;
+	}
+
+	protected function _normalizeOptionsKey($key) {
+		return join('', array_map('ucfirst', explode('_', $key)));
+	}
 
 	/**
-	 * Saves cuurent cart data to database
+	 * Saves current cart data to database
 	 *
 	 * @param $customer
 	 * @return Tools_ShoppingCart
@@ -348,56 +491,67 @@ class Tools_ShoppingCart {
 		}
 
 		$cartSessionContent = array();
-		foreach ($this->getContent() as $uniqKey => $item) {
-			$data = array(
-				'product_id'    => $item['id'],
-				'price'         => $item['price'],
-				'qty'           => $item['qty'],
-				'tax'           => $item['tax'],
-				'tax_price'     => $item['taxPrice'],
-				'options'       => array()
-			);
-
-			foreach ($item['options'] as $option) {
-				$data['options'][$option['option_id']] = isset($option['id']) ? $option['id'] : $option['title'];
-			}
-			array_push($cartSessionContent, $data);
-		}
-		$cartSession->setCartContent($cartSessionContent);
-		$cartSession->setIpAddress($_SERVER['REMOTE_ADDR']);
-		$cartSession->setOptions($this->calculate());
+//		if ($this->getContent()){
+//			foreach ($this->getContent() as $uniqKey => $item) {
+//				$data = array(
+//					'product_id' => isset($item['product_id']) ? $item['product_id'] : $item['id'],
+//					'price'      => $item['price'],
+//					'qty'        => $item['qty'],
+//					'tax'        => $item['tax'],
+//					'tax_price'  => $item['taxPrice'],
+//					'options'    => isset($item['options']) ? $item['options'] : array()
+//				);
+//
+//				foreach ($item['options'] as $option) {
+//					$data['options'][$option['option_id']] = isset($option['id']) ? $option['id'] : $option['title'];
+//				}
+//				array_push($cartSessionContent, $data);
+//			}
+//		}
+		$cartSession->setCartContent($this->getContent())
+				->setIpAddress($_SERVER['REMOTE_ADDR'])
+				->setOptions($this->calculate());
 
 		if ($customer->getId() !== null) {
 			$cartSession->setUserId($customer->getId())
-					->setShippingAddressId( $this->_shippingAddressKey )
-					->setBillingAddressId(  $this->_billingAddressKey );
+					->setShippingAddressId($this->_shippingAddressKey)
+					->setBillingAddressId($this->_billingAddressKey);
 		}
 
-		if ($customer->getReferer()){
+		if ($customer->getReferer()) {
 			$cartSession->setReferer($customer->getReferer());
 		}
 
 		if (null !== ($shippingData = $this->getShippingData())) {
 			$cartSession->setShippingPrice($shippingData['price'])
-				->setShippingType($shippingData['type'])
-				->setShippingService($shippingData['service']);
+					->setShippingType($shippingData['type'])
+					->setShippingService($shippingData['service']);
+		}
+
+		if ($this->getNotes()) {
+			$cartSession->setNotes($this->getNotes());
 		}
 
 		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
-		if ($result && $this->getCartId() === null){
+		if ($result && $this->getCartId() === null) {
 			$cartSession->notifyObservers();
 			$this->setCartId($cartSession->getId())->save();
 		}
 
-        return $this;
+		//saving "one use per client" coupons to DB
+		if (sizeof($this->getCoupons())){
+			Store_Mapper_CouponMapper::getInstance()->saveCouponsToCart($this);
+		}
+
+		return $this;
 	}
 
 	public function restoreCartSession($cartId) {
 		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
-		$currentUser   = $sessionHelper->getCurrentUser();
+		$currentUser = $sessionHelper->getCurrentUser();
 
 		$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(intval($cartId));
-		if ($cartSession !== null ) {
+		if ($cartSession !== null) {
 			//preventing user to restore foreign cart
 			//			if ( $cartSession->getUserId() === null ||
 			//              $currentUser->getRoleId() !== Shopping::ROLE_CUSTOMER ||
@@ -406,8 +560,8 @@ class Tools_ShoppingCart {
 			//			}
 
 			$this->setCartId($cartSession->getId())
-				->setContent($cartSession->getCartContent())
-				->save();
+					->setContent(is_null($cartSession->getCartContent()) ? array() : $cartSession->getCartContent())
+					->save();
 		}
 	}
 
@@ -417,22 +571,22 @@ class Tools_ShoppingCart {
 
 	private function _parseOptions(Models_Model_Product $item, $options = array()) {
 		$modifiers = array();
-		if(!empty($options)) {
+		if (!empty($options)) {
 			$defaultOptions = $item->getDefaultOptions();
-			foreach($defaultOptions as $defaultOption) {
-				switch ($defaultOption['type']){
+			foreach ($defaultOptions as $defaultOption) {
+				switch ($defaultOption['type']) {
 					case Models_Model_Option::TYPE_DROPDOWN:
 					case Models_Model_Option::TYPE_RADIO:
-						foreach($options as $optionId => $selectionId) {
-							if($defaultOption['id'] != $optionId) {
+						foreach ($options as $optionId => $selectionId) {
+							if ($defaultOption['id'] != $optionId) {
 								continue;
 							}
 							$defaultSelections = $defaultOption['selection'];
-							if(empty($defaultSelections)) {
+							if (empty($defaultSelections)) {
 								return array();
 							}
-							foreach($defaultSelections as $defaultSelection) {
-								if($defaultSelection['id'] != $selectionId) {
+							foreach ($defaultSelections as $defaultSelection) {
+								if ($defaultSelection['id'] != $selectionId) {
 									continue;
 								}
 								$modifiers[$defaultOption['title']] = $defaultSelection;
@@ -442,12 +596,12 @@ class Tools_ShoppingCart {
 					case Models_Model_Option::TYPE_DATE:
 					case Models_Model_Option::TYPE_TEXT:
 						$modifiers[$defaultOption['title']] = array(
-							'option_id' => $defaultOption['id'],
-							'title'     => $options[$defaultOption['id']],
-							'priceSign' => null,
-							'priceType' => null,
-							'priceValue' => null,
-							'weightSign' => null,
+							'option_id'   => $defaultOption['id'],
+							'title'       => $options[$defaultOption['id']],
+							'priceSign'   => null,
+							'priceType'   => null,
+							'priceValue'  => null,
+							'weightSign'  => null,
 							'weightValue' => null
 						);
 						break;
@@ -455,10 +609,6 @@ class Tools_ShoppingCart {
 			}
 		}
 		return $modifiers;
-	}
-
-	private function _filterCallback($item) {
-		return (isset($item['id']) && $item['id'] == $this->_filterId);
 	}
 
 	public function setCartId($cartId) {
@@ -475,8 +625,11 @@ class Tools_ShoppingCart {
 		return $this->_cartId;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setAddressKey($type, $addressKey) {
-		switch ($type){
+		switch ($type) {
 			case Models_Model_Customer::ADDRESS_TYPE_BILLING:
 				$this->_billingAddressKey = $addressKey;
 				break;
@@ -488,8 +641,11 @@ class Tools_ShoppingCart {
 		return $this;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getAddressKey($type) {
-		switch ($type){
+		switch ($type) {
 			case Models_Model_Customer::ADDRESS_TYPE_BILLING:
 				return $this->_billingAddressKey;
 				break;
@@ -502,7 +658,7 @@ class Tools_ShoppingCart {
 	public static function getAddressById($id) {
 		$addressTable = new Models_DbTable_CustomerAddress();
 		$address = $addressTable->find($id)->current();
-		return $address ? $address->toArray() : null ;
+		return $address ? $address->toArray() : null;
 	}
 
 	public function setShippingData($shippingData) {
@@ -522,5 +678,78 @@ class Tools_ShoppingCart {
 	public function getCustomerId() {
 		return $this->_customerId;
 	}
+
+	public function setNotes($notes) {
+		$this->_notes = $notes;
+		return $this;
+	}
+
+	public function getNotes() {
+		return $this->_notes;
+	}
+
+	public function setCoupons($coupons) {
+		$this->_coupons = $coupons;
+		return $this;
+	}
+
+	public function getCoupons() {
+		return $this->_coupons;
+	}
+
+	public function setDiscount($discount) {
+		$this->_discount = $discount;
+		return $this;
+	}
+
+	public function getDiscount() {
+		return $this->_discount;
+	}
+
+	public function setSubTotal($subTotal) {
+		$this->_subTotal = $subTotal;
+		return $this;
+	}
+
+	public function getSubTotal() {
+		return $this->_subTotal;
+	}
+
+	public function setTotal($total) {
+		$this->_total = $total;
+		return $this;
+	}
+
+	public function getTotal() {
+		return $this->_total;
+	}
+
+	public function setTotalTax($totalTax) {
+		$this->_totalTax = $totalTax;
+		return $this;
+	}
+
+	public function getTotalTax() {
+		return $this->_totalTax;
+	}
+
+	public function setBillingAddressKey($billingAddressKey) {
+		$this->_billingAddressKey = $billingAddressKey;
+		return $this;
+	}
+
+	public function getBillingAddressKey() {
+		return $this->_billingAddressKey;
+	}
+
+	public function setShippingAddressKey($shippingAddressKey) {
+		$this->_shippingAddressKey = $shippingAddressKey;
+		return $this;
+	}
+
+	public function getShippingAddressKey() {
+		return $this->_shippingAddressKey;
+	}
+
 
 }

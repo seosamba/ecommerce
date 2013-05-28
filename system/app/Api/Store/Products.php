@@ -1,16 +1,28 @@
 <?php
 /**
- * Api_Store_Products
+ * Products REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Products extends Api_Service_Abstract {
 
 	/**
-	 * @var Models_Mapper_ProductMapper
+	 * @var Models_Mapper_ProductMapper Mapper for Products
 	 */
 	private $_productMapper;
 
-	protected $_accessList = array(
+    /**
+     * @var Helpers_Action_Language Language helper
+     * @ignore
+     */
+    private $_translator = null;
+
+	/**
+	 * @var array Access Control List
+	 */
+    protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
 		),
@@ -22,12 +34,52 @@ class Api_Store_Products extends Api_Service_Abstract {
 		)
 	);
 
+	/**
+	 * Initialization
+	 * @ignore
+	 */
 	public function init() {
 		parent::init();
 		$this->_productMapper   = Models_Mapper_ProductMapper::getInstance();
 		$this->_cacheHelper     = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+        $this->_translator      = Zend_Controller_Action_HelperBroker::getStaticHelper('language');
 	}
 
+	/**
+	 * Get products by giving contitions
+	 *
+	 * Resourse:
+	 * : /api/store/products/id/:id
+	 *
+	 * Method:
+	 * : GET
+	 *
+	 * ## Parameters:
+	 * id (type string)
+	 * : Product id to fetch single product
+	 *
+	 * ## Optional parameters (оnly if ID is not defined)
+	 *
+	 * limit (type integer)
+	 * : Maximum number of results
+	 *
+	 * offset (type integer)
+	 * : Number of results to skip
+	 *
+	 * count (type boolean)
+	 * : Include total result count if true
+	 *
+	 * key (type string)
+	 * : Filter results by keyword. Searches across name, mpn, sku, brand name or tags
+	 *
+	 * ftag (type array)
+	 * : Filter results by given tag IDs
+	 *
+	 * fbrand (type string)
+	 * : Filter results by given brand names
+	 *
+	 * @return JSON List of products
+	 */
 	public function getAction() {
 		$data = array();
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
@@ -85,6 +137,18 @@ class Api_Store_Products extends Api_Service_Abstract {
 		return $data;
 	}
 
+
+	/**
+	 * New product creation
+	 *
+	 * Resourse:
+	 * : /api/store/products/
+	 *
+	 * HttpMethod:
+	 * : POST
+	 *
+	 * @return JSON New product model
+	 */
 	public function postAction() {
 		$srcData = Zend_Json_Decoder::decode($this->_request->getRawBody());
 		$validator = new Zend_Validate_Db_NoRecordExists(array(
@@ -108,26 +172,42 @@ class Api_Store_Products extends Api_Service_Abstract {
 		$this->_error();
 	}
 
+	/**
+	 * Update product model fields
+	 *
+	 * Resourse:
+	 * : /api/store/products/
+	 *
+	 * HttpMethod:
+	 * : PUT
+	 *
+	 * @return JSON Updated product model
+	 */
 	public function putAction() {
 		$data = array();
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		$srcData = json_decode($this->_request->getRawBody(), true);
-		if (!empty($id) && !empty($srcData)){
+		if (empty($srcData)){
+			$this->_error('Empty data');
+		}
+		if (!empty($id)){
 			$products = $this->_productMapper->find($id);
 			!is_array($products) && $products = array($products);
 			if (isset($srcData['id'])){
 				unset($srcData['id']);
 			}
-		} elseif(!empty($srcData)) {
-			$key    = filter_var($this->_request->getParam('key'), FILTER_SANITIZE_STRING);
-			$tags   = filter_var_array($this->_request->getParam('ftag', array()), FILTER_SANITIZE_NUMBER_INT);
-			$brands  = filter_var_array($this->_request->getParam('fbrand', array()), FILTER_SANITIZE_STRING);
-			if (empty($key) && empty($tags) && empty($brands)){
-				return array(
-					'error'		=> true,
-					'code'		=> 400,
-					'message'	=> 'Bad request'
-				);
+		} else {
+			$key    = $this->_request->getParam('key');
+			if (!is_null($key)){
+				$key = filter_var($key, FILTER_SANITIZE_STRING);
+			}
+			$tags   = $this->_request->getParam('ftag');
+			if ($tags){
+				$tags = filter_var_array($tags, FILTER_SANITIZE_NUMBER_INT);
+			}
+			$brands  = $this->_request->getParam('fbrand');
+			if ($brands){
+				$brands = filter_var_array($brands, FILTER_SANITIZE_STRING);
 			}
 
 			$products = $this->_productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands);
@@ -149,6 +229,33 @@ class Api_Store_Products extends Api_Service_Abstract {
 		}
 	}
 
+
+	/**
+	 * Remove product
+	 *
+	 * Resourse:
+	 * : /api/store/products/
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * ## Parameters:
+	 * id (type string)
+	 * : Id of product to delete
+	 *
+	 * ## Optional parameters (оnly if ID is not defined)
+	 *
+	 * key (type string)
+     * : Filter results by keyword. Searches across name, mpn, sku, brand name or tags.
+     *
+     * ftag (type array)
+     * : Filter results by given tag IDs
+     *
+     * fbrand (type string)
+     * : Filter results by given brand names
+	 *
+	 * @return JSON Result of deletion
+	 */
 	public function deleteAction() {
 		$ids = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 

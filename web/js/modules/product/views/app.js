@@ -8,11 +8,14 @@ define([
     '../collections/images',
     './tag',
 	'./option',
-	'./productlist'
+	'./productlist',
+    '../../coupons/views/coupon_form',
+    '../../coupons/views/coupons_table',
+    '../../groups/views/group_price'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -25,8 +28,9 @@ define([
 			'click #submit': 'saveProduct',
 			'change #product-image-folder': 'imageChange',
 			'click div.box': 'setProductImage',
-			'change [data-reflection=property]': 'setProperty',
+			'change :input[data-reflection]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
+            'change #free-shipping': 'toggleFreeShipping',
 			'click #product-tags-available div.tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
             'keypress input#new-brand': 'newBrand',
@@ -41,22 +45,24 @@ define([
                 e.preventDefault();
                 $('#product-tags-current, #product-tags-available, div.paginator', '#tag-tab').slideToggle();
             },
-            'click .paginator a.page': 'paginatorAction'
+            'click .paginator a.page': 'paginatorAction',
+            'change #automated-set-price': 'toggleSetPriceConfig'
 		},
         products: null,
         tags: null,
         brands: null,
         searchIndex: null,
 		websiteUrl: $('#website_url').val(),
+        mediaPath: $('#media-path').val(),
 		initialize: function(){
             var self = this;
             this.initProduct();
             $('#add-new-option-btn').button();
 
-            $('#product-list-search').ajaxStart(function(){
-                $(this).attr('disabled', 'disabled');
+            $(document).ajaxStart(function(){
+                $('#product-list-search').attr('disabled', 'disabled');
             }).ajaxStop(function(){
-                $(this).removeAttr('disabled');
+                $('#product-list-search').removeAttr('disabled');
             });
 
             this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
@@ -67,16 +73,38 @@ define([
             });
 
             $('#ajax_msg, #product-list').hide();
-            this.$el.on('tabsselect', function(event, ui){
-                if (ui.index === 1){
-                    self.initTags();
+            this.$el.tabs({
+                beforeLoad: function(event, ui){
+                    ui.ajaxSettings.url += '?'+$.param({productId : self.model.get('id')}); // TODO find a right way
+                }
+            });
+            this.$el.on('tabsbeforeactivate', function(event, ui){
+                switch (ui.newPanel.selector){
+                    case '#tag-tab':
+                        self.initTags();
+                    break;
+                    case '#coupon-tab':
+                    case '#group-pricing-tab':
+                        if (self.model.isNew()){
+                            showMessage('Please save product information first', true);
+                            return false;
+                        }
+                    break;
                 }
             }).show();
 
             this.images =  new ImagesCollection(),
             this.images.on('reset', this.renderImages, this);
 
-            this.render()
+            this.render();
+
+            this.couponForm = new CouponFormView();
+            this.couponGrid = new CouponGridView({hideProductColumn: true});
+            this.couponForm.$el.on('coupon:created', _.bind(this.couponGrid.render, this.couponGrid));
+            this.couponForm.render();
+
+            this.groupsPrice = new GroupsPriceView();
+
 		},
         initProducts: function(){
             if (this.products === null) {
@@ -101,16 +129,15 @@ define([
 
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
+            this.model.on('change:id', this.setProductIdForCouponAndGroup, this);
+
             this.model.on('sync', function(){
                 if (this.model.has('options')){
                     this.model.get('options').on('add', this.renderOption, this);
                     this.model.get('options').on('reset', this.renderOptions, this);
                 }
                 if (this.products !== null){
-//                    var product = this.products.get(this.model.get('id'));
-//                    !_.isUndefined(product) && product.set(this.model.toJSON());
                     this.products.pager();
-    
                 }
                 this.render();
                 showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
@@ -135,6 +162,9 @@ define([
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
 		},
+        toggleFreeShipping: function(e){
+            this.model.set({freeShipping: this.$('#free-shipping').prop('checked') ? 1 :0 });
+        },
 		newTag: function(e){
 			var name = $.trim(e.currentTarget.value);
 			if (e.keyCode == 13 && name !== '') {
@@ -153,6 +183,7 @@ define([
 			var newOption = new ProductOption();
             newOption.get('selection').add({isDefault: 1});
 			this.model.get('options').add(newOption);
+            this.renderOptions();
 		},
         addOption: function(){
             var optId = this.$('#option-library').val();
@@ -197,21 +228,17 @@ define([
             var imgName = $(e.currentTarget).find('img').data('name');
             var fldrName = this.$('#product-image-folder').val();
             this.model.set({photo: fldrName+'/'+imgName });
-            this.$('#product-image').attr('src', '/media/'+this.model.get('photo').replace('/', '/small/'));
+            this.$('#product-image').attr('src', '/' + this.mediaPath + this.model.get('photo').replace('/', '/small/'));
             this.$('#image-select-dialog').hide('slide');
             this.$('#product-image-folder').val('0');
         },
 		setProperty: function(e){
-			var propName = e.currentTarget.id.replace('product-', '');
-			var data = {};
-			data[propName] = e.currentTarget.value;
-			this.model.set(data);
+			var propName = $(e.currentTarget).data('reflection');
+			this.model.set(propName, _.isNaN(e.currentTarget.value) ? null : e.currentTarget.value) ;
 		},
 		render: function(){
             console.log('render: app.js', this.model.changedAttributes());
-            this.$el.tabs("select" , 0).tabs( "option", "ajaxOptions",
-                { data: {productId: this.model.get('id') } }
-            );
+            this.$el.tabs({ active: 0 });
 
             $('#product-list:visible').hide();
 
@@ -226,39 +253,27 @@ define([
 
 			//setting model properties to view
 			if (this.model.has('photo')){
-				this.$('#product-image').attr('src', $('#website_url').val()+'media/'+this.model.get('photo').replace('/', '/small/'));
+				this.$('#product-image').attr('src', $('#website_url').val()+ this.mediaPath + this.model.get('photo').replace('/', '/small/'));
 			} else {
 				this.$('#product-image').attr('src', $('#website_url').val()+'system/images/noimage.png');
 			}
-			this.$('#product-name').val(this.model.get('name'));
-			this.$('#product-sku').val(this.model.get('sku'));
-			this.$('#product-mpn').val(this.model.get('mpn'));
-			this.$('#product-weight').val(this.model.get('weight'));
 
+            this.$('#product-brand').val(-1); //reseting brand field
 
-            if (this.model.has('brand')){
-                this.$('#product-brand').val(this.model.get('brand'));
-            } else {
-                this.$('#product-brand').val(-1);
+            var self = this;
+            _.each(this.model.toJSON(), function(value, name){
+                self.$('[data-reflection='+name+']').val(value);
+            });
+
+            if (this.model.has('related')){
+                _.isEmpty(this.model.get('related')) && this.$('#related-holder').empty();
             }
-
-			this.$('#product-price').val(this.model.get('price'));
-			this.$('#product-taxClass').val(this.model.get('taxClass'));
-			this.$('#product-shortDescription').val(this.model.get('shortDescription'));
-			this.$('#product-fullDescription').val(this.model.get('fullDescription'));
 
 			// loading option onto frontend
-			$('#options-holder').empty();
-			if (this.model.has('options')) {
-                this.renderOptions();
-			}
-
-            //populating selected tags
-            if (!this.model.has('tags')) {
-                $('#product-tags-current').empty();
-                $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
-            }
-//			$('#product-tags-available:not(:empty)').find('div.tag-widget').show();
+//			$('#options-holder').empty();
+//			if (this.model.has('options')) {
+            this.renderOptions();
+//			}
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
@@ -266,6 +281,13 @@ define([
 			} else {
 				this.$('#product-enabled').removeAttr('checked');
 			}
+
+            //toggle free-shipping flag
+            if (parseInt(this.model.get('freeShipping'))){
+                this.$('#free-shipping').attr('checked', 'checked');
+            } else {
+                this.$('#free-shipping').removeAttr('checked');
+            }
 
 			if (this.model.has('pageTemplate')){
 				this.$('#product-pageTemplate').val(this.model.get('pageTemplate'));
@@ -279,6 +301,7 @@ define([
                 $('#quick-preview').html(this.quickPreviewTmpl({
                     product: this.model.toJSON(),
                     websiteUrl: $('#website_url').val(),
+                    mediaPath: this.mediaPath,
                     currency: this.$('#currency-unit').text()
                 }));
             }
@@ -327,6 +350,8 @@ define([
             }, 500);
         },
         renderProductTags: function(){
+            console.log('render product tags');
+            $('div.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
             if (this.model && this.model.has('tags')){
                 var self = this,
                     container = $('#product-tags-current').empty();
@@ -526,6 +551,9 @@ define([
                 case 'related':
                     this.addRelated(pid);
                     break;
+                case 'set':
+                    this.addPart(pid);
+                    break;
             }
             $('#product-list').hide('slide');
             return false;
@@ -538,7 +566,13 @@ define([
 
             this.model.set({related: _.without(relateds, this.model.get('id'))});
 		},
-		removeRelated: function(id){
+
+        toggleSetPriceConfig: function(e) {
+            var checked = ($(e.currentTarget).prop('checked')) ? 1 : 0;
+            $.post($('#website_url').val() + 'plugin/shopping/run/setConfig/', {config: {autocalculateSetPrice: checked}});
+        },
+
+        removeRelated: function(id){
             var relateds = _(this.model.get('related')).map(function(id){ return parseInt(id) });
 			this.model.set({related: _.without(relateds, parseInt(id))});
 		},
@@ -550,7 +584,7 @@ define([
                     self = this;
 
                 $.ajax({
-                    url: this.model.urlRoot,
+                    url: this.model.urlRoot(),
                     data: {id: relateds.join(',')},
                     success: function(response){
                         if (!response) return false;
@@ -609,6 +643,7 @@ define([
             optWidget.render().$el.appendTo('#options-holder');
         },
         renderOptions: function(){
+            $('#options-holder').empty();
             if (!this.model.has('options')) return false;
             this.model.get('options').each(this.renderOption, this);
         },
@@ -662,6 +697,10 @@ define([
                     this.addRelated(this.products.checked);
                     $('#product-list').hide('slide');
                     break;
+                case 'set':
+                    this.addPart(this.products.checked);
+                    $('#product-list').hide('slide');
+                    break;
             }
             $('div.productlisting input.marker:checked', '#product-list-holder').removeAttr('checked');
             this.products.checked = [];
@@ -688,11 +727,12 @@ define([
             });
         },
         initSearchIndex: _.once(function(){
-            $.getJSON($('#website_url').val() + '/plugin/shopping/run/searchindex', function(response){
+            var self = this;
+            $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
                 self.searchIndex = response;
                 $('#product-list-search').autocomplete({
                     minLength: 2,
-                    source: response,
+                    source: self.searchIndex,
                     select: function(event, ui){
                         $('#product-list-search').val(ui.item.value).trigger('keypress', true);
                     }
@@ -762,6 +802,18 @@ define([
                     break;
             }
             return false;
+        },
+        setProductIdForCouponAndGroup: function(){
+            var productId = this.model.get('id');
+            var productPrice = this.model.get('price');
+            this.couponForm.$el.find('input#data-products').val(productId);
+            this.couponGrid.coupons.server_api.productId = productId;
+            this.couponGrid.render();
+            this.groupsPrice.$el.find('input#group-products-price').val(productPrice);
+            this.groupsPrice.$el.find('input#group-products-id').val(productId);
+            this.groupsPrice.$el.find('#group-regular-price').html(' '+$('#group-products-price-symbol').val()+parseFloat(productPrice).toFixed(2));
+            this.groupsPrice.groups.server_api.productId = productId;
+            this.groupsPrice.render();
         }
 	});
 

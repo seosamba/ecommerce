@@ -13,6 +13,7 @@ class Forms_BasicsSettings extends Zend_Form {
 
 		$this->addElement('select', 'currency', array(
 			'label' => 'Currency',
+            'disableTranslator' => 'true',
 			'multiOptions' => Tools_Misc::getCurrencyList()
 		));
 		

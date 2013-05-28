@@ -76,7 +76,7 @@ define([
                 data: JSON.stringify(data),
                 dataType: 'json',
                 success: function(response){
-                    self.products.pager();
+                    self.pager();
                 },
                 error: function(){
                     console.log('Batch action error:', arguments);

@@ -1,337 +1,8 @@
 <?php
 $this->headTitle('Manage product');
 ?>
-
-<style>
-<?php $this->headStyle()->captureStart();?>
-.ui-effects-transfer {
-	border: 2px dotted #778899;
-}
-/* paginated block styles */
-.paginator {
-	background-color: white;
-	box-shadow: 0 -2px 4px -3px #7c7c7c;
-	text-align: right;
-}
-.paginator > *{
-	padding: 5px;
-	display: inline-block;
-}
-*+html .paginator > *{
-	display: inline;
-}
-.paginator a.page{
-	color: #cd5c5c;
-	opacity: 0.75;
-}
-.paginator a.page:hover,
-.paginator a.page.current {
-    opacity: 1;
-}
-
-.paginator a.page span{
-
-}
-
-.seotoaster #manage-product {
-	font-size: 11pt;
-}
-div.box {
-	display: inline-block;
-	background-color: white;
-	margin: 3px 0;
-	padding: 5px 5px 0;
-	cursor: pointer;
-	border: 1px solid whiteSmoke;
-	height: auto;
-}
-div.box:hover {
-	box-shadow: 0 0 3px lightseagreen;
-}
-.product-tags .tag-widget {
-    background: url("<?php echo $this->websiteUrl;?>/system/images/bg-strip.png") repeat scroll 0 0 transparent;
-    border: 2px solid white;
-    -moz-border-radius: 3px 3px 3px 3px;
-    -webkit-border-radius: 3px 3px 3px 3px;
-    border-radius: 3px 3px 3px 3px;
-    color: #5C5C5C;
-    float: left;
-    font-weight: normal;
-    margin: 3px 6px 3px 0;
-    padding: 5px 4px 4px;
-    width: 23%;
-	height:18px;
-}
-.product-tags .tag-widget span {
-	cursor: pointer;
-}
-.product-tags .tag-widget span.tag-editable {
-	float: left;
-	margin-left: 2%;
-	width: 81%;
-	white-space: nowrap;
-	overflow: hidden;
-	line-height: 1.2em;
-}
-.product-tags .tag-widget input {
-	float: left;
-	margin-top: 2px;
-	margin-left: 1px;
-}
-
-.product-tags .tag-widget .ui-icon-closethick {
-    float: right;
-    margin: 0 0 0 3px;
-}
-
-.tag-widget span.ui-icon {
-	display: inline-block;
-	border-radius: 4px;
-	cursor:pointer;
-	vertical-align: bottom;
-}
-.tag-widget .tag-editable {
-	vertical-align:top;
-}
-.tag-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
-	background-image: url(<?php echo $this->websiteUrl;?>/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png);
-}
-#options-holder .option-content .option-modifier-select {
-	width: 50px;
-}
-#massaction::before {
-	content: '[ '
-}#massaction::after {
-	content: ' ]'
-}
-#product-image-holder {
-	height: 130px;
-	width: 191px;
-	background: white;
-	text-align: center;
-	vertical-align: middle;
-	border: 1px solid #BDE6F1;
-	border-radius: 3px 3px 3px 3px;
-	-moz-border-radius: 3px 3px 3px 3px;
-	-webkit-border-radius: 3px 3px 3px 3px;
-}
-#product-image-holder img { max-height: 130px; max-width: 190px; height:auto; width:auto; }
-a.nav-links.first {
-	margin-left: 175px;
-}
-a.nav-links {
-	color:#e7e7e7;
-	font-weight: normal;
-	line-height:24px;
-}
-a.nav-links:hover {
-	border-bottom: 1px solid #E7E7E7;
-}
-a.nav-links.first {
-    margin-left: 90px;
-}
-a.nav-links {
-    color: #E7E7E7;
-    font-weight: bold;
-    line-height: 24px;
-}
-div.productlisting {
-	width: 11%;
-	border: 1px solid #fff;
-	height: 140px;
-	margin: 3px 5px;
-	float: left;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	box-shadow: 0 0 4px #bbbbbb;
-	-moz-box-shadow: 0 0 4px #bbbbbb;
-	-webkit-box-shadow: 0 0 4px #bbbbbb;
-	overflow: hidden;
-	position: relative;
-	text-align: center;
-	cursor: pointer;
-	background: #fff;
-	font-size: 9pt;
-}
-div.productlisting img{
-	max-height: 80px;
-}
-div.productlisting input.marker {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-}
-p.brand {
-	padding: 2px 0;
-	background-color: lavender;
-	margin-bottom: 1px;
-}
-p.sku{
-	text-align: right;
-	font-size: 8pt;
-	border-top: 1px dotted #eee;
-	padding: 4px 0;
-	margin-top: 4px;
-	color: #7C7C7C;
-	position: absolute;
-	bottom: 0;
-	right: 2px;
-	width: 100%;
-	height: 8pt;
-	overflow: hidden;
-	background-color:#fff;
-}
-.add-selection-btn {
-	float: right;
-	font-size: 10pt;
-}
-.add-selection-btn .ui-button-text {
-	padding: 5px 10px 4px;
-}
-.add-selection-btn .ui-icon {display:none;}
-input#delete {
-	padding: 3px 16px 4px !important;
-	display: none;
-	float: left;
-	margin-left: 5px;
-}
-#manage-product>.ui-tabs-nav li.ui-tabs-selected, #manage-product>.ui-tabs-panel {
-	background: #DAE8ED;
-}
-#short-description-tab, #full-description-tab {
-	padding: 6px 5px !important;
-	border: 1px solid #DDDDDD;
-	border-top-width: 0;
-	text-align: center;
-}
-
-.highlight {
-	border: 1px solid #cd5c5c !important;
-}
-#manage-product > .ui-tabs-panel {
-	height: 420px;
-}
-#manage-product .ui-tabs-panel {
-	padding: 10px 0;
-}
-#options-holder > div.option-wrapper {
-	padding: 7px 0 0;
-	color: #444;
-	border-radius: 3px 3px 3px 3px;
-	-moz-border-radius: 3px 3px 3px 3px;
-	-webkit-border-radius: 3px 3px 3px 3px;
-	background: #81AAC3;
-	width: 918px;
-}
-#options-holder .option-content {
-	background: #fff;
-	color: #444;
-	overflow: hidden;
-}
-#options-holder .option-content .ui-widget-header {
-	background: #EFEFEF;
-	color: #666;
-	font-size: 9pt;
-	padding:4px;
-	border: none;
-}
-#options-holder input[type="text"], #options-holder textarea {
-	padding: 3px 0 3px 3px;
-	font-size:9pt;
-}
-#options-holder select {
-	padding: 2px 0 2px 3px;
-	font-size:9pt;
-}
-.ui-widget.ui-button.remove-option, .ui-widget.ui-button.item-remove {
-	background: none;
-	border:none;
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	min-width: 10px;
-	overflow: visible;
-}
-.ui-widget.ui-button.remove-option {
-	background: #49738b;
-	float: right;
-	height: 36px;
-	margin: -6px -13px;
-	width: 36px;
-}
-.ui-widget.ui-button.remove-option:hover {
-	background: #3d6075;
-}
-.ui-widget.ui-button.remove-option span.ui-icon {
-	background-image: url(<?php echo $this->websiteUrl;?>/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png);
-}
-#image-list {
-	height: 450px !important;
-}
-#image-list-dialog div.paginator {
-	position: absolute;
-	bottom: 0;
-	width: 98%;
-	margin: 0 1%;
-}
-#ajax_msg {
-	line-height: 50px;
-	position: absolute;
-	top: 30%;
-	left:0;
-	width: 100%;
-	z-index: 5000;
-}
-.ui-autocomplete {
-	max-height: 180px;
-	overflow-y: auto;
-	overflow-x: hidden;
-	padding-right: 5px;
-	background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
-	box-shadow: rgb(153, 153, 153) 0px 4px 10px;
-}
-/* IE 6 doesn't support max-height
-* we use height instead, but this forces the menu to always be this tall
-*/
-* html .ui-autocomplete {
-	height: 100px;
-}
-.ui-autocomplete .ui-menu-item {
-	cursor: pointer;
-}
-#product-list div.paginator {
-	position: absolute;
-	bottom: 5px;
-	height: 20px;
-	padding: 0;
-	padding-top: 5px;
-	margin: 0 1%;
-	width: 98%;
-}
-#product-list-holder > p.nothing {
-	text-align: center;
-	padding: 5px;
-	font-size: 150%;
-	margin-top: 20%;
-}
-
-div.spinner {
-    position: absolute;
-	width: 48px;
-	height: 48px;
-	top: 45%;
-	left: 50%;
-	background: url('<?php echo $this->websiteUrl; ?>plugins/shopping/web/images/spinner.gif');
-}
-div.spinner.bg {
-	background: url('<?php echo $this->websiteUrl; ?>plugins/shopping/web/images/spinner_bg.gif');
-}
-.seotoaster .help a {
-    color: #E7E7E7;
-}
-<?php $this->headStyle()->captureEnd();?>
-</style>
+<link rel="stylesheet" href="<?php echo $this->websiteUrl.'plugins/shopping/web/css/product.css' ; ?>"/>
+<link rel="stylesheet" href="<?php echo $this->websiteUrl.'system/css/reset-widgets.css' ; ?>"/>
 
 <?php
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
@@ -339,11 +10,18 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/
 $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
 ?>
 
+<?php
+$firstPageCaption = $this->translate('First');
+$lastPageCaption = $this->translate('Last');
+?>
+
+<?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->generalConfig['currency'])); ?>
+
 <script id="paginatorTemplate" type="text/template">
 <div class="paginator <%= cssClass %>" data-collection="<%= collection %>" >
-<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first">First</a><% } else { %><span>First</span><% } %>
+<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first"><?php echo $firstPageCaption;?></a><% } else { %><span><?php echo $firstPageCaption;?></span><% } %>
 
-<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev">Pevious</a><% } %>
+<% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev"><?php echo $this->translate('Previous'); ?></a><% } %>
 
 <% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
 
@@ -358,9 +36,9 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 
 <% if (currentPage + 5 < lastPage) { %><span>...</span><% } %>
 
-<% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next">Next</a><% } %>
+<% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next"><?php echo $this->translate('Next');?></a><% } %>
 
-<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last">Last</a><% } else { %><span>Last</span> <%} %>
+<% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last"><?php echo $lastPageCaption;?></a><% } else { %><span><?php echo $lastPageCaption;?></span> <%} %>
 </div>
 </script>
 
@@ -476,12 +154,12 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
     <% } %>
         <p class="brand"><%= brand %></p>
 	    <% if (showDelete) { %>
-        <img src="<?php echo $this->websiteUrl;?><%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <img src="<?php echo $this->websiteUrl;?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
         <% } else { %>
 		<% if (rendered) { %>
-        <img src="<?php echo $this->websiteUrl;?><%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+        <img src="<?php echo $this->websiteUrl;?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
         <% } else { %>
-	    <img class="lazy" src="" data-original="<?php echo $this->websiteUrl;?><%= photo ? '/media/'+photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
+	    <img class="lazy" src="" data-original="<?php echo $this->websiteUrl;?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>" />
 	    <% } %>
 	    <% } %>
         <p class="name"><%= name %></p>
@@ -493,15 +171,15 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 </script>
 
 <script id="quickPreviewTemplate" type="text/template">
-	<fieldset style="background-image:none; background-color: white; height:272px;">
+	<fieldset style="background-image:none; background-color: white; height:226px;">
 	    <legend><?php echo $this->translate('Preview');?></legend>
-		<a href="<%= websiteUrl + product.page.url %>" target="_blank" style="text-decoration: none; color: inherit;">
+		<a href="<%= (_.isObject(product.page) ? product.page.url : '#') %>" target="_blank" style="text-decoration: none; color: inherit;">
             <div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to get to product landing page</div>
-            <img src="<%= websiteUrl +'media/'+ product.photo.replace('/','/product/') %>" style="float:left; padding: 15px; max-height: 120px"/>
+            <img src="<%= websiteUrl + mediaPath + product.photo.replace('/','/product/') %>" style="float:left; padding: 15px; max-height: 120px"/>
 	        <p style="text-align:center; font-weight: bold;"><%= product.name %></p>
 	        <p class="mt10px" style="height: 160px;"><%= product.shortDescription.length > 300 ? product.shortDescription.slice(0,299)+'...' : product.shortDescription %></p>
 	        <p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-	        <%= product.price + '&nbsp;' + currency %>
+	        <%= parseFloat(product.price).toFixed(2) + '&nbsp;' + currency %>
 	        </p>
         </a>
     </fieldset>
@@ -526,7 +204,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
             </div>
             <div class="grid_2 mt5px" style="text-align:center;">
                 <label>
-                    <a id="massaction" style="color:#e6e6fa;" href="javascript:;" data-labels='{"related": "add as related", "edit": "delete selected"}' >run mass action</a>
+                    <a id="massaction" style="color:#e6e6fa;" href="javascript:;" data-labels='{"related": "add as related", "edit": "delete selected", "set": "add to set"}' >run mass action</a>
                 </label>
             </div>
         </div>
@@ -554,17 +232,20 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
         <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
         <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
+        <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
+        <li><a href="#group-pricing-tab"><?php echo $this->translate('Group price'); ?></a></li>
         <?php foreach ($this->plugins as $plugin) : ?>
 		<?php
         $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
 	    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
 	    ?>
-        <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate('Marketing: '.$title);?></a></li>
+        <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin;?>/run/tab/"><?php echo $this->translate($title);?></a></li>
         <?php endforeach; ?>
         <a href="#new" id="new-product" class="nav-links first"><?php echo $this->translate('New product');?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
         <a href="javascript:;" data-listtype="edit" class="nav-links show-list"><?php echo $this->translate('Edit product');?></a>
     </ul>
     <!--------- MAIN INFO -------------->
+    <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path" />
     <div id="main-tab" class="clearfix">
         <div class="grid_8">
             <fieldset>
@@ -575,57 +256,65 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
                 </div>
             </div>
             <div class="grid_4">
-                <label for="product-name">Product Name</label>
+                <label for="product-name"><?php echo $this->translate('Product Name'); ?></label>
             </div>
 			<div class="grid_4" style="text-align: right;">
-				<label for="product-enabled">This product is enabled</label>
+				<label for="product-enabled"><?php echo $this->translate('This product is enabled');?></label>
 			</div>
             <div class="grid_7">
-	            <input type="text" id="product-name" data-reflection="property" placeholder="enter name of product" autofocus="autofocus" />
+	            <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product');?>" autofocus="autofocus" />
             </div>
 			<div class="grid_1">
 				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
 			</div>
             <div class="grid_2">
                 <label for="product-sku">SKU</label>
-                <input type="text" id="product-sku" data-reflection="property" placeholder="item id" />
+                <input type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id');?>" />
             </div>
-            <div class="grid_3">
+            <div class="grid_2">
                 <label for="product-mpn">MPN</label>
-                <input type="text" id="product-mpn" data-reflection="property" placeholder="manufacturer partnumber" />
+                <input type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber" />
             </div>
-            <div class="grid_3">
-                <label for="product-weight">Weight (in <?php echo $this->generalConfig['weightUnit']; ?>)</label>
-                <input type="text" id="product-weight" data-reflection="property" placeholder="0.00">
+            <div class="grid_2">
+                <label style="width:87px;" for="product-weight"><?php echo $this->translate("Weight (%1\$s)", $this->generalConfig['weightUnit']); ?></label>
+                <input type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
+            </div>
+            <div class="grid_2">
+                <label style="text-align: center; font-size: 8pt;" for="free-shipping">Free Shipping</label>
+                <input style="margin: 10px 40px;" id="free-shipping" type="checkbox" />
             </div>
             <div class="grid_8">
-                <label for="product-brand">Brand</label>
+                <label for="product-brand"><?php echo $this->translate('Brand');?></label>
             </div>
             <div class="grid_4">
-                <select name="product-brand" id="product-brand" data-reflection="property">
-	                <option value="-1">select brand</option>
+                <select name="product-brand" id="product-brand" data-reflection="brand">
+	                <option value="-1"><?php echo $this->translate('select brand');?></option>
                 <?php foreach($this->brands as $brand): ?>
 		           	<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName(); ?></option>
 				<?php endforeach; ?>
                 </select>
             </div>
             <div class="grid_4">
-                <input type="text" name="" id="new-brand" placeholder="or create new">
+                <input type="text" name="" id="new-brand" placeholder="<?php echo $this->translate('or create new');?>">
             </div>
             <div class="clear"></div>
             </fieldset>
 
             <div class="mt5px">
                 <div id="description-box">
+	                <?php
+	                $lexemShortDescription = $this->translate('Short description');
+	                $lexemFullDescription = $this->translate('Full description');
+					?>
                     <ul>
-                        <li><a href="#short-description-tab">Short description</a></li>
-                        <li><a href="#full-description-tab">Full description</a></li>
+                        <li><a href="#short-description-tab"><?php echo $lexemShortDescription;?></a></li>
+                        <li><a href="#full-description-tab"><?php echo $lexemFullDescription;?></a></li>
                     </ul>
                     <div id="short-description-tab">
-                    <textarea id="product-shortDescription" class="h170" data-reflection="property" placeholder="Short description"></textarea>
+                    <textarea id="product-shortDescription" class="h170" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription;?>"></textarea>
                     </div>
                     <div id="full-description-tab">
-                    <textarea id="product-fullDescription" class="h170" data-reflection="property" placeholder="Full description"></textarea>
+                    <textarea id="product-fullDescription" class="h170" data-reflection="fullDescription" placeholder="<?php echo $lexemFullDescription;?>"></textarea>
                     </div>
                 </div>
             </div>
@@ -633,22 +322,32 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         <!--End grid_8-->
 		<div class="grid_4">
 		<fieldset>
-			<div class="grid_6 alpha">
-                <label for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
-                <input type="text" id="product-price" data-reflection="property" placeholder="0.00"/>
+			<div class="grid_5 alpha">
+                <label class="mt5px" for="product-price">Price (in <span id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
+			</div>
+            <div class="grid_7">
+                <input type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
             </div>
-            <div class="grid_6">
-                <label for="product-taxClass"><?php echo $this->translate('Taxes');?></label>
-                <select name="taxes" id="product-taxClass" data-reflection="property" >
+            <div class="grid_5 alpha">
+                <label class="mt5px" for="product-taxClass"><?php echo $this->translate('Taxes');?></label>
+            </div>
+            <div class="grid_7">
+                <select name="taxes" id="product-taxClass" data-reflection="taxClass" >
                     <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
                     <option value="1"><?php echo $this->translate('Default');?></option>
                     <option value="2"><?php echo $this->translate('Alternative');?></option>
                     <option value="3"><?php echo $this->translate('Alternative 2');?></option>
                 </select>
             </div>
+			<div class="grid_5 alpha">
+                <label class="mt5px" for="product-inventory"><?php echo $this->translate('Stock qty');?></label>
+			</div>
+			<div class="grid_7">
+                <input type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
+			</div>
             <div class="grid_12 alpha">
                 <label for="product-pageTemplate">Select a product page template</label>
-                <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="property">
+                <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
                     <option value="-1" disabled="disable">Select Template</option>
                     <?php foreach ($this->templateList as $tmpl) : ?>
                     <option value="<?php echo $tmpl->getName();?>" ><?php echo $tmpl->getName();?></option>
@@ -698,6 +397,20 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
         </div>
         <div id="related-holder" class="grid_12">
 
+        </div>
+    </div>
+
+    <div id="coupon-tab" class="clearfix">
+	    <div class="padding5px">
+		    <p style="text-align: center"><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
+		    <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+	    </div>
+    </div>
+
+    <div id="group-pricing-tab" class="clearfix">
+        <div class="padding5px">
+            <p style="text-align: center; font-weight: bold;"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><?php echo $this->translate('(create groups & defaults from the merchandising menu.)');?></p>
+            <?php echo $this->partial('product/grouping-price.phtml'); ?>
         </div>
     </div>
 

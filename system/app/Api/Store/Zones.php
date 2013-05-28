@@ -1,20 +1,36 @@
 <?php
 /**
- * Zones.php
+ * Zones REST API controller
+ *
+ * @package Store
+ * @since 2.0.0
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
  */
 class Api_Store_Zones extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
+			'allow' => array('get', 'post', 'delete')
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
 			'allow' => array('get', 'post', 'delete')
 		)
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Find zone by ID
+	 *
+	 * Resourse:
+	 * : /api/store/zones/id/:id
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * @return json List of zones
 	 */
 	public function getAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
@@ -31,8 +47,19 @@ class Api_Store_Zones extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Saves zones into database
+	 *
+     * Resourse:
+	 * : /api/store/zones
+	 *
+	 * HttpMethod:
+	 * : POST
+	 *
+	 * ## Parameters:
+	 * zones (type array)
+	 * : List of zones to save
+	 *
+	 * @return json Passthroug incoming list of zones
 	 */
 	public function postAction() {
 		$rules = $this->_request->getParam('zones', null);
@@ -48,18 +75,22 @@ class Api_Store_Zones extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Delete zone by ID
+	 *
+	 * Resourse:
+	 * : /api/store/zones/id/:id
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * @return json List of zones
 	 */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);

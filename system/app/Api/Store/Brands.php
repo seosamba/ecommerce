@@ -1,10 +1,16 @@
 <?php
 /**
- * Brands.php
+ * Store brands REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Brands extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post')
@@ -18,9 +24,15 @@ class Api_Store_Brands extends Api_Service_Abstract {
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Returns brands list
+	 *
+	 * Resourse:
+	 * : /api/store/brands/
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * @return json Set of brands
 	 */
 	public function getAction() {
 		$brandsList = Models_Mapper_Brand::getInstance()->fetchAll(null, array('name'));
@@ -35,8 +47,15 @@ class Api_Store_Brands extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Creates new brand
+	 *
+	 * Resourse:
+	 * : /api/store/brands/
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * @return JSON Newly created brand representation
 	 */
 	public function postAction() {
 		$postData = json_decode($this->_request->getRawBody(), true);
@@ -51,18 +70,14 @@ class Api_Store_Brands extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function deleteAction() {
 		// TODO: Implement deleteAction() method.

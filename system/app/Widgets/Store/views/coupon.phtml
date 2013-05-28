@@ -1,0 +1,53 @@
+<?php $id = uniqid('store-coupon-'); ?>
+<div id="cart-coupon-form">
+    <h3 class="checkout-widget-title">
+	    <?php echo $this->translate('Enter coupon');?>
+	    <?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
+        <a href="<?php echo $this->websiteUrl . $this->returnUrl ;?>?step=signup" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+	    <?php endif; ?>
+    </h3>
+    <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo trim($this->websiteUrl, '/').$_SERVER['REQUEST_URI']; ?>" method="post">
+	    <input type="text" name="code" required>
+	    <input type="submit" value="<?php echo $this->translate('Apply'); ?>">
+	</form>
+	<div class="coupon-msg"></div>
+</div>
+<script>
+$(function(){
+	$('#<?php echo $id; ?>').on('submit', function(e){
+        e.preventDefault();
+
+        var self = this;
+
+		var codeInput = $(this).find("input[name=code]");
+		if (codeInput.val() == ''){
+			codeInput.focus();
+			return false;
+		}
+
+		$.ajax({
+			url: $('#website_url').val()+'plugin/shopping/run/coupon/',
+			data: $(this).serialize(),
+			type: 'POST',
+			dataType: 'json',
+			success: function(r){
+				var $msgContainer = $('#cart-coupon-form div.coupon-msg');
+				if (!!r.error){
+					showMessage(r.responseText, true);
+				} else {
+					$msgContainer.empty();
+					if (typeof  r.responseText === 'object'){
+						$.each(r.responseText, function(key, msg) {
+							$("<p></p>", { "class": "store-coupon-notify" }).html(msg)
+									.on('click', function(){ $(this).remove(); })
+									.appendTo($msgContainer);
+						});
+					}
+				}
+				$(self).trigger('reset');
+                refreshCartSummary();
+			}
+		})
+	});
+});
+</script>

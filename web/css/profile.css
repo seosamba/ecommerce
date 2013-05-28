@@ -53,6 +53,12 @@ table#orders-table td.shipping-data p { margin:0; }
 #profile .profile-header ul.stats li.pending {
 	background-color: #ff7f50;
 }
+#profile .profile-header ul.stats li.shipped {
+	background-color: #9FC569;
+}
+#profile .profile-header ul.stats li.delivered {
+	background-color: #32cd32;
+}
 
 /* Profile address */
 #profile #profile-address-list>div {

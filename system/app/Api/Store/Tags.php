@@ -1,46 +1,87 @@
 <?php
 /**
- * Tags.php
- * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ * Product Tags REST API controller
+ *
+ * @package Store
+ * @since   2.0.0
+ *
+ * @author  Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Api_Store_Tags extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Tools_Security_Acl::ROLE_ADMIN      => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Shopping::ROLE_SALESPERSON      => array(
+			'allow' => array('get')
 		)
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Find product tag by ID
+	 *
+	 * Resourse:
+	 * : /api/store/tags/id/:id
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * ## Parameters:
+	 * id (type *mixed*)
+	 * : Tag ID or comma separated list of IDs
+	 *
+	 * limit (type *int*)
+	 * : Specifies the number of records to retrieve. If omitted, will return all existing records.
+	 *
+	 * offset (type *int*)
+	 * : Number of records to skip. Used for pagination result set.
+	 *
+	 * count (type *boolean*)
+	 * : When set to true, 1 or non empty string total number of records will be returned in response in 'totalCount' key
+	 *
+	 * @return JSON Single tag or set of tags
 	 */
 	public function getAction() {
+		/**
+		 * @var mixed ID or comma-separated list of IDs
+		 */
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 
 		if ($id) {
 			$data = Models_Mapper_Tag::getInstance()->find($id);
-			if ($data instanceof Models_Model_Tag){
+			if ($data instanceof Models_Model_Tag) {
 				return $data->toArray();
-			} elseif (is_array($data) && !empty($data)){
-				return array_map(function($tag){ return $tag->toArray(); }, $data);
+			} elseif (is_array($data) && !empty($data)) {
+				return array_map(function ($tag) {
+					return $tag->toArray();
+				}, $data);
 			} else {
 
 			}
 		} else {
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
-			$limit  = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
-			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+			$limit = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
+			$count = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
 
 			$result = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit, $count);
-			if ($result){
-				if ($count && isset($result['data'])){
-					$result['data'] = array_map(function($tag){ return $tag->toArray(); }, $result['data']);
+			if ($result) {
+				if ($count && isset($result['data'])) {
+					$result['data'] = array_map(function ($tag) {
+						return $tag->toArray();
+					}, $result['data']);
 					return $result;
 				} else {
-					return array_map(function($tag){ return $tag->toArray(); }, $result);
+					return array_map(function ($tag) {
+						return $tag->toArray();
+					}, $result);
 				}
 			}
 		}
@@ -48,18 +89,19 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Create new product tag
+	 *
+	 * @return JSON
 	 */
 	public function postAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
-		if (!empty($rawData)){
+		if (!empty($rawData)) {
 			$rawData['name'] = ucfirst($rawData['name']);
 			$result = Models_Mapper_Tag::getInstance()->save($rawData);
 		} else {
 			$this->_error();
 		}
-		if ($result === null){
+		if ($result === null) {
 			$this->_error('This tag already exists', self::REST_STATUS_BAD_REQUEST);
 		} else {
 			return $result->toArray();
@@ -67,19 +109,19 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Update an existing product tag
+	 *
+	 * @return JSON Returns updated models representations
 	 */
 	public function putAction() {
 		$rawData = json_decode($this->_request->getRawBody(), true);
-		if (!empty($rawData)){
+		if (!empty($rawData)) {
 			$rawData['name'] = ucfirst($rawData['name']);
 			$result = Models_Mapper_Tag::getInstance()->save($rawData);
 		} else {
 			$this->_error();
 		}
-		if ($result === null){
+		if ($result === null) {
 			$this->_error('This tag already exists', self::REST_STATUS_BAD_REQUEST);
 		} else {
 			return $result->toArray();
@@ -87,13 +129,21 @@ class Api_Store_Tags extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Deletes product tag by tag id
+	 *
+	 * Resourse:
+	 * : /api/store/tags/
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * ## Parameters:
+	 * id (type integer) Tag id
+	 *
 	 */
 	public function deleteAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
-		if ($id !== false){
+		if ($id !== false) {
 			return Models_Mapper_Tag::getInstance()->delete($id);
 		} else {
 			$this->_error(null, self::REST_STATUS_NOT_FOUND);

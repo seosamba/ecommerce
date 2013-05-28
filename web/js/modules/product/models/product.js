@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, ProductOptions){
 	
 	var Product = Backbone.Model.extend({
-		urlRoot: function(){ return $('#website_url').val() + '/api/store/products/id/'; },
+		urlRoot: function(){ return $('#website_url').val() + 'api/store/products/id/'; },
 		defaults: function(){
             return {
                 name: '',
@@ -15,11 +15,13 @@ define([
                 shortDescription: '',
                 fullDescription: '',
                 enabled: 1,
+                freeShipping: 0,
                 taxClass: 1,
                 related: [],
                 photo: null,
-                options: new ProductOptions()
-		    }
+                options: new ProductOptions(),
+                inventory: null
+            }
         },
 		initialize: function (){
             this.on('error', function(model, error) { showMessage(error, true); });

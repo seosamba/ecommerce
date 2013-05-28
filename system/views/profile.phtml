@@ -76,12 +76,12 @@
 				<tr class="title-table">
 					<th>#</th>
 					<th><?php echo $this->translate('Purchased On');?></th>
-					<th><?php echo $this->translate('Status');?></th>
 					<th><?php echo $this->translate('Products in cart');?></th>
-					<th><?php echo $this->translate('Total Price');?></th>
-					<th><?php echo $this->translate('Shipping price');?></th>
-					<th><?php echo $this->translate('Shipping via');?></th>
-					<th><?php echo $this->translate('Details');?></th>
+                    <th><?php echo $this->translate('Total Price');?></th>
+                    <th><?php echo $this->translate('Shipping price');?></th>
+                    <th><?php echo $this->translate('Shipping via');?></th>
+                    <th style="width: 180px;"><?php echo $this->translate('Status');?></th>
+                    <th><?php echo $this->translate('Details');?></th>
                     <?php if(isset($this->invoicePlugin)):?>
                         <th><?php echo $this->translate('View/Download Invoice');?></th>
                     <?php endif;?>
@@ -93,18 +93,17 @@
 				<tr data-role="cart" data-id="<?php echo $order->getId();?>">
 					<td><?php echo $order->getId();?></td>
 					<td><?php echo date('d M, Y', strtotime($order->getCreatedAt()));?></td>
-					<td><?php echo $order->getStatus();?></td>
 					<td><?php echo sizeof($order->getCartContent());?></td>
 					<td><?php echo $this->currency(floatval($order->getTotal()));?></td>
 					<td><?php echo $this->currency(floatval($order->getShippingPrice()));?></td>
 					<td class="shipping-data">
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
-						<?php if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)):?>
 						<p>
-							<i>Tracking ID</i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
-							<a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
+	                        <i>Tracking ID</i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+							<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                            <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
+							<?php endif;?>
 						</p>
-						<?php endif;?>
                         <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
                             <?php if($order->getShippingTrackingId() != ''):?>
                                 <p class="textcentered">
@@ -113,10 +112,11 @@
                             <?php endif;?>
                         <?php endif;?>
 					</td>
+					<td class="current-status"><?php echo $order->getStatus();?></td>
 					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
                     <?php if(isset($this->invoicePlugin)):?>
                         <td>   
-                        <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
+                        <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
                             <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
                                 <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
                             </a>
@@ -169,6 +169,7 @@
 			bPaginate: false,
 			bLengthChange: false,
 			sDom: 't',
+			aaSorting: [[ 1, "desc" ]],
 			aoColumnDefs: [
 				{bSortable: false, aTargets: [-1]}
 			],
@@ -179,9 +180,12 @@
 		$('ul.stats').on('click', 'li', function(e){
 			var filter = $(this).data('sort');
 			if (filter === 'total') filter = '';
-			oTable.fnFilter(filter, 2);
+			oTable.fnFilter(filter);
 		});
 	});
+
+	<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+
 	$('a.tracking-dialog').on('click', function(e){
 		e.preventDefault();
 		var self = this,
@@ -202,10 +206,78 @@
 						if (response.hasOwnProperty('responseText')){
 							$(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
 							$(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
+							$(self).closest('tr').find('td.current-status').text(response.responseText.status);
 						}
 					}
 				});
 			}
 		});
 	});
+
+	$('#orders-table').on('mouseenter', 'td.current-status', function(){
+		var self    = this,
+			id      = parseInt($(this).closest('tr').data('id')),
+			currentStatus = $(this).text();
+
+		$(this).data('currentStatus', $(this).text());
+
+		var buttons = {
+			'refunded'  : '<button class="change-status btn btn-small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+			'completed' : '<button class="change-status btn btn-small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+			'canceled'  : '<button class="change-status btn btn-small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+			'delivered' : '<button class="change-status btn btn-small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+		}
+
+		var html = ''
+		switch (currentStatus){
+			case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
+				html += buttons['refunded']
+				break;
+			case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
+				html += buttons['completed'];
+                html += buttons['canceled'];
+                break;
+			case '<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>':
+				html += buttons['delivered'];
+				html += buttons['refunded'];
+				break;
+		}
+
+		if (html.length){
+			var popup = $('<div></div>')
+					.css({"white-space": "nowrap"})
+					.html(html);
+			$(this).html(popup);
+		}
+
+
+	});
+	$('#orders-table').on('mouseleave', 'td.current-status', function(){
+		var oldStatus = $(this).data('currentStatus');
+		if (oldStatus) $(this).text(oldStatus);
+	});
+
+	$('#orders-table').on('click', 'td.current-status .change-status', function(){
+		var statusTd    = $(this).closest('td'),
+			id      = parseInt($(this).closest('tr').data('id')),
+			currentStatus = $(this).data('status');
+
+		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+
+		$.ajax({
+			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+			data: {status: currentStatus},
+			type: 'POST',
+			dataType: 'json',
+			success: function(response) {
+				showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+				if (!response.error && response.hasOwnProperty('responseText')){
+                    console.log(response);
+                    $(statusTd).text(response.responseText.status).data('currentStatus', response.responseText.status);
+				}
+			}
+		});
+	});
+	<?php endif;?>
+	
 </script>

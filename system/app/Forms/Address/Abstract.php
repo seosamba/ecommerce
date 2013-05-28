@@ -120,6 +120,4 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		return $valid;
 	}
-
-
 }

@@ -30,6 +30,7 @@ class Forms_GeneralSettings extends Zend_Form {
 		
 		$this->addElement('select', 'country', array(
 			'label' => 'Country',
+            'disableTranslator' => 'true',
 			'multiOptions' => Tools_Geo::getCountries(true)
 		));
 		
@@ -39,6 +40,7 @@ class Forms_GeneralSettings extends Zend_Form {
 		
 		$this->addElement('select', 'state', array(
 			'label' => 'State/Province/Region',
+            'disableTranslator' => 'true',
 			'multiOptions' => Tools_Geo::getState(null, true)
 		));
 		

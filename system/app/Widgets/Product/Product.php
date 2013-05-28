@@ -9,6 +9,12 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     const TYPE_PRODUCTLISTING = 'productlisting';
 
+	const PRICE_MODE_NOCURRENCY = 'nocurrency';
+
+	const PRICE_MODE_LIFERELOAD = 'realtimeupdate';
+
+	const PRICE_MODE_CURRENCY   = 'currency';
+
 	/**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -34,6 +40,16 @@ class Widgets_Product_Product extends Widgets_Abstract {
      * @var null|Zend_Currency Zend_Currency holder
      */
     private $_currency = null;
+
+	protected function _init(){
+		parent::_init();
+
+		if (in_array('options', $this->_options)){
+			$layout = Zend_Layout::getMvcInstance();
+			$websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
+			$layout->getView()->headScript()->appendFile($websiteUrl.'plugins/shopping/web/js/product-options.js');
+		}
+	}
 
 	protected function _load(){
 		if (empty($this->_options)){
@@ -108,6 +124,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
             );
             unset($themeConfig);
 
+	        if (!$this->_product->getPage() instanceof Application_Model_Models_Page){
+	            if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)){
+		            throw new Exceptions_SeotoasterWidgetException('Cannot render product widget. Product page is missing.');
+	            } else {
+		            return '';
+	            }
+	        }
+
             $parser = new Tools_Content_Parser($templatePrepend . $template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
 
 	        if ((bool)$this->_product->getEnabled()){
@@ -145,41 +169,102 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderPhotourl() {
-		$photoSrc = $this->_product->getPhoto();
+		$websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $photoSrc      = $this->_product->getPhoto();
 		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
             $photoSrc = str_replace('/', '/'.$this->_options[0].'/', $photoSrc);
         } else {
             $photoSrc = str_replace('/', '/product/', $photoSrc);
         }
-        return $this->_websiteUrl .'media/' . $photoSrc;
+        return $this->_websiteUrl . $websiteHelper->getMedia() . $photoSrc;
 	}
 	
 	private function _renderPrice() {
-		$noCurrency = (strtolower(end($this->_options)) === 'nocurrency');
-		if ($noCurrency === true){
-			array_pop($this->_options);
-		}
+		array_push($this->_cacheTags, 'product_price');
 
-		if (empty($this->_options)){
-			$price = $this->_product->getCurrentPrice() !== null ? $this->_product->getCurrentPrice() : $this->_product->getPrice();
-		} else {
+		$noCurrency = array_search(self::PRICE_MODE_NOCURRENCY, $this->_options);
+		$lifeReload = array_search(self::PRICE_MODE_LIFERELOAD, $this->_options);
+        $currency   = array_search(self::PRICE_MODE_CURRENCY, $this->_options);
+
+		if ($noCurrency !== false){
+			unset($this->_options[$noCurrency]);
+			$noCurrency = true;
+		}
+        if ($lifeReload !== false){
+	        unset($this->_options[$lifeReload]);
+	        $lifeReload = true;
+	        $lifeReloadClass = array();
+		}
+        if ($currency !== false){
+	        $currencyCode =  $currency + 1;
+			if(!isset($this->_options[$currency]) || empty($this->_options[$currency])){
+                return false;
+            }
+            $newCurrency = strtoupper($this->_options[$currencyCode]);
+	        unset($this->_options[$currency], $this->_options[$currencyCode], $currencyCode);
+            $currency = true;
+        }
+        
+		if (!empty($this->_options)){
             $pluginName = strtolower($this->_options[0]);
 			if ($pluginName === 'original'){
-				$price = !$noCurrency ? $this->_currency->toCurrency($this->_product->getPrice()) : $this->_product->getPrice() ;
+				if (is_null($this->_product->getCurrentPrice())){
+					return null;
+				} else {
+					if ($lifeReload){
+						array_push($lifeReloadClass, 'original-price');
+					}
+					$this->_product->setCurrentPrice(null);
+				}
 			} else {
-	            $plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
-	            if ($plugin){ //$plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
-	                return Tools_Factory_PluginFactory::createPlugin($plugin->getName(), array('price', $this->_product->getId()), $this->_toasterOptions)->run();
-	            }
-				return false;
+				$plugin = Tools_Plugins_Tools::findPluginByName($pluginName);
+			    if ($plugin->getStatus() === Application_Model_Models_Plugin::ENABLED){
+				    $price = Tools_Factory_PluginFactory::createPlugin($pluginName, array('price', $this->_product->getId()), $this->_toasterOptions)->run();
+				    if (is_numeric($price)){
+					    $price = floatval($price);
+					    $this->_product->setCurrentPrice($price);
+				    } else {
+					    return null;
+				    }
+				    unset($price);
+			    } else {
+				    if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)){
+					    throw new Exceptions_SeotoasterWidgetException('Plugin '.$pluginName. ' does not exists');
+				    }
+				    return false;
+			    }
 			}
         }
 
-		if ((bool)self::$_shoppingConfig['showPriceIncTax']){
-			$price += Tools_Tax_Tax::calculateProductTax($this->_product);
-		}
+		$itemDefaultOptionsArray = array();
+        foreach($this->_product->getDefaultOptions() as $option){
+            foreach ($option['selection'] as $item) {
+                if($item['isDefault'] == 1){
+                    $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                }
+            }
+        }
+      
+        $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($this->_product, $itemDefaultOptionsArray);
+        if($currency === true){
+            if (null === ($changedPrice = $this->_cache->load('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_'))){
+                $cacheCurrencyTime = strtotime('tomorrow') - strtotime('now');
+                $changedPrice = Tools_Misc::getConvertedPriceByCurrency($price, $newCurrency);
+                $this->_cache->save('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
+            }
+            $price = $changedPrice;
+	        $noCurrency = true;     // disabling wrapping converted values
+	        $lifeReload = false;    // life reload is not allowed
+        }
 
-		return !$noCurrency ? $this->_currency->toCurrency($price): $price;
+		$price = !$noCurrency ? $this->_currency->toCurrency($price): $price;
+
+        if($lifeReload){
+	        $lifeReloadClass = implode(' ', $lifeReloadClass);
+            return '<span class="price-lifereload-'.$this->_product->getId().' '.$lifeReloadClass.'">'.$price.'</span>';
+        }
+
+		return $price;
 	}
 	
 	private function _renderBrand() {
@@ -187,6 +272,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 	
 	private function _renderOptions() {
+		$this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
 		return $this->_view->render('options.phtml');
 	}
 	
@@ -244,9 +330,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderRelated() {
         $ids = $this->_product->getRelated();
-        if (empty($ids)){
+	    if (empty($ids)){
             return null;
-        }
+        } else {
+		    foreach($ids as $id) {
+			    array_push($this->_cacheTags, 'prodid_'.$id);
+		    }
+	    }
         $related = $this->_productMapper->find($ids);
         $checkoutPage = Tools_Misc::getCheckoutPage();
         $checkoutPageUrl = $checkoutPage != null?$checkoutPage->getUrl():'';
@@ -260,6 +350,27 @@ class Widgets_Product_Product extends Widgets_Abstract {
             return $this->_view->render('related.phtml');
         }
         return false;
+    }
+
+	private function  _renderInventory() {
+		$inventoryCount = $this->_product->getInventory();
+		if (is_null($inventoryCount)){
+			return $this->_translator->translate('In stock');
+		}
+		return $inventoryCount > 0 ? $inventoryCount : $this->_translator->translate('Out of stock');
+	}
+
+    private function _renderFreeShipping() {
+        $freeShippingInfo = '';
+        $freeShipping = $this->_product->getFreeShipping();
+        if($freeShipping == 1){
+            if(isset($this->_options[0])){
+                $freeShippingInfo = $this->_options[0];
+            }
+            return '<span class="product-free-shipping">'.$freeShippingInfo.'</span>';
+        }
+        return '';
+
     }
 
     public static function getAllowedOptions() {

@@ -23,6 +23,8 @@ class Tools_Misc {
     const SECTION_STORE_ADDEDITPRODUCT  = 'addproduct';
     
     const SECTION_STORE_BRANDLOGOS      = 'brandlogos';
+
+	const SECTION_STORE_MERCHANDISING   = 'merchandising';
     
     /*
      * Changes for name inc. Tax 
@@ -42,8 +44,8 @@ class Tools_Misc {
         self::SECTION_STORE_CONFIG          => 'setup-online-shopping-cart.html',
         self::SECTION_STORE_SHIPPINGCONFIG  => 'shopping-cart-shipping-calculator.html',
         self::SECTION_STORE_ADDEDITPRODUCT  => 'how-to-add-or-edit-a-product-to-your-store.html',
-        self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html'
-       
+        self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html',
+		self::SECTION_STORE_MERCHANDISING   => 'ecommerce-marketing.html'
     );
     
     /**
@@ -236,6 +238,23 @@ class Tools_Misc {
         return $data;
     }
 
+    /**
+     * Get current format for the currency such as decimal separator, thousand separator, symbol and format
+     *
+     * @return array
+     */
+    public static function getCurrencyFormat() {
+        $currency = Zend_Registry::get('Zend_Currency');
+        $format   = strtr($currency->toCurrency(0), array('0' => 'x', '.'=> '', ',' => '', $currency->getSymbol() => '%s' ));
+        return array(
+            'decimal'   => preg_replace('/.*0([\.,])0.*/u', '$1', $currency->toCurrency(0) ),
+            'thousand'  => preg_replace('/.*1(.?)000.*/u', '$1', $currency->toCurrency(1000)),
+            'symbol'    => $currency->getSymbol(),
+            'format'    => preg_replace('/x+/', '%v', $format),
+            'precision' => 2
+        );
+    }
+
 	public static function clenupAddress($address) {
 		$_addressTmpl   = array(
 			'address_type'  => '',
@@ -296,5 +315,20 @@ class Tools_Misc {
         }else{
             return '';
         }
+    }
+    
+    public static function getConvertedPriceByCurrency($price, $currency) {
+        $amount = number_format($price,2,".",",");
+        $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
+        $googleCalculatorUrl = "http://www.google.com/ig/calculator?hl=en&q=".$amount."".$shoppingCurrency."=?".$currency;
+        $ch = curl_init();
+        curl_setopt ($ch, CURLOPT_URL, $googleCalculatorUrl);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $result = explode('"', $result);
+	    $price = preg_replace('/[^\.\d\s]/', '', $result['3']);
+	    return number_format(floatval($price), 2);
     }
 }

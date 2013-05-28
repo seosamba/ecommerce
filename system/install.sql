@@ -30,7 +30,7 @@ INSERT INTO `shopping_list_country` (`id`, `country`) VALUES
 (231, 'TL'), (232, 'TM'), (233, 'TN'), (234, 'TO'), (235, 'TR'), (236, 'TT'), (237, 'TV'), (238, 'TW'), (239, 'TZ'), (240, 'UA'),
 (241, 'UG'), (242, 'UM'), (243, 'US'), (244, 'UY'), (245, 'UZ'), (246, 'VA'), (247, 'VC'), (248, 'VD'), (249, 'VE'), (250, 'VG'),
 (251, 'VI'), (252, 'VN'), (253, 'VU'), (254, 'WF'), (255, 'WK'), (256, 'WS'), (257, 'YD'), (258, 'YE'), (259, 'YT'), (260, 'ZA'),
-(261, 'ZM'), (262, 'ZW'); 
+(261, 'ZM'), (262, 'ZW');
 CREATE TABLE IF NOT EXISTS `shopping_list_state` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `country` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
@@ -102,7 +102,15 @@ INSERT INTO `shopping_list_state` (`id`, `country`, `state`, `name`) VALUES
 (61, 'CA', 'PE', 'Prince Edward Island'),
 (62, 'CA', 'QC', 'Quebec'),
 (63, 'CA', 'SK', 'Saskatchewan'),
-(64, 'CA', 'YT', 'Yukon Territory');
+(64, 'CA', 'YT', 'Yukon Territory'),
+(65, 'AU', 'ACT', 'Australian Capital Territory'),
+(66, 'AU', 'NSW', 'New South Wales'),
+(67, 'AU', 'NT', 'Northern Territory'),
+(68, 'AU', 'QLD', 'Queensland'),
+(69, 'AU', 'SA', 'South Australia'),
+(70, 'AU', 'TAS', 'Tasmania'),
+(71, 'AU', 'VIC', 'Victoria'),
+(72, 'AU', 'WA', 'Western Australia');
 
 CREATE TABLE IF NOT EXISTS `shopping_brands` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -152,12 +160,13 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `photo` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
   `short_description` mediumtext COLLATE utf8_unicode_ci,
   `full_description` text COLLATE utf8_unicode_ci,
-  `price` decimal(10,2) DEFAULT NULL,
+  `price` decimal(10,4) DEFAULT NULL,
   `tax_class` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `base_price` DECIMAL(10,2) NULL DEFAULT NULL,
   `inventory` VARCHAR(50) NULL DEFAULT NULL COLLATE utf8_unicode_ci,
+  `free_shipping` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -200,7 +209,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option_selection` (
   `option_id` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
-  `priceValue` decimal(10,2) DEFAULT NULL,
+  `priceValue` decimal(10,4) DEFAULT NULL,
   `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
   `weightValue` decimal(8,3) DEFAULT NULL,
@@ -263,7 +272,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `sub_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total',
   `total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Total Tax',
   `total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total + Total Tax + Shipping',
-  `notes` TEXT NULL DEFAULT NULL COMMENT 'Comment for order',
+  `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
+  `discount` decimal(10,2) DEFAULT NULL COMMENT 'Order discount',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -275,10 +285,10 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
   `cart_id` int(10) unsigned DEFAULT NULL,
   `product_id` int(10) unsigned DEFAULT NULL,
   `options` text,
-  `price` decimal(10,2) DEFAULT NULL COMMENT  'Price w/o Tax',
+  `price` decimal(10,4) DEFAULT NULL COMMENT  'Price w/o Tax',
   `qty` int(10) unsigned DEFAULT NULL,
-  `tax` int(11) DEFAULT NULL COMMENT  'Tax Price',
-  `tax_price` decimal(10,2) DEFAULT NULL COMMENT  'Price + Tax',
+  `tax` decimal(10,4) DEFAULT NULL COMMENT  'Tax Price',
+  `tax_price` decimal(10,4) DEFAULT NULL COMMENT  'Price + Tax',
   PRIMARY KEY (`id`),
   KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -308,6 +318,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_info` (
   `user_id` int(10) unsigned NOT NULL,
   `default_shipping_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `default_billing_address_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `group_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -471,3 +482,109 @@ INSERT INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
 ('1', 'store_newcustomer', 'Tools_StoreMailWatchdog'),
 ('1', 'store_neworder', 'Tools_StoreMailWatchdog'),
 ('1', 'store_trackingnumber', 'Tools_StoreMailWatchdog');
+
+DROP TABLE IF EXISTS `shopping_coupon`;
+CREATE TABLE IF NOT EXISTS `shopping_coupon` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Coupon ID',
+  `code` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Coupon code',
+  `type` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'discount' COMMENT 'Coupon discount type',
+  `scope` enum('order','client') COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Coupon usage scope',
+  `startDate` date DEFAULT NULL COMMENT 'Coupon start date',
+  `endDate` date DEFAULT NULL COMMENT 'Coupon expire date',
+  `allowCombination` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'Allow combination with other coupons',
+  PRIMARY KEY (`id`),
+  KEY `code` (`code`),
+  KEY `type` (`type`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_coupon_discount`;
+CREATE TABLE IF NOT EXISTS `shopping_coupon_discount` (
+  `coupon_id` int(10) unsigned NOT NULL COMMENT 'Coupon ID',
+  `minOrderAmount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Allow combination with other coupons',
+  `discountAmount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Coupon discount amount',
+  `discountUnits` enum('unit','percent') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'unit' COMMENT 'Coupon discount units',
+  PRIMARY KEY (`coupon_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_coupon_freeshipping`;
+CREATE TABLE IF NOT EXISTS `shopping_coupon_freeshipping` (
+  `coupon_id` int(10) unsigned NOT NULL COMMENT 'Coupon ID',
+  `minOrderAmount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Minimal order amount',
+  PRIMARY KEY (`coupon_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_coupon_product`;
+CREATE TABLE IF NOT EXISTS `shopping_coupon_product` (
+  `coupon_id` int(10) unsigned NOT NULL COMMENT 'Coupon ID',
+  `product_id` int(10) unsigned NOT NULL COMMENT 'Product ID',
+  PRIMARY KEY (`coupon_id`,`product_id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_coupon_type`;
+CREATE TABLE IF NOT EXISTS `shopping_coupon_type` (
+  `type` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `label` tinytext COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_coupon_usage`;
+CREATE TABLE IF NOT EXISTS `shopping_coupon_usage` (
+  `coupon_id` int(10) unsigned NOT NULL COMMENT 'Coupon ID',
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Customer ID',
+  PRIMARY KEY (`coupon_id`,`cart_id`),
+  KEY `cart_id` (`cart_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_coupon`
+  ADD CONSTRAINT `shopping_coupon_ibfk_1` FOREIGN KEY (`type`) REFERENCES `shopping_coupon_type` (`type`) ON UPDATE CASCADE;
+
+ALTER TABLE `shopping_coupon_discount`
+  ADD CONSTRAINT `shopping_coupon_discount_ibfk_1` FOREIGN KEY (`coupon_id`) REFERENCES `shopping_coupon` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `shopping_coupon_freeshipping`
+  ADD CONSTRAINT `shopping_coupon_freeshipping_ibfk_2` FOREIGN KEY (`coupon_id`) REFERENCES `shopping_coupon` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `shopping_coupon_product`
+  ADD CONSTRAINT `shopping_coupon_product_ibfk_3` FOREIGN KEY (`coupon_id`) REFERENCES `shopping_coupon` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `shopping_coupon_product_ibfk_4` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `shopping_coupon_usage`
+  ADD CONSTRAINT `shopping_coupon_usage_ibfk_4` FOREIGN KEY (`coupon_id`) REFERENCES `shopping_coupon` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `shopping_coupon_usage_ibfk_5` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+DROP TABLE IF EXISTS `shopping_product_has_part`;
+CREATE TABLE IF NOT EXISTS `shopping_product_has_part` (
+  `product_id` int(10) unsigned NOT NULL,
+  `part_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`part_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_product_has_part` ADD CONSTRAINT `shopping_product_has_part_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE;
+
+DROP TABLE IF EXISTS `shopping_product_set_settings`;
+CREATE TABLE IF NOT EXISTS  `shopping_product_set_settings` (
+  `productId` int(10) unsigned NOT NULL,
+  `autoCalculatePrice` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  PRIMARY KEY (`productId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_group`;
+CREATE TABLE IF NOT EXISTS `shopping_group` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `groupName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `priceSign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `priceValue` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `shopping_group_price`;
+CREATE TABLE IF NOT EXISTS `shopping_group_price` (
+  `groupId` int(10) unsigned NOT NULL,
+  `productId` int(10) unsigned NOT NULL,
+  `priceValue` decimal(10,2) DEFAULT NULL,
+  `priceSign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`groupId`,`productId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

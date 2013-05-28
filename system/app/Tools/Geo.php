@@ -83,6 +83,16 @@ class Tools_Geo {
 		return null;
 	}
 
+    public static function getStateByCode($code) {
+        $code       = filter_var($code, FILTER_SANITIZE_STRING);
+        $stateTable = new Zend_Db_Table('shopping_list_state');
+        $state      = $stateTable->fetchAll($stateTable->getAdapter()->quoteInto('state=?', $code))->current();
+        if($state) {
+            return $state->toArray();
+        }
+        return null;
+    }
+
 	public static function generateStaticGmaps($markers, $width = 640, $height = 640){
 		if (is_array($markers) && !is_array(current($markers))){
 			$markers = array($markers);

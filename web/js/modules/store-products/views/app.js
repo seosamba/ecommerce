@@ -11,10 +11,11 @@ define([
     'text!../templates/tags_dialog.html',
     'text!../templates/template_dialog.html',
     'text!../templates/toggle_dialog.html',
-    'text!../templates/delete_dialog.html'
+    'text!../templates/delete_dialog.html',
+    'text!../templates/freeShipping_dialog.html'
 ], function(Backbone, ProductsCollection, BrandsCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
-            PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl){
+            PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl, FreeShippingDialogTmpl){
     var MainView = Backbone.View.extend({
         el: $('#store-products table.products-table'),
         events: {
@@ -197,6 +198,28 @@ define([
                     }
                 }
             });
+        },
+        freeshippingAction:function (products){
+            var self = this;
+
+            var dialog = _.template(FreeShippingDialogTmpl, {
+                totalProducts: this.products.totalRecords
+            });
+            $(dialog).dialog({
+                dialogClass: 'seotoaster',
+                buttons: {
+                    "Apply": function(){
+                        var freeShipping = $(this).find($("select option:selected")).val();
+                        if(freeShipping == -1){
+                            return false;
+                        }
+
+                        self.products.batch('PUT', {'freeShipping': freeShipping}, $(this).find('input[name="applyToAll"]').attr('checked') );
+                        $(this).dialog('close');
+                    }
+                }
+            });
+            return false;
         },
         templateAction: function(products){
             var self = this;

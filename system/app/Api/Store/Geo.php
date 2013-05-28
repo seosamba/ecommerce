@@ -1,23 +1,48 @@
 <?php
 /**
- * Geo
+ * Geo data REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Geo extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_GUEST => array(
 			'allow' => array('get')
 		),
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get')
+		),
+		Shopping::ROLE_SALESPERSON => array(
+			'allow' => array('get')
 		)
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Get geographical data
+	 *
+	 * Resourse:
+	 * : /api/store/geo/type/:type
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * ## Parameters:
+     * type (type string)
+     * : Type of data. Possible values: country, state
+	 *
+	 * pairs (type sting)
+	 * : If given data will be returned as key-value array
+	 *
+	 * @return JSON Data
 	 */
 	public function getAction() {
 		$type = strtolower(filter_var($this->_request->getParam('type'), FILTER_SANITIZE_STRING));
@@ -38,26 +63,21 @@ class Api_Store_Geo extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Reserved for future usage
 	 */
 	public function postAction() {
 		// TODO: Implement postAction() method.
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function deleteAction() {
 		// TODO: Implement deleteAction() method.

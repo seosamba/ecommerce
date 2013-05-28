@@ -1,5 +1,6 @@
 <ul class="related-products">
     <?php foreach ($this->related as $product) : ?>
+	<?php if (!$product->getEnabled()) continue; ?>
     <li>
         <?php if ($product->getPhoto()) : ?>
         <?php
@@ -12,7 +13,14 @@
         <?php endif; ?>
         <a class="product-title" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>"><?php echo $product->getName(); ?></a>
         <p class="product-description"><?php echo $product->getShortDescription();?></p>
-        <span class="product-price"><?php echo $this->currency($product->getPrice());?></span>
+	    <?php
+	    // building related product price
+	    $price = $product->getCurrentPrice() !== null ? $product->getCurrentPrice() : $product->getPrice();
+	    if ((bool) Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax')) {
+            $price += Tools_Tax_Tax::calculateProductTax($product);
+        }
+		?>
+        <span class="product-price"><?php echo $this->currency($price);?></span>
         <?php if(isset($this->checkoutPageUrl)):?>
            <a class="tcart-add related-cart-add" href="javascript:;" data-pid="<?php echo $product->getId();?>"><?php echo $this->translate('Add to cart');?></a>
         <?php endif;?>

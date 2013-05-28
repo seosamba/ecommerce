@@ -1,0 +1,101 @@
+<style type="text/css">
+#edit-group {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	position: relative;
+}
+#edit-group label{
+	display: inline-block;
+}
+#edit-group input,
+#edit-group select,
+#edit-group textarea {
+	width: 185px;
+    text-align: center;
+}
+#edit-group input[type=checkbox],
+#edit-group input[type=radio] {
+    width: auto;
+	margin: 0 5px;
+	vertical-align: middle;
+}
+#edit-group input.blue-btn[type=submit]{
+	float:none;
+    width: 230px;
+    margin-left: 10px;
+}
+#edit-group .input-auto {
+	width: auto;
+}
+#edit-group .input-micro {
+	width: 40px;
+}
+#edit-group .input-mini {
+    width: 60px;
+}
+#edit-group .input-normal {
+    width: 80px;
+}
+#edit-group .input-medium {
+	width: 100px;
+}
+#edit-group .input-large {
+	width: 140px;
+}
+
+#group-table_paginate a[role="button"] {
+	display: inline-block;
+	cursor: pointer;
+	padding: 4px 0;
+}
+#group-table_paginate a[role="button"]:not(:first-child) {
+	padding-left: 10px;
+}
+</style>
+
+<input type="hidden" name="group-currency" class="group-currency" value="<?php echo Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');?>"/>
+<form id="edit-group" class="grid_12 clearfix">
+    <div class="grid_3">
+        <?php echo $this->formText('groupName', null, array(
+            'class'          => 'new-group-name',
+            'placeholder'    => $this->translate('Enter group name')
+        )); ?>
+    </div>
+
+    <div class="grid_1">
+       <?php echo $this->formSelect('priceSign', null, array(
+            'style'         => 'width: auto',
+            'id'            => 'group-sign',),
+            array('plus' => '+', 'minus' => '-')); ?>
+
+    </div>
+    <div class="grid_3">
+        <?php echo $this->formText('priceValue', null, array(
+            'class'          => 'new-group-price-value'
+        )); ?>
+    </div>
+    <div class="grid_1">
+        <?php echo $this->formSelect('priceType', null, array(
+                'style'         => 'width: auto',
+                'id'            => 'group-price-type',),
+            array( 'percent' => '%', 'unit' => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency'))); ?>
+
+    </div>
+
+    <input class="blue-btn" type="submit" value="<?php echo $this->translate('Create or update group'); ?>"/>
+
+</form>
+
+<div class="toaster-widget mt5px grid_12">
+    <table id="group-table" style="width: 95%;" class="widget">
+        <thead>
+        <tr>
+            <th><?php echo $this->translate('Group Name');?></th>
+            <th><?php echo $this->translate('Default price modifier');?></th>
+            <th><?php echo $this->translate('Action');?></th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>

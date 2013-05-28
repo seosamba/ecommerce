@@ -1,18 +1,40 @@
 <?php
 /**
- * Shippers.php
+ * Shipping plugins config REST API controller
+ *
+ * @package Store
+ * @since 2.0.0
+ *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Api_Store_Shippers extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+		Tools_Security_Acl::ROLE_ADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
 		)
 	);
 
 	/**
-	 * @return array
+	 * Fetch a shipping module configuration
+	 *
+	 * Resourse:
+	 * : /api/store/shippers/
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * ## Parameters:
+	 * name (type string)
+	 * : Name of shipping plugin
+	 *
+	 * @return JSON List of shipping plugins configurations
 	 */
 	public function getAction() {
 		$name = filter_var($this->_request->getParam('name'), FILTER_SANITIZE_STRING);
@@ -24,17 +46,23 @@ class Api_Store_Shippers extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Alias for PUT method
+	 * @see Api_Store_Shippers::put()
 	 */
 	public function postAction() {
 		return $this->putAction();
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Saves shipping plugin config in database
+	 *
+	 * Resourse:
+	 * : /api/store/shippers/
+	 *
+	 * HttpMethod:
+	 * : PUT
+	 *
+	 * @return JSON Passthrough config
 	 */
 	public function putAction() {
 		$data = Zend_Json::decode($this->_request->getRawBody());
@@ -47,9 +75,7 @@ class Api_Store_Shippers extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function deleteAction() {
 		// TODO: Implement deleteAction() method.

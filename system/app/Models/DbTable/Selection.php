@@ -10,7 +10,7 @@ class Models_DbTable_Selection extends Zend_Db_Table_Abstract {
 	protected $_name = 'shopping_product_option_selection';
 
 	protected $_dependentTables = array(
-		'Models_DbTable_OptionSelection'
+//		'Models_DbTable_OptionSelection'
 	);
 	
 	protected $_referenceMap = array(

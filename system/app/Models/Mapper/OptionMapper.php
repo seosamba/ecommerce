@@ -1,8 +1,8 @@
 <?php
-
 /**
- * Option
+ * Models_Mapper_OptionMapper
  *
+ * @method Models_Mapper_OptionMapper getInstance() getInstance() Returns an instance of itself
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {

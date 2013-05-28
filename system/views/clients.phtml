@@ -3,7 +3,19 @@
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
     <td class="check-td textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
-    <td class="email text-left"><a href="mailto:${email}">${email}</a></td>
+    <td class="email textcentered"><a href="mailto:${email}">${email}</a></td>
+    <td class="group textcentered">
+        <?php if(!empty($this->allGroups)):?>
+            <select name="groups">
+                <option value="0"><?php echo $this->translate('select');?></option>
+                <?php foreach($this->allGroups as $group): ?>
+                    <option {{if group_id == <?php echo $group->getId();?>}} selected="selected" {{/if}} value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
+                <?php endforeach;?>
+            </select>
+        <?php else:?>
+            <span><?php echo $this->translate('There are no groups yet');?></span>
+        <?php endif;?>
+    </td>
     <td class="date textcentered">${reg_date}</td>
     <td class="total textcentered"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
@@ -38,7 +50,7 @@
     <table id="clients-table" class="widget" style="width: 100%">
         <thead>
             <tr class="search-line">
-				<th colspan="4" class="gray-bg">
+				<th colspan="5" class="gray-bg">
 					<label class="mt5px"><?php echo $this->translate('Search');?></label>
 					<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
                 </th>
@@ -52,6 +64,7 @@
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
+                <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
 	            <th class="sortable" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
             </tr>
@@ -63,11 +76,12 @@
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="4" class="ui-resizable text-left">
+	            <td colspan="5" class="ui-resizable text-left">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
 		            <select id="mass-action">
 			            <option value="0"><?php echo $this->translate('nothing');?></option>
+                        <option value="assignGroups"><?php echo $this->translate('assign groups');?></option>
 			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
 		            </select>
 	            </td>

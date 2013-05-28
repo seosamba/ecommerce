@@ -1,20 +1,45 @@
 <?php
 /**
- * Customers.php
+ * Customers REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Customers extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
-			'allow' => array('get', 'delete')
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+        Tools_Security_Acl::ROLE_ADMIN => array(
+			'allow' => array('get', 'post', 'put', 'delete')
+		),
+        Shopping::ROLE_SALESPERSON => array(
+			'allow' => array('get', 'post', 'put', 'delete')
 		)
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Get customers data
+	 *
+	 * Resourse:
+	 * : /api/store/customers/id/:id
+	 *
+	 * HttpMethod:
+	 * : GET
+	 *
+	 * ## Parameters:
+     * type (type string)
+     * : Type of data. Possible values: country, state
+	 *
+	 * pairs (type sting)
+	 * : If given data will be returned as key-value array
+	 *
+	 * @return JSON List of customers
 	 */
 	public function getAction() {
 		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
@@ -51,26 +76,80 @@ class Api_Store_Customers extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Attaching user group for customers if groupId exist
+     *
 	 */
 	public function postAction() {
-		// TODO: Implement postAction() method.
+        $userId = filter_var($this->_request->getParam('userId'), FILTER_VALIDATE_INT);
+        $groupId = filter_var($this->_request->getParam('groupId'), FILTER_VALIDATE_INT);
+        $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+
+        if(!isset($userId)){
+            $this->_error();
+        }
+
+        if(isset($groupId)){
+            $customerInfoDbTable = new Models_DbTable_CustomerInfo();
+            if($groupId == 0){
+                $groupId = null;
+            }
+            $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id = ?', $userId);
+            $existingCustomerInfo = $customerInfoDbTable->find($userId)->current();
+            if($existingCustomerInfo !== null){
+                $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+            }else{
+                $data['user_id']  = $userId;
+                $data['group_id'] = $groupId;
+                $customerInfoDbTable->insert($data);
+            }
+
+            $cache->clean('', '', array('0'=>'product_price'));
+            $cache->clean('products_groups_price', 'store_');
+            $cache->clean('customers_groups', 'store_');
+        }
+
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
-		// TODO: Implement putAction() method.
+        $groupId     = filter_var($this->_request->getParam('groupId'), FILTER_SANITIZE_NUMBER_INT);
+        $customerIds = filter_var($this->_request->getParam('customerIds'), FILTER_SANITIZE_STRING);
+        $allGroups = filter_var($this->_request->getParam('allGroups'), FILTER_SANITIZE_NUMBER_INT);
+        $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+        $customersIdsArray = explode(',', $customerIds);
+        if(!isset($groupId) || !is_array($customersIdsArray)){
+            $this->_error();
+        }
+        $customerInfoDbTable = new Models_DbTable_CustomerInfo();
+
+        if($allGroups == 1){
+            $updateField = $customerInfoDbTable->getAdapter()->quoteInto('group_id =?', $groupId);
+            $customerInfoDbTable->getAdapter()->query('UPDATE `shopping_customer_info` SET '.$updateField);
+        }else{
+            $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
+            $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+        }
+
+        $cache->clean('products_groups_price', 'store_');
+        $cache->clean('customers_groups', 'store_');
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Delete customer
+	 *
+	 * Resourse:
+	 * : /api/store/customers/
+	 *
+	 * HttpMethod:
+	 * : DELETE
+	 *
+	 * ## Parameters:
+     * ids (type string)
+     * : List of customer IDs to delete
+	 *
+	 * @return JSON Result of operations
 	 */
 	public function deleteAction() {
 		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
@@ -83,6 +162,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
 					foreach ($customers as $user) {
 						$data[$user->getId()] = (bool)Application_Model_Mappers_UserMapper::getInstance()->delete($user);
 					}
+                    return $data;
 				} else {
 					$this->_error(null, self::REST_STATUS_NOT_FOUND);
 				}

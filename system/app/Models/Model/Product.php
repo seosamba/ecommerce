@@ -43,11 +43,17 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	
 	protected $_related;
 
+    protected $_parts = null;
+
 	protected $_createdAt;
 
 	protected $_updatedAt;
 
 	protected $_extraProperties = array();
+
+	protected $_inventory;
+
+    protected $_freeShipping;
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -189,7 +195,15 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 	public function setEnabled($_enabled) {
 		$this->_enabled = $_enabled;
 	}
-	
+
+    public function getFreeShipping() {
+        return $this->_freeShipping;
+    }
+
+    public function setFreeShipping($_freeShipping) {
+        $this->_freeShipping = $_freeShipping;
+    }
+
 	public function toArray() {
 		$vars = array();
 		$methods = get_class_methods($this);
@@ -256,4 +270,21 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 		return $this->_pageTemplate;
 	}
 
+	public function setInventory($inventory) {
+		$this->_inventory = $inventory;
+		return $this;
+	}
+
+	public function getInventory() {
+		return $this->_inventory;
+	}
+
+    public function setParts($parts) {
+        $this->_parts = $parts;
+        return $this;
+    }
+
+    public function getParts() {
+        return $this->_parts;
+    }
 }

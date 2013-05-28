@@ -38,7 +38,7 @@ define([
             this.rulesCollection.add();
         },
         changeTaxConfig: function(e){
-            $.post('/plugin/shopping/run/setConfig', {config: {showPriceIncTax: e.target.checked ? 1 : 0}}) ;
+            $.post($('#website_url').val() + '/plugin/shopping/run/setConfig', {config: {showPriceIncTax: e.target.checked ? 1 : 0}}) ;
         }
     })
 	

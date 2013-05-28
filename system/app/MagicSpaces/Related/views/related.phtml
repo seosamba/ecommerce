@@ -1,0 +1,36 @@
+<div class="seotoaster product-related-wrap">
+    <div class="product-related-controlls">
+        <h4>Magic space: Related products</h4>
+    </div>
+    <div class="product-related-content"><?php echo $this->content; ?></div>
+</div>
+
+<style type="text/css">
+
+    .seotoaster.product-related-wrap,
+    .seotoaster.product-related-wrap div.product-related-controlls,
+    .seotoaster.product-related-wrap div.product-related-content {
+        overflow: hidden;
+        background-color: #fff;
+    }
+    .seotoaster.product-related-wrap {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        border: 3px dashed #eee;
+    }
+    .seotoaster.product-related-wrap div.product-related-controlls {
+        background: rgba(248, 248, 248, 1);
+        padding: 10px 5px 5px 5px;
+        min-height: 30px;
+    }
+    .seotoaster.product-related-wrap div.product-related-controlls h4 {
+        padding: 3px;
+        color: #ccc;
+        text-transform: uppercase;
+    }
+    .seotoaster.product-related-wrap div.product-related-content {
+        padding: 5px;
+        background: background: rgba(250, 250, 250, 1);
+    }
+</style>

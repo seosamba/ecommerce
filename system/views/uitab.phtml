@@ -1,22 +1,28 @@
 <?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
 <div class="container_12">
 	<!-- Product listing selector -->
-	<div id="template-selector" class="grid_12 mt10px mb5px">
-		<?php if(isset($this->productTemplates) && !empty($this->productTemplates)): ?>
-			<select id="templates" class="templates" style="width:260px;margin: 3px;float:left;" data-placeholder="Select a product listing template...">
-				<option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
-				<?php foreach($this->productTemplates as $template): ?>
-					<option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
-				<?php endforeach; ?>
-			</select>
-		<?php else: ?>
-			<h3 class="grid_12"><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
-		<?php endif; ?>
-	</div>
+    <div class="grid_12">
+        <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
+            <h3><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
+        <?php else: ?>
+            <div id="template-selector" class="grid_6 mt10px mb5px">
+				<select id="templates" class="templates" data-placeholder="Select a product listing template...">
+                    <option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
+                    <?php foreach($this->productTemplates as $template): ?>
+                        <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="grid_6">
+                <?php echo $this->formText('search', '', array('placeholder' => 'search by name, sku or tags')); ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
+		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
 	</div>
 	<div class="grid_4">
 		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands');?>..."></select>
@@ -91,29 +97,79 @@
         overflow: hidden;
         background-color:#fff;
     }
+    .ui-autocomplete {
+        max-height: 180px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+        background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
+        box-shadow: rgb(153, 153, 153) 0px 4px 10px;
+    }
+    #search {
+        margin-top: 12px;
+        padding: 6px 5px;
+
+    }
+    .chzn-container-multi {min-width: 200px}
 </style>
-<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js'); ?>
-<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js'); ?>
-<?php $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js'); ?>
-<?php echo $this->headScript(); ?>
+
+<?php
+    echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+        ->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
+        ->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
+?>
+
 <script type="text/javascript" charset="utf-8">
     $(function() {
 	    // uiTab object
 	    var uiTab = {
+		    step: parseInt('<?php echo Shopping::PRODUCT_DEFAULT_LIMIT; ?>'),
 		    offset: 0,
+            searchTerm: null,
 		    init: function() {
-				//init chosen plugin
-			    $('.pselect').chosen();
+
+                //init chosen plugin
+                $('.pselect').chosen();
+
 			    //init jqueryui button
 			    $('#btn-create').button();
 			    $('.ui-tabs-nav-item a').click(this.launch);
 			    $(document).on('click', '.currproduct', this.insertSingleProduct)
 			        .on('click', '#btn-create', this.insertList);
 			    $('.pselect').chosen().change(function() {
-					uiTab.offset = 0;
-				    uiTab.loadStoreData('products', true)
+					uiTab.offset    = 0;
+
+                    //cleaning the search params before filtering
+                    self.searchTerm = null;
+                    $('#search').val('');
+
+                    uiTab.loadStoreData('products', true)
 			    });
-		    },
+
+
+                var self = this;
+                $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
+                    $('#search').autocomplete({
+                        minLength: 2,
+                        source: response,
+                        select: function(event, ui){
+                            self.searchTerm = null;
+                            self.loadStoreData('products', {
+                                key: ui.item.value
+                            }, true);
+                        }
+                    });
+                });
+
+                $(document).on('keypress', '#search', function(e) {
+                    if(e.keyCode == 13) {
+                        $('.ui-autocomplete').hide();
+                        self.searchTerm = null;
+                        self.loadStoreData('products', {key: $(e.currentTarget).val()}, true);
+                    }
+                })
+
+    	    },
 		    launch: function() {
 			    $('#product-products').html('');
 			    $('ul.chzn-choices').removeClass('ui-corner-top').addClass('ui-corner-all');
@@ -152,23 +208,67 @@
                 }
                 //listing template
                 shortCode += $('#templates').val();
-                //tags filter
-                shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
-                //brands filter
-                shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
-                //ordering
-                shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
-                $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+
+                if(($('#search').val() != '')) {
+                    var ids             = [];
+                    var visibleProducts = $('a.currproduct');
+                    if(visibleProducts.length < uiTab.step) {
+                        $.each(visibleProducts, function(key, productContainer) {
+                            ids.push($(productContainer).attr('id'));
+                        });
+                        shortCode += ':' + ids.join(',') + '}';
+                        $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                    } else {
+                        showSpinner();
+                        $.when($.getJSON($('#website_url').val() + 'api/store/products/offset/0/limit/1000000/', {key: $('#search').val()}, function(response) {
+                            //console.log(response);
+                            hideSpinner();
+                            if(!response.length) {
+                                showMessage('There is nothing to put in the list. Search different criteria and try again', true);
+                                return false;
+                            }
+                            $.each(response, function(key, product) {
+                                ids.push(product.id);
+                            });
+                        })).done(function() {
+                            shortCode += ':' + ids.join(',') + '}';
+                            $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                        });
+                    }
+                } else {
+                    //tags filter
+                    shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
+                    //brands filter
+                    shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
+                    //ordering
+                    shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
+                    $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                }
+
 		    },
-		    loadStoreData : function(dataType, filter) {
+		    loadStoreData : function(dataType, filter, force) {
                 showSpinner();
                 //if data type already loaded - return
                 if($('#' + dataType + ' option').length) {
                     return false;
                 }
+
                 var utab = this;
-			    $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
-				    this.getParams(filter),
+                if((!force || typeof(force) == 'undefined') && !utab.searchTerm) {
+		            params = uiTab.getParams(filter);
+                } else {
+                    if(!utab.searchTerm) {
+                        utab.searchTerm = filter;
+                        params          = filter;
+                    } else {
+                        params = utab.searchTerm;
+                    }
+                    params.offset = utab.offset;
+                    params.limit  = utab.limit;
+                }
+
+                $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
+				    params,
 				function(response) {
                     if(response.length) {
                         switch(dataType) {
@@ -178,11 +278,11 @@
                             break;
                             case 'products':
 	                            uiTab.parseProducts(response, filter);
-								if(!$('#tags').val() && !$('#brands').val()) {
+								if(response.length >= uiTab.step) {
 		                            $('.productlisting:last-child').waypoint(function() {
 										$(this).waypoint('remove');
-										utab.offset += 30;
-										uiTab.loadStoreData('products')
+			                            uiTab.offset += 30;
+										uiTab.loadStoreData('products', filter)
 									},
 									{
 										context: '#product-products',
@@ -226,28 +326,33 @@
 		    },
 		    parseProducts: function(productsResponse, filter) {
 			    var productsContainer = $('#product-products');
-			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
-				    $(productsContainer).empty();
-			    }
+//			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
+//				    productsContainer.empty();
+//			    }
 			    //media servers
 			    var mediaServers = <?php echo Tools_Content_Tools::getMediaServers(true); ?>;
 			    var srcPart      = '<?php echo $this->websiteUrl;?>';
+			    var productItemsHtml = '';
 			    $.each(productsResponse, function() {
 				    var srcPart = '<?php echo $this->websiteUrl;?>';
 			        <?php if($this->mediaServersAllowed): ?>
 	                    srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
 	                <?php endif; ?>
-                    productItem = '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
+                    productItemsHtml += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
                                 '<p class="brand">' + this.brand + '</p>' +
                                 '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
-	                $(productsContainer).append(productItem);
-	                hideSpinner();
                 });
+			    if (this.offset === 0) {
+				    productsContainer.html(productItemsHtml).scrollTop(0);
+                } else {
+                    productsContainer.append(productItemsHtml);
+			    }
                 $('img.lazy').lazyload({
-                    container: $(productsContainer),
+                    container: productsContainer,
                     effect: 'fadeIn'
                 });
-		    }
+                hideSpinner();
+            }
 	    };
 	    // end uiTab
 	    uiTab.init();

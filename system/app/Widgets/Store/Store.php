@@ -136,6 +136,16 @@ class Widgets_Store_Store extends Widgets_Abstract {
             }else{
                 unset($sessionHelper->storeCartSessionKey);
             }
+            if(isset($this->_options[2]) && $this->_options[2] != ''){
+                $additionalTableRows = explode(',', $this->_options[2]);
+                $this->_view->additionalTableRows = $additionalTableRows;
+            }
+            
+            if(isset($this->_options[2]) && $this->_options[2] != '' && isset($this->_options[3]) && $this->_options[3] != ''){
+                $renamedTableRows = explode(',', $this->_options[3]);
+                $this->_view->renamedTableRows = $renamedTableRows;
+            }
+            
 			if ($cartSession instanceof Models_Model_CartSession){
 				$cartContent = $cartSession->getCartContent();
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
@@ -143,13 +153,15 @@ class Widgets_Store_Store extends Widgets_Abstract {
 				$this->_view->shoppingConfig = $shoppingConfig;
                 foreach ($cartContent as $key=>$product){
                     $productObject = $productMapper->find($product['product_id']);
-                    if(!empty($product['options'])){
-                        $optionsData = $this->_getOptions($product['product_id'], $product['options']);
-                        $cartContent[$key]['options'] = $optionsData;
-                    }
-                    if($productObject !=null){
+//                    if(!empty($product['options'])){
+//                        $optionsData = $this->_getOptions($product['product_id'], $product['options']);
+//                        $cartContent[$key]['options'] = $optionsData;
+//                    }
+                    if($productObject !== null){
+                        $cartContent[$key]['mpn']      = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
+                        $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                     }
                 }
                 $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];
@@ -168,6 +180,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$actualOptions  = array();
 		$product        = Models_Mapper_ProductMapper::getInstance()->find($productId);
 		$defaultOptions = $product->getDefaultOptions();
+        $resultOptions = array();
 		foreach($options as $optionId => $selectionId) {
 			foreach($defaultOptions as $defaultOption) {
 				if($optionId != $defaultOption['id']) {
@@ -178,9 +191,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
 						return $selection;
 					}
 				});
+                $resultOptions = array_merge($actualOptions, $resultOptions);
+                $resultOptions[0]['optionTitle'] = $defaultOption['title'];
 			}
 		}
-		return $actualOptions;
+		return $resultOptions;
 	}
     
     /**
@@ -197,4 +212,14 @@ class Widgets_Store_Store extends Widgets_Abstract {
         
         
     }
+
+	protected function _makeOptionCoupon() {
+		if (!Tools_ShoppingCart::getInstance()->getCustomerId()){
+			return null;
+		}
+
+		$this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();
+
+		return $this->_view->render('coupon.phtml');
+	}
 }

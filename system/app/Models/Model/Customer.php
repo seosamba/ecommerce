@@ -15,6 +15,8 @@ class Models_Model_Customer extends Application_Model_Models_User {
 
 	protected $_default_shipping_address_id;
 
+    protected $_group_id;
+
 	public function getDefaultAddress($type = self::ADDRESS_TYPE_SHIPPING) {
 		if (empty($type)) {
 			throw new Exception('Address type must be defined');
@@ -63,6 +65,15 @@ class Models_Model_Customer extends Application_Model_Models_User {
 	public function getDefaultShippingAddressId() {
 		return $this->_default_shipping_address_id;
 	}
+
+    public function setGroupId($_group_id) {
+        $this->_group_id = $_group_id;
+        return $this;
+    }
+
+    public function getGroupId() {
+        return $this->_group_id;
+    }
 
 	public function getAddressById($id) {
 		$list = $this->_filterAddresses('id', $id);

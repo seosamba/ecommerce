@@ -1,19 +1,51 @@
 <?php
 class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
+	/**
+	 * New cart registered in system.
+	 */
 	const CART_STATUS_NEW           = 'new';
 
+	/**
+	 * Payment information have been sent to payment gateway but needs to be verified or awaiting confirmation on gateway.
+	 * This status will also be used by offline payment options.
+	 */
 	const CART_STATUS_PENDING       = 'pending';
 
+	/**
+	 * Payment information have been sent to payment gateway and waiting for instant response.
+	 */
 	const CART_STATUS_PROCESSING    = 'processing';
 
+	/**
+	 * Payment has been applied on payment gateway or successful transaction notification for pending operation received.
+	 */
 	const CART_STATUS_COMPLETED     = 'completed';
 
-	const CART_STATUS_UNPROCESSED   = 'unprocessed';
-
+	/**
+	 * Payment transaction has been denied/cancelled.
+	 */
 	const CART_STATUS_CANCELED      = 'canceled';
 
+	/**
+	 * Error occured during payment processing.
+	 */
 	const CART_STATUS_ERROR         = 'error';
+
+	/**
+	 * Order has been sent via shipping service.
+	 */
+	const CART_STATUS_SHIPPED       = 'shipped';
+
+	/**
+	 * Order has been delivered
+	 */
+	const CART_STATUS_DELIVERED     = 'delivered';
+
+	/**
+	 * Order was canceled after successfull payment and money was sent back to customer
+	 */
+	const CART_STATUS_REFUNDED      = 'refunded';
 
 	protected $_cartContent = null;
 
@@ -48,6 +80,11 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	protected $_createdAt;
 
 	protected $_updatedAt;
+    
+    protected $_notes = null;
+
+	protected $_discount = 0;
+    
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -214,6 +251,24 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	public function getReferer() {
 		return $this->_referer;
+	}
+    
+    public function setNotes($notes) {
+		$this->_notes = $notes;
+		return $this;
+	}
+
+	public function getNotes() {
+		return $this->_notes;
+	}
+
+	public function setDiscount($discount) {
+		$this->_discount = $discount;
+		return $this;
+	}
+
+	public function getDiscount() {
+		return $this->_discount;
 	}
 
 }

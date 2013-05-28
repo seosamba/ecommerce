@@ -1,10 +1,16 @@
 <?php
 /**
- * Orders.php
+ * Orders REST API controller
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
+ *
+ * @package Store
+ * @since 2.0.0
  */
 class Api_Store_Orders extends Api_Service_Abstract {
 
+	/**
+	 * @var array Access Control List
+	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
 			'allow' => array('get', 'post', 'put', 'delete')
@@ -18,9 +24,36 @@ class Api_Store_Orders extends Api_Service_Abstract {
 	);
 
 	/**
-	 * The get action handles GET requests and receives an 'id' parameter; it
-	 * should respond with the server resource state of the resource identified
-	 * by the 'id' value.
+	 * Get orders by giving contitions
+	 *
+	 * Resourse:
+	 * : /api/store/orders/id/:id
+	 *
+	 * Method:
+	 * : GET
+	 *
+	 * ## Parameters:
+	 * id (type string)
+	 * : Order id to fetch single product
+	 *
+	 * ## Optional parameters (оnly if ID is not defined)
+	 *
+	 * productid (type integer)
+	 * : Filter orders that contains products with given id
+	 *
+	 * filter (type array)
+	 * : Set of filters. Possible arguments: country, state, date-from, date-to, product-id
+	 *
+	 * limit (type integer)
+	 * : Maximum number of results
+	 *
+	 * offset (type integer)
+	 * : Number of results to skip
+	 *
+	 * order (type string)
+	 * : Sorting fields
+	 *
+	 * @return JSON List of orders
 	 */
 	public function getAction() {
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
@@ -42,26 +75,43 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			}
 			return $order;
 		} else {
-			$filter = $this->_request->getParam('filter');
+			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
 			$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
-			$order = filter_var_array($this->_request->getParam('order', array()), FILTER_SANITIZE_STRING);
+			$sortOrder = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
+
+			if ($sortOrder){
+				$sortOrder = strtr($sortOrder, array(
+					'name'  => 'u.full_name',
+					'email' => 'u.email',
+					'date'  => 'order.created_at',
+					'status' => 'order.status',
+					'products' => 'total_products',
+					'total' => 'order.total',
+					'shipping_price' => 'order.shipping_price'
+				));
+			} else {
+				$sortOrder = 'order.created_at DESC';
+			}
+
 			if (is_array($filter)){
-				if($filter['country'] == 'AA'){
-                     $filter['country'] = 0;
-                }
-                if($filter['state'] == 'null'){
-                    $filter['state'] = 0;
-                }
-                if($filter['date-from'] != ''){
-                    $filter['date-from'] = date("Y-m-d", strtotime($filter['date-from']));
-                }
-                if($filter['date-to'] != ''){  
-                    $filter['date-to']   = date("Y-m-d", strtotime($filter['date-to']));
-                }
+				if (isset($filter['country'])) {
+					if (!preg_match('/[A-Z]{2}/', $filter['country'])) {
+	                     unset($filter['country']);
+	                }
+				}
+				if (isset($filter['state']) && $filter['state'] === '0') {
+					unset($filter['state']);
+				}
+				if (isset($filter['date-from']) && !empty($filter['date-from'])) {
+					$filter['date-from'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-from']));
+				}
+				if (isset($filter['date-to']) && !empty($filter['date-to'])) {
+					$filter['date-to'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-to']));
+				}
                 $filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
 				$filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
-				return $orderMapper->fetchAll($filter, $order, $limit, $offset);
+				$orderList = $orderMapper->fetchAll($filter, $sortOrder, $limit, $offset);
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}
@@ -70,26 +120,21 @@ class Api_Store_Orders extends Api_Service_Abstract {
 	}
 
 	/**
-	 * The post action handles POST requests; it should accept and digest a
-	 * POSTed resource representation and persist the resource state.
+	 * Reserved for future usage
 	 */
 	public function postAction() {
 		// TODO: Implement postAction() method.
 	}
 
 	/**
-	 * The put action handles PUT requests and receives an 'id' parameter; it
-	 * should update the server resource state of the resource identified by
-	 * the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function putAction() {
 		// TODO: Implement putAction() method.
 	}
 
 	/**
-	 * The delete action handles DELETE requests and receives an 'id'
-	 * parameter; it should update the server resource state of the resource
-	 * identified by the 'id' value.
+	 * Reserved for future usage
 	 */
 	public function deleteAction() {
 		// TODO: Implement deleteAction() method.
