@@ -99,7 +99,7 @@ $lastPageCaption = $this->translate('Last');
 			{{/if}}
 		</div>
 		<div class="grid_3">
-			<button class="remove-option">Delete option</button>
+			<button class="remove-option"><?php echo $this->translate('Delete option'); ?></button>
 		</div>
 	</div>
 	<div class="clear"></div>
@@ -108,17 +108,17 @@ $lastPageCaption = $this->translate('Last');
 
 <script id="optionListTemplate" type="text/x-jquery-tmpl">
 	<div class="ui-widget-header clearfix">
-		<div class="grid_4">Title</div>
-		<div class="grid_3">Price modifier</div>
-		<div class="grid_3">Weight modifier</div>
-		<div class="grid_1">Default</div>
+		<div class="grid_4"><?php echo $this->translate('Title'); ?></div>
+		<div class="grid_3"><?php echo $this->translate('Price modifier'); ?></div>
+		<div class="grid_3"><?php echo $this->translate('Weight modifier'); ?></div>
+		<div class="grid_1"><?php echo $this->translate('Default'); ?></div>
 		<div class="grid_1"></div>
 	</div>
 	<div class="option-list-holder mt5px">
 
 	</div>
 	<div class="clearfix grid_12 mt5px mb10px">
-		<a class="add-selection-btn" href="javascript:;">[ Add new selection ]</a>
+		<a class="add-selection-btn" href="javascript:;">[ <?php echo $this->translate('Add new selection');?> ]</a>
 	</div>
 </script>
 

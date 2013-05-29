@@ -43,7 +43,7 @@ div.box:hover {
 	box-shadow: 0 0 3px lightseagreen;
 }
 .product-tags .tag-widget {
-    background: url("/system/images/bg-strip.png") repeat scroll 0 0 transparent;
+    background: url("../../../../system/images/bg-strip.png") repeat scroll 0 0 transparent;
     border: 2px solid white;
     -moz-border-radius: 3px 3px 3px 3px;
     -webkit-border-radius: 3px 3px 3px 3px;
@@ -88,7 +88,7 @@ div.box:hover {
 	vertical-align:top;
 }
 .tag-widget span.ui-icon:hover, .ui-widget.ui-button.item-remove:hover .ui-icon {
-	background-image: url("/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png");
+	background-image: url("../../../../system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png");
 }
 #options-holder .option-content .option-modifier-select {
 	width: 50px;
@@ -258,7 +258,7 @@ input#delete {
 	background: #3d6075;
 }
 .ui-widget.ui-button.remove-option span.ui-icon {
-	background-image: url("/system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png");
+	background-image: url("../../../../system/uithemes/seotoasterui/images/ui-icons_ffffff_256x240.png");
 }
 #image-list {
 	height: 450px !important;
@@ -282,7 +282,7 @@ input#delete {
 	overflow-y: auto;
 	overflow-x: hidden;
 	padding-right: 5px;
-	background: url("/system/images/bg-strip.png");
+	background: url("../../../../system/images/bg-strip.png");
 	box-shadow: rgb(153, 153, 153) 0px 4px 10px;
     z-index: 9999;
 }
@@ -317,10 +317,10 @@ div.spinner {
 	height: 48px;
 	top: 45%;
 	left: 50%;
-	background: url("/plugins/shopping/web/images/spinner.gif");
+	background: url("../images/spinner.gif");
 }
 div.spinner.bg {
-	background: url("/plugins/shopping/web/images/spinner_bg.gif");
+	background: url("../images/spinner_bg.gif");
 }
 .seotoaster .help a {
     color: #E7E7E7;
