@@ -550,6 +550,10 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_type` (
   PRIMARY KEY (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+INSERT INTO `shopping_coupon_type` (`type`, `label`) VALUES
+('discount',	'Discount with min. order'),
+('freeshipping',	'Free shipping with min. order');
+
 DROP TABLE IF EXISTS `shopping_coupon_usage`;
 CREATE TABLE IF NOT EXISTS `shopping_coupon_usage` (
   `coupon_id` int(10) unsigned NOT NULL COMMENT 'Coupon ID',
