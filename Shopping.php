@@ -549,9 +549,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * Generates list of website clients
-	 * for admins only
-	 * @return string Html content
+	 * Generates a list of clients - only visible to admin
+	 *
+     * @return string Html content
 	 */
 	protected function _makeOptionClients() {
 		//if (Tools_Security_Acl::isAllowed(__CLASS__.'-clients')){
