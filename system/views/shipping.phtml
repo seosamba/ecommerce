@@ -21,6 +21,9 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 #shippers .ui-tabs-panel {
 	padding: 4px;
 }
+#shippers #pane-container > div {
+	border: 1px solid #cacaca;
+}
 #shippers #pane-container header {
 	color: gray;
 	padding: 4px 20px;
@@ -104,7 +107,7 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
 			<li><a data-plugin="<?php echo $plugin->getName();?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute');?>"><?php echo $plugin->getName();?></a></li>
 		<?php endforeach; ?>
 		</ul>
-		<div id="pane-container" class="grid_8 relative">
+		<div id="pane-container" class="grid_8 alpha omega relative" style="padding: .1em .2em 0;">
 
             <div id="markup">
                 <header><?php echo $this->translate('Shipping markup configuration');?></header>
@@ -164,10 +167,11 @@ $(function(){
 				.end().find('.ui-tabs-panel').removeClass('ui-corner-bottom');
 		}
 	});
-	$('#ajax_msg').ajaxStart(function(){
-		$(this).fadeIn();
+
+	$(document).ajaxStart(function(){
+		$('#ajax_msg').fadeIn();
 	}).ajaxStop(function(){
-		$(this).fadeOut();
+		$('#ajax_msg').fadeOut();
 	});
 });
 </script>

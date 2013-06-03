@@ -30,8 +30,9 @@ define([
             });
         },
         save: function() {
+            var self = this;
             $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON()}, function(response){
-                closePopup();
+                self.$el.closest('div.seotoaster').find('div.closebutton span.close').trigger('click');
             });
         },
         newRule: function(){

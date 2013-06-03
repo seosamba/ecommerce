@@ -29,7 +29,7 @@ define(['backbone'], function(Backbone){
                     $(e.currentTarget).parent('li').removeClass('enabled').addClass('disabled').find('span.icon-checkmark').removeClass('icon-checkmark').addClass('icon-minus');
                 }
                 plugin.set('enabled', status);
-                console.log(plugin.save());
+                plugin.save();
                 $(e.currentTarget).replaceWith(_.template(this.templates.button, plugin.toJSON()));
             }
         },
@@ -55,7 +55,7 @@ define(['backbone'], function(Backbone){
             });
         },
         saveShipperConfig: function(){
-            var index = this.$el.tabs( "option", "selected" ),
+            var index = this.$el.tabs( "option", "active" ),
                 currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
             if (currentPane){
                 var form = currentPane.find('form');
@@ -65,7 +65,7 @@ define(['backbone'], function(Backbone){
                     dataType: 'json',
                     type: form.attr('method'),
                     complete: function(response){
-                        form.trigger('formsave', response)
+                        form.trigger('formsave', response);
                     }
                 });
             }

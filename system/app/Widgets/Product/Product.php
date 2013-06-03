@@ -152,7 +152,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
              return false;
         }
-        $html = sprintf('<a href="javascript:;" data-url="%splugin/shopping/run/product/id/%d" class="tpopup">%s</a>',
+        $html = sprintf('<a href="javascript:;" data-url="%splugin/shopping/run/product/id/%d" class="edit-product-btn tpopup">%s</a>',
             $this->_websiteUrl,
             $this->_product->getId(),
             $this->_translator->translate('Edit product')
