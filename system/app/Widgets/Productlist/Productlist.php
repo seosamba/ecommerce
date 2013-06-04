@@ -209,10 +209,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			if (preg_match_all('~{\$product:((?:price|freeshipping):?[^}]*)}~', $data['templateContent'], $productPriceWidgets)) {
 				$replacements = array();
 				foreach ($productPriceWidgets[1] as $key => $widgetData) {
+                    $page = $product->getPage();
+                    if(!$page instanceof Application_Model_Models_Page) {
+                        continue;
+                    }
 					$args = array_filter(explode(':', $widgetData));
-					$priceWidget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
+					$widget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $page->getId()));
 					$key = trim($productPriceWidgets[0][$key], '{}');
-					$replacements[$key] = $priceWidget->render();
+					$replacements[$key] = $widget->render();
 				}
 				if (!empty($replacements)) {
 					$entityParser->addToDictionary($replacements);
