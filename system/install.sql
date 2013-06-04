@@ -614,3 +614,8 @@ CREATE TABLE IF NOT EXISTS `shopping_group_price` (
   `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`groupId`,`productId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `template_type` (`id`, `title`) VALUES
+('typecheckout', 'Checkout page'),
+('typeproduct', 'Product page'),
+('typelisting', 'Product listing');
