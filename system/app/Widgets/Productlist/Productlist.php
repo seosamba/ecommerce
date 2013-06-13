@@ -160,8 +160,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				}
 			}
 			// proccessing product photo and get some data
-			$productPhotoData = explode('/', $product->getPhoto());
-			$photoUrlPart = $data['mediaPath'] . $productPhotoData[0];
+//			$productPhotoData = explode('/', $product->getPhoto());
+//			$photoUrlPart = $data['mediaPath'] . $productPhotoData[0];
 			$shortDesc = $product->getShortDescription();
 			$templatePrepend = '<!--pid="' . $product->getId() . '"-->';
 
@@ -184,12 +184,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			//setting up the entity parser
 			$entityParser->addToDictionary(array(
 				'$product:name'                         => $product->getName(),
-				'$product:photourl'                     => $photoUrlPart . '/product/' . $productPhotoData[1],
-				'$product:photourl:product'             => $photoUrlPart . '/product/' . $productPhotoData[1],
-				'$product:photourl:small'               => $photoUrlPart . '/small/' . $productPhotoData[1],
-				'$product:photourl:medium'              => $photoUrlPart . '/medium/' . $productPhotoData[1],
-				'$product:photourl:large'               => $photoUrlPart . '/large/' . $productPhotoData[1],
-				'$product:photourl:original'            => $photoUrlPart . '/original/' . $productPhotoData[1],
+//				'$product:photourl'                     => $photoUrlPart . '/product/' . $productPhotoData[1],
+//				'$product:photourl:product'             => $photoUrlPart . '/product/' . $productPhotoData[1],
+//				'$product:photourl:small'               => $photoUrlPart . '/small/' . $productPhotoData[1],
+//				'$product:photourl:medium'              => $photoUrlPart . '/medium/' . $productPhotoData[1],
+//				'$product:photourl:large'               => $photoUrlPart . '/large/' . $productPhotoData[1],
+//				'$product:photourl:original'            => $photoUrlPart . '/original/' . $productPhotoData[1],
 				'$product:url'                          => $product->getPage() ? $product->getPage()->getUrl() : null,
 				'$product:brand'                        => $product->getBrand(),
 				'$product:weight'                       => $product->getWeight(),
@@ -206,7 +206,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			));
 
 			// fetching $product:price and $product:freeshipping widgets and rendering them via native widget
-			if (preg_match_all('~{\$product:((?:price|freeshipping):?[^}]*)}~', $data['templateContent'], $productPriceWidgets)) {
+			if (preg_match_all('~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~', $data['templateContent'], $productPriceWidgets)) {
 				$replacements = array();
 				foreach ($productPriceWidgets[1] as $key => $widgetData) {
                     $page = $product->getPage();

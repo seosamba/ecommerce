@@ -170,13 +170,39 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	
 	private function _renderPhotourl() {
 		$websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+		$websiteUrl    = (Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('mediaServers') ? Tools_Content_Tools::applyMediaServers($websiteHelper->getUrl()) : $websiteHelper->getUrl());
+
         $photoSrc      = $this->_product->getPhoto();
+		if (empty($photoSrc)){
+			return $this->_websiteUrl.Tools_Page_Tools::PLACEHOLDER_NOIMAGE;
+		}
+
 		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
-            $photoSrc = str_replace('/', '/'.$this->_options[0].'/', $photoSrc);
-        } else {
-            $photoSrc = str_replace('/', '/product/', $photoSrc);
-        }
-        return $this->_websiteUrl . $websiteHelper->getMedia() . $photoSrc;
+			$newSize = $this->_options[0];
+		} else {
+			$newSize = 'product';
+		}
+		if (preg_match('~^https?://.*~', $photoSrc)){
+			$tmp = parse_url($photoSrc);
+			$path = explode('/', trim($tmp['path'], '/'));
+			if (is_array($path)){
+				$imgName = array_pop($path);
+				$guessSize = array_pop($path);
+				if (in_array($guessSize, array('small', 'medium', 'large', 'original')) && $guessSize !== $newSize ){
+					$guessSize = $newSize;
+				}
+				return $tmp['scheme'] .'://'. implode('/', array(
+					$tmp['host'],
+					implode('/', $path),
+					$guessSize,
+					$imgName
+				));
+			}
+			return $photoSrc;
+		} else {
+			$photoSrc = str_replace('/', '/'.$newSize.'/', $photoSrc);
+			return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
+		}
 	}
 	
 	private function _renderPrice() {
