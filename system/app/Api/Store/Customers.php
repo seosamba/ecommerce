@@ -110,30 +110,77 @@ class Api_Store_Customers extends Api_Service_Abstract {
 
 	}
 
-	/**
-	 * Reserved for future usage
-	 */
+    /**
+     * Assign groups for customer
+     * Changing customer passwords
+     *
+     * Resourse:
+     * : /api/store/customers/
+     *
+     * HttpMethod:
+     * : PUT
+     *
+     * ## Parameters:
+     * customerIds (type string)
+     * : List of customer IDs
+     *
+     * groupId (type integer)
+     * : group Id
+     *
+     * allGroups (type integer)
+     * : all Groups
+     *
+     * changePassword (type integer)
+     * : change Password flag
+     *
+     * @return JSON Result of operations
+     */
 	public function putAction() {
-        $groupId     = filter_var($this->_request->getParam('groupId'), FILTER_SANITIZE_NUMBER_INT);
-        $customerIds = filter_var($this->_request->getParam('customerIds'), FILTER_SANITIZE_STRING);
-        $allGroups = filter_var($this->_request->getParam('allGroups'), FILTER_SANITIZE_NUMBER_INT);
+        $groupId        = filter_var($this->_request->getParam('groupId'), FILTER_SANITIZE_NUMBER_INT);
+        $customerIds    = filter_var($this->_request->getParam('customerIds'), FILTER_SANITIZE_STRING);
+        $allGroups      = filter_var($this->_request->getParam('allGroups'), FILTER_SANITIZE_NUMBER_INT);
+        $changePassword = filter_var($this->_request->getParam('changePassword'), FILTER_SANITIZE_NUMBER_INT);
+
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
         $customersIdsArray = explode(',', $customerIds);
-        if(!isset($groupId) || !is_array($customersIdsArray)){
+        if(!is_array($customersIdsArray)){
             $this->_error();
         }
-        $customerInfoDbTable = new Models_DbTable_CustomerInfo();
 
-        if($allGroups == 1){
-            $updateField = $customerInfoDbTable->getAdapter()->quoteInto('group_id =?', $groupId);
-            $customerInfoDbTable->getAdapter()->query('UPDATE `shopping_customer_info` SET '.$updateField);
-        }else{
-            $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
-            $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+        if($changePassword == 1){
+            $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+            $where = $userMapper->getDbTable()->getAdapter()->quoteInto('id IN (?)', $customersIdsArray);
+            $users = $userMapper->fetchAll($where);
+            if(!empty($users)){
+                foreach($users as $user){
+                    $resetToken = new Application_Model_Models_PasswordRecoveryToken(array(
+                        'saltString' => $user->getEmail(),
+                        'expiredAt'  => date(Tools_System_Tools::DATE_MYSQL, strtotime('+1 day', time())),
+                        'userId'     => $user->getId()
+                    ));
+                    $resetToken->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_Mail_SystemMailWatchdog::TRIGGER_PASSWORDRESET
+                    )));
+                    Application_Model_Mappers_PasswordRecoveryMapper::getInstance()->save($resetToken);
+
+                }
+            }
         }
 
-        $cache->clean('products_groups_price', 'store_');
-        $cache->clean('customers_groups', 'store_');
+
+        if($groupId != ''){
+            $customerInfoDbTable = new Models_DbTable_CustomerInfo();
+            if($allGroups == 1){
+                $updateField = $customerInfoDbTable->getAdapter()->quoteInto('group_id =?', $groupId);
+                $customerInfoDbTable->getAdapter()->query('UPDATE `shopping_customer_info` SET '.$updateField);
+            }else{
+                $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
+                $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+            }
+
+            $cache->clean('products_groups_price', 'store_');
+            $cache->clean('customers_groups', 'store_');
+        }
 	}
 
 	/**
