@@ -201,6 +201,38 @@ define([
                 }
             });
             return false;
+        },
+        assignPassword: function(e){
+            var checkedCustomers = this.customers.checked();
+            var customerIds = '';
+
+            if(checkedCustomers.length == 0){
+                return false;
+            }
+            $.each(checkedCustomers, function(index, value) {
+                customerIds += value.id+',';
+            });
+            customerIds = customerIds.substring(0, customerIds.length - 1);
+
+            smoke.confirm('Change password for clients?', function(e) {
+                if(e) {
+                    showSpinner();
+                    $.ajax({
+                        url: $('#website_url').val()+'api/store/customers/customerIds/'+customerIds+'/changePassword/1/',
+                        type: 'PUT',
+                        dataType: 'json'
+
+                    }).done(function(response) {
+                        hideSpinner();
+                        showMessage('Changed');
+
+                    });
+                } else {
+
+                }
+            }, {classname:"errors", 'ok':'Yes', 'cancel':'No'});
+
+
         }
     });
 	
