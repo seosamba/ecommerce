@@ -6,7 +6,7 @@
         <?php
 	        $photo = $product->getPhoto();
             if (preg_match('~^https?://~', $photo)){
-	            $src = $photo;
+	            $src = preg_replace('~/(product|small|medium|large|original)/([^/]*\.(?:jpe?g|gif|png))$~i', '/'.$this->imageSize.'/$2', $photo);
             } else {
 	            $photo = explode('/', $product->getPhoto());
 	            $src = $this->websiteUrl.'media/'.$photo[0].'/'.$this->imageSize.'/'.$photo[1];
