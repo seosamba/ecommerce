@@ -67,11 +67,12 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		$content = $cartSession->getCartContent();
 
         $cartSessionContentDbTable->getAdapter()->beginTransaction();
-//        $cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSession->getId() ));
 		$cartSessionId = $cartSession->getId();
         if (!empty($content)) {
+	        $currentProductIds = array();
             foreach ($content as $item) {
 	            $productId = isset($item['product_id']) ? $item['product_id'] : $item['id'];
+	            array_push($currentProductIds, $productId);
 
 	            $select = $cartSessionContentDbTable->select()
 			            ->where('cart_id = ?', $cartSessionId)
@@ -102,6 +103,14 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 	            $itemRow->setFromArray($data);
 	            $r = $itemRow->save();
             }
+	        $cartSessionContentDbTable->delete(array(
+		        'cart_id = ?' => $cartSession->getId(),
+		        'product_id NOT IN (?)' => $currentProductIds
+	        ));
+        } else {
+	        $cartSessionContentDbTable->delete(array(
+		        'cart_id = ?' => $cartSession->getId()
+	        ));
         }
         $cartSessionContentDbTable->getAdapter()->commit();
 	}
