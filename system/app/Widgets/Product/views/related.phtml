@@ -4,9 +4,14 @@
     <li>
         <?php if ($product->getPhoto()) : ?>
         <?php
-            $photo = explode('/', $product->getPhoto());
-            $src = $this->websiteUrl.'media/'.$photo[0].'/'.$this->imageSize.'/'.$photo[1];
-        ?>
+	        $photo = $product->getPhoto();
+            if (preg_match('~^https?://~', $photo)){
+	            $src = preg_replace('~/(product|small|medium|large|original)/([^/]*\.(?:jpe?g|gif|png))$~i', '/'.$this->imageSize.'/$2', $photo);
+            } else {
+	            $photo = explode('/', $product->getPhoto());
+	            $src = $this->websiteUrl.'media/'.$photo[0].'/'.$this->imageSize.'/'.$photo[1];
+            }
+	        ?>
         <a class="product-image" href="<?php echo $this->websiteUrl . ($product->getPage() !== null ? $product->getPage()->getUrl(): '' );?>" title="<?php echo $product->getPage()->getH1(); ?>">
             <img src="<?php echo $src; ?>" alt="<?php echo $product->getName(); ?>" title="<?php echo $product->getName(); ?>" />
         </a>

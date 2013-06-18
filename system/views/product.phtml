@@ -47,24 +47,24 @@ $lastPageCaption = $this->translate('Last');
 </script>
 
 <script id="imgTemplate" type="text/template">
-	<% _ . each(images, function (img){ %>
+	<% _.each(images, function (img){ %>
 		<div class="box">
-			<img class="lazy" src="<%= img . src %>" width="100px" data-name="<%= img . name %>"
-			     title="<%= img . name %>"/>
+			<img class="lazy" src="<%= img.src %>" width="100px" data-name="<%= img.name %>"
+			     title="<%= img.name %>"/>
 		</div>
 	<% }) %>
 </script>
 
 <script id="tagTemplate" type="text/template">
-	<input type="checkbox" name="tag[]" value="<%= tag . get('id') %>"/>
-	<span class="tag-editable" title="Click to edit"><%= tag . get('name') %></span>
+	<input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
+	<span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
 	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete'); ?></span>
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
 	<option value="-1" disabled="disabled" selected="selected">select from library</option>
-	<% _ . each(items, function (item){ %>
-		<option value="<%= item . id %>"><%= item . title %></option>
+	<% _.each(items, function (item){ %>
+		<option value="<%= item.id %>"><%= item.title %></option>
 	<% }); %>
 </script>
 
@@ -171,19 +171,15 @@ $lastPageCaption = $this->translate('Last');
 	   title="<?php echo $this->translate('Edit'); ?> <%= name %>" class="clearfix" style="text-align:center;">
 		<% } %>
 		<p class="brand"><%= brand %></p>
-		<% if (showDelete) { %>
-			<img src="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo . replace('/', '/product/') : '/system/images/noimage.png' %>"
-			     alt="<%= name %>"/>
-		<% } else { %>
-			<% if (rendered) { %>
-				<img src="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo . replace('/', '/product/') : '/system/images/noimage.png' %>"
-				     alt="<%= name %>"/>
-			<% } else { %>
-				<img class="lazy" src=""
-				     data-original="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo . replace('/', '/product/') : '/system/images/noimage.png' %>"
-				     alt="<%= name %>"/>
-			<% } %>
-		<% } %>
+		<%
+			if (!photo) {
+				photo = $('#website_url').val()+'/system/images/noimage.png';
+			} else if (! /^https?:\/\//.test(photo) ) {
+				photo = websiteUrl + mediaPath + photo.replace('/', '/product/');
+			}
+		%>
+		<img src="<%= photo %>" alt="<%= name %>"/>
+
 		<p class="name"><%= name %></p>
 
 		<p class="sku"><%= sku %></p>
@@ -196,21 +192,21 @@ $lastPageCaption = $this->translate('Last');
 <script id="quickPreviewTemplate" type="text/template">
 	<fieldset style="background-image:none; background-color: white; height:226px;">
 		<legend><?php echo $this->translate('Preview'); ?></legend>
-		<a href="<%= (_ . isObject(product . page) ? $('#website_url') . val() + product . page . url : '#') %>"
+		<a href="<%= (_.isObject(product.page) ? $('#website_url').val() + product.page.url : '#') %>"
 		   target="_blank" style="text-decoration: none; color: inherit;">
 			<div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to
 				get to product landing page
 			</div>
-			<img src="<%= websiteUrl + mediaPath + product . photo . replace('/', '/product/') %>"
+			<img src="<%= photoUrl %>"
 			     style="float:left; padding: 15px; max-height: 120px"/>
 
-			<p style="text-align:center; font-weight: bold;"><%= product . name %></p>
+			<p style="text-align:center; font-weight: bold;"><%= product.name %></p>
 
 			<p class="mt10px"
-			   style="height: 160px;"><%= product . shortDescription . length > 300 ? product . shortDescription . slice(0, 299) + '...' : product . shortDescription %></p>
+			   style="height: 160px;"><%= product.shortDescription.length > 300 ? product.shortDescription.slice(0, 299) + '...' : product.shortDescription %></p>
 
 			<p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-				<%= parseFloat(product . price) . toFixed(2) + '&nbsp;' + currency %>
+				<%= parseFloat(product.price).toFixed(2) + '&nbsp;' + currency %>
 			</p>
 		</a>
 	</fieldset>
