@@ -1,0 +1,25 @@
+<div id="users-tabs">
+    <ul>
+        <?php if(!empty($this->tabsNames)):?>
+            <?php foreach($this->tabsNames as $tabName):?>
+                <?php $tabId= trim(preg_replace('~[^\w]+|[\s\-]+~ui', '-', filter_var($tabName, FILTER_SANITIZE_STRING)), '-');?>
+                <li><a href="#users-<?php echo $tabId;?>"><?php echo $tabName;?></a></li>
+            <?php endforeach;?>
+        <?php endif;?>
+    </ul>
+    <?php if(!empty($this->tabsNames)):?>
+        <?php foreach($this->tabsNames as $tabName):?>
+            <?php $tabId= trim(preg_replace('~[^\w]+|[\s\-]+~ui', '-', filter_var($tabName, FILTER_SANITIZE_STRING)), '-');?>
+            <div id="users-<?php echo $tabId;?>">
+                {$content:user_<?php echo $tabName;?>}
+            </div>
+        <?php endforeach;?>
+    <?php endif;?>
+</div>
+
+<script>
+    $(function() {
+        $( "#users-tabs" ).tabs();
+
+    });
+</script>

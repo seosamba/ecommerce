@@ -15,6 +15,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_CUSTOMER    = 'customer';
 
+    const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
+
 	private $_options;
 
 	/**
@@ -325,6 +327,15 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
 		return $this->_send();
 	}
+
+    private function _sendNewuseraccountMail(){
+        $systemConfig = $this->_configHelper->getConfig();
+        $this->_mailer->setMailToLabel($this->_object->getFullName())
+            ->setMailTo($this->_object->getEmail());
+        $this->_entityParser
+            ->objectToDictionary($this->_object);
+        return $this->_send();
+    }
     
     private function _prepareAdddress($address, $shippingAddressId){
        foreach($address->getAddresses() as $addressData){
