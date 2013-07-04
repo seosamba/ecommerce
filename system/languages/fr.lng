@@ -317,7 +317,7 @@
         'assign groups'=>'attribuer des groupes',
         'delete'=>'supprimer',
         'previous'=>'précédent',
-        'next'=>'prochaine',
+        'next'=>'Suivant',
         'Manage brand logos'=>'Gérer les logos des marques',
         'Upload brand logos'=>'Télécharger logos de marque',
         'Uploading'=>'Téléchargement',
@@ -564,7 +564,9 @@
         'I will use SEO Samba&rsquo;s real-time and free web analytics service'=>'Je vais utiliser le service d&rsquo;analyse Web en temps réel gratuit de SEO Samba',
         'No, thank you. I don’t need to automate my SEO and will deploy web analytics code on my own.'=>'Non, merci. Je n&rsquo;ai pas besoin d&rsquo;automatiser mon référencement et je déploierai mon code d\'analyse web par moi-meme.',
         'Alrighty…but you are missing out. At SEO Samba, we are working very hard to help you manage and market  websites (Here is why you should use <a href="http://www.seosamba.com/" target="_blankSEO Samba). In any case, you can connect later by using the WID card if you so choose to.'=>'Ok... mais c\'est dommage. A SEO Samba, nous travaillons très dur pour vous aider à gérer et promouvoir les sites Web (voici pourquoi vous devriez utiliser <a href = cible "http://www.seosamba.com/" = "_blankSEO Samba). Dans tous les cas, vous pouvez connecter plus tard en utilisant la carte IFD si vous le désirez.',
-        'of this service'=>'de ce service'
+        'of this service'=>'de ce service',
+       	'OR' => 'OU',
+
 
         );
         ?>
