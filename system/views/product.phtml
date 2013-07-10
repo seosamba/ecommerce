@@ -62,7 +62,7 @@ $lastPageCaption = $this->translate('Last');
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
-	<option value="-1" disabled="disabled" selected="selected">select from library</option>
+	<option value="-1" disabled="disabled" selected="selected"><?php echo $this->translate('select from library');?></option>
 	<% _.each(items, function (item){ %>
 		<option value="<%= item.id %>"><%= item.title %></option>
 	<% }); %>
@@ -70,7 +70,7 @@ $lastPageCaption = $this->translate('Last');
 
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_5">
-		<div class="grid_4"><label>Option Name</label></div>
+		<div class="grid_4"><label><?php echo $this->translate('Option Name');?></label></div>
 		<div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
 	</div>
 	<div class="grid_4">
@@ -321,7 +321,7 @@ $lastPageCaption = $this->translate('Last');
 				<input type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
 			</div>
 			<div class="grid_2">
-				<label style="text-align: center; font-size: 8pt;" for="free-shipping">Free Shipping</label>
+				<label style="text-align: center; font-size: 8pt;" for="free-shipping"><?php echo $this->translate('Free Shipping');?></label>
 				<input style="margin: 10px 40px;" id="free-shipping" type="checkbox"/>
 			</div>
 			<div class="grid_8">
@@ -391,9 +391,9 @@ $lastPageCaption = $this->translate('Last');
 				<input type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
 			</div>
 			<div class="grid_12 alpha">
-				<label for="product-pageTemplate">Select a product page template</label>
+				<label for="product-pageTemplate"><?php echo $this->translate('Select a product page template');?></label>
 				<select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
-					<option value="-1" disabled="disable">Select Template</option>
+					<option value="-1" disabled="disable"><?php echo $this->translate('Select Template');?></option>
 					<?php foreach ($this->templateList as $tmpl) : ?>
 						<option value="<?php echo $tmpl->getName(); ?>"><?php echo $tmpl->getName(); ?></option>
 					<?php endforeach; ?>
@@ -406,7 +406,7 @@ $lastPageCaption = $this->translate('Last');
 
 <div id="tag-tab" class="clearfix">
 	<div class="grid_3 mt10px textcentered">
-		<a href="javascript" id="toggle-current-tags">[ show only selected ] </a>
+		<a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ] </a>
 	</div>
 	<div class="grid_4 prefix_1 suffix_4 mb5px" style="text-align:center;">
 		<input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>"
@@ -428,10 +428,10 @@ $lastPageCaption = $this->translate('Last');
 
 <div id="options-tab" class="clearfix">
 	<div class="grid_6 prefix_3 suffix_3 mb5px" style="text-align:center;">
-		<button id="add-new-option-btn">Create new option</button>
-		or
+		<button id="add-new-option-btn"><?php echo $this->translate('Create new option');?></button>
+        <?php echo $this->translate('or');?>
 		<select name="option-library" id="option-library" style="width: 230px;">
-			<option value="-1" disabled="disabled">select from library</option>
+			<option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
 		</select>
 	</div>
 	<div id="options-holder" class="clearfix h380 grid_12" style="overflow-y: auto;">
@@ -453,7 +453,7 @@ $lastPageCaption = $this->translate('Last');
 
 <div id="coupon-tab" class="clearfix">
 	<div class="padding5px">
-		<p style="text-align: center"><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
+		<p style="text-align: center"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
 		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	</div>
 </div>
