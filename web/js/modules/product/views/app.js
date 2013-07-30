@@ -22,7 +22,7 @@ define([
 		events: {
             'click #new-product': 'newProduct',
             'click .show-list': 'toggleList',
-			'keypress input#new-tag': 'newTag',
+			'keyup input#new-tag': 'newTag',
 			'click #add-new-option-btn': 'newOption',
             'change select#option-library': 'addOption',
 			'click #submit': 'saveProduct',
@@ -167,16 +167,22 @@ define([
         },
 		newTag: function(e){
 			var name = $.trim(e.currentTarget.value);
-			if (e.keyCode == 13 && name !== '') {
-			   this.tags.create({name: name}, {
-                   wait: true,
-				   success: function(model, response){
-					   $('#new-tag').val('').blur();
-				   },
-				   error: function(model, response){
-                       showMessage(response.responseText, true);
-				   }
-			   });
+            if (e.keyCode == 13 && name !== '') {
+                if (name.indexOf(',') > 0) {
+                    showMessage('Tag name should contain only letters, digits and spaces', true);
+//                    $(e.currentTarget).blur();
+                    return false;
+                } else {
+                    this.tags.create({name: name}, {
+                        wait: true,
+                        success: function(model, response){
+                            $('#new-tag').val('').blur();
+                        },
+                        error: function(model, response){
+                            showMessage(response.responseText, true);
+                        }
+                    });
+                }
 			}
 		},
 		newOption: function(){

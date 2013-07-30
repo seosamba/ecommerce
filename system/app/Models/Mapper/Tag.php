@@ -5,6 +5,7 @@
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  * @method Models_Mapper_Tag getInstance() getInstance()  Returns an instance of itself
+ * @method Models_DbTable_Tag getDbTable() getDbTable()  Returns an instance of related Db Table
  */
 class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 
@@ -108,5 +109,24 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 				'totalCount'    => $count,
 				'data'          => $entries
 			);
+	}
+
+	public function findByName($tagNames, $pairs = false){
+		if (!is_array($tagNames)){
+			$tagNames = (array) $tagNames;
+		}
+		$select = $this->getDbTable()->select()
+				->where('name IN (?)', $tagNames);
+
+		if ($pairs) {
+			return $this->getDbTable()->getAdapter()->fetchPairs($select);
+		} else {
+			$rows = $this->getDbTable()->fetchAll($select);
+			if ($rows->count()){
+				return array_map(function($row, $model){ return new $model($row); }, $rows->toArray(), $this->_model);
+			} else {
+				return array();
+			}
+		}
 	}
 }

@@ -267,7 +267,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	}
 
 	/**
-	 * Load the wright products set
+	 * Load the right products set
 	 *
 	 * @return array
 	 */
@@ -283,7 +283,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'order'  => null
 		);
 		foreach ($this->_options as $option) {
-			if (preg_match('/^(brands|tags|order)-(.*)$/u', $option, $parts)) {
+			if (preg_match('/^(brands|tag(?:name)?s|order)-(.*)$/u', $option, $parts)) {
 				$filters[$parts[1]] = explode(',', $parts[2]);
 			}
 		}
@@ -292,6 +292,16 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$filters['order'] = array_map(function ($field) {
 				return trim($field) === 'brand' ? 'b.name' : 'p.' . $field;
 			}, $filters['order']);
+		}
+
+		if (isset($filters['tagnames']) && !empty($filters['tagnames'])){
+			$tags = Models_Mapper_Tag::getInstance()->findByName($filters['tagnames'], true);
+			if ($tags){
+				$filters['tags'] = array_keys($tags);
+			} else {
+				$filters['tags'] = array(0);
+			}
+			unset($tags, $filters['tagnames']);
 		}
 
 		if (!empty($filters['tags'])) {
