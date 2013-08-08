@@ -334,13 +334,17 @@
 			    var srcPart      = '<?php echo $this->websiteUrl;?>';
 			    var productItemsHtml = '';
 			    $.each(productsResponse, function() {
-				    var srcPart = '<?php echo $this->websiteUrl;?>';
-			        <?php if($this->mediaServersAllowed): ?>
-	                    srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
-	                <?php endif; ?>
+				    var photoUrl = this.photo;
+				    if (!/^https?:\/\/.*/.test(photoUrl)){
+				        var srcPart = '<?php echo $this->websiteUrl;?>';
+			            <?php if($this->mediaServersAllowed): ?>
+                        srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
+	                    <?php endif; ?>
+                        photoUrl = srcPart + 'media/' + photoUrl.replace('/', '/product/');
+                    }
                     productItemsHtml += '<div class="productlisting"><a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
                                 '<p class="brand">' + this.brand + '</p>' +
-                                '<img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
+                                '<img class="lazy" src="" data-original="' + photoUrl + '" alt="' + this.name + '"><p>' + this.name + '</p></a><p class="sku">' + this.sku + '</p></div>';
                 });
 			    if (this.offset === 0) {
 				    productsContainer.html(productItemsHtml).scrollTop(0);

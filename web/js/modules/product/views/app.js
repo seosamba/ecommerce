@@ -170,7 +170,7 @@ define([
             if (e.keyCode == 13 && name !== '') {
                 if (name.indexOf(',') > 0) {
                     showMessage('Tag name should contain only letters, digits and spaces', true);
-//                    $(e.currentTarget).blur();
+                    $(e.currentTarget).blur();
                     return false;
                 } else {
                     this.tags.create({name: name}, {
