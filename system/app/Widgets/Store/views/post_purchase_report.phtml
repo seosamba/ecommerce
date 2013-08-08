@@ -126,7 +126,7 @@
 						<a class="page-teaser-image"
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
 						   title="<?php echo $product['name']; ?>" target="_blank">
-							<img src="<?php echo $this->websiteUrl; ?>/media/<?php echo str_replace('/', '/product/', $product['photo']); ?>"
+							<img src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
 							     alt="<?php echo $product['name']; ?>"/>
 						</a>
 					<?php else: ?>
@@ -328,7 +328,7 @@
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
 						   title="<?php echo $product['name']; ?>" target="_blank">
 							<img style="width:60px; vertical-align:middle"
-							     src="<?php echo $this->websiteUrl; ?>/media/<?php echo str_replace('/', '/product/', $product['photo']); ?>"
+							     src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
 							     alt="<?php echo $product['name']; ?>"/>
 						</a>
 					<?php else: ?>

@@ -331,4 +331,31 @@ class Tools_Misc {
 	    $price = preg_replace('/[^\.\d\s]/', '', $result['3']);
 	    return number_format(floatval($price), 2);
     }
+
+    public static function prepareProductImage($photoSrc, $newSize = 'product'){
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $websiteUrl    = (Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('mediaServers') ? Tools_Content_Tools::applyMediaServers($websiteHelper->getUrl()) : $websiteHelper->getUrl());
+        if (preg_match('~^https?://.*~', $photoSrc)){
+            $tmp = parse_url($photoSrc);
+            $path = explode('/', trim($tmp['path'], '/'));
+            if (is_array($path)){
+                $imgName = array_pop($path);
+                $guessSize = array_pop($path);
+                if (in_array($guessSize, array('small', 'medium', 'large', 'original')) && $guessSize !== $newSize ){
+                    $guessSize = $newSize;
+                }
+                return $tmp['scheme'] .'://'. implode('/', array(
+                    $tmp['host'],
+                    implode('/', $path),
+                    $guessSize,
+                    $imgName
+                ));
+            }
+            return $photoSrc;
+        } else {
+            $photoSrc = str_replace('/', '/'.$newSize.'/', $photoSrc);
+            return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
+        }
+    }
+
 }
