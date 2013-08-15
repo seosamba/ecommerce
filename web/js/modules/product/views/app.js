@@ -11,11 +11,12 @@ define([
 	'./productlist',
     '../../coupons/views/coupon_form',
     '../../coupons/views/coupons_table',
-    '../../groups/views/group_price'
+    '../../groups/views/group_price',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -86,7 +87,7 @@ define([
                     case '#coupon-tab':
                     case '#group-pricing-tab':
                         if (self.model.isNew()){
-                            showMessage('Please save product information first', true);
+                            showMessage(_.isUndefined(i18n['Please save product information first'])?'Please save product information first':i18n['Please save product information first'], true);
                             return false;
                         }
                     break;
@@ -140,7 +141,10 @@ define([
                     this.products.pager();
                 }
                 this.render();
-                showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
+                var productSavedMessage = _.isUndefined(i18n['Product saved.'])?'Product saved.':i18n['Product saved.'];
+                var gotoMesssage = _.isUndefined(i18n['Go to your search engine optimized product landing page here.'])?'Go to your search engine optimized product landing page here.':i18n['Go to your search engine optimized product landing page here.'];
+                var messageSaved = productSavedMessage+'</br>'+gotoMesssage;
+                showMessage(messageSaved);
             }, this);
             this.model.on('error', this.processSaveError, this);
 
@@ -169,7 +173,7 @@ define([
 			var name = $.trim(e.currentTarget.value);
             if (e.keyCode == 13 && name !== '') {
                 if (name.indexOf(',') > 0) {
-                    showMessage('Tag name should contain only letters, digits and spaces', true);
+                    showMessage(_.isUndefined(i18n['Tag name should contain only letters, digits and spaces'])?'Tag name should contain only letters, digits and spaces':i18n['Tag name should contain only letters, digits and spaces'], true);
 //                    $(e.currentTarget).blur();
                     return false;
                 } else {
@@ -436,7 +440,7 @@ define([
             var self = this;
 
             if (!this.validateProduct()) {
-                showMessage('Missing some required fields', true);
+                showMessage(_.isUndefined(i18n['Missing some required fields'])?'Missing some required fields':i18n['Missing some required fields'], true);
                 $('#manage-product').tabs("select" , 0);
                 return false;
             }
@@ -451,7 +455,7 @@ define([
 				if (templateId !== '-1') {
                     this.model.set({pageTemplate: templateId});
                 } else {
-                    showMessage('Please, select product page template before saving', true);
+                    showMessage(_.isUndefined(i18n['Please, select product page template before saving'])?'Please, select product page template before saving':i18n['Please, select product page template before saving'], true);
                     this.$('#product-pageTemplate').focus();
                     return false;
                 }
@@ -487,7 +491,7 @@ define([
 		deleteProduct: function(){
 			var self = this;
 			if (this.model.isNew()){
-                showMessage('Product is not saved yet', true);
+                showMessage(_.isUndefined(i18n['Product is not saved yet'])?'Product is not saved yet':i18n['Product is not saved yet'], true);
 				return false;
 			}
             showConfirm('Dragons ahead! Are you sure?', function(){
@@ -495,7 +499,7 @@ define([
                     success: function(model, response){
                         self.products && self.products.pager();
                         $('#new-product').trigger('click');
-                        showMessage('Product deleted');
+                        showMessage(_.isUndefined(i18n['Product deleted'])?'Product deleted':i18n['Product deleted']);
                     }
                 });
 			});
@@ -727,12 +731,12 @@ define([
                         type: 'DELETE',
                         dataType: 'json',
                         statusCode: {
-                            403: function() { showMessage("Forbidden action", true) },
-                            409: function() { showMessage("Can't remove products", true); }
+                            403: function() { showMessage(_.isUndefined(i18n['Forbidden action'])?'Forbidden action':i18n['Forbidden action'], true) },
+                            409: function() { showMessage(_.isUndefined(i18n['Can\'t remove products'])?'Can\'t remove products':i18n['Can\'t remove products'], true); }
                         }
                     }).done(function(){
                         self.products.remove(ids);
-                        showMessage('Products removed');
+                        showMessage(_.isUndefined(i18n['Products removed'])?'Products removed':i18n['Products removed']);
                     });
                 }
             });

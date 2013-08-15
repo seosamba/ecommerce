@@ -1,4 +1,4 @@
-<div title="Assign product page template">
+<div title="<%= _.isUndefined(i18n['Assign product page template']) ? 'Assign product page template':i18n['Assign product page template'] %>">
     <select name="page-tmpl">
         <!--<option value="-1" disabled="disabled" selected="selected">select page template</option>-->
         <% _.each(templates, function(template){ %>
@@ -8,7 +8,8 @@
     <% if (totalProducts) { %>
     <hr />
     <label>
-        <input type="checkbox" name="applyToAll"> Apply to all <%= totalProducts %> products
+        <input type="checkbox" name="applyToAll"><%= _.isUndefined(i18n['Apply to all']) ? 'Apply to all':i18n['Apply to all'] %> <%= totalProducts %> <%= _.isUndefined(i18n['products']) ? 'products':i18n['products'] %>
     </label>
     <% } %>
+    <%   %>
 </div>

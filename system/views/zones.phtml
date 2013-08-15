@@ -11,31 +11,31 @@
 	</div>
 	<div class="countries grid_6">
 		<div class="ui-widget-header ui-corner-top padding5px">
-            <span class="padding5px">Countries</span>
-            <a href="javascript:;" class="clearprop" data-property="countries">[ clear ]</a>
+            <span class="padding5px"><?php echo $this->translate('Countries');?></span>
+            <a href="javascript:;" class="clearprop" data-property="countries">[ <?php echo $this->translate('clear');?> ]</a>
         </div>
 		<ul class="ui-widget-content zone-countries" style="height: 140px; overflow-y: auto; background:#fff; margin:0;">
         </ul>
 		<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
-			<button class="open-dialog" data-name="add-country">Add Country</button>
+			<button class="open-dialog" data-name="add-country"><?php echo $this->translate('Add Country');?></button>
 		</div>
 	</div>
 	<div class="states grid_6">
 		<div class="ui-widget-header ui-corner-top padding5px">
-            <span class="padding5px">States</span>
-            <a href="javascript:;" class="clearprop" data-property="states">[ clear ]</a>
+            <span class="padding5px"><?php echo $this->translate('States');?></span>
+            <a href="javascript:;" class="clearprop" data-property="states">[ <?php echo $this->translate('clear');?> ]</a>
         </div>
 		<ul class="ui-widget-content zone-states" style="height: 140px; overflow-y: auto; background:#fff; margin:0;">
 		</ul>
 		<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
-			<button class="open-dialog" data-name="add-state">Add State</button>
+			<button class="open-dialog" data-name="add-state"><?php echo $this->translate('Add State');?></button>
 		</div>
 	</div>
 	<div class="grid_12 mt10px">
         <div class="ui-widget-header ui-corner-top padding5px">
-            <span class="padding5px">Postal codes</span>
-            <a href="javascript:;" class="clearprop" data-property="zip">[ clear ]</a>
-            <span style="font-weight:normal; margin-left:160px;">Insert list of zip/postal codes: one per line</span>
+            <span class="padding5px"><?php echo $this->translate('Postal codes');?></span>
+            <a href="javascript:;" class="clearprop" data-property="zip">[ <?php echo $this->translate('clear');?> ]</a>
+            <span style="font-weight:normal; margin-left:160px;"><?php echo $this->translate('Insert list of zip/postal codes: one per line');?></span>
         </div>
             <div class="ui-widget-content" style="text-align: center">
             <textarea style="width: 99%; height: 180px; resize: none;" class="zone-zip"><%= zip.join('\n') %></textarea>

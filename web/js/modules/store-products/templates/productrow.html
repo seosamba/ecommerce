@@ -6,19 +6,21 @@
 <td class="editable " data-prop="sku"><%= sku %></td>
 <td class="editable" data-prop="mpn"><%= mpn %></td>
 <% if (freeShipping == '0'){%>
-    <td>no</td>
+    <td><%= _.isUndefined(i18n['no']) ? 'no':i18n['no'] %></td>
 <% } %>
 <% if (freeShipping == '1'){%>
-    <td>yes</td>
+    <td><%= _.isUndefined(i18n['yes']) ? 'yes':i18n['yes'] %></td>
 <% } %>
 <td class="editable" data-prop="weight"><%= weight %></td>
 <td class="editable" data-prop="price"><%= price %></td>
 <td class="textcentered">
 <% if (this.model.has('stats')) {%>
     <% if (stats.length) {%>
-    Total: <%= _.reduce(_.pluck(stats, 'count'), function(m, n){ return m+parseInt(n)}, 0) %>
+    <%= _.isUndefined(i18n['Total']) ? 'Total':i18n['Total'] %>: <%= _.reduce(_.pluck(stats, 'count'), function(m, n){ return m+parseInt(n)}, 0) %>
     <ul>
-    <% _.each(stats, function(stat) { %> <li><strong><%= stat.status %></strong>: <%= stat.count %></li> <% }); %>
+    <% _.each(stats, function(stat) { %>
+        <% translatedStatus = 'cs_'+stat.status %>
+        <li><strong><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></strong>: <%= stat.count %></li> <% }); %>
     </ul>
     <% } else {%>
     n/a

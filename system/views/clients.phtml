@@ -37,7 +37,7 @@
 		<span class="postal-code">zip</span>
 	</div>
 </script>
-
+<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <?php
     $this->headScript()->setAllowArbitraryAttributes(true)
 		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')

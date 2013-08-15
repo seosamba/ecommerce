@@ -18,12 +18,12 @@
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
 					if ($lastSeen < 7) {
-						$lastSeenStamp = date('l', strtotime($lastSeen.' days ago'));
+						$lastSeenStamp = date('l', strtotime($lastSeen.' '.$this->translate(' days ago')));
 					} else {
-						$lastSeenStamp = $lastSeen.' days ago';
+						$lastSeenStamp = $lastSeen.' '.$this->translate(' days ago');
 					}
 				} else {
-					$lastSeenStamp = 'never';
+					$lastSeenStamp = $this->translate('never');
 				}
 				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
 				?></p>
@@ -57,7 +57,7 @@
 		</p>
 		<ul class="stats clearfix">
 			<?php foreach ($this->stats as $key => $value) : ?>
-				<li class="oh <?php echo $key;?>" data-sort="<?php echo $key;?>"><?php echo $value.' '.$this->translate($key);?></li>
+				<li class="oh <?php echo $key;?>" data-sort="<?php echo $this->translate('cs_'.$key);?>"><?php echo $value.' '.$this->translate('cs_'.$key);?></li>
 			<?php endforeach; ?>
 		</ul>
 	</div>
@@ -66,8 +66,8 @@
 
 <div id="profile-content">
 	<ul class="profile-nav">
-		<li><a href="#profile-orders-list">Orders</a></li>
-		<li><a href="#profile-address-list">Addresses</a></li>
+		<li><a href="#profile-orders-list"><?php echo $this->translate('Orders');?></a></li>
+		<li><a href="#profile-address-list"><?php echo $this->translate('Addresses');?></a></li>
 	</ul>
 
 	<div id="profile-orders-list" class="clearfix">
@@ -99,12 +99,12 @@
 					<td class="shipping-data">
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
 						<p>
-	                        <i>Tracking ID</i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+	                        <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
 							<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                            <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;edit&nbsp;]</a>
+                            <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
 							<?php endif;?>
 						</p>
-                        <?php if($order->getStatus() == 'completed' || $order->getStatus() == 'paid' || $order->getStatus() == 'shipped'):?>
+                        <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
                             <?php if($order->getShippingTrackingId() != ''):?>
                                 <p class="textcentered">
                                 <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
@@ -112,16 +112,29 @@
                             <?php endif;?>
                         <?php endif;?>
 					</td>
-					<td class="current-status"><?php echo $order->getStatus();?></td>
-					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>">view</a></td>
+
+                    <?php $status = 'cs_'.$order->getStatus();?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PROCESSING):?>
+                         <?php $status = 'Customer not charged';?>
+                    <?php endif;?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PENDING):?>
+                        <?php $status = 'Customer charged';?>
+                    <?php endif;?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_CANCELED):?>
+                        <?php $status = 'Lost opportunity';?>
+                    <?php endif;?>
+					<td class="current-status"><?php echo $this->translate($status);?></td>
+
+
+					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"><?php echo $this->translate('view');?></a></td>
                     <?php if(isset($this->invoicePlugin)):?>
                         <td>   
                         <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
                             <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
-                                <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
+                                <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
                             </a>
                             <a href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/1/">
-                                <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="Download invoice" title="Download invoice"/>    
+                                <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="<?php echo $this->translate('Download invoice');?>" title="<?php echo $this->translate('Download invoice');?>"/>
                             </a>
                         <?php endif;?>
                          </td>   
@@ -175,7 +188,10 @@
 			],
 			oLanguage: {
 		      sEmptyTable: "<?php echo $this->translate('You do not have any orders'); ?>"
-		    }
+		    },
+            "oLanguage": {
+                "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>"
+            }
 		});
 		$('ul.stats').on('click', 'li', function(e){
 			var filter = $(this).data('sort');
