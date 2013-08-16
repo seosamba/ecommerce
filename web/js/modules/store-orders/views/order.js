@@ -30,11 +30,11 @@ define([
                 var translatedStatus = 'cs_'+status;
 
                 if (translatedGateway == 'Quote' && status == 'pending'){
-                    translatedStatus = 'Customer charged';
+                    translatedStatus = 'New quote';
                 }
 
                 if (translatedGateway == 'Quote' && status == 'processing'){
-                    translatedStatus = 'Customer not charged';
+                    translatedStatus = 'Quote Sent';
                 }
 
                 if (translatedGateway == 'Quote' && status == 'canceled'){

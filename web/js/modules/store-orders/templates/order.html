@@ -5,11 +5,11 @@
 <% translatedStatus = 'cs_'+status %>
 
 <% if (gateway == 'Quote' && status == 'pending'){ %>
-    <% translatedStatus = 'Customer charged' %>
+    <% translatedStatus = 'New quote' %>
 <% } %>
 
 <% if (gateway == 'Quote' && status == 'processing'){ %>
-    <% translatedStatus = 'Customer not charged' %>
+    <% translatedStatus = 'Quote Sent' %>
 <% } %>
 
 <% if (gateway == 'Quote' && status == 'canceled'){ %>

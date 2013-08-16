@@ -4,6 +4,6 @@
 	'cs_shipped'    => 'Items Shipped',
 	'cs_refunded'   => 'Refunded purchase',
 	'cs_delivered'  => 'Items Delivered',
-	'cs_customer_charged'     => 'Customer charged',
-	'cs_customer_not_charged' => 'Customer not charged'
+	'cs_new_quote'  => 'New quote',
+	'cs_quote_sent' => 'Quote Sent'
 );

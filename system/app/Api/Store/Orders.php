@@ -117,11 +117,11 @@ class Api_Store_Orders extends Api_Service_Abstract {
                 if(isset($filter['status']) && ($filter['status'] == Models_Model_CartSession::CART_STATUS_PENDING || $filter['status'] == Models_Model_CartSession::CART_STATUS_PROCESSING || $filter['status'] == Models_Model_CartSession::CART_STATUS_CANCELED)){
                     $filter['exclude_gateway'] = self::GATEWAY_QUOTE;
                 }
-                if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_CUSTOMER_CHARGED){
+                if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_PENDING){
                     $filter['status']  = Models_Model_CartSession::CART_STATUS_PENDING;
                     $filter['gateway'] = self::GATEWAY_QUOTE;
                 }
-                if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_CUSTOMER_NOT_CHARGED){
+                if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_PROCESSING){
                     $filter['status']  = Models_Model_CartSession::CART_STATUS_PROCESSING;
                     $filter['gateway'] = self::GATEWAY_QUOTE;
                 }

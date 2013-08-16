@@ -9,8 +9,8 @@ define({
 	    'cs_delivered'	  : 'Livraison effectuée',
 	    'cs_canceled'	  : 'Commande annulée',
         'cs_error'        : 'erreur',
-        'Customer charged': 'Client chargé',
-        'Customer not charged' : 'Client non chargé',
+        'New quote'       : 'Nouveau devis',
+        'Quote Sent'      : 'Devis envoyé',
 	    'Mark order paid' : 'Recevoir paiement',
 	    'Refund payment'  : 'Rembourser client',
 	    'Cancel order'	  : 'Annuler commande',
@@ -67,18 +67,17 @@ define({
         'select group'    : 'Sélectionner un groupe',
         'Apply to all customers' : 'Appliquer a tous les clients',
         'Lost opportunity' : 'Opportunité perdu',
-        'Please save product information first' : 'Please save product information first',
-        'Tag name should contain only letters, digits and spaces' : 'Tag name should contain only letters, digits and spaces',
-        'Product saved.' : 'Product saved.',
-        'Go to your search engine optimized product landing page here.' : 'Go to your search engine optimized product landing page here.',
-        'Missing some required fields' : 'Missing some required fields',
-        'Please, select product page template before saving' : 'Please, select product page template before saving',
-        'Product is not saved yet' : 'Product is not saved yet',
-        'Product deleted' : 'Product deleted',
-        'Forbidden action' : 'Forbidden action',
-        'Can\'t remove products' : 'Can\'t remove products',
-        'Products removed' : 'Products removed'
-
+        'Please save product information first' : 'Sauvegarder d’abord la fiche produit',
+        'Tag name should contain only letters, digits and spaces' : 'Les tags doivent contenir uniquement des lettres, nombres ou espaces.',
+        'Product saved.' : 'Produit sauvegardé.',
+        'Go to your search engine optimized product landing page here.' : 'Accéder a la page produit ici.',
+        'Missing some required fields' : 'Tous les champs obligatoires doivent être renseignés',
+        'Please, select product page template before saving' : 'Sélectionner un modèle de page produit avant de sauvegarder SVP',
+        'Product is not saved yet' : 'Le produit n’est pas encore sauvegardé',
+        'Product deleted' : 'Produit effacé',
+        'Forbidden action' : 'Action interdite',
+        'Can\'t remove products' : 'Incapable d’effacer les produits',
+        'Products removed' : 'Produits effacés'
 
     }
 });

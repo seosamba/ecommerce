@@ -26,9 +26,9 @@ class Tools_Misc {
 
 	const SECTION_STORE_MERCHANDISING   = 'merchandising';
 
-    const CS_ALIAS_CUSTOMER_CHARGED     = 'customer_charged';
+    const CS_ALIAS_PENDING              = 'new_quote';
 
-    const CS_ALIAS_CUSTOMER_NOT_CHARGED = 'customer_not_charged';
+    const CS_ALIAS_PROCESSING           = 'quote_sent';
 
     const CS_ALIAS_LOST_OPPORTUNITY     = 'lost_opportunity';
     

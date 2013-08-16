@@ -115,10 +115,10 @@
 
                     <?php $status = 'cs_'.$order->getStatus();?>
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PROCESSING):?>
-                         <?php $status = 'Customer not charged';?>
+                         <?php $status = 'Quote Sent';?>
                     <?php endif;?>
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PENDING):?>
-                        <?php $status = 'Customer charged';?>
+                        <?php $status = 'New quote';?>
                     <?php endif;?>
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_CANCELED):?>
                         <?php $status = 'Lost opportunity';?>
