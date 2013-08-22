@@ -10,6 +10,7 @@
 			->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
 <div id="store-products" class="toaster-widget store-widget">
+    <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 	<table class="products-table widget">
 		<thead>
 			<tr class="ui-helper-hidden search-line">
@@ -77,4 +78,5 @@
 <!-- chosen init fix -->
 <style type="text/css">
     .chzn-container-multi {min-width: 300px}
+    .chzn-choices input{min-height: 2.3em}
 </style>

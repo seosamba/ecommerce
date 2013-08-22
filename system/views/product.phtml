@@ -14,7 +14,7 @@ $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoint
 $firstPageCaption = $this->translate('First');
 $lastPageCaption = $this->translate('Last');
 ?>
-
+<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->generalConfig['currency'])); ?>
 
 <script id="paginatorTemplate" type="text/template">
@@ -75,14 +75,14 @@ $lastPageCaption = $this->translate('Last');
 	</div>
 	<div class="grid_4">
 		<div class="grid_3">
-			<label>Type</label>
+			<label><?php echo $this->translate('Type');?></label>
 		</div>
 		<div class="grid_9">
 			<select class="option-type-select">
-				<option value="dropdown">Dropdown Box</option>
-				<option value="radio">Radio Switch</option>
-				<option value="text">Text Field</option>
-				<option value="date">Datepicker</option>
+				<option value="dropdown"><?php echo $this->translate('Dropdown Box');?></option>
+				<option value="radio"><?php echo $this->translate('Radio Switch');?></option>
+				<option value="text"><?php echo $this->translate('Text Field');?></option>
+				<option value="date"><?php echo $this->translate('Datepicker');?></option>
 			</select>
 		</div>
 	</div>
@@ -158,14 +158,14 @@ $lastPageCaption = $this->translate('Last');
 		'1'}}checked="checked"{{/if}} />
 	</div>
 	<div class="grid_1">
-		<button class="item-remove">Delete item</button>
+		<button class="item-remove"><?php echo $this->translate('Delete item');?></button>
 	</div>
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
 		<span class="ui-icon ui-icon-closethick"
-		      style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
+		      style="position: absolute;right: 0;top: 0; cursor: pointer;"><?php echo $this->translate('Delete');?></span>
 	<% } else { %>
 	<a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>"
 	   title="<?php echo $this->translate('Edit'); ?> <%= name %>" class="clearfix" style="text-align:center;">
@@ -194,9 +194,7 @@ $lastPageCaption = $this->translate('Last');
 		<legend><?php echo $this->translate('Preview'); ?></legend>
 		<a href="<%= (_.isObject(product.page) ? $('#website_url').val() + product.page.url : '#') %>"
 		   target="_blank" style="text-decoration: none; color: inherit;">
-			<div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to
-				get to product landing page
-			</div>
+			<div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;"><?php echo $this->translate('Click preview to get to product landing page');?></div>
 			<img src="<%= photoUrl %>"
 			     style="float:left; padding: 15px; max-height: 120px"/>
 
@@ -222,10 +220,10 @@ $lastPageCaption = $this->translate('Last');
 	<div class="clearfix ui-widget-header">
 		<div class="grid_1 mt10px">
 			<a href="javascript:;" id="product-list-back-link" style="color:#e6e6fa;">
-				&nbsp;&laquo; <?php echo $this->translate('back'); ?></a>
+				&laquo; <?php echo $this->translate('back'); ?></a>
 		</div>
 		<div class="grid_1 prefix_2 mt5px">
-			<label for="product-list-search">Search</label>
+			<label style="line-height:14pt;" for="product-list-search"><?php echo $this->translate('Search');?></label>
 		</div>
 		<div class="grid_5 suffix_1">
 			<input type="text" name="product-list-search" id="product-list-search"
@@ -234,7 +232,7 @@ $lastPageCaption = $this->translate('Last');
 		<div class="grid_2 mt5px" style="text-align:center;">
 			<label>
 				<a id="massaction" style="color:#e6e6fa;" href="javascript:;"
-				   data-labels='{"related": "add as related", "edit": "delete selected", "set": "add to set"}'>run mass
+				   data-labels='{"related": "<?php echo $this->translate('add as related');?>", "edit": "<?php echo $this->translate('delete selected');?>", "set": "<?php echo $this->translate('add to set');?>"}'>run mass
 					action</a>
 			</label>
 		</div>
@@ -469,7 +467,7 @@ $lastPageCaption = $this->translate('Last');
 	<a href="javascript:;" class="delete-selected" style="margin-left: 10px;"
 	   alt="<?php echo $this->translate('Delete this product'); ?>" id="delete"
 	   style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
-	<input type="submit" name="submit" id="submit" value="Save"/>
+	<input type="submit" name="submit" id="submit" value="<?php echo $this->translate('Save');?>"/>
 </div>
 </div>
 

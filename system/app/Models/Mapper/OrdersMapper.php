@@ -132,6 +132,14 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 						$val = filter_var($val, FILTER_SANITIZE_NUMBER_FLOAT);
 						$select->where('order.total <= ?', $val);
 						break;
+                    case 'gateway':
+                        $val = filter_var($val, FILTER_SANITIZE_STRING);
+                        $select->where('order.gateway = ?', $val);
+                        break;
+                    case 'exclude_gateway':
+                        $val = filter_var($val, FILTER_SANITIZE_STRING);
+                        $select->where('order.gateway <> ?', $val);
+                        break;
 					case 'status':
 						$val = filter_var($val, FILTER_SANITIZE_STRING);
 						$select->where('order.status = ?', $val);

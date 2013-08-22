@@ -1,17 +1,17 @@
-<?php $this->placeholder('headerContent')->set('Order #' . $this->order->getId()); ?>
+<?php $this->placeholder('headerContent')->set($this->translate('Order #').' '. $this->order->getId()); ?>
 <?php $countryList = Tools_Geo::getCountries(true); ?>
 <div class="h550" style="overflow-y: auto;">
 	<div id="order-view" class="toaster-widget clearfix">
 		<div class="grid_12">
-			<div class="title padding5px">Summary</div>
-			<div><?php echo $this->translate("Placed on %1\$s", date('d M, Y', strtotime($this->order->getCreatedAt())));?></div>
-			<div><?php echo $this->translate("Placed from IP %1\$s", $this->order->getIpAddress());?></div>
+			<div class="title padding5px"><?php echo $this->translate('Summary');?></div>
+			<div><?php echo $this->translate("Placed on").' '.date('d M, Y', strtotime($this->order->getCreatedAt()));?></div>
+			<div><?php echo $this->translate("Placed from IP").' '. $this->order->getIpAddress();?></div>
 		</div>
 
 		<div class="mt10px">&nbsp;</div>
 
 		<div class="grid_6">
-			<div class="title padding5px">Billing Address <!--span>[edit]</span--></div>
+			<div class="title padding5px"><?php echo $this->translate('Billing Address');?> <!--span>[edit]</span--></div>
 			<div class="adr">
 				<?php if (null !== ($billingAddressId = $this->order->getBillingAddressId())): ?>
 					<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
@@ -29,13 +29,13 @@
 					<span><?php echo $countryList[$billingAddress['country']];?></span>
 					<span class="phone"><?php echo $billingAddress['phone'];?></span>
 				<?php else: ?>
-					<p>not provided</p>
+					<p><?php echo $this->translate('not provided');?></p>
 				<?php endif;?>
 			</div>
 		</div>
 
 		<div class="grid_6">
-			<div class="title padding5px">Shipping Address <!--span>[edit]</span--></div>
+			<div class="title padding5px"><?php echo $this->translate('Shipping Address');?> <!--span>[edit]</span--></div>
 			<div class="adr">
 				<?php if (null !== ($shippingAddressId = $this->order->getShippingAddressId())): ?>
 					<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId); ?>
@@ -54,7 +54,7 @@
 					<span><?php echo $countryList[$shippingAddress['country']];?></span>
 					<span class="phone"><?php echo $shippingAddress['phone'];?></span>
 				<?php else: ?>
-					<p>not provided</p>
+					<p><?php echo $this->translate('not provided');?></p>
 				<?php endif;?>
 			</div>
 		</div>
@@ -97,7 +97,7 @@
 									     src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
 									     alt="<?php echo $product->getName(); ?>"/>
 								<?php endif;?>
-								<br/>SKU: <?php echo $item['sku'];?></td>
+								<br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?></td>
 							<td class="textcentered"><?php echo $product->getMpn();?></td>
 							<td class="textcentered"><?php echo $this->currency($item['original_price']);?></td>
 							<td class="textcentered"><?php echo $this->currency($item['price']);?></td>

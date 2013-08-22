@@ -1,12 +1,12 @@
-<div title="Delete products">
+<div title="<%= _.isUndefined(i18n['Delete products']) ? 'Delete products':i18n['Delete products'] %>">
     <div class="textcentered">
-        <h2 class="ui-state-error-text">Are you sure?</h2>
-        <span class="ui-state-error-text">This operation cannot be undone</span>
+        <h2 class="ui-state-error-text"><%= _.isUndefined(i18n['Are you sure']) ? 'Are you sure':i18n['Are you sure'] %>?</h2>
+        <span class="ui-state-error-text"><%= _.isUndefined(i18n['This operation cannot be undone']) ? 'This operation cannot be undone':i18n['This operation cannot be undone'] %></span>
     </div>
     <% if (totalProducts) { %>
     <hr />
     <label>
-        <input type="checkbox" name="applyToAll"> Apply to all <%= totalProducts %> products
+        <input type="checkbox" name="applyToAll"> <%= _.isUndefined(i18n['Apply to all']) ? 'Apply to all':i18n['Apply to all'] %> <%= totalProducts %> <%= _.isUndefined(i18n['products']) ? 'products':i18n['products'] %>
     </label>
     <% } %>
 </div>

@@ -19,70 +19,77 @@ echo $this->noLayout ? $this->headLink() : '';
 		min-height: 24px;
 	}
 </style>
+<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <div id="store-orders" class="toaster-widget clearfix">
 	<div>
 		<form class="filters clearfix">
 			<div class="fl-left w600 mb10px">
-				<label class="mr5px fl-left wAuto bold">Search</label>
+				<label class="mr5px fl-left wAuto bold"><?php echo $this->translate('Search');?></label>
 				<div class="wrap fl-none wAuto">
 					<input type="text" class="filter w200 margin0px mr10px" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
-					<input type="text" class="filter w250 margin0px" name="filter-product-key" placeholder="by product name, sku, mpn">
+					<input type="text" class="filter w250 margin0px" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
 				</div>
 			</div>
-			<div id="extra-filters-switch" class="mt3px fl-right" style="cursor:pointer;">[ show/hide advanced filters ]</div>
+			<div id="extra-filters-switch" class="mt3px fl-right" style="cursor:pointer;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</div>
             <div id="extra-filters" class="both">
 				<div class="grid_3">
-					<label class="block wGrid100 bold">By order amount</label>
+					<label class="block wGrid100 bold"><?php echo $this->translate('By order amount');?></label>
 					<div class="oh">
-                            <label class="mr5px fl-left wAuto">from</label>
+                            <label class="mr5px fl-left wAuto"><?php echo $this->translate('from');?></label>
                             <div class="wrap"><input type="text" name="filter-from-amount" class="wGrid90"></div>
                     </div>
                     <div class="oh">
-                            <label class="mr5px fl-left wAuto">to</label>
+                            <label class="mr5px fl-left wAuto"><?php echo $this->translate('to');?></label>
                             <div class="wrap"><input class="wGrid90" type="text" name="filter-to-amount" ></div>
                     </div>
 				</div>
 				<div class="grid_3">
-					<label class="block wGrid100 bold">By date</label>
+					<label class="block wGrid100 bold"><?php echo $this->translate('By date');?></label>
 					<div class="oh">
-                        <label class="mr5px fl-left wAuto">from</label>
+                        <label class="mr5px fl-left wAuto"><?php echo $this->translate('from');?></label>
                         <div class="wrap"><input type="text" id="orders-filter-fromdate" name="filter-from-date" class="wGrid90"></div>
                     </div>
                     <div class="oh">
-                        <label class="mr5px fl-left wAuto">to</label>
+                        <label class="mr5px fl-left wAuto"><?php echo $this->translate('to');?></label>
                         <div class="wrap"><input type="text" id="orders-filter-todate" name="filter-to-date" class="wGrid90"></div>
                     </div>
 				</div>
 	            <div class="grid_2">
-		            <label class="block wGrid100 bold mb10px">By order status</label>
-		            <?php echo $this->formSelect('filter-status', null, array(
+		            <label class="block wGrid100 bold mb10px"><?php echo $this->translate('By order status');?></label>
+                    <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
+		             <?php echo $this->formSelect('filter-status', null, array(
                         'class' => 'filter',
-                        'data-placeholder' => 'show all'
+                        'data-placeholder' => $this->translate('show all')
                     ), array(
                         '',
-                        Models_Model_CartSession::CART_STATUS_NEW => $this->translate(Models_Model_CartSession::CART_STATUS_NEW),
-                        Models_Model_CartSession::CART_STATUS_PENDING => $this->translate(Models_Model_CartSession::CART_STATUS_PENDING),
-                        Models_Model_CartSession::CART_STATUS_COMPLETED => $this->translate(Models_Model_CartSession::CART_STATUS_COMPLETED),
-                        Models_Model_CartSession::CART_STATUS_SHIPPED => $this->translate(Models_Model_CartSession::CART_STATUS_SHIPPED),
-                        Models_Model_CartSession::CART_STATUS_CANCELED => $this->translate(Models_Model_CartSession::CART_STATUS_CANCELED),
-                        Models_Model_CartSession::CART_STATUS_REFUNDED => $this->translate(Models_Model_CartSession::CART_STATUS_REFUNDED)
+                        Models_Model_CartSession::CART_STATUS_NEW => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW),
+                        Models_Model_CartSession::CART_STATUS_PENDING => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING),
+                        Models_Model_CartSession::CART_STATUS_PROCESSING => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING),
+                        Models_Model_CartSession::CART_STATUS_COMPLETED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED),
+                        Models_Model_CartSession::CART_STATUS_SHIPPED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED),
+                         Models_Model_CartSession::CART_STATUS_DELIVERED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
+                        Models_Model_CartSession::CART_STATUS_CANCELED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED),
+                        Models_Model_CartSession::CART_STATUS_REFUNDED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED),
+                        Tools_Misc::CS_ALIAS_PENDING => $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING),
+                        Tools_Misc::CS_ALIAS_PROCESSING => $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING),
+                        Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY)
                     )); ?>
 	            </div>
 				<div class="grid_4">
-					<label class="block wGrid100 bold mb10px">By shipping destination</label>
+					<label class="block wGrid100 bold mb10px"><?php echo $this->translate('By shipping destination');?></label>
 					<?php
                     $countryList = Tools_Geo::getCountries(true);
                     $countryList = array_merge(array('_' => ''), $countryList);
-					echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => 'shipping country'), $countryList );
-					echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => 'shipping state'), array('') );
+					echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList );
+					echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), array('') );
 
 					$shippingServices = array_merge(array(''), $this->shippingServices);
-					echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => 'shipping carrier'), $shippingServices );
+					echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices );
 					?>
 				</div>
 	            <div class="fl-right mb10px mrGrid1">
-                    <input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="Apply filter" >
-		            <input type="button" class="blue-btn" name="filter-reset" id="orders-filter-reset-btn" value="Reset all filters" >
+                    <input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="<?php echo $this->translate('Apply filter');?>" >
+		            <input type="button" class="blue-btn" name="filter-reset" id="orders-filter-reset-btn" value="<?php echo $this->translate('Reset all filters');?>" >
 	            </div>
 			</div>
 		</form>

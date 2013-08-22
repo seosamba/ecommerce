@@ -31,6 +31,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const RESOURCE_API = 'api';
 
+    /**
+     * quote gateway
+     */
+    const GATEWAY_QUOTE = 'Quote';
+
 	/**
 	 * Resource describes store management widgets and screens
 	 */
@@ -604,7 +609,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
 				})),
 				'pending'   => sizeof(array_filter($orders, function ($order) {
-					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING;
+					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== self::GATEWAY_QUOTE);
 				})),
 				'shipped'   => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED;
@@ -612,6 +617,12 @@ class Shopping extends Tools_Plugins_Abstract {
 				'delivered' => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
 				}))
+                //'customer_charged' => sizeof(array_filter($orders, function ($order) {
+                    //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() === self::GATEWAY_QUOTE);
+                //})),
+                //'customer_not_charged' => sizeof(array_filter($orders, function ($order) {
+                    //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === self::GATEWAY_QUOTE);
+                //}))
 			);
 			$this->_view->orders = $orders;
 		}

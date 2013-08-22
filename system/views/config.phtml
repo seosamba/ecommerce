@@ -1,6 +1,6 @@
 <?php
 $this->headTitle($this->translate('Manage config'));
-$this->placeholder('headerContent')->set('Manage store config');
+$this->placeholder('headerContent')->set($this->translate('Manage store config'));
 
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
@@ -111,6 +111,8 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 		<div id="<?php echo $subform->getId();?>-tab">
 			<?php foreach ($subform->getElements() as $elem):?>
 			<div class="mt5px clearfix">
+                <?php $labelText = $this->translate($elem->getLabel());?>
+                <?php $elem->setLabel($labelText);?>
 				<?php echo $elem->renderLabel();?>
 				<div class="grid_6 alpha">
 					<?php echo $elem->renderViewHelper();?>

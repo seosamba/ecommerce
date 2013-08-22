@@ -25,6 +25,12 @@ class Tools_Misc {
     const SECTION_STORE_BRANDLOGOS      = 'brandlogos';
 
 	const SECTION_STORE_MERCHANDISING   = 'merchandising';
+
+    const CS_ALIAS_PENDING              = 'new_quote';
+
+    const CS_ALIAS_PROCESSING           = 'quote_sent';
+
+    const CS_ALIAS_LOST_OPPORTUNITY     = 'lost_opportunity';
     
     /*
      * Changes for name inc. Tax 
@@ -356,6 +362,20 @@ class Tools_Misc {
             $photoSrc = str_replace('/', '/'.$newSize.'/', $photoSrc);
             return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
         }
+    }
+
+
+    public static function getJsTranslationLanguage(){
+        $miscConfig = Zend_Registry::get('misc');
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $translator = Zend_Registry::get('Zend_Translate');
+        $locale = $translator->getLocale();
+        $translationFilePath =  $websiteHelper->getPath().$miscConfig['pluginsPath'].'shopping'.DIRECTORY_SEPARATOR.'web'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'nls'.DIRECTORY_SEPARATOR.$locale.'_ln.js';
+        if(!file_exists($translationFilePath)){
+            return 'en_US';
+        }
+        return $locale;
+
     }
 
 }

@@ -2,24 +2,46 @@
 <td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
 <td><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
 <td><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(created_at.replace(/\-/g, '/')))) %></td>
-<td class="status-change"><%= status %></td>
+<% translatedStatus = 'cs_'+status %>
+
+<% if (gateway == 'Quote' && status == 'pending'){ %>
+    <% translatedStatus = 'New quote' %>
+<% } %>
+
+<% if (gateway == 'Quote' && status == 'processing'){ %>
+    <% translatedStatus = 'Quote Sent' %>
+<% } %>
+
+<% if (gateway == 'Quote' && status == 'canceled'){ %>
+    <% translatedStatus = 'Lost opportunity' %>
+<% } %>
+
+<td class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <td><%= total_products %></td>
 <td><%= total %></td>
 <td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
 <td class="shipping-service">
     <p><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
-    <p><i>Tracking ID:</i>&nbsp;<%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %>
+    <p><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %>
 <% if (status == 'completed' || status == 'shipped') { %>
-    <a href="javascript:;" class="setTracking">[&nbsp;<%= _.isNull(shipping_tracking_id) ? 'add' : 'edit' %>&nbsp;]</a>
+        <% addButton = 'add' %>
+        <% editButton = 'edit' %>
+        <% if (!_.isUndefined(i18n['add'])){ %>
+            <% addButton = i18n['add'] %>
+        <% } %>
+        <% if (!_.isUndefined(i18n['edit'])){ %>
+            <% editButton = i18n['edit'] %>
+        <% } %>
+        <a href="javascript:;" class="setTracking">[&nbsp;<%= _.isNull(shipping_tracking_id) ? addButton : editButton %>&nbsp;]</a>
 <% } %>
     </p>
 </td>
-<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>">view</a></td>
+<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a></td>
 <% if(useInvoice == 'enabled') { %>
    <td><a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
-           <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
+           <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
    </a>/
    <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/">
-           <img src="<%= $('#website_url').val() %>system/images/download.png" alt="Download invoice" title="Download invoice"/>    
+           <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
    </a></td>
 <% } %>
