@@ -7,7 +7,7 @@
         <?php else: ?>
             <div id="template-selector" class="grid_6 mt10px mb5px">
 				<select id="templates" class="templates" data-placeholder="Select a product listing template...">
-                    <option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
+                    <option value=""><?php echo $this->translate('Select a product listing template'); ?></option>
                     <?php foreach($this->productTemplates as $template): ?>
                         <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
                     <?php endforeach; ?>
@@ -202,14 +202,14 @@
 		    },
 		    insertList: function() {
 			    var shortCode = '{$productlist:';
-                if($('#templates').val() == 0) {
+                if(!$('#templates').size() || !$('#templates').val()) {
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
                 //listing template
                 shortCode += $('#templates').val();
 
-                if(($('#search').val() != '')) {
+                if($('#search').size() && $('#search').val()) {
                     var ids             = [];
                     var visibleProducts = $('a.currproduct');
                     if(visibleProducts.length < uiTab.step) {
@@ -237,7 +237,15 @@
                     }
                 } else {
                     //tags filter
-                    shortCode += (($('#tags').val() != null) ? ':tagnames-' + $('#tags').val() : '');
+                    if ($('#tags').val()){
+                        shortCode += ':tagnames-';
+                        var tagnames = [];
+                        $('#tags option:selected').each(function(){
+                            tagnames.push($(this).text());
+                        });
+                        shortCode += tagnames.join(',');
+//                        shortCode += (($('#tags').val() != null) ? ':tagnames-' + $('#tags').val() : '');
+                    }
                     //brands filter
                     shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                     //ordering
@@ -320,7 +328,7 @@
 		    parseTagsAndBrands: function(tagsBrandResponse, dataType) {
                $.each(tagsBrandResponse, function() {
                    $('#' + dataType).append(
-                       $('<option></option>').val(this.name).text(this.name)
+                           $('<option></option>').val((dataType == 'tags') ? this.id : this.name).text(this.name)
                    );
                });
 		    },
