@@ -62,7 +62,7 @@
         'Your store dashboard url (bookmark it): '=>'URL de votre tableau de bord boutique:',
         'Store dashboard'=>'Dashboard boutique',
         'Invoice'=>'Facture',
-        'Choose invoice template<'=>'Choisir modèle de facture <',
+        'Choose invoice template'=>'Choisir modèle de facture',
         'Save'=>'Sauvegarder',
         'Please create at least one Invoice template'=>'S&rsquo;il vous plaît créer au moins un modèle de facture',
         'Saved'=>'Sauvegardé',
@@ -225,8 +225,8 @@
         'select image for product'=>'sélectionner l&rsquo;image pour le produit',
         'Close'=>'Fermer',
         'Main'=>'Principal',
-        'Product tags'=>'Tags produit',
-        'Product options'=>'Options du produit',
+        'Product tags'=>'Tags',
+        'Product options'=>'Options',
         'Cross selling'=>'Connexes',
         'Coupons'=>'Coupons',
         'Group price'=>'Prix par groupe',
@@ -594,6 +594,7 @@
         'by order ID'=>'par numéro de commande',
         'Order #' => 'N ° de commande',
         'by product name, sku, mpn' =>  'par nom de produit, mpn, sku',
-        'select folder'=>'sélectionnez le dossier'
+        'select folder'=>'sélectionnez le dossier',
+        'For orders over'=>'pour les commandes de plus de'
 
 );?>

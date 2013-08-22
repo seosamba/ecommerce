@@ -131,7 +131,7 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
 				<label style="display: block;margin: 10px; text-align: justify"><?php echo $this->translate('When this option is checked user will be given the option to pick their stuff up at your store location.'); ?></label>
 			</div>
 			<div id="freeshipping">
-				<header>Free shipping</header>
+				<header><?php echo $this->translate('Free shipping');?></header>
 				<?php $this->freeForm->setAction($this->url(array('run' => 'bundledshipper')));?>
 				<form class="clearfix" action="<?php echo $this->freeForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
 					<?php echo $this->freeForm->getElement('shipper')->renderViewHelper(); ?>
