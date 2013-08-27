@@ -77,7 +77,8 @@ define({
         'Product deleted' : 'Produit effacé',
         'Forbidden action' : 'Action interdite',
         'Can\'t remove products' : 'Incapable d’effacer les produits',
-        'Products removed' : 'Produits effacés'
+        'Products removed' : 'Produits effacés',
+        'Input new value' : 'Entrée nouvelle valeur'
 
     }
 });

@@ -89,7 +89,7 @@
 									   href="<?php echo $this->websiteUrl . $product->getPage()->getUrl(); ?>"
 									   title="<?php echo $product->getName(); ?>" target="_blank">
 										<img style="width:80px; vertical-align:middle"
-										     src="<?php echo $this->websiteUrl; ?>media/<?php echo str_replace('/', '/product/', $product->getPhoto()); ?>"
+										     src="<?php echo Tools_Misc::prepareProductImage($product->getPhoto()); ?>"
 										     alt="<?php echo $product->getName(); ?>"/>
 									</a>
 								<?php else: ?>

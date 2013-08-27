@@ -77,6 +77,7 @@ define({
         'Product deleted' : 'Product deleted',
         'Forbidden action' : 'Forbidden action',
         'Can\'t remove products' : 'Can\'t remove products',
-        'Products removed' : 'Products removed'
+        'Products removed' : 'Products removed',
+        'Input new value' : 'Input new value'
     }
 });

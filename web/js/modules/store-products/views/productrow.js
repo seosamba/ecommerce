@@ -1,7 +1,8 @@
 define([
 	'backbone',
-    'text!../templates/productrow.html'
-], function(Backbone, ProductRowTemplate){
+    'text!../templates/productrow.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(Backbone, ProductRowTemplate, i18n){
     var ProductRowView = Backbone.View.extend({
         tagName: 'tr',
         events: {
@@ -28,7 +29,7 @@ define([
             e.preventDefault();
             var self = this,
                 prop = $(e.currentTarget).data('prop');
-            smoke.prompt('Input new value', function(e){
+            smoke.prompt(_.isUndefined(i18n['Input new value']) ? 'Input new value':i18n['Input new value'], function(e){
                 if (e && self.model.get(prop) !== e){
                     self.model.set(prop, e);
                     self.model.save
