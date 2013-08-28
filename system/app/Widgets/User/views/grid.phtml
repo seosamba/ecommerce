@@ -5,7 +5,7 @@
                     <?php if($status == 'all'):?>
                         <li class="<?php echo $status;?> active" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
                     <?php else:?>
-                        <li class="<?php echo $status;?>" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
+                        <li class="<?php echo $this->translate('cs_'.$status);?>" data-sort="<?php echo $this->translate('cs_'.$status);?>"><?php echo $this->translate('cs_'.$status);?></li>
                     <?php endif;?>
                 <?php endif;?>
             <?php endforeach; ?>
@@ -60,7 +60,7 @@
                                 <p> - </p>
                              <?php endif;?>
                         </td>
-                        <td class="user-order-current-status"><?php echo $order->getStatus();?></td>
+                        <td class="user-order-current-status"><?php echo $this->translate('cs_'.$order->getStatus());?></td>
                         <?php if(isset($this->invoicePlugin)):?>
                             <td>
                                 <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
@@ -88,7 +88,14 @@
                     {bSortable: false, aTargets: [-1]}
                 ],
                 oLanguage: {
-                    sEmptyTable: "<?php echo $this->translate('You do not have any orders'); ?>"
+                    sEmptyTable: "<?php echo $this->translate('You do not have any orders'); ?>",
+                    "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>",
+                    "oPaginate": {
+                        "sFirst": "<?php echo $this->translate('First');?>",
+                        "sLast" : "<?php echo $this->translate('Last');?>",
+                        "sPrevious" : "<?php echo $this->translate('Previous');?>",
+                        "sNext" : "<?php echo $this->translate('Next');?>"
+                    }
                 }
             });
             $('ul.user-stats').on('click', 'li', function(e){

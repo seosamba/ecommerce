@@ -8,6 +8,8 @@
 class Widgets_User_User extends Widgets_Abstract {
 
 
+    const GATEWAY_QUOTE = 'Quote';
+
 	/**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -123,22 +125,37 @@ class Widgets_User_User extends Widgets_Abstract {
         $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $this->_customer->getId()));
         $this->_view->stats = array(
             'all'     => sizeof($orders),
-            'new'       => sizeof(array_filter($orders, function ($order) {
-                return (!$order->getStatus() || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_NEW));
+            'new'     => sizeof(array_filter($orders, function ($order) {
+                    return (!$order->getStatus() || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_NEW));
                 })
             ),
             'completed' => sizeof(array_filter($orders, function ($order) {
-                 return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
+                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
             })),
             'pending'   => sizeof(array_filter($orders, function ($order) {
-                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING;
+                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== self::GATEWAY_QUOTE);
             })),
+            //'processing'   => sizeof(array_filter($orders, function ($order) {
+                //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() !== self::GATEWAY_QUOTE);
+            //})),
+            //'canceled'   => sizeof(array_filter($orders, function ($order) {
+                //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_CANCELED && $order->getGateway() !== self::GATEWAY_QUOTE);
+            //})),
             'shipped'   => sizeof(array_filter($orders, function ($order) {
                 return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED;
             })),
             'delivered' => sizeof(array_filter($orders, function ($order) {
                 return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
+            })),
+            'new_quote' => sizeof(array_filter($orders, function ($order) {
+                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() === self::GATEWAY_QUOTE);
+            })),
+            'quote_sent' => sizeof(array_filter($orders, function ($order) {
+                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === self::GATEWAY_QUOTE);
             }))
+            //'lost_opportunity' => sizeof(array_filter($orders, function ($order) {
+                //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_CANCELED && $order->getGateway() === self::GATEWAY_QUOTE);
+            //}))
         );
         $this->_view->orders = $orders;
         return $this->_view->render('grid.phtml');
