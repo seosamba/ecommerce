@@ -133,7 +133,7 @@ class Widgets_User_User extends Widgets_Abstract {
                 return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
             })),
             'pending'   => sizeof(array_filter($orders, function ($order) {
-                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== self::GATEWAY_QUOTE);
+                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== 'Quote');
             })),
             //'processing'   => sizeof(array_filter($orders, function ($order) {
                 //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() !== self::GATEWAY_QUOTE);
@@ -148,10 +148,10 @@ class Widgets_User_User extends Widgets_Abstract {
                 return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
             })),
             'new_quote' => sizeof(array_filter($orders, function ($order) {
-                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() === self::GATEWAY_QUOTE);
+                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() === 'Quote');
             })),
             'quote_sent' => sizeof(array_filter($orders, function ($order) {
-                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === self::GATEWAY_QUOTE);
+                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote');
             }))
             //'lost_opportunity' => sizeof(array_filter($orders, function ($order) {
                 //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_CANCELED && $order->getGateway() === self::GATEWAY_QUOTE);
