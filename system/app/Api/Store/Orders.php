@@ -129,6 +129,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
                     $filter['status']  = Models_Model_CartSession::CART_STATUS_CANCELED;
                     $filter['gateway'] = self::GATEWAY_QUOTE;
                 }
+                $filter['exclude_empty_address'] = '';
 				$orderList = $orderMapper->fetchAll($filter, $sortOrder, $limit, $offset);
 			} else {
 				$orderList = $orderMapper->fetchAll();
