@@ -78,6 +78,7 @@ define({
         'Forbidden action' : 'Forbidden action',
         'Can\'t remove products' : 'Can\'t remove products',
         'Products removed' : 'Products removed',
-        'Input new value' : 'Input new value'
+        'Input new value' : 'Input new value',
+        'View packing slip' : 'View packing slip'
     }
 });

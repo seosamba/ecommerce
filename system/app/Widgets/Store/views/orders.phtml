@@ -108,7 +108,7 @@ echo $this->noLayout ? $this->headLink() : '';
 				<th style="min-width: 110px;"><?php echo $this->translate('Shipping via');?></th>
 				<th><?php echo $this->translate('Details');?></th>
                 <?php if(isset($this->invoicePlugin)):?>
-                    <th><?php echo $this->translate('View/Download Invoice');?></th>
+                    <th><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
 			</tr>
 		</thead>
@@ -126,7 +126,7 @@ echo $this->noLayout ? $this->headLink() : '';
                 <td colspan="11" class="paginator"></td>
             <?php else:?>
                 <td colspan="10" class="paginator"></td>
-            <?php endif;?>  
+            <?php endif;?>
 		</tfoot>
 	</table>
     <?php if(isset($this->invoicePlugin)):?>
