@@ -79,7 +79,8 @@ define({
         'Can\'t remove products' : 'Incapable d’effacer les produits',
         'Products removed' : 'Produits effacés',
         'Input new value' : 'Entrée nouvelle valeur',
-        'View packing slip' : 'View packing slip'
+        'View packing slip' : 'Voir bon de livraison',
+        'Download packing slip' : 'Télécharger bon de livraison'
 
     }
 });

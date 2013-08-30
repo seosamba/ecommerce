@@ -79,6 +79,7 @@ define({
         'Can\'t remove products' : 'Can\'t remove products',
         'Products removed' : 'Products removed',
         'Input new value' : 'Input new value',
-        'View packing slip' : 'View packing slip'
+        'View packing slip' : 'View packing slip',
+        'Download packing slip' : 'Download packing slip'
     }
 });
