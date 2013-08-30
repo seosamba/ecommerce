@@ -146,12 +146,17 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 	 */
 	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null) {
 		$userDbTable = new Application_Model_DbTable_User();
-		$select = $userDbTable->select()
+        $joinCondition = '(cart.user_id = user.id)';
+        $joinCondition .= ' AND ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
+        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        $select = $userDbTable->select()
 				->setIntegrityCheck(false)
 				->from('user',array('id', 'full_name', 'email', 'reg_date' ))
 				->joinLeft(
 					array('cart' => 'shopping_cart_session'),
-					sprintf('cart.user_id = user.id AND cart.status = "%s"', Models_Model_CartSession::CART_STATUS_COMPLETED),
+                    $joinCondition,
 					array(
 						'total_amount' => 'SUM(cart.total)',
 						'total_orders'=>'COUNT(cart.id)'
