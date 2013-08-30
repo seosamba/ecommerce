@@ -6,7 +6,7 @@
             <h3><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
         <?php else: ?>
             <div id="template-selector" class="grid_6 mt10px mb5px">
-				<select id="templates" class="templates" data-placeholder="Select a product listing template...">
+				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
                     <option value=""><?php echo $this->translate('Select a product listing template'); ?></option>
                     <?php foreach($this->productTemplates as $template): ?>
                         <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
@@ -14,7 +14,7 @@
                 </select>
             </div>
             <div class="grid_6">
-                <?php echo $this->formText('search', '', array('placeholder' => 'search by name, sku or tags')); ?>
+                <?php echo $this->formText('search', '', array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
             </div>
         <?php endif; ?>
     </div>
@@ -22,15 +22,15 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
+		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
 	</div>
 	<div class="grid_4">
-		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands');?>..."></select>
+		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
 	</div>
 
 	<!-- Ordering -->
 	<div id="order" class="grid_4">
-		<select style="width: 205px;float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Sort by');?>...">
+		<select style="width: 205px;float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Sort by...');?>">
 			<option value="name"><?php echo $this->translate('Name'); ?></option>
 			<option value="price"><?php echo $this->translate('Price'); ?></option>
 			<option value="brand"><?php echo $this->translate('Brand'); ?></option>
