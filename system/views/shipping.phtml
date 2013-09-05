@@ -144,6 +144,10 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
 					<div class="grid_3">
 						<?php echo $this->freeForm->getElement('destination')->renderViewHelper();?>
 					</div>
+                    <label class="grid_12 mt10px"><?php echo $this->freeForm->getElement('errormessage')->getLabel();?>:</label>
+                    <div class="grid_12">
+                        <?php echo $this->freeForm->getElement('errormessage')->renderViewHelper();?>
+                    </div>
 				</form>
 			</div>
 		</div>
