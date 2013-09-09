@@ -569,8 +569,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * Generates product grid
-	 * for admins only
+	 * Generates product grid for admins only
+     *
 	 * @return string Widget html content
 	 */
 	protected function _makeOptionProducts() {
