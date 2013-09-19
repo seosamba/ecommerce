@@ -112,6 +112,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$this->_processRelated($model);
 		}
 
+        if ($model->getFreebies()){
+            $this->_processFreebies($model);
+        }
+
         //proccess product parts if any
         $this->_processParts($model);
 
@@ -361,6 +365,22 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 
 	}
+
+    private function _processFreebies(Models_Model_Product $model){
+        $freebies = $model->getFreebies();
+        $freebiesTable = new Models_DbTable_ProductHasFreebies();
+
+        $where = $freebiesTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+        $freebiesTable->delete($where);
+
+        foreach ($freebies as $id) {
+            $freebiesTable->insert(array(
+                'product_id'  => $model->getId(),
+                'freebies_id' => intval($id)
+            ));
+        }
+
+    }
 
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();

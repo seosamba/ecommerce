@@ -167,9 +167,21 @@
 						<?php endif; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
-				<td class="product-unit-price"><?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?></td>
+                <td class="product-unit-price">
+                <?php if($product['tax_price'] == 0):?>
+                    <?php echo $this->translate('free'); ?>
+                <?php else:?>
+				    <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
+                <?php endif;?>
+                </td>
 				<td class="product-qty"><?php echo $product['qty']; ?></td>
-				<td class="product-total"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
+                <td class="product-total">
+                <?php if($product['tax_price'] == 0):?>
+                    <?php echo $this->translate('free'); ?>
+                <?php else:?>
+				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                <?php endif;?>
+                </td>
 			</tr>
 		<?php endforeach; ?>
 		</tbody>
@@ -369,17 +381,28 @@
 						<?php endif; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
-				<td valign="middle" align="center"><?php echo $this->currency($product['tax_price']); ?></td>
+                <td valign="middle" align="center">
+                <?php if($product['tax_price'] == 0):?>
+                    <?php echo $this->translate('free'); ?>
+                <?php else:?>
+                    <?php echo $this->currency($product['tax_price']); ?>
+                <?php endif;?>
+                </td>
 				<td valign="middle" align="center"><?php echo $product['qty']; ?></td>
-				<td valign="middle"
-				    align="center"><?php echo $this->currency($product['tax_price'] * $product['qty']); ?></td>
+                <td valign="middle" align="center">
+                <?php if($product['tax_price'] == 0):?>
+                    <?php echo $this->translate('free'); ?>
+                <?php else:?>
+				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                <?php endif;?>
+                </td>
 			</tr>
 		<?php endforeach; ?>
 		</tbody>
 	</table>
 
 	<div style="float:right; width:30%; margin-bottom:15px; margin-right:2%;">
-		<span style="font-weight:bold;font-size:15px;color:#222222">Summary:</span>
+		<span style="font-weight:bold;font-size:15px;color:#222222"><?php echo $this->translate('Summary');?>:</span>
 
 		<p style="padding:10px 0 5px; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
 				<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Sub-Total');?>

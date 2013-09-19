@@ -177,10 +177,11 @@ class Tools_ShoppingCart {
 	 * @param Models_Model_Product $item
 	 * @param                      $options array of toaster products optionsId => selectionId
 	 * @param int                  $qty     Items quantity
+     * @param bool                 $recalculate Recalculate cart
 	 * @throws Exceptions_SeotoasterPluginException
 	 * @return string Item storage key
 	 */
-	public function add(Models_Model_Product $item, $options = array(), $qty = 1) {
+	public function add(Models_Model_Product $item, $options = array(), $qty = 1, $recalculate = true) {
 		if (!$item instanceof Models_Model_Product) {
 			throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
 		}
@@ -208,14 +209,16 @@ class Tools_ShoppingCart {
 				'taxClass'         => $item->getTaxClass(),
 				'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
 				'note'             => '',
-                'freeShipping'     => $item->getFreeShipping()
+                'freeShipping'     => $item->getFreeShipping(),
+                'freebies'         => $item->getFreebies()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;
 		}
 		unset($item);
-
-		$this->calculate(true);
+        if($recalculate){
+		    $this->calculate(true);
+        }
 		$this->_save();
 
 		return $itemKey;
@@ -288,11 +291,18 @@ class Tools_ShoppingCart {
             if (null !== ($addrId = Tools_ShoppingCart::getInstance()->getAddressKey(Models_Model_Customer::ADDRESS_TYPE_SHIPPING))) {
 				$destinationAddress = Tools_ShoppingCart::getInstance()->getAddressById($addrId);
 			}
-
+            $freebiesProductsInCart = array();
+            $notFreebiesProductsInCart = array();
 			if (is_array($this->_content) && !empty($this->_content)) {
 				foreach ($this->_content as $storageKey => &$cartItem) {
 					if (isset($cartItem['sid'])) {
-						$product = new Models_Model_Product(array(
+						if($cartItem['freebies'] == 1){
+                            $cartItem['price'] = 0;
+                            $freebiesProductsInCart[$cartItem['id']] = $storageKey;
+                        }else{
+                            $notFreebiesProductsInCart[$cartItem['id']] = $cartItem['id'];
+                        }
+                        $product = new Models_Model_Product(array(
 							'price'    => $cartItem['price'],
 							'taxClass' => $cartItem['taxClass']
 						));
@@ -326,6 +336,39 @@ class Tools_ShoppingCart {
 			}
 			$summary['total'] -= $summary['discount'];
 
+            //process freebies
+            if(!empty($notFreebiesProductsInCart)){
+                $freebiesProducts = Models_Mapper_ProductFreebiesSettingsMapper::getInstance()->getFreebiesByProdIds($notFreebiesProductsInCart);
+                if(!empty($freebiesProducts)){
+                    foreach($freebiesProducts as $freebiesProd){
+                        $productForFreebies = $this->find($freebiesProd['prod_id']);
+                        $freebiesProduct = Models_Mapper_ProductMapper::getInstance()->find($freebiesProd['freebies_id']);
+                        $itemKey = $this->_generateStorageKey($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']));
+                        if($freebiesProd['quantity'] <= $productForFreebies['qty'] && $freebiesProd['price_value'] < $summary['total']){
+                            if (!$this->findBySid($itemKey)){
+                                if($freebiesProduct instanceof Models_Model_Product){
+                                    $freebiesProduct->setFreebies(1);
+                                    $inStockCount = $freebiesProduct->getInventory();
+                                    if(is_null($inStockCount)) {
+                                        $this->add($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']), 1, false);
+                                    }elseif(intval($inStockCount) > 0){
+                                        $this->add($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']), 1, false);
+                                    }
+                                }
+                            }
+                        }elseif($this->findBySid($itemKey)){
+                            if($this->_content[$itemKey]['qty'] <= 1){
+                                unset($this->_content[$itemKey]);
+                            }else{
+                                $this->_content[$itemKey]['qty']--;
+                            }
+                            $this->_save();
+                        }
+
+                    }
+                }
+            }
+
 			$this->setDiscount($summary['discount'])
 					->setTotal($summary['total']);
 		}
@@ -357,8 +400,19 @@ class Tools_ShoppingCart {
 		}
 		if (array_key_exists($storageKey, $this->_content)) {
 			if ($complete) {
-				unset($this->_content[$storageKey]);
-			} else {
+                //remove freebies
+                $productHasFreebies = Models_Mapper_ProductFreebiesSettingsMapper::getInstance()->getFreebies($this->_content[$storageKey]['id']);
+                if(!empty($productHasFreebies)){
+                    foreach($productHasFreebies as $freebies){
+                        $freebiesProduct = Models_Mapper_ProductMapper::getInstance()->find($freebies['freebies_id']);
+                        $itemKey = $this->_generateStorageKey($freebiesProduct, array(0 => 'freebies_'.$freebies['prod_id']));
+                        if (array_key_exists($itemKey, $this->_content)) {
+                            unset($this->_content[$itemKey]);
+                        }
+                    }
+                }
+                unset($this->_content[$storageKey]);
+            } else {
 				$this->_content[$storageKey]['qty']--;
 			}
 			$this->calculate(true);

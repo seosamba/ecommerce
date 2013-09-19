@@ -1,0 +1,64 @@
+<div class="seotoaster product-freebies-wrap">
+    <div class="product-freebies-controlls">
+        <h4><?php echo $this->translate('Magic space: Freebies products');?></h4>
+    </div>
+    <div class="product-freebies-controlls">
+    <label>
+        <span><?php echo $this->translate('Cart amount'); ?></span>
+        <input type="text" name="assign-freebies-price" id="assign-freebies-price" value="<?php echo $this->currentFreebiesPrice; ?>" />
+    </label>
+    <label>
+        <span><?php echo $this->translate('Products quantity'); ?></span>
+        <input type="text" name="assign-freebies-quantity" id="assign-freebies-quantity" value="<?php echo $this->currentFreebiesQuantity; ?>" />
+    </label>
+    </div>
+    <div class="product-freebies-content"><?php echo $this->content; ?></div>
+</div>
+
+<style type="text/css">
+
+    .seotoaster.product-freebies-wrap,
+    .seotoaster.product-freebies-wrap div.product-freebies-controlls,
+    .seotoaster.product-freebies-wrap div.product-freebies-content {
+        overflow: hidden;
+        background-color: #fff;
+    }
+    .seotoaster.product-freebies-wrap {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        border: 3px dashed #eee;
+    }
+    .seotoaster.product-freebies-wrap div.product-freebies-controlls{
+        background: rgba(248, 248, 248, 1);
+        padding: 10px 5px 5px 5px;
+        min-height: 30px;
+    }
+    .seotoaster.product-freebies-wrap div.product-freebies-controlls h4{
+        padding: 3px;
+        color: #ccc;
+        text-transform: uppercase;
+    }
+    .seotoaster.product-freebies-wrap div.product-freebies-content {
+        padding: 5px;
+        background: background: rgba(250, 250, 250, 1);
+    }
+    .seotoaster.product-freebies-wrap div.product-freebies-controlls input{
+        width:100px;
+    }
+</style>
+<script type="text/javascript">
+
+    $(document).on('blur', '#assign-freebies-price', saveFreebies);
+    $(document).on('blur', '#assign-freebies-quantity', saveFreebies);
+
+    function saveFreebies(){
+        var priceValue = +$('#assign-freebies-price').val();
+        var quantity   = +$('#assign-freebies-quantity').val();
+        $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setFreebies/', {
+            productId  : '<?php echo $this->currentProductId; ?>',
+            priceValue : priceValue,
+            quantity   : quantity
+        });
+    }
+</script>

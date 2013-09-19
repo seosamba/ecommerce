@@ -17,7 +17,8 @@ define(['backbone',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
             'click td.shipping-service .setTracking': 'changeTracking',
-            'click #orders-filter-reset-btn': 'resetFilter'
+            'click #orders-filter-reset-btn': 'resetFilter',
+            'change select[name="order-mass-action"]': 'massAction'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -42,6 +43,28 @@ define(['backbone',
             });
             this.orders.on('reset', this.renderOrders, this);
             this.orders.pager();
+        },
+        massAction: function(e){
+            var func = $(e.currentTarget).val()+'Action';
+
+            if (_.isFunction(this[func])){
+                var orders = this.orders;
+                if (orders.length){
+                    var self = this;
+                    this[func].call(self, orders);
+                }
+            }
+            $(e.currentTarget).val(0);
+        },
+        invoicesAction: function(orders){
+            console.log(orders);
+            smoke.confirm(_.isUndefined(i18n['Download invoices from the current page?'])?'Download invoices from the current page?':i18n['Download invoices from the current page?'], function(e) {
+                if(e) {
+                    window.location= $('#website_url').val()+'plugin/invoicetopdf/run/massDownloadInvoice/cartId/388/dwn/1/packing/1/';
+                } else {
+
+                }
+            }, {classname:"errors", 'ok':_.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], 'cancel':_.isUndefined(i18n['No'])?'No':i18n['No']});
         },
         resetFilters: function(){
             this.$('form.filters > :input').val('');
