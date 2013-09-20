@@ -80,7 +80,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		            'price' => $item['price'],
 		            'qty' => $item['qty'],
 		            'tax' => $item['tax'],
-		            'tax_price' => isset($item['taxPrice']) ? $item['taxPrice'] : $item['tax_price']
+		            'tax_price' => isset($item['taxPrice']) ? $item['taxPrice'] : $item['tax_price'],
+                    'freebies'  => is_null($item['freebies']) ? 0 : $item['freebies']
 	            );
 	            if (isset($item['options']) && !empty($item['options'])) {
 		            $options = array();

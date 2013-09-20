@@ -359,11 +359,7 @@ class Tools_ShoppingCart {
                                 }
                             }
                         }elseif($this->findBySid($itemKey)){
-                            if($this->_content[$itemKey]['qty'] <= 1){
-                                unset($this->_content[$itemKey]);
-                            }else{
-                                $this->_content[$itemKey]['qty']--;
-                            }
+                            unset($this->_content[$itemKey]);
                             $this->_save();
                         }
 

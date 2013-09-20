@@ -168,7 +168,7 @@
 					<?php endforeach; ?>
 				<?php endif; ?>
                 <td class="product-unit-price">
-                <?php if($product['tax_price'] == 0):?>
+                <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
                 <?php else:?>
 				    <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
@@ -176,7 +176,7 @@
                 </td>
 				<td class="product-qty"><?php echo $product['qty']; ?></td>
                 <td class="product-total">
-                <?php if($product['tax_price'] == 0):?>
+                <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
                 <?php else:?>
 				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
@@ -382,7 +382,7 @@
 					<?php endforeach; ?>
 				<?php endif; ?>
                 <td valign="middle" align="center">
-                <?php if($product['tax_price'] == 0):?>
+                <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
                 <?php else:?>
                     <?php echo $this->currency($product['tax_price']); ?>
@@ -390,7 +390,7 @@
                 </td>
 				<td valign="middle" align="center"><?php echo $product['qty']; ?></td>
                 <td valign="middle" align="center">
-                <?php if($product['tax_price'] == 0):?>
+                <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
                 <?php else:?>
 				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
