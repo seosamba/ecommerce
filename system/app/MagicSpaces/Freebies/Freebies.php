@@ -51,8 +51,7 @@ class MagicSpaces_Freebies_Freebies extends Tools_MagicSpaces_Abstract {
         }
         $this->_view->currentProductId = $productId;
         if(isset($found[1]) && !empty($found[1])){
-		    $result =  array_unique($found[1]);
-            $product->setFreebies($result);
+		    $product->setFreebies($found[1]);
             $productMapper->save($product);
         }
 	}

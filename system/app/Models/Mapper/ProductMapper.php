@@ -374,10 +374,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $freebiesTable->delete($where);
 
         foreach ($freebies as $id) {
-            $freebiesTable->insert(array(
-                'product_id'  => $model->getId(),
-                'freebies_id' => intval($id)
-            ));
+            $where = $freebiesTable->getAdapter()->quoteInto('freebies_id = ?', intval($id));
+            $where .= ' AND '.$freebiesTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+            $select = $freebiesTable->getAdapter()->select()->from('shopping_product_has_freebies')->where($where);
+            $freebiesExist = $freebiesTable->getAdapter()->fetchRow($select);
+            if(!empty($freebiesExist)){
+                $freebiesTable->update(array('freebies_quantity' => $freebiesExist['freebies_quantity']+1), $where);
+            }else{
+                $freebiesTable->insert(array(
+                    'product_id'  => $model->getId(),
+                    'freebies_id' => intval($id),
+                    'freebies_quantity' => 1
+                ));
+            }
         }
 
     }

@@ -293,6 +293,7 @@ class Tools_ShoppingCart {
 			}
             $freebiesProductsInCart = array();
             $notFreebiesProductsInCart = array();
+            $notFreebiesProductsInCartStorageKeys = array();
 			if (is_array($this->_content) && !empty($this->_content)) {
 				foreach ($this->_content as $storageKey => &$cartItem) {
 					if (isset($cartItem['sid'])) {
@@ -301,6 +302,7 @@ class Tools_ShoppingCart {
                             $freebiesProductsInCart[$cartItem['id']] = $storageKey;
                         }else{
                             $notFreebiesProductsInCart[$cartItem['id']] = $cartItem['id'];
+                            $notFreebiesProductsInCartStorageKeys[$cartItem['id']] = $storageKey;
                         }
                         $product = new Models_Model_Product(array(
 							'price'    => $cartItem['price'],
@@ -341,7 +343,7 @@ class Tools_ShoppingCart {
                 $freebiesProducts = Models_Mapper_ProductFreebiesSettingsMapper::getInstance()->getFreebiesByProdIds($notFreebiesProductsInCart);
                 if(!empty($freebiesProducts)){
                     foreach($freebiesProducts as $freebiesProd){
-                        $productForFreebies = $this->find($freebiesProd['prod_id']);
+                        $productForFreebies = $this->findBySid($notFreebiesProductsInCartStorageKeys[$freebiesProd['prod_id']]);
                         $freebiesProduct = Models_Mapper_ProductMapper::getInstance()->find($freebiesProd['freebies_id']);
                         $itemKey = $this->_generateStorageKey($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']));
                         if($freebiesProd['quantity'] <= $productForFreebies['qty'] && $freebiesProd['price_value'] < $summary['total']){
@@ -350,9 +352,9 @@ class Tools_ShoppingCart {
                                     $freebiesProduct->setFreebies(1);
                                     $inStockCount = $freebiesProduct->getInventory();
                                     if(is_null($inStockCount)) {
-                                        $this->add($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']), 1, false);
-                                    }elseif(intval($inStockCount) > 0){
-                                        $this->add($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']), 1, false);
+                                        $this->add($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']), $freebiesProd['freebies_quantity'], false);
+                                    }elseif(intval($inStockCount) >= $freebiesProd['freebies_quantity']){
+                                        $this->add($freebiesProduct, array(0 => 'freebies_'.$freebiesProd['prod_id']), $freebiesProd['freebies_quantity'], false);
                                     }
                                 }
                             }
