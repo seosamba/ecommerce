@@ -4,11 +4,16 @@
     </div>
     <div class="product-freebies-controlls">
     <label>
-        <span><?php echo $this->translate('Cart amount'); ?></span>
-        <input type="text" name="assign-freebies-price" id="assign-freebies-price" value="<?php echo $this->currentFreebiesPrice; ?>" />
+        <span><?php echo $this->translate('Minimum cart amount'); ?></span>
+        <?php if($this->currentFreebiesPrice != 0):?>
+            <?php $currentFreebiesPrice = round($this->currentFreebiesPrice, 2);?>
+        <?php else:?>
+            <?php $currentFreebiesPrice = '';?>
+        <?php endif;?>
+        <input type="text" name="assign-freebies-price" id="assign-freebies-price" value="<?php echo $currentFreebiesPrice; ?>" />
     </label>
     <label>
-        <span><?php echo $this->translate('Products quantity'); ?></span>
+        <span><?php echo $this->translate('Minimum pieces to buy'); ?></span>
         <input type="text" name="assign-freebies-quantity" id="assign-freebies-quantity" value="<?php echo $this->currentFreebiesQuantity; ?>" />
     </label>
     </div>
@@ -45,9 +50,13 @@
     }
     .seotoaster.product-freebies-wrap div.product-freebies-controlls input{
         width:100px;
+        background-color:rgba(248, 248, 248, 1);
     }
 </style>
 <script type="text/javascript">
+    $(document).on('click', '.product-freebies-wrap input', function(){
+        $(this).css('background-color','#fff');
+    });
 
     $(document).on('blur', '#assign-freebies-price', saveFreebies);
     $(document).on('blur', '#assign-freebies-quantity', saveFreebies);
@@ -55,6 +64,7 @@
     function saveFreebies(){
         var priceValue = +$('#assign-freebies-price').val();
         var quantity   = +$('#assign-freebies-quantity').val();
+        $(this).css('background-color','rgba(248, 248, 248, 1)');
         $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setFreebies/', {
             productId  : '<?php echo $this->currentProductId; ?>',
             priceValue : priceValue,
