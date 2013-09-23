@@ -324,6 +324,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 			->objectToDictionary($this->_object, 'order')
 			->objectToDictionary($customer);
+        $dictionaryWithaddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId());
+        if(isset($dictionaryWithaddress)){
+            $this->_entityParser->addToDictionary(array('order:shippingaddress'=>$dictionaryWithaddress));
+        }
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
 		return $this->_send();
 	}
