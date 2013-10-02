@@ -1,0 +1,9 @@
+<div title="<%= _.isUndefined(i18n['Email Marketing']) ? 'Email Marketing':i18n['Email Marketing'] %>">
+    <select name="choose-service" id="marketing-services" style="float:none;">
+        <option value="select"><%= _.isUndefined(i18n['Select service']) ? 'Select service':i18n['Select service'] %></option>
+        <% _.each(enabledServices, function(status, service){ %>
+            <option value="<%= service %>"><%= service %></option>
+        <% }); %>
+    </select>
+</div>
+
