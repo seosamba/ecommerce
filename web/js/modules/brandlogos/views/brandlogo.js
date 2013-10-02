@@ -4,7 +4,7 @@ define([
 
     var BrandView = Backbone.View.extend({
         tagName: 'li',
-        className: 'grid_2 h150 ui-corner-all',
+        className: 'grid_2 ui-corner-all',
         template: _.template("<img src='<%= src %>'/><p class='ui-corner-bottom'><%= name %></p>"),
         events: {},
         initialize: function(){

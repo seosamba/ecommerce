@@ -1,0 +1,243 @@
+#manage-product {
+  position: static;
+}
+#manage-product .header .nav-links {
+  display: inline-block;
+  *zoom: 1;
+  *display: inline;
+  /* Fix for IE7 */
+
+  vertical-align: top;
+}
+#manage-product .header .nav-links a {
+  color: #666666;
+}
+#manage-product .header .nav-links a:hover {
+  color: #59a5c3;
+}
+#manage-product .header .nav-links a span {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+}
+#manage-product .header .nav-links a span:before,
+#manage-product .header .nav-links a span [class^="icon-"]:before,
+#manage-product .header .nav-links a span [class*=" icon-"]:before {
+  font-size: 28px;
+}
+#manage-product #product-list {
+  width: 100%;
+  right: -110%;
+}
+#manage-product #product-list .show {
+  right: 0;
+}
+#manage-product #product-list-holder .productlisting,
+#manage-product #related-holder .productlisting {
+  position: relative;
+  float: left;
+  width: 11%;
+  margin: 0 0 1.7% 1.7%;
+  text-align: center;
+  overflow: hidden;
+  background: #fafafa;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  -webkit-box-shadow: 0 1px 1px #bbbbbb;
+  -moz-box-shadow: 0 1px 1px #bbbbbb;
+  -ms-box-shadow: 0 1px 1px #bbbbbb;
+  box-shadow: 0 1px 1px #bbbbbb;
+}
+#manage-product #product-list-holder .productlisting:nth-child(8n+1),
+#manage-product #related-holder .productlisting:nth-child(8n+1) {
+  margin-left: 0;
+}
+#manage-product #product-list-holder .productlisting.show-list,
+#manage-product #related-holder .productlisting.show-list {
+  height: 180px;
+  line-height: 180px;
+  color: #d1d1d1;
+}
+#manage-product #product-list-holder .productlisting.show-list span,
+#manage-product #related-holder .productlisting.show-list span {
+  display: inline-block;
+  *zoom: 1;
+  *display: inline;
+  /* Fix for IE7 */
+
+  vertical-align: middle;
+}
+#manage-product #product-list-holder .productlisting.show-list:hover,
+#manage-product #related-holder .productlisting.show-list:hover {
+  color: #666666;
+}
+#manage-product #product-list-holder .productlisting:hover,
+#manage-product #related-holder .productlisting:hover {
+  background: #eaeaea;
+}
+#manage-product #product-list-holder .productlisting span,
+#manage-product #related-holder .productlisting span {
+  display: block;
+  font-size: 0.85em;
+}
+#manage-product #product-list-holder .productlisting .icon-remove,
+#manage-product #related-holder .productlisting .icon-remove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+#manage-product #product-list-holder .productlisting .brand,
+#manage-product #related-holder .productlisting .brand {
+  color: #666666;
+  font-weight: bold;
+  background: #eaeaea;
+  padding: 3px 0;
+}
+#manage-product #product-list-holder .productlisting .image,
+#manage-product #related-holder .productlisting .image {
+  height: 90px;
+  line-height: 90px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+#manage-product #product-list-holder .productlisting .name,
+#manage-product #related-holder .productlisting .name {
+  height: 30px;
+  padding: 3px 4px;
+  margin-bottom: 5px;
+}
+#manage-product #product-list-holder .productlisting .sku,
+#manage-product #related-holder .productlisting .sku {
+  color: #666666;
+  text-align: right;
+  padding: 3px 8px;
+  background: #eaeaea;
+}
+#manage-product #product-list-holder .productlisting .checkbox-del,
+#manage-product #related-holder .productlisting .checkbox-del {
+  margin-top: -18px;
+  float: left;
+  margin-left: 5px;
+}
+#manage-product #image-select-dialog {
+  width: 100%;
+  left: -110%;
+}
+#manage-product #image-select-dialog .show {
+  left: 0;
+}
+#manage-product #image-select-dialog #image-list {
+  -webkit-column-count: 9;
+  -moz-column-count: 9;
+  column-count: 9;
+  -webkit-column-gap: 10px;
+  -moz-column-gap: 10px;
+  column-gap: 10px;
+}
+#manage-product #image-select-dialog #image-list > .box {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+#manage-product #image-select-dialog #image-list > .box:hover {
+  opacity: 0.7;
+  filter: alpha(opacity=70);
+}
+#manage-product #main-tab #product-image-holder {
+  max-height: 137px;
+}
+#manage-product #main-tab #description-box textarea {
+  height: 215px;
+}
+#manage-product #main-tab #quick-preview {
+  position: relative;
+}
+#manage-product #main-tab #quick-preview .image {
+  float: left;
+  margin-top: 7px;
+  margin-right: 5%;
+  padding: 0;
+  height: 80px;
+  width: 80px;
+  -webkit-border-radius: 100px;
+  -moz-border-radius: 100px;
+  -ms-border-radius: 100px;
+  border-radius: 100px;
+}
+#manage-product #main-tab #quick-preview .name {
+  background: #666666;
+  color: #fff;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#manage-product #main-tab #quick-preview .description {
+  font-size: 0.85em;
+  color: #666666;
+  display: block;
+  height: 137px;
+}
+#manage-product #main-tab #quick-preview .price {
+  position: absolute;
+  top: 100px;
+  left: 6px;
+  width: 90px;
+  text-align: center;
+  color: #fff;
+  background: #666666;
+  font-size: 0.85em;
+}
+#manage-product #main-tab #quick-preview .info {
+  margin-top: 10px;
+  padding-top: 5px;
+  border-top: 1px dashed #bbb;
+  display: block;
+  text-align: center;
+  color: #5bc0de;
+}
+#manage-product #tag-tab .product-tags .tag-widget {
+  font-size: 0.85em;
+  float: left;
+  width: 19.2%;
+  margin: 1% 0 0 1%;
+  background: #eaeaea;
+  padding: 5px;
+  cursor: pointer;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#manage-product #tag-tab .product-tags .tag-widget:hover,
+#manage-product #tag-tab .product-tags .tag-widget.tag-current {
+  background: #dddddd;
+}
+#manage-product #tag-tab .product-tags .tag-widget:nth-child(5n + 1) {
+  margin-left: 0;
+}
+#manage-product #tag-tab .product-tags .tag-widget label {
+  display: inline-block;
+  *zoom: 1;
+  *display: inline;
+  /* Fix for IE7 */
+
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 88%;
+  cursor: pointer;
+}
+#manage-product #group-pricing-tab #editing-grouping-price {
+  overflow: auto;
+  height: 400px;
+}
+#merchandising #group-table td:last-child {
+  text-align: center;
+}

@@ -58,10 +58,10 @@ define([
             this.zoneHolder.tabs('option', 'active', 0);
         },
         saveZones: function(){
-            $('#ajax_msg').show('fade');
+			showSpinner('#general-config');
             $.post(this.zonesCollection.url, {zones: this.zonesCollection.toJSON()}, function(){
                 app.view.zonesCollection.fetch();
-                $('#ajax_msg').hide('fade');
+				hideSpinner();
             });
         },
         openDialog: function(e){

@@ -15,8 +15,8 @@ define(['backbone', 'backbone.paginator'], function(Backbone){
         paginator_ui: {
             firstPage: 1,
             currentPage: 1,
-            totalPages: 10,
-            perPage: 30
+            totalPages: 3,
+            perPage: 40
         },
         server_api: {
             folder: null

@@ -8,76 +8,6 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 ?>
 <!--[if lte IE 7]><script type="text/javascript" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/css/icon-ie.js"></script><![endif]-->
 <link type="text/css" rel="stylesheet" media="screen" href="<?php echo $this->websiteUrl; ?>plugins/shopping/web/css/toaster-icon.css">
-<style>
-#shippers ul li {
-	clear: both;
-	width: 100%;
-}
-#shippers ul li > a {
-	width: 80%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-#shippers .ui-tabs-panel {
-	padding: 4px;
-}
-#shippers #pane-container > div {
-	border: 1px solid #cacaca;
-}
-#shippers #pane-container header {
-	color: gray;
-	padding: 4px 20px;
-	border-bottom: 1px solid #b5b5b5;
-	font-variant: small-caps;
-	font-size: 120%;
-}
-.textright {
-	text-align: right;
-}
-.relative {
-	position: relative;
-}
-#shippers .relative input {
-
-}
-.unit-over {
-	color: #999;
-	position: absolute;
-	top: 5px;
-	right: 3px;
-}
-ul.ui-tabs-nav span.unit-over {
-	cursor: pointer;
-}
-ul.ui-tabs-nav span.unit-over:hover {
-	text-decoration: underline;
-}
-ul.ui-tabs-nav li.enabled a, ul.ui-tabs-nav li.enabled span.icon-checkmark{
-	color: #228b22;
-}
-ul.ui-tabs-nav li.disabled a,  ul.ui-tabs-nav li.disabled span.icon-minus{
-	color: #cd5c5c;
-}
-#ajax_msg {
-	position: absolute;
-	top: 3px;
-	left: 0;
-	width: 100%;
-	z-index: 5000;
-	text-align: center;
-	display: none;
-}
-#ajax_msg img {
-	vertical-align: middle;
-}
-ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.icon-minus{
-	margin-left: 5px;
-    float:left;
-}
-
-</style>
-
-<div id="ajax_msg"><img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" /></div>
 <form id="general-config" class="container_12 clearfix" style="min-height: 0">
     <label class="mt5px grid_6 omega" for="config-checkoutShippingTocRequire">
 	    <?php echo $this->formCheckbox(
@@ -169,9 +99,9 @@ $(function(){
 	});
 
 	$(document).ajaxStart(function(){
-		$('#ajax_msg').fadeIn();
+		showSpinner('#general-config');
 	}).ajaxStop(function(){
-		$('#ajax_msg').fadeOut();
+		hideSpinner();
 	});
 });
 </script>

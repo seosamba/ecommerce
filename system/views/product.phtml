@@ -1,486 +1,397 @@
 <?php
-$this->headTitle('Manage product');
-?>
-<link rel="stylesheet" href="<?php echo $this->websiteUrl . 'plugins/shopping/web/css/product.css'; ?>"/>
-<link rel="stylesheet" href="<?php echo $this->websiteUrl . 'system/css/reset-widgets.css'; ?>"/>
-
-<?php
-$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
-		->addJavascriptFile($this->websiteUrl . 'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js');
-$this->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
+    $this->headTitle('Manage product');
 ?>
 
 <?php
-$firstPageCaption = $this->translate('First');
-$lastPageCaption = $this->translate('Last');
+    $this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
+        ->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.masonry.min.js');
+    $this->headScript()->appendFile($this->websiteUrl.'system/js/external/waypoints/waypoints.min.js');
+?>
+
+<?php
+    $firstPageCaption = $this->translate('First');
+    $lastPageCaption = $this->translate('Last');
 ?>
 
 <?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->generalConfig['currency'])); ?>
 
 <script id="paginatorTemplate" type="text/template">
 	<div class="paginator <%= cssClass %>" data-collection="<%= collection %>">
-		<% if (firstPage != currentPage) { %><a href="#" class="page"
-		                                        data-page="first"><?php echo $firstPageCaption; ?></a><% } else { %><span><?php echo $firstPageCaption; ?></span><% } %>
+		<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first"><?php echo $firstPageCaption; ?></a><% } else { %><span><?php echo $firstPageCaption; ?></span><% } %>
 
-		<% if (currentPage > firstPage) { %><a href="#" class="page"
-		                                       data-page="prev"><?php echo $this->translate('Previous'); ?></a><% } %>
+        <% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev"><?php echo $this->translate('Previous'); ?></a><% } %>
 
-		<% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
+        <% if (currentPage - 5 > firstPage) { %><span>...</span><% } %>
 
-		<% for (var p = currentPage - 5; p <= currentPage + 5; p++) { %>
-			<% if (p < firstPage || p > lastPage) continue; %>
-			<% if (currentPage == p) { %>
-				<span class="page selected"><%= p %></span>
-			<% } else { %>
-				<a href="#" class="page" data-page="<%= p %>"><%= p %></a>
-			<% } %>
-		<% } %>
+        <% for (var p = currentPage - 5; p <= currentPage + 5; p++) { %>
+            <% if (p < firstPage || p > lastPage) continue; %>
+            <% if (currentPage == p) { %>
+                <span class="page selected"><%= p %></span>
+            <% } else { %>
+                <a href="#" class="page" data-page="<%= p %>"><%= p %></a>
+            <% } %>
+        <% } %>
 
-		<% if (currentPage + 5 < lastPage) { %><span>...</span><% } %>
+        <% if (currentPage + 5 < lastPage) { %><span>...</span><% } %>
 
-		<% if (currentPage < totalPages) { %><a href="#" class="page"
-		                                        data-page="next"><?php echo $this->translate('Next'); ?></a><% } %>
+        <% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next"><?php echo $this->translate('Next'); ?></a><% } %>
 
-		<% if (lastPage != currentPage) { %><a href="#" class="page"
-		                                       data-page="last"><?php echo $lastPageCaption; ?></a><% } else { %><span><?php echo $lastPageCaption; ?></span> <% } %>
+        <% if (lastPage != currentPage) { %><a href="#" class="page" data-page="last"><?php echo $lastPageCaption; ?></a><% } else { %><span><?php echo $lastPageCaption; ?></span> <% } %>
 	</div>
 </script>
 
 <script id="imgTemplate" type="text/template">
-	<% _ . each(images, function (img){ %>
-		<div class="box">
-			<img class="lazy" src="<%= img . src %>" width="100px" data-name="<%= img . name %>"
-			     title="<%= img . name %>"/>
+	<% _.each(images, function (img){ %>
+        <div class="box">
+			<img class="lazy" src="<%= img.src %>" width="100px" data-name="<%= img.name %>" title="<%= img.name %>"/>
 		</div>
-	<% }) %>
+    <% }) %>
 </script>
 
 <script id="tagTemplate" type="text/template">
-	<input type="checkbox" name="tag[]" value="<%= tag . get('id') %>"/>
-	<span class="tag-editable" title="Click to edit"><%= tag . get('name') %></span>
-	<span class="ui-icon ui-icon-closethick"><?php echo $this->translate('Delete'); ?></span>
+	<label>
+        <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span></span>
+	    <span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
+    </label>
+	<span class="icon-remove btn btn-icon btn-link btn-error icon14" title="<?php echo $this->translate('Delete'); ?>"></span>
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
 	<option value="-1" disabled="disabled" selected="selected">select from library</option>
-	<% _ . each(items, function (item){ %>
-		<option value="<%= item . id %>"><%= item . title %></option>
-	<% }); %>
+    <% _.each(items, function (item){ %>
+        <option value="<%= item.id %>"><%= item.title %></option>
+    <% }); %>
 </script>
 
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
-	<div class="grid_5">
-		<div class="grid_4"><label>Option Name</label></div>
-		<div class="grid_8"><input type="text" class="option-title" value="${title}"/></div>
+	<div class="grid_4 alpha omega">
+        <label class="grid_4 alpha omega mt5px"><?php echo $this->translate('Option name'); ?></label>
+        <input class="grid_8 alpha omega small" type="text" class="option-title" value="${title}"/>
 	</div>
 	<div class="grid_4">
-		<div class="grid_3">
-			<label>Type</label>
-		</div>
-		<div class="grid_9">
-			<select class="option-type-select">
-				<option value="dropdown">Dropdown Box</option>
-				<option value="radio">Radio Switch</option>
-				<option value="text">Text Field</option>
-				<option value="date">Datepicker</option>
-			</select>
-		</div>
+        <label class="grid_3 alpha omega text-center mt5px"><?php echo $this->translate('Type'); ?></label>
+        <select class="option-type-select grid_9 alpha omega small">
+            <option value="dropdown">Dropdown Box</option>
+            <option value="radio">Radio Switch</option>
+            <option value="text">Text Field</option>
+            <option value="date">Datepicker</option>
+        </select>
 	</div>
-	<div class="grid_3">
-		<div class="grid_9" style="height: 26px;">
-			{{if id}}
-			&nbsp;
-			{{else}}
-			<input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate"
-			       style="margin: 5px 5px 5px 0; cursor:pointer" {{if isTemplate}}checked="checked"{{/if}} />
-			<label style="display:inline;"><?php echo $this->translate('Add to library?'); ?></label>
-			<input type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"
-			       style="width: 80%"/>
-			{{/if}}
-		</div>
-		<div class="grid_3">
-			<button class="remove-option"><?php echo $this->translate('Delete option'); ?></button>
-		</div>
+	<div class="grid_3 alpha omega text-center">
+        {{if id}}
+        &nbsp;
+        {{else}}
+        <label class="block mt5px"><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span></span> <span><?php echo $this->translate('Add to library?'); ?></span></label>
+        <input class="small" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+        {{/if}}
 	</div>
-	<div class="clear"></div>
-	<div class="option-content mt5px"></div>
+    <button class="fl-right remove-option btn-icon btn-error gray-light-bg gray icon-remove icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
+	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
 <script id="optionListTemplate" type="text/x-jquery-tmpl">
-	<div class="ui-widget-header clearfix">
+	<div class="header-inner mt15px">
 		<div class="grid_4"><?php echo $this->translate('Title'); ?></div>
-		<div class="grid_3"><?php echo $this->translate('Price modifier'); ?></div>
+		<div class="grid_3 alpha"><?php echo $this->translate('Price modifier'); ?></div>
 		<div class="grid_3"><?php echo $this->translate('Weight modifier'); ?></div>
-		<div class="grid_1"><?php echo $this->translate('Default'); ?></div>
+		<div class="grid_1 alpha omega text-center"><?php echo $this->translate('Default'); ?></div>
 		<div class="grid_1"></div>
 	</div>
-	<div class="option-list-holder mt5px">
-
-	</div>
-	<div class="clearfix grid_12 mt5px mb10px">
-		<a class="add-selection-btn" href="javascript:;">[ <?php echo $this->translate('Add new selection');?> ]</a>
-	</div>
+	<div class="option-list-holder grid_12 alpha omega"></div>
+	<a class="add-selection-btn grid_12 alpha omega mt20px btn btn-block btn-success gray-light-bg gray" href="javascript:;"><span class="icon-plus icon18"></span> <?php echo $this->translate('Add new selection');?></a>
 </script>
 
 <script id="listItemTemplate" type="text/x-jquery-tmpl">
-	<div class="grid_4">
-		<input type="text" name="title" data-role="title" value="${title}"/>
-	</div>
-	<div class="grid_3">
-		<select class="option-modifier-select" name="priceModifierSign">
-			<option value="+"
-			{{if priceSign == '+'}}selected{{/if}} >+</option>
-			<option value="-"
-			{{if priceSign == '-'}}selected{{/if}} >-</option>
-		</select>
-		<input type="text" name="priceModifierValue" value="${priceValue}" class="option-modifier-select"
-		       placeholder="0"/>
-		<select name="priceModifierType" class="option-modifier-select">
-			<option value="percent"
-			{{if priceType == 'percent'}}selected{{/if}} >%</option>
-			<option value="unit"
-			{{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
-		</select>
-	</div>
-	<div class="grid_3">
-		<select name="weightModifierSign" class="option-modifier-select">
+	<input class="grid_4 alpha" type="text" name="title" data-role="title" value="${title}"/>
+	<div class="grid_3 alpha omega">
+        <select class="option-modifier-select grid_3 alpha" name="priceModifierSign">
+            <option value="+"
+            {{if priceSign == '+'}}selected{{/if}} >+</option>
+            <option value="-"
+            {{if priceSign == '-'}}selected{{/if}} >-</option>
+        </select>
+        <input class="option-modifier-select grid_5 alpha omega" type="text" name="priceModifierValue" value="${priceValue}" placeholder="0"/>
+        <select class="option-modifier-select grid_4 omega" name="priceModifierType">
+            <option value="percent"
+            {{if priceType == 'percent'}}selected{{/if}} >%</option>
+            <option value="unit"
+            {{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
+        </select>
+    </div>
+	<div class="grid_3 omega">
+		<select class="option-modifier-select grid_3 alpha omega" name="weightModifierSign">
 			<option value="+"
 			{{if weightSign == '+'}}selected{{/if}} >+</option>
-			<option value="-"
+            <option value="-"
 			{{if weightSign == '-'}}selected{{/if}} >-</option>
 		</select>
-		<input name="weightModifierValue" type="text" class="option-modifier-select" placeholder="0"
-		       value="${weightValue}"/>
-		<span><?php echo $this->generalConfig['weightUnit']; ?></span>
+		<input class="option-modifier-select grid_7 omega" name="weightModifierValue" type="text" placeholder="0" value="${weightValue}"/>
+		<span class="grid_2 alpha omega text-center mt5px"><?php echo $this->generalConfig['weightUnit']; ?></span>
 	</div>
-	<div class="grid_1 mt8px">
-		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault ==
-		'1'}}checked="checked"{{/if}} />
-	</div>
-	<div class="grid_1">
-		<button class="item-remove">Delete item</button>
+	<label class="grid_1 text-center mt5px">
+		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} /><span></span>
+	</label>
+	<div class="grid_1 text-center mt5px">
+		<button class="item-remove btn-link btn-error icon-remove-2 icon16" title="<?php echo $this->translate('Delete item'); ?>"</button>
 	</div>
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-		<span class="ui-icon ui-icon-closethick"
-		      style="position: absolute;right: 0;top: 0; cursor: pointer;">Delete</span>
-	<% } else { %>
-	<a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>"
-	   title="<?php echo $this->translate('Edit'); ?> <%= name %>" class="clearfix" style="text-align:center;">
+        <span class="icon-remove btn btn-icon btn-link btn-error" title="Delete"></span>
+    <% } else { %>
+    <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>
-		<p class="brand"><%= brand %></p>
-		<% if (showDelete) { %>
-			<img src="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo . replace('/', '/product/') : '/system/images/noimage.png' %>"
-			     alt="<%= name %>"/>
-		<% } else { %>
-			<% if (rendered) { %>
-				<img src="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo . replace('/', '/product/') : '/system/images/noimage.png' %>"
-				     alt="<%= name %>"/>
-			<% } else { %>
-				<img class="lazy" src=""
-				     data-original="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo . replace('/', '/product/') : '/system/images/noimage.png' %>"
-				     alt="<%= name %>"/>
-			<% } %>
-		<% } %>
-		<p class="name"><%= name %></p>
+        <span class="brand"><%= brand %></span>
+		<span class="image">
+        <% if (showDelete) { %>
+            <img src="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>"/>
+        <% } else { %>
+            <% if (rendered) { %>
+                <img src="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>"/>
+            <% } else { %>
+                <img class="lazy" src="" data-original="<?php echo $this->websiteUrl; ?><%= photo ? mediaPath + photo.replace('/', '/product/') : '/system/images/noimage.png' %>" alt="<%= name %>"/>
+            <% } %>
+        <% } %>
+		</span>
+        <span class="name"><%= name %></span>
 
-		<p class="sku"><%= sku %></p>
-		<% if (!showDelete) { %>
+		<span class="sku"><%= sku %></span>
+        <% if (!showDelete) { %>
 	</a>
-<input type="checkbox" class="marker" name="marker" value=<%= id %>>
+	<label class="checkbox-del"><input type="checkbox" class="marker processed" name="marker" value=<%= id %>><span></span></label>
 <% } %>
 </script>
 
 <script id="quickPreviewTemplate" type="text/template">
-	<fieldset style="background-image:none; background-color: white; height:226px;">
-		<legend><?php echo $this->translate('Preview'); ?></legend>
-		<a href="<%= (_ . isObject(product . page) ? $('#website_url') . val() + product . page . url : '#') %>"
-		   target="_blank" style="text-decoration: none; color: inherit;">
-			<div class="ui-state-highlight textcentered mb10px" style="padding: 2px; font-size: 12px;">Click preview to
-				get to product landing page
-			</div>
-			<img src="<%= websiteUrl + mediaPath + product . photo . replace('/', '/product/') %>"
-			     style="float:left; padding: 15px; max-height: 120px"/>
+	<a href="<%= (_.isObject(product.page) ? $('#website_url').val() + product.page.url : '#') %>" target="_blank">
 
-			<p style="text-align:center; font-weight: bold;"><%= product . name %></p>
+		<span class="name"><%= product.name %></span>
 
-			<p class="mt10px"
-			   style="height: 160px;"><%= product . shortDescription . length > 300 ? product . shortDescription . slice(0, 299) + '...' : product . shortDescription %></p>
+		<span class="image background"><img src="<%= websiteUrl + mediaPath + product.photo.replace('/', '/product/') %>"/></span>
 
-			<p style="color: white; background-color: cadetBlue; text-align: right; padding: 5px 10px 5px 0; font-size: 1.5em; font-weight: bold; position:absolute; left:-5px; right:-5px; bottom:5px;">
-				<%= parseFloat(product . price) . toFixed(2) + '&nbsp;' + currency %>
-			</p>
-		</a>
-	</fieldset>
+		<span class="description"><%= product.shortDescription.length > 270 ? product.shortDescription.slice(0, 269) + '...' : product.shortDescription %></span>
+
+		<span class="price">
+			<%= parseFloat(product.price).toFixed(2) + '&nbsp;' + currency %>
+		</span>
+		<span class="info">Click preview to get to product landing page</span>
+	</a>
 </script>
 
-
-<div id="ajax_msg" class="smoke">
-	<img style="vertical-align: middle;" src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif"/>
-</div>
-<div id="manage-product" class="h520" style="padding: 0;">
-<div id="product-list" class="clearfix"
-     style="display: none; overflow: hidden; position:absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background-color: #fff;">
-	<div class="clearfix ui-widget-header">
-		<div class="grid_1 mt10px">
-			<a href="javascript:;" id="product-list-back-link" style="color:#e6e6fa;">
-				&nbsp;&laquo; <?php echo $this->translate('back'); ?></a>
+<div id="manage-product">
+    <span class="spinner"></span>
+    <div id="product-list" class="show-right">
+        <div class="header">
+            <div class="closebutton">
+                <a id="product-list-back-link" class="hide icon-chevron-right btn-icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
+            </div>
+            <div class="grid_5">
+                <label class="grid_2 alpha omega" for="product-list-search">Search</label>
+                <input class="grid_10 small mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
+            </div>
+        </div>
+        <div id="product-list-holder" class="content-footer grid_12" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
+        <div class="footer grid_12">
+			<a id="massaction" class="btn btn-link fl-left" href="javascript:;">run mass action</a>
+        	<div class="paginator"><!-- placeholder for paginator --></div>
 		</div>
-		<div class="grid_1 prefix_2 mt5px">
-			<label for="product-list-search">Search</label>
-		</div>
-		<div class="grid_5 suffix_1">
-			<input type="text" name="product-list-search" id="product-list-search"
-			       placeholder="by name, sku, mpn or tags" style="margin-top: 2px;"/>
-		</div>
-		<div class="grid_2 mt5px" style="text-align:center;">
-			<label>
-				<a id="massaction" style="color:#e6e6fa;" href="javascript:;"
-				   data-labels='{"related": "add as related", "edit": "delete selected", "set": "add to set"}'>run mass
-					action</a>
-			</label>
-		</div>
-	</div>
-	<div id="product-list-holder" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>" class="h450"
-	     style="overflow-x: hidden; overflow-y: auto; background: url('<?php echo $this->websiteUrl; ?>/system/images/bg-strip.png');"></div>
-	<div class="paginator"><!-- placeholder for paginator --></div>
-</div>
+    </div>
 
-<div id="image-select-dialog" class="ui-helper-reset"
-     style="display:none; padding: 5px 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: white;">
-	<div class="clearfix" style="border-bottom: 1px solid #777; margin-bottom: 10px;">
-		<a href="javascript:;" onclick="$('#image-select-dialog').hide('slide');$('#product-image-folder').val('0');">
-			&nbsp;&laquo; back</a>
-		<span style="margin-left: 35%"><?php echo $this->translate('select image for product'); ?></span>
-	</div>
-	<div id="image-list" style="overflow-x: hidden; overflow-y: auto;"></div>
-	<div class="paginator"></div>
-</div>
+    <div id="image-select-dialog" class="show-left">
+        <div class="header text-center">
+            <div class="closebutton">
+                <a class="hide icon-chevron-left btn-icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
+            </div>
+			<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'small mt5px grid_4 push_4'), $this->imageDirList); ?>
+        </div>
+        <div class="content-footer grid_12">
+            <div id="image-list"></div>
+        </div>
+        <div class="paginator grid_12"></div>
+    </div>
 
-<div class="closebutton">
-        <span class="help">
-                <?php echo $this->toasterHelp(Tools_Misc::SECTION_STORE_ADDEDITPRODUCT, Tools_Misc::$_helpHashMap); ?>
-        </span>
-	<span class="close"><?php echo $this->translate('Close'); ?></span></div>
+    <ul class="header text-center">
+        <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
+        <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
+        <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
+        <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
+        <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
+        <li><a href="#group-pricing-tab"><?php echo $this->translate('Group price'); ?></a></li>
+        <?php foreach ($this->plugins as $plugin) : ?>
+            <?php
+            $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+            $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+            ?>
+            <li>
+                <a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin; ?>/run/tab/"><?php echo $this->translate($title); ?></a>
+            </li>
+        <?php endforeach; ?>
+        <div class="nav-links">
+            <a href="javascript:;" data-listtype="edit" class="show-list btn btn-link" title="<?php echo $this->translate('Edit product'); ?>"><span class="icon-edit"></span></a>
+            <span class="text-line"><?php echo $this->translate('Product'); ?></span>
+            <a href="#new" id="new-product" class="btn btn-link" title="<?php echo $this->translate('New product'); ?>"><span class="icon-plus-sign"></span></a>
+        </div>
+    </ul>
+    <!--------- MAIN INFO -------------->
+    <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
 
-<ul>
-	<li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
-	<li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
-	<li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
-	<li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
-	<li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
-	<li><a href="#group-pricing-tab"><?php echo $this->translate('Group price'); ?></a></li>
-	<?php foreach ($this->plugins as $plugin) : ?>
-		<?php
-		$pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
-		$title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
-		?>
-		<li>
-			<a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin; ?>/run/tab/"><?php echo $this->translate($title); ?></a>
-		</li>
-	<?php endforeach; ?>
-	<a href="#new" id="new-product" class="nav-links first"><?php echo $this->translate('New product'); ?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
-	<a href="javascript:;" data-listtype="edit"
-	   class="nav-links show-list"><?php echo $this->translate('Edit product'); ?></a>
-</ul>
-<!--------- MAIN INFO -------------->
-<input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
-
-<div id="main-tab" class="clearfix">
-	<div class="grid_8">
-		<fieldset>
-			<div class="grid_4" style="margin-left: 0.7%;">
-				<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder'), $this->imageDirList); ?>
-				<div id="product-image-holder">
+    <div id="main-tab" class="content-footer form">
+        <div class="grid_8 alpha">
+            <fieldset>
+				<div id="product-image-holder" class="background page-preview grid_3 alpha mt15px">
 					<img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
+					<span class="icon-folder-upload hidden pt20px"><?php echo $this->translate('Choose you image');?></span>
 				</div>
-			</div>
-			<div class="grid_4">
-				<label for="product-name"><?php echo $this->translate('Product Name'); ?></label>
-			</div>
-			<div class="grid_4" style="text-align: right;">
-				<label for="product-enabled"><?php echo $this->translate('This product is enabled'); ?></label>
-			</div>
-			<div class="grid_7">
-				<input type="text" id="product-name" data-reflection="name"
-				       placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
-			</div>
-			<div class="grid_1">
-				<input type="checkbox" id="product-enabled" style="margin: 10px;"/>
-			</div>
-			<div class="grid_2">
-				<label for="product-sku">SKU</label>
-				<input type="text" id="product-sku" data-reflection="sku"
-				       placeholder="<?php echo $this->translate('item id'); ?>"/>
-			</div>
-			<div class="grid_2">
-				<label for="product-mpn">MPN</label>
-				<input type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber"/>
-			</div>
-			<div class="grid_2">
-				<label style="width:87px;"
-				       for="product-weight"><?php echo $this->translate("Weight (%1\$s)", $this->generalConfig['weightUnit']); ?></label>
-				<input type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
-			</div>
-			<div class="grid_2">
-				<label style="text-align: center; font-size: 8pt;" for="free-shipping">Free Shipping</label>
-				<input style="margin: 10px 40px;" id="free-shipping" type="checkbox"/>
-			</div>
-			<div class="grid_8">
-				<label for="product-brand"><?php echo $this->translate('Brand'); ?></label>
-			</div>
-			<div class="grid_4">
-				<select name="product-brand" id="product-brand" data-reflection="brand">
-					<option value="-1"><?php echo $this->translate('select brand'); ?></option>
+                <div class="grid_9 alpha omega">
+                    <label class="grid_7 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                    <label class="grid_5 omega fs12 text-right pointer">
+                        <?php echo $this->translate('This product is enabled'); ?>
+                        <input type="checkbox" id="product-enabled"/>
+                    </label>
+                    <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
+                </div>
+                <div class="grid_3 alpha omega labeled mt15px">
+                    <label class="grid_4 alpha omega" for="product-sku">SKU</label>
+                    <input class="grid_8 alpha omega" type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id'); ?>"/>
+                </div>
+                <div class="grid_3 omega labeled mt15px">
+                    <label class="grid_4 alpha omega" for="product-mpn">MPN</label>
+                    <input class="grid_8 alpha omega" type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber"/>
+                </div>
+                <div class="grid_3 omega labeled mt15px">
+                    <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
+                    <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
+                </div>
+				<label class="grid_1 alpha omega mt20px" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
+				<select class="grid_5 alpha omega mt15px" name="product-brand" id="product-brand" data-reflection="brand">
+					<option value="0"><?php echo $this->translate('select brand'); ?></option>
 					<?php foreach ($this->brands as $brand): ?>
 						<option value="<?php echo $brand->getName(); ?>"><?php echo $brand->getName(); ?></option>
 					<?php endforeach; ?>
 				</select>
-			</div>
-			<div class="grid_4">
-				<input type="text" name="" id="new-brand"
-				       placeholder="<?php echo $this->translate('or create new'); ?>">
-			</div>
-			<div class="clear"></div>
-		</fieldset>
+<!--				<input class="grid_3 omega mt15px" type="text" name="" id="new-brand"  placeholder="--><?php //echo $this->translate('or create new'); ?><!--">-->
+				<label class="grid_3 omega mt20px text-right pointer"><input id="free-shipping" type="checkbox"/><?php echo $this->translate('Free Shipping'); ?></label>
+            </fieldset>
 
-		<div class="mt5px">
-			<div id="description-box">
-				<?php
-				$lexemShortDescription = $this->translate('Short description');
-				$lexemFullDescription = $this->translate('Full description');
-				?>
-				<ul>
-					<li><a href="#short-description-tab"><?php echo $lexemShortDescription; ?></a></li>
-					<li><a href="#full-description-tab"><?php echo $lexemFullDescription; ?></a></li>
-				</ul>
-				<div id="short-description-tab">
-					<textarea id="product-shortDescription" class="h170" data-reflection="shortDescription"
-					          placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
-				</div>
-				<div id="full-description-tab">
-					<textarea id="product-fullDescription" class="h170" data-reflection="fullDescription"
-					          placeholder="<?php echo $lexemFullDescription; ?>"></textarea>
-				</div>
+            <div class="mt20px">
+                <div id="description-box" class="tabs-gray">
+                    <?php
+                        $lexemShortDescription = $this->translate('Short description');
+                        $lexemFullDescription = $this->translate('Full description');
+                    ?>
+                    <ul>
+                        <li><a href="#short-description-tab"><?php echo $lexemShortDescription; ?></a></li>
+                        <li><a href="#full-description-tab"><?php echo $lexemFullDescription; ?></a></li>
+                    </ul>
+                    <div id="short-description-tab">
+                        <textarea id="product-shortDescription" data-reflection="shortDescription"
+                                  placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
+                    </div>
+                    <div id="full-description-tab">
+                        <textarea id="product-fullDescription" data-reflection="fullDescription"
+                                  placeholder="<?php echo $lexemFullDescription; ?>"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End grid_8-->
+        <div class="grid_4 omega">
+            <fieldset>
+                <div class="grid_12 alpha omega">
+                    <label for="product-pageTemplate">Select a product page template</label>
+                    <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
+                        <option value="-1" disabled="disable">Select Template</option>
+						<?php foreach ($this->templateList as $tmpl) : ?>
+							<option value="<?php echo $tmpl->getName(); ?>"><?php echo $tmpl->getName(); ?></option>
+						<?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="grid_6 alpha labeled mt15px">
+                    <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->generalConfig['currency']; ?></label>
+                    <input class="grid_8 alpha omega" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
+                </div>
+                <div class="grid_6 omega labeled mt15px">
+                    <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
+                    <input class="grid_8 alpha omega" type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
+                </div>
+                <div class="grid_12 alpha omega mt15px">
+                    <label class="mt5px grid_2 alpha" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
+                    <select class="grid_10 omega" name="taxes" id="product-taxClass" data-reflection="taxClass">
+                        <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
+                        <option value="1"><?php echo $this->translate('Default'); ?></option>
+                        <option value="2"><?php echo $this->translate('Alternative'); ?></option>
+                        <option value="3"><?php echo $this->translate('Alternative 2'); ?></option>
+                    </select>
+                </div>
+            </fieldset>
+        </div>
+        <div id="preview-box" class="grid_4 omega tabs-gray mt20px">
+			<ul>
+				<li><a href="#quick-preview"><?php echo $this->translate('Preview'); ?></a></li>
+				<li><a href="#merchandising"><?php echo $this->translate('Merchandising'); ?></a></li>
+			</ul>
+			<div id="quick-preview">
 			</div>
+			<div id="merchandising">
+			</div>
+        </div>
+    </div>
+
+    <div id="tag-tab" class="content-footer">
+        <div class="grid_4 mt5px">
+            <a href="javascript" id="toggle-current-tags">[ show only selected ] </a>
+        </div>
+		<div class="grid_4 alpha omega">
+			<input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
 		</div>
-	</div>
-	<!--End grid_8-->
-	<div class="grid_4">
-		<fieldset>
-			<div class="grid_5 alpha">
-				<label class="mt5px" for="product-price">Price (in <span
-							id="currency-unit"><?php echo $this->generalConfig['currency']; ?></span>)</label>
-			</div>
-			<div class="grid_7">
-				<input type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
-			</div>
-			<div class="grid_5 alpha">
-				<label class="mt5px" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
-			</div>
-			<div class="grid_7">
-				<select name="taxes" id="product-taxClass" data-reflection="taxClass">
-					<option value="0"><?php echo $this->translate('Non taxable'); ?></option>
-					<option value="1"><?php echo $this->translate('Default'); ?></option>
-					<option value="2"><?php echo $this->translate('Alternative'); ?></option>
-					<option value="3"><?php echo $this->translate('Alternative 2'); ?></option>
-				</select>
-			</div>
-			<div class="grid_5 alpha">
-				<label class="mt5px" for="product-inventory"><?php echo $this->translate('Stock qty'); ?></label>
-			</div>
-			<div class="grid_7">
-				<input type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
-			</div>
-			<div class="grid_12 alpha">
-				<label for="product-pageTemplate">Select a product page template</label>
-				<select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
-					<option value="-1" disabled="disable">Select Template</option>
-					<?php foreach ($this->templateList as $tmpl) : ?>
-						<option value="<?php echo $tmpl->getName(); ?>"><?php echo $tmpl->getName(); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</div>
-		</fieldset>
-	</div>
-	<div id="quick-preview" class="grid_4" style="overflow: hidden;"></div>
-</div>
+        <div class="paginator">
+            <!-- placeholder for pagination -->
+        </div>
 
-<div id="tag-tab" class="clearfix">
-	<div class="grid_3 mt10px textcentered">
-		<a href="javascript" id="toggle-current-tags">[ show only selected ] </a>
-	</div>
-	<div class="grid_4 prefix_1 suffix_4 mb5px" style="text-align:center;">
-		<input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>"
-		       data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
-	</div>
+        <div id="product-tags-current" class="product-tags grid_12 alpha omega" style="display:none;"></div>
 
-	<div id="product-tags-current" class="product-tags mb5px grid_12 bottomdashed"
-	     style="display:none; max-height: 120px; overflow-y: auto;">
-	</div>
+        <div id="product-tags-available" class="product-tags grid_12 alpha omega"></div>
+    </div>
+    <!-- #tag-tab -->
 
-	<div id="product-tags-available" class="h350 grid_12 product-tags" style="position: relative;">
-		<div class="spinner bg"></div>
-	</div>
-	<div class="paginator">
-		<!-- placeholder for pagination -->
-	</div>
-</div>
-<!-- #tag-tab -->
+    <div id="options-tab" class="content-footer">
+        <div class="grid_6 prefix_3 suffix_3">
+            <select id="option-library" class="grid_5 alpha omega" name="option-library">
+                <option value="-1" disabled="disabled">select from library</option>
+            </select>
+            <span class="grid_2 alpha omega or">or</span>
+            <button id="add-new-option-btn" class="grid_5 alpha omega">Create new option</button>
+        </div>
+        <div id="options-holder" class="grid_12 alpha omega"></div>
+    </div>
+    <!-- End Tab 3 -->
 
-<div id="options-tab" class="clearfix">
-	<div class="grid_6 prefix_3 suffix_3 mb5px" style="text-align:center;">
-		<button id="add-new-option-btn">Create new option</button>
-		or
-		<select name="option-library" id="option-library" style="width: 230px;">
-			<option value="-1" disabled="disabled">select from library</option>
-		</select>
-	</div>
-	<div id="options-holder" class="clearfix h380 grid_12" style="overflow-y: auto;">
+    <div id="related-tab" class="content-footer">
+        <div id="related-holder" class="grid_12 alpha omega">
+            <a href="javascript:;" data-listtype="related" class="show-list productlisting" title="<?php echo $this->translate('Add related'); ?>"><span class="icon-plus-sign icon48"></span></a>
+            <span class="spinner"></span>
+        </div>
+    </div>
 
-	</div>
-</div>
-<!-- End Tab 3 -->
+    <div id="coupon-tab" class="content-footer">
+        <p class="blockquote info fs12 hidden"><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
+        <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+    </div>
 
-<div id="related-tab" class="clearfix">
-	<div class="grid_12 mb5px">
-		<a href="javascript:;" data-listtype="related" class="show-list"
-		   title="<?php echo $this->translate('Add related'); ?>">
-			&#10010; <?php echo $this->translate('Add related'); ?></a>
-	</div>
-	<div id="related-holder" class="grid_12">
-
-	</div>
-</div>
-
-<div id="coupon-tab" class="clearfix">
-	<div class="padding5px">
-		<p style="text-align: center"><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
-		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
-	</div>
-</div>
-
-<div id="group-pricing-tab" class="clearfix">
-	<div class="padding5px">
-		<p style="text-align: center; font-weight: bold;"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></p>
-		<?php echo $this->partial('product/grouping-price.phtml'); ?>
-	</div>
-</div>
-
-<div class="grid_12 mb10px">
-	<a href="javascript:;" class="delete-selected" style="margin-left: 10px;"
-	   alt="<?php echo $this->translate('Delete this product'); ?>" id="delete"
-	   style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
-	<input type="submit" name="submit" id="submit" value="Save"/>
-</div>
+    <div id="group-pricing-tab" class="content-footer">
+        <p class="blockquote fs12 mb10px hidden"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
+        <?php echo $this->partial('product/grouping-price.phtml'); ?>
+    </div>
+    <div class="grid_12 footer">
+        <a href="javascript:;" class="delete-selected btn btn-link btn-error mt5px" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
+		<button type="submit" name="submit" id="submit" value="Save"/><span class="icon-save"></span> <?php echo $this->translate('Save product'); ?></button>
+    </div>
 </div>
 
 <script>
 	(function () {
-		$('div.seotoaster > div.ui-widget-header:first').remove();
-		$('#manage-product,#description-box').tabs();
+		$('#manage-product,#description-box, #preview-box').tabs();
 		$(".ui-tabs-nav, .ui-tabs-nav > *")
 				.removeClass("ui-corner-all")
 				.addClass("ui-corner-top");
@@ -499,5 +410,4 @@ $lastPageCaption = $this->translate('Last');
 	});
 </script>
 
-<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/libs/require.min.js"
-        data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/modules/product/config"></script>
+<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/libs/require.min.js" data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/modules/product/config"></script>

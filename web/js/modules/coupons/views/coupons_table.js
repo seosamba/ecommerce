@@ -27,7 +27,7 @@ define([
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
                 "bPaginate": true,
-                "iDisplayLength": 7,
+                "iDisplayLength": 9,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs
             });
@@ -56,7 +56,7 @@ define([
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
                 coupon.get('action'),
-                '<a data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;">[x]</a>'
+                '<a class="icon-remove-2 btn-link btn-error" data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;"></a>'
             ]);
         },
         deleteCoupon: function(e){

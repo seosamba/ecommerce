@@ -20,7 +20,7 @@ define([
 
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 7,
+                "iDisplayLength": 12,
                 "bPaginate": true,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs
@@ -37,7 +37,7 @@ define([
         renderGroups: function(){
             this.$el.fnClearTable();
             this.groups.each(this.renderGroup, this);
-            $('#group-pricing .dataTables_paginate')[0].style.display = "none";
+           // $('#group-pricing .dataTables_paginate')[0].style.display = "none";
         },
         renderGroup: function(group){
             var priceType = $('.group-currency').val();
@@ -51,8 +51,7 @@ define([
             this.$el.fnAddData([
                 '<span class="groupName-table">'+group.get('groupName')+'</span>',
                 '<span>'+priceSign+' '+group.get('priceValue')+' '+priceType+'</span>',
-                '<a data-role="edit" data-cid="'+group.get('id')+'" href="javascript:;">[edit]</a> <a data-role="delete" data-cid="'+group.get('id')+'" href="javascript:;">[x]</a>',
-
+                '<a class="icon-pencil btn-link icon14" data-role="edit" data-cid="'+group.get('id')+'" href="javascript:;"></a> <a class="icon-remove-2 btn-link btn-error icon14" data-role="delete" data-cid="'+group.get('id')+'" href="javascript:;"></a>',
             ]);
         },
         deleteGroup: function(e){
@@ -76,8 +75,8 @@ define([
                 $('#group-sign').val(responce[0].priceSign).attr('selected',true);
                 $('#priceValue').val(responce[0].priceValue);
                 $('#priceValue').focus();
-
-            })}
+            })
+        }
     });
 
     return GroupsTableView;
