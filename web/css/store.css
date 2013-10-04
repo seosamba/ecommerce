@@ -94,7 +94,7 @@
   color: #666666;
   font-weight: bold;
   background: #eaeaea;
-  padding: 3px 0;
+  padding: 4px 0;
 }
 #manage-product #product-list-holder .productlisting .image,
 #manage-product #related-holder .productlisting .image {
@@ -106,14 +106,14 @@
 #manage-product #product-list-holder .productlisting .name,
 #manage-product #related-holder .productlisting .name {
   height: 30px;
-  padding: 3px 4px;
+  padding: 4px 4px;
   margin-bottom: 5px;
 }
 #manage-product #product-list-holder .productlisting .sku,
 #manage-product #related-holder .productlisting .sku {
   color: #666666;
   text-align: right;
-  padding: 3px 8px;
+  padding: 4px 8px;
   background: #eaeaea;
 }
 #manage-product #product-list-holder .productlisting .checkbox-del,
