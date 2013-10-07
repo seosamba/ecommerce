@@ -31,6 +31,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const RESOURCE_API = 'api';
 
+    /**
+     * quote gateway
+     */
+    const GATEWAY_QUOTE = 'Quote';
+
 	/**
 	 * Resource describes store management widgets and screens
 	 */
@@ -564,8 +569,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * Generates product grid
-	 * for admins only
+	 * Generates product grid for admins only
+     *
 	 * @return string Widget html content
 	 */
 	protected function _makeOptionProducts() {
@@ -604,7 +609,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
 				})),
 				'pending'   => sizeof(array_filter($orders, function ($order) {
-					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING;
+					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== self::GATEWAY_QUOTE);
 				})),
 				'shipped'   => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED;
@@ -612,6 +617,12 @@ class Shopping extends Tools_Plugins_Abstract {
 				'delivered' => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
 				}))
+                //'customer_charged' => sizeof(array_filter($orders, function ($order) {
+                    //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() === self::GATEWAY_QUOTE);
+                //})),
+                //'customer_not_charged' => sizeof(array_filter($orders, function ($order) {
+                    //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === self::GATEWAY_QUOTE);
+                //}))
 			);
 			$this->_view->orders = $orders;
 		}
@@ -898,4 +909,55 @@ class Shopping extends Tools_Plugins_Abstract {
 			}, $productImages)
 		);
 	}
+
+    public function editAccountAction(){
+        if ($this->_request->isPost() && $this->_sessionHelper->getCurrentUser()->getRoleId() != Tools_Security_Acl::ROLE_GUEST) {
+            $data = $this->_request->getParams();
+            $form = new Forms_User();
+            if ($form->isValid($data)) {
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $userData = $userMapper->find($this->_sessionHelper->getCurrentUser()->getId());
+                if($userData instanceof Application_Model_Models_User){
+                    $userExistingPassword = $userData->getPassword();
+                    if($userExistingPassword != md5($data['currentPassword'])){
+                        $this->_responseHelper->fail($this->_translator->translate('Current password not valid'));
+                    }
+                    $where = $userMapper->getDbTable()->getAdapter()->quoteInto("id <> ?", $this->_sessionHelper->getCurrentUser()->getId());
+                    $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
+                    $emailAlreadyExist = $userMapper->fetchAll($where);
+                    if(!empty($emailAlreadyExist)){
+                        $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                    }
+                    $userData->setPassword($data['newPassword']);
+                    $userData->setEmail($data['newEmail']);
+                    $userMapper->save($userData);
+                    $userData->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_USER_ACCOUNT
+                    )));
+                    $userData->notifyObservers();
+                }else{
+                    $this->_responseHelper->fail($this->_translator->translate('Autification failed'));
+                }
+                $this->_responseHelper->success(array('message'=>$this->_translator->translate('New account information send at your email'), 'email'=> $data['newEmail']));
+            }else{
+                $errorMessage = $form->getErrors();
+                $singleMessage = 0;
+                if(!empty($errorMessage)){
+                    $resultMessage = '';
+                    foreach($errorMessage as $message){
+                        foreach($message as $msg){
+                            if($msg != ''){
+                                if($singleMessage == 0){
+                                    $singleMessage = 1;
+                                    $resultMessage .= $this->_translator->translate($msg).' </br>';
+                                }
+                            }
+                        }
+                    }
+                    $this->_responseHelper->fail($resultMessage);
+                }
+
+            }
+        }
+    }
 }

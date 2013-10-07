@@ -85,10 +85,13 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
                     }
                 }
                 $pathToCropPreview = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'] . 'crop';
-                $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . str_replace('/', '/small/' , $this->_object->getPhoto());
+	            list($folder, $imgName) = explode('/', $this->_object->getPhoto());
+                $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder .DIRECTORY_SEPARATOR.'small'.DIRECTORY_SEPARATOR.$imgName;
                 $pagePreviewImg = $savePath.strtolower($uniqName).'.'.pathinfo($productImg, PATHINFO_EXTENSION);
                 if (is_file($productImg) && copy($productImg, $pagePreviewImg)) {
-                    Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, $pathToCropPreview, true);
+                    if (Tools_Image_Tools::resize($pagePreviewImg, $miscConfig['pageTeaserSize'], true, $pathToCropPreview, true)){
+	                    $pageMapper->save($page->setPreviewImage(Tools_Filesystem_Tools::basename($pagePreviewImg)));
+                    }
                 }
             }
 			$page->notifyObservers();

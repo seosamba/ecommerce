@@ -1,0 +1,178 @@
+<div id="user-grid-part">
+        <ul class="user-stats clearfix">
+            <?php foreach ($this->stats as $status => $value) : ?>
+                <?php if($status != Models_Model_CartSession::CART_STATUS_NEW):?>
+                    <?php if($status == 'all'):?>
+                        <li class="<?php echo $status;?> active" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
+                    <?php else:?>
+                        <li class="<?php echo $this->translate('cs_'.$status);?>" data-sort="<?php echo $this->translate('cs_'.$status);?>"><?php echo $this->translate('cs_'.$status);?></li>
+                    <?php endif;?>
+                <?php endif;?>
+            <?php endforeach; ?>
+        </ul>
+        <div class="user-orders-range">
+            <label><?php echo $this->translate('Date range');?></label>
+            <input type="text" id="user-orders-filter-fromdate" name="filter-from-date">
+            <label><?php echo $this->translate('to');?></label>
+            <input type="text" id="user-orders-filter-todate" name="filter-to-date">
+        </div>
+        <table id="user-orders-table" border="1" class="widget">
+            <thead>
+            <tr class="user-orders-title-table">
+                <th><?php echo $this->translate('Order date');?></th>
+                <th><?php echo $this->translate('Details');?></th>
+                <th><?php echo $this->translate('Total');?></th>
+                <th><?php echo $this->translate('Shipping');?></th>
+                <th><?php echo $this->translate('Tracking ID');?></th>
+                <th class="user-status-th"><?php echo $this->translate('Status');?></th>
+                <?php if(isset($this->invoicePlugin)):?>
+                    <th><?php echo $this->translate('Invoice');?></th>
+                <?php endif;?>
+            </tr>
+            </thead>
+            <tbody>
+            <?php if ($this->orders): ?>
+                <?php foreach ($this->orders as $order):?>
+                    <tr data-role="cart" data-id="<?php echo $order->getId();?>">
+                        <td><?php echo date("d-M-Y", strtotime($order->getCreatedAt()));?></td>
+                        <td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
+                        <td><?php echo $this->currency(floatval($order->getTotal()));?></td>
+                        <td class="user-orders-shipping-data">
+                            <?php if($order->getShippingPrice() != 0):?>
+                               <p><?php echo $this->currency(floatval($order->getShippingPrice()));?></p>
+                            <?php endif;?>
+                            <?php if($order->getShippingType() != ''):?>
+                                <p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
+                            <?php else:?>
+                                <p><?php echo $order->getShippingService();?></p>
+                            <?php endif;?>
+                        </td>
+                        <td>
+                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
+                                <?php if($order->getShippingTrackingId() != ''):?>
+                                    <p class="textcentered">
+                                        <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Track your parcel')?></a>
+                                    </p>
+                                <?php else:?>
+                                    <p> - </p>
+                                <?php endif;?>
+                              <?php else:?>
+                                <p> - </p>
+                             <?php endif;?>
+                        </td>
+                        <td class="user-order-current-status"><?php echo $this->translate('cs_'.$order->getStatus());?></td>
+                        <?php if(isset($this->invoicePlugin)):?>
+                            <td>
+                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
+                                    <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
+                                        <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
+                                    </a>
+                                <?php endif;?>
+                            </td>
+                        <?php endif;?>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+        </table>
+</div>
+<script>
+    $.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
+       $(function(){
+            var oTable = $('#user-orders-table').dataTable({
+                iDisplayLength:10,
+                "sPaginationType": "full_numbers",
+                sDom: 't,p',
+                aaSorting: [[ 1, "desc" ]],
+                aoColumnDefs: [
+                    {bSortable: false, aTargets: [-1]}
+                ],
+                oLanguage: {
+                    sEmptyTable: "<?php echo $this->translate('You do not have any orders'); ?>",
+                    "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>",
+                    "oPaginate": {
+                        "sFirst": "<?php echo $this->translate('First');?>",
+                        "sLast" : "<?php echo $this->translate('Last');?>",
+                        "sPrevious" : "<?php echo $this->translate('Previous');?>",
+                        "sNext" : "<?php echo $this->translate('Next');?>"
+                    }
+                }
+            });
+            $('ul.user-stats').on('click', 'li', function(e){
+                var filter = $(this).data('sort');
+                $('.user-stats li').removeClass('active');
+                $('.user-stats .'+filter+'').addClass('active');
+                if (filter === 'all'){
+                    filter = '';
+                }
+                oTable.fnFilter(filter);
+            });
+
+            $('#user-orders-filter-fromdate').datepicker({
+                dateFormat: 'd-M-yy',
+                defaultDate: "+1w",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "c-5:c+5",
+                onSelect: function(){
+                    if($('#user-orders-filter-todate').val() != ''){
+                        oTable.fnDraw();
+                    }
+
+
+                }
+            });
+            $('#user-orders-filter-todate').datepicker({
+                dateFormat: 'd-M-yy',
+                defaultDate: "+1w",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "c-5:c+5",
+                onSelect: function(){
+                    if($('#user-orders-filter-fromdate').val() != ''){
+                        oTable.fnDraw();
+                    }
+                }
+            });
+        });
+        $.fn.dataTableExt.afnFiltering.push(
+            function( oSettings, aData, iDataIndex ) {
+                var fromDate = $('#user-orders-filter-fromdate').val();
+                var toDate = $('#user-orders-filter-todate').val();
+                if(fromDate == '' || toDate == ''){
+                    return true;
+                }
+                var startDateCol = 0;
+                var endDateCol = 0;
+                var monthAbbr = [{'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr':4, 'May': 5, 'Jun':6, 'Jul': 7, 'Aug': 8, 'Sep':9, 'Oct':10, 'Nov':11, 'Dec':12}];
+                if(fromDate != '' && toDate != ''){
+                    var firstFromDate = fromDate.split('-');
+                    var secondFromDate = toDate.split('-');
+                    var fromDate = new Date(firstFromDate[2], monthAbbr[0][firstFromDate[1]], firstFromDate[0]).getTime();
+                    var toDate = new Date(secondFromDate[2], monthAbbr[0][secondFromDate[1]], secondFromDate[0]).getTime();
+                }else{
+                    fromDate = '';
+                    toDate = '';
+                }
+                var partsStartColumnDate = aData[startDateCol].split('-');
+                var partsFinishColumnDate = aData[endDateCol].split('-');
+                var datoStart = new Date(partsStartColumnDate[2], monthAbbr[0][partsStartColumnDate[1]], partsStartColumnDate[0]).getTime();
+                var datoFinal = new Date(partsFinishColumnDate[2], monthAbbr[0][partsFinishColumnDate[1]], partsFinishColumnDate[0]).getTime();
+                if ( fromDate == "" && toDate == "" ){
+                    return true;
+                }
+                else if (fromDate <= datoStart && toDate == ""){
+                    return true;
+                }
+                else if (toDate >= datoFinal && fromDate == ""){
+                    return true;
+                }
+                else if (fromDate <= datoStart && toDate >= datoFinal){
+                    return true;
+                }
+                return false;
+            }
+        );
+
+
+</script>

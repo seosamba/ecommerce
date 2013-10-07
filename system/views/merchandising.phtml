@@ -7,17 +7,17 @@
 
 <div id="merchandising">
     <ul class="header">
-        <li><a href="#coupons"><?php echo $this->translate('Coupons'); ?></a></li>
-        <?php if(isset($this->plugins) && !empty($this->plugins)): ?>
-            <?php foreach($this->plugins as $plugin) : ?>
-                <?php
-                $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
-                $title       = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
-                ?>
-                <li><a href="<?php echo $this->websiteUrl . 'plugin/' . $plugin . '/run/merchandising'; ?>"><?php echo $this->translate($title); ?></a></li>
+        <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
+	    <?php if (isset($this->plugins) && !empty($this->plugins)):?>
+            <?php foreach ($this->plugins as $plugin) :?>
+			    <?php
+	            $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+	            $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
+	            ?>
+	    <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
             <?php endforeach; ?>
         <?php endif; ?>
-        <li><a href="#group-pricing"><?php echo $this->translate('Customers groups'); ?></a></li>
+        <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
 	</ul>
 	<div id="coupons" class="content-footer">
 		<?php echo $this->partial('merchandising/coupon.phtml'); ?>

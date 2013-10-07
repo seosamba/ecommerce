@@ -31,6 +31,10 @@ class Forms_Shipping_FreeShipping extends Zend_Form {
 				self::DESTINATION_BOTH          => 'Both'
 			)
 		));
+
+        $this->addElement('text', 'errormessage', array(
+            'label' => 'Error message at the checkout page'
+        ));
 	}
 
 

@@ -61,7 +61,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 				<label style="display: block;margin: 10px; text-align: justify"><?php echo $this->translate('When this option is checked user will be given the option to pick their stuff up at your store location.'); ?></label>
 			</div>
 			<div id="freeshipping">
-				<header>Free shipping</header>
+				<header><?php echo $this->translate('Free shipping');?></header>
 				<?php $this->freeForm->setAction($this->url(array('run' => 'bundledshipper')));?>
 				<form class="clearfix" action="<?php echo $this->freeForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
 					<?php echo $this->freeForm->getElement('shipper')->renderViewHelper(); ?>
@@ -74,6 +74,10 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 					<div class="grid_3">
 						<?php echo $this->freeForm->getElement('destination')->renderViewHelper();?>
 					</div>
+                    <label class="grid_12 mt10px"><?php echo $this->freeForm->getElement('errormessage')->getLabel();?>:</label>
+                    <div class="grid_12">
+                        <?php echo $this->freeForm->getElement('errormessage')->renderViewHelper();?>
+                    </div>
 				</form>
 			</div>
 		</div>

@@ -163,8 +163,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 			$select->from(array('t' => 'shopping_tags'), null)
                 ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
-				->where('pt.tag_id IN (?)', $tags)
-				->having('COUNT(*) = ?', sizeof($tags));
+				->where('pt.tag_id IN (?)', $tags);
+				//->having('COUNT(*) = ?', sizeof($tags));
 		}
 
         if ((bool)$search) {

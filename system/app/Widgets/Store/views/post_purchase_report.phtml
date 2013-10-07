@@ -1,7 +1,7 @@
 <?php $countries = Tools_Geo::getCountries(true); ?>
 <?php if (!isset($this->mailReport)): ?>
 	<div class="post-purchase">
-	<h3 class="post-purchase-report-customer-order-id">Order number # <?php echo $this->cart->getId();?></h3>
+	<h3 class="post-purchase-report-customer-order-id"><?php echo $this->translate('Order number');?> # <?php echo $this->cart->getId();?></h3>
 
 	<p class="createdOrderDate"><?php echo date("d-M-Y", strtotime($this->cart->getCreatedAt()));?></p>
 
@@ -126,7 +126,7 @@
 						<a class="page-teaser-image"
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
 						   title="<?php echo $product['name']; ?>" target="_blank">
-							<img src="<?php echo $this->websiteUrl; ?>/media/<?php echo str_replace('/', '/product/', $product['photo']); ?>"
+							<img src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
 							     alt="<?php echo $product['name']; ?>"/>
 						</a>
 					<?php else: ?>
@@ -328,7 +328,7 @@
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
 						   title="<?php echo $product['name']; ?>" target="_blank">
 							<img style="width:60px; vertical-align:middle"
-							     src="<?php echo $this->websiteUrl; ?>/media/<?php echo str_replace('/', '/product/', $product['photo']); ?>"
+							     src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
 							     alt="<?php echo $product['name']; ?>"/>
 						</a>
 					<?php else: ?>

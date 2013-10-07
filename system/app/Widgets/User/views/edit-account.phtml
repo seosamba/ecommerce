@@ -1,0 +1,45 @@
+<form name="user-edit-account" id="user-edit-account" action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/editAccount/" method='post' enctype="multipart/form-data">
+    <p><label><?php echo $this->translate('Current email');?>:</label>
+    <p><span class="user-current-email"><?php echo $this->currentEmail;?></span></p>
+    <input type="hidden" name="currentEmail" value="<?php echo $this->currentEmail;?>" />
+    <p><?php echo $this->userForm->getElement('newEmail')->renderLabel(); ?></p>
+    <p><?php echo $this->userForm->getElement('newEmail')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('newEmailConfirm')->renderLabel(); ?></p>
+    <p><?php echo $this->userForm->getElement('newEmailConfirm')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('currentPassword')->renderLabel(); ?></p>
+    <p><?php echo $this->userForm->getElement('currentPassword')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('newPassword')->renderLabel(); ?></p>
+    <p><?php echo $this->userForm->getElement('newPassword')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('newPasswordConfirm')->renderLabel(); ?></p>
+    <p><?php echo $this->userForm->getElement('newPasswordConfirm')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('saveUser')->renderViewHelper(); ?></p>
+ </form>
+
+<script type="text/javascript">
+    $(function() {
+        var form = $('#user-edit-account');
+        $(document).on('submit', '#user-edit-account', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url      : form.attr('action'),
+                    type     : 'post',
+                    data     : form.serialize(),
+                    beforeSend: showSpinner,
+                    dataType :'json',
+                    success  : function(response) {
+                        hideSpinner();
+                        if(response.error) {
+                            showMessage(response.responseText, response.error);
+                        } else {
+                            $('#user-edit-account').find(':input[type=text]').val('');
+                            $('#user-edit-account').find(':input[type=password]').val('');
+                            $('.user-current-email').html(response.responseText.email);
+                            showMessage(response.responseText.message);
+                        }
+                    }
+                });
+
+        });
+
+    });
+</script>

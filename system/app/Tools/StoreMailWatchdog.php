@@ -15,6 +15,12 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_CUSTOMER    = 'customer';
 
+    const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
+
+    const SHIPPING_TYPE = 'shipping';
+
+    const BILLING_TYPE = 'billing';
+
 	private $_options;
 
 	/**
@@ -252,9 +258,13 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 				->objectToDictionary($customer)
 				->objectToDictionary($this->_object, 'order');
-        $dictionaryWithaddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId());
-        if(isset($dictionaryWithaddress)){
-            $this->_entityParser->addToDictionary(array('order:shippingaddress'=>$dictionaryWithaddress));
+        $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
+        if(isset($withBillingAddress)){
+            $this->_entityParser->addToDictionary(array('order:billingaddress'=> $withBillingAddress));
+        }
+        if(isset($withShippingAddress)){
+            $this->_entityParser->addToDictionary(array('order:shippingaddress'=> $withShippingAddress));
         }
         $currency = '';
         if(Zend_Registry::isRegistered('Zend_Currency')){
@@ -322,13 +332,33 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 			->objectToDictionary($this->_object, 'order')
 			->objectToDictionary($customer);
+        $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
+        if(isset($withBillingAddress)){
+            $this->_entityParser->addToDictionary(array('order:billingaddress'=> $withBillingAddress));
+        }
+        if(isset($withShippingAddress)){
+            $this->_entityParser->addToDictionary(array('order:shippingaddress'=> $withShippingAddress));
+        }
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
 		return $this->_send();
 	}
+
+    private function _sendNewuseraccountMail(){
+        $systemConfig = $this->_configHelper->getConfig();
+        $this->_mailer->setMailToLabel($this->_object->getFullName())
+            ->setMailTo($this->_object->getEmail());
+        $this->_entityParser
+            ->objectToDictionary($this->_object);
+        return $this->_send();
+    }
     
-    private function _prepareAdddress($address, $shippingAddressId){
+    private function _prepareAdddress($address, $addressId, $type){
        foreach($address->getAddresses() as $addressData){
-           if($addressData['id'] == $shippingAddressId){
+           if($addressData['id'] == $addressId){
+               foreach($addressData as $el => $value){
+                   $this->_entityParser->addToDictionary(array('order:'.$type.$el => $value));
+               }
                if(isset($addressData['state']) && $addressData['state'] != ''){
                     $state = Tools_Geo::getStateById($addressData['state']);
                     return $addressData['firstname'].' '.$addressData['lastname'].' '.$addressData['address1'].' '.$addressData['address2'].' '.$addressData['city'].' '.$state['state'].' '.$addressData['zip'].' '.$addressData['country'];

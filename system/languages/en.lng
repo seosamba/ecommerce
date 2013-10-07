@@ -1,0 +1,9 @@
+<?php return array(
+	'cs_new'        => 'Abandoned carts',
+	'cs_completed'  => 'Payment Received',
+	'cs_shipped'    => 'Items Shipped',
+	'cs_refunded'   => 'Refunded purchase',
+	'cs_delivered'  => 'Items Delivered',
+	'cs_new_quote'  => 'New quote',
+	'cs_quote_sent' => 'Quote Sent'
+);

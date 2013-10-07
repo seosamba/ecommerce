@@ -29,7 +29,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
 		if (isset($shoppingConfig[Shopping::SHIPPING_TOC_STATUS]) && (bool)$shoppingConfig[Shopping::SHIPPING_TOC_STATUS]){
-			if (!isset($shoppingConfig[$shoppingConfig[Shopping::SHIPPING_TOC_LABEL]]) || empty($shoppingConfig[Shopping::SHIPPING_TOC_LABEL]) ){
+			if (!isset($shoppingConfig[Shopping::SHIPPING_TOC_LABEL]) || empty($shoppingConfig[Shopping::SHIPPING_TOC_LABEL]) ){
 				$tocPage = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_STORE_SHIPPING_TERMS);
 				$shippingTocLabel = 'I authorize the parcel to be left at the delivery address without signature.';
 		        if(!empty($tocPage)){

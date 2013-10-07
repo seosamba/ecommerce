@@ -97,6 +97,9 @@ class Api_Store_Tags extends Api_Service_Abstract {
 		$rawData = json_decode($this->_request->getRawBody(), true);
 		if (!empty($rawData)) {
 			$rawData['name'] = ucfirst($rawData['name']);
+			if (strpos($rawData['name'], ',') !== false){
+				$this->_error('Tag should not contain comma in name', self::REST_STATUS_BAD_REQUEST);
+			}
 			$result = Models_Mapper_Tag::getInstance()->save($rawData);
 		} else {
 			$this->_error();

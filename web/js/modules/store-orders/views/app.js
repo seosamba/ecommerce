@@ -1,10 +1,11 @@
 define(['backbone',
     '../collections/orders',
     './order',
-    'text!../templates/paginator.html'
+    'text!../templates/paginator.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl
+        PaginatorTmpl,i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -48,13 +49,15 @@ define(['backbone',
         render: function(){},
         renderOrder: function(order){
             order.set({useInvoice: $('#invoiceEnable').val()});
+            order.set({i18n: i18n});
             var view = new OrdersView({model: order});
             this.$('#orders-list').append(view.render().el);
         },
         renderOrders: function(){
             this.$('#orders-list').empty();
             this.orders.each(this.renderOrder.bind(this));
-            this.$('td.paginator').html(this.templates.paginator(this.orders.info()));
+            this.orders.info()['i18n'] = i18n;
+            this.$('td.paginator').html(this.templates.paginator(this.orders.information));
         },
         applyFilter: function(){
             this.orders.pager();
@@ -127,7 +130,7 @@ define(['backbone',
                     el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
                 },
                 success: function(response) {
-                    showMessage('Saved', response.hasOwnProperty('error') && response.error);
+                    showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
                     if (!response.error && response.hasOwnProperty('responseText')){
                         model.set('status', response.responseText.status);
                     }
@@ -143,8 +146,7 @@ define(['backbone',
             if (!model) {
                 return false;
             }
-
-            smoke.prompt('Insert tracking code for this order', function(value){
+            smoke.prompt(_.isUndefined(i18n['Insert tracking code for this order'])?'Insert tracking code for this order':i18n['Insert tracking code for this order'], function(value){
                 if (value === false) {
                     return value;
                 }
@@ -161,7 +163,7 @@ define(['backbone',
                         success: function(response) {
                             console.log(model.toJSON());
                             if (response.hasOwnProperty('error') && !response.error){
-                                showMessage('Saved');
+                                showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
                             }
                             if (response.hasOwnProperty('responseText')){
                                 model.set({
@@ -172,7 +174,10 @@ define(['backbone',
                         }
                     });
                 }
-            }, {value: model.get('shipping_tracking_id')});
+            }, {value: model.get('shipping_tracking_id'),
+                ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
+                cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
+            });
         }
     });
 

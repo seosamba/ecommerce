@@ -47,9 +47,9 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 		if (empty($data)) {
 			$this->_error();
 		}
-
+        $translator = Zend_Registry::get('Zend_Translate');
 		if (!isset($data['code']) || empty($data['code'])) {
-			$this->_error('Missing mandatory code parameter');
+			$this->_error($translator->translate('Missing mandatory code parameter'));
 		} else {
 			$validator = new Zend_Validate_Db_RecordExists(array(
 				'table' => 'shopping_coupon',
@@ -57,7 +57,7 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 			));
 
 			if ($validator->isValid($data['code'])) {
-				$this->_error('Coupon with such code already exists');
+				$this->_error($translator->translate('Coupon with such code already exists'));
 			}
 		}
 
@@ -68,7 +68,7 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 				unset($data['startDate']);
 			}
 		} else {
-			$this->_error('Coupon start date should be specified');
+			$this->_error($translator->translate('Coupon start date should be specified'));
 		}
 
 		if (isset($data['endDate'])) {
@@ -78,7 +78,7 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 				unset($data['endDate']);
 			}
 		} else {
-			$this->_error('Coupon end date should be specified');
+			$this->_error($translator->translate('Coupon end date should be specified'));
 		}
 
 		if (isset($data['scope']) && empty($data['scope'])) {

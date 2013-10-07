@@ -3,8 +3,9 @@ define([
     '../collections/customers',
     './customer_row',
     '../../groups/collections/group',
-    'text!../../groups/templates/groups_dialog.html'
-    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl){
+    'text!../../groups/templates/groups_dialog.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, i18n){
 
     var AppView = Backbone.View.extend({
         el: $('#clients'),
@@ -108,9 +109,9 @@ define([
                                }
                             });
                             if (msg.length) {
-                                showMessage('Unable to remove following users: '+msg, true);
+                                showMessage(_.isUndefined(i18n['Unable to remove following users'])?'Unable to remove following users':i18n['Unable to remove following users']+': '+msg, true);
                             }else{
-                                showMessage('Users deleted');
+                                showMessage(_.isUndefined(i18n['Users deleted'])?'Users deleted':i18n['Users deleted']);
                             }
                         //});
                     },
@@ -144,7 +145,7 @@ define([
                 type: 'POST',
                 dataType: 'json',
                 success: function(response){
-                    showMessage('Group saved');
+                    showMessage(_.isUndefined(i18n['Group saved'])?'Group saved':i18n['Group saved']);
                 }
             });
         },
@@ -163,42 +164,45 @@ define([
                 this.groups.fetch({async: false});
             }
 
+            var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
+            var assignGroupsButtons = {};
+
+            assignGroupsButtons[applyButton] = function() {
+                var groupId = $(this).find($("select option:selected")).val();
+                if(groupId == -1){
+                    return false;
+                }
+                var allGroups = 0;
+                var customerIds = '';
+                if($(this).find('input[name="applyToAll"]').attr('checked')){
+                    allGroups = 1;
+                    checkedCustomers = allCustomers.models;
+                }
+
+                $.each(checkedCustomers, function(index, value) {
+                    customerIds += value.id+',';
+                });
+                customerIds = customerIds.substring(0, customerIds.length - 1);
+
+                $.ajax({
+                    url: $('#website_url').val()+'api/store/customers/groupId/'+groupId+'/customerIds/'+customerIds+'/allGroups/'+allGroups,
+                    type: 'PUT',
+                    dataType: 'json',
+                    success: function(response){
+                        top.location.reload();
+                    }
+                });
+                $(this).dialog('close');
+            };
+
             var dialog = _.template(GroupsDialogTmpl, {
                 groups: this.groups.toJSON(),
-                totalCustomers: this.customers.length
+                totalCustomers: this.customers.length,
+                i18n:i18n
             });
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
-                buttons: {
-                    "Apply": function(){
-                        var groupId = $(this).find($("select option:selected")).val();
-                        if(groupId == -1){
-                            return false;
-                        }
-                        var allGroups = 0;
-                        var customerIds = '';
-                        if($(this).find('input[name="applyToAll"]').attr('checked')){
-                            allGroups = 1;
-                            checkedCustomers = allCustomers.models;
-                        }
-
-                        $.each(checkedCustomers, function(index, value) {
-                            customerIds += value.id+',';
-                        });
-                        customerIds = customerIds.substring(0, customerIds.length - 1);
-
-                        $.ajax({
-                            url: $('#website_url').val()+'api/store/customers/groupId/'+groupId+'/customerIds/'+customerIds+'/allGroups/'+allGroups,
-                            type: 'PUT',
-                            dataType: 'json',
-                            success: function(response){
-                                top.location.reload();
-                            }
-                        });
-                        $(this).dialog('close');
-
-                    }
-                }
+                buttons: assignGroupsButtons
             });
             return false;
         },
@@ -214,7 +218,7 @@ define([
             });
             customerIds = customerIds.substring(0, customerIds.length - 1);
 
-            smoke.confirm('Change password for clients?', function(e) {
+            smoke.confirm(_.isUndefined(i18n['Change password for clients?'])?'Change password for clients?':i18n['Change password for clients?'], function(e) {
                 if(e) {
                     showSpinner();
                     $.ajax({
@@ -224,7 +228,7 @@ define([
 
                     }).done(function(response) {
                         hideSpinner();
-                        showMessage('Changed');
+                        showMessage(_.isUndefined(i18n['Changed'])?'Changed':i18n['Changed']);
 
                     });
                 } else {

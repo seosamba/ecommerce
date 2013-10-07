@@ -52,7 +52,8 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 
 	public static function getAllowedOptions() {
-		$classes = array('Shopping', __CLASS__);
+        $translator = Zend_Registry::get('Zend_Translate');
+        $classes = array('Shopping', __CLASS__);
 		$cartPluginName = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('cartPlugin');
 		if ($cartPluginName){
 			array_push($classes, ucfirst(strtolower($cartPluginName)));
@@ -74,7 +75,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 					$description = null;
 				}
 				array_push($allowedOptions, array(
-					'alias'  => 'Store' .' '. $name. (isset($description) ? ' - '.$description: ''),
+					'alias'  => $translator->translate('Store' .' '. $name. (isset($description) ? ' - '.$description: '')),
 					'option' => 'store:'.strtolower($name)
 				));
 			}

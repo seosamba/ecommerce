@@ -1,10 +1,10 @@
 <div>
 <% if (firstPage != currentPage) { %>
-    <a href="#" class="page" data-page="first">First</a>
+    <a href="#" class="page" data-page="first"><%= _.isUndefined(i18n['First']) ? 'First':i18n['First'] %></a>
 <% } %>
 
 <% if (currentPage > firstPage) { %>
-    <a href="#" class="page" data-page="prev">Previous</a>
+    <a href="#" class="page" data-page="prev"><%= _.isUndefined(i18n['Previous']) ? 'Previous':i18n['Previous'] %></a>
 <% } %>
 
 <% if (currentPage - 3 > firstPage) { %>
@@ -25,13 +25,13 @@
 <% } %>
 
 <% if (currentPage < totalPages) { %>
-    <a href="#" class="page" data-page="next">Next</a>
+    <a href="#" class="page" data-page="next"><%= _.isUndefined(i18n['Next']) ? 'Next':i18n['Next'] %></a>
 <% } %>
 
 <% if (lastPage != currentPage) { %>
-    <a href="#" class="page" data-page="last">Last</a>
+    <a href="#" class="page" data-page="last"><%= _.isUndefined(i18n['Last']) ? 'Last':i18n['Last'] %></a>
 <% } %>
 </div>
 <div>
-    Total <%= totalRecords %> orders found
+    <%= _.isUndefined(i18n['Total']) ? 'Total':i18n['Total'] %> <%= totalRecords %> <%= _.isUndefined(i18n['orders found']) ? 'orders found':i18n['orders found'] %>
 </div>

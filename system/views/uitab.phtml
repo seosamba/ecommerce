@@ -6,15 +6,15 @@
             <h3><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
         <?php else: ?>
             <div id="template-selector" class="grid_6 alpha">
-				<select id="templates" class="templates" data-placeholder="Select a product listing template...">
-                    <option value="0"><?php echo $this->translate('Select a product listing template'); ?></option>
+				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
+                    <option value=""><?php echo $this->translate('Select a product listing template'); ?></option>
                     <?php foreach($this->productTemplates as $template): ?>
                         <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="grid_6 omega">
-                <?php echo $this->formText('search', '', array('placeholder' => 'search by name, sku or tags')); ?>
+                <?php echo $this->formText('search', '', array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
             </div>
         <?php endif; ?>
     </div>
@@ -22,15 +22,15 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4 alpha">
-		<select class="pselect chzn-select ui-corner-all" name="product-tags" id="tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags');?>..."></select>
+		<select class="pselect chzn-select ui-corner-all" name="product-tags" id="tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
 	</div>
 	<div class="grid_4">
-		<select class="pselect ui-corner-all" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands');?>..."></select>
+		<select class="pselect ui-corner-all" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
 	</div>
 
 	<!-- Ordering -->
 	<div id="order" class="grid_4 omega">
-		<select class="pselect ui-corner-all" name="ordering" id="ordering" multiple data-placeholder="<?php echo $this->translate('Sort by');?>...">
+		<select id="ordering" class="pselect ui-corner-all" name="ordering" multiple data-placeholder="<?php echo $this->translate('Sort by...');?>">
 			<option value="name"><?php echo $this->translate('Name'); ?></option>
 			<option value="price"><?php echo $this->translate('Price'); ?></option>
 			<option value="brand"><?php echo $this->translate('Brand'); ?></option>
@@ -127,14 +127,14 @@
 		    },
 		    insertList: function() {
 			    var shortCode = '{$productlist:';
-                if($('#templates').val() == 0) {
+                if(!$('#templates').size() || !$('#templates').val()) {
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
                 //listing template
                 shortCode += $('#templates').val();
 
-                if(($('#search').val() != '')) {
+                if($('#search').size() && $('#search').val()) {
                     var ids             = [];
                     var visibleProducts = $('a.currproduct');
                     if(visibleProducts.length < uiTab.step) {
@@ -162,7 +162,15 @@
                     }
                 } else {
                     //tags filter
-                    shortCode += (($('#tags').val() != null) ? ':tags-' + $('#tags').val() : '');
+                    if ($('#tags').val()){
+                        shortCode += ':tagnames-';
+                        var tagnames = [];
+                        $('#tags option:selected').each(function(){
+                            tagnames.push($(this).text());
+                        });
+                        shortCode += tagnames.join(',');
+//                        shortCode += (($('#tags').val() != null) ? ':tagnames-' + $('#tags').val() : '');
+                    }
                     //brands filter
                     shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                     //ordering
@@ -259,14 +267,18 @@
 			    var srcPart      = '<?php echo $this->websiteUrl;?>';
 			    var productItemsHtml = '';
 			    $.each(productsResponse, function() {
-				    var srcPart = '<?php echo $this->websiteUrl;?>';
-			        <?php if($this->mediaServersAllowed): ?>
-	                    srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
-	                <?php endif; ?>
+				    var photoUrl = this.photo;
+				    if (!/^https?:\/\/.*/.test(photoUrl)){
+				        var srcPart = '<?php echo $this->websiteUrl;?>';
+			            <?php if($this->mediaServersAllowed): ?>
+                        srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
+	                    <?php endif; ?>
+                        photoUrl = srcPart + 'media/' + photoUrl.replace('/', '/product/');
+                    }
                     productItemsHtml += '<div class="productlisting">' +
                                             '<a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
                                                 '<span class="brand">' + this.brand + '</span>' +
-                                                '<span class="image"><img class="lazy" src="" data-original="' + srcPart + 'media/' + this.photo.replace('/', '/product/') + '" alt="' + this.name + '"></span>' +
+                                                '<span class="image"><img class="lazy" src="" data-original="' + photoUrl + '" alt="' + this.name + '"></span>' +
                                                 '<span class="name">' + this.name + '</span>' +
                                                 '<span class="sku">' + this.sku + '</span>' +
                                             '</a>' +
