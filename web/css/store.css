@@ -94,7 +94,7 @@
   color: #666666;
   font-weight: bold;
   background: #eaeaea;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 #manage-product #product-list-holder .productlisting .image,
 #manage-product #related-holder .productlisting .image {
@@ -113,7 +113,7 @@
 #manage-product #related-holder .productlisting .sku {
   color: #666666;
   text-align: right;
-  padding: 4px 8px;
+  padding: 2px 4px;
   background: #eaeaea;
 }
 #manage-product #product-list-holder .productlisting .checkbox-del,
@@ -129,27 +129,12 @@
 #manage-product #image-select-dialog .show {
   left: 0;
 }
-#manage-product #image-select-dialog #image-list {
-  -webkit-column-count: 9;
-  -moz-column-count: 9;
-  column-count: 9;
-  -webkit-column-gap: 10px;
-  -moz-column-gap: 10px;
-  column-gap: 10px;
-}
 #manage-product #image-select-dialog #image-list > .box {
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-#manage-product #image-select-dialog #image-list > .box:hover {
-  opacity: 0.7;
-  filter: alpha(opacity=70);
-}
-#manage-product #main-tab #product-image-holder {
-  max-height: 137px;
+  width: 9%;
+  margin: 0.5%;
 }
 #manage-product #main-tab #description-box textarea {
-  height: 215px;
+  height: 225px;
 }
 #manage-product #main-tab #quick-preview {
   position: relative;
@@ -166,6 +151,10 @@
   -ms-border-radius: 100px;
   border-radius: 100px;
 }
+#manage-product #main-tab #quick-preview .image img {
+  height: 100%;
+  width: 100%;
+}
 #manage-product #main-tab #quick-preview .name {
   background: #666666;
   color: #fff;
@@ -181,7 +170,7 @@
   font-size: 0.85em;
   color: #666666;
   display: block;
-  height: 137px;
+  height: 147px;
 }
 #manage-product #main-tab #quick-preview .price {
   position: absolute;
@@ -203,36 +192,14 @@
 }
 #manage-product #tag-tab .product-tags .tag-widget {
   font-size: 0.85em;
-  float: left;
   width: 19.2%;
   margin: 1% 0 0 1%;
-  background: #eaeaea;
-  padding: 5px;
-  cursor: pointer;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  box-sizing: border-box;
-}
-#manage-product #tag-tab .product-tags .tag-widget:hover,
-#manage-product #tag-tab .product-tags .tag-widget.tag-current {
-  background: #dddddd;
 }
 #manage-product #tag-tab .product-tags .tag-widget:nth-child(5n + 1) {
   margin-left: 0;
 }
-#manage-product #tag-tab .product-tags .tag-widget label {
-  display: inline-block;
-  *zoom: 1;
-  *display: inline;
-  /* Fix for IE7 */
-
-  vertical-align: middle;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 88%;
-  cursor: pointer;
+#manage-product #tag-tab .paginator {
+  text-align: right;
 }
 #manage-product #group-pricing-tab #editing-grouping-price {
   overflow: auto;

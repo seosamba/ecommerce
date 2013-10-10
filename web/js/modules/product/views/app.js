@@ -59,7 +59,6 @@ define([
 		initialize: function(){
             var self = this;
             this.initProduct();
-            $('#add-new-option-btn').button();
 
             $(document).ajaxStart(function(){
                 $('#product-list-search').attr('disabled', 'disabled');
@@ -68,11 +67,6 @@ define([
             });
 
             this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
-
-            $('.ie #image-list').masonry({
-                itemSelector : '.box',
-                columnWidth : 100
-            });
 
             $('#product-list').removeClass('show');
 			hideSpinner();
@@ -217,20 +211,18 @@ define([
             $('#image-select-dialog').addClass('show');
         },
 		imageChange: function(e){
+            showSpinner('#image-select-dialog');
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;
             }
             var self = this;
-
-            $('#image-list').html('<span class="spinner"></span>');
             this.images.server_api.folder = folder;
-            this.images.flush().fetch({success: function(){ self.images.pager(); }, silent: true});
+            this.images.flush().fetch({ success: function(){ self.images.pager(); hideSpinner();}, silent: true});
             //$('#image-select-dialog').addClass('show');
         },
         renderImages: function(){
             $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}))
-            $('.ie #image-list').imagesLoaded(function(){ $(this).masonry('reload'); })
             $('.paginator', '#image-select-dialog').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(
                 this.images.paginator_ui,
                 this.images.info(),
@@ -244,6 +236,7 @@ define([
             this.$('#product-image').attr('src', $('#website_url').val() + this.mediaPath + fldrName +'/small/'+ imgName);
             this.$('#image-select-dialog').removeClass('show');
             this.$('#product-image-folder').val('0');
+            this.$('#image-list, .paginator').empty();
         },
 		setProperty: function(e){
 			var propName = $(e.currentTarget).data('reflection');
@@ -356,14 +349,14 @@ define([
             if (e.currentTarget.checked){
                 var tag = {
                     id: e.currentTarget.value,
-                    name: $(e.currentTarget).nextAll('.tag-editable').text()
+                    name: $(e.currentTarget).closest('.tag-widget').find('.tag-editable').text()
                 };
                 var current = this.model.get('tags') || [];
                 this.model.set('tags', _.union(current, tag));
             }
             $(e.currentTarget).attr({
                 disabled: 'disabled'
-            }).parent('.tag-widget').effect("transfer", {
+            }).closest('.tag-widget').effect("transfer", {
                to: '#toggle-current-tags',
                className: 'ui-effects-transfer'
             }, 500);
@@ -441,11 +434,13 @@ define([
             }
         },
 		saveProduct: function(){
+            showSpinner('#manage-product');
             var self = this;
 
             if (!this.validateProduct()) {
+                hideSpinner();
                 showMessage(_.isUndefined(i18n['Missing some required fields'])?'Missing some required fields':i18n['Missing some required fields'], true);
-                $('#manage-product').tabs("select" , 0);
+                $('#manage-product').tabs({active : 0});
                 return false;
             }
 
@@ -490,6 +485,7 @@ define([
             }
 		},
         processSaveError: function(model, response){
+            hideSpinner();
             showMessage(response.responseText, true);
         },
 		deleteProduct: function(){
@@ -512,45 +508,45 @@ define([
             var error   = false;
 
             if (!this.model.has('name') || $.trim(this.model.get('name')) === ''){
-                this.$('#product-name').addClass('highlight');
+                this.$('#product-name').attr('error');
                 error = true || error;
             } else {
-                this.$('#product-name').removeClass('highlight');
+                this.$('#product-name').removeClass('error');
             }
 
             if (!this.model.has('sku') || $.trim(this.model.get('sku')) === ''){
-                this.$('#product-sku').addClass('highlight');
+                this.$('#product-sku').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-sku').removeClass('highlight');
+                this.$('#product-sku').removeClass('error');
             }
 
             if (!this.model.has('price')){
-                this.$('#product-price').addClass('highlight');
+                this.$('#product-price').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-price').removeClass('highlight');
+                this.$('#product-price').removeClass('error');
             }
 
             if (!this.model.has('brand') && $.trim($('#new-brand').val()) === '') {
-                this.$('#product-brand').addClass('highlight');
+                this.$('#product-brand').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-brand').removeClass('highlight');
+                this.$('#product-brand').removeClass('error');
             }
 
             if (!this.model.has('photo')) {
-                this.$('#product-image-holder').addClass('highlight');
+                this.$('#product-image-holder').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-image-holder').removeClass('highlight');
+                this.$('#product-image-holder').removeClass('error');
             }
 
             if (!this.model.has('shortDescription') || $.trim(this.model.get('shortDescription')) === ''){
-                this.$('#product-shortDescription').addClass('highlight');
+                this.$('#product-shortDescription').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-shortDescription').removeClass('highlight');
+                this.$('#product-shortDescription').removeClass('error');
             }
 
             return !error;

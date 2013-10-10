@@ -3,7 +3,7 @@ define([
 ], function(Backbone){
 	
 	var TagView = Backbone.View.extend({
-		tagName: 'div',
+		tagName: 'li',
 		className: 'tag-widget',
 		template: _.template($('#tagTemplate').html()),
 		nameInput: null,

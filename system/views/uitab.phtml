@@ -3,7 +3,7 @@
 	<!-- Product listing selector -->
     <div class="grid_12 alpha omega">
         <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
-            <h3><?php echo $this->translate('Warning! You don\'t have any product listing template. You should create one.'); ?></h3>
+            <h4 class="message warning normal"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
         <?php else: ?>
             <div id="template-selector" class="grid_6 alpha">
 				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
@@ -37,7 +37,7 @@
 		</select>
 	</div>
 	<div id="product-products" class="grid_12 alpha omega"></div>
-	<a href="javascript:;" id="btn-create" class="grid_12 alpha omega mt5px"><?php echo $this->translate('Create an automated product listing'); ?></a>
+	<a href="javascript:;" id="btn-create" class="grid_12 alpha omega mt5px btn"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
 
 <?php
@@ -59,7 +59,6 @@
                 $('.pselect').chosen();
 
 			    //init jqueryui button
-			    $('#btn-create').button();
 			    $('.ui-tabs-nav-item a').click(this.launch);
 			    $(document).on('click', '.currproduct', this.insertSingleProduct)
 			        .on('click', '#btn-create', this.insertList);
