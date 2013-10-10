@@ -960,4 +960,16 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
     }
+
+    public function setFreebiesAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+            $priceValue = filter_var($this->_request->getParam('priceValue'), FILTER_SANITIZE_NUMBER_FLOAT);
+            $quantity = filter_var($this->_request->getParam('quantity'), FILTER_SANITIZE_NUMBER_INT);
+            $freebiesSettingsMapper = Models_Mapper_ProductFreebiesSettingsMapper::getInstance();
+            $freebiesSettingsMapper->save(array('prod_id' => $productId, 'price_value' => $priceValue, 'quantity' => $quantity));
+            $this->_responseHelper->success('');
+        }
+    }
+
 }
