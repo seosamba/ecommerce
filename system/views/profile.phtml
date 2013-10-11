@@ -10,10 +10,20 @@
 			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
 		</div>
 		<div class="tt profile-main-info vcard">
-			<h2 class="client-name"><?php echo $this->customer->getFullName();?></h2>
-			<h4><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><?php echo $this->customer->getEmail();?></a></h4>
-			<p><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
-			<p><?php
+			<h2 class="client-fullname client-info"><span><?php echo $this->customer->getFullName();?></span>
+                <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                    <input class="edit-client-fullname edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname" />
+                    <img data-client-param="client-fullname" class="edit-client-fullname edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                <?php endif;?>
+            </h2>
+         	<h4 class="client-email client-info"><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span><?php echo $this->customer->getEmail();?></span></a>
+                <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                    <input class="edit-client-email edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
+                    <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                <?php endif;?>
+            </h4>
+			<p class="client-info"><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
+			<p class="client-info"><?php
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
@@ -27,6 +37,7 @@
 				}
 				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
 				?></p>
+            <input type="hidden" name="userId" id="userId" value="<?php echo $this->customer->getId();?>"/>
 			<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
 				<div class="adr">
 					<span class="street-address"><?php echo $billingAddressDefault['address1'].' '. $billingAddressDefault['address2'];?></span>
@@ -294,6 +305,38 @@
 			}
 		});
 	});
+
+    $('.edit-inline-profile').on('click', function(){
+        var editClientElement = $(this).data('client-param');
+        var clientElementData = $(this).closest('.client-info').find('span').text();
+        $('.'+editClientElement+' span').hide();
+        $('.edit-'+editClientElement).val(clientElementData).show();
+    });
+
+    $('.edit-client-profile').on('blur', function(){
+        var clientEditParam = $(this).data('client-param');
+        var editedValue     = $(this).val();
+        $.ajax({
+            type: "POST",
+            url: $('#website_url').val()+'plugin/shopping/run/editUserProfile/',
+            dataType: "json",
+            data: {
+                profileElement:clientEditParam,
+                profileValue:editedValue,
+                userId:$('#userId').val()
+            }
+        }).done(function(response) {
+                if(response.error == 1){
+                    smoke.alert(response.responseText,{'classname':'errors'});
+                }else{
+                    $('.edit-client-'+clientEditParam).hide();
+                    $('.client-'+clientEditParam+' span').text(editedValue).show();
+                    smoke.signal('<?php echo $this->translate('Saved');?>');
+                }
+            })
+        return false;
+    });
+
 	<?php endif;?>
 	
 </script>

@@ -86,3 +86,11 @@ table#orders-table td.shipping-data p { margin:0; }
 	top: 2px;
 	right: 2px;
 }
+#profile .edit-inline-profile{
+    margin: 0px 3px 8px 5px;
+    cursor:pointer;
+}
+#profile .client-info{
+    margin-top: 10px;
+}
+
