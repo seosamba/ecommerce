@@ -987,6 +987,15 @@ class Shopping extends Tools_Plugins_Abstract {
                         }else{
                             $this->_responseHelper->fail($this->_translator->translate('Email not valid'));
                         }
+                        $validator = new Zend_Validate_Db_RecordExists(
+                            array(
+                                'table' => 'user',
+                                'field' => 'email'
+                            )
+                        );
+                        if ($validator->isValid($data['profileValue'])) {
+                            $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                        }
                     }
                     if($data['profileElement'] == 'fullname' && $data['profileElement'] != ''){
                         $user->setFullName($data['profileValue']);
