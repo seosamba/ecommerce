@@ -58,7 +58,7 @@ define([
             this.zoneHolder.tabs('option', 'active', 0);
         },
         saveZones: function(){
-			showSpinner('#general-config');
+			showSpinner();
             $.post(this.zonesCollection.url, {zones: this.zonesCollection.toJSON()}, function(){
                 app.view.zonesCollection.fetch();
 				hideSpinner();

@@ -79,7 +79,7 @@ define([
                 switch (ui.newPanel.selector){
                     case '#tag-tab':
                         self.initTags();
-                        showSpinner('#tag-tab');
+                        showSpinner();
                     break;
                     case '#coupon-tab':
                     case '#group-pricing-tab':
@@ -211,7 +211,7 @@ define([
             $('#image-select-dialog').addClass('show');
         },
 		imageChange: function(e){
-            showSpinner('#image-select-dialog');
+            showSpinner();
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;
@@ -434,7 +434,7 @@ define([
             }
         },
 		saveProduct: function(){
-            showSpinner('#manage-product');
+            showSpinner();
             var self = this;
 
             if (!this.validateProduct()) {
@@ -593,7 +593,7 @@ define([
 		},
 		renderRelated: function() {
             $('#related-holder').find('.productlisting:not(.show-list)').remove();
-            showSpinner('#related-holder');
+            showSpinner();
 
             if (this.model.has('related') && this.model.get('related').length) {
                 var relateds = this.model.get('related'),
@@ -608,7 +608,7 @@ define([
                             response = [response];
                         }
                         $('#related-holder').find('.productlisting:not(.show-list)').remove();
-                        showSpinner('#related-holder');
+                        showSpinner();
                         _.each(response, function(related){
                             var view = new ProductListView({model: new ProductModel(related), showDelete: true});
                             view.delegateEvents({
