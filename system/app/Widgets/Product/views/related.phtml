@@ -32,7 +32,7 @@
     </li>
     <?php endforeach ; ?>
 </ul>
-<?php if(isset($this->checkoutPageUrl)):?>
+<?php if(isset($this->checkoutPageUrl) && !isset($this->onCheckoutPage)):?>
     <script type="text/javascript">
         $(function() {
             $(document).on('click', '.related-cart-add', function(e) {

@@ -55,6 +55,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_freeShipping;
 
+    protected $_freebies;
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -286,5 +288,13 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     public function getParts() {
         return $this->_parts;
+    }
+
+    public function getFreebies() {
+        return $this->_freebies;
+    }
+
+    public function setFreebies($freebies) {
+        $this->_freebies = $freebies;
     }
 }

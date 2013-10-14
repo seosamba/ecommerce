@@ -960,4 +960,52 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
     }
+
+    public function setFreebiesAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+            $priceValue = filter_var($this->_request->getParam('priceValue'), FILTER_SANITIZE_NUMBER_FLOAT);
+            $quantity = filter_var($this->_request->getParam('quantity'), FILTER_SANITIZE_NUMBER_INT);
+            $freebiesSettingsMapper = Models_Mapper_ProductFreebiesSettingsMapper::getInstance();
+            $freebiesSettingsMapper->save(array('prod_id' => $productId, 'price_value' => $priceValue, 'quantity' => $quantity));
+            $this->_responseHelper->success('');
+        }
+    }
+
+    public function editUserProfileAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+            if(isset($data['profileElement']) && isset($data['profileValue']) && isset($data['userId'])){
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $user = $userMapper->find($data['userId']);
+                $data['profileValue'] = trim($data['profileValue']);
+                if($user instanceof Application_Model_Models_User){
+                    if($data['profileElement'] == 'email'){
+                        $validator = new Zend_Validate_EmailAddress();
+                        if ($validator->isValid($data['profileValue'])) {
+                            $user->setEmail($data['profileValue']);
+                        }else{
+                            $this->_responseHelper->fail($this->_translator->translate('Email not valid'));
+                        }
+                        $validator = new Zend_Validate_Db_RecordExists(
+                            array(
+                                'table' => 'user',
+                                'field' => 'email'
+                            )
+                        );
+                        if ($validator->isValid($data['profileValue'])) {
+                            $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                        }
+                    }
+                    if($data['profileElement'] == 'fullname' && $data['profileElement'] != ''){
+                        $user->setFullName($data['profileValue']);
+                    }
+                    $userMapper->save($user);
+                    $this->_responseHelper->success('');
+                }
+                $this->_responseHelper->fail();
+            }
+        }
+    }
+
 }

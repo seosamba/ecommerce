@@ -66,7 +66,9 @@
 				<tr>
 					<th><?php echo $this->translate('Product');?></th>
 					<th><?php echo $this->translate('Mpn');?></th>
-					<th><?php echo $this->translate('Original Price'); ?></th>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+					    <th><?php echo $this->translate('Original Price'); ?></th>
+                    <?php endif;?>
 					<th><?php echo $this->translate('Price'); ?></th>
 					<th><?php echo $this->translate('Qty'); ?></th>
 					<th><?php echo $this->translate('Subtotal'); ?></th>
@@ -99,12 +101,26 @@
 								<?php endif;?>
 								<br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?></td>
 							<td class="textcentered"><?php echo $product->getMpn();?></td>
-							<td class="textcentered"><?php echo $this->currency($item['original_price']);?></td>
-							<td class="textcentered"><?php echo $this->currency($item['price']);?></td>
+                            <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+							    <td class="textcentered"><?php echo $this->currency($item['original_price']);?></td>
+                            <?php endif;?>
+                            <td class="textcentered">
+                            <?php if($item['freebies'] == 1):?>
+							    <?php echo $this->translate('free');?>
+                            <?php else:?>
+                                <?php echo $this->currency($item['price']);?>
+                            <?php endif;?>
+                            </td>
 							<td class="textcentered"><?php echo $item['qty'];?></td>
-							<td class="textcentered"><?php echo $this->currency($item['qty'] * $item['price']);?></td>
-							<td class="textcentered"><?php echo $this->currency($item['qty'] * $item['tax']);?></td>
-							<td class="textcentered"><?php echo $this->currency($item['qty'] * $item['tax_price']);?></td>
+                            <?php if($item['freebies'] == 1):?>
+                                <td class="textcentered"><?php echo $this->translate('free');?></td>
+                                <td class="textcentered"><?php echo $this->translate('free');?></td>
+                                <td class="textcentered"><?php echo $this->translate('free');?></td>
+                            <?php else:?>
+                                <td class="textcentered"><?php echo $this->currency($item['qty'] * $item['price']);?></td>
+                                <td class="textcentered"><?php echo $this->currency($item['qty'] * $item['tax']);?></td>
+                                <td class="textcentered"><?php echo $this->currency($item['qty'] * $item['tax_price']);?></td>
+                            <?php endif;?>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>

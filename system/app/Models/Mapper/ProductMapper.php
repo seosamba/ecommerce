@@ -112,6 +112,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$this->_processRelated($model);
 		}
 
+        if ($model->getFreebies()){
+            $this->_processFreebies($model);
+        }
+
         //proccess product parts if any
         $this->_processParts($model);
 
@@ -361,6 +365,31 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 
 	}
+
+    private function _processFreebies(Models_Model_Product $model){
+        $freebies = $model->getFreebies();
+        $freebiesTable = new Models_DbTable_ProductHasFreebies();
+
+        $where = $freebiesTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+        $freebiesTable->delete($where);
+
+        foreach ($freebies as $id) {
+            $where = $freebiesTable->getAdapter()->quoteInto('freebies_id = ?', intval($id));
+            $where .= ' AND '.$freebiesTable->getAdapter()->quoteInto('product_id = ?', $model->getId());
+            $select = $freebiesTable->getAdapter()->select()->from('shopping_product_has_freebies')->where($where);
+            $freebiesExist = $freebiesTable->getAdapter()->fetchRow($select);
+            if(!empty($freebiesExist)){
+                $freebiesTable->update(array('freebies_quantity' => $freebiesExist['freebies_quantity']+1), $where);
+            }else{
+                $freebiesTable->insert(array(
+                    'product_id'  => $model->getId(),
+                    'freebies_id' => intval($id),
+                    'freebies_quantity' => 1
+                ));
+            }
+        }
+
+    }
 
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();
