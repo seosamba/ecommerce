@@ -249,10 +249,10 @@
 		$(this).data('currentStatus', $(this).text());
 
 		var buttons = {
-			'refunded'  : '<button class="change-status btn btn-small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
-			'completed' : '<button class="change-status btn btn-small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
-			'canceled'  : '<button class="change-status btn btn-small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
-			'delivered' : '<button class="change-status btn btn-small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+			'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+			'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+			'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+			'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
 		}
 
 		var html = ''

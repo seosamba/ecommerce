@@ -54,10 +54,10 @@ define([
             var deliveredTranslation     = _.isUndefined(i18n['Delivered'])?'Delivered':i18n['Delivered'];
 
             var buttons = {
-                'refunded'  : '<button class="change-status btn btn-small blue-gradient" data-status="refunded" >'+refundPaymentTranslation+'</button>',
-                'completed' : '<button class="change-status btn btn-small green-gradient" data-status="completed" >'+paidPaymentTranslation+'</button>',
-                'canceled'  : '<button class="change-status btn btn-small red-gradient" data-status="canceled" >'+cancelOrderTranslation+'</button>',
-                'delivered' : '<button class="change-status btn btn-small orange-gradient" data-status="delivered" >'+deliveredTranslation+'</button>'
+                'refunded'  : '<button class="change-status btn small blue-gradient" data-status="refunded" >'+refundPaymentTranslation+'</button>',
+                'completed' : '<button class="change-status btn small green-gradient" data-status="completed" >'+paidPaymentTranslation+'</button>',
+                'canceled'  : '<button class="change-status btn small red-gradient" data-status="canceled" >'+cancelOrderTranslation+'</button>',
+                'delivered' : '<button class="change-status btn small orange-gradient" data-status="delivered" >'+deliveredTranslation+'</button>'
             }
 
             var html = ''

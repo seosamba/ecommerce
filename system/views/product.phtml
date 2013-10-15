@@ -49,7 +49,7 @@
 </script>
 
 <script id="tagTemplate" type="text/template">
-	<a href="javascript:;" class="fl-right ml1 icon-remove error" title="<?php echo $this->translate('Delete'); ?>"></a>
+	<a href="javascript:;" class="fl-right ml1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
 	<label>
         <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span></span>
     </label>
@@ -85,7 +85,7 @@
         <input class="small" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
-    <button class="fl-right remove-option btn-icon btn-error inverse icon-remove icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
+    <button class="fl-right remove-option icon error inverse icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -98,7 +98,7 @@
 		<div class="grid_1"></div>
 	</div>
 	<div class="option-list-holder grid_12 alpha omega"></div>
-	<a class="add-selection-btn grid_12 alpha omega mt20px btn btn-success inverse" href="javascript:;"><span class="icon-plus icon18"></span> <?php echo $this->translate('Add new selection');?></a>
+	<a class="add-selection-btn grid_12 alpha omega mt20px btn success inverse" href="javascript:;"><span class="icon-plus icon18"></span> <?php echo $this->translate('Add new selection');?></a>
 </script>
 
 <script id="listItemTemplate" type="text/x-jquery-tmpl">
@@ -132,13 +132,13 @@
 		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} /><span></span>
 	</label>
 	<div class="grid_1 text-center mt5px">
-		<button class="item-remove btn-link btn-error icon-remove-2 icon16" title="<?php echo $this->translate('Delete'); ?>"</button>
+		<button class="item-remove link error icon-remove icon16" title="<?php echo $this->translate('Delete'); ?>"</button>
 	</div>
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-        <span class="icon-remove btn btn-icon btn-link btn-error" title="<?php echo $this->translate('Delete');?>"></span>
+        <span class="icon-close btn icon link error" title="<?php echo $this->translate('Delete');?>"></span>
     <% } else { %>
     <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>
@@ -179,7 +179,7 @@
     <div id="product-list" class="show-right">
         <div class="header">
             <div class="closebutton">
-                <a id="product-list-back-link" class="hide icon-chevron-right btn-icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
+                <a id="product-list-back-link" class="hide icon-chevron-right icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
             <div class="grid_5">
                 <label class="grid_2 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?></label>
@@ -187,8 +187,8 @@
             </div>
         </div>
         <div id="product-list-holder" class="content-footer grid_12" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
-        <div class="footer">
-			<a id="massaction" class="btn btn-link fl-left" href="javascript:;">run mass action</a>
+        <div class="footer text-center">
+			<a id="massaction" class="btn link fl-left" href="javascript:;">run mass action</a>
         	<div class="paginator"><!-- placeholder for paginator --></div>
 		</div>
     </div>
@@ -196,7 +196,7 @@
     <div id="image-select-dialog" class="show-left">
         <div class="header text-center">
             <div class="closebutton">
-                <a class="hide icon-chevron-left btn-icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
+                <a class="hide icon-chevron-left icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
 			<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); ?>
         </div>
@@ -223,9 +223,9 @@
             </li>
         <?php endforeach; ?>
         <div class="nav-links">
-            <a href="javascript:;" data-listtype="edit" class="show-list btn btn-link" title="<?php echo $this->translate('Edit product'); ?>"><span class="icon-edit"></span></a>
+            <a class="show-list btn link icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
             <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-            <a href="#new" id="new-product" class="btn btn-link" title="<?php echo $this->translate('New product'); ?>"><span class="icon-plus-sign"></span></a>
+            <a id="new-product" class="btn link icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
         </div>
     </ul>
     <!--------- MAIN INFO -------------->
@@ -247,12 +247,12 @@
                     <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
                 </div>
                 <div class="grid_3 alpha omega labeled mt15px">
+                    <input class="grid_8 alpha omega fl-right" type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id'); ?>"/>
                     <label class="grid_4 alpha omega" for="product-sku">SKU</label>
-                    <input class="grid_8 alpha omega" type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id'); ?>"/>
                 </div>
                 <div class="grid_4 omega labeled mt15px">
+                    <input class="grid_9 alpha omega fl-right" type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber"/>
                     <label class="grid_3 alpha omega" for="product-mpn">MPN</label>
-                    <input class="grid_9 alpha omega" type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber"/>
                 </div>
                 <div class="grid_2 omega labeled mt15px">
                     <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
@@ -302,12 +302,12 @@
                     </select>
                 </div>
                 <div class="grid_6 alpha labeled mt15px">
+                    <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
                     <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->generalConfig['currency']; ?></label>
-                    <input class="grid_8 alpha omega" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
                 </div>
                 <div class="grid_6 omega labeled mt15px">
+                    <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
                     <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
-                    <input class="grid_8 alpha omega" type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
                 </div>
                 <div class="grid_12 alpha omega mt15px">
                     <label class="mt5px grid_2 alpha" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
@@ -364,7 +364,7 @@
 
     <div id="related-tab" class="content-footer">
         <div id="related-holder" class="grid_12 alpha omega">
-            <a href="javascript:;" data-listtype="related" class="show-list productlisting" title="<?php echo $this->translate('Add related'); ?>"><span class="icon-plus-sign icon48"></span></a>
+            <a href="javascript:;" data-listtype="related" class="show-list productlisting icon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
             <span class="spinner"></span>
         </div>
     </div>
@@ -380,7 +380,7 @@
     </div>
 
     <div class="footer grid_12">
-        <a href="javascript:;" class="delete-selected btn btn-link btn-error mt5px" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
+        <a href="javascript:;" class="delete-selected btn link error mt5px" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
 		<button type="submit" name="submit" id="submit" value="Save"/><span class="icon-save"></span> <?php echo $this->translate('Save product'); ?></button>
     </div>
 </div>

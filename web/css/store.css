@@ -11,19 +11,17 @@
 }
 #manage-product .header .nav-links a {
   color: #666666;
-}
-#manage-product .header .nav-links a:hover {
-  color: #59a5c3;
-}
-#manage-product .header .nav-links a span {
   width: 28px;
   height: 28px;
   line-height: 28px;
 }
-#manage-product .header .nav-links a span:before,
-#manage-product .header .nav-links a span [class^="icon-"]:before,
-#manage-product .header .nav-links a span [class*=" icon-"]:before {
+#manage-product .header .nav-links a:before,
+#manage-product .header .nav-links a [class^="icon-"]:before,
+#manage-product .header .nav-links a [class*=" icon-"]:before {
   font-size: 28px;
+}
+#manage-product .header .nav-links a:hover {
+  color: #59a5c3;
 }
 #manage-product #product-list {
   width: 100%;
@@ -39,17 +37,22 @@
   width: 11%;
   margin: 0 0 1.7% 1.7%;
   text-align: center;
-  overflow: hidden;
-  background: #fafafa;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -ms-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
+  overflow: hidden;
+  background: #fafafa;
+  padding: 0;
   -webkit-box-shadow: 0 1px 1px #bbbbbb;
   -moz-box-shadow: 0 1px 1px #bbbbbb;
   -ms-box-shadow: 0 1px 1px #bbbbbb;
   box-shadow: 0 1px 1px #bbbbbb;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
 }
 #manage-product #product-list-holder .productlisting:nth-child(8n+1),
 #manage-product #related-holder .productlisting:nth-child(8n+1) {
@@ -57,8 +60,8 @@
 }
 #manage-product #product-list-holder .productlisting.show-list,
 #manage-product #related-holder .productlisting.show-list {
-  height: 180px;
-  line-height: 180px;
+  height: 178px;
+  line-height: 178px;
   color: #d1d1d1;
 }
 #manage-product #product-list-holder .productlisting.show-list span,
@@ -83,8 +86,8 @@
   display: block;
   font-size: 0.85em;
 }
-#manage-product #product-list-holder .productlisting .icon-remove,
-#manage-product #related-holder .productlisting .icon-remove {
+#manage-product #product-list-holder .productlisting [class*="icon-"],
+#manage-product #related-holder .productlisting [class*="icon-"] {
   position: absolute;
   top: 3px;
   right: 3px;

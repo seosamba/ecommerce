@@ -8,13 +8,10 @@
 
             a{
                 color : @gray;
+                .icon-size(28px);
 
                 &:hover{
                     color : @link-color;
-                }
-
-                span{
-                    .icon-size(28px);
                 }
             }
         }
@@ -37,18 +34,16 @@
             width      : 11%;
             margin     : 0 0 1.7% 1.7%;
             text-align : center;
-            overflow   : hidden;
-            background : @gray-lighter;
             .transition;
-            .box-shadow(0 1px 1px #BBB);
+            .background(0, 0);
 
             &:nth-child(8n+1){
                 margin-left : 0;
             }
 
             &.show-list{
-                height      : 180px;
-                line-height : 180px;
+                height      : 178px;
+                line-height : 178px;
                 color       : darken(@gray-light, 10%);
 
                 span{
@@ -69,7 +64,7 @@
                 font-size : @font-size-small;
             }
 
-            .icon-remove{
+            [class*="icon-"]{
                 position : absolute;
                 top      : 3px;
                 right    : 3px;
