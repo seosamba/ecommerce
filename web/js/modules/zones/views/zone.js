@@ -7,6 +7,7 @@ define([
     var zoneTabView = Backbone.View.extend({
         template: _.template($('#zoneTemplate').text()),
         tagName: 'div',
+        className: 'content-footer',
         events: {
             'click .clearprop': 'clearProperty',
             'change .zone-name': 'setName',

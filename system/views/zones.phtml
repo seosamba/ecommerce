@@ -1,195 +1,117 @@
 <?php
-    $this->headTitle($this->translate('Manage zones'));
-    $this->headScript()->setAllowArbitraryAttributes(true)
-        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js'));
+    $this->headTitle( $this->translate( 'Manage zones' ) );
+    $this->headScript()->setAllowArbitraryAttributes( true )->appendFile( $this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array( 'data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js' ) );
 ?>
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_6 suffix_6 mb10px">
-		<label class="grid_3 mt5px alpha"><?php echo $this->translate('Zone Name');?>:</label>
+		<label class="grid_3 mt5px alpha"><?php echo $this->translate( 'Zone Name' ); ?>:</label>
 		<input type="text" class="zone-name grid_9 alpha omega" value="<%= name %>" placeholder="enter name for zone"/>
 	</div>
-	<div class="countries grid_6">
-		<div class="ui-widget-header ui-corner-top padding5px">
-            <span class="padding5px"><?php echo $this->translate('Countries');?></span>
-            <a href="javascript:;" class="clearprop" data-property="countries">[ <?php echo $this->translate('clear');?> ]</a>
+	<div class="countries grid_6 alpha">
+		<div class="header-inner pl2 pr2">
+            <?php echo $this->translate( 'Countries' ); ?>
         </div>
-		<ul class="ui-widget-content zone-countries" style="height: 140px; overflow-y: auto; background:#fff; margin:0;">
-        </ul>
-		<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
-			<button class="open-dialog" data-name="add-country"><?php echo $this->translate('Add Country');?></button>
-		</div>
+		<ul class="zone-countries list-tags"></ul>
+        <div class="footer grid_12">
+            <a href="javascript:;" class="clearprop error" data-property="countries">[ <?php echo $this->translate( 'clear' ); ?>
+                                                                                     ]</a>
+            <button class="open-dialog fl-right" data-name="add-country"><?php echo $this->translate( 'Add Country' ); ?></button>
+        </div>
 	</div>
-	<div class="states grid_6">
-		<div class="ui-widget-header ui-corner-top padding5px">
-            <span class="padding5px"><?php echo $this->translate('States');?></span>
-            <a href="javascript:;" class="clearprop" data-property="states">[ <?php echo $this->translate('clear');?> ]</a>
+	<div class="states grid_6 omega">
+		<div class="header-inner pl2 pr2">
+            <?php echo $this->translate( 'States' ); ?>
         </div>
-		<ul class="ui-widget-content zone-states" style="height: 140px; overflow-y: auto; background:#fff; margin:0;">
-		</ul>
-		<div class="ui-widget-header ui-corner-bottom" style="text-align: center">
-			<button class="open-dialog" data-name="add-state"><?php echo $this->translate('Add State');?></button>
-		</div>
+		<ul class="zone-states list-tags"></ul>
+        <div class="footer grid_12">
+            <a href="javascript:;" class="clearprop error" data-property="states">[ <?php echo $this->translate( 'clear' ); ?>
+                                                                                  ]</a>
+            <button class="open-dialog fl-right" data-name="add-state"><?php echo $this->translate( 'Add State' ); ?></button>
+        </div>
 	</div>
-	<div class="grid_12 mt10px">
-        <div class="ui-widget-header ui-corner-top padding5px">
-            <span class="padding5px"><?php echo $this->translate('Postal codes');?></span>
-            <a href="javascript:;" class="clearprop" data-property="zip">[ <?php echo $this->translate('clear');?> ]</a>
-            <span style="font-weight:normal; margin-left:160px;"><?php echo $this->translate('Insert list of zip/postal codes: one per line');?></span>
+	<div class="grid_12 alpha omega mt15px">
+        <div class="header-inner pl2 pr2 text-center">
+            <span class="fl-left"><?php echo $this->translate( 'Postal codes' ); ?></span>
+            <a href="javascript:;" class="clearprop fl-right" data-property="zip">[ <?php echo $this->translate( 'clear' ); ?>
+                                                                                  ]</a>
+            <em><?php echo $this->translate( 'Insert list of zip/postal codes: one per line' ); ?></em>
         </div>
-            <div class="ui-widget-content" style="text-align: center">
-            <textarea style="width: 99%; height: 180px; resize: none;" class="zone-zip"><%= zip.join('\n') %></textarea>
-		</div>
+        <textarea class="zone-zip"><%= zip . join( '\n' ) %></textarea>
 	</div>
 </script>
 
-<style>
-#zones.ui-tabs .ui-tabs-panel {
-    padding: 10px 5px;
-    overflow: hidden;
-    background: #DAE8ED;
-}
-#zones .ui-tabs-nav li.ui-tabs-selected {
-    background: #DAE8ED;
-}
-#add-country-dialog {
-    padding: 0;
-}
-li.entry-row .ui-icon {
-    float:right;
-    cursor: pointer;
-}
-li.entry-row .ui-icon:hover {
-    background-image: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-icons_cd0a0a_256x240.png");
-}
-#ajax_msg {
-    line-height: 50px;
-    position: absolute;
-    top: 30%;
-    left:0;
-    width: 100%;
-    z-index: 5000;
-}
-#manage-zones .clearprop {
-	float: right;
-	font-size: 10pt;
-	color: #E6E6FA;
-}
-li.add-new-zone {
-	float: none !important;
-	-moz-border-radius:3px 3px 0 0;
-	-webkit-border-radius:3px 3px 0 0;
-	border-radius:3px 3px 0 0;
-	background: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-bg_highlight-soft_50_dedede_1x100.png") repeat-x scroll 50% 50% #E8E8E8;
-	border: 1px solid #D6D6D6;
-	display: inline-block;
-}
-li.add-new-zone:hover {
-	background: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-bg_inset-soft_50_e6e6fa_1x100.png") repeat-x scroll 50% 50% #E6E6FA;
-	border: 1px solid #D3D3D3;
-}
-#new-zone-btn {
-	background: url("<?php echo $this->websiteUrl; ?>/system/uithemes/seotoasterui/images/ui-icons_444444_256x240.png") -12px -125px no-repeat;
-	border: none;
-	height: 1.3em;
-	width: 1.5em;
-	cursor: pointer;
-	margin: 2px 3px 4px;
-	text-indent: -5000em;
-}
-.seotoaster .help a {
-    color: #E7E7E7;
-}
-</style>
-
-
-<div id="ajax_msg" class="smoke">
-    <img src="<?php echo $this->websiteUrl; ?>/system/images/loading.gif" />
-</div>
+<span class="spinner"></span>
 
 <div id="manage-zones">
-    <div id="zones" class="ui-helper-clearfix h530">
-        
-            <div class="closebutton">
-                    <span class="help">
-                        <?php echo $this->toasterHelp(Tools_Misc::SECTION_STORE_MANAGEZONES, Tools_Misc::$_helpHashMap);?>
-                    </span>
-                    <span class="close"><?php echo $this->translate('Close'); ?></span>
-            </div>
-        
-        <ul>
-	        <li class="add-new-zone">
-		        <button id="new-zone-btn" title="Hotkey: Ctrl+N" ><?php echo $this->translate('Add new');?></button>
-	        </li>
-        </ul>
-	</div>
-
-    <a id="delete-zone" href="javascript:;" class="delete-selected" style="margin-left:10px;">[ <?php echo $this->translate('Delete this zone'); ?> ]</a>
-    <button id="save-btn" title="Hotkey: Ctrl+S" style="margin: 0 10px 10px 0;"><?php echo $this->translate('Save');?></button>
+    <ul class="header">
+        <li class="add-new-zone">
+            <a id="new-zone-btn" class="ui-tabs-anchor icon-plus fs16" title="Hotkey: Ctrl+N"></a>
+        </li>
+    </ul>
+</div>
+<div class="footer grid_12">
+    <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?>
+                                                                          ]</a>
+    <button id="save-btn" class="icon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
 </div>
 
 <div class="ui-helper-hidden">
-    <div id="add-country-dialog" title="<?php echo $this->translate('Add country');?>">
-        <ul tabindex="0" id="country-list" class="ui-helper-clearfix" style="height: 200px; overflow-x:hidden;overflow-y: auto; background: lavender;">
-        </ul>
-        <div class="ui-widget-header padding5px" style="text-align:center;">
-            <span class="ui-icon ui-icon-search" style="display: inline-block"></span>
-            <input id="country-filter" type="text" placeholder="<?php echo $this->translate('Start typing country name here');?>" size="30" />
+    <div id="add-country-dialog" title="<?php echo $this->translate( 'Add country' ); ?>">
+        <ul id="country-list" class="list-bordered mt10px" tabindex="0"></ul>
+        <div class="footer grid_12">
+            <span class="ui-icon ui-icon-search"></span>
+            <input id="country-filter" type="text" placeholder="<?php echo $this->translate( 'Start typing country name here' ); ?>" size="30"/>
         </div>
     </div>
 
-    <div id="add-state-dialog" style="margin-top: -5px; padding: 0;" title="<?php echo $this->translate('Add state');?>">
-        <div class="ui-widget-header padding5px">
-            <?php echo $this->translate('Filter by country');?>:
+    <div id="add-state-dialog" title="<?php echo $this->translate( 'Add state' ); ?>">
+        <div class="">
+            <?php echo $this->translate( 'Filter by country' ); ?>:
             <select id="state-filter">
-                <option value="0" selected="selected"><?php echo $this->translate('all');?></option>
+                <option value="0" selected="selected"><?php echo $this->translate( 'all' ); ?></option>
             </select>
         </div>
-        <ul id="state-list" class="ui-helper-clearfix" style="height: 300px; overflow-x:hidden;overflow-y: auto; background: lavender;">
-        </ul>
+        <ul id="state-list" class="list-tags"></ul>
     </div>
 </div>
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
-    $('div.seotoaster > div.ui-widget-header:first').remove();
-    $('#zones').tabs();
-    $(document).one('zones:loaded', function() {
-        app.states.reset(<?php echo Zend_Json::encode($this->states); ?>);
-        app.countries.reset(<?php echo Zend_Json::encode($this->countries); ?>);
-        app.view.zonesCollection.reset(<?php echo Zend_Json::encode($this->zones); ?>);
-
-        $('#add-country-dialog').dialog({
-            modal     :  true,
-            autoOpen  : false,
-            resizable : false,
-            height    : 300,
-            width     : 500,
-            create    : function(){
-                app.views.countryList.collection = _(app.countries.toJSON()).sortBy(function(c){
-                    return c.name.toLowerCase()
-                });
-                app.views.countryList.render();
-            },
-            close: function(event, ui){
-                $('#country-filter').val('');
-                $('#country-list > li').show();
-            }
-        });
-
-        $('#add-state-dialog').dialog({
-            modal     : true,
-            autoOpen  : false,
-            resizable : false,
-            height    : 410,
-            width     : 600,
-            create    : function(){
-                app.views.statesList.collection = app.states.toJSON();
-                app.views.statesList.render();
-            }
-        });
-
-        $('#ajax_msg').hide();
-    })
+$('#manage-zones').tabs();
+$(document).one('zones:loaded', function () {
+    app.states.reset(<?php echo Zend_Json::encode($this->states); ?>);
+    app.countries.reset(<?php echo Zend_Json::encode($this->countries); ?>);
+    app.view.zonesCollection.reset(<?php echo Zend_Json::encode($this->zones); ?>);
+    $('#add-country-dialog').dialog({
+        modal     : true,
+        autoOpen  : false,
+        resizable : false,
+        height    : 310,
+        width     : 500,
+        create    : function () {
+            app.views.countryList.collection = _(app.countries.toJSON()).sortBy(function (c) {
+                return c.name.toLowerCase()
+            });
+            app.views.countryList.render();
+        },
+        close     : function (event, ui) {
+            $('#country-filter').val('');
+            $('#country-list > li').show();
+        }
+    });
+    $('#add-state-dialog').dialog({
+        modal     : true,
+        autoOpen  : false,
+        resizable : false,
+        height    : 410,
+        width     : 600,
+        create    : function () {
+            app.views.statesList.collection = app.states.toJSON();
+            app.views.statesList.render();
+        }
+    });
+    hideSpinner();
+})
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

@@ -79,7 +79,6 @@ define([
                 switch (ui.newPanel.selector){
                     case '#tag-tab':
                         self.initTags();
-                        showSpinner();
                     break;
                     case '#coupon-tab':
                     case '#group-pricing-tab':

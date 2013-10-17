@@ -1,4 +1,13 @@
 @import "../../../../../system/css/less/Base/variables";
+
+// Table of Content
+//==================================================
+//	Add/edit product
+//	Manage brand logos
+//==================================================
+
+// Add/edit product
+//==================================================
 #manage-product{
     position : static;
 
@@ -35,7 +44,7 @@
             margin     : 0 0 1.7% 1.7%;
             text-align : center;
             .transition;
-            .background(0, 0);
+            .background(0);
 
             &:nth-child(8n+1){
                 margin-left : 0;
@@ -260,4 +269,53 @@
             text-align : center;
         }
     }
+}
+
+//	Manage brand logos
+//==================================================
+#manage-logos{
+    .brand-list{
+        &>*{
+            margin : 0 1% 1% 0;
+
+            .caption{
+                font-size   : @font-size-base - 2;
+                padding     : @padding-mini-vertical @padding-mini-horizontal;
+                position    : absolute;
+                top         : auto;
+                left        : 0;
+                right       : 0;
+                bottom      : 5px;
+                font-weight : bold;
+            }
+        }
+    }
+}
+
+//	Manage zones
+//==================================================
+#manage-zones{
+    .countries, .states{
+        .background(0);
+
+        ul{
+            background : @body-bg;
+            height     : 144px;
+            overflow   : auto;
+        }
+
+        .footer{
+            height  : auto;
+            padding : 5px 0;
+        }
+    }
+
+    .zone-zip{
+        height : 154px;
+    }
+}
+
+#country-list, #state-list{
+    height   : 200px;
+    overflow : auto;
 }

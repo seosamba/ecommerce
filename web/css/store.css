@@ -211,3 +211,49 @@
 #merchandising #group-table td:last-child {
   text-align: center;
 }
+#manage-logos .brand-list > * {
+  margin: 0 1% 1% 0;
+}
+#manage-logos .brand-list > * .caption {
+  font-size: 12px;
+  padding: 2px 4px;
+  position: absolute;
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  font-weight: bold;
+}
+#manage-zones .countries,
+#manage-zones .states {
+  overflow: hidden;
+  background: #fafafa;
+  padding: 0;
+  -webkit-box-shadow: 0 1px 1px #bbbbbb;
+  -moz-box-shadow: 0 1px 1px #bbbbbb;
+  -ms-box-shadow: 0 1px 1px #bbbbbb;
+  box-shadow: 0 1px 1px #bbbbbb;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#manage-zones .countries ul,
+#manage-zones .states ul {
+  background: #ffffff;
+  height: 144px;
+  overflow: auto;
+}
+#manage-zones .countries .footer,
+#manage-zones .states .footer {
+  height: auto;
+  padding: 5px 0;
+}
+#manage-zones .zone-zip {
+  height: 154px;
+}
+#country-list,
+#state-list {
+  height: 200px;
+  overflow: auto;
+}
