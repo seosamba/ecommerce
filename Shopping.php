@@ -777,10 +777,12 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	protected function _addVersionToAdminPanel() {
-		$shoppingVersion = Tools_Filesystem_Tools::getFile(__DIR__ . DIRECTORY_SEPARATOR . 'version.txt');
-		if (!empty($shoppingVersion) && defined('Tools_System_Tools::PLACEHOLDER_SYSTEM_VERSION')) {
-			$shoppingVersion = str_replace(array("\r\n", "\n", "\r"), '', '+ Store ' . $shoppingVersion);
-			Zend_Layout::getMvcInstance()->getView()->placeholder(Tools_System_Tools::PLACEHOLDER_SYSTEM_VERSION)->append($shoppingVersion);
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL) && !$this->_request->isXmlHttpRequest()){
+            $shoppingVersion = Tools_Filesystem_Tools::getFile(__DIR__ . DIRECTORY_SEPARATOR . 'version.txt');
+            if (!empty($shoppingVersion) && defined('Tools_System_Tools::PLACEHOLDER_SYSTEM_VERSION')) {
+                $shoppingVersion = str_replace(array("\r\n", "\n", "\r"), '', '+ Store ' . $shoppingVersion);
+                Zend_Layout::getMvcInstance()->getView()->placeholder(Tools_System_Tools::PLACEHOLDER_SYSTEM_VERSION)->append($shoppingVersion);
+            }
 		}
 	}
 
