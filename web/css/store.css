@@ -254,6 +254,6 @@
 }
 #country-list,
 #state-list {
-  height: 200px;
+  height: 205px;
   overflow: auto;
 }

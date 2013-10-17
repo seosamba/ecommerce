@@ -59,20 +59,18 @@
 <div class="ui-helper-hidden">
     <div id="add-country-dialog" title="<?php echo $this->translate( 'Add country' ); ?>">
         <ul id="country-list" class="list-bordered mt10px" tabindex="0"></ul>
-        <div class="footer grid_12">
+        <div class="footer">
             <span class="ui-icon ui-icon-search"></span>
             <input id="country-filter" type="text" placeholder="<?php echo $this->translate( 'Start typing country name here' ); ?>" size="30"/>
         </div>
     </div>
 
-    <div id="add-state-dialog" title="<?php echo $this->translate( 'Add state' ); ?>">
-        <div class="">
-            <?php echo $this->translate( 'Filter by country' ); ?>:
-            <select id="state-filter">
-                <option value="0" selected="selected"><?php echo $this->translate( 'all' ); ?></option>
-            </select>
-        </div>
-        <ul id="state-list" class="list-tags"></ul>
+    <div id="add-state-dialog" class="form" title="<?php echo $this->translate( 'Add state' ); ?>">
+        <label class="grid_3 alpha mt15px"><?php echo $this->translate( 'Filter by country' ); ?>:</label>
+        <select id="state-filter" class="grid_9 alpha omega mt10px">
+            <option value="0" selected="selected"><?php echo $this->translate( 'all' ); ?></option>
+        </select>
+        <ul id="state-list" class="list-bordered mt10px grid_12 alpha omega"></ul>
     </div>
 </div>
 
@@ -104,8 +102,8 @@ $(document).one('zones:loaded', function () {
         modal     : true,
         autoOpen  : false,
         resizable : false,
-        height    : 410,
-        width     : 600,
+        height    : 310,
+        width     : 500,
         create    : function () {
             app.views.statesList.collection = app.states.toJSON();
             app.views.statesList.render();

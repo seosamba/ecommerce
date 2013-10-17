@@ -22,7 +22,7 @@ define([
             switch (mode) {
                 default:
                 case 'add':
-                    this.$el.prepend('<a href="javascript:;" class="add-item icon-plus fl-right"></a>');
+                    this.$el.prepend('<a href="javascript:;" class="add-item icon-plus success fl-right"></a>');
                     break;
                 case 'delete':
                     this.$el.prepend('<a href="javascript:;" class="remove-item icon-close error fl-right"></a>');
