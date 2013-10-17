@@ -176,7 +176,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$itemDefaultOptionsArray = array();
             $productDefaultOptions   = $product->getDefaultOptions();
             if(is_array($productDefaultOptions) && !empty($productDefaultOptions)) {
-                foreach ($product->getDefaultOptions() as $option) {
+                foreach ($productDefaultOptions as $option) {
                     foreach ($option['selection'] as $item) {
                         if ($item['isDefault'] == 1) {
                             $itemDefaultOptionsArray[$option['id']] = $item['id'];
