@@ -174,13 +174,16 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 			//preparing default price with applied default options
 			$itemDefaultOptionsArray = array();
-			foreach ($product->getDefaultOptions() as $option) {
-				foreach ($option['selection'] as $item) {
-					if ($item['isDefault'] == 1) {
-						$itemDefaultOptionsArray[$option['id']] = $item['id'];
-					}
-				}
-			}
+            $productDefaultOptions   = $product->getDefaultOptions();
+            if(is_array($productDefaultOptions) && !empty($productDefaultOptions)) {
+                foreach ($product->getDefaultOptions() as $option) {
+                    foreach ($option['selection'] as $item) {
+                        if ($item['isDefault'] == 1) {
+                            $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                        }
+                    }
+                }
+            }
 
 			//setting up the entity parser
 			$entityParser->addToDictionary(array(
