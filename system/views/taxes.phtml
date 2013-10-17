@@ -9,62 +9,56 @@
 	<% if (!(typeof(id) == 'undefined')) { %>
         <input type="hidden" name="rule-id" value="<%= id %>" />
     <% } %>
-    <div class="grid_1 textcentered mt8px">
-        <input type="radio" name="default" <% if (isDefault == 1) { %> checked="checked" <% } %> />
-    </div>
+    <label class="grid_1 text-center mt5px">
+        <input class="processed" type="radio" name="default" <% if (isDefault == 1) { %> checked="checked" <% } %> /><span></span>
+    </label>
     <div class="grid_4">
-        <select name="zoneId" data-reflection="property" style="width: 95%">
-        <option value="-1"><?php echo $this->translate('Select zone');?></option>
-            <% _.each(app.zones.toJSON(), function(zone) { %>
-                <option value="<%= zone.id %>" <% if(zone.id == zoneId) { %>selected="selected"<% } %> ><%= zone.name %></option>
-            <% }) %>
+        <select name="zoneId" data-reflection="property">
+            <option value="-1"><?php echo $this->translate('Select zone');?></option>
+        <% _.each(app.zones.toJSON(), function(zone) { %>
+            <option value="<%= zone.id %>" <% if(zone.id == zoneId) { %>selected="selected"<% } %> ><%= zone.name %></option>
+        <% }) %>
         </select>
     </div>
-    <div class="grid_6 omega" style="white-space:nowrap; font-weight:bold;">
-        <div class="grid_4">
-            <input type="text" name="rate1" data-reflection="property" value="<%= rate1 %>" placeholder="0"/>%
-        </div>
-        <div class="grid_4 ">
-            <input type="text" name="rate2" data-reflection="property" value="<%= rate2 %>" placeholder="0"/>%
-        </div>
-        <div class="grid_4">
-            <input type="text" name="rate3" data-reflection="property" value="<%= rate3 %>" placeholder="0"/>%
-        </div>
+    <div class="grid_2 labeled">
+        <input class="grid_8 alpha omega text-center" type="text" name="rate1" data-reflection="property" value="<%= rate1 %>" placeholder="0"/><span class="label grid_4 alpha omega">%</span>
     </div>
-    <div class="grid_1 textcentered mt8px">
-        <a href="javascript:;" class="delete-rule">
-            <img src="<?php echo $this->websiteUrl;?>system/images/delete.png" />
-        </a>
+    <div class="grid_2 labeled">
+        <input class="grid_8 alpha omega text-center" type="text" name="rate2" data-reflection="property" value="<%= rate2 %>" placeholder="0"/><span class="label grid_4 alpha omega">%</span>
+    </div>
+    <div class="grid_2 labeled">
+        <input class="grid_8 alpha omega text-center" type="text" name="rate3" data-reflection="property" value="<%= rate3 %>" placeholder="0"/><span class="label grid_4 alpha omega">%</span>
+    </div>
+    <div class="grid_1 text-center mt5px">
+        <a href="javascript:;" class="delete-rule icon-remove icon16 error"></a>
     </div>
 </script>
 <?php
 $this->placeholder('headerContent')->captureStart();
     echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
-    echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'));
+    echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'), array('class' => 'pointer'));
 $this->placeholder('headerContent')->captureEnd();
 ?>
 
 <div id="manage-taxes">
+	<div class="content-medium-footer grid_12">
+        <div class="header-inner">
+            <div class="grid_1 alpha omega text-center"><?php echo $this->translate('Default');?></div>
+            <div class="grid_4"><?php echo $this->translate('Zone');?></div>
+            <div class="grid_2 text-center""><?php echo $this->translate('Default Tax');?></div>
+            <div class="grid_2 text-center"><?php echo $this->translate('Tax Rate 1');?></div>
+            <div class="grid_2 suffix_1 text-center""><?php echo $this->translate('Tax Rate 2');?></div>
+        </div>
 
-	<div class="ui-helper-clearfix padding10px" style="text-align:center; font-weight:bold; line-height: 20px;">
-		<div class="grid_1"><?php echo $this->translate('Default');?></div>
-		<div class="grid_4"><?php echo $this->translate('Zone');?></div>
-		<div class="grid_6 omega">
-			<div class="grid_4"><?php echo $this->translate('Default Tax');?></div>
-			<div class="grid_4"><?php echo $this->translate('Tax Rate 1');?></div>
-			<div class="grid_4"><?php echo $this->translate('Tax Rate 2');?></div>
-		</div>
-		<div class="grid_1">&nbsp;</div>
+        <div id="rules" class="">
+            <!-- container for rules -->
+        </div>
 	</div>
 
-	<div id="rules" class="ui-widget-content ui-helper-clearfix h430" style="overflow-x: hidden; overflow-y: auto;">
-		<!-- container for rules -->
-	</div>
-
-	<div class="padding5px">
-		<button id="new-rule-btn" class="blue-btn"><?php echo $this->translate('Add new');?></button>
-		<button id="save-btn" style="float:right;"><?php echo $this->translate('Save and close');?></button>
-	</div>
+    <div class="footer grid_12">
+        <button id="new-rule-btn" class=" icon-plus success"><?php echo $this->translate('Add new');?></button>
+        <button id="save-btn" class="icon-save"><?php echo $this->translate('Save and close');?></button>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -75,23 +69,3 @@ $this->placeholder('headerContent')->captureEnd();
         })
     })
 </script>
-
-
-<style type="text/css">
-    .taxrule {
-        margin-top: 5px;
-        color: #5F9EA0;
-        padding: 6px 0px;
-        background: url('<?php echo $this->websiteUrl;?>/system/images/bg-strip.png');
-    }
-    .ui-widget-header label {
-        display: inline;
-        vertical-align: bottom;
-    }
-    #price-inc-tax {margin-top:2px;}
-    #rules input[type=text] {
-        width: 70%;
-        margin-right:-22px;
-        padding-right:22px;
-    }
-</style>
