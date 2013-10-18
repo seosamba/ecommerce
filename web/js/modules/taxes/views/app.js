@@ -36,6 +36,7 @@ define([
             $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON()}, function(response){
                 self.$el.closest('.seotoaster').find('.closebutton .close').trigger('click');
                 hideSpinner();
+                showMessage('Saved');
             }).fail(function() {
                 hideSpinner();
                 $('[name="zoneId"]').filter(function(){
