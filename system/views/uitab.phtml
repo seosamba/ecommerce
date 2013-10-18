@@ -21,16 +21,20 @@
 
 
 	<!-- Filtering -->
-	<div id="filters" class="grid_4">
-		<select style="width: 205px;float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
+	<div id="filters" class="grid_5">
+		<select style="float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
+        <label>
+            <input type="checkbox" id="strict-tags" />&nbsp;<?php echo $this->translate('AND'); ?>
+        </label>
 	</div>
-	<div class="grid_4">
-		<select style="width: 205px;float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
+
+	<div class="grid_3">
+		<select style="float:left;" name="product-brands" id="brands" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
 	</div>
 
 	<!-- Ordering -->
-	<div id="order" class="grid_4">
-		<select style="width: 205px;float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Sort by...');?>">
+	<div id="order" class="grid_3">
+		<select style="float:left;" name="ordering" id="ordering" multiple class="pselect ui-corner-all" data-placeholder="<?php echo $this->translate('Sort by...');?>">
 			<option value="name"><?php echo $this->translate('Name'); ?></option>
 			<option value="price"><?php echo $this->translate('Price'); ?></option>
 			<option value="brand"><?php echo $this->translate('Brand'); ?></option>
@@ -50,7 +54,7 @@
 	}
 	#product-products {
 		overflow-y: auto;
-		height: 310px;
+        height: 295px;
 	}
 	div.productlisting {
         width: 15%;
@@ -110,7 +114,7 @@
         padding: 6px 5px;
 
     }
-    .chzn-container-multi {min-width: 200px}
+    .chzn-container-multi {min-width: 100%}
 </style>
 
 <?php
@@ -134,8 +138,18 @@
 			    //init jqueryui button
 			    $('#btn-create').button();
 			    $('.ui-tabs-nav-item a').click(this.launch);
-			    $(document).on('click', '.currproduct', this.insertSingleProduct)
-			        .on('click', '#btn-create', this.insertList);
+			    $(document)
+                    .on('click', '.currproduct', this.insertSingleProduct)
+			        .on('click', '#btn-create', this.insertList)
+                    .on('click', '#strict-tags', function() {
+                        if($('#tags').val() !== null) {
+                            uiTab.offset    = 0;
+                            self.searchTerm = null;
+                            $('#search').val('');
+                            uiTab.loadStoreData('products', true);
+                        }
+                    });
+
 			    $('.pselect').chosen().change(function() {
 					uiTab.offset    = 0;
 
@@ -143,9 +157,8 @@
                     self.searchTerm = null;
                     $('#search').val('');
 
-                    uiTab.loadStoreData('products', true)
+                    uiTab.loadStoreData('products', true);
 			    });
-
 
                 var self = this;
                 $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
@@ -323,6 +336,7 @@
                         data.fbrand = $('#brands').val();
 	                }
                 }
+                data['stc'] = ($('#strict-tags').prop('checked') == false) ? 0 : 1;
 			    return data;
 		    },
 		    parseTagsAndBrands: function(tagsBrandResponse, dataType) {
