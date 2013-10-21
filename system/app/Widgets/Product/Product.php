@@ -74,14 +74,23 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			$this->_type = self::TYPE_PRODUCTLISTING;
 			array_shift($this->_options);
 		} else {
-			$productCacheId = __CLASS__.'_byPage_'.$this->_toasterOptions['id'];
-			if (null === ($this->_product = $this->_cache->load($productCacheId, 'store_'))){
-				$this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
-				if (null !== $this->_product){
-					$this->_cache->save($productCacheId, $this->_product, 'store_', array('productwidget', 'prodid_'.$this->_product->getId()), Helpers_Action_Cache::CACHE_FLASH);
-				}
-			}
-			$this->_type = array_shift($this->_options);
+            $productCacheId = __CLASS__.'_byPage_'.$this->_toasterOptions['id'];
+            if ($this->_cacheable) {
+                $this->_product = $this->_cache->load($productCacheId, 'store_');
+            }
+            if (is_null($this->_product)) {
+                $this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
+                if ($this->_cacheable && !is_null($this->_product)) {
+                    $this->_cache->save(
+                        $productCacheId,
+                        $this->_product,
+                        'store_',
+                        array('productwidget', 'prodid_' . $this->_product->getId()),
+                        Helpers_Action_Cache::CACHE_FLASH
+                    );
+                }
+            }
+            $this->_type = array_shift($this->_options);
 		}
 
 		//initializing Zend Currency for future use
@@ -273,10 +282,17 @@ class Widgets_Product_Product extends Widgets_Abstract {
       
         $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($this->_product, $itemDefaultOptionsArray);
         if($currency === true){
-            if (null === ($changedPrice = $this->_cache->load('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_'))){
-                $cacheCurrencyTime = strtotime('tomorrow') - strtotime('now');
+            if ($this->_cacheable) {
+                $changedPrice = $this->_cache->load('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, 'store_');
+            } else {
+                $changedPrice = null;
+            }
+            if (is_null($changedPrice)){
                 $changedPrice = Tools_Misc::getConvertedPriceByCurrency($price, $newCurrency);
-                $this->_cache->save('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
+                if ($this->_cacheable) {
+                    $cacheCurrencyTime = strtotime('tomorrow') - strtotime('now');
+                    $this->_cache->save('product_prodid_'.$this->_product->getId().'_currency_'.$newCurrency.'_price_'.$price, $changedPrice, 'store_', array(), $cacheCurrencyTime);
+                }
             }
             $price = $changedPrice;
 	        $noCurrency = true;     // disabling wrapping converted values
