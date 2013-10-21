@@ -24,7 +24,7 @@
 	<div id="filters" class="grid_5">
 		<select style="float:left;" name="product-tags" id="tags" multiple class="pselect chzn-select ui-corner-all" data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
         <label>
-            <input type="checkbox" id="strict-tags" />&nbsp;<?php echo $this->translate('AND'); ?>
+            <input type="checkbox" id="strict-tags" title="<?php echo $this->translate('AND condition'); ?>" />
         </label>
 	</div>
 
@@ -56,6 +56,13 @@
 		overflow-y: auto;
         height: 295px;
 	}
+    div#filters {position: relative}
+    #filters ul.chzn-choices {padding-right: 25px;}
+    #filters label {
+        position: absolute;
+        top: 9px;
+        right: 4px;
+    }
 	div.productlisting {
         width: 15%;
         height: 140px;
