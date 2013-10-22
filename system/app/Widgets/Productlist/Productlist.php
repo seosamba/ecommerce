@@ -62,7 +62,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 *
 	 * @var array
 	 */
-	private $_products = array();
+	private $_products        = array();
+
+    /**
+     * Show which logic should be used when selecting products by tags AND or OR (default)
+     */
+    private $_strictTagsCount = false;
 
 	public function _init() {
 		parent::_init();
@@ -85,6 +90,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
+        $this->_strictTagsCount = (strtolower(end($this->_options)) == 'and');
+
 
 		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
 		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
@@ -343,7 +350,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), self::DEFAULT_LIMIT,
-			null, $filters['tags'], $filters['brands']);
+			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount);
 	}
 
 	/**

@@ -264,6 +264,12 @@
                             tagnames.push($(this).text());
                         });
                         shortCode += tagnames.join(',');
+
+                        // and logic checkbox checked
+                        if($('#strict-tags').prop('checked')) {
+                            shortCode += ':and';
+                        }
+
 //                        shortCode += (($('#tags').val() != null) ? ':tagnames-' + $('#tags').val() : '');
                     }
                     //brands filter
