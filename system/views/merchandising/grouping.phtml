@@ -1,34 +1,34 @@
-<input type="hidden" name="group-currency" class="group-currency" value="<?php echo Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency'); ?>" xmlns="http://www.w3.org/1999/html"/>
+<input type="hidden" name="group-currency" class="group-currency" value="<?php echo Models_Mapper_ShoppingConfig::getInstance()->getConfigParam( 'currency' ); ?>" xmlns="http://www.w3.org/1999/html"/>
 <form id="edit-group" class="grid_12 alpha omega background">
     <div class="grid_3 alpha">
-        <?php echo $this->formText('groupName', null, array(
-            'class' => 'new-group-name', 'placeholder' => $this->translate('Enter group name')
-        )); ?>
+        <?php echo $this->formText( 'groupName', null, array(
+            'class' => 'new-group-name', 'placeholder' => $this->translate( 'Enter group name' )
+        ) ); ?>
     </div>
 
     <div class="grid_1 alpha omega mt0px">
-        <?php echo $this->formSelect('priceSign', null, array(
+        <?php echo $this->formSelect( 'priceSign', null, array(
             'id' => 'group-sign',
         ), array(
             'plus' => '+', 'minus' => '-'
-        )); ?>
+        ) ); ?>
 
     </div>
     <div class="grid_3 mt0px">
-        <?php echo $this->formText('priceValue', null, array(
+        <?php echo $this->formText( 'priceValue', null, array(
             'class' => 'new-group-price-value'
-        )); ?>
+        ) ); ?>
     </div>
     <div class="grid_1 alpha omega mt0px">
-        <?php echo $this->formSelect('priceType', null, array(
+        <?php echo $this->formSelect( 'priceType', null, array(
             'id' => 'group-price-type',
         ), array(
-            'percent' => '%', 'unit' => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency')
-        )); ?>
+            'percent' => '%', 'unit' => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam( 'currency' )
+        ) ); ?>
 
     </div>
 
-    <button class="grid_4 omega mt0px inverse" type="submit"><?php echo $this->translate('Create or update group'); ?></button>
+    <button class="grid_4 omega mt0px icon-plus" type="submit"><?php echo $this->translate( 'Create or update group' ); ?></button>
 
 </form>
 
@@ -36,9 +36,9 @@
     <table id="group-table" class="table-striped table-hover small mb15px">
         <thead class="header-inner">
             <tr>
-                <th><?php echo $this->translate('Group Name'); ?></th>
-                <th><?php echo $this->translate('Default price modifier'); ?></th>
-                <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
+                <th><?php echo $this->translate( 'Group Name' ); ?></th>
+                <th><?php echo $this->translate( 'Default price modifier' ); ?></th>
+                <th class="w10 text-center"><?php echo $this->translate( 'Action' ); ?></th>
             </tr>
         </thead>
         <tbody></tbody>

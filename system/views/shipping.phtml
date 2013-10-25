@@ -8,7 +8,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
 ?>
 <div class="content-footer">
     <form id="general-config" class="grid_12">
-        <label class="grid_6 alpha" for="config-checkoutShippingTocRequire">
+        <label class="grid_6 alpha pointer mt5px bold" for="config-checkoutShippingTocRequire">
             <?php echo $this->formCheckbox(
                 'config['.Shopping::SHIPPING_TOC_STATUS.']',
                 null,
@@ -16,7 +16,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                 ); ?>
             <?php echo $this->translate('Require Shipping TOC on checkout. Use label (HTML ok):'); ?>
         </label>
-        <div class="grid_6 omega">
+        <div class="grid_6 omega mt0px">
             <?php
             echo $this->formText(
             'config['.Shopping::SHIPPING_TOC_LABEL.']',
@@ -26,55 +26,55 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             ?>
         </div>
     </form>
-    <div id="shipping-config" class="grid_12">
+    <div id="shipping-config" class="grid_12 mt15px">
         <div id="shippers" class="ui-tabs-vertical">
-            <ul class="grid_4">
-                <li><a href="#markup" data-plugin="markup"><?php echo $this->translate('Markup');?></a></li>
-                <li><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup');?></a></li>
-                <li><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping');?></a></li>
+            <ul class="grid_4 alpha omega list-bordered">
+                <li><input class="switcher" type="checkbox" role="switch"/><a href="#markup" data-plugin="markup"><?php echo $this->translate('Markup');?></a></li>
+                <li><input class="switcher" type="checkbox" role="switch"/><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup');?></a></li>
+                <li><input class="switcher" type="checkbox" role="switch"/><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping');?></a></li>
             <?php foreach($this->shippingPlugins as $plugin):?>
                 <li><a data-plugin="<?php echo $plugin->getName();?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute');?>"><?php echo $plugin->getName();?></a></li>
             <?php endforeach; ?>
             </ul>
-            <div id="pane-container" class="grid_8">
+            <div id="pane-container" class="grid_8 omega">
 
                 <div id="markup">
                     <header><?php echo $this->translate('Shipping markup configuration');?></header>
                     <?php $this->markupForm->setAction($this->url(array('run' => 'bundledshipper')));?>
                     <form class="clearfix" action="<?php echo $this->markupForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
                         <?php echo $this->markupForm->getElement('shipper')->renderViewHelper(); ?>
-                        <label class="grid_3 mt5px textright" for="cartamount"><?php echo $this->markupForm->getElement('price')->getLabel();?></label>
-                        <div class="grid_2 relative">
+                        <label class="grid_3 mt5px" for="cartamount"><?php echo $this->markupForm->getElement('price')->getLabel();?></label>
+                        <div class="grid_3 mt0px">
                             <?php echo $this->markupForm->getElement('modifierSign')->renderViewHelper();?>
                         </div>
-                        <div class="grid_2 relative">
+                        <div class="grid_3 mt0px">
                             <?php echo $this->markupForm->getElement('price')->renderViewHelper();?>
                             <label class="unit-over"><?php //echo $this->config['currency'];?></label>
                         </div>
-                        <div class="grid_2 relative">
+                        <div class="grid_3 mt0px">
                             <?php echo $this->markupForm->getElement('modifierType')->renderViewHelper();?>
                         </div>
                      </form>
                 </div>
                 <div id="pickup">
-                    <label style="display: block;margin: 10px; text-align: justify"><?php echo $this->translate('When this option is checked user will be given the option to pick their stuff up at your store location.'); ?></label>
+                    <label class="message info"><?php echo $this->translate('When this option is checked user will be given the option to pick their stuff up at your store location.'); ?></label>
                 </div>
                 <div id="freeshipping">
                     <header><?php echo $this->translate('Free shipping');?></header>
                     <?php $this->freeForm->setAction($this->url(array('run' => 'bundledshipper')));?>
                     <form class="clearfix" action="<?php echo $this->freeForm->getAction();?>" method="post" enctype="application/x-www-form-urlencoded">
                         <?php echo $this->freeForm->getElement('shipper')->renderViewHelper(); ?>
-                        <label class="grid_3 mt5px textright" for="cartamount"><?php echo $this->freeForm->getElement('cartamount')->getLabel();?></label>
-                        <div class="grid_3 relative">
+                        <label class="grid_3 alpha omega mt5px" for="cartamount"><?php echo $this->freeForm->getElement('cartamount')->getLabel();?></label>
+                        <div class="grid_3 alpha omega labeled mt0px">
                             <?php echo $this->freeForm->getElement('cartamount')->renderViewHelper();?>
-                            <label class="unit-over"><?php echo $this->config['currency'];?></label>
+                            <label class="unit-over grid_4 alpha omega"><?php echo $this->config['currency'];?></label>
                         </div>
-                        <label class="grid_2 mt5px textcentered"><?php echo $this->freeForm->getElement('destination')->getLabel();?></label>
-                        <div class="grid_3">
+                        <label class="grid_2 alpah omega text-right mt5px"><?php echo $this->freeForm->getElement('destination')->getLabel();?></label>
+                        <div class="grid_4 omega mt0px">
                             <?php echo $this->freeForm->getElement('destination')->renderViewHelper();?>
                         </div>
-                        <label class="grid_12 mt10px"><?php echo $this->freeForm->getElement('errormessage')->getLabel();?>:</label>
-                        <div class="grid_12">
+                        <div class="grid_12 alpha omega">
+                            <label><?php echo $this->freeForm->getElement('errormessage')->getLabel();?>:</label>
                             <?php echo $this->freeForm->getElement('errormessage')->renderViewHelper();?>
                         </div>
                     </form>

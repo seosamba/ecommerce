@@ -319,3 +319,48 @@
     height   : 205px;
     overflow : auto;
 }
+
+//	Manage zones
+//==================================================
+#general-config{
+}
+
+#shipping-config{
+
+    #shippers{
+
+        ul{
+            li{
+                label{
+                    //margin-top : @padding-base-vertical;
+                    float : right;
+                }
+
+                &.disabled{
+                    //color : @brand-error;
+                }
+
+                &.enabled{
+                    //color : @brand-success;
+                }
+                a{
+                    //color : inherit;
+                }
+            }
+        }
+
+        #pane-container{
+            .background(0);
+
+            .ui-tabs-panel{
+
+                header{
+                    background : @header-inner-bg;
+                    color      : @header-inner-color;
+                    margin     : -@padding-base-vertical -@padding-base-horizontal @padding-base-vertical;
+                    padding    : @padding-base-vertical @padding-base-horizontal;
+                }
+            }
+        }
+    }
+}

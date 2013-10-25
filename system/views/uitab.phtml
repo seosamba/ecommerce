@@ -23,11 +23,11 @@
 	<!-- Filtering -->
 	<div id="filters" class="grid_4 alpha">
 		<select class="pselect chzn-select" name="product-tags" id="tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
-        <label>
-            <input type="checkbox" id="strict-tags" />&nbsp;<?php echo $this->translate('AND'); ?>
+        <label class="pointer">
+            <input type="checkbox" id="strict-tags" class="processed"/><span title="AND conditional"></span>
         </label>
 	</div>
-	<div class="grid_4">
+    <div class="grid_4">
 		<select class="pselect" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
 	</div>
 
@@ -109,7 +109,6 @@
 
     	    },
 		    launch: function() {
-			    $('#product-products').html('<span class="spinner"></span>');
 			    var children = $(this).find('span#products');
 			    if(!children.length) {
                     $('tr.mceFirst').show();
@@ -121,7 +120,7 @@
                     //hiding mce controls
                     $('tr.mceFirst').hide();
                     $('table#content_tbl').width('100%');
-                    $('table#content_tbl').height('430px');
+                    $('table#content_tbl').height('435px');
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');

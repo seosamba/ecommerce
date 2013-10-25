@@ -14,10 +14,9 @@
   width: 28px;
   height: 28px;
   line-height: 28px;
+  font-size: 0;
 }
-#manage-product .header .nav-links a:before,
-#manage-product .header .nav-links a [class^="icon-"]:before,
-#manage-product .header .nav-links a [class*=" icon-"]:before {
+#manage-product .header .nav-links a:before {
   font-size: 28px;
 }
 #manage-product .header .nav-links a:hover {
@@ -45,6 +44,7 @@
   overflow: hidden;
   background: #fafafa;
   padding: 0;
+  border-top: 1px solid #eee;
   -webkit-box-shadow: 0 1px 1px #bbbbbb;
   -moz-box-shadow: 0 1px 1px #bbbbbb;
   -ms-box-shadow: 0 1px 1px #bbbbbb;
@@ -229,6 +229,7 @@
   overflow: hidden;
   background: #fafafa;
   padding: 0;
+  border-top: 1px solid #eee;
   -webkit-box-shadow: 0 1px 1px #bbbbbb;
   -moz-box-shadow: 0 1px 1px #bbbbbb;
   -ms-box-shadow: 0 1px 1px #bbbbbb;
@@ -256,4 +257,27 @@
 #state-list {
   height: 205px;
   overflow: auto;
+}
+#shipping-config #shippers ul li label {
+  float: right;
+}
+#shipping-config #shippers #pane-container {
+  overflow: hidden;
+  background: #fafafa;
+  padding: 0;
+  border-top: 1px solid #eee;
+  -webkit-box-shadow: 0 1px 1px #bbbbbb;
+  -moz-box-shadow: 0 1px 1px #bbbbbb;
+  -ms-box-shadow: 0 1px 1px #bbbbbb;
+  box-shadow: 0 1px 1px #bbbbbb;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#shipping-config #shippers #pane-container .ui-tabs-panel header {
+  background: #aaaaaa;
+  color: #ffffff;
+  margin: -8px -16px 8px;
+  padding: 8px 16px;
 }
