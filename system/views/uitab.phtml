@@ -22,15 +22,18 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4 alpha">
-		<select class="pselect chzn-select ui-corner-all" name="product-tags" id="tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
+		<select class="pselect chzn-select" name="product-tags" id="tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
+        <label>
+            <input type="checkbox" id="strict-tags" />&nbsp;<?php echo $this->translate('AND'); ?>
+        </label>
 	</div>
 	<div class="grid_4">
-		<select class="pselect ui-corner-all" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
+		<select class="pselect" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
 	</div>
 
 	<!-- Ordering -->
 	<div id="order" class="grid_4 omega">
-		<select id="ordering" class="pselect ui-corner-all" name="ordering" multiple data-placeholder="<?php echo $this->translate('Sort by...');?>">
+		<select id="ordering" class="pselect" name="ordering" multiple data-placeholder="<?php echo $this->translate('Sort by...');?>">
 			<option value="name"><?php echo $this->translate('Name'); ?></option>
 			<option value="price"><?php echo $this->translate('Price'); ?></option>
 			<option value="brand"><?php echo $this->translate('Brand'); ?></option>
@@ -60,8 +63,18 @@
 
 			    //init jqueryui button
 			    $('.ui-tabs-nav-item a').click(this.launch);
-			    $(document).on('click', '.currproduct', this.insertSingleProduct)
-			        .on('click', '#btn-create', this.insertList);
+			    $(document)
+                    .on('click', '.currproduct', this.insertSingleProduct)
+			        .on('click', '#btn-create', this.insertList)
+                    .on('click', '#strict-tags', function() {
+                        if($('#tags').val() !== null) {
+                            uiTab.offset    = 0;
+                            self.searchTerm = null;
+                            $('#search').val('');
+                            uiTab.loadStoreData('products', true);
+                        }
+                    });
+
 			    $('.pselect').chosen().change(function() {
 					uiTab.offset    = 0;
 
@@ -69,9 +82,8 @@
                     self.searchTerm = null;
                     $('#search').val('');
 
-                    uiTab.loadStoreData('products', true)
+                    uiTab.loadStoreData('products', true);
 			    });
-
 
                 var self = this;
                 $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
@@ -247,6 +259,7 @@
                         data.fbrand = $('#brands').val();
 	                }
                 }
+                data['stc'] = ($('#strict-tags').prop('checked') == false) ? 0 : 1;
 			    return data;
 		    },
 		    parseTagsAndBrands: function(tagsBrandResponse, dataType) {

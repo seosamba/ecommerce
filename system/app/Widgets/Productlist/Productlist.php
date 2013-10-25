@@ -135,7 +135,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'templateContent'     => $template->getContent(),
 			'websiteUrl'          => $wesiteData['url'],
 			'domain'              => str_replace('www.', '', $wesiteData['url']),
-			'mediaServersAllowed' => $confiHelper->getConfig('mediaServers')
+			'mediaServersAllowed' => $confiHelper->getConfig('mediaServers'),
+            'noZeroPrice'         => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice')
 		);
 
 		if (empty($products)) {
@@ -173,13 +174,19 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 			//preparing default price with applied default options
 			$itemDefaultOptionsArray = array();
-			foreach ($product->getDefaultOptions() as $option) {
-				foreach ($option['selection'] as $item) {
-					if ($item['isDefault'] == 1) {
-						$itemDefaultOptionsArray[$option['id']] = $item['id'];
-					}
-				}
-			}
+            $productDefaultOptions   = $product->getDefaultOptions();
+            if(is_array($productDefaultOptions) && !empty($productDefaultOptions)) {
+                foreach ($productDefaultOptions as $option) {
+                    if(!isset($option['selection'])) {
+                        continue;
+                    }
+                    foreach ($option['selection'] as $item) {
+                        if ($item['isDefault'] == 1) {
+                            $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                        }
+                    }
+                }
+            }
 
 			//setting up the entity parser
 			$entityParser->addToDictionary(array(
@@ -216,7 +223,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 					$args = array_filter(explode(':', $widgetData));
 					$widget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $page->getId()));
 					$key = trim($productPriceWidgets[0][$key], '{}');
-					$replacements[$key] = $widget->render();
+                    $replacements[$key] = $widget->render();
+
+                    // if noZeroPrice in config set to 1 - do not show zero prices and "Add to cart" becomes "Go to product"
+                    if($widgetData == 'price' && $data['noZeroPrice'] && !intval(trim($replacements[$key], '$'))) {
+                        $replacements[$key]                                    = '';
+                        $replacements['$store:addtocart']                      = '<a class="tcart-add" href="' . ($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;') . '">Go to product</a>';
+                        $replacements['$store:addtocart:' . $product->getId()] = $replacements['$store:addtocart'];
+                        $replacements['$store:addtocart:checkbox']             = $replacements['$store:addtocart'];
+                    }
 				}
 				if (!empty($replacements)) {
 					$entityParser->addToDictionary($replacements);
@@ -230,6 +245,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_cacheTags = array_merge($this->_cacheTags, $cacheTags);
 		return $renderedContent;
 	}
+
 
 	protected function _listSameTags() {
 		//get the product

@@ -141,7 +141,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	 * @return array|null List of products
 	 */
 	public function fetchAll($where = null, $order = null, $offset = null, $limit = null,
-	                         $search = null, $tags = null, $brands = null) {
+	                         $search = null, $tags = null, $brands = null, $strictTagsCount = false) {
 		$entities = array();
 
 		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
@@ -168,7 +168,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$select->from(array('t' => 'shopping_tags'), null)
                 ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
 				->where('pt.tag_id IN (?)', $tags);
-				//->having('COUNT(*) = ?', sizeof($tags));
+
+            // we need product with all the tags at the same time ('AND' loginc)
+            if($strictTagsCount) {
+                $select->having('COUNT(*) = ?', sizeof($tags));
+            }
 		}
 
         if ((bool)$search) {
