@@ -96,6 +96,19 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
 		);
 		?>
 	</div>
+    <div class="clear"></div>
+    <label class="mt5px grid_6 omega" for="config-checkoutShippingErrorMessage">
+        <?php echo $this->translate('Error message at the checkout page'); ?>
+    </label>
+    <div class="grid_6 alpha">
+        <?php
+        echo $this->formText(
+            'config['.Shopping::SHIPPING_ERROR_MESSAGE.']',
+            isset($this->shoppingConfig[Shopping::SHIPPING_ERROR_MESSAGE]) ? $this->shoppingConfig[Shopping::SHIPPING_ERROR_MESSAGE] : null,
+            array('placeholder' => $this->translate('Error message at the checkout page'))
+        );
+        ?>
+    </div>
 </form>
 <div id="shipping-config" class="container_12 clearfix">
 	<div id="shippers" class="mt10px mb10px clearfix">
@@ -144,11 +157,7 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
 					<div class="grid_3">
 						<?php echo $this->freeForm->getElement('destination')->renderViewHelper();?>
 					</div>
-                    <label class="grid_12 mt10px"><?php echo $this->freeForm->getElement('errormessage')->getLabel();?>:</label>
-                    <div class="grid_12">
-                        <?php echo $this->freeForm->getElement('errormessage')->renderViewHelper();?>
-                    </div>
-				</form>
+                </form>
 			</div>
 		</div>
 		<div class="grid_12 mt10px">

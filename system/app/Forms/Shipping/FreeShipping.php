@@ -22,19 +22,24 @@ class Forms_Shipping_FreeShipping extends Zend_Form {
 			'label' => 'For orders over'
 		));
 
+        $destinationOptions = array(
+            '0'             => 'select',
+            self::DESTINATION_NATIONAL      => 'National',
+            self::DESTINATION_INTERNATIONAL => 'International',
+            self::DESTINATION_BOTH          => 'All'
+        );
+
+        $zones = Models_Mapper_Zone::getInstance()->fetchAll();
+        if(!empty($zones)){
+            foreach($zones as $zone){
+                $destinationOptions[$zone->getId()] = $zone->getName();
+            }
+        }
 		$this->addElement('select', 'destination', array(
 			'label'         => 'delivery to',
-			'multiOptions'  => array(
-				'0'             => 'select',
-				self::DESTINATION_NATIONAL      => 'National',
-				self::DESTINATION_INTERNATIONAL => 'International',
-				self::DESTINATION_BOTH          => 'Both'
-			)
+			'multiOptions'  => $destinationOptions
 		));
 
-        $this->addElement('text', 'errormessage', array(
-            'label' => 'Error message at the checkout page'
-        ));
 	}
 
 
