@@ -378,4 +378,13 @@ class Tools_Misc {
 
     }
 
+    public static function getDefaultCheckoutErrorMessage(){
+        $translator = Zend_Registry::get('Zend_Translate');
+        $checkoutErrorMessage = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::SHIPPING_ERROR_MESSAGE);
+        if($checkoutErrorMessage === null){
+            $checkoutErrorMessage = $translator->translate('There is an issue with the shipping information provided, please contact us for support.');
+        }
+        return $checkoutErrorMessage;
+    }
+
 }
