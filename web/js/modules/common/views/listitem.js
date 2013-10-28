@@ -1,7 +1,8 @@
 define([
 	'underscore',
-	'backbone'
-], function(_, Backbone){
+	'backbone',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(_, Backbone, i18n){
 
     var listItemView = Backbone.View.extend({
         tagName: 'li',
@@ -32,10 +33,37 @@ define([
             return this;
         },
         addItem: function(e){
+            var currentModel = this.model;
+            var notAddExistingZone = false;
+            var currentTarget = $(e.target).parent('li');
+            if(app.view.zonesCollection.length > 0){
+                $.each(app.view.zonesCollection.models, function(index, countrys){
+                    if(countrys.get('countries').length > 0){
+                        $.each(countrys.get('countries'), function(index, country){
+                           if(country.country == currentModel.country){
+                               notAddExistingZone = true;
+                           }
+                        });
+                    }
+                });
+            }
             var index = app.view.zoneHolder.tabs('option', 'active'),
                 currentZone = app.view.zonesCollection.at(index);
-                currentZone.addItem(this.$el.data('listname'), this.model);
-            $(e.target).parent('li').hide('slide');
+            var currentListName = this.$el.data('listname');
+            if(notAddExistingZone){
+                smoke.confirm((_.isUndefined(i18n['Wait a minute! this country is already part of another zone... Add anyway?'])?'Wait a minute! this country is already part of another zone... Add anyway?':i18n['Wait a minute! this country is already part of another zone... Add anyway?']), function(e) {
+                    if(e) {
+                        currentZone.addItem(currentListName, currentModel);
+                        currentTarget.hide('slide');
+                    }else{
+                        return false;
+                    }
+                }, {classname : 'errors', ok : _.isUndefined(i18n['Add'])?'Add':i18n['Add'], cancel : _.isUndefined(i18n['No'])?'No':i18n['No']});
+            }
+            if(!notAddExistingZone){
+                currentZone.addItem(currentListName, currentModel);
+                currentTarget.hide('slide');
+            }
         },
         removeItem: function(e){
             var index = app.view.zoneHolder.tabs('option', 'active'),
