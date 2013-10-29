@@ -10,7 +10,6 @@
   vertical-align: top;
 }
 #manage-product .header .nav-links a {
-  color: #666666;
   width: 28px;
   height: 28px;
   line-height: 28px;
@@ -18,9 +17,6 @@
 }
 #manage-product .header .nav-links a:before {
   font-size: 28px;
-}
-#manage-product .header .nav-links a:hover {
-  color: #59a5c3;
 }
 #manage-product #product-list {
   width: 100%;

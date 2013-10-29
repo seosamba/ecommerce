@@ -85,7 +85,7 @@
         <input class="small" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
-    <button class="fl-right remove-option icon error inverse icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
+    <button class="fl-right remove-option icon inverse-error icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -138,7 +138,7 @@
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-        <span class="icon-close btn icon link error" title="<?php echo $this->translate('Delete');?>"></span>
+        <span class="icon-close btn icon link error icon12" title="<?php echo $this->translate('Delete');?>"></span>
     <% } else { %>
     <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>
@@ -179,7 +179,7 @@
     <div id="product-list" class="show-right">
         <div class="header">
             <div class="closebutton">
-                <a id="product-list-back-link" class="hide icon-chevron-right btn icon link error inverse" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
+                <a id="product-list-back-link" class="hide icon-chevron-right btn icon link inverse-error" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
             <div class="grid_5">
                 <label class="grid_2 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?></label>
@@ -196,7 +196,7 @@
     <div id="image-select-dialog" class="show-left">
         <div class="header text-center">
             <div class="closebutton">
-                <a class="hide icon-chevron-left icon" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
+                <a class="hide icon-chevron-left btn link icon inverse-error" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
 			<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); ?>
         </div>
@@ -223,9 +223,9 @@
             </li>
         <?php endforeach; ?>
         <div class="nav-links">
-            <a class="show-list btn link icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+            <a class="show-list btn link inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
             <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-            <a id="new-product" class="btn link icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+            <a id="new-product" class="btn link inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
         </div>
     </ul>
     <!--------- MAIN INFO -------------->
