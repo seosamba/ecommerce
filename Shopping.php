@@ -85,6 +85,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const SHIPPING_TOC_LABEL = 'checkoutShippingTocLabel';
 
+    const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */

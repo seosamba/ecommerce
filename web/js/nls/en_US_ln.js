@@ -80,6 +80,7 @@ define({
         'Products removed' : 'Products removed',
         'Input new value' : 'Input new value',
         'View packing slip' : 'View packing slip',
-        'Download packing slip' : 'Download packing slip'
+        'Download packing slip' : 'Download packing slip',
+        'Wait a minute! this country is already part of another zone... Add anyway?':'Wait a minute! this country is already part of another zone... Add anyway?'
     }
 });

@@ -80,7 +80,8 @@ define({
         'Products removed' : 'Produits effacés',
         'Input new value' : 'Entrée nouvelle valeur',
         'View packing slip' : 'Voir bon de livraison',
-        'Download packing slip' : 'Télécharger bon de livraison'
+        'Download packing slip' : 'Télécharger bon de livraison',
+        'Wait a minute! this country is already part of another zone... Add anyway?':'Wait a minute! this country is already part of another zone... Add anyway?'
 
     }
 });

@@ -1,6 +1,7 @@
 <?php
-    $this->headTitle( $this->translate( 'Manage zones' ) );
-    $this->headScript()->setAllowArbitraryAttributes( true )->appendFile( $this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array( 'data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js' ) );
+    $this->headTitle($this->translate('Manage zones'));
+    $this->headScript()->setAllowArbitraryAttributes(true)
+        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js'));
 ?>
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
