@@ -17,7 +17,7 @@ define([
 	// @description:
 	// This paginator is responsible for providing pagination
 	// and sort capabilities for a single payload of data
-	// we wish to paginate by the Modules for easier browsering.
+	// we wish to paginate by the UI for easier browsering.
 	//
 	Paginator.clientPager = Backbone.Collection.extend({
 	
