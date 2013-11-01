@@ -681,6 +681,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				$this->_responseHelper->response($status->toArray(), false);
 			}
 			$this->_view->order = $order;
+            $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
 			$this->_layout->content = $this->_view->render('order.phtml');
 			echo $this->_layout->render();
 		}
