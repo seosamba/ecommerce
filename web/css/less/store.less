@@ -4,6 +4,8 @@
 //==================================================
 //	Add/edit product
 //	Manage brand logos
+//	Tax configuration
+//	Shipping configuration
 //==================================================
 
 // Add/edit product
@@ -274,7 +276,12 @@
 #manage-logos{
     .brand-list{
         &>*{
-            margin : 0 1% 1% 0;
+            .grid-elements(8, 1, true);
+            margin-bottom : 1%;
+
+            img{
+                vertical-align : top;
+            }
 
             .caption{
                 font-size   : @font-size-base - 2;
@@ -309,7 +316,7 @@
     }
 
     .zone-zip{
-        height : 154px;
+        height : 153px;
     }
 }
 
@@ -318,7 +325,17 @@
     overflow : auto;
 }
 
-//	Manage zones
+//	Tax configuration
+//==================================================
+#manage-taxes{
+
+    #rules{
+        max-height : 340px;
+        overflow   : auto;
+    }
+}
+
+//	Shipping configuration
 //==================================================
 #general-config{
 }

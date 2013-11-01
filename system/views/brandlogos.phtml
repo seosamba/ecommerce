@@ -5,7 +5,7 @@ $this->placeholder('headerContent')->set($this->translate('Manage brand logos'))
 ?>
 
 
-<div class="content-footer grid_12">
+<div class="content-footer">
     <div class="hidden">
     <?php
         echo $this->formHidden('things-select-folder', Shopping::BRAND_LOGOS_FOLDER);
@@ -20,7 +20,7 @@ $this->placeholder('headerContent')->set($this->translate('Manage brand logos'))
     ?>
     </div>
 
-    <div id="manage-logos">
+    <div id="manage-logos" class="grid_12">
         <ul class="brand-list list-images"></ul>
         <span class="spinner"></span>
     </div>

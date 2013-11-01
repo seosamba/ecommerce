@@ -15,8 +15,7 @@
         </div>
 		<ul class="zone-countries list-tags"></ul>
         <div class="footer grid_12">
-            <a href="javascript:;" class="clearprop error" data-property="countries">[ <?php echo $this->translate( 'clear' ); ?>
-                                                                                     ]</a>
+            <a href="javascript:;" class="clearprop error" data-property="countries">[ <?php echo $this->translate( 'clear' ); ?> ]</a>
             <button class="open-dialog fl-right" data-name="add-country"><?php echo $this->translate( 'Add Country' ); ?></button>
         </div>
 	</div>
@@ -26,8 +25,7 @@
         </div>
 		<ul class="zone-states list-tags"></ul>
         <div class="footer grid_12">
-            <a href="javascript:;" class="clearprop error" data-property="states">[ <?php echo $this->translate( 'clear' ); ?>
-                                                                                  ]</a>
+            <a href="javascript:;" class="clearprop error" data-property="states">[ <?php echo $this->translate( 'clear' ); ?> ]</a>
             <button class="open-dialog fl-right" data-name="add-state"><?php echo $this->translate( 'Add State' ); ?></button>
         </div>
 	</div>
@@ -52,8 +50,7 @@
     </ul>
 </div>
 <div class="footer grid_12">
-    <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?>
-                                                                          ]</a>
+    <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?> ]</a>
     <button id="save-btn" class="icon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
 </div>
 
@@ -74,7 +71,7 @@
         <ul id="state-list" class="list-bordered mt10px grid_12 alpha omega"></ul>
     </div>
 </div>
-
+<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
 $('#manage-zones').tabs();

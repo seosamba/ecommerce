@@ -208,7 +208,21 @@
   text-align: center;
 }
 #manage-logos .brand-list > * {
-  margin: 0 1% 1% 0;
+  margin-bottom: 1%;
+}
+#manage-logos .brand-list > *:not(.featureapage) {
+  width: 11.625%;
+  margin-left: 1%;
+}
+#manage-logos .brand-list > *:not(.featureapage):nth-child(8n + 1) {
+  margin-left: 0;
+}
+#manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
+#manage-logos .brand-list > *:not(.featureapage) {
+  width: 11.325%;
+}
+#manage-logos .brand-list > * img {
+  vertical-align: top;
 }
 #manage-logos .brand-list > * .caption {
   font-size: 12px;
@@ -247,11 +261,15 @@
   padding: 5px 0;
 }
 #manage-zones .zone-zip {
-  height: 154px;
+  height: 153px;
 }
 #country-list,
 #state-list {
   height: 205px;
+  overflow: auto;
+}
+#manage-taxes #rules {
+  max-height: 340px;
   overflow: auto;
 }
 #shipping-config #shippers ul li label {
