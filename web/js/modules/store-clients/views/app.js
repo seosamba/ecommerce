@@ -4,8 +4,9 @@ define([
     './customer_row',
     '../../groups/collections/group',
     'text!../../groups/templates/groups_dialog.html',
+    'text!../templates/email_service.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
-    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, i18n){
+    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, EmailServiceDialogTmpl, i18n){
 
     var AppView = Backbone.View.extend({
         el: $('#clients'),
@@ -237,6 +238,115 @@ define([
             }, {classname:"errors", 'ok':'Yes', 'cancel':'No'});
 
 
+        },
+        emailMarketing: function(e){
+            var checkedCustomers = this.customers.checked();
+            var customerIds = [];
+
+            if(checkedCustomers.length == 0){
+                return false;
+            }
+
+            $.each(checkedCustomers, function(index, value) {
+                customerIds.push(value.id);
+            });
+
+            $.ajax({
+                url: $('#website_url').val()+'plugin/apps/run/getEnabledServicesDashboard/customers/'+customerIds,
+                type: 'GET',
+                dataType: 'json'
+
+            }).done(function(response) {
+                    if(response.error == 1){
+                        showMessage(_.isUndefined(i18n['No available services'])?'No available services':i18n['No available services']);
+                        return false;
+                    }else{
+                        var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
+                        var assignEmailService = {};
+                        var customerIds = response.responseText.clients;
+                        var customerIds = customerIds.split(',');
+
+
+                        var enabledServices = response.responseText.enabledServices;
+                        assignEmailService[applyButton] = function() {
+
+                            if($("#marketing-services option:selected").val() == 'select'){
+                                showMessage(_.isUndefined(i18n['Please choose service'])?'Please choose service':i18n['Please choose service']);
+                                return false;
+                            }
+
+                            if($("input:checkbox[name=list]:checked").length == 0){
+                                showMessage(_.isUndefined(i18n['Please choose list'])?'Please choose list':i18n['Please choose list']);
+                                return false;
+                            }
+
+                            var lists = [];
+                            $("input:checkbox[name=list]:checked").each(function() {
+                                lists.push($(this).val());
+                            });
+
+                            $.ajax({
+                                url: $('#website_url').val()+'plugin/apps/run/sendServicesDashboard/customers/'+customerIds+'/service/'+$("#marketing-services option:selected").val()+'/lists/'+lists,
+                                type: 'POST',
+                                dataType: 'json'
+                                }).done(function(response) {
+                                    if(response.error == 0){
+                                        showMessage(_.isUndefined(i18n['Emails added'])?'Emails added':i18n['Emails added']);
+                                    }else{
+                                        showMessage(_.isUndefined(i18n['Something went wrong'])?'Something went wrong':i18n['Something went wrong']);
+                                    }
+                                })
+                        };
+
+                        var dialog = _.template(EmailServiceDialogTmpl, {
+                            enabledServices:enabledServices,
+                            customerIds:customerIds,
+                            i18n:i18n
+                        });
+
+                        $(dialog).dialog({
+                            width: 600,
+                            dialogClass: 'seotoaster',
+                            buttons: assignEmailService,
+                            open: function(event, ui) {
+                                $('#marketing-services').on('change',  function(){
+                                    if($("#marketing-services option:selected").val() != 'select'){
+                                        $.ajax({
+                                            url: $('#website_url').val()+'plugin/apps/run/getService/serviceName/'+$("#marketing-services option:selected").val(),
+                                            type: 'GET',
+                                            dataType: 'json'
+
+                                        }).done(function(response) {
+                                            if(response.error == 1){
+                                                showMessage(_.isUndefined(i18n['No available lists'])?'No available lists':i18n['No available lists']);
+                                                $('#subscribe-list').remove();
+                                                return false;
+                                            }else{
+                                                $('#subscribe-list').remove();
+                                                var subscribeList = '<div id="subscribe-list" style="margin-top: 15px;">';
+                                                $.each(response.responseText.list, function(value, listName){
+                                                    subscribeList += '<input style="margin-top:5px;" type="checkbox" name="list" value="'+value+'"/><label style="float:left; margin-right: 20px;">'+listName+'</label>'
+                                                })
+                                                subscribeList += '</div>';
+                                                $('#marketing-services').after(subscribeList);
+
+                                            }
+
+                                        });
+                                    }else{
+                                        $('#subscribe-list').remove();
+                                    }
+                                })
+
+                            },
+                            close: function(event, ui){
+                                $(this).dialog('close').remove();
+                            }
+                        });
+                        return false;
+                    }
+
+            });
         }
     });
 	
