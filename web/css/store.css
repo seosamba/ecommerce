@@ -289,6 +289,10 @@
   -ms-box-sizing: border-box;
   box-sizing: border-box;
 }
+#shipping-config #shippers #pane-container .ui-tabs-panel {
+  overflow: auto;
+  max-height: 395px;
+}
 #shipping-config #shippers #pane-container .ui-tabs-panel header {
   background: #aaaaaa;
   color: #ffffff;
