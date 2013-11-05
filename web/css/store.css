@@ -133,7 +133,7 @@
   margin: 0.5%;
 }
 #manage-product #main-tab #description-box textarea {
-  height: 225px;
+  height: 210px;
 }
 #manage-product #main-tab #quick-preview {
   position: relative;
@@ -169,7 +169,7 @@
   font-size: 0.85em;
   color: #666666;
   display: block;
-  height: 147px;
+  height: 150px;
 }
 #manage-product #main-tab #quick-preview .price {
   position: absolute;
@@ -188,6 +188,12 @@
   display: block;
   text-align: center;
   color: #3498db;
+}
+#manage-product #main-tab #new-brand:focus {
+  width: 50%;
+}
+#manage-product #main-tab #new-brand:focus + #product-brand {
+  width: 31.333%;
 }
 #manage-product #tag-tab .product-tags .tag-widget {
   font-size: 0.85em;
