@@ -323,6 +323,7 @@ class Tools_ShoppingCart {
 
 			$summary['shipping'] = $shippingPrice;
 			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
+            $summary['discount'] = $this->getDiscount();
 
 			foreach ($summary as $key => $value) {
 				$methodName = 'set' . ucfirst($key);
@@ -333,9 +334,12 @@ class Tools_ShoppingCart {
 
 			//process discount coupons
 			$discountCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_DISCOUNT);
-			foreach ($discountCoupons as $coupon) {
-				$summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
-			}
+			if(!empty($discountCoupons)){
+                $summary['discount'] = 0;
+                foreach ($discountCoupons as $coupon) {
+				    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
+			    }
+            }
 			$summary['total'] -= $summary['discount'];
 
             //process freebies

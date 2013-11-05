@@ -79,10 +79,14 @@
 	            <td colspan="5" class="ui-resizable text-left">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
-		            <select id="mass-action">
+                    <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>
+                    <select id="mass-action">
 			            <option value="0"><?php echo $this->translate('nothing');?></option>
                         <option value="assignGroups"><?php echo $this->translate('assign groups');?></option>
                         <option value="assignPassword"><?php echo $this->translate('assign new password');?></option>
+                        <?php if($enabledAppsPlugin instanceof Application_Model_Models_Plugin):?>
+                            <option value="emailMarketing"><?php echo $this->translate('add to email list');?></option>
+                        <?php endif;?>
 			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
 		            </select>
 	            </td>
