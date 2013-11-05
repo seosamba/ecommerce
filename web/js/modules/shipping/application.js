@@ -43,11 +43,12 @@ define(['backbone'], function(Backbone){
             $('ul.ui-tabs-nav a[data-plugin]').each(function(){
                 var plugin = self.shippers.get($(this).data('plugin'));
                 if (plugin) {
-                    console.log(plugin.toJSON().enabled )
                     $(this).closest('li').addClass(!!plugin.get('enabled')?'enabled':'disabled').find(':checkbox').prop('checked', plugin.toJSON().enabled ? true : false);
                 } else {
                     $(this).closest('li').addClass('disabled').find(':checkbox').prop('checked', false);
                 }
+                $(this).closest('li.enabled').prepend('<input class="switcher" type="checkbox" role="switch" checked/>');
+                $(this).closest('li.disabled').prepend('<input class="switcher" type="checkbox" role="switch"/>');
             });
             checkboxRadio();
         },
