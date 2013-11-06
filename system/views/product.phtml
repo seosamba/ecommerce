@@ -234,9 +234,14 @@
     <div id="main-tab" class="content-footer form">
         <div class="grid_8 alpha">
             <fieldset>
-                <div id="product-image-holder" class="page-preview grid_3 alpha mt5px">
+                <div class="page-preview grid_3 alpha mt5px">
                     <img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
                     <span class="icon-folder-upload"><?php echo $this->translate('Choose you image');?></span>
+                    <input type="hidden" id="things-new-folder" value="products"/>
+                    <?php
+                    $uploader = $this->toasterUploader(array('id' => 'page-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'caption' => " "));
+                    echo $uploader;
+                    ?>
                 </div>
                 <div class="grid_9 alpha omega mt0">
                     <label class="grid_7 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
