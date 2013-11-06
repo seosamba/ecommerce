@@ -138,6 +138,20 @@
 					<td class="text-right"><?php echo $this->translate('Shipping');?>:</td>
 					<td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
 				</tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <?php if (Tools_Misc::getTaxName() != ''): ?>
+                        <?php $taxName = Tools_Misc::getTaxName(); ?>
+                    <?php else: ?>
+                        <?php $taxName = 'Tax'; ?>
+                    <?php endif;?>
+                    <?php if ($this->showPriceIncTax == 1): ?>
+                        <td class="text-right"><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
+                    <?php else: ?>
+                        <td class="text-right"><?php echo $this->translate('Total ' . $taxName);?>:</td>
+                    <?php endif;?>
+                    <td><?php echo $this->currency($this->order->getTotalTax());?></td>
+                </tr>
 				<?php if ($this->order->getDiscount() > 0): ?>
 					<tr>
 						<td colspan="5"></td>

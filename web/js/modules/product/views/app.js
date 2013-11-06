@@ -28,7 +28,6 @@ define([
             'change select#option-library': 'addOption',
 			'click #submit': 'saveProduct',
 			'change #product-image-folder': 'imageChange',
-			'click #product-image-holder': 'showImageList',
 			'click .box': 'setProductImage',
 			'change :input[data-reflection]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',
@@ -206,11 +205,8 @@ define([
             }
             $('#option-library').val('-1');
         },
-		showImageList: function(e){
-            $('#image-select-dialog').addClass('show');
-        },
 		imageChange: function(e){
-            showSpinner();
+            $('#image-select-dialog').addClass('show');
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;

@@ -198,7 +198,7 @@
             <div class="closebutton">
                 <a class="hide icon-chevron-left btn link icon inverse-error" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
-			<?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); ?>
+			<?php /*echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); */?>
         </div>
         <div id="image-list" class="content-footer grid_12 list-images"><span class="spinner"></span></div>
         <div class="footer grid_12 text-center">
@@ -263,15 +263,17 @@
                     <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                     <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
                 </div>
-                <label class="grid_1 alpha omega mt20px" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
-                <select class="grid_5 alpha omega mt15px" name="product-brand" id="product-brand" data-reflection="brand">
-                    <option value="0"><?php echo $this->translate('select brand'); ?></option>
-                    <?php foreach ($this->brands as $brand): ?>
-                    <option value="<?php echo $brand->getName(); ?>"><?php echo $brand->getName(); ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <!-- <input class="grid_3 omega mt15px" type="text" name="" id="new-brand"  placeholder="--><?php //echo $this->translate('or create new'); ?><!--">-->
-                <label class="grid_3 omega mt20px text-right pointer"><input id="free-shipping" type="checkbox"/><?php echo $this->translate('Free Shipping'); ?></label>
+                <p class="grid_6 alpha omega">
+                    <label class="grid_2 alpha omega mt5px" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
+                    <input class="grid_4 omega fl-right" type="text" name="" id="new-brand"  placeholder="<?php echo $this->translate('create new'); ?>">
+                    <select class="grid_6 alpha omega" name="product-brand" id="product-brand" data-reflection="brand">
+                        <option value="0"><?php echo $this->translate('select brand'); ?></option>
+                        <?php foreach ($this->brands as $brand): ?>
+                        <option value="<?php echo $brand->getName(); ?>"><?php echo $brand->getName(); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </p>
+                <label class="grid_3 omega mt15px text-right pointer"><input id="free-shipping" type="checkbox"/><?php echo $this->translate('Free Shipping'); ?></label>
             </fieldset>
 
             <div class="mt30px">
