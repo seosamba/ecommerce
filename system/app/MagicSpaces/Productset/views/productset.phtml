@@ -56,7 +56,7 @@
             $.ajax({
                 url        : '<?php echo $this->websiteUrl;?>api/store/products/id/<?php echo $this->currentSetId; ?>',
                 type       : 'put',
-                beforeSend : showSpinner,
+                beforeSend : showSpinner(),
                 data       : JSON.stringify({price: newPrice}),
                 dataType   : 'json'
             }).done(function(response) {

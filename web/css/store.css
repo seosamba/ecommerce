@@ -219,6 +219,10 @@
 #manage-logos .brand-list > *:not(.featureapage) {
   width: 11.625%;
   margin-left: 1%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
 }
 #manage-logos .brand-list > *:not(.featureapage):nth-child(8n + 1) {
   margin-left: 0;
@@ -226,6 +230,57 @@
 #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
 #manage-logos .brand-list > *:not(.featureapage) {
   width: 11.325%;
+}
+@media only screen and (max-width: 800px) {
+  #manage-logos .brand-list > *:not(.featureapage) {
+    width: 32.66666666666667%;
+    margin-left: 1%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  #manage-logos .brand-list > *:not(.featureapage):nth-child(3n + 1) {
+    margin-left: 0;
+  }
+  #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
+  #manage-logos .brand-list > *:not(.featureapage) {
+    width: 32.366666666666674%;
+  }
+}
+@media only screen and (max-width: 640px) {
+  #manage-logos .brand-list > *:not(.featureapage) {
+    width: 49.5%;
+    margin-left: 1%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  #manage-logos .brand-list > *:not(.featureapage):nth-child(2n + 1) {
+    margin-left: 0;
+  }
+  #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
+  #manage-logos .brand-list > *:not(.featureapage) {
+    width: 49.2%;
+  }
+}
+@media only screen and (max-width: 480px) {
+  #manage-logos .brand-list > *:not(.featureapage) {
+    width: 100%;
+    margin-left: 0%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  #manage-logos .brand-list > *:not(.featureapage):nth-child(1n + 1) {
+    margin-left: 0;
+  }
+  #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
+  #manage-logos .brand-list > *:not(.featureapage) {
+    width: 99.7%;
+  }
 }
 #manage-logos .brand-list > * img {
   vertical-align: top;
