@@ -131,12 +131,31 @@
 					<td class="floatLeft"><span class="order-notes"><?php echo $this->order->getNotes();?></span></td>
 					<td colspan="4"></td>
 					<td class="text-right"><?php echo $this->translate('Subtotal');?>:</td>
-					<td><?php echo $this->currency($this->order->getSubTotal());?></td>
+                    <?php if ($this->showPriceIncTax == 1): ?>
+					    <td><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
+                    <?php else:?>
+                        <td><?php echo $this->currency($this->order->getSubTotal());?></td>
+                    <?php endif;?>
 				</tr>
+                <?php if ($this->order->getDiscount() > 0): ?>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td class="text-right"><?php echo $this->translate('Discount');?>:</td>
+                        <?php if ($this->showPriceIncTax == 1): ?>
+                            <td><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
+                        <?php else: ?>
+                            <td><?php echo $this->currency($this->order->getDiscount());?></td>
+                        <?php endif;?>
+                    </tr>
+                <?php endif; ?>
 				<tr>
 					<td colspan="5"></td>
 					<td class="text-right"><?php echo $this->translate('Shipping');?>:</td>
-					<td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
+                    <?php if ($this->showPriceIncTax == 1): ?>
+                        <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
+                    <?php else:?>
+                        <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
+                    <?php endif;?>
 				</tr>
                 <tr>
                     <td colspan="5"></td>
@@ -152,13 +171,6 @@
                     <?php endif;?>
                     <td><?php echo $this->currency($this->order->getTotalTax());?></td>
                 </tr>
-				<?php if ($this->order->getDiscount() > 0): ?>
-					<tr>
-						<td colspan="5"></td>
-						<td class="text-right"><?php echo $this->translate('Discount');?>:</td>
-						<td><?php echo $this->currency($this->order->getDiscount());?></td>
-					</tr>
-				<?php endif; ?>
 				<tr>
 					<td colspan="5"></td>
 					<td class="text-right"><?php echo $this->translate('Grand Total');?>:</td>

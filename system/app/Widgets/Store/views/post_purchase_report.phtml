@@ -193,11 +193,29 @@
 		<div class="post-purchase-row cart-subtotal">
 			<span><?php echo $this->translate('Sub-Total');?>:</span>
 			<?php if ($this->showPriceIncTax == 1): ?>
-				<span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getTotalTax());?></span>
+				<span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getSubTotalTax());?></span>
 			<?php else: ?>
 				<span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal());?></span>
 			<?php endif;?>
 		</div>
+        <?php if ($this->cart->getDiscount() > 0) : ?>
+            <div class="post-purchase-row cart-discount">
+                <span><?php echo $this->translate('Discount');?>:</span>
+                <?php if ($this->showPriceIncTax == 1): ?>
+                    <span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount() + $this->cart->getDiscountTax());?></span>
+                <?php else:?>
+                    <span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount());?></span>
+                <?php endif;?>
+            </div>
+        <?php endif; ?>
+        <div class="post-purchase-row cart-shipping">
+            <span><?php echo $this->translate('Shipping');?>:</span>
+            <?php if ($this->showPriceIncTax == 1): ?>
+                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
+            <?php else:?>
+                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice());?></span>
+            <?php endif;?>
+        </div>
 		<div class="post-purchase-row cart-total-tax">
 			<?php if (Tools_Misc::getTaxName() != ''): ?>
 				<?php $taxName = Tools_Misc::getTaxName(); ?>
@@ -211,16 +229,6 @@
 			<?php endif;?>
 			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
 		</div>
-		<div class="post-purchase-row cart-shipping">
-			<span><?php echo $this->translate('Shipping');?>:</span>
-			<span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice());?></span>
-		</div>
-		<?php if ($this->cart->getDiscount() > 0) : ?>
-			<div class="post-purchase-row cart-discount">
-				<span><?php echo $this->translate('Discount');?>:</span>
-				<span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount());?></span>
-			</div>
-		<?php endif; ?>
 		<div class="post-purchase-row cart-total">
 			<span><?php echo $this->translate('Total');?>:</span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
@@ -408,12 +416,30 @@
 				<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Sub-Total');?>
 					:</span>
 			<?php if ($this->showPriceIncTax == 1): ?>
-				<span><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getTotalTax());?></span>
+				<span><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getSubTotalTax());?></span>
 			<?php else: ?>
 				<span><?php echo $this->currency($this->cart->getSubTotal());?></span>
 			<?php endif;?>
 		</p>
-
+        <?php if ($this->cart->getDiscount() > 0) : ?>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
+					<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Discount');?>
+                        :</span>
+                <?php if ($this->showPriceIncTax == 1): ?>
+                    <span><?php echo $this->currency($this->cart->getDiscount() + $this->cart->getDiscountTax());?></span>
+                <?php else:?>
+                    <span><?php echo $this->currency($this->cart->getDiscount());?></span>
+                <?php endif;?>
+            </p>
+        <?php endif; ?>
+        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
+            <span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Shipping');?>:</span>
+            <?php if ($this->showPriceIncTax == 1): ?>
+                <span><?php echo $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
+            <?php else:?>
+                <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
+            <?php endif;?>
+        </p>
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
 			<?php if (Tools_Misc::getTaxName() != ''): ?>
 				<?php $taxName = Tools_Misc::getTaxName(); ?>
@@ -429,18 +455,6 @@
 			<?php endif;?>
 			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
 		</p>
-
-		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
-			<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Shipping');?>:</span>
-			<span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
-		</p>
-		<?php if ($this->cart->getDiscount() > 0) : ?>
-			<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
-					<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Discount');?>
-						:</span>
-				<span><?php echo $this->currency($this->cart->getDiscount());?></span>
-			</p>
-		<?php endif; ?>
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right;">
 			<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total');?>:</span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>

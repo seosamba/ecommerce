@@ -109,6 +109,17 @@ ul.ui-tabs-nav li.enabled span.icon-checkmark, ul.ui-tabs-nav li.disabled span.i
         );
         ?>
     </div>
+    <label class="mt5px grid_6 omega" for="config-shippingTaxRate">
+        <?php echo $this->translate('Shipping Tax Rate'); ?>
+        </label>
+        <div class="grid_6 alpha">
+            <select name="<?php echo 'config['.Shopping::SHIPPING_TAX_RATE.']';?>">
+                <option value="0" <?php echo (isset($this->shoppingConfig[Shopping::SHIPPING_TAX_RATE]) && $this->shoppingConfig[Shopping::SHIPPING_TAX_RATE] === '0') ? 'selected' : '';?>><?php echo $this->translate('Select');?></option>
+                <option value="1" <?php echo (isset($this->shoppingConfig[Shopping::SHIPPING_TAX_RATE]) && $this->shoppingConfig[Shopping::SHIPPING_TAX_RATE] === '1') ? 'selected' : '';?>><?php echo $this->translate('Default Tax');?></option>
+                <option value="2" <?php echo (isset($this->shoppingConfig[Shopping::SHIPPING_TAX_RATE]) && $this->shoppingConfig[Shopping::SHIPPING_TAX_RATE] === '2') ? 'selected' : '';?>><?php echo $this->translate('Tax Rate 1');?></option>
+                <option value="3" <?php echo (isset($this->shoppingConfig[Shopping::SHIPPING_TAX_RATE]) && $this->shoppingConfig[Shopping::SHIPPING_TAX_RATE] === '3') ? 'selected' : '';?>><?php echo $this->translate('Tax Rate 2');?></option>
+            </select>
+        </div>
 </form>
 <div id="shipping-config" class="container_12 clearfix">
 	<div id="shippers" class="mt10px mb10px clearfix">

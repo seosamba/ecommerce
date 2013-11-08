@@ -84,6 +84,14 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_notes = null;
 
 	protected $_discount = 0;
+
+    protected $_shippingTax = 0;
+
+    protected $_discountTax = 0;
+
+    protected $_subTotalTax = 0;
+
+    protected $_discountTaxRate = 0;
     
 
 	public function setCartContent($cartContent) {
@@ -270,5 +278,41 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	public function getDiscount() {
 		return $this->_discount;
 	}
+
+    public function setShippingTax($shippingTax) {
+        $this->_shippingTax = $shippingTax;
+        return $this;
+    }
+
+    public function getShippingTax() {
+        return $this->_shippingTax;
+    }
+
+    public function setDiscountTax($discountTax) {
+        $this->_discountTax = $discountTax;
+        return $this;
+    }
+
+    public function getDiscountTax() {
+        return $this->_discountTax;
+    }
+
+    public function setSubTotalTax($subTotalTax) {
+        $this->_subTotalTax = $subTotalTax;
+        return $this;
+    }
+
+    public function getSubTotalTax() {
+        return $this->_subTotalTax;
+    }
+
+    public function setDiscountTaxRate($discountTaxRate) {
+        $this->_discountTaxRate = $discountTaxRate;
+        return $this;
+    }
+
+    public function getDiscountTaxRate() {
+        return $this->_discountTaxRate;
+    }
 
 }

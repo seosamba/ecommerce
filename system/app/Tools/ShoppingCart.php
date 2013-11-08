@@ -43,7 +43,15 @@ class Tools_ShoppingCart {
 
 	protected $_subTotal = 0;
 
+    protected $_shippingTax = 0;
+
+    protected $_discountTax = 0;
+
+    protected $_subTotalTax = 0;
+
 	protected $_totalTax = 0;
+
+    protected $_discountTaxRate = 0;
 
 	protected $_total = 0;
 
@@ -278,6 +286,10 @@ class Tools_ShoppingCart {
             'totalTax'        => 0,
             'total'           => 0,
             'shipping'        => 0,
+            'shippingTax'     => 0,
+            'discountTax'     => 0,
+            'subTotalTax'     => 0,
+            'discountTaxRate' => 0,
             'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
         );
 
@@ -317,13 +329,26 @@ class Tools_ShoppingCart {
 					$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
 					$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
 					$summary['subTotal'] += $cartItem['price'] * $cartItem['qty'];
-					$summary['totalTax'] += $cartItem['tax'] * $cartItem['qty'];
+					$summary['subTotalTax'] += $cartItem['tax'] * $cartItem['qty'];
 				}
 			}
 
-			$summary['shipping'] = $shippingPrice;
-			$summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
             $summary['discount'] = $this->getDiscount();
+            $summary['discountTaxRate'] = $this->getDiscountTaxRate();
+            //process discount coupons
+            $discountCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_DISCOUNT);
+            if(!empty($discountCoupons)){
+                $summary['discount'] = 0;
+                foreach ($discountCoupons as $coupon) {
+                    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
+                }
+            }
+
+           	$summary['shipping'] = $shippingPrice;
+            $summary['shippingTax'] = Tools_Tax_Tax::calculateShippingTax($shippingPrice, isset($destinationAddress) ? $destinationAddress : null);
+            $summary['discountTax'] = Tools_Tax_Tax::calculateDiscountTax($summary['discount'], $summary['discountTaxRate'], isset($destinationAddress) ? $destinationAddress : null);
+            $summary['totalTax'] = $summary['subTotalTax'] + $summary['shippingTax'] - $summary['discountTax'];
+            $summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];
 
 			foreach ($summary as $key => $value) {
 				$methodName = 'set' . ucfirst($key);
@@ -332,14 +357,6 @@ class Tools_ShoppingCart {
 				}
 			}
 
-			//process discount coupons
-			$discountCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_DISCOUNT);
-			if(!empty($discountCoupons)){
-                $summary['discount'] = 0;
-                foreach ($discountCoupons as $coupon) {
-				    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
-			    }
-            }
 			$summary['total'] -= $summary['discount'];
 
             //process freebies
@@ -379,6 +396,9 @@ class Tools_ShoppingCart {
 			'discount'        => $this->getDiscount(),
 			'totalTax'        => $this->getTotalTax(),
 			'total'           => $this->getTotal(),
+            'shippingTax'     => $this->getShippingTax(),
+            'discountTax'     => $this->getDiscountTax(),
+            'subTotalTax'     => $this->getSubTotalTax(),
 			'shipping'        => $shippingPrice
 			//'showPriceIncTax' => (bool)$this->_shoppingConfig['showPriceIncTax']
 		);
@@ -789,6 +809,33 @@ class Tools_ShoppingCart {
 		return $this->_totalTax;
 	}
 
+    public function setShippingTax($shippingTax) {
+        $this->_shippingTax = $shippingTax;
+        return $this;
+    }
+
+    public function getShippingTax() {
+        return $this->_shippingTax;
+    }
+
+    public function setDiscountTax($discountTax) {
+        $this->_discountTax = $discountTax;
+        return $this;
+    }
+
+    public function getDiscountTax() {
+        return $this->_discountTax;
+    }
+
+    public function setSubTotalTax($subTotalTax) {
+        $this->_subTotalTax = $subTotalTax;
+        return $this;
+    }
+
+    public function getSubTotalTax() {
+        return $this->_subTotalTax;
+    }
+
 	public function setBillingAddressKey($billingAddressKey) {
 		$this->_billingAddressKey = $billingAddressKey;
 		return $this;
@@ -807,5 +854,12 @@ class Tools_ShoppingCart {
 		return $this->_shippingAddressKey;
 	}
 
+    public function setDiscountTaxRate($discountTaxRate) {
+        $this->_discountTaxRate = $discountTaxRate;
+        return $this;
+    }
 
+    public function getDiscountTaxRate() {
+        return $this->_discountTaxRate;
+    }
 }
