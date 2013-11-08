@@ -105,15 +105,23 @@ class Tools_Tax_Tax {
 		} else {
 			$address = Tools_Misc::clenupAddress($address);
 		}
+        $zones = array();
+        $taxableZones = Models_Mapper_Tax::getInstance()->fetchAll();
+        $zoneMapper = Models_Mapper_Zone::getInstance();
+        if(is_array($taxableZones) && !empty($taxableZones)) {
+            foreach($taxableZones as $taxZone){
+                $zoneIds[] =  $taxZone->getZoneId();
+            }
+            $zones =  $zoneMapper->fetchAll($zoneMapper->getDbTable()->getAdapter()->quoteInto('id IN(?)', $zoneIds));
+        }
 
-		$zones = Models_Mapper_Zone::getInstance()->fetchAll();
 		if(is_array($zones) && !empty($zones)) {
 			$zoneMatch = 0;
 			$maxRate = 0;
 			foreach($zones as $zone) {
 				$matchRate = 0;
 
-				if (empty($address['coutry']) && empty($address['state']) && empty($address['zip'])){
+				if (empty($address['country']) && empty($address['state']) && empty($address['zip'])){
 					continue;
 				}
 
