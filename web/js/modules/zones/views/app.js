@@ -8,7 +8,7 @@ define([
 
     var appView = Backbone.View.extend({
         el: $('#manage-zones'),
-        zoneHolder: $('#manage-zones'),
+        zoneHolder: $('#zone'),
         events: {
             'click #new-zone-btn': 'newZone',
             'click #delete-zone': 'deleteZone',
@@ -29,6 +29,7 @@ define([
             this.zoneHolder.tabs('option', 'active', lastIndex);
         },
         deleteZone: function(){
+            console.log('dfd');
             var zoneHolder = this.zoneHolder;
                 index = zoneHolder.tabs('option', 'active');
                 model = this.zonesCollection.at(index);

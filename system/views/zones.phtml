@@ -40,18 +40,18 @@
 	</div>
 </script>
 
-<span class="spinner"></span>
-
 <div id="manage-zones">
-    <ul class="header">
-        <li class="add-new-zone">
-            <a id="new-zone-btn" class="ui-tabs-anchor icon-plus fs16" title="Hotkey: Ctrl+N"></a>
-        </li>
-    </ul>
-</div>
-<div class="footer grid_12">
-    <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?> ]</a>
-    <button id="save-btn" class="icon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
+    <div id="zone">
+        <ul class="header">
+            <li class="add-new-zone">
+                <a id="new-zone-btn" class="ui-tabs-anchor icon-plus fs16" title="Hotkey: Ctrl+N"></a>
+            </li>
+        </ul>
+    </div>
+    <div class="footer grid_12">
+        <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?> ]</a>
+        <button id="save-btn" class="icon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
+    </div>
 </div>
 
 <div class="ui-helper-hidden">
@@ -74,7 +74,7 @@
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
-$('#manage-zones').tabs();
+$('#zone').tabs();
 $(document).one('zones:loaded', function () {
     app.states.reset(<?php echo Zend_Json::encode($this->states); ?>);
     app.countries.reset(<?php echo Zend_Json::encode($this->countries); ?>);

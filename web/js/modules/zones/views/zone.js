@@ -36,7 +36,6 @@ define([
                 });
                 statesList.append(view.render(view.templates.state, 'delete', 'states').$el);
             });
-            this.$el.find('.delete-zone').button();
 
             this.el.id = this.model.cid;
             return this;

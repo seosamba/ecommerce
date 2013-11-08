@@ -182,8 +182,8 @@
                 <a id="product-list-back-link" class="hide icon-chevron-right btn icon link inverse-error" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
             <div class="grid_5">
-                <label class="grid_2 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?></label>
-                <input class="grid_10 small mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
+                <label class="grid_2 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?>:</label>
+                <input class="grid_10 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
             </div>
         </div>
         <div id="product-list-holder" class="content-footer grid_12" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
@@ -255,19 +255,19 @@
                     </label>
                     <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
                 </div>
-                <div class="grid_3 alpha omega labeled mt15px">
+                <div class="grid_3 alpha omega labeled mt1-5em">
                     <input class="grid_8 alpha omega fl-right" type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id'); ?>"/>
                     <label class="grid_4 alpha omega" for="product-sku">SKU</label>
                 </div>
-                <div class="grid_4 omega labeled mt15px">
+                <div class="grid_4 omega labeled mt1-5em">
                     <input class="grid_9 alpha omega fl-right" type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber"/>
                     <label class="grid_3 alpha omega" for="product-mpn">MPN</label>
                 </div>
-                <div class="grid_2 omega labeled mt15px">
+                <div class="grid_2 omega labeled mt1-5em">
                     <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                     <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
                 </div>
-                <p class="grid_6 alpha omega">
+                <p class="grid_6 alpha omega mt1-5em">
                     <label class="grid_2 alpha omega mt5px" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
                     <input class="grid_4 omega fl-right" type="text" name="" id="new-brand"  placeholder="<?php echo $this->translate('create new'); ?>">
                     <select class="grid_6 alpha omega" name="product-brand" id="product-brand" data-reflection="brand">
@@ -277,10 +277,10 @@
                         <?php endforeach; ?>
                     </select>
                 </p>
-                <label class="grid_3 omega mt15px text-right pointer"><input id="free-shipping" type="checkbox"/><?php echo $this->translate('Free Shipping'); ?></label>
+                <label class="grid_3 omega mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/><?php echo $this->translate('Free Shipping'); ?></label>
             </fieldset>
 
-            <div class="mt30px">
+            <div class="mt2-75em">
                 <div id="description-box" class="tabs-gray">
                     <?php
                         $lexemShortDescription = $this->translate('Short description');
@@ -312,15 +312,15 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="grid_6 alpha labeled mt15px">
+                <div class="grid_6 alpha labeled mt1-5em">
                     <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
                     <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->generalConfig['currency']; ?></label>
                 </div>
-                <div class="grid_6 omega labeled mt15px">
+                <div class="grid_6 omega labeled mt1-5em">
                     <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
                     <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                 </div>
-                <div class="grid_12 alpha omega mt15px">
+                <div class="grid_12 alpha omega mt1-5em">
                     <label class="mt5px grid_2 alpha" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
                     <select class="grid_10 omega" name="taxes" id="product-taxClass" data-reflection="taxClass">
                         <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
@@ -331,7 +331,7 @@
                 </div>
             </fieldset>
         </div>
-        <div id="preview-box" class="grid_4 omega tabs-gray mt30px">
+        <div id="preview-box" class="grid_4 omega tabs-gray mt2-75em">
 			<ul>
 				<li><a href="#quick-preview"><?php echo $this->translate('Preview'); ?></a></li>
 				<li><a href="#merchandising"><?php echo $this->translate('Merchandising'); ?></a></li>

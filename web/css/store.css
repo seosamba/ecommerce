@@ -133,7 +133,7 @@
   margin: 0.5%;
 }
 #manage-product #main-tab #description-box textarea {
-  height: 210px;
+  height: 205px;
 }
 #manage-product #main-tab #quick-preview {
   position: relative;
@@ -169,7 +169,7 @@
   font-size: 0.85em;
   color: #666666;
   display: block;
-  height: 150px;
+  height: 140px;
 }
 #manage-product #main-tab #quick-preview .price {
   position: absolute;
@@ -210,7 +210,8 @@
   overflow: auto;
   height: 400px;
 }
-#merchandising #group-table td:last-child {
+#merchandising #group-table td:last-child,
+#merchandising #coupon-table td:last-child {
   text-align: center;
 }
 #manage-logos .brand-list > * {

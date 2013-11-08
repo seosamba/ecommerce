@@ -21,11 +21,11 @@
     </div>
 
     <div class="grid_4 alpha omega mt0px">
-		<label class="mb0-5em mt0-5em pointer">
+		<label class="mb0-5em mt0-5em pointer" for="allowCombination">
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
         </label>
-		<label class="mb0px pointer">
+		<label class="mb0px pointer" for="scope">
 			<?php echo $this->formCheckbox('scope', 'client', null, array(
                 'checked' => 'client',
                 'unChecked' => ''
