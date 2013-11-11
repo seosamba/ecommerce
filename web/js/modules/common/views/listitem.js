@@ -24,10 +24,18 @@ define([
             switch (mode){
                 default:
                 case 'add':
-                    this.$el.append('<span class="add-item ui-icon ui-icon-plusthick"></span>');
+                    if(_.isUndefined(this.model.state)){
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item ui-icon ui-icon-plusthick"></span>');
+                    }else{
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item ui-icon ui-icon-plusthick"></span>');
+                    }
                     break;
                 case 'delete':
-                    this.$el.append('<span class="remove-item ui-icon ui-icon-trash"></span>');
+                    if(_.isUndefined(this.model.state)){
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item ui-icon ui-icon-trash"></span>');
+                    }else{
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item ui-icon ui-icon-trash"></span>');
+                    }
                     break
             }
             return this;
