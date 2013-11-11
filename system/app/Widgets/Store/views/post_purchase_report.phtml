@@ -49,7 +49,10 @@
 		<div class="post-purchase-report-shipping-address">
 			<?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
 			<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
-			<span><?php echo $shippingAddress['firstname'];?></span>
+            <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
+                <span><?php echo $shippingAddress['company'];?></span><br />
+            <?php endif;?>
+            <span><?php echo $shippingAddress['firstname'];?></span>
 			<span><?php echo $shippingAddress['lastname'];?></span>
 			<br/>
 			<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP) : ?>
@@ -289,6 +292,9 @@
 		<p style="color:#444444;">
 			<?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
 				<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId); ?>
+                <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
+                    <span><?php echo $shippingAddress['company'];?></span><br />
+                <?php endif;?>
 				<span><?php echo $shippingAddress['firstname'];?></span>
 				<span><?php echo $shippingAddress['lastname'];?></span>
 				<br/>
