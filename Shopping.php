@@ -613,7 +613,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
 				})),
 				'pending'   => sizeof(array_filter($orders, function ($order) {
-					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== self::GATEWAY_QUOTE);
+					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== Shopping::GATEWAY_QUOTE);
 				})),
 				'shipped'   => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED;
