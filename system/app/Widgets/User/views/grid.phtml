@@ -5,7 +5,11 @@
                     <?php if($status == 'all'):?>
                         <li class="<?php echo $status;?> active" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
                     <?php else:?>
-                        <li class="<?php echo $this->translate('cs_'.$status);?>" data-sort="<?php echo $this->translate('cs_'.$status);?>"><?php echo $this->translate('cs_'.$status);?></li>
+                        <?php if($status == 'quote_sent'):?>
+                            <li class="<?php echo $this->translate('Open Quotes');?>" data-sort="<?php echo $this->translate('Open Quotes');?>"><?php echo $this->translate('Open Quotes');?></li>
+                        <?php else:?>
+                            <li class="<?php echo $this->translate('cs_'.$status);?>" data-sort="<?php echo $this->translate('cs_'.$status);?>"><?php echo $this->translate('cs_'.$status);?></li>
+                        <?php endif;?>
                     <?php endif;?>
                 <?php endif;?>
             <?php endforeach; ?>
@@ -33,6 +37,8 @@
             <tbody>
             <?php if ($this->orders): ?>
                 <?php foreach ($this->orders as $order):?>
+                    <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED ||
+                        $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')):?>
                     <tr data-role="cart" data-id="<?php echo $order->getId();?>">
                         <td><?php echo date("d-M-Y", strtotime($order->getCreatedAt()));?></td>
                         <td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
@@ -60,7 +66,11 @@
                                 <p> - </p>
                              <?php endif;?>
                         </td>
-                        <td class="user-order-current-status"><?php echo $this->translate('cs_'.$order->getStatus());?></td>
+                        <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote'):?>
+                            <td class="user-order-current-status"><?php echo $this->translate('Open Quotes');?></td>
+                        <?php else:?>
+                            <td class="user-order-current-status"><?php echo $this->translate('cs_'.$order->getStatus());?></td>
+                        <?php endif;?>
                         <?php if(isset($this->invoicePlugin)):?>
                             <td>
                                 <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
@@ -71,6 +81,7 @@
                             </td>
                         <?php endif;?>
                     </tr>
+                    <?php endif;?>
                 <?php endforeach; ?>
             <?php endif; ?>
             </tbody>
