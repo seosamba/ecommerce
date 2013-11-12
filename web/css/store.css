@@ -13,7 +13,8 @@
   width: 28px;
   height: 28px;
   line-height: 28px;
-  font-size: 0;
+  font: 0/0 a;
+  text-shadow: none;
 }
 #manage-product .header .nav-links a:before {
   font-size: 28px;
@@ -169,7 +170,7 @@
   font-size: 0.85em;
   color: #666666;
   display: block;
-  height: 140px;
+  height: 125px;
 }
 #manage-product #main-tab #quick-preview .price {
   position: absolute;
@@ -225,12 +226,8 @@
   -ms-box-sizing: border-box;
   box-sizing: border-box;
 }
-#manage-logos .brand-list > *:not(.featureapage):nth-child(8n + 1) {
+#manage-logos .brand-list > *:not(.featureapage):nth-child(8n+1) {
   margin-left: 0;
-}
-#manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
-#manage-logos .brand-list > *:not(.featureapage) {
-  width: 11.325%;
 }
 @media only screen and (max-width: 800px) {
   #manage-logos .brand-list > *:not(.featureapage) {
@@ -241,12 +238,8 @@
     -ms-box-sizing: border-box;
     box-sizing: border-box;
   }
-  #manage-logos .brand-list > *:not(.featureapage):nth-child(3n + 1) {
+  #manage-logos .brand-list > *:not(.featureapage):nth-child(3n+1) {
     margin-left: 0;
-  }
-  #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
-  #manage-logos .brand-list > *:not(.featureapage) {
-    width: 32.366666666666674%;
   }
 }
 @media only screen and (max-width: 640px) {
@@ -258,12 +251,8 @@
     -ms-box-sizing: border-box;
     box-sizing: border-box;
   }
-  #manage-logos .brand-list > *:not(.featureapage):nth-child(2n + 1) {
+  #manage-logos .brand-list > *:not(.featureapage):nth-child(2n+1) {
     margin-left: 0;
-  }
-  #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
-  #manage-logos .brand-list > *:not(.featureapage) {
-    width: 49.2%;
   }
 }
 @media only screen and (max-width: 480px) {
@@ -275,12 +264,8 @@
     -ms-box-sizing: border-box;
     box-sizing: border-box;
   }
-  #manage-logos .brand-list > *:not(.featureapage):nth-child(1n + 1) {
+  #manage-logos .brand-list > *:not(.featureapage):nth-child(1n+1) {
     margin-left: 0;
-  }
-  #manage-logos .brand-list > *:not(.featureapage) ::made-up-pseudo-element,
-  #manage-logos .brand-list > *:not(.featureapage) {
-    width: 99.7%;
   }
 }
 #manage-logos .brand-list > * img {
@@ -323,7 +308,7 @@
   padding: 5px 0;
 }
 #manage-zones .zone-zip {
-  height: 153px;
+  height: 145px;
 }
 #country-list,
 #state-list {

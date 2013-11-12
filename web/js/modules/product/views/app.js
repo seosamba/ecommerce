@@ -25,7 +25,7 @@ define([
             'click .show-list': 'toggleList',
 			'keyup input#new-tag': 'newTag',
 			'click #add-new-option-btn': 'newOption',
-            'change select#option-library': 'addOption',
+            'change #option-library': 'addOption',
 			'click #submit': 'saveProduct',
 			'change #product-image-folder': 'imageChange',
 			'click .box': 'setProductImage',

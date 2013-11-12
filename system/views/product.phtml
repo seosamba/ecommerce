@@ -166,7 +166,7 @@
 	<a href="<%= (_.isObject(product.page) ? $('#website_url').val() + product.page.url : '#') %>" target="_blank">
 		<span class="name"><%= product.name %></span>
 		<span class="image background"><img src="<%= photoUrl %>"/></span>
-		<span class="description"><%= product.shortDescription.length > 300 ? product.shortDescription.slice(0, 299) + '...' : product.shortDescription %></span>
+		<span class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></span>
 		<span class="price">
 			<%= parseFloat(product.price).toFixed(2) + '&nbsp;' + currency %>
 		</span>
@@ -277,10 +277,10 @@
                         <?php endforeach; ?>
                     </select>
                 </p>
-                <label class="grid_3 omega mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/><?php echo $this->translate('Free Shipping'); ?></label>
+                <label class="grid_3 omega mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
             </fieldset>
 
-            <div class="mt2-75em">
+            <div class="mt2-25em">
                 <div id="description-box" class="tabs-gray">
                     <?php
                         $lexemShortDescription = $this->translate('Short description');
@@ -331,7 +331,7 @@
                 </div>
             </fieldset>
         </div>
-        <div id="preview-box" class="grid_4 omega tabs-gray mt2-75em">
+        <div id="preview-box" class="grid_4 omega tabs-gray mt2-25em">
 			<ul>
 				<li><a href="#quick-preview"><?php echo $this->translate('Preview'); ?></a></li>
 				<li><a href="#merchandising"><?php echo $this->translate('Merchandising'); ?></a></li>
