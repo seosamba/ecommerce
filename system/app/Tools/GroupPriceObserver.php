@@ -43,29 +43,31 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
                 $groupId = $allCustomersGroups[$currentUser]['group_id'];
                 if(isset($allProductsGroups[$groupId])){
                     $productId = $object->getId();
-                    $groupProductKey = $groupId.'_'.$productId;
-                    $priceNow = $object->getPrice();
-                    $priceValue = $allProductsGroups[$groupId]['priceValue'];
-                    $priceSign  = $allProductsGroups[$groupId]['priceSign'];
-                    $priceType  = $allProductsGroups[$groupId]['priceType'];
-                    if(array_key_exists($groupProductKey, $allProductsWithGroups)){
-                        $priceValue = $allProductsWithGroups[$groupProductKey]['priceValue'];
-                        $priceSign  = $allProductsWithGroups[$groupProductKey]['priceSign'];
-                        $priceType  = $allProductsWithGroups[$groupProductKey]['priceType'];
+                    if($productId != null){
+                        $groupProductKey = $groupId.'_'.$productId;
+                        $priceNow = $object->getPrice();
+                        $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                        $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                        $priceType  = $allProductsGroups[$groupId]['priceType'];
+                        if(array_key_exists($groupProductKey, $allProductsWithGroups)){
+                            $priceValue = $allProductsWithGroups[$groupProductKey]['priceValue'];
+                            $priceSign  = $allProductsWithGroups[$groupProductKey]['priceSign'];
+                            $priceType  = $allProductsWithGroups[$groupProductKey]['priceType'];
+                        }
+                        if($priceType == 'percent'){
+                            $priceModificationValue = $priceNow*$priceValue/100;
+                        }
+                        if($priceType == 'unit'){
+                            $priceModificationValue = $priceValue;
+                        }
+                        if($priceSign == 'minus'){
+                            $resultPrice = $priceNow - $priceModificationValue;
+                        }
+                        if($priceSign == 'plus'){
+                            $resultPrice = $priceNow + $priceModificationValue;
+                        }
+                        $object->setCurrentPrice($resultPrice);
                     }
-                    if($priceType == 'percent'){
-                        $priceModificationValue = $priceNow*$priceValue/100;
-                    }
-                    if($priceType == 'unit'){
-                        $priceModificationValue = $priceValue;
-                    }
-                    if($priceSign == 'minus'){
-                        $resultPrice = $priceNow - $priceModificationValue;
-                    }
-                    if($priceSign == 'plus'){
-                        $resultPrice = $priceNow + $priceModificationValue;
-                    }
-                    $object->setCurrentPrice($resultPrice);
                 }
             }
         }
