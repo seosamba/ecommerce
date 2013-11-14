@@ -50,7 +50,7 @@ class Tools_Tax_Tax {
 
     public static function calculateShippingTax($shippingPrice, $destinationAddress = null) {
         $shippingTaxClass = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('shippingTaxRate');
-        if($shippingTaxClass !==  '0') {
+        if($shippingTaxClass !=  '0') {
             $getRate = 'getRate'.$shippingTaxClass;
             if (null !== $destinationAddress){
                 $zoneId = self::getZone($destinationAddress);
