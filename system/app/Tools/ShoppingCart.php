@@ -218,7 +218,9 @@ class Tools_ShoppingCart {
 				'taxIncluded'      => isset($this->_shoppingConfig['showPriceIncTax']) ? (bool)$this->_shoppingConfig['showPriceIncTax'] : false,
 				'note'             => '',
                 'freeShipping'     => $item->getFreeShipping(),
-                'freebies'         => $item->getFreebies()
+                'freebies'         => $item->getFreebies(),
+                'groupPriceEnabled' => $item->getGroupPriceEnabled(),
+                'originalPrice'     => $item->getPrice()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;
@@ -325,6 +327,22 @@ class Tools_ShoppingCart {
 						$product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
 						$product->setPrice($cartItem['price']);
 					}
+
+                    $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
+                    if($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())){
+                        $product->setGroupPriceEnabled(1);
+                        $priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
+                        $product->setPrice($priceForGroup);
+                        $cartItem['price'] = $priceForGroup;
+                        $cartItem['groupPriceEnabled'] = 1;
+                    }
+
+                    if($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())){
+                        $cartItem['groupPriceEnabled'] = 0;
+                        $product->setGroupPriceEnabled(0);
+                        $product->setPrice($cartItem['originalPrice']);
+                        $cartItem['price'] = $cartItem['originalPrice'];
+                    }
 
 					$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
 					$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
