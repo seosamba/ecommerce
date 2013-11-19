@@ -54,6 +54,17 @@
 <form id="edit-coupon" class="grid_12 clearfix">
 	<?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
 
+    <div class="grid_12">
+    <?php $generalConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();?>
+    <label><?php echo $this->translate('Discount Tax Rate'); ?></label>
+        <select name="coupon-discount-tax-rate" id="coupon-discount-tax-rate">
+            <option value="0" <?php echo (isset($generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE]) && $generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE] === '0') ? 'selected' : '';?>><?php echo $this->translate('Select');?></option>
+            <option value="1" <?php echo (isset($generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE]) && $generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE] === '1') ? 'selected' : '';?>><?php echo $this->translate('Default Tax');?></option>
+            <option value="2" <?php echo (isset($generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE]) && $generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE] === '2') ? 'selected' : '';?>><?php echo $this->translate('Tax Rate 1');?></option>
+            <option value="3" <?php echo (isset($generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE]) && $generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE] === '3') ? 'selected' : '';?>><?php echo $this->translate('Tax Rate 2');?></option>
+        </select>
+    </div>
+
 	<div class="clearfix grid_4">
         <label><?php echo $this->translate('Type');?></label>
 		<?php echo $this->formSelect('type', null, array(

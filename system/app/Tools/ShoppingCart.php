@@ -360,10 +360,21 @@ class Tools_ShoppingCart {
                 foreach ($discountCoupons as $coupon) {
                     $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
                 }
+                $summary['discountTaxRate'] = isset($this->_shoppingConfig['couponDiscountTaxRate']) ? $this->_shoppingConfig['couponDiscountTaxRate'] : 0;
             }
 
-           	$summary['shipping'] = $shippingPrice;
-            $summary['shippingTax'] = Tools_Tax_Tax::calculateShippingTax($shippingPrice, isset($destinationAddress) ? $destinationAddress : null);
+            $summary['shipping'] = $shippingPrice;
+            $freeShippingCoupons = Tools_CouponTools::filterCoupons($this->getCoupons(), Store_Model_Coupon::COUPON_TYPE_FREESHIPPING);
+            if(!empty($freeShippingCoupons)){
+                foreach ($freeShippingCoupons as $freeShippingCoupon) {
+                    $freeCoupon = Tools_CouponTools::processFreeshippingCoupon($freeShippingCoupon);
+                    if($freeCoupon){
+                        $summary['shipping'] = 0;
+                    }
+                }
+            }
+
+            $summary['shippingTax'] = Tools_Tax_Tax::calculateShippingTax($summary['shipping'], isset($destinationAddress) ? $destinationAddress : null);
             $summary['discountTax'] = Tools_Tax_Tax::calculateDiscountTax($summary['discount'], $summary['discountTaxRate'], isset($destinationAddress) ? $destinationAddress : null);
             $summary['totalTax'] = $summary['subTotalTax'] + $summary['shippingTax'] - $summary['discountTax'];
             $summary['total']    = $summary['subTotal'] + $summary['totalTax'] + $summary['shipping'];

@@ -8,6 +8,9 @@
 	<div id="discount-units-holder" style="display: inline-block">
 		<label><?php echo $this->translate('Discount amount:');?></label>
 		<?php echo $this->formText('data[discountAmount]'); ?>
+        <div id="coupon-tax-discount" style="display: inline-block">
+            <span class="couponDiscountWithTax">0</span>
+        </div>
 		<?php echo $this->formSelect('data[discountUnits]', null, array(
 			'class' => 'input-auto'
 		), array(
