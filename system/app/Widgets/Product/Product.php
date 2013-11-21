@@ -204,12 +204,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
 					$tmp['host'],
 					implode('/', $path),
 					$guessSize,
-					$imgName
+                    rawurlencode($imgName)
 				));
 			}
 			return $photoSrc;
 		} else {
-			$photoSrc = str_replace('/', '/'.$newSize.'/', $photoSrc);
+            $photoSrc = explode('/', $photoSrc);
+            $photoSrc = $photoSrc[0].'/'.$newSize.'/'.rawurlencode(end($photoSrc));
+
 			return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
 		}
 	}

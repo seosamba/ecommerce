@@ -37,9 +37,9 @@ require([
             $('#progressbar').progressbar({value: file.percent});
             $('#progressbar .value').text(file.percent);
         })
-        jsBrandLogoUploader.bind('FileUploaded', function(uploader, file){
+        jsBrandLogoUploader.bind('FileUploaded', function(uploader, file) {
             var timestamp = new Date().getTime();
-                newSrc = $('#website_url').val()+'media/brands/small/'+file.name+'?'+timestamp,
+            var newSrc = $('#website_url').val()+'media/brands/small/'+file.name+'?'+timestamp,
                 brand = Toastr.BrandLogos.brands.find(function(brand){ return brand.get('name') === Toastr.BrandLogos.filename; });
             if (brand !== undefined){
                 brand.set('src', newSrc);
