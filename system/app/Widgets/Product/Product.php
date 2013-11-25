@@ -69,12 +69,12 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
 
-		if (is_numeric($this->_options[0])){
-			$this->_product = $this->_productMapper->find(intval($this->_options[0]));
-			$this->_type = self::TYPE_PRODUCTLISTING;
-			array_shift($this->_options);
-		} else {
-            $productCacheId = __CLASS__.'_byPage_'.$this->_toasterOptions['id'];
+        if (is_numeric($this->_options[0])) {
+            $this->_product = $this->_productMapper->find(intval($this->_options[0]));
+            $this->_type = self::TYPE_PRODUCTLISTING;
+            array_shift($this->_options);
+        } else {
+            $productCacheId = __CLASS__ . '_byPage_' . $this->_toasterOptions['id'];
             if ($this->_cacheable) {
                 $this->_product = $this->_cache->load($productCacheId, 'store_');
             }
@@ -86,23 +86,23 @@ class Widgets_Product_Product extends Widgets_Abstract {
                         $this->_product,
                         'store_',
                         array('productwidget', 'prodid_' . $this->_product->getId()),
-                        Helpers_Action_Cache::CACHE_FLASH
+                        Helpers_Action_Cache::CACHE_NORMAL
                     );
                 }
             }
             $this->_type = array_shift($this->_options);
-		}
+        }
 
 		//initializing Zend Currency for future use
         if ($this->_currency === null){
             $this->_currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
         }
 
-	    if ($this->_product === null || $this->_type === null) {
+	    if (!$this->_product instanceof Models_Model_Product || is_null($this->_type)) {
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
-                 return "<b>Product doesn&apos;t exist or wrong options provided</b>";
+                 return '<b>Product does not exist or wrong options provided</b>';
             }
-            return "<!--Product doesn&apos;t exist or wrong options provided-->";
+            return '<!--Product does not exist or wrong options provided-->';
         }
 		array_push($this->_cacheTags, 'prodid_'.$this->_product->getId());
         $this->_view->product = $this->_product;
