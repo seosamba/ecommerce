@@ -124,13 +124,18 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector {
 			}
 
             if ((bool)$page->getDraft() !== !(bool)$this->_object->getEnabled()){
-                $page->setDraft(!(bool)$this->_object->getEnabled());
+                $page->setDraft((bool)$this->_object->getEnabled() ? 0 : 1);
                 $this->_cacheHelper->clean(Helpers_Action_Cache::KEY_DRAFT, Helpers_Action_Cache::PREFIX_DRAFT);
                 $isModified = true;
             }
 
 			if ($isModified){
+                $page->registerObserver(new Tools_Search_Watchdog());
+                $page->registerObserver(new Tools_Page_GarbageCollector(array(
+                    'action' => Tools_System_GarbageCollector::CLEAN_ONUPDATE
+                )));
                 $pageMapper->save($page);
+                $page->notifyObservers();
 				$this->_object->setPage(array(
 					'id'         => $page->getId(),
 					'templateId' => $page->getTemplateId(),

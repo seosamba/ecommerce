@@ -320,9 +320,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()) {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
+                $fullname = isset($data['firstname']) ? $data['firstname'] : '';
+                $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
-						->setFullName($data['firstname'] . ' ' . $data['lastname'])
+						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
 						->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
