@@ -146,7 +146,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        if ((bool)$this->_product->getEnabled()){
 		        return $parser->parse();
 	        } elseif (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
-		        return '<div style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
+		        return '<div class="product-disabled" style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
 				        $this->_translator->translate('This product is disabled').
 				        '</span>'.$parser->parse().'</div>';
 	        }else{
