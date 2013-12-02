@@ -387,7 +387,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $imageSize = 'small';
         if ($related !== null) {
             $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
-            $this->_view->imageSize = (isset($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->imageSize = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
             if(isset($this->_options[1]) && $this->_options[1] == 'addtocart'){
                $this->_view->checkoutPageUrl = $checkoutPageUrl;
             }
