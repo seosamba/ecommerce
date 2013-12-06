@@ -146,7 +146,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        if ((bool)$this->_product->getEnabled()){
 		        return $parser->parse();
 	        } elseif (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
-		        return '<div style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
+		        return '<div class="product-disabled" style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
 				        $this->_translator->translate('This product is disabled').
 				        '</span>'.$parser->parse().'</div>';
 	        }else{
@@ -387,7 +387,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $imageSize = 'small';
         if ($related !== null) {
             $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
-            $this->_view->imageSize = (isset($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->imageSize = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
             if(isset($this->_options[1]) && $this->_options[1] == 'addtocart'){
                $this->_view->checkoutPageUrl = $checkoutPageUrl;
             }
