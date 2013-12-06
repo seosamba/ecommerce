@@ -340,8 +340,10 @@
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
 						   title="<?php echo $product['name']; ?>" target="_blank">
 							<img style="width:60px; vertical-align:middle"
-							     src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
-							     alt="<?php echo $product['name']; ?>"/>
+                                <?php $src = mb_eregi_replace(' ', "%20", $product['photo']); ?>
+                                <?php $src = Tools_Misc::prepareProductImage($src); ?>
+							    src="<?php echo Tools_Misc::prepareProductImage($src); ?>"
+							    alt="<?php echo $product['name']; ?>"/>
 						</a>
 					<?php else: ?>
 						<img style="width:60px;" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
