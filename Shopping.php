@@ -678,8 +678,6 @@ class Shopping extends Tools_Plugins_Abstract {
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
-				$order->notifyObservers();
-
 				$this->_responseHelper->response($status->toArray(), false);
 			}
 			$this->_view->order = $order;
