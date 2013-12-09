@@ -313,7 +313,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
 			$filters['order'] = array_map(function ($field) {
-				return trim($field) === 'brand' ? 'b.name' : 'p.' . $field;
+				switch (trim($field)) {
+                    case 'brand':
+                        return $field = 'b.name'; break;
+                    case 'date':
+                        return $field = 'p.created_at DESC'; break;
+                    default:
+                        return $field =  'p.' . $field;
+                }
 			}, $filters['order']);
 		}
 
@@ -346,7 +353,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
 			$enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
 		}
-
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), self::DEFAULT_LIMIT,
