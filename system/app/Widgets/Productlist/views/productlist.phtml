@@ -15,7 +15,8 @@
 		    filters = $.extend({
 			    pageId: '<?php echo $this->pageId; ?>',
 			    template: '<?php echo $this->productTemplate; ?>',
-			    nextpage: nextpage
+			    nextpage: nextpage,
+                limit: '<?php echo $this->limit; ?>'
 		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>);
 
 		showSpinner();
