@@ -500,10 +500,12 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$content = '';
 		$nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
-        $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
-        if($limit === 0) {
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
             $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
         }
+
 		$order = $this->_request->getParam('order');
 		$tags = $this->_request->getParam('tags');
 		$brands = $this->_request->getParam('brands');
