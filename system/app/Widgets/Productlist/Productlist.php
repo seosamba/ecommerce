@@ -92,17 +92,19 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
+
         if (is_numeric($last)) {
             $last = abs(intval($last));
+            if ($last !== 0 && count($this->_options) > 1) {
+                $this->_limit = $last;
+            }
         }
-        if ($last !== 0 && count($this->_options) > 1) {
-            $this->_limit = $last;
-            $this->_view->limit = $this->_limit;
-        } else {
-		    $this->_view->limit = self::DEFAULT_LIMIT;
+
+        if (null === $this->_limit) {
             $this->_limit = self::DEFAULT_LIMIT;
         }
-		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+        $this->_view->limit = $this->_limit;
+        $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
         $this->_strictTagsCount = (strtolower(end($this->_options)) == 'and');
