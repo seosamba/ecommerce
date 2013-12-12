@@ -275,9 +275,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		$itemDefaultOptionsArray = array();
         foreach($this->_product->getDefaultOptions() as $option){
-            foreach ($option['selection'] as $item) {
-                if($item['isDefault'] == 1){
-                    $itemDefaultOptionsArray[$option['id']] = $item['id'];
+            if(is_array($option['selection'])) {
+                foreach ($option['selection'] as $item) {
+                    if($item['isDefault'] == 1){
+                        $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                    }
                 }
             }
         }
