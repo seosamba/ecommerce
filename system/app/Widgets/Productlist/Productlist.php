@@ -250,9 +250,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $replacements[$key] = $widget->render();
 
                     // if noZeroPrice in config set to 1 - do not show zero prices and "Add to cart" becomes "Go to product"
-                    if($widgetData === 'price' && $data['noZeroPrice'] && floatval($product->getPrice()) === 0) {
+                    if ($widgetData === 'price' && $data['noZeroPrice'] && floatval($product->getPrice()) == 0) {
                         $replacements[$key]                                    = '';
-                        $replacements['$store:addtocart']                      = '<a class="tcart-add" href="' . ($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;') . '">Go to product</a>';
+                        $replacements['$store:addtocart']                      = '<a class="tcart-add" href="' . ($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;') . '">'.$this->_translator->translate('Go to product').'</a>';
                         $replacements['$store:addtocart:' . $product->getId()] = $replacements['$store:addtocart'];
                         $replacements['$store:addtocart:checkbox']             = $replacements['$store:addtocart'];
                     }
