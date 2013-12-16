@@ -387,4 +387,47 @@ class Tools_Misc {
         return $checkoutErrorMessage;
     }
 
+    /*
+     * Replaces widgets on values from a dictionary.
+     *
+     * If noZeroPrice in config set to 1 - do not show zero prices and "Add to cart" becomes "Go to product".
+     *
+     * @return string
+     */
+    public static function preparingProductListing($templateContent, $product, $dictionary = array(), $noZeroPrice = 0) {
+        $translator   = Zend_Registry::get('Zend_Translate');
+        $entityParser = new Tools_Content_EntityParser();
+
+        //setting up the entity parser
+        $entityParser->addToDictionary($dictionary);
+
+        // fetching $product:price and $product:freeshipping widgets and rendering them via native widget
+        if (preg_match_all('~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~', $templateContent, $productPriceWidgets)) {
+            $replacements = array();
+            foreach ($productPriceWidgets[1] as $key => $widgetData) {
+                if(!$product->getPage() instanceof Application_Model_Models_Page) {
+                    continue;
+                }
+                $args   = array_filter(explode(':', $widgetData));
+                $widget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
+                $key    = trim($productPriceWidgets[0][$key], '{}');
+                $replacements[$key] = $widget->render();
+
+                if ($widgetData === 'price' || $widgetData === 'price:original') {
+                    if ((int) $noZeroPrice == 1 && floatval($product->getPrice()) == 0) {
+                        $replacements[$key]                                  = '';
+                        $replacements['$store:addtocart']                    = '<a class="tcart-add" href="'.($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;').'">'.$translator->translate('Go to product').'</a>';
+                        $replacements['$store:addtocart:'.$product->getId()] = $replacements['$store:addtocart'];
+                        $replacements['$store:addtocart:checkbox']           = $replacements['$store:addtocart'];
+                    }
+                }
+            }
+            if (!empty($replacements)) {
+                $entityParser->addToDictionary($replacements);
+                unset($replacements, $productPriceWidgets);
+            }
+        }
+
+        return $entityParser->parse($templateContent);
+    }
 }

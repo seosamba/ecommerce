@@ -152,7 +152,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
 		// init variables we will use in closure
 		$renderedContent = '';
-		$entityParser = new Tools_Content_EntityParser();
 		$currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
 		$data = array(
 			'mediaPath'           => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia(),
@@ -169,7 +168,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$cacheTags = array();
 		// here we go - proccessing the list
-		array_walk($products, function ($product) use (&$renderedContent, $entityParser, $currency, $data, &$cacheTags) {
+		array_walk($products, function ($product) use (&$renderedContent, $currency, $data, &$cacheTags) {
 			array_push($cacheTags, 'prodid_' . $product->getId());
 			if (strpos($data['templateContent'], '$store:addtocart') !== false) {
 				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
@@ -212,61 +211,30 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
             }
 
-			//setting up the entity parser
-			$entityParser->addToDictionary(array(
-				'$product:name'                         => $product->getName(),
-//				'$product:photourl'                     => $photoUrlPart . '/product/' . $productPhotoData[1],
-//				'$product:photourl:product'             => $photoUrlPart . '/product/' . $productPhotoData[1],
-//				'$product:photourl:small'               => $photoUrlPart . '/small/' . $productPhotoData[1],
-//				'$product:photourl:medium'              => $photoUrlPart . '/medium/' . $productPhotoData[1],
-//				'$product:photourl:large'               => $photoUrlPart . '/large/' . $productPhotoData[1],
-//				'$product:photourl:original'            => $photoUrlPart . '/original/' . $productPhotoData[1],
-				'$product:url'                          => $product->getPage() ? $product->getPage()->getUrl() : null,
-				'$product:brand'                        => $product->getBrand(),
-				'$product:weight'                       => $product->getWeight(),
-				'$product:mpn'                          => $product->getMpn(),
-				'$product:sku'                          => $product->getSku(),
-				'$product:id'                           => $product->getId(),
-				'$product:description:short'            => nl2br($shortDesc),
-				'$product:description'                  => nl2br($shortDesc),
-				'$product:description:full'             => nl2br($product->getFullDescription()),
-				'$store:addtocart'                      => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
-				'$store:addtocart:' . $product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
-				'$store:addtocart:checkbox'             => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
-				'$product:options'                      => isset($productOptionsView) ? $productOptionsView : ''
-			));
+            $dictionary = array(
+                '$product:name'                       => $product->getName(),
+                //'$product:photourl'                   => $photoUrlPart . '/product/' . $productPhotoData[1],
+                //'$product:photourl:product'           => $photoUrlPart . '/product/' . $productPhotoData[1],
+                //'$product:photourl:small'             => $photoUrlPart . '/small/' . $productPhotoData[1],
+                //'$product:photourl:medium'            => $photoUrlPart . '/medium/' . $productPhotoData[1],
+                //'$product:photourl:large'             => $photoUrlPart . '/large/' . $productPhotoData[1],
+                //'$product:photourl:original'          => $photoUrlPart . '/original/' . $productPhotoData[1],
+                '$product:url'                        => $product->getPage() ? $product->getPage()->getUrl() : null,
+                '$product:brand'                      => $product->getBrand(),
+                '$product:weight'                     => $product->getWeight(),
+                '$product:mpn'                        => $product->getMpn(),
+                '$product:sku'                        => $product->getSku(),
+                '$product:id'                         => $product->getId(),
+                '$product:description:short'          => nl2br($shortDesc),
+                '$product:description'                => nl2br($shortDesc),
+                '$product:description:full'           => nl2br($product->getFullDescription()),
+                '$store:addtocart'                    => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:'.$product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:checkbox'           => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
+                '$product:options'                    => isset($productOptionsView) ? $productOptionsView : ''
+            );
 
-			// fetching $product:price and $product:freeshipping widgets and rendering them via native widget
-			if (preg_match_all('~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~', $data['templateContent'], $productPriceWidgets)) {
-				$replacements = array();
-				foreach ($productPriceWidgets[1] as $key => $widgetData) {
-                    $page = $product->getPage();
-                    if(!$page instanceof Application_Model_Models_Page) {
-                        continue;
-                    }
-					$args = array_filter(explode(':', $widgetData));
-					$widget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $page->getId()));
-					$key = trim($productPriceWidgets[0][$key], '{}');
-                    $replacements[$key] = $widget->render();
-
-                    // if noZeroPrice in config set to 1 - do not show zero prices and "Add to cart" becomes "Go to product"
-                    if ($widgetData === 'price' || $widgetData === 'price:original') {
-                        if ($data['noZeroPrice'] && floatval($product->getPrice()) == 0) {
-                            $replacements[$key]                                    = '';
-                            $replacements['$store:addtocart']                      = '<a class="tcart-add" href="' . ($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;') . '">'.$this->_translator->translate('Go to product').'</a>';
-                            $replacements['$store:addtocart:' . $product->getId()] = $replacements['$store:addtocart'];
-                            $replacements['$store:addtocart:checkbox']             = $replacements['$store:addtocart'];
-                        }
-                    }
-				}
-				if (!empty($replacements)) {
-					$entityParser->addToDictionary($replacements);
-					unset($replacements, $productPriceWidgets);
-				}
-			}
-
-			$renderedContent .= $entityParser->parse($templatePrepend . $data['templateContent']);
-			unset($storeWidget);
+            $renderedContent .= Tools_Misc::preparingProductListing($templatePrepend.$data['templateContent'], $product, $dictionary, $data['noZeroPrice']);
 		});
 		$this->_cacheTags = array_merge($this->_cacheTags, $cacheTags);
 		return $renderedContent;

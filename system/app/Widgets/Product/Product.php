@@ -141,7 +141,23 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	            }
 	        }
 
-            $parser = new Tools_Content_Parser($templatePrepend . $template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
+            if (strpos($template->getContent(), '$store:addtocart') !== false) {
+                $storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $this->_product->getId()));
+            }
+            if (strpos($template->getContent(), '$store:addtocart:checkbox') !== false) {
+                $storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $this->_product->getId(), 'checkbox'));
+            }
+
+            $dictionary = array(
+                '$product:id'                                => $this->_product->getId(),
+                '$store:addtocart'                           => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:'.$this->_product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:checkbox'                  => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : ''
+            );
+
+            $noZeroPrice     = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice');
+            $renderedContent = Tools_Misc::preparingProductListing($template->getContent(), $this->_product, $dictionary, $noZeroPrice);
+            $parser          = new Tools_Content_Parser($templatePrepend.$renderedContent, $this->_product->getPage()->toArray(), $parserOptions);
 
 	        if ((bool)$this->_product->getEnabled()){
 		        return $parser->parse();
