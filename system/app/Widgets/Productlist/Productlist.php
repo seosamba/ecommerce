@@ -29,6 +29,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	const DEFAULT_LIMIT = 50;
 
+    /**
+     *  Product limit
+     */
+    protected  $_limit = null;
+
 	/**
 	 * Seotoaster website action helper
 	 *
@@ -86,8 +91,20 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	public function _load() {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
-		$this->_view->limit = self::DEFAULT_LIMIT;
-		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+        $last = end($this->_options);
+
+        if (is_numeric($last)) {
+            $last = abs(intval($last));
+            if ($last !== 0 && count($this->_options) > 1) {
+                $this->_limit = $last;
+            }
+        }
+
+        if (null === $this->_limit) {
+            $this->_limit = self::DEFAULT_LIMIT;
+        }
+        $this->_view->limit = $this->_limit;
+        $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
         $this->_strictTagsCount = (strtolower(end($this->_options)) == 'and');
@@ -233,11 +250,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $replacements[$key] = $widget->render();
 
                     // if noZeroPrice in config set to 1 - do not show zero prices and "Add to cart" becomes "Go to product"
-                    if($widgetData == 'price' && $data['noZeroPrice'] && !intval(trim($replacements[$key], '$'))) {
-                        $replacements[$key]                                    = '';
-                        $replacements['$store:addtocart']                      = '<a class="tcart-add" href="' . ($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;') . '">Go to product</a>';
-                        $replacements['$store:addtocart:' . $product->getId()] = $replacements['$store:addtocart'];
-                        $replacements['$store:addtocart:checkbox']             = $replacements['$store:addtocart'];
+                    if ($widgetData === 'price' || $widgetData === 'price:original') {
+                        if ($data['noZeroPrice'] && floatval($product->getPrice()) == 0) {
+                            $replacements[$key]                                    = '';
+                            $replacements['$store:addtocart']                      = '<a class="tcart-add" href="' . ($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;') . '">'.$this->_translator->translate('Go to product').'</a>';
+                            $replacements['$store:addtocart:' . $product->getId()] = $replacements['$store:addtocart'];
+                            $replacements['$store:addtocart:checkbox']             = $replacements['$store:addtocart'];
+                        }
                     }
 				}
 				if (!empty($replacements)) {
@@ -298,7 +317,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 		if (empty($this->_options)) {
 			array_push($this->_cacheTags, 'prodid_all');
-			return $this->_productMapper->fetchAll($enabledOnly, null, 0, self::DEFAULT_LIMIT);
+			return $this->_productMapper->fetchAll($enabledOnly, null, 0, $this->_limit);
 		}
 		$filters = array(
 			'tags'   => null,
@@ -313,7 +332,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
 			$filters['order'] = array_map(function ($field) {
-				return trim($field) === 'brand' ? 'b.name' : 'p.' . $field;
+				switch (trim($field)) {
+                    case 'brand':
+                        return $field = 'b.name'; break;
+                    case 'date':
+                        return $field = 'p.created_at DESC'; break;
+                    default:
+                        return $field =  'p.' . $field;
+                }
 			}, $filters['order']);
 		}
 
@@ -347,9 +373,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
 		}
 
-
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
-			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), self::DEFAULT_LIMIT,
+			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,
 			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount);
 	}
 

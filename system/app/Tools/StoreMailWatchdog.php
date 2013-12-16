@@ -199,7 +199,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 			);
 			$parser = new Tools_Content_Parser($mailTemplate, Tools_Misc::getCheckoutPage()->toArray(), $parserOptions);
 
-			return $parser->parseSimple();
+			return Tools_Content_Tools::stripEditLinks($parser->parseSimple());
 		}
 
 		return false;

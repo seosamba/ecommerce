@@ -69,12 +69,12 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
 
-		if (is_numeric($this->_options[0])){
-			$this->_product = $this->_productMapper->find(intval($this->_options[0]));
-			$this->_type = self::TYPE_PRODUCTLISTING;
-			array_shift($this->_options);
-		} else {
-            $productCacheId = __CLASS__.'_byPage_'.$this->_toasterOptions['id'];
+        if (is_numeric($this->_options[0])) {
+            $this->_product = $this->_productMapper->find(intval($this->_options[0]));
+            $this->_type = self::TYPE_PRODUCTLISTING;
+            array_shift($this->_options);
+        } else {
+            $productCacheId = __CLASS__ . '_byPage_' . $this->_toasterOptions['id'];
             if ($this->_cacheable) {
                 $this->_product = $this->_cache->load($productCacheId, 'store_');
             }
@@ -86,23 +86,23 @@ class Widgets_Product_Product extends Widgets_Abstract {
                         $this->_product,
                         'store_',
                         array('productwidget', 'prodid_' . $this->_product->getId()),
-                        Helpers_Action_Cache::CACHE_FLASH
+                        Helpers_Action_Cache::CACHE_NORMAL
                     );
                 }
             }
             $this->_type = array_shift($this->_options);
-		}
+        }
 
 		//initializing Zend Currency for future use
         if ($this->_currency === null){
             $this->_currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
         }
 
-	    if ($this->_product === null || $this->_type === null) {
+	    if (!$this->_product instanceof Models_Model_Product || is_null($this->_type)) {
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
-                 return "<b>Product doesn&apos;t exist or wrong options provided</b>";
+                 return '<b>Product does not exist or wrong options provided</b>';
             }
-            return "<!--Product doesn&apos;t exist or wrong options provided-->";
+            return '<!--Product does not exist or wrong options provided-->';
         }
 		array_push($this->_cacheTags, 'prodid_'.$this->_product->getId());
         $this->_view->product = $this->_product;
@@ -146,7 +146,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        if ((bool)$this->_product->getEnabled()){
 		        return $parser->parse();
 	        } elseif (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
-		        return '<div style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
+		        return '<div class="product-disabled" style="border: 1px dashed #cd5c5c; overflow: hidden;"><span>'.
 				        $this->_translator->translate('This product is disabled').
 				        '</span>'.$parser->parse().'</div>';
 	        }else{
@@ -204,12 +204,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
 					$tmp['host'],
 					implode('/', $path),
 					$guessSize,
-					$imgName
+                    rawurlencode($imgName)
 				));
 			}
 			return $photoSrc;
 		} else {
-			$photoSrc = str_replace('/', '/'.$newSize.'/', $photoSrc);
+            $photoSrc = explode('/', $photoSrc);
+            $photoSrc = $photoSrc[0].'/'.$newSize.'/'.rawurlencode(end($photoSrc));
+
 			return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
 		}
 	}
@@ -273,9 +275,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		$itemDefaultOptionsArray = array();
         foreach($this->_product->getDefaultOptions() as $option){
-            foreach ($option['selection'] as $item) {
-                if($item['isDefault'] == 1){
-                    $itemDefaultOptionsArray[$option['id']] = $item['id'];
+            if(is_array($option['selection'])) {
+                foreach ($option['selection'] as $item) {
+                    if($item['isDefault'] == 1){
+                        $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                    }
                 }
             }
         }
@@ -385,7 +389,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $imageSize = 'small';
         if ($related !== null) {
             $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
-            $this->_view->imageSize = (isset($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->imageSize = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
             if(isset($this->_options[1]) && $this->_options[1] == 'addtocart'){
                $this->_view->checkoutPageUrl = $checkoutPageUrl;
             }

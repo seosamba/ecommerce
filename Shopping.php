@@ -320,9 +320,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()) {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
+                $fullname = isset($data['firstname']) ? $data['firstname'] : '';
+                $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
-						->setFullName($data['firstname'] . ' ' . $data['lastname'])
+						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
 						->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
@@ -498,15 +500,21 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$content = '';
 		$nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+        }
+
 		$order = $this->_request->getParam('order');
 		$tags = $this->_request->getParam('tags');
 		$brands = $this->_request->getParam('brands');
 
-		$offset = intval($nextPage) * Widgets_Productlist_Productlist::DEFAULT_LIMIT;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, Widgets_Productlist_Productlist::DEFAULT_LIMIT, null, $tags, $brands);
+		$offset = intval($nextPage) * $limit;
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + Widgets_Productlist_Productlist::DEFAULT_LIMIT));
+			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit));
 			$content = $widget->setProducts($products)->setCleanListOnly(true)->render();
 			unset($widget);
 		}
@@ -611,7 +619,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
 				})),
 				'pending'   => sizeof(array_filter($orders, function ($order) {
-					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== self::GATEWAY_QUOTE);
+					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== Shopping::GATEWAY_QUOTE);
 				})),
 				'shipped'   => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED;
@@ -675,8 +683,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
-
-				$order->notifyObservers();
 
 				$this->_responseHelper->response($status->toArray(), false);
 			}
