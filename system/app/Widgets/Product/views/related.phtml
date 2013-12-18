@@ -36,7 +36,7 @@
             <?php if ($noZeroPrice): ?>
                 <a class="tcart-add related-cart-add" href="javascript:;" data-pid="<?php echo $product->getId(); ?>"><?php echo $this->translate('Add to cart'); ?></a>
             <?php else: ?>
-                <a class="tcart-add go-to-product related-cart-add" href="<?php echo ($product->getPage()) ? $product->getPage()->getUrl() : 'javascript:;'; ?>"><?php echo $this->translate('Go to product'); ?></a>
+                <a class="tcart-add go-to-product" href="<?php echo ($product->getPage()) ? $product->getPage()->getUrl() : 'javascript:;'; ?>"><?php echo $this->translate('Go to product'); ?></a>
             <?php endif; ?>
         <?php endif; ?>
     </li>
