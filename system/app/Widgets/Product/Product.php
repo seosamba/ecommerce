@@ -404,8 +404,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $checkoutPageUrl = $checkoutPage != null?$checkoutPage->getUrl():'';
         $imageSize = 'small';
         if ($related !== null) {
-            $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
-            $this->_view->imageSize = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->related     = ($related instanceof Models_Model_Product) ? array($related) : $related ;
+            $this->_view->imageSize   = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->noZeroPrice = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice');
             if(isset($this->_options[1]) && $this->_options[1] == 'addtocart'){
                $this->_view->checkoutPageUrl = $checkoutPageUrl;
             }

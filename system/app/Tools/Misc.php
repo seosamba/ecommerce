@@ -414,9 +414,9 @@ class Tools_Misc {
                 $replacements[$key] = $widget->render();
 
                 if ($widgetData === 'price' || $widgetData === 'price:original') {
-                    if ((int) $noZeroPrice == 1 && floatval($product->getPrice()) == 0) {
+                    if ((int) $noZeroPrice === 1 && floatval($product->getPrice()) == 0) {
                         $replacements[$key]                                  = '';
-                        $replacements['$store:addtocart']                    = '<a class="tcart-add" href="'.($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;').'">'.$translator->translate('Go to product').'</a>';
+                        $replacements['$store:addtocart']                    = '<a class="tcart-add go-to-product" href="'.($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;').'">'.$translator->translate('Go to product').'</a>';
                         $replacements['$store:addtocart:'.$product->getId()] = $replacements['$store:addtocart'];
                         $replacements['$store:addtocart:checkbox']           = $replacements['$store:addtocart'];
                     }
