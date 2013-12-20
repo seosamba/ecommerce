@@ -141,7 +141,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	 * @return array|null List of products
 	 */
 	public function fetchAll($where = null, $order = null, $offset = null, $limit = null,
-	                         $search = null, $tags = null, $brands = null, $strictTagsCount = false) {
+	                         $search = null, $tags = null, $brands = null, $strictTagsCount = false, $organicSearch = false) {
 		$entities = array();
 
 		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
@@ -159,7 +159,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		if (!empty($brands)){
 			if (!is_array($brands)) $brands = (array) $brands;
-			$select->where('b.name in (?)', $brands);
+
+            if($organicSearch) {
+                $select->orWhere('b.name in (?)', $brands);
+            } else {
+                $select->where('b.name in (?)', $brands);
+            }
+
 		}
 
 		if (!empty($tags)){
@@ -176,14 +182,25 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		}
 
         if ((bool)$search) {
-	        $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
-	        if (empty($tags)){
-		        $select
-                    ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', array())
-		            ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
-		        $likeWhere .= ' OR t.name LIKE ?';
-	        }
-	        $select->where($likeWhere, '%'.$search.'%');
+            $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
+
+	        if($organicSearch) {
+                if(is_array($search)) {
+                    foreach($search as $key) {
+                        $select->orWhere($likeWhere, '%'.$key.'%');
+                    }
+                } else {
+                    $select->orWhere($likeWhere, '%'.$search.'%');
+                }
+            } else {
+                if (empty($tags)){
+                    $select
+                        ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', array())
+                        ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
+                    $likeWhere .= ' OR t.name LIKE ?';
+                }
+                $select->where($likeWhere, '%'.$search.'%');
+            }
         }
 
 
