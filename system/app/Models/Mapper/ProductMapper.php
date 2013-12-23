@@ -449,8 +449,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             if ($product->getBrand()){
                 $brand = $this->_brandMapper->findByName($product->getBrand());
                 if ($brand) {
-                    $prodList = $this->fetchAll($this->getDbTable()->getAdapter()->quoteInto('brand_id = ?', $brand->getId()));
-                    if (empty($prodList)){
+                    $prodList = $this->getDbTable()->getAdapter()->select()->from("shopping_product", array("num"=>"COUNT(*)"))->where('brand_id = ?', $brand->getId());
+                    $brandProducts = $this->getDbTable()->getAdapter()->fetchOne($prodList);
+                    if (empty($brandProducts)){
                         $this->_brandMapper->delete($brand);
                     }
                 }
