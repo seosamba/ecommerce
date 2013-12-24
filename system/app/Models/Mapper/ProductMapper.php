@@ -190,14 +190,17 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
                 $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?';
                 if(is_array($search)) {
+
                     $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false);
                     foreach($search as $key => $term) {
                         $subWhere->orWhere($likeWhere, $term.'%');
                     }
+
+                    $subWhere = implode(' ', $subWhere->getPart('WHERE'));
                     if($brandExists) {
-                        $select->orWhere(implode(' ', $subWhere->getPart('WHERE')));
+                        $select->where($subWhere);
                     } else {
-                        $select->where(implode(' ', $subWhere->getPart('WHERE')));
+                        $select->orWhere($subWhere);
                     }
                 } else {
                     $select->orWhere($likeWhere, $search.'%');
@@ -217,8 +220,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		if (self::$_logSelectResultLength === false){
 			$select->limit($limit, $offset);
 		}
-
-        $q = $select->assemble();
 
 		Tools_System_Tools::debugMode() && error_log($select->__toString());
 		$resultSet = $this->getDbTable()->fetchAll($select);
