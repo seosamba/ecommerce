@@ -159,13 +159,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		if (!empty($brands)){
 			if (!is_array($brands)) $brands = (array) $brands;
-
-            if($organicSearch) {
-                $select->orWhere('b.name in (?)', $brands);
-            } else {
-                $select->where('b.name in (?)', $brands);
-            }
-
+            $select->where('b.name in (?)', $brands);
 		}
 
 		if (!empty($tags)){
@@ -185,13 +179,28 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
 
 	        if($organicSearch) {
+
+                $brandDbTable = new Models_DbTable_Brand();
+                $entries      = $brandDbTable->getAdapter()->fetchAll(
+                    $brandDbTable
+                        ->select()
+                        ->where('name in (?)', $brands)
+                );
+                $brandExists  = is_array($entries) && !empty($entries);
+
+                $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?';
                 if(is_array($search)) {
-                    foreach($search as $key) {
-                        $select->orWhere($likeWhere, '%'.$key.'%');
+                    foreach($search as $key => $term) {
+                        if($key === 0 && $brandExists) {
+                            $select->where($likeWhere, $term.'%');
+                        } else {
+                            $select->orWhere($likeWhere, $term.'%');
+                        }
                     }
                 } else {
-                    $select->orWhere($likeWhere, '%'.$search.'%');
+                    $select->orWhere($likeWhere, $search.'%');
                 }
+
             } else {
                 if (empty($tags)){
                     $select
@@ -202,7 +211,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 $select->where($likeWhere, '%'.$search.'%');
             }
         }
-
 
 		if (self::$_logSelectResultLength === false){
 			$select->limit($limit, $offset);
