@@ -141,7 +141,23 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	            }
 	        }
 
-            $parser = new Tools_Content_Parser($templatePrepend . $template->getContent(), $this->_product->getPage()->toArray(), $parserOptions);
+            if (strpos($template->getContent(), '$store:addtocart') !== false) {
+                $storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $this->_product->getId()));
+            }
+            if (strpos($template->getContent(), '$store:addtocart:checkbox') !== false) {
+                $storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $this->_product->getId(), 'checkbox'));
+            }
+
+            $dictionary = array(
+                '$product:id'                                => $this->_product->getId(),
+                '$store:addtocart'                           => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:'.$this->_product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:checkbox'                  => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : ''
+            );
+
+            $noZeroPrice     = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice');
+            $renderedContent = Tools_Misc::preparingProductListing($template->getContent(), $this->_product, $dictionary, $noZeroPrice);
+            $parser          = new Tools_Content_Parser($templatePrepend.$renderedContent, $this->_product->getPage()->toArray(), $parserOptions);
 
 	        if ((bool)$this->_product->getEnabled()){
 		        return $parser->parse();
@@ -176,17 +192,18 @@ class Widgets_Product_Product extends Widgets_Abstract {
     private function _renderName() {
 		return $this->_product->getName();
 	}
-	
+
 	private function _renderPhotourl() {
 		$websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
 		$websiteUrl    = (Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('mediaServers') ? Tools_Content_Tools::applyMediaServers($websiteHelper->getUrl()) : $websiteHelper->getUrl());
 
+        $photourlOptions = array('small', 'medium', 'large', 'original', 'crop');
         $photoSrc      = $this->_product->getPhoto();
 		if (empty($photoSrc)){
 			return $this->_websiteUrl.Tools_Page_Tools::PLACEHOLDER_NOIMAGE;
 		}
 
-		if (!empty($this->_options) && in_array($this->_options[0], array('small', 'medium', 'large', 'original'))) {
+		if (!empty($this->_options) && in_array($this->_options[0], $photourlOptions)) {
 			$newSize = $this->_options[0];
 		} else {
 			$newSize = 'product';
@@ -197,7 +214,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			if (is_array($path)){
 				$imgName = array_pop($path);
 				$guessSize = array_pop($path);
-				if (in_array($guessSize, array('small', 'medium', 'large', 'original')) && $guessSize !== $newSize ){
+				if (in_array($guessSize, $photourlOptions) && $guessSize !== $newSize ){
 					$guessSize = $newSize;
 				}
 				return $tmp['scheme'] .'://'. implode('/', array(
@@ -215,7 +232,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 			return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
 		}
 	}
-	
+
 	private function _renderPrice() {
 		array_push($this->_cacheTags, 'product_price');
 
@@ -275,9 +292,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		$itemDefaultOptionsArray = array();
         foreach($this->_product->getDefaultOptions() as $option){
-            foreach ($option['selection'] as $item) {
-                if($item['isDefault'] == 1){
-                    $itemDefaultOptionsArray[$option['id']] = $item['id'];
+            if(is_array($option['selection'])) {
+                foreach ($option['selection'] as $item) {
+                    if($item['isDefault'] == 1){
+                        $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                    }
                 }
             }
         }
@@ -386,8 +405,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $checkoutPageUrl = $checkoutPage != null?$checkoutPage->getUrl():'';
         $imageSize = 'small';
         if ($related !== null) {
-            $this->_view->related = $related instanceof Models_Model_Product ? array($related) : $related ;
-            $this->_view->imageSize = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->related     = ($related instanceof Models_Model_Product) ? array($related) : $related ;
+            $this->_view->imageSize   = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
+            $this->_view->noZeroPrice = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice');
             if(isset($this->_options[1]) && $this->_options[1] == 'addtocart'){
                $this->_view->checkoutPageUrl = $checkoutPageUrl;
             }

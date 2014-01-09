@@ -75,7 +75,7 @@
                             <td>
                                 <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
                                     <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
-                                        <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="View invoice" title="View invoice"/>
+                                        <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
                                     </a>
                                 <?php endif;?>
                             </td>
