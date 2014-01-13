@@ -33,7 +33,7 @@
 						$lastSeenStamp = $lastSeen.' '.$this->translate(' days ago');
 					}
 				} else {
-					$lastSeenStamp = $this->translate('never');
+					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
 				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
 				?></p>
