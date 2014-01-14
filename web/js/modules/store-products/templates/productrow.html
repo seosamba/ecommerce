@@ -16,7 +16,7 @@
 <td class="textcentered">
 <% if (this.model.has('stats')) {%>
     <% if (stats.length) {%>
-    <%= _.isUndefined(i18n['Total']) ? 'Total':i18n['Total'] %>: <%= _.reduce(_.pluck(stats, 'count'), function(m, n){ return m+parseInt(n)}, 0) %>
+    <%= _.isUndefined(i18n['Total']) ? 'Total':i18n['Total'] %>: <%= _.reduce(_.pluck(_.filter(stats, function(elem){return elem.status != "new"}), 'count'),function(m, n){ return m+parseInt(n)}, 0) %>
     <ul>
     <% _.each(stats, function(stat) { %>
         <% translatedStatus = 'cs_'+stat.status %>
