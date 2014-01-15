@@ -11,6 +11,9 @@
 		<div class="post-purchase-report-billing-address">
 			<?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
 				<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
+                <span><?php echo $billingAddress['firstname'];?></span>
+                <span><?php echo $billingAddress['lastname'];?></span>
+                <br/>
 				<span class="street-address"><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2'];?></span>
 				<br/>
 				<span class="locality"><?php echo $billingAddress['city'] . ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');?></span>
@@ -248,7 +251,10 @@
 		<p style="color:#444444;">
 			<?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
 				<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
-				<span><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2'];?></span>
+                <span><?php echo $billingAddress['firstname'];?></span>
+                <span><?php echo $billingAddress['lastname'];?></span>
+                <br/>
+                <span><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2'];?></span>
 				<br/>
 				<span><?php echo $billingAddress['city'] . ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');?></span>
 				<?php $state = Tools_Geo::getStateById($billingAddress['state']); ?>
