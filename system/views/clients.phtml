@@ -16,6 +16,7 @@
             <span><?php echo $this->translate('There are no groups yet');?></span>
         <?php endif;?>
     </td>
+    <td class="abn textcentered">${reg_date}</td>
     <td class="date textcentered">${reg_date}</td>
     <td class="total textcentered"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
@@ -65,6 +66,7 @@
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
                 <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
+                <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('ABN');?></th>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
 	            <th class="sortable" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
             </tr>
