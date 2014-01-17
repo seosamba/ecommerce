@@ -4,7 +4,8 @@
  * @author Vitaly Vyrodov <vitaly.vyrodov@gmail.com>
  */
 
-class Widgets_Customer_Customer extends Widgets_User_Base {
+class Widgets_Customer_Customer extends Widgets_User_Base
+{
 
     protected $_fieldType = 'text';
 
@@ -12,19 +13,24 @@ class Widgets_Customer_Customer extends Widgets_User_Base {
 
     protected $_customerId = null;
 
-    protected function _init() {
+    protected $_checkCart = null;
+
+    protected function _init()
+    {
         parent::_init();
         $this->_view->addScriptPath(__DIR__ . '/views');
     }
 
-    protected function _load(){
+    protected function _load()
+    {
         if (empty($this->_options)) {
             throw new Exceptions_SeotoasterWidgetException('No options provided');
         }
 
+        $this->_checkCart  = Tools_ShoppingCart::getInstance()->getContent();
         $this->_customerId = Tools_ShoppingCart::getInstance()->getCustomer()->getId();
 
-        if (!empty($this->_customerId)) {
+        if (empty($this->_customerId) || empty($this->_checkCart)) {
             return '';
         } else {
             if (!empty($this->_options[0])) {
@@ -54,7 +60,8 @@ class Widgets_Customer_Customer extends Widgets_User_Base {
         }
     }
 
-    public function __call($attrName, $arguments) {
+    public function __call($attrName, $arguments)
+    {
         if (preg_match('/^_render/', $attrName)) {
             $attrName = mb_strtolower(mb_strcut($attrName, 7));
             if (!empty($this->_options)) {
@@ -64,8 +71,8 @@ class Widgets_Customer_Customer extends Widgets_User_Base {
             $attrName = preg_replace('/[^\w\d-_]/ui', '', $attrName);
 
             // check if we have a getter for this property
-            $getter = 'get'.ucfirst($attrName);
-            if (method_exists($this->_user, $getter)){
+            $getter = 'get' . ucfirst($attrName);
+            if (method_exists($this->_user, $getter)) {
                 $value = $this->_user->$getter();
             } else {
                 // or try to get attribute value
