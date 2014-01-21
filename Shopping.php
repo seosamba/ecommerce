@@ -577,7 +577,14 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
 			$this->_view->noLayout = true;
 			$allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
-			$this->_view->allGroups = $allGroups;
+            $this->_view->allGroups = $allGroups;
+            $attributes = Application_Model_Mappers_UserMapper::getInstance();
+            $query = $attributes->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'))->where('attribute LIKE ?', 'customer_%');
+            $customerAttributes = $attributes->getDbTable()->getAdapter()->fetchCol($query);
+            foreach ($customerAttributes as $key => $attrName) {
+                $customerAttributes[$key] = preg_replace('/customer_/', '', $attrName);
+            }
+            $this->_view->customerAttributes = $customerAttributes;
 			return $this->_view->render('clients.phtml');
 		}
 	}

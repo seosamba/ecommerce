@@ -71,7 +71,7 @@ class Api_Store_Customer extends Api_Service_Abstract
         $data = json_decode($this->_request->getRawBody(), true);
 
         if ($id && !empty($data)) {
-            if ($id !== Tools_ShoppingCart::getInstance()->getCustomer()->getId()) {
+            if ($id !== Tools_ShoppingCart::getInstance()->getCustomer()->getId() && !Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
                 $this->_error(self::REST_STATUS_FORBIDDEN);
             }
 

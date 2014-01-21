@@ -151,6 +151,8 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
         $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
         $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        $joinConditionCustomer = ('userattr.user_id = user.id').' AND '.$userDbTable->getAdapter()->quoteInto('userattr.attribute LIKE ?', 'customer_%');
+
         $select = $userDbTable->select()
 				->setIntegrityCheck(false)
 				->from('user',array('id', 'full_name', 'email', 'reg_date' ))
@@ -167,7 +169,11 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                     array(
                         'group_id' => 'customerinfo.group_id',
                    ))
-				->group('user.id');
+            ->joinLeft(
+                array('userattr' => 'user_attributes'),
+                $joinConditionCustomer,
+                array('customer_attr'=>'(GROUP_CONCAT(DISTINCT(userattr.attribute), \'||\', userattr.value))'))
+            ->group('user.id');
 
 		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {
 			$select->where('user.role_id NOT IN (?)', array(

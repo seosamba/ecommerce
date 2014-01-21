@@ -56,6 +56,17 @@ class Api_Store_Customers extends Api_Service_Abstract {
 			$data = array_map(function($row) use ($currency){
 				$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
 				$row['total_amount'] = $currency->toCurrency($row['total_amount']);
+                if (!empty($row['customer_attr'])) {
+                    $attributes = explode(',', $row['customer_attr']);
+                    unset($row['customer_attr']);
+                    foreach ($attributes as $attribute) {
+                        $attribute = explode('||', $attribute);
+                        $row[preg_replace('/customer_/', '', $attribute[0])] = $attribute[1];
+
+                    }
+                } else {
+                    unset($row['customer_attr']);
+                }
 				return $row;
 			},
 			$customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset, $search));
