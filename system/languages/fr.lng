@@ -598,7 +598,7 @@
         'by product name, sku, mpn' =>  'par nom de produit, mpn, sku',
         'select folder'=>'sélectionnez le dossier',
         'Owner' =>'Créateur',
-        'Not set' =>'Pas fixé',
+        'Not set' =>'Aucun',
         'For orders over'=>'pour les commandes de plus de'
 
 );?>
