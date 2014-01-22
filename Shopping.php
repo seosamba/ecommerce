@@ -582,7 +582,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $query = $attributes->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'))->where('attribute LIKE ?', 'customer_%');
             $customerAttributes = $attributes->getDbTable()->getAdapter()->fetchCol($query);
             foreach ($customerAttributes as $key => $attrName) {
-                $customerAttributes[$key] = preg_replace('/customer_/', '', $attrName);
+                $customerAttributes[$key] = preg_replace('`customer_`', '', $attrName);
             }
             $this->_view->customerAttributes = $customerAttributes;
 			return $this->_view->render('clients.phtml');

@@ -20,7 +20,8 @@ define([
             'change select#mass-action': 'doAction',
             'keyup #clients-search': 'searchClient',
             'change select[name=groups]': 'assignGroup',
-            'blur input.customer-attribute': 'changeCustomAttr'
+            'blur input.customer-attribute': 'changeCustomAttr',
+            'click th.customer-attribute':'deleteCustomAttr'
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -365,6 +366,26 @@ define([
 
                         }
                     }
+                })
+            });
+        },
+        deleteCustomAttr:function(){
+            $('body').on('click', 'th.customer-attribute span', function(e){
+                var attrName = $(this).parent().data('custom');
+                console.log(attrName);
+                showConfirm('Do you really want to delete this column? (Data will be deleted!)', function(){
+                    $.ajax({
+                        url: $('#website_url').val() + 'api/store/customer/attr/' + attrName,
+                        method: 'DELETE',
+                        data: JSON.stringify({attrName: attrName}),
+                        complete: function(xhr, status, response) {
+                            if (status === 'error'){
+                                showMessage(status, true);
+                            } else {
+                                window.location.reload();
+                            }
+                        }
+                    })
                 })
             });
         }

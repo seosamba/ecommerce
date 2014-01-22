@@ -61,7 +61,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
                     unset($row['customer_attr']);
                     foreach ($attributes as $attribute) {
                         $attribute = explode('||', $attribute);
-                        $row[preg_replace('/customer_/', '', $attribute[0])] = $attribute[1];
+                        $row[preg_replace('`customer_`', '', $attribute[0])] = $attribute[1];
 
                     }
                 } else {

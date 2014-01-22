@@ -96,14 +96,20 @@ class Api_Store_Customer extends Api_Service_Abstract
         }
     }
 
-    /**
-     * The delete action handles DELETE requests and receives an 'id'
-     * parameter; it should update the server resource state of the resource
-     * identified by the 'id' value.
-     */
+
     public function deleteAction()
     {
-        // TODO: Implement deleteAction() method.
+        $rawBody = Zend_Json::decode($this->_request->getRawBody());
+        if (isset($rawBody['attrName']) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $attrName = 'customer_' . filter_var($rawBody['attrName'], FILTER_SANITIZE_STRING);
+            if (!empty($attrName)) {
+                $attributes = Application_Model_Mappers_UserMapper::getInstance()->getDbTable()->getAdapter();
+                $where = $attributes->quoteInto('attribute = ?', $attrName);
+                $attributes->delete('user_attributes', $where);
+                //$attributes->fetchCol($query);
+            } else {
+                $this->_error(null, self::REST_STATUS_NOT_FOUND);
+            }
+        }
     }
-
 }

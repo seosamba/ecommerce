@@ -19,7 +19,6 @@
     <?php if (is_array($this->customerAttributes)): ?>
         <?php foreach ($this->customerAttributes as $attrName): ?>
             <td><input type="text" class="customer-attribute" data-uid="${id}" data-attribute="customer_<?php echo $attrName?>" value="${<?php echo $attrName?>}" /></td>
-            <!--<td class="customer textcentered"><input type="text" id="customer-attribute" class="customer-attribute" value="${<?php echo $attrName?>}" /></td> -->
                     <?php endforeach; ?>
     <?php endif; ?>
     <td class="date textcentered">${reg_date}</td>
@@ -56,7 +55,7 @@
     <table id="clients-table" class="widget" style="width: 100%">
         <thead>
             <tr class="search-line">
-				<th colspan="5" class="gray-bg">
+				<th colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="gray-bg">
 					<label class="mt5px"><?php echo $this->translate('Search');?></label>
 					<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
                 </th>
@@ -73,7 +72,7 @@
                 <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
                 <?php if (is_array($this->customerAttributes)): ?>
                     <?php foreach ($this->customerAttributes as $attrName): ?>
-                        <th data-sortkey="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate($attrName);?></th>
+                        <th class="customer-attribute" data-custom="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate($attrName);?><span class="icomoon-cancel red"></span></th>
                     <?php endforeach; ?>
                 <?php endif; ?>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
@@ -82,12 +81,12 @@
         </thead>
         <tbody id="customer-list">
             <tr>
-	            <td colspan="5" class=" textcentered"><img src="<?php echo $this->websiteUrl;?>/system/images/loading.gif"/></td>
+	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class=" textcentered"><img src="<?php echo $this->websiteUrl;?>/system/images/loading.gif"/></td>
             </tr>
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="5" class="ui-resizable text-left">
+	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="ui-resizable text-left">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
                     <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>
