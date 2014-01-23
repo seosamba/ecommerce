@@ -129,7 +129,7 @@
         'search quote by title) ?>'=>'rechercher devis par titre)?>',
         'Id'=>'Id',
         'Title'=>'Titre',
-        'Date'=>'Date d&rsquo;',
+        'Date'=>'Date',
         'Status'=>'Statut',
         'Preview'=>'Apercu',
         'Remove'=>'Supprimer',
@@ -598,7 +598,8 @@
         'by product name, sku, mpn' =>  'par nom de produit, mpn, sku',
         'select folder'=>'sélectionnez le dossier',
         'Owner' =>'Créateur',
-        'Not set' =>'Pas fixé',
-        'For orders over'=>'pour les commandes de plus de'
+        'Not set' =>'Aucun',
+        'For orders over'=>'pour les commandes de plus de',
+        'search quote by title, by creator, by client email & name' => 'rechercher devis par titre, par le créateur, par nom or email du client'
 
 );?>
