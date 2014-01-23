@@ -87,6 +87,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
 
+    const SHIPPING_TAX_RATE     = 'shippingTaxRate';
+
+    const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -573,7 +577,14 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
 			$this->_view->noLayout = true;
 			$allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
-			$this->_view->allGroups = $allGroups;
+            $this->_view->allGroups = $allGroups;
+            $attributes = Application_Model_Mappers_UserMapper::getInstance();
+            $query = $attributes->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'))->where('attribute LIKE ?', 'customer_%');
+            $customerAttributes = $attributes->getDbTable()->getAdapter()->fetchCol($query);
+            foreach ($customerAttributes as $key => $attrName) {
+                $customerAttributes[$key] = preg_replace('`customer_`', '', $attrName);
+            }
+            $this->_view->customerAttributes = $customerAttributes;
 			return $this->_view->render('clients.phtml');
 		}
 	}
@@ -1016,6 +1027,34 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
                 $this->_responseHelper->fail();
             }
+        }
+    }
+
+    public function saveDiscountTaxRateAction(){
+        if(Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $couponDiscountTaxRate = filter_var($this->_request->getParam('discountTaxValue'), FILTER_SANITIZE_NUMBER_INT);
+            $shoppingConfigParams = $this->_configMapper->getConfigParams();
+            $shoppingConfigParams['couponDiscountTaxRate'] = $couponDiscountTaxRate;
+            $this->_configMapper->save($shoppingConfigParams);
+            $this->_responseHelper->success('');
+        }
+    }
+
+    public function precalculateDiscountTaxAction(){
+        if(Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $couponDiscountTaxRate = filter_var($this->_request->getParam('discountTaxValue'), FILTER_SANITIZE_NUMBER_INT);
+            $couponDiscountAmount  = $this->_request->getParam('discountAmount');
+            $getRate = 'getRate'.$couponDiscountTaxRate;
+            $shoppingConfig = $this->_configMapper->getConfigParams();
+            if(isset($shoppingConfig['showPriceIncTax']) && (bool)$shoppingConfig['showPriceIncTax'] == 1){
+                $tax = Models_Mapper_Tax::getInstance()->getDefaultRule();
+                if($tax instanceof Models_Model_Tax){
+                    $couponAmountWithDiscount = $couponDiscountAmount + ($couponDiscountAmount / 100 * $tax->$getRate());
+                    $this->_responseHelper->success(array('discountResultValue' => $couponAmountWithDiscount));
+                }
+                $this->_responseHelper->success(array('discountResultValue' => $couponDiscountAmount));
+            }
+            $this->_responseHelper->success(array('discountResultValue' => $couponDiscountAmount));
         }
     }
 

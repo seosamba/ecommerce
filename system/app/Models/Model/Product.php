@@ -57,6 +57,10 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_freebies;
 
+    protected $_groupPriceEnabled = 0;
+
+    protected $_originalPrice = 0;
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -296,5 +300,21 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     public function setFreebies($freebies) {
         $this->_freebies = $freebies;
+    }
+
+    public function getGroupPriceEnabled() {
+        return $this->_groupPriceEnabled;
+    }
+
+    public function setGroupPriceEnabled($groupPriceEnabled) {
+        $this->_groupPriceEnabled = $groupPriceEnabled;
+    }
+
+    public function getOriginalPrice() {
+        return $this->_originalPrice;
+    }
+
+    public function setOriginalPrice($originalPrice) {
+        $this->_originalPrice = $originalPrice;
     }
 }

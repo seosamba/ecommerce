@@ -119,6 +119,9 @@ class Tools_CouponTools {
 		$cart->calculate(true);
 		$cart->save();
 
+        $customer = $cart->getCustomer();
+        $cart->save()->saveCartSession($customer);
+
 		return self::STATUS_APPLIED;
 	}
 

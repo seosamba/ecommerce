@@ -129,7 +129,7 @@
         'search quote by title) ?>'=>'rechercher devis par titre)?>',
         'Id'=>'Id',
         'Title'=>'Titre',
-        'Date'=>'Date d&rsquo;',
+        'Date'=>'Date',
         'Status'=>'Statut',
         'Preview'=>'Apercu',
         'Remove'=>'Supprimer',
@@ -177,8 +177,8 @@
         'Default'=>'Par défaut',
         'Zone'=>'Zone',
         'Default Tax'=>'taxe par défaut',
-        'Tax Rate 1'=>'Taux d&rsquo;imposition 1',
-        'Tax Rate 2'=>'Taux d&rsquo;imposition 2',
+        'Tax Rate 1'=>'Taux d’imposition 1',
+        'Tax Rate 2'=>'Taux d’imposition 2',
         'Add new'=>'Ajouter un nouveau',
         'Save and close'=>'Sauvegardez et fermez',
         'Shipping configuration'=>'configuration de port',
@@ -597,6 +597,9 @@
         'Order #' => 'N ° de commande',
         'by product name, sku, mpn' =>  'par nom de produit, mpn, sku',
         'select folder'=>'sélectionnez le dossier',
-        'For orders over'=>'pour les commandes de plus de'
+        'Owner' =>'Créateur',
+        'Not set' =>'Aucun',
+        'For orders over'=>'pour les commandes de plus de',
+        'search quote by title, by creator, by client email & name' => 'rechercher devis par titre, par le créateur, par nom or email du client'
 
 );?>

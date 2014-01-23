@@ -66,7 +66,27 @@ define([
         },
         openDialog: function(e){
             var id = '#'+$(e.target).data('name')+'-dialog';
+            if($(e.target).data('name') == 'add-country'){
+                var countryList = $(e.target).closest('.countries').find('.zone-countries li');
+                $.each(countryList, function(zone){
+                    var countryId = $(this).find('.remove-item').data('element-country');
+                    $('#country-list').find('[data-element-country="'+countryId+'"]').closest('li').hide();
+                });
+            }
+            if($(e.target).data('name') == 'add-state'){
+                var statesList = $(e.target).closest('.states').find('.zone-states li');
+                $.each(statesList, function(zone){
+                    var countryId = $(this).find('.remove-item').data('element-state');
+                    $('#state-list').find('[data-element-state="'+countryId+'"]').closest('li').hide();
+                });
+            }
             $(id).dialog('open');
+            $(id).dialog({
+                beforeClose: function(event) {
+                    $('#state-list').find('li').show();
+                    $('#country-list').find('li').show();
+                }
+            });
         },
         render: function(){
             return this;

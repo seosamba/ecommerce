@@ -19,7 +19,9 @@ define([
             'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #clients-search': 'searchClient',
-            'change select[name=groups]': 'assignGroup'
+            'change select[name=groups]': 'assignGroup',
+            'blur input.customer-attribute': 'changeCustomAttr',
+            'click th.customer-attribute':'deleteCustomAttr'
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -346,6 +348,44 @@ define([
                         return false;
                     }
 
+            });
+        },
+        changeCustomAttr:function(){
+            $('input.customer-attribute').on('blur', function(e){
+                var data = {};
+                data[$(this).data('attribute')] = $(this).val();
+
+                $.ajax({
+                    url: $('#website_url').val() + 'api/store/customer/id/' + $(this).data('uid'),
+                    method: 'PUT',
+                    data: JSON.stringify(data),
+                    complete: function(xhr, status, response) {
+                        if (status === 'error'){
+                            showMessage(status, true);
+                        } else {
+                            showMessage('Attribute saved!');
+                        }
+                    }
+                })
+            });
+        },
+        deleteCustomAttr:function(){
+            $('body').on('click', 'th.customer-attribute span', function(e){
+                var attrName = $(this).parent().data('custom');
+                showConfirm('Do you really want to delete this column? (Data will be deleted!)', function(){
+                    $.ajax({
+                        url: $('#website_url').val() + 'api/store/customer/attr/' + attrName,
+                        method: 'DELETE',
+                        data: JSON.stringify({attrName: attrName}),
+                        complete: function(xhr, status, response) {
+                            if (status === 'error'){
+                                showMessage(status, true);
+                            } else {
+                                window.location.reload();
+                            }
+                        }
+                    })
+                })
             });
         }
     });
