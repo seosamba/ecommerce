@@ -19,7 +19,7 @@
     <?php if (is_array($this->customerAttributes)): ?>
         <?php foreach ($this->customerAttributes as $attrName): ?>
             <td><input type="text" class="customer-attribute" data-uid="${id}" data-attribute="customer_<?php echo $attrName?>" value="${<?php echo $attrName?>}" /></td>
-                    <?php endforeach; ?>
+        <?php endforeach; ?>
     <?php endif; ?>
     <td class="date textcentered">${reg_date}</td>
     <td class="total textcentered"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
@@ -72,7 +72,7 @@
                 <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
                 <?php if (is_array($this->customerAttributes)): ?>
                     <?php foreach ($this->customerAttributes as $attrName): ?>
-                        <th class="customer-attribute" data-custom="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate($attrName);?><span class="icomoon-cancel red"></span></th>
+                        <th class="customer-attribute" data-custom="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate(mb_convert_case(preg_replace('`_`', ' ', $attrName), MB_CASE_TITLE, 'UTF-8'));?><span class="icomoon-cancel red"></span></th>
                     <?php endforeach; ?>
                 <?php endif; ?>
 	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>

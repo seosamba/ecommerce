@@ -363,7 +363,7 @@ define([
                         if (status === 'error'){
                             showMessage(status, true);
                         } else {
-
+                            showMessage('Attribute saved!');
                         }
                     }
                 })
@@ -372,7 +372,6 @@ define([
         deleteCustomAttr:function(){
             $('body').on('click', 'th.customer-attribute span', function(e){
                 var attrName = $(this).parent().data('custom');
-                console.log(attrName);
                 showConfirm('Do you really want to delete this column? (Data will be deleted!)', function(){
                     $.ajax({
                         url: $('#website_url').val() + 'api/store/customer/attr/' + attrName,

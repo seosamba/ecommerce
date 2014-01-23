@@ -106,7 +106,6 @@ class Api_Store_Customer extends Api_Service_Abstract
                 $attributes = Application_Model_Mappers_UserMapper::getInstance()->getDbTable()->getAdapter();
                 $where = $attributes->quoteInto('attribute = ?', $attrName);
                 $attributes->delete('user_attributes', $where);
-                //$attributes->fetchCol($query);
             } else {
                 $this->_error(null, self::REST_STATUS_NOT_FOUND);
             }
