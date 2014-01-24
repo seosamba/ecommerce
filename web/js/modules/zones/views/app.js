@@ -8,7 +8,7 @@ define([
 
     var appView = Backbone.View.extend({
         el: $('#manage-zones'),
-        zoneHolder: $('#zones'),
+        zoneHolder: $('#zone'),
         events: {
             'click #new-zone-btn': 'newZone',
             'click #delete-zone': 'deleteZone',
@@ -25,10 +25,11 @@ define([
         newZone: function(){
             var model = new ZoneModel();
             this.zonesCollection.add(model);
-            var lastIndex = this.zoneHolder.find('ul.ui-tabs-nav li').size()-1;
+            var lastIndex = this.zoneHolder.find('.ui-tabs-nav li').size()-1;
             this.zoneHolder.tabs('option', 'active', lastIndex);
         },
         deleteZone: function(){
+            console.log('dfd');
             var zoneHolder = this.zoneHolder;
                 index = zoneHolder.tabs('option', 'active');
                 model = this.zonesCollection.at(index);
@@ -41,27 +42,27 @@ define([
             }
         },
         destroyZone: function(zone){
-            this.zoneHolder.find('ul.ui-tabs-nav li[aria-controls='+zone.cid+'], div#'+zone.cid).remove()
+            this.zoneHolder.find('.ui-tabs-nav li[aria-controls='+zone.cid+'], div#'+zone.cid).remove()
                 .end().tabs('refresh');
         },
         renderZone: function(zone){
             var view = new ZoneView({model: zone}),
                 id   = '#zone-'+zone.cid;
 
-            this.zoneHolder.find('ul.ui-tabs-nav').append('<li><a href="#'+zone.cid+'">'+zone.get('name')+'</a></li>')
+            this.zoneHolder.find('.ui-tabs-nav .add-new-zone').before('<li><a href="#'+zone.cid+'">'+zone.get('name')+'</a></li>')
             view.render().$el.appendTo(this.zoneHolder);
             this.zoneHolder.tabs('refresh');
         },
         resetZones: function(){
-            this.zoneHolder.find('ul.ui-tabs-nav li:not(.add-new-zone), div.ui-tabs-panel').remove();
+            this.zoneHolder.find('.ui-tabs-nav li:not(.add-new-zone), .ui-tabs-panel').remove();
             this.zonesCollection.each(this.renderZone, this);
             this.zoneHolder.tabs('option', 'active', 0);
         },
         saveZones: function(){
-            $('#ajax_msg').show('fade');
+			showSpinner();
             $.post(this.zonesCollection.url, {zones: this.zonesCollection.toJSON()}, function(){
                 app.view.zonesCollection.fetch();
-                $('#ajax_msg').hide('fade');
+				hideSpinner();
             });
         },
         openDialog: function(e){
@@ -92,6 +93,6 @@ define([
             return this;
         }
     })
-	
+
 	return appView;
 });

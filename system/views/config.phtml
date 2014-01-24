@@ -1,6 +1,6 @@
 <?php
-$this->headTitle($this->translate('Manage config'));
-$this->placeholder('headerContent')->set($this->translate('Manage store config'));
+//$this->headTitle($this->translate('Manage config'));
+//$this->placeholder('headerContent')->set($this->translate('Manage store config'));
 
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
@@ -73,28 +73,8 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
 
-<style>
-	a.user-changed::after {
-		content: '*'
-	}
-    .ui-tabs#config .ui-tabs-panel {
-        padding: 2px 0 10px;
-    }
-    button#save-btn {
-	    position: absolute;
-        bottom: 5px;
-	    right: 0;
-    }
-	.email-trigger label {
-		display: inline-block;
-	}
-	.email-trigger select {
-		width: 300px;
-	}
-</style>
-
-<div id="config" class="h500 grid_12 mt5px">
-    <ul>
+<div id="config">
+    <ul class="header">
 	    <?php $subForms = $this->form->getSubForms(); ?>
         <?php foreach ($subForms as $subform): ?>
             <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
@@ -106,11 +86,11 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
         <?php endif; ?>
 	</ul>
 
-	<form action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<form class="content-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
 	<?php foreach ($subForms as $subform) :?>
-		<div id="<?php echo $subform->getId();?>-tab">
+		<fieldset id="<?php echo $subform->getId();?>-tab">
 			<?php foreach ($subform->getElements() as $elem):?>
-			<div class="mt5px clearfix">
+			<div>
                 <?php $labelText = $this->translate($elem->getLabel());?>
                 <?php $elem->setLabel($labelText);?>
 				<?php echo $elem->renderLabel();?>
@@ -119,10 +99,12 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 				</div>
 			</div>
 			<?php endforeach; ?>
-		</div>
+		</fieldset>
 	<?php endforeach; ?>
 	</form>
 
 	<?php //echo $this->form; ?>
-	<button id="save-btn"><?php echo $this->translate('Save');?></button>
+    <div class="footer grid_12">
+	    <button id="save-btn" class="icon-save"><?php echo $this->translate('Save');?></button>
+    </div>
 </div>

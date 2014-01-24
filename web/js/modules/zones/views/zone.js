@@ -7,6 +7,7 @@ define([
     var zoneTabView = Backbone.View.extend({
         template: _.template($('#zoneTemplate').text()),
         tagName: 'div',
+        className: 'content-footer',
         events: {
             'click .clearprop': 'clearProperty',
             'change .zone-name': 'setName',
@@ -42,7 +43,6 @@ define([
                 });
                 statesList.append(view.render(view.templates.state, 'delete', 'states').$el);
             });
-            this.$el.find('.delete-zone').button();
 
             this.el.id = this.model.cid;
             return this;

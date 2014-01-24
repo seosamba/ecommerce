@@ -1,58 +1,7 @@
-<style type="text/css">
-#edit-coupon {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	position: relative;
-}
-#edit-coupon label{
-	display: inline-block;
-}
-#edit-coupon input,
-#edit-coupon select,
-#edit-coupon textarea {
-	width: 100px;
-}
-#edit-coupon input[type=checkbox],
-#edit-coupon input[type=radio] {
-    width: auto;
-	margin: 0 5px;
-	vertical-align: middle;
-}
-#edit-coupon input.blue-btn[type=submit]{
-	position: absolute;
-	bottom: 5px;
-	right: 10px;
-}
-#edit-coupon .input-auto {
-	width: auto;
-}
-#edit-coupon .input-micro {
-	width: 40px;
-}
-#edit-coupon .input-mini {
-    width: 60px;
-}
-#edit-coupon .input-normal {
-    width: 80px;
-}
-#edit-coupon .input-medium {
-	width: 100px;
-}
-#edit-coupon .input-large {
-	width: 140px;
-}
+<form id="edit-coupon" class="grid_12 alpha omega background">
+<!--    <p class="blockquote gray-light-bg fs12 mb0px">--><?php //echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?><!--</p>-->
 
-#coupon-table_paginate a[role="button"] {
-	display: inline-block;
-	cursor: pointer;
-	padding: 4px 0;
-}
-#coupon-table_paginate a[role="button"]:not(:first-child) {
-	padding-left: 10px;
-}
-</style>
-<form id="edit-coupon" class="grid_12 clearfix">
-	<?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
+    <?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
 
     <div class="grid_12">
     <?php $generalConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();?>
@@ -65,68 +14,62 @@
         </select>
     </div>
 
-	<div class="clearfix grid_4">
+	<div class="grid_4 alpha mt0px">
         <label><?php echo $this->translate('Type');?></label>
 		<?php echo $this->formSelect('type', null, array(
-				'style'         => 'width: auto',
 				'data-action'   => 'render',
 				'id'            => 'coupon-type'
 			), Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true) ); ?>
 	</div>
 
-    <div class="grid_4">
-        <label><?php echo $this->translate('Code');?></label>
+    <div class="grid_4 alpha mt0px">
+        <label class="grid_8 alpha"><?php echo $this->translate('Code');?></label>
+        <a id="genCoupon" class="grid_4 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="icon-refresh"></span></a>
         <?php echo $this->formText('code', null, array(
-			'class'          => 'input-large',
             'data-validator' => array('notempty'),
             'placeholder'    => $this->translate('Enter coupon code')
         )); ?>
-        <a id="genCoupon" style="cursor:pointer;">[<?php echo $this->translate('new'); ?>]</a>
     </div>
 
-	<div class="grid_4">
-        <label><?php echo $this->translate('From');?></label>
-		<?php echo $this->formText('startDate', date('d-M-Y'), array(
-			'class' => 'datepicker',
-			'style' => 'width: 90px'
-		)); ?>
-<!--			</div>-->
-<!--			<div class="grid_3">-->
-        <label><?php echo $this->translate('to');?></label>
-		<?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
-			'class' => 'datepicker',
-			'style' => 'width: 90px'
-		)); ?>
-	</div>
-
-	<div class="grid_12 mt5px clearfix"></div>
-
-    <div class="grid_5">
-		<label>
+    <div class="grid_4 alpha omega mt0px">
+		<label class="mb0-5em mt0-5em pointer" for="allowCombination">
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
         </label>
-    </div>
-	<div class="grid_6">
-		<label>
+		<label class="mb0px pointer" for="scope">
 			<?php echo $this->formCheckbox('scope', 'client', null, array(
-			    'checked' => 'client',
-			    'unChecked' => ''
-			)); ?>
-			<?php echo $this->translate('One use per client');?>
+                'checked' => 'client',
+                'unChecked' => ''
+            )); ?>
+            <?php echo $this->translate('One use per client');?>
 		</label>
     </div>
 
-	<div class="grid_12 mt5px clearfix" id="coupon-action">
-
+	<div class="grid_4 alpha cl-both">
+        <label><?php echo $this->translate('From');?></label>
+        <span class="labeled grid_5 alpha omega">
+            <i class="icon-calendar-3 icon16"></i>
+            <?php echo $this->formText('startDate', date('d-M-Y'), array(
+                'class' => 'datepicker'
+            )); ?>
+        </span>
+        <label class="grid_2 text-center mt5px">- <?php echo $this->translate('to');?> -</label>
+        <span class="labeled grid_5 alpha omega">
+            <i class="icon-calendar-3 icon16"></i>
+            <?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
+                'class' => 'datepicker'
+            )); ?>
+        </span>
 	</div>
 
-	<input class="blue-btn" type="submit" value="<?php echo $this->translate('Create'); ?>"/>
+	<div class="grid_5 alpha" id="coupon-action"></div>
+
+	<button class="grid_2 omega mt2-25em icon-plus" type="submit"/><?php echo $this->translate('Create'); ?></button>
 </form>
 
-<div class="toaster-widget mt5px grid_12">
-    <table id="coupon-table" style="width: 100%;" class="widget">
-        <thead>
+<div class="mt15px grid_12 alpha omega">
+    <table id="coupon-table" class="table-striped table-hover small mb10px">
+        <thead class="header-inner">
         <tr>
             <th>#</th>
             <th><?php echo $this->translate('Type');?></th>

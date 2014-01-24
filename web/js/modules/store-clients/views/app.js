@@ -237,7 +237,7 @@ define([
                 } else {
 
                 }
-            }, {classname:"errors", 'ok':'Yes', 'cancel':'No'});
+            }, {classname:"error", 'ok':'Yes', 'cancel':'No'});
 
 
         },

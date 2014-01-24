@@ -24,7 +24,7 @@
                     url      : form.attr('action'),
                     type     : 'post',
                     data     : form.serialize(),
-                    beforeSend: showSpinner,
+                    beforeSend: showSpinner(),
                     dataType :'json',
                     success  : function(response) {
                         hideSpinner();

@@ -5,15 +5,15 @@ define([
 ], function(_, Backbone, i18n){
 
     var listItemView = Backbone.View.extend({
-        tagName: 'li',
-        className: 'entry-row ui-state-active padding5px',
-        events: {
-            'click .add-item': 'addItem',
-            'click .remove-item': 'removeItem'
+        tagName    : 'li',
+        className  : 'entry-row',
+        events     : {
+            'click .add-item'    : 'addItem',
+            'click .remove-item' : 'removeItem'
         },
-        templates:{
-            country: '<%= name %>',
-            state: '<%= app.countries.findByCode(country).get("name") %>: <%= name %>'
+        templates  : {
+            country : '<%= name %>',
+            state   : '<%= app.countries.findByCode(country).get("name") %>: <%= name %>'
         },
         render: function(template, mode, listName){
             var template = _.template(template);
@@ -25,14 +25,14 @@ define([
                 default:
                 case 'add':
                     if(_.isUndefined(this.model.state)){
-                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item ui-icon ui-icon-plusthick"></span>');
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item icon-plus success fl-right"></span>');
                     }else{
                         this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item ui-icon ui-icon-plusthick"></span>');
                     }
                     break;
                 case 'delete':
                     if(_.isUndefined(this.model.state)){
-                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item ui-icon ui-icon-trash"></span>');
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item icon-close error fl-right"></span>');
                     }else{
                         this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item ui-icon ui-icon-trash"></span>');
                     }

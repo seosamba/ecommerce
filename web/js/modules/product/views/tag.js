@@ -3,15 +3,15 @@ define([
 ], function(Backbone){
 	
 	var TagView = Backbone.View.extend({
-		tagName: 'div',
+		tagName: 'li',
 		className: 'tag-widget',
 		template: _.template($('#tagTemplate').html()),
 		nameInput: null,
 		events: {
-			"click span.ui-icon-closethick": "kill",
-			"dblclick span.tag-editable": "edit",
-			"keypress span.tag-editable": "preventLineBreak",
-			"blur span.tag-editable": "save"
+			"click .icon-remove": "kill",
+			"dblclick .tag-editable": "edit",
+			"keypress .tag-editable": "preventLineBreak",
+			"blur .tag-editable": "save"
 		},
 		initialize: function(){
 			this.model.on('change', this.render, this);
@@ -19,7 +19,7 @@ define([
 		},
 		render: function(){
 			$(this.el).addClass('tagid-'+this.model.get('id')).html(this.template({tag: this.model}));
-            this.nameInput = this.$el.children('span.tag-editable');
+            this.nameInput = this.$el.children('.tag-editable');
 			return this;
 		},
 		kill: function(){
@@ -29,7 +29,7 @@ define([
 		},
 		edit: function(){
             this.buffer = this.nameInput.text();
-            this.nameInput.attr('contenteditable', true).css({border: '1px solid #999'}).focus();
+            this.nameInput.attr('contenteditable', true).focus();
 		},
 		preventLineBreak: function(e){
 			if (e.keyCode == 13) {

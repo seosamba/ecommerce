@@ -4,7 +4,7 @@ define([
 ], function(_, Backbone){
 	var SelectionView = Backbone.View.extend({
 		tagName: 'div',
-		className: 'clearfix',
+		className: 'wrap mt5px',
 		template: $('#listItemTemplate').template(),
 		events: {
 			"click button.item-remove": 'markToDelete',
@@ -37,10 +37,6 @@ define([
 				weightModifierSign: this.$('select[name="weightModifierSign"]'),
 				weightModifierValue: this.$('input[name="weightModifierValue"]')
 			}
-            this.$('button.item-remove').button({
-                icons: { primary: 'ui-icon-closethick' },
-                text: false
-            });
 			return this;
 		},
 		markToDelete: function(){
