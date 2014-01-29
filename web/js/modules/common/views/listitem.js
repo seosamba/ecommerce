@@ -27,14 +27,14 @@ define([
                     if(_.isUndefined(this.model.state)){
                         this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item icon-plus success fl-right"></span>');
                     }else{
-                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item ui-icon ui-icon-plusthick"></span>');
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item icon-plus ui-icon ui-icon-plusthick success fl-right"></span>');
                     }
                     break;
                 case 'delete':
                     if(_.isUndefined(this.model.state)){
                         this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item icon-close error fl-right"></span>');
                     }else{
-                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item ui-icon ui-icon-trash"></span>');
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item icon-close ui-icon ui-icon-trash error fl-right"></span>');
                     }
                     break
             }
