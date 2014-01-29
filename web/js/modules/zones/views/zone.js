@@ -23,12 +23,6 @@ define([
             //rendering list of countries for zone
             var countriesList = this.$el.find('.zone-countries');
 
-            var countries = this.model.get('countries');
-            countries = _(countries).sortBy(function(country) {
-                return country.name.toLowerCase();
-            });
-            this.model.set('countries',countries);
-
             _.each(this.model.get('countries'), function(country){
                 var view = new ListItemView({
                     model: country
