@@ -14,7 +14,6 @@ define(['backbone'], function(Backbone){
     var AppView = Backbone.View.extend({
         el: $('#shippers'),
         events: {
-            'click #submit': 'saveShipperConfig',
             'click [role=switch]': function (e){
                 var name =  $(e.currentTarget).closest('li').find('a').data('plugin'),
                     plugin = this.shippers.get(name);
@@ -51,22 +50,6 @@ define(['backbone'], function(Backbone){
                 $(this).closest('li.disabled').prepend('<input class="switcher" type="checkbox" role="switch"/>');
             });
             checkboxRadio();
-        },
-        saveShipperConfig: function(){
-            var index = this.$el.tabs( "option", "active" ),
-                currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
-            if (currentPane){
-                var form = currentPane.find('form');
-                $.ajax({
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    dataType: 'json',
-                    type: form.attr('method'),
-                    complete: function(response){
-                        form.trigger('formsave', response);
-                    }
-                });
-            }
         }
     });
 

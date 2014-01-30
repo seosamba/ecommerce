@@ -109,5 +109,22 @@ $(function(){
         hideSpinner();
         checkboxRadio();
     });
+
+    $('.footer #submit').on('click', function(){
+        var index = $('#shippers').tabs( "option", "active" ),
+            currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
+        if (currentPane){
+            var form = currentPane.find('form');
+            $.ajax({
+                url: form.attr('action'),
+                data: form.serialize(),
+                dataType: 'json',
+                type: form.attr('method'),
+                complete: function(response){
+                    form.trigger('formsave', response);
+                }
+            });
+        }
+    });
 });
 </script>
