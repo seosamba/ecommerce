@@ -3,18 +3,13 @@
 }
 #manage-product .header .nav-links {
   display: inline-block;
-  *zoom: 1;
-  *display: inline;
-  /* Fix for IE7 */
-
   vertical-align: top;
 }
 #manage-product .header .nav-links a {
   width: 28px;
   height: 28px;
   line-height: 28px;
-  font: 0/0 a;
-  text-shadow: none;
+  font-size: 0 !important;
 }
 #manage-product .header .nav-links a:before {
   font-size: 28px;
@@ -36,9 +31,7 @@
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -ms-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
-  overflow: hidden;
   background: #fafafa;
   padding: 0;
   border-top: 1px solid #eee;
@@ -50,6 +43,15 @@
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   box-sizing: border-box;
+}
+#manage-product #product-list-holder .productlisting:after,
+#manage-product #related-holder .productlisting:after {
+  content: "";
+  clear: both;
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  height: 0;
 }
 #manage-product #product-list-holder .productlisting:nth-child(8n+1),
 #manage-product #related-holder .productlisting:nth-child(8n+1) {
@@ -64,10 +66,6 @@
 #manage-product #product-list-holder .productlisting.show-list span,
 #manage-product #related-holder .productlisting.show-list span {
   display: inline-block;
-  *zoom: 1;
-  *display: inline;
-  /* Fix for IE7 */
-
   vertical-align: middle;
 }
 #manage-product #product-list-holder .productlisting.show-list:hover,
@@ -108,12 +106,13 @@
   height: 30px;
   padding: 4px 4px;
   margin-bottom: 5px;
+  overflow: hidden;
 }
 #manage-product #product-list-holder .productlisting .sku,
 #manage-product #related-holder .productlisting .sku {
   color: #666666;
   text-align: right;
-  padding: 2px 4px;
+  padding: 2px 6px;
   background: #eaeaea;
 }
 #manage-product #product-list-holder .productlisting .checkbox-del,
@@ -216,64 +215,24 @@
   text-align: center;
 }
 #manage-logos .brand-list > * {
-  margin-bottom: 1%;
-}
-#manage-logos .brand-list > *:not(.featureapage) {
   width: 11.625%;
   margin-left: 1%;
+  margin-right: 0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   box-sizing: border-box;
+  margin-bottom: 1%;
 }
-#manage-logos .brand-list > *:not(.featureapage):nth-child(8n+1) {
+#manage-logos .brand-list > *:nth-child(8n + 1) {
   margin-left: 0;
-}
-@media only screen and (max-width: 800px) {
-  #manage-logos .brand-list > *:not(.featureapage) {
-    width: 32.66666666666667%;
-    margin-left: 1%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  #manage-logos .brand-list > *:not(.featureapage):nth-child(3n+1) {
-    margin-left: 0;
-  }
-}
-@media only screen and (max-width: 640px) {
-  #manage-logos .brand-list > *:not(.featureapage) {
-    width: 49.5%;
-    margin-left: 1%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  #manage-logos .brand-list > *:not(.featureapage):nth-child(2n+1) {
-    margin-left: 0;
-  }
-}
-@media only screen and (max-width: 480px) {
-  #manage-logos .brand-list > *:not(.featureapage) {
-    width: 100%;
-    margin-left: 0%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  #manage-logos .brand-list > *:not(.featureapage):nth-child(1n+1) {
-    margin-left: 0;
-  }
 }
 #manage-logos .brand-list > * img {
   vertical-align: top;
 }
 #manage-logos .brand-list > * .caption {
   font-size: 12px;
-  padding: 2px 4px;
+  padding: 2px 6px;
   position: absolute;
   top: auto;
   left: 0;
@@ -283,7 +242,6 @@
 }
 #manage-zones .countries,
 #manage-zones .states {
-  overflow: hidden;
   background: #fafafa;
   padding: 0;
   border-top: 1px solid #eee;
@@ -295,6 +253,15 @@
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   box-sizing: border-box;
+}
+#manage-zones .countries:after,
+#manage-zones .states:after {
+  content: "";
+  clear: both;
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  height: 0;
 }
 #manage-zones .countries ul,
 #manage-zones .states ul {
@@ -323,7 +290,6 @@
   float: right;
 }
 #shipping-config #shippers #pane-container {
-  overflow: hidden;
   background: #fafafa;
   padding: 0;
   border-top: 1px solid #eee;
@@ -335,6 +301,14 @@
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   box-sizing: border-box;
+}
+#shipping-config #shippers #pane-container:after {
+  content: "";
+  clear: both;
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  height: 0;
 }
 #shipping-config #shippers #pane-container .ui-tabs-panel {
   overflow: auto;

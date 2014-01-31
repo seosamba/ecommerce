@@ -23,8 +23,8 @@
 	<!-- Filtering -->
 	<div id="filters" class="grid_5 alpha omega">
 		<select class="pselect chzn-select" name="product-tags" id="tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
-        <label class="pointer">
-            <input type="checkbox" id="strict-tags" class="processed"/><span title="<?php echo $this->translate('AND conditional');?>"></span>
+        <label class="checkbox_radio-wrap" title="<?php echo $this->translate('AND conditional');?>">
+            <input type="checkbox" id="strict-tags" class="processed"/><span class="checkbox_radio"></span>
         </label>
 	</div>
     <div class="grid_4">
