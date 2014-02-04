@@ -66,11 +66,11 @@
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_4 alpha omega">
         <label class="grid_4 alpha omega mt5px"><?php echo $this->translate('Option name'); ?></label>
-        <input class="grid_8 alpha omega small" type="text" class="option-title" value="${title}"/>
+        <input class="grid_8 alpha omega option-title" type="text" value="${title}"/>
 	</div>
 	<div class="grid_4">
         <label class="grid_3 alpha omega text-center mt5px"><?php echo $this->translate('Type'); ?></label>
-        <select class="option-type-select grid_9 alpha omega small">
+        <select class="option-type-select grid_9 alpha omega">
             <option value="dropdown"><?php echo $this->translate('Dropdown Box');?></option>
             <option value="radio"><?php echo $this->translate('Radio Switch');?></option>
             <option value="text"><?php echo $this->translate('Text Field');?></option>
@@ -81,8 +81,8 @@
         {{if id}}
         &nbsp;
         {{else}}
-        <label class="block mt5px"><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span></span> <span><?php echo $this->translate('Add to library?'); ?></span></label>
-        <input class="small" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span class="checkbox_radio"></span></label>
+        <input type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
     <button class="fl-right remove-option icon inverse-error icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
