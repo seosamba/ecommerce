@@ -3,9 +3,9 @@
 
     <?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
 
-    <div class="grid_12">
+    <div class="grid_2 alpha mt0px">
     <?php $generalConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();?>
-    <label><?php echo $this->translate('Discount Tax Rate'); ?></label>
+        <label><?php echo $this->translate('Discount Tax Rate'); ?></label>
         <select name="coupon-discount-tax-rate" id="coupon-discount-tax-rate">
             <option value="0" <?php echo (isset($generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE]) && $generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE] === '0') ? 'selected' : '';?>><?php echo $this->translate('Select');?></option>
             <option value="1" <?php echo (isset($generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE]) && $generalConfig[Shopping::COUPON_DISCOUNT_TAX_RATE] === '1') ? 'selected' : '';?>><?php echo $this->translate('Default Tax');?></option>
@@ -22,16 +22,16 @@
 			), Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true) ); ?>
 	</div>
 
-    <div class="grid_4 alpha mt0px">
-        <label class="grid_8 alpha"><?php echo $this->translate('Code');?></label>
-        <a id="genCoupon" class="grid_4 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="icon-refresh"></span></a>
+    <div class="grid_2 alpha omega mt0px">
+        <label class="grid_4 alpha"><?php echo $this->translate('Code');?></label>
+        <a id="genCoupon" class="grid_8 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="icon-refresh"></span></a>
         <?php echo $this->formText('code', null, array(
             'data-validator' => array('notempty'),
             'placeholder'    => $this->translate('Enter coupon code')
         )); ?>
     </div>
 
-    <div class="grid_4 alpha omega mt0px">
+    <div class="grid_4 omega mt0px">
 		<label class="mb0-5em mt0-5em pointer" for="allowCombination">
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
@@ -47,14 +47,14 @@
 
 	<div class="grid_4 alpha cl-both">
         <label><?php echo $this->translate('From');?></label>
-        <span class="labeled grid_5 alpha omega">
+        <span class="labeled icon left grid_5 alpha omega">
             <i class="icon-calendar-3 icon16"></i>
             <?php echo $this->formText('startDate', date('d-M-Y'), array(
                 'class' => 'datepicker'
             )); ?>
         </span>
         <label class="grid_2 text-center mt5px">- <?php echo $this->translate('to');?> -</label>
-        <span class="labeled grid_5 alpha omega">
+        <span class="labeled icon left grid_5 alpha omega">
             <i class="icon-calendar-3 icon16"></i>
             <?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
                 'class' => 'datepicker'
@@ -68,7 +68,7 @@
 </form>
 
 <div class="mt15px grid_12 alpha omega">
-    <table id="coupon-table" class="table-striped table-hover small mb10px">
+    <table id="coupon-table" class="table-striped table-hover mb10px">
         <thead class="header-inner">
         <tr>
             <th>#</th>
