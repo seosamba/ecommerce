@@ -44,7 +44,7 @@ define([
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
-                $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').slideToggle();
+                $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
             'change #automated-set-price': 'toggleSetPriceConfig'
@@ -112,6 +112,7 @@ define([
             return this.products;
         },
         initTags: function(){
+            showSpinner('#tag-tab');
             if (this.tags === null){
                 this.tags = new TagsCollection();
                 this.tags.template = _.template($('#tagTemplate').html());
@@ -374,7 +375,7 @@ define([
                             $('.tagid-'+id+' input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled').closest('.tag-widget').removeClass('tag-current');
                         }
                     });
-                    $('.tagid-'+tag.id+' input:checkbox', '#product-tags-available').attr('checked', 'checked').attr('disabled', 'disabled').closest('.tag-widget').addClass('tag-current');
+                    $('.tagid-'+tag.id+' input:checkbox', '#product-tags-available').attr('checked', true).attr('disabled', 'disabled').closest('.tag-widget').addClass('tag-current');
 
                     view.render().$el
                         .find('.icon-remove').remove().end()

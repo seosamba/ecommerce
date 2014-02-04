@@ -50,10 +50,10 @@
 
 <script id="tagTemplate" type="text/template">
 	<a href="javascript:;" class="fl-right ml1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
-	<label>
-        <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span></span>
+	<label class="fl-left mr-grid">
+        <input class="processed" type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span class="checkbox_radio"></span>
     </label>
-    <span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
+    <span class="tag-editable text-overflow align-middle" title="Click to edit"><%= tag.get('name') %></span>
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
@@ -81,8 +81,8 @@
         {{if id}}
         &nbsp;
         {{else}}
-        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span class="checkbox_radio"></span></label>
-        <input type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span class="checkbox_radio"></span></label>
+        <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
     <button class="fl-right remove-option icon inverse-error icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
@@ -129,7 +129,7 @@
 		<span class="grid_2 alpha omega text-center mt5px"><?php echo $this->generalConfig['weightUnit']; ?></span>
 	</div>
 	<label class="grid_1 text-center mt5px">
-		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} /><span></span>
+		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} /><span class="checkbox_radio"></span>
 	</label>
 	<div class="grid_1 text-center mt5px">
 		<button class="item-remove link error icon-remove icon16" title="<?php echo $this->translate('Delete'); ?>"</button>
@@ -138,7 +138,7 @@
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-        <span class="icon-close btn icon link error icon12" title="<?php echo $this->translate('Delete');?>"></span>
+        <a class="icon-close error small pointer" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
     <% } else { %>
     <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>
@@ -158,7 +158,7 @@
 		<span class="sku"><%= sku %></span>
         <% if (!showDelete) { %>
 	</a>
-	<label class="checkbox-del"><input type="checkbox" class="marker processed" name="marker" value=<%= id %>><span></span></label>
+	<label class="checkbox-del"><input type="checkbox" class="marker processed" name="marker" value=<%= id %>><span class="checkbox_radio"></span></label>
 <% } %>
 </script>
 
@@ -177,7 +177,7 @@
 <div id="manage-product">
     <span class="spinner"></span>
     <div id="product-list" class="show-right">
-        <div class="header">
+        <div class="header shadow">
             <div class="closebutton">
                 <a id="product-list-back-link" class="hide icon-chevron-right btn icon link inverse-error" href="javascript:;" onclick="$('#image-select-dialog').removeClass('show');$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
@@ -186,9 +186,9 @@
                 <input class="grid_10 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
             </div>
         </div>
-        <div id="product-list-holder" class="content-footer grid_12" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
-        <div class="footer text-center">
-			<a id="massaction" class="btn link fl-left" href="javascript:;">run mass action</a>
+        <div id="product-list-holder" class="content-footer scroll pl2 pr2" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
+        <div class="footer text-right grid_12">
+			<a id="massaction" class="fl-left" href="javascript:;">run mass action</a>
         	<div class="paginator"><!-- placeholder for paginator --></div>
 		</div>
     </div>
@@ -207,28 +207,32 @@
         </div>
     </div>
 
-    <ul class="header text-center">
-        <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
-        <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
-        <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
-        <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
-        <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
-        <li><a href="#group-pricing-tab"><?php echo $this->translate('Groups'); ?></a></li>
-        <?php foreach ($this->plugins as $plugin) : ?>
-            <?php
-            $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
-            $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
-            ?>
-            <li>
-                <a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin; ?>/run/tab/"><?php echo $this->translate($title); ?></a>
-            </li>
-        <?php endforeach; ?>
-        <div class="nav-links">
-            <a class="show-list btn link inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
-            <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-            <a id="new-product" class="btn link inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
-        </div>
-    </ul>
+    <div class="tabs-nav-wrap grid_9 alpha omega">
+        <span class="arrow left icon-arrow-left-3"></span>
+        <span class="arrow right icon-arrow-right-3"></span>
+        <ul class="header">
+            <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
+            <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
+            <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
+            <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
+            <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
+            <li><a href="#group-pricing-tab"><?php echo $this->translate('Groups'); ?></a></li>
+            <?php foreach ($this->plugins as $plugin) : ?>
+                <?php
+                $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                ?>
+                <li>
+                    <a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin; ?>/run/tab/"><?php echo $this->translate($title); ?></a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <div class="nav-links header grid_3 alpha omega">
+        <a class="show-list btn link inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+        <span class="text-line"><?php echo $this->translate('Product'); ?></span>
+        <a id="new-product" class="btn link inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+    </div>
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
 
@@ -247,7 +251,7 @@
                         ?>
                     </div>
                 </div>
-                <div class="grid_9 alpha omega mt0">
+                <div class="grid_9 alpha omega mt0px">
                     <label class="grid_7 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
                     <label class="grid_5 omega fs12 text-right pointer">
                         <?php echo $this->translate('This product is enabled'); ?>
@@ -267,15 +271,15 @@
                     <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                     <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
                 </div>
-                <p class="grid_6 alpha omega mt1-5em">
-                    <label class="grid_2 alpha omega mt5px" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
+                <p class="labeled grid_6 alpha omega mt1-5em">
                     <input class="grid_4 omega fl-right" type="text" name="" id="new-brand"  placeholder="<?php echo $this->translate('create new'); ?>">
-                    <select class="grid_6 alpha omega" name="product-brand" id="product-brand" data-reflection="brand">
+                    <select class="grid_6 alpha omega fl-right" name="product-brand" id="product-brand" data-reflection="brand">
                         <option value="0"><?php echo $this->translate('select brand'); ?></option>
                         <?php foreach ($this->brands as $brand): ?>
                         <option value="<?php echo $brand->getName(); ?>"><?php echo $brand->getName(); ?></option>
                         <?php endforeach; ?>
                     </select>
+                    <label class="grid_2 alpha omega" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
                 </p>
                 <label class="grid_3 omega mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
             </fieldset>
@@ -301,7 +305,7 @@
 	    </div>
         <!--End grid_8-->
             
-        <div class="grid_4 omega mt0">
+        <div class="grid_4 omega mt0px">
             <fieldset>
                 <div class="grid_12 alpha omega">
                     <label for="product-pageTemplate"><?php echo $this->translate('Select a product page template');?></label>
@@ -320,14 +324,14 @@
                     <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
                     <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                 </div>
-                <div class="grid_12 alpha omega mt1-5em">
-                    <label class="mt5px grid_2 alpha" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
-                    <select class="grid_10 omega" name="taxes" id="product-taxClass" data-reflection="taxClass">
+                <div class="grid_12 alpha omega mt1-5em labeled">
+                    <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
                         <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
                         <option value="1"><?php echo $this->translate('Default'); ?></option>
                         <option value="2"><?php echo $this->translate('Alternative'); ?></option>
                         <option value="3"><?php echo $this->translate('Alternative 2'); ?></option>
                     </select>
+                    <label class="grid_2 alpha omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
                 </div>
             </fieldset>
         </div>
@@ -360,7 +364,7 @@
     </div>
     <!-- #tag-tab -->
 
-    <div id="options-tab" class="content-footer">
+    <div id="options-tab" class="content-footer scroll">
         <div class="grid_6 prefix_3 suffix_3">
             <select name="option-library" id="option-library" class="grid_5 alpha omega">
                 <option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
@@ -373,7 +377,7 @@
     </div>
     <!-- End Tab 3 -->
 
-    <div id="related-tab" class="content-footer">
+    <div id="related-tab" class="content-footer scroll">
         <div id="related-holder" class="grid_12 alpha omega">
             <a href="javascript:;" data-listtype="related" class="show-list productlisting icon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
             <span class="spinner"></span>
@@ -381,7 +385,7 @@
     </div>
 
     <div id="coupon-tab" class="content-footer">
-        <p class="blockquote info fs12 hidden"><?php echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?></p>
+        <p class="blockquote info fs12 hidden"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
         <?php echo $this->partial('merchandising/coupon.phtml'); ?>
     </div>
 
