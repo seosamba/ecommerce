@@ -221,6 +221,9 @@
                 <?php
                 $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
                 $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                if(!$pluginClass->hasMethod('tabAction')){
+                    continue;
+                }
                 ?>
                 <li>
                     <a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin; ?>/run/tab/"><?php echo $this->translate($title); ?></a>
