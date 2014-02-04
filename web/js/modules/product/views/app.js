@@ -112,8 +112,8 @@ define([
             return this.products;
         },
         initTags: function(){
-            showSpinner('#tag-tab');
             if (this.tags === null){
+                showSpinner('#tag-tab');
                 this.tags = new TagsCollection();
                 this.tags.template = _.template($('#tagTemplate').html());
                 this.tags.on('add', this.renderTag, this);
@@ -324,13 +324,14 @@ define([
                 $('#product-tags-available').append(view.$el);
             }
             if ($('div.tagid-'+tag.get('id'), '#product-tags-current').size()){
-                view.$el.addClass('tag-current').find('input:checkbox').attr({
-                    disabled: 'disabled',
-                    checked: 'checked'
+                view.$el.addClass('tag-current').find('input:checkbox').prop({
+                    disabled: true,
+                    checked: true
                 });
             }
         },
         renderTags: function(){
+            showSpinner('#tag-tab');
             $('#product-tags-available').empty();
             this.tags.each(this.renderTag, this);
             var paginatorData = {
@@ -359,7 +360,11 @@ define([
         },
         renderProductTags: function(){
             console.log('render product tags');
-            $('.tag-widget input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled');
+            $('.tag-widget input:checkbox', '#product-tags-available').prop({
+                disabled: false,
+                checked: false
+            }).closest('.tag-widget').removeClass('tag-current');
+
             if (this.model && this.model.has('tags')){
                 var self = this,
                     container = $('#product-tags-current').empty();
@@ -372,14 +377,20 @@ define([
                                 return tag.id === id;
                             });
                             self.model.set('tags', newSet);
-                            $('.tagid-'+id+' input:checkbox', '#product-tags-available').removeAttr('checked').removeAttr('disabled').closest('.tag-widget').removeClass('tag-current');
+                            $('.tagid-'+id+' input:checkbox', '#product-tags-available').prop({
+                                disabled: false,
+                                checked: false
+                            }).closest('.tag-widget').removeClass('tag-current');
                         }
                     });
-                    $('.tagid-'+tag.id+' input:checkbox', '#product-tags-available').attr('checked', true).attr('disabled', 'disabled').closest('.tag-widget').addClass('tag-current');
+                    $('.tagid-'+tag.id+' input:checkbox', '#product-tags-available').prop({
+                        disabled: true,
+                        checked: true
+                    }).closest('.tag-widget').addClass('tag-current');
 
                     view.render().$el
                         .find('.icon-remove').remove().end()
-                        .find('input:checkbox').attr('checked', 'checked').end()
+                        .find('input:checkbox').prop('checked', true).end()
                         .appendTo(container);
 
                 });
@@ -405,7 +416,9 @@ define([
 
             this.$('#product-list-holder').append(productView.render().el);
             if (_.has(this.products, 'checked') && _.contains(this.products.checked, product.get('id'))){
-                productView.$el.find('input.marker').attr('checked', 'checked');
+                productView.$el.find('input.marker').prop({
+                    checked: true
+                });
             }
 //            disabled lazy load because don't needed for now
 //            if (this.$('#product-list-holder').children().size() === this.products.size()){
@@ -617,6 +630,8 @@ define([
                         hideSpinner();
                     }
                 });
+            }else{
+                hideSpinner();
             }
             return false;
         },
@@ -716,7 +731,9 @@ define([
                     $('#product-list').removeClass('show');
                     break;
             }
-            $('div.productlisting input.marker:checked', '#product-list-holder').removeAttr('checked');
+            $('div.productlisting input.marker:checked', '#product-list-holder').prop({
+                checked: false
+            });
             this.products.checked = [];
 
             return false;

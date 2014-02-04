@@ -239,7 +239,7 @@
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
 
-    <div id="main-tab" class="content-footer form">
+    <div id="main-tab" class="form">
         <div class="grid_8 alpha">
             <fieldset>
                 <div class="grid_3 alpha text-center">
@@ -350,7 +350,7 @@
         </div>
     </div>
 
-    <div id="tag-tab" class="content-footer">
+    <div id="tag-tab">
         <div class="grid_4 alpha mt5px">
             <a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ]</a>
         </div>
@@ -367,7 +367,7 @@
     </div>
     <!-- #tag-tab -->
 
-    <div id="options-tab" class="content-footer scroll">
+    <div id="options-tab" class="scroll">
         <div class="grid_6 prefix_3 suffix_3">
             <select name="option-library" id="option-library" class="grid_5 alpha omega">
                 <option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
@@ -380,19 +380,19 @@
     </div>
     <!-- End Tab 3 -->
 
-    <div id="related-tab" class="content-footer scroll">
+    <div id="related-tab" class="scroll">
         <div id="related-holder" class="grid_12 alpha omega">
             <a href="javascript:;" data-listtype="related" class="show-list productlisting icon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
             <span class="spinner"></span>
         </div>
     </div>
 
-    <div id="coupon-tab" class="content-footer">
+    <div id="coupon-tab">
         <p class="blockquote info fs12 hidden"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
         <?php echo $this->partial('merchandising/coupon.phtml'); ?>
     </div>
 
-    <div id="group-pricing-tab" class="content-footer">
+    <div id="group-pricing-tab">
         <p class="blockquote fs12 mb10px hidden"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
         <?php echo $this->partial('product/grouping-price.phtml'); ?>
     </div>

@@ -48,17 +48,17 @@
 	<div class="grid_4 alpha cl-both">
         <label><?php echo $this->translate('From');?></label>
         <span class="labeled icon left grid_5 alpha omega">
-            <i class="icon-calendar-3 icon16"></i>
             <?php echo $this->formText('startDate', date('d-M-Y'), array(
                 'class' => 'datepicker'
             )); ?>
+            <i class="icon-calendar icon16"></i>
         </span>
         <label class="grid_2 text-center mt5px">- <?php echo $this->translate('to');?> -</label>
         <span class="labeled icon left grid_5 alpha omega">
-            <i class="icon-calendar-3 icon16"></i>
             <?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
                 'class' => 'datepicker'
             )); ?>
+            <i class="icon-calendar icon16"></i>
         </span>
 	</div>
 
