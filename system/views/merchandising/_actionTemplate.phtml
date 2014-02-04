@@ -5,14 +5,14 @@
 ?>
 <script id="actionDiscountFreeshippingTmpl" type="text/template">
 <% if (type === 'discount'){ %>
-	<div id="discount-units-holder" class="grid_5 alpha omega">
+	<div id="discount-units-holder" class="grid_6 alpha omega">
 		<label><?php echo $this->translate('Discount amount:');?></label>
+        <p class="labeled grid_6 alpha omega">
         <?php echo $this->formText('data[discountAmount]', null, array(
-                'class' => 'grid_6 alpha'
+                'class' => 'grid_6 alpha omega'
             )); ?>
-        <div id="coupon-tax-discount" style="display: inline-block">
-            <span class="couponDiscountWithTax">0</span>
-        </div>
+        <label id="coupon-tax-discount" class="couponDiscountWithTax grid_6 alpha omega">0</label>
+        </p>
 		<?php echo $this->formSelect('data[discountUnits]', null, array(
 			'class' => 'grid_6 omega'
 		), array(
@@ -22,12 +22,12 @@
 	</div>
     <label class="mt20px grid_3 text-center fs12 bold"><?php echo $this->translate('for orders over');?></label>
 <% } else { %>
-    <label class="mt25px grid_7 alpha omega"><?php echo $this->translate('Free shipping for orders over');?></label>
+    <label class="mt25px grid_7 alpha text-right"><?php echo $this->translate('Free shipping for orders over');?></label>
 <% } %>
-    <div class="labeled grid_4 alpha mt1-5em">
+    <div class="labeled grid_3 alpha mt1-5em">
 	<?php echo $this->formText('data[minOrderAmount]', 0, array(
-            'class' => 'grid_8 alpha omega'
+            'class' => 'grid_7 alpha omega'
 	)); ?>
-        <label class="unit grid_4 alpha omega"><?php echo $this->currency; ?></label>
+        <label class="unit grid_5 alpha omega"><?php echo $this->currency; ?></label>
     </div>
 </script>
