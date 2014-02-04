@@ -5,7 +5,7 @@
     $this->jQuery()->addJavascriptFile($this->websiteUrl . 'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
 
-<div id="merchandising">
+<div id="merchandising" class="with-content-footer">
     <ul class="header">
         <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
 	    <?php if (isset($this->plugins) && !empty($this->plugins)):?>
@@ -19,10 +19,10 @@
         <?php endif; ?>
         <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
 	</ul>
-	<div id="coupons" class="content-footer">
+	<div id="coupons">
 		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	</div>
-    <div id="group-pricing" class="content-footer">
+    <div id="group-pricing">
         <?php echo $this->partial('merchandising/grouping.phtml'); ?>
     </div>
 	<div class="message info mb0px grid_12 pt5px pb5px">
