@@ -1,28 +1,4 @@
-#manage-product {
-  position: static;
-}
-#manage-product .header.nav-links {
-  display: inline-block;
-  vertical-align: top;
-  padding-left: 5px;
-}
-#manage-product .header.nav-links a {
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
-  font-size: 0 !important;
-}
-#manage-product .header.nav-links a:before {
-  font-size: 28px;
-}
-#manage-product #product-list {
-  width: 100%;
-  right: -110%;
-}
-#manage-product #product-list .show {
-  right: 0;
-}
-#manage-product .productlisting {
+.productlisting {
   position: relative;
   float: left;
   margin-top: .75%;
@@ -47,10 +23,10 @@
   -ms-box-sizing: border-box;
   box-sizing: border-box;
 }
-#manage-product .productlisting:nth-child(8n + 1) {
+.productlisting:nth-child(8n + 1) {
   margin-left: 0;
 }
-#manage-product .productlisting:after {
+.productlisting:after {
   content: "";
   clear: both;
   display: block;
@@ -58,34 +34,34 @@
   visibility: hidden;
   height: 0;
 }
-#manage-product .productlisting.show-list {
+.productlisting.show-list {
   height: 160px;
   line-height: 160px;
   color: #d1d1d1;
 }
-#manage-product .productlisting.show-list span {
+.productlisting.show-list span {
   display: inline-block;
   vertical-align: middle;
 }
-#manage-product .productlisting.show-list:hover {
+.productlisting.show-list:hover {
   color: #666666;
 }
-#manage-product .productlisting:hover {
+.productlisting:hover {
   background: #eaeaea;
 }
-#manage-product .productlisting span {
+.productlisting span {
   display: block;
   font-size: 0.85em;
 }
-#manage-product .productlisting [class*="icon-"] {
+.productlisting [class*="icon-"] {
   position: absolute;
   top: 1px;
   right: 3px;
 }
-#manage-product .productlisting [class*="icon-"] + .brand {
+.productlisting [class*="icon-"] + .brand {
   padding-right: 1.7em;
 }
-#manage-product .productlisting .brand {
+.productlisting .brand {
   color: #666666;
   font-weight: bold;
   background: #eaeaea;
@@ -94,26 +70,51 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-#manage-product .productlisting .image {
+.productlisting .image {
   height: 75px;
   line-height: 75px;
   overflow: hidden;
 }
-#manage-product .productlisting .name {
+.productlisting .name {
   height: 34.000000010200004px;
   padding: 4px;
   overflow: hidden;
 }
-#manage-product .productlisting .sku {
+.productlisting .sku {
   color: #666666;
   text-align: right;
   padding: 2px 6px;
   background: #eaeaea;
 }
-#manage-product .productlisting .checkbox-del {
+.productlisting .checkbox-del {
   margin-top: -19px;
   float: left;
   margin-left: 1px;
+  line-height: 1;
+}
+#product-list {
+  width: 100%;
+  right: -110%;
+}
+#product-list .show {
+  right: 0;
+}
+#manage-product {
+  position: static;
+}
+#manage-product .header.nav-links {
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 5px;
+}
+#manage-product .header.nav-links a {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  font-size: 0 !important;
+}
+#manage-product .header.nav-links a:before {
+  font-size: 28px;
 }
 #manage-product #image-select-dialog {
   width: 100%;

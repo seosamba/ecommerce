@@ -86,7 +86,7 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
         <?php endif; ?>
 	</ul>
 
-	<form class="content-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
 	<?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">
 			<?php foreach ($subform->getElements() as $elem):?>
