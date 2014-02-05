@@ -9,8 +9,8 @@ class Models_DbTable_ShoppingConfig extends Zend_Db_Table_Abstract {
 
 	protected $_name = 'shopping_config';
 	
-	public function updateParam($name, $value) {	
-		if ($value === null) {
+	public function updateParam($name, $value, $allowSaveNull = array()) {
+		if ($value === null && !in_array($name, $allowSaveNull)) {
 			return false;
 		}
 		$rowset = $this->find($name);

@@ -17,7 +17,7 @@ class Models_Mapper_ShoppingConfig extends Application_Model_Mappers_Abstract {
 		}
 		
 		array_walk($plugin, function($value, $key, $dbTable){
-			$dbTable->updateParam($key, $value);
+			$dbTable->updateParam($key, $value, array('state'));
 		}, $this->getDbTable());
 		
 		return true;
