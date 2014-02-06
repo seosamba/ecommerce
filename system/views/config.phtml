@@ -94,9 +94,7 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
                 <?php $labelText = $this->translate($elem->getLabel());?>
                 <?php $elem->setLabel($labelText);?>
 				<?php echo $elem->renderLabel();?>
-				<div class="grid_6 alpha">
-					<?php echo $elem->renderViewHelper();?>
-				</div>
+                <?php echo $elem->renderViewHelper();?>
 			</div>
 			<?php endforeach; ?>
 		</fieldset>
