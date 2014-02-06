@@ -7,67 +7,67 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
-//	$('div.seotoaster > div.ui-widget-header:first').remove();
+    //	$('div.seotoaster > div.ui-widget-header:first').remove();
 
-	var shopping = {};
-	shopping.saveconfig = function(){
-		var url = '<?php echo $this->form->getAction(); ?>';
-		var data = $('form[user-changed="true"]').serialize();
-		if (!data) {
-			window.console && console.log('nothing to save');
-			return false;
-		} else {
-			window.console && console.log(data);
-		}
+    var shopping = {};
+    shopping.saveconfig = function(){
+        var url = '<?php echo $this->form->getAction(); ?>';
+        var data = $('form[user-changed="true"]').serialize();
+        if(!data){
+            window.console && console.log('nothing to save');
+            return false;
+        }else{
+            window.console && console.log(data);
+        }
 
-		$.ajax({
-			url: url,
-			data: data,
-			type: 'POST',
-			dataType: 'html',
-			success: function(response){
-				$('form[user-changed="true"]').removeAttr('user-changed');
-				$('#config > ul > li > a.user-changed').removeClass('user-changed');
+        $.ajax({
+            url      : url,
+            data     : data,
+            type     : 'POST',
+            dataType : 'html',
+            success  : function(response){
+                $('form[user-changed="true"]').removeAttr('user-changed');
+                $('#config > ul > li > a.user-changed').removeClass('user-changed');
                 showMessage('<?php echo $this->translate('Saved'); ?>');
-			}
-		});
-	}
+            }
+        });
+    }
 
-	$('#save-btn').on('click', shopping.saveconfig);
+    $('#save-btn').on('click', shopping.saveconfig);
 
-	$('#config').tabs({
-		select: function(event, ui){
-			$form = $(ui.panel).children('form');
-			if ($form.attr('user-changed') === true && $form.find(':submit').size() == 0) {
-				$form.append('<input type=submit />');
-			}
-		}
-	});
-	$('select[name$="country"]').each(function(){
-		var $stateField = $(this).closest('form').find('select[name$="state"]');
-		$(this).selectChain({
-			data: {
-                country: $(this).val(),
-                pairs: true
+    $('#config').tabs({
+        select : function(event, ui){
+            $form = $(ui.panel).children('form');
+            if($form.attr('user-changed')===true && $form.find(':submit').size()==0){
+                $form.append('<input type=submit />');
+            }
+        }
+    });
+    $('select[name$="country"]').each(function(){
+        var $stateField = $(this).closest('form').find('select[name$="state"]');
+        $(this).selectChain({
+            data   : {
+                country : $(this).val(),
+                pairs   : true
             },
-			target: $stateField,
-			url: '<?php echo $this->websiteUrl; ?>api/store/geo/type/state/'
-		})
-	});
+            target : $stateField,
+            url    : '<?php echo $this->websiteUrl; ?>api/store/geo/type/state/'
+        })
+    });
 
-	$('form :input').on('change', function(){
-		var $form = $(this).closest('form');
-		if (!$form.attr('user-changed')){
-			$form.attr('user-changed', true);
-			var currentTab = $('#config').tabs('option', 'selected');
-			$('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
-		}
-	});
+    $('form :input').on('change', function(){
+        var $form = $(this).closest('form');
+        if(!$form.attr('user-changed')){
+            $form.attr('user-changed', true);
+            var currentTab = $('#config').tabs('option', 'selected');
+            $('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+        }
+    });
 
-    $('.no-save-btn').on('click', function() {
+    $('.no-save-btn').on('click', function(){
         $('#save-btn').hide();
     })
-    $('a').not('.no-save-btn').on('click', function() {
+    $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
     })
 <?php $this->jQuery()->onLoadCaptureEnd();?>
