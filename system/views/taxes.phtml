@@ -10,7 +10,7 @@
         <input type="hidden" name="rule-id" value="<%= id %>" />
     <% } %>
     <label class="grid_1 text-center mt5px">
-        <input class="processed" type="radio" name="default" <% if (isDefault == 1) { %> checked="checked" <% } %> /><span></span>
+        <input class="processed" type="radio" name="default" <% if (isDefault == 1) { %> checked="checked" <% } %> /><span class="checkbox_radio"></span>
     </label>
     <div class="grid_4">
         <select name="zoneId" data-reflection="property">
@@ -36,7 +36,7 @@
 <?php
 $this->placeholder('headerContent')->captureStart();
     echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
-    echo $this->formLabel('price-inc-tax', $this->translate('Show product price with tax included.'), array('class' => 'pointer'));
+    echo $this->formLabel('price-inc-tax', ' '.$this->translate('Show product price with tax included.'), array('class' => 'pointer'));
 $this->placeholder('headerContent')->captureEnd();
 ?>
 
