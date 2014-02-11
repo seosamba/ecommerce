@@ -358,6 +358,7 @@
 #shipping-config{
 
     #shippers{
+        height : 385px;
 
         ul{
             li{
@@ -380,17 +381,16 @@
         }
 
         #pane-container{
-            .background(0);
+            min-height : 100%;
 
             .ui-tabs-panel{
-                overflow   : auto;
-                max-height : 395px;
 
                 header{
                     background : @header-inner-bg;
                     color      : @header-inner-color;
-                    margin     : -@padding-base-vertical -@padding-base-horizontal @padding-base-vertical;
+                    overflow   : hidden;
                     padding    : @padding-base-vertical @padding-base-horizontal;
+                    margin     : 0 -@padding-base-horizontal .5em;
                 }
             }
         }

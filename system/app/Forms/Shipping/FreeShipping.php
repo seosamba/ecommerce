@@ -19,8 +19,7 @@ class Forms_Shipping_FreeShipping extends Zend_Form {
 		));
 
 		$this->addElement('text', 'cartamount', array(
-			'label' => 'For orders over',
-            'class' => 'grid_8 alpha omega'
+			'label' => 'For orders over'
 		));
 
         $destinationOptions = array(

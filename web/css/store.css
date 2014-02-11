@@ -290,37 +290,19 @@
   max-height: 340px;
   overflow: auto;
 }
+#shipping-config #shippers {
+  height: 385px;
+}
 #shipping-config #shippers ul li label {
   float: right;
 }
 #shipping-config #shippers #pane-container {
-  background: #fafafa;
-  padding: 0;
-  border-top: 1px solid #eee;
-  -webkit-box-shadow: 0 1px 1px #bbbbbb;
-  -moz-box-shadow: 0 1px 1px #bbbbbb;
-  -ms-box-shadow: 0 1px 1px #bbbbbb;
-  box-shadow: 0 1px 1px #bbbbbb;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  box-sizing: border-box;
-}
-#shipping-config #shippers #pane-container:after {
-  content: "";
-  clear: both;
-  display: block;
-  overflow: hidden;
-  visibility: hidden;
-  height: 0;
-}
-#shipping-config #shippers #pane-container .ui-tabs-panel {
-  overflow: auto;
-  max-height: 395px;
+  min-height: 100%;
 }
 #shipping-config #shippers #pane-container .ui-tabs-panel header {
   background: #aaaaaa;
   color: #ffffff;
-  margin: -6px -12px 6px;
+  overflow: hidden;
   padding: 6px 12px;
+  margin: 0 -12px 0.5em;
 }
