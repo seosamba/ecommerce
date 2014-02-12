@@ -67,7 +67,7 @@ define([
 
             this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
 
-            $('#product-list').removeClass('show');
+            $('#product-list').hide("slide", { direction: "right"});
 			hideSpinner();
             this.$el.tabs({
                 beforeLoad: function(event, ui){
@@ -207,7 +207,7 @@ define([
             $('#option-library').val('-1');
         },
 		imageChange: function(e){
-            $('#image-select-dialog').addClass('show');
+            $('#image-select-dialog').show("slide", { direction: "right"});
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;
@@ -215,7 +215,7 @@ define([
             var self = this;
             this.images.server_api.folder = folder;
             this.images.flush().fetch({ success: function(){ self.images.pager(); hideSpinner();}, silent: true});
-            //$('#image-select-dialog').addClass('show');
+            //$('#image-select-dialog').show("slide", { direction: "right"});
         },
         renderImages: function(){
             $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}))
@@ -230,7 +230,7 @@ define([
             var fldrName = this.$('#product-image-folder').val();
             this.model.set({photo: fldrName+'/'+imgName });
             this.$('#product-image').attr('src', $('#website_url').val() + this.mediaPath + fldrName +'/small/'+ imgName);
-            this.$('#image-select-dialog').removeClass('show');
+            this.$('#image-select-dialog').hide("slide", { direction: "right"});
             this.$('#product-image-folder').val('0');
             this.$('#image-list, .paginator').empty();
         },
@@ -242,7 +242,7 @@ define([
             console.log('render: app.js', this.model.changedAttributes());
             this.$el.tabs({ active: 0 });
 
-            $('#product-list:visible').removeClass('show');
+            $('#product-list:visible').hide("slide", { direction: "right"});
 
             $('#quick-preview').empty(); //clening preview content
 
@@ -579,7 +579,7 @@ define([
                     this.addPart(pid);
                     break;
             }
-            $('#product-list').removeClass('show');
+            $('#product-list').hide("slide", { direction: "right"});
             return false;
         },
 		addRelated: function( ids ) {
@@ -724,11 +724,11 @@ define([
                     break;
                 case 'related':
                     this.addRelated(this.products.checked);
-                    $('#product-list').removeClass('show');
+                    $('#product-list').hide("slide", { direction: "right"});
                     break;
                 case 'set':
                     this.addPart(this.products.checked);
-                    $('#product-list').removeClass('show');
+                    $('#product-list').hide("slide", { direction: "right"});
                     break;
             }
             $('div.productlisting input.marker:checked', '#product-list-holder').prop({
@@ -777,7 +777,7 @@ define([
 
             var listtype = $(e.currentTarget).data('listtype');
 
-            $('#product-list').addClass('show');
+            $('#product-list').show("slide", { direction: "right"});
             $('#product-list-holder').data('type', listtype);
             var labels = {
                 "related": "<span class='success'>[ Add as related ]</span>",
@@ -792,7 +792,7 @@ define([
             }
         },
         hideProductList: function(){
-            $('#product-list').removeClass('show');
+            $('#product-list').hide("slide", { direction: "right"});
             var term = $.trim($('#product-list-search').val());
             if (term != this.products.key){
                 if (term == ''){

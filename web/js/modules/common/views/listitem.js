@@ -6,7 +6,7 @@ define([
 
     var listItemView = Backbone.View.extend({
         tagName    : 'li',
-        className  : 'entry-row',
+        className  : 'entry-row pr2 pl2',
         events     : {
             'click .add-item'    : 'addItem',
             'click .remove-item' : 'removeItem'
@@ -25,18 +25,18 @@ define([
                 default:
                 case 'add':
                     if(_.isUndefined(this.model.state)){
-                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item icon-plus success fl-right"></span>');
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item icon-plus success fl-right pointer"></span>');
                     }else{
-                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item icon-plus ui-icon ui-icon-plusthick success fl-right"></span>');
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item icon-plus success fl-right pointer"></span>');
                     }
                     break;
                 case 'delete':
                     if(_.isUndefined(this.model.state)){
-                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item icon-close error fl-right"></span>');
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item icon-close error fl-right pointer"></span>');
                     }else{
-                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item icon-close ui-icon ui-icon-trash error fl-right"></span>');
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item icon-close error fl-right pointer"></span>');
                     }
-                    break
+                    break;
             }
             return this;
         },

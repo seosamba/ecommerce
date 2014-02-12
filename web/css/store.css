@@ -94,10 +94,6 @@
 }
 #product-list {
   width: 100%;
-  right: -110%;
-}
-#product-list .show {
-  right: 0;
 }
 #manage-product {
   position: static;
@@ -270,13 +266,12 @@
 #manage-zones .countries ul,
 #manage-zones .states ul {
   background: #ffffff;
-  height: 144px;
   overflow: auto;
 }
 #manage-zones .countries .footer,
 #manage-zones .states .footer {
-  height: auto;
-  padding: 5px 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 #manage-zones .zone-zip {
   height: 145px;
