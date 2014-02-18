@@ -37,24 +37,32 @@ class Widgets_User_User extends Widgets_User_Base {
         }
         $this->_view->addScriptPath(dirname(__FILE__) . '/views');
 
-        $customerId = $this->_sessionHelper->getCurrentUser()->getId();
-        $this->_customer = Models_Mapper_CustomerMapper::getInstance()->find($customerId);
+
     }
 
+    private function _getCustomer(){
+        $customerId = $this->_sessionHelper->getCurrentUser()->getId();
+        $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+        $customer = $customerMapper->find($customerId);
+        if(is_null($customer)){
+            return $customerMapper->find($this->_user->getId());
+        }
+        return $customer;
+    }
     protected function _renderName() {
-        return $this->_customer->getFullName();
+        return $this->_getCustomer()->getFullName();
     }
 
     protected function _renderRegistration() {
-        return $this->_customer->getRegDate();
+        return $this->_getCustomer()->getRegDate();
     }
 
     protected function _renderLastlogin() {
-        return $this->_customer->getLastLogin();
+        return $this->_getCustomer()->getLastLogin();
     }
 
     protected function _renderEmail() {
-        return $this->_customer->getEmail();
+        return $this->_getCustomer()->getEmail();
     }
 
     protected function _renderTabs() {
@@ -70,21 +78,22 @@ class Widgets_User_User extends Widgets_User_Base {
     protected function _renderAccount() {
         $form = new Forms_User();
         $this->_view->userForm = $form;
-        $this->_view->currentEmail = $this->_customer->getEmail();
+        $this->_view->currentEmail = $this->_getCustomer()->getEmail();
         return $this->_view->render('edit-account.phtml');
     }
 
     protected function _renderGrid() {
-        $addresses = $this->_customer->getAddresses();
+        $customerObject = $this->_getCustomer();
+        $addresses = $customerObject->getAddresses();
         $enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
         if ($enabledInvoicePlugin != null) {
             if ($enabledInvoicePlugin->getStatus() == 'enabled') {
                 $this->_view->invoicePlugin = 1;
             }
         }
-        $this->_view->customer = $this->_customer;
+        $this->_view->customer = $customerObject;
         $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(
-            array('user_id = ?' => $this->_customer->getId())
+            array('user_id = ?' => $customerObject->getId())
         );
         $this->_view->stats = array(
             'all'     => sizeof($orders),
