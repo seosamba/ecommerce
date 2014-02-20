@@ -207,7 +207,7 @@ define([
             $('#option-library').val('-1');
         },
 		imageChange: function(e){
-            $('#image-select-dialog').show("slide", { direction: "right"});
+            $('#image-select-dialog').show("slide", { direction: "left"});
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;
@@ -230,7 +230,7 @@ define([
             var fldrName = this.$('#product-image-folder').val();
             this.model.set({photo: fldrName+'/'+imgName });
             this.$('#product-image').attr('src', $('#website_url').val() + this.mediaPath + fldrName +'/small/'+ imgName);
-            this.$('#image-select-dialog').hide("slide", { direction: "right"});
+            this.$('#image-select-dialog').hide("slide", { direction: "left"});
             this.$('#product-image-folder').val('0');
             this.$('#image-list, .paginator').empty();
         },

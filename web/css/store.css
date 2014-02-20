@@ -12,7 +12,6 @@
 .productlisting .checkbox-del{margin-top:-19px;float:left;margin-left:1px;line-height:1;}
 #product-list{width:100%;}
 #manage-product{position:static;}#manage-product .header.nav-links{display:inline-block;vertical-align:top;padding-left:5px;}#manage-product .header.nav-links a{width:28px;height:28px;line-height:28px;font-size:0;}#manage-product .header.nav-links a:before{font-size:28px;}
-#manage-product #image-select-dialog{width:100%;left:-110%;}#manage-product #image-select-dialog .show{left:0;}
 #manage-product #image-select-dialog #image-list>.box{width:9%;margin:0.5%;}
 #manage-product #main-tab #description-box textarea{height:210px;}
 #manage-product #main-tab #quick-preview{position:relative;}#manage-product #main-tab #quick-preview .image{float:left;margin-top:7px;margin-right:5%;padding:0;height:80px;width:80px;-webkit-border-radius:100px;-moz-border-radius:100px;-ms-border-radius:100px;border-radius:100px;}#manage-product #main-tab #quick-preview .image img{height:100%;width:100%;}
