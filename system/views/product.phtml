@@ -49,9 +49,9 @@
 </script>
 
 <script id="tagTemplate" type="text/template">
-	<a href="javascript:;" class="fl-right ml1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
-	<label class="fl-left mr-grid">
-        <input class="processed" type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span class="checkbox_radio"></span>
+	<a href="javascript:;" class="fl-right ml1 mr1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
+	<label class="fl-left mr-grid checkbox_radio-wrap">
+        <input class="processed checkbox-upgrade filed-upgrade" type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span class="checkbox_radio"></span>
     </label>
     <span class="tag-editable text-overflow align-middle" title="Click to edit"><%= tag.get('name') %></span>
 </script>
