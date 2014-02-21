@@ -487,7 +487,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 }
             }
             // removing page
-            if ($product->getPage()){
+            if ($product->getPage()) {
+                $page = $product->getPage();
+                $page->registerObserver(new Tools_Page_GarbageCollector(array(
+                    'action' => Tools_System_GarbageCollector::CLEAN_ONDELETE
+                )));
                 Application_Model_Mappers_PageMapper::getInstance()->delete($product->getPage());
             }
 
