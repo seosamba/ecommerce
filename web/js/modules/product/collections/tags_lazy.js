@@ -16,7 +16,7 @@ define([
         paginator_ui: {
             firstPage: 1,
             currentPage: 1,
-            perPage: 36
+            perPage: 55
         },
         server_api: {
             count: true,

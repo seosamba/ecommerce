@@ -19,12 +19,12 @@
 					<input type="text" class="pfilter" name="productsearch" placeholder="<?php echo $this->translate('by name, sku, mpn') ?>" >
 				</th>
 				<th colspan="7" class="gray-bg text-right">
-					<select class="pfilter w150" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
+					<select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
 						<?php foreach($this->brands as $brand):?>
 						<option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
 						<?php endforeach;?>
 					</select>
-					<select class="pfilter w150" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
+					<select class="pfilter" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
 						<?php foreach($this->tags as $tag):?>
 						<option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
 						<?php endforeach;?>

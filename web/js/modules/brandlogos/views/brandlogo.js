@@ -4,14 +4,15 @@ define([
 
     var BrandView = Backbone.View.extend({
         tagName: 'li',
-        className: 'grid_2 h150 ui-corner-all',
-        template: _.template("<img src='<%= src %>'/><p class='ui-corner-bottom'><%= name %></p>"),
+        className: '',
+        template: _.template("<img src='<%= src %>'/><span class='caption'><%= name %></span>"),
         events: {},
         initialize: function(){
             this.model.on('change', this.render, this);
         },
         render: function(){
             $(this.el).html(this.template(this.model.toJSON()));
+            hideSpinner();
             return this;
         },
         triggerUpload: function(){

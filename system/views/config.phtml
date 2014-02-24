@@ -1,100 +1,89 @@
 <?php
-$this->headTitle($this->translate('Manage config'));
-$this->placeholder('headerContent')->set($this->translate('Manage store config'));
+//$this->headTitle($this->translate('Manage config'));
+//$this->placeholder('headerContent')->set($this->translate('Manage store config'));
 
 $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
-//	$('div.seotoaster > div.ui-widget-header:first').remove();
+    //	$('div.seotoaster > div.ui-widget-header:first').remove();
 
-	var shopping = {};
-	shopping.saveconfig = function(){
-		var url = '<?php echo $this->form->getAction(); ?>';
-		var data = $('form[user-changed="true"]').serialize();
-		if (!data) {
-			window.console && console.log('nothing to save');
-			return false;
-		} else {
-			window.console && console.log(data);
-		}
+    var shopping = {};
+    shopping.saveconfig = function(){
+        var url = '<?php echo $this->form->getAction(); ?>';
+        var data = $('form[user-changed="true"]').serialize();
+        if(!data){
+            window.console && console.log('nothing to save');
+            return false;
+        }else{
+            window.console && console.log(data);
+        }
 
-		$.ajax({
-			url: url,
-			data: data,
-			type: 'POST',
-			dataType: 'html',
-			success: function(response){
-				$('form[user-changed="true"]').removeAttr('user-changed');
-				$('#config > ul > li > a.user-changed').removeClass('user-changed');
+        $.ajax({
+            url      : url,
+            data     : data,
+            type     : 'POST',
+            dataType : 'html',
+            success  : function(response){
+                $('form[user-changed="true"]').removeAttr('user-changed');
+                $('#config > ul > li > a.user-changed').removeClass('user-changed');
                 showMessage('<?php echo $this->translate('Saved'); ?>');
-			}
-		});
-	}
+            }
+        });
+    }
 
-	$('#save-btn').on('click', shopping.saveconfig);
+    $('#save-btn').on('click', shopping.saveconfig);
 
-	$('#config').tabs({
-		select: function(event, ui){
-			$form = $(ui.panel).children('form');
-			if ($form.attr('user-changed') === true && $form.find(':submit').size() == 0) {
-				$form.append('<input type=submit />');
-			}
-		}
-	});
-	$('select[name$="country"]').each(function(){
-		var $stateField = $(this).closest('form').find('select[name$="state"]');
-		$(this).selectChain({
-			data: {
-                country: $(this).val(),
-                pairs: true
+    $('#config').tabs({
+        select : function(event, ui){
+            $form = $(ui.panel).children('form');
+            if($form.attr('user-changed')===true && $form.find(':submit').size()==0){
+                $form.append('<input type=submit />');
+            }
+        },
+        beforeLoad    : function(event, ui){
+            showSpinner('#config');
+        }
+    });
+
+    $(document).ajaxStop(function(){
+        hideSpinner();
+        checkboxRadio();
+    });
+
+    $('select[name$="country"]').each(function(){
+        var $stateField = $(this).closest('form').find('select[name$="state"]');
+        $(this).selectChain({
+            data   : {
+                country : $(this).val(),
+                pairs   : true
             },
-			target: $stateField,
-			url: '<?php echo $this->websiteUrl; ?>api/store/geo/type/state/'
-		})
-	});
+            target : $stateField,
+            url    : '<?php echo $this->websiteUrl; ?>api/store/geo/type/state/'
+        })
+    });
 
-	$('form :input').on('change', function(){
-		var $form = $(this).closest('form');
-		if (!$form.attr('user-changed')){
-			$form.attr('user-changed', true);
-			var currentTab = $('#config').tabs('option', 'selected');
-			$('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
-		}
-	});
+    $('form :input').on('change', function(){
+        var $form = $(this).closest('form');
+        if(!$form.attr('user-changed')){
+            $form.attr('user-changed', true);
+            var currentTab = $('#config').tabs('option', 'selected');
+            $('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+        }
+    });
 
-    $('.no-save-btn').on('click', function() {
+    $('.no-save-btn').on('click', function(){
         $('#save-btn').hide();
-    })
-    $('a').not('.no-save-btn').on('click', function() {
+    });
+    $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
-    })
+    });
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
 
-<style>
-	a.user-changed::after {
-		content: '*'
-	}
-    .ui-tabs#config .ui-tabs-panel {
-        padding: 2px 0 10px;
-    }
-    button#save-btn {
-	    position: absolute;
-        bottom: 5px;
-	    right: 0;
-    }
-	.email-trigger label {
-		display: inline-block;
-	}
-	.email-trigger select {
-		width: 300px;
-	}
-</style>
-
-<div id="config" class="h500 grid_12 mt5px">
-    <ul>
+<div id="config">
+    <ul class="header">
 	    <?php $subForms = $this->form->getSubForms(); ?>
         <?php foreach ($subForms as $subform): ?>
             <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
@@ -106,23 +95,23 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
         <?php endif; ?>
 	</ul>
 
-	<form action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
 	<?php foreach ($subForms as $subform) :?>
-		<div id="<?php echo $subform->getId();?>-tab">
+		<fieldset id="<?php echo $subform->getId();?>-tab">
 			<?php foreach ($subform->getElements() as $elem):?>
-			<div class="mt5px clearfix">
+			<div>
                 <?php $labelText = $this->translate($elem->getLabel());?>
                 <?php $elem->setLabel($labelText);?>
 				<?php echo $elem->renderLabel();?>
-				<div class="grid_6 alpha">
-					<?php echo $elem->renderViewHelper();?>
-				</div>
+                <?php echo $elem->renderViewHelper();?>
 			</div>
 			<?php endforeach; ?>
-		</div>
+		</fieldset>
 	<?php endforeach; ?>
 	</form>
 
 	<?php //echo $this->form; ?>
-	<button id="save-btn"><?php echo $this->translate('Save');?></button>
+    <div class="footer grid_12">
+	    <button id="save-btn" class="icon-save mr-grid"><?php echo $this->translate('Save');?></button>
+    </div>
 </div>

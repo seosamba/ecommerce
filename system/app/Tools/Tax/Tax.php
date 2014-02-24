@@ -41,6 +41,59 @@ class Tools_Tax_Tax {
 		return 0;
 	}
 
+    /**
+     * Calculates shipping tax according to configured rules
+     * @param float                $shippingPrice       Shipping price
+     * @param null                 $destinationAddress  If not specified uses default tax rule for calculation
+     * @return float|int
+    */
+
+    public static function calculateShippingTax($shippingPrice, $destinationAddress = null) {
+        $shippingTaxClass = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('shippingTaxRate');
+        if($shippingTaxClass !=  '0' && $shippingTaxClass != null) {
+            $getRate = 'getRate'.$shippingTaxClass;
+            if (null !== $destinationAddress){
+                $zoneId = self::getZone($destinationAddress);
+                if ($zoneId) {
+                    $tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
+                }
+            } else {
+                $tax = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            }
+
+            if (isset($tax) && $tax !== null) {
+                return ($shippingPrice / 100) * $tax->$getRate();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Calculates discount tax according to configured rules
+     * @param float                $discountPrice       Discount price
+     * @param null                 $destinationAddress  If not specified uses default tax rule for calculation
+     * @return float|int
+     */
+
+    public static function calculateDiscountTax($discountPrice, $discountTaxRate, $destinationAddress = null) {
+        if($discountTaxRate != '0') {
+            $getRate = 'getRate'.$discountTaxRate;
+            if (null !== $destinationAddress){
+                $zoneId = self::getZone($destinationAddress);
+                if ($zoneId) {
+                    $tax = Models_Mapper_Tax::getInstance()->findByZoneId($zoneId);
+                }
+            } else {
+                $tax = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            }
+
+            if (isset($tax) && $tax !== null) {
+                return ($discountPrice / 100) * $tax->$getRate();
+            }
+        }
+        return 0;
+    }
+
 	/**
 	 * Tries to find zone id using all zone types (zip, state, country)
 	 *
@@ -52,15 +105,23 @@ class Tools_Tax_Tax {
 		} else {
 			$address = Tools_Misc::clenupAddress($address);
 		}
+        $zones = array();
+        $taxableZones = Models_Mapper_Tax::getInstance()->fetchAll();
+        $zoneMapper = Models_Mapper_Zone::getInstance();
+        if(is_array($taxableZones) && !empty($taxableZones)) {
+            foreach($taxableZones as $taxZone){
+                $zoneIds[] =  $taxZone->getZoneId();
+            }
+            $zones =  $zoneMapper->fetchAll($zoneMapper->getDbTable()->getAdapter()->quoteInto('id IN(?)', $zoneIds));
+        }
 
-		$zones = Models_Mapper_Zone::getInstance()->fetchAll();
 		if(is_array($zones) && !empty($zones)) {
 			$zoneMatch = 0;
 			$maxRate = 0;
 			foreach($zones as $zone) {
 				$matchRate = 0;
 
-				if (empty($address['coutry']) && empty($address['state']) && empty($address['zip'])){
+				if (empty($address['country']) && empty($address['state']) && empty($address['zip'])){
 					continue;
 				}
 

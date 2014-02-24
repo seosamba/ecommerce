@@ -33,7 +33,7 @@
 						$lastSeenStamp = $lastSeen.' '.$this->translate(' days ago');
 					}
 				} else {
-					$lastSeenStamp = $this->translate('never');
+					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
 				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
 				?></p>
@@ -187,7 +187,7 @@
 <script>
 	$('#profile-content').tabs();
 	$('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
-	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-all ui-corner-top" );
+	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
 	$(function(){
 		var oTable = $('#orders-table').dataTable({
 			bPaginate: false,
@@ -249,10 +249,10 @@
 		$(this).data('currentStatus', $(this).text());
 
 		var buttons = {
-			'refunded'  : '<button class="change-status btn btn-small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
-			'completed' : '<button class="change-status btn btn-small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
-			'canceled'  : '<button class="change-status btn btn-small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
-			'delivered' : '<button class="change-status btn btn-small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+			'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+			'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+			'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+			'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
 		}
 
 		var html = ''
@@ -289,7 +289,7 @@
 			id      = parseInt($(this).closest('tr').data('id')),
 			currentStatus = $(this).data('status');
 
-		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
 
 		$.ajax({
 			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
