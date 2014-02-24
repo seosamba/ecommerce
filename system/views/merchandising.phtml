@@ -35,7 +35,11 @@
 
 <script>
     $(function () {
-        $('#merchandising').tabs();
+        $('#merchandising').tabs({
+            beforeLoad: function(event, ui){
+                showSpinner('#merchandising');
+            }
+        });
     });
 </script>
 

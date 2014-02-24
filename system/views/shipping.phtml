@@ -109,11 +109,6 @@ $(function(){
         }
     });
 
-    $(document).ajaxStop(function(){
-        hideSpinner();
-        checkboxRadio();
-    });
-
     $('.footer #submit').on('click', function(){
         var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
         if(currentPane){

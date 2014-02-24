@@ -405,7 +405,11 @@
 
 <script>
 	(function () {
-		$('#manage-product,#description-box, #preview-box').tabs();
+		$('#manage-product,#description-box, #preview-box').tabs({
+            beforeLoad: function(event, ui){
+                //showSpinner('#merchandising');
+            }
+        });
 		$(".ui-tabs-nav, .ui-tabs-nav > *")
 				.removeClass("ui-corner-all")
 				.addClass("ui-corner-top");
