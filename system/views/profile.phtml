@@ -289,7 +289,7 @@
 			id      = parseInt($(this).closest('tr').data('id')),
 			currentStatus = $(this).data('status');
 
-		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
 
 		$.ajax({
 			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,

@@ -150,7 +150,7 @@ define(['backbone',
                 type: 'POST',
                 dataType: 'json',
                 beforeSend: function(){
-                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                 },
                 success: function(response) {
                     showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
@@ -181,7 +181,7 @@ define(['backbone',
                         type: 'POST',
                         dataType: 'json',
                         beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                         },
                         success: function(response) {
                             console.log(model.toJSON());
