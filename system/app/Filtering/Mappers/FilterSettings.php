@@ -6,7 +6,7 @@
  */
 class Filtering_Mappers_FilterSettings
 {
-    const TABLE_NAME = 'plugin_filtering_filter_settings';
+    const TABLE_NAME = 'shopping_filtering_widget_settings';
 
     /**
      * @var Filtering_Mappers_FilterSettings
