@@ -159,6 +159,20 @@ class Tools_ShoppingCart {
 		return reset($filteredContent);
 	}
 
+    /**
+     * Returns quantity of products in cart
+     *
+     * @return int
+     *
+     */
+    public function findProductQuantityInCart(){
+        $quantity = 0;
+        foreach($this->_content as $cartItem){
+            $quantity = $quantity + $cartItem['qty'];
+        }
+        return $quantity;
+    }
+
 	/**
 	 *
 	 * @param Models_Model_Product $item

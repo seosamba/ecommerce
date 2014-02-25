@@ -91,6 +91,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
 
+    const ORDER_CONFIG  = 'orderconfig';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -286,6 +288,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (isset($markupConfig['config']) && !empty($markupConfig['config'])) {
 			$markupForm->populate($markupConfig['config']);
 		}
+        $orderConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::ORDER_CONFIG);
+        $orderConfigForm = new Forms_Shipping_OrderConfig();
+        if(isset($orderConfig['config'])){
+            $orderConfigForm->populate($orderConfig['config']);
+        }
 		$freeShippingForm = new Forms_Shipping_FreeShipping();
 		$freeShippingConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_FREESHIPPING);
 		if (isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])) {
@@ -294,6 +301,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$this->_view->freeForm = $freeShippingForm;
 		$this->_view->markupForm = $markupForm;
+        $this->_view->orderConfigForm = $orderConfigForm;
 
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
@@ -717,7 +725,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$bundledShippers = array(
 			self::SHIPPING_FREESHIPPING,
 			self::SHIPPING_PICKUP,
-			self::SHIPPING_MARKUP
+			self::SHIPPING_MARKUP,
+            self::ORDER_CONFIG
 		);
 
 		if (!in_array($name, $bundledShippers)) {
@@ -735,6 +744,9 @@ class Shopping extends Tools_Plugins_Abstract {
 				case self::SHIPPING_MARKUP:
 					$form = new Forms_Shipping_MarkupShipping();
 					break;
+                case self::ORDER_CONFIG:
+                    $form = new Forms_Shipping_OrderConfig();
+                    break;
 				default:
 					break;
 			}
