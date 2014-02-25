@@ -1,0 +1,68 @@
+<?php $widgetId = uniqid('widget-filtering-'); ?>
+<div class="filtering-builder-wrap" id="<?php echo $widgetId; ?>" data-productid="<?php echo $this->productId; ?>">
+    <div class="filtering-builder-controlls">
+        <h4><?php echo $this->translate('Filter Builder'); ?>:</h4>
+    </div>
+    <div class="filtering-builder-content">
+        <p><?php echo $this->translate('Product tags'); ?>:
+        <?php
+        if (!empty($this->tags)) {
+            foreach($this->tags as $tag) {
+                echo '<a href="javascript:;">'.$tag['name'].'</a>';
+            }
+        } else {
+            echo $this->translate('No tags yet');
+        }
+        ?>
+        </p>
+
+        <div class="product-filters-list">
+        </div>
+    </div>
+    <div class="filtering-builder-controlls">
+        <h4><?php echo $this->translate('Add Filter'); ?>:</h4>
+        <p><input type="text" class="typeahead" name="new-attribute" placeholder="Give a name to filter" /></p>
+        <p><?php echo $this->translate('Applies to'); ?>:</p>
+        <p class="apply-to-tags"></p>
+    </div>
+</div>
+
+<style type="text/css">
+    .filtering-builder-wrap,
+    .filtering-builder-wrap div.filtering-builder-controlls,
+    .filtering-builder-wrap div.filtering-builder-content {
+        overflow: hidden;
+        background-color: #fff;
+    }
+    .filtering-builder-wrap {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        border: 3px dashed #eee;
+    }
+    .filtering-builder-wrap div.filtering-builder-controlls {
+        background: rgba(248, 248, 248, 1);
+        padding: 10px 5px 5px 5px;
+        min-height: 30px;
+    }
+    .filtering-builder-wrap div.filtering-builder-controlls h4 {
+        padding: 3px;
+        color: #ccc;
+        text-transform: uppercase;
+    }
+    .filtering-builder-wrap div.filtering-builder-content {
+        padding: 5px;
+        background: background: rgba(250, 250, 250, 1);
+    }
+</style>
+
+<script type="text/javascript">
+    $(function () {
+        var app = new TFilter.MainView({el: '#<?php echo $widgetId; ?>'});
+        <?php if (!empty($this->currentFilters)) : ?>
+        app.loadAttributes(<?php echo json_encode($this->currentFilters); ?>);
+        <?php endif; ?>
+<!--        app.$el.data(--><?php //echo json_encode($this->widgetData); ?><!--);-->
+        app.setTags(<?php echo json_encode($this->tags); ?>).initTagsBlock();
+    });
+</script>

@@ -24,6 +24,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	const OPTTYPE_ORDER = 'order';
 
+    /**
+     * Option to apply product list filtering via URI params
+     */
+    const OPTION_FILTERABLE = 'filterable';
+
 	/**
 	 * Product list default offset (used for portional load)
 	 */
@@ -86,6 +91,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$layout = Zend_Layout::getMvcInstance();
 		$layout->getView()->headScript()->appendFile(Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl()
 				. 'plugins/shopping/web/js/product-options.js');
+
+        if (in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
+        }
 	}
 
 	public function _load() {
@@ -283,6 +292,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	private function _loadProducts($enabled = true) {
 		$enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
+
+
 		if (empty($this->_options)) {
 			array_push($this->_cacheTags, 'prodid_all');
 			return $this->_productMapper->fetchAll($enabledOnly, null, 0, $this->_limit);
@@ -335,11 +346,21 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$this->_view->filters = $filters;
 
-		//if no filters passed in the product list we will check if it is a PL of product ids
-		if (preg_match('~^[0-9,]+$~', $this->_options[0])) {
+        if (!empty($_SERVER['QUERY_STRING']) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $urlFilter = Filtering_Tools::normalizeFilterQuery();
+            $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
+            if (empty($productIds)) {
+                return null;
+            }
+            $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+        } elseif (preg_match('~^[0-9,]+$~', $this->_options[0])) {
+            //if no filters passed in the product list we will check if it is a PL of product ids
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
-			$enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
 		}
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,

@@ -1,0 +1,46 @@
+<form class="plugin-filtering-widget filtering-form">
+    <?php foreach ($this->filters as $filterId => $filter) : ?>
+        <?php if (empty($filter['value'])) {
+            continue;
+        };
+        if (isset($this->settings[$filterId])) {
+            if ($this->settings[$filterId] === '1') {
+                continue;
+            }
+            if (is_array($this->settings[$filterId])) {
+                $filter['value'] = array_diff($filter['value'], $this->settings[$filterId]);
+            }
+        }
+        ?>
+        <ul>
+            <?php if (!empty($filter['value'])) : ?>
+                <li>
+                    <header><?php echo $filter['label']; ?></header>
+                    <ul>
+                        <?php
+                        $filter['value'] = array_unique($filter['value']);
+                        foreach ($filter['value'] as $value) : ?>
+                            <?php
+                            $checked = '';
+                            if (array_key_exists($filter['name'], $this->currentFilters)
+                                && in_array($value, $this->currentFilters[$filter['name']])) {
+                                $checked = 'checked';
+                            }
+                            ;?>
+                            <li>
+                                <label>
+                                    <input type="checkbox"
+                                           name="<?php echo $filter['name']; ?>"
+                                           value="<?php echo $value; ?>"
+                                           <?php echo $checked; ?>
+                                        />
+                                    <a href="<?php echo $this->url().'?'.$filter['name'].'='.urlencode($value); ?>"><?php echo $value; ?></a></label>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </li>
+            <?php endif; ?>
+        </ul>
+    <?php endforeach; ?>
+    <button><?php echo $this->translate('Apply filters');?></button>
+</form>
