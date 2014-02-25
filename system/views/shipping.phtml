@@ -124,6 +124,7 @@ $(function(){
     });
 
     $('.footer #submit').on('click', function(){
+        showSpinner();
         var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
         if(currentPane){
             var form = currentPane.find('form');
@@ -134,6 +135,7 @@ $(function(){
                 type     : form.attr('method'),
                 complete : function(response){
                     form.trigger('formsave', response);
+                    hideSpinner();
                 }
             });
         }
