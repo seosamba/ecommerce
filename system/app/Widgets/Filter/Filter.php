@@ -9,7 +9,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
     const CACHE_KEY_SETTINGS = 'settings';
 
     private $_allowedOptions = array(
-        'builder'
+        'builder', 'product'
     );
 
     protected function _init()

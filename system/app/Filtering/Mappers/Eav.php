@@ -110,35 +110,36 @@ class Filtering_Mappers_Eav
         }
         $filters = array();
 
-        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
-        $select = $dbAdapter->select()->from(
-            array('v' => $this->_valuesTable),
-            array('v.attribute_id', 'v.value')
-        )
-            ->join(array('a' => $this->_attributesTable), 'a.id = v.attribute_id', array('a.name', 'a.label'))
-            ->join(
-                array('tha' => $this->_tagsRelationTable),
-                'tha.attribute_id = v.attribute_id',
-                null
+        if (!empty($tags)) {
+            $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+            $select = $dbAdapter->select()->from(
+                array('v' => $this->_valuesTable),
+                array('v.attribute_id', 'v.value')
             )
-            ->where('tha.tag_id IN (?)', $tags);
+                ->join(array('a' => $this->_attributesTable), 'a.id = v.attribute_id', array('a.name', 'a.label'))
+                ->join(
+                    array('tha' => $this->_tagsRelationTable),
+                    'tha.attribute_id = v.attribute_id',
+                    null
+                )
+                ->where('tha.tag_id IN (?)', $tags);
 
-        $data = $dbAdapter->fetchAll($select);
-        if (!empty($data)) {
-            foreach ($data as $item) {
-                $id = $item['attribute_id'];
-                if (!array_key_exists($id, $filters)) {
-                    $filters[$id] = $item;
-                }
-                if (!is_array($filters[$id]['value'])) {
-                    $filters[$id]['value'] = (array)$filters[$id]['value'];
-                } else {
-                    array_push($filters[$id]['value'], $item['value']);
-                }
+            $data = $dbAdapter->fetchAll($select);
+            if (!empty($data)) {
+                foreach ($data as $item) {
+                    $id = $item['attribute_id'];
+                    if (!array_key_exists($id, $filters)) {
+                        $filters[$id] = $item;
+                    }
+                    if (!is_array($filters[$id]['value'])) {
+                        $filters[$id]['value'] = (array)$filters[$id]['value'];
+                    } else {
+                        array_push($filters[$id]['value'], $item['value']);
+                    }
 
+                }
             }
         }
-
         return $filters;
     }
 
