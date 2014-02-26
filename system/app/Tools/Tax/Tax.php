@@ -126,13 +126,30 @@ class Tools_Tax_Tax {
 				}
 
 				$countries = $zone->getCountries(true);
-				if ($zone->getZip() && !empty($address['zip'])) {
-					if (in_array($address['zip'], $zone->getZip()) && in_array($address['country'], $countries) ){
-						$matchRate += 5;
-					} else {
-						continue;
-					}
-				}
+                if ($zone->getZip() && !empty($address['zip'])) {
+
+                    //wildcard zip analyze
+                    $zipMatched = false;
+                    $wildcardZones = preg_grep('~\*~',  $zone->getZip());
+                    if (!empty($wildcardZones)) {
+                        foreach ($wildcardZones as $wildcardZone) {
+                            $wildcardPosition = strpos($wildcardZone, '*');
+                            $currentZip = substr_replace($address['zip'], '', $wildcardPosition);
+                            $matchZip = substr_replace($wildcardZone, '', $wildcardPosition);
+                            if ($currentZip === $matchZip && in_array($address['country'], $countries)) {
+                                $matchRate += 5;
+                                $zipMatched = true;
+                            }
+                        }
+                    }
+
+                    if (in_array($address['zip'], $zone->getZip()) && in_array($address['country'], $countries)
+                        && !$zipMatched) {
+                        $matchRate += 5;
+                    } elseif(!$zipMatched) {
+                        continue;
+                    }
+                }
 				if (!empty($address['state'])){
 					if ($zone->getStates()) {
 						$states = array_map(function($state){ return $state['id'];}, $zone->getStates());
