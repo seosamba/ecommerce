@@ -22,12 +22,14 @@ class Filtering_Tools
 
         if (!empty($queryString)) {
             foreach (explode('&', $queryString) as $queryParam) {
-                list ($filter, $value) = explode('=', $queryParam);
+                $queryParam = explode('=', $queryParam);
+                $filter = $queryParam[0];
+                $value = isset($queryParam[1]) ? urldecode($queryParam[1]) : null;
                 if (!isset($urlFilters[$filter])) {
                     $urlFilters[$filter] = array();
                 }
                 if (!empty($value)) {
-                    array_push($urlFilters[$filter], urldecode($value));
+                    array_push($urlFilters[$filter], $value);
                 }
             }
             $urlFilters = array_filter($urlFilters);

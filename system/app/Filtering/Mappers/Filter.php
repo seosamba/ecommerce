@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Filtering_Mappers_FilterSettings
+ * Filtering_Mappers_Filter
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Filtering_Mappers_FilterSettings
+class Filtering_Mappers_Filter
 {
     const TABLE_NAME = 'shopping_filtering_widget_settings';
 
     /**
-     * @var Filtering_Mappers_FilterSettings
+     * @var Filtering_Mappers_Filter
      */
     protected static $_instance;
 
@@ -23,13 +23,13 @@ class Filtering_Mappers_FilterSettings
     }
 
     /**
-     * @return Filtering_Mappers_FilterSettings
+     * @return Filtering_Mappers_Filter
      */
     public static function getInstance()
     {
         $class = get_called_class();
         if (self::$_instance === null) {
-            self::$_instance = new Filtering_Mappers_FilterSettings();
+            self::$_instance = new Filtering_Mappers_Filter();
         }
         return self::$_instance;
     }
