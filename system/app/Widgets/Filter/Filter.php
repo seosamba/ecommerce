@@ -9,10 +9,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
     const CACHE_KEY_SETTINGS = 'settings';
 
     private $_allowedOptions = array(
-        'builder',
-        'products',
-        'page',
-        'news'
+        'builder'
     );
 
     protected function _init()
@@ -21,16 +18,18 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $this->_cachePrefix = strtolower(__CLASS__);
 
+        // disable cache if we are in development environment
         $this->_cacheable = !(APPLICATION_ENV === 'development');
 
-        if (!empty($this->_options) && $this->_options[0] === 'builder') {
+        if ((!empty($this->_options) && $this->_options[0] === 'builder') || (!empty($_SERVER['REQUEST_URI']))) {
             // disabling cache if rendering builder widget
             $this->_cacheable = false;
         }
 
         $this->_view = new Zend_View();
         $this->_view->setScriptPath(__DIR__ . '/views/');
-        $this->_view->websiteUrl = Zend_Controller_Action_HelperBroker::getStaticHelper('website')->getUrl();
+        $this->_websiteUrl = Zend_Controller_Action_HelperBroker::getStaticHelper('website')->getUrl();
+        $this->_view->websiteUrl = $this->_websiteUrl;
     }
 
 
@@ -41,21 +40,29 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 . implode(', ', $this->_allowedOptions));
         }
 
-        $method = array_shift($this->_options);
-        $method = '_render' . ucfirst(strtolower($method));
-
-        if (method_exists($this, $method)) {
-            return $this->$method();
+        // check if first option is allowed method
+        if (in_array($this->_options[0], $this->_allowedOptions)) {
+            $method = array_shift($this->_options);
+            $method = '_render' . ucfirst(strtolower($method));
+            if (method_exists($this, $method)) {
+                // render widget
+                return $this->$method();
+            }
         }
+
+        // render default
+        return $this->_renderProduct();
     }
 
     private function _renderBuilder()
     {
         $layout = Zend_Layout::getMvcInstance()->getView();
-//        $layout->headLink()->appendStylesheet($this->_view->websiteUrl . 'system/css/seotoaster.css');
-        $layout->headScript()->appendFile($this->_view->websiteUrl . 'system/js/external/underscore/underscore.min.js');
-        $layout->headScript()->appendFile($this->_view->websiteUrl . 'system/js/external/backbone/backbone.min.js');
-        $layout->headScript()->appendFile($this->_view->websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-builder.js');
+        $layout->headScript()
+            ->appendFile($this->_websiteUrl . 'system/js/external/underscore/underscore.min.js')
+            ->appendFile($this->_websiteUrl . 'system/js/external/backbone/backbone.min.js')
+            ->appendFile(
+                $this->_websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-builder' . (APPLICATION_ENV === 'production' ? '.min' : '') . '.js'
+            );
 
         $mapper = Filtering_Mappers_Eav::getInstance();
 
@@ -83,7 +90,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $editMode = Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT);
         if ($editMode) {
             $layout = Zend_Layout::getMvcInstance()->getView();
-            $layout->headScript()->appendFile($this->_view->websiteUrl . 'plugins/filtering/web/js/filtering-product' . (APPLICATION_ENV === 'production' ? 'min' : '') . '.js');
+            $layout->headScript()->appendFile(
+                $this->_websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-product' . (APPLICATION_ENV === 'production' ? '.min' : '') . '.js'
+            );
         }
 
         $tagsNames = explode(',', $this->_options[0]);
