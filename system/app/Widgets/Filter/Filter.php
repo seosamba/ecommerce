@@ -96,25 +96,92 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
 
         $tagsNames = explode(',', $this->_options[0]);
-        $tags = Models_Mapper_Tag::getInstance()->findByName($tagsNames, true);
+        $tags = Models_Mapper_Tag::getInstance()->findByName($tagsNames, false);
+        $tagIds = array_map(
+            function ($tag) {
+                return $tag->getId();
+            },
+            $tags
+        );
 
         // generating filter id
         $filterId = implode('_', array_merge(array($this->_toasterOptions['id']), $tagsNames));
         $filterId = substr(md5($filterId), 0, 16);
         $this->_view->filterId = $filterId;
 
-        $this->_view->settings = Filtering_Mappers_FilterSettings::getInstance()->getSettings($filterId);
+        $settings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
+        $this->_view->settings = $settings;
 
-        $filters = Filtering_Mappers_Eav::getInstance()->findFiltersByTags(array_keys($tags));
+        $eavMapper = Filtering_Mappers_Eav::getInstance();
 
-        $this->_view->tags = $tagsNames;
-        $this->_view->filters = $filters;
+        // fetch filters by given tags
+        $filters = $eavMapper->findFiltersByTags($tagIds);
+
+        // get applied filters from query
+        $appliedFilters = Filtering_Tools::normalizeFilterQuery();
+
+        $filters = array_map(
+            function ($filter) use ($appliedFilters, $settings) {
+                // opt out if isset in widget settings
+                if (array_key_exists($filter['attribute_id'], $settings)
+                    && $settings[$filter['attribute_id']] === '1') {
+                    return null;
+                }
+                if (!empty($filter['value'])) {
+                    $values = array_unique($filter['value'], SORT_STRING);
+                    if (isset($settings[$filter['attribute_id']]) && is_array($settings[$filter['attribute_id']])) {
+                        $values = array_diff($values, $settings[$filter['attribute_id']]);
+                    }
+                    $filter['value'] = $values;
+                } else {
+                    return null;
+                }
+                if (isset($appliedFilters[$filter['name']])) {
+                    $filter['checked'] = $appliedFilters[$filter['name']];
+                } else {
+                    $filter['checked'] = array();
+                }
+                return $filter;
+            },
+            $filters
+        );
+
+        $this->_view->filters = array_filter($filters);
+
+        $this->_view->tags = array_map(
+            function ($tag) use ($appliedFilters) {
+                $tag = $tag->toArray();
+                $tag['checked'] = isset($appliedFilters['category']) && in_array(
+                        $tag['name'],
+                        $appliedFilters['category']
+                    );
+                return $tag;
+            },
+            $tags
+        );
+
+        // fetch price range
+        $priceRange = $eavMapper->getPriceRange($tagIds);
+        if (!empty($appliedFilters['price'])) {
+            $price = array_pop($appliedFilters['price']);
+            list($priceRange['from'], $priceRange['to']) = explode('-', $price, 2);
+            unset($appliedFilters['price'], $price);
+        }
+        $this->_view->priceRange = $priceRange;
+
+
+        // loading brands for current filter
+        $brands = $eavMapper->getBrands($tagIds);
+        $this->_view->brands = array_map(function($brand) use ($appliedFilters) {
+                $brand['checked'] = isset($appliedFilters['brand']) && in_array($brand['name'], $appliedFilters['brand']);
+                return $brand;
+            }, $brands);
 
         if ($editMode && !$request->has('filter_preview')) {
             return $this->_view->render('filter-product/editor.phtml');
         }
 
-        $this->_view->currentFilters = Filtering_Tools::normalizeFilterQuery();
+//        $this->_view->currentFilters = $appliedFilters;
         return $this->_view->render('filter-product/widget.phtml');
     }
 }

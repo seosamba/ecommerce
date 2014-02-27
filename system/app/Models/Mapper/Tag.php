@@ -123,7 +123,12 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 		} else {
 			$rows = $this->getDbTable()->fetchAll($select);
 			if ($rows->count()){
-				return array_map(function($row, $model){ return new $model($row); }, $rows->toArray(), $this->_model);
+                return array_map(
+                    function ($row) {
+                        return new Models_Model_Tag($row);
+                    },
+                    $rows->toArray()
+                );
 			} else {
 				return array();
 			}

@@ -22,4 +22,14 @@ $(function () {
             .prop('checked', e.currentTarget.checked)
             .prop('disabled', e.currentTarget.checked);
     });
+    $widgets.find('div.slider').each(function () {
+        var min = Math.floor(parseFloat($(this).data('min'))),
+            max = Math.ceil(parseFloat($(this).data('max')));
+        $(this).slider({
+            range: true,
+            min: min,
+            max: max,
+            values: [ min, max ]
+        });
+    });
 });

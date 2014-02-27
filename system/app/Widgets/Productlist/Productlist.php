@@ -285,12 +285,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		return $content;
 	}
 
-	/**
-	 * Load the right products set
-	 *
-	 * @return array
-	 */
-	private function _loadProducts($enabled = true) {
+    /**
+     * Load the right products set
+     * @param bool $enabled Filter only enabled products
+     * @return array|null
+     */
+    private function _loadProducts($enabled = true) {
 		$enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 
 
@@ -298,19 +298,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			array_push($this->_cacheTags, 'prodid_all');
 			return $this->_productMapper->fetchAll($enabledOnly, null, 0, $this->_limit);
 		}
-		$filters = array(
+		$filtersExists = array(
 			'tags'   => null,
 			'brands' => null,
 			'order'  => null
 		);
 		foreach ($this->_options as $option) {
 			if (preg_match('/^(brands|tag(?:name)?s|order)-(.*)$/u', $option, $parts)) {
-				$filters[$parts[1]] = explode(',', $parts[2]);
+				$filtersExists[$parts[1]] = explode(',', $parts[2]);
 			}
 		}
-		if (is_array($filters['order']) && !empty($filters['order'])) {
+
+        // fetching filters from query string
+        $urlFilter = Filtering_Tools::normalizeFilterQuery();
+
+		if (is_array($filtersExists['order']) && !empty($filtersExists['order'])) {
 			//normalization to proper column names
-			$filters['order'] = array_map(function ($field) {
+			$filtersExists['order'] = array_map(function ($field) {
 				switch (trim($field)) {
                     case 'brand':
                         return $field = 'b.name'; break;
@@ -319,35 +323,45 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     default:
                         return $field =  'p.' . $field;
                 }
-			}, $filters['order']);
+			}, $filtersExists['order']);
 		}
 
-		if (isset($filters['tagnames']) && !empty($filters['tagnames'])){
-			$tags = Models_Mapper_Tag::getInstance()->findByName($filters['tagnames'], true);
+        if (!empty($urlFilter['category'])) {
+            $filtersExists['tagnames'] = $urlFilter['category'];
+            unset($urlFilter['category']);
+        }
+		if (isset($filtersExists['tagnames']) && !empty($filtersExists['tagnames'])) {
+			$tags = Models_Mapper_Tag::getInstance()->findByName($filtersExists['tagnames'], true);
 			if ($tags){
-				$filters['tags'] = array_keys($tags);
+				$filtersExists['tags'] = array_keys($tags);
 			} else {
-				$filters['tags'] = array(0);
+				$filtersExists['tags'] = array(0);
 			}
-			unset($tags, $filters['tagnames']);
+			unset($tags, $filtersExists['tagnames']);
 		}
 
-		if (!empty($filters['tags'])) {
-			foreach ($filters['tags'] as $tagId) {
+		if (!empty($filtersExists['tags'])) {
+			foreach ($filtersExists['tags'] as $tagId) {
 				array_push($this->_cacheTags, 'prodtag_' . $tagId);
 			}
 		}
 
-		if (!empty($filters['brands'])) {
-			foreach ($filters['brands'] as $brand) {
+        if (!empty($urlFilter['brand'])) {
+            $filtersExists['brands'] = $urlFilter['brand'];
+            unset($urlFilter['brand']);
+        }
+		if (!empty($filtersExists['brands'])) {
+			foreach ($filtersExists['brands'] as $brand) {
 				array_push($this->_cacheTags, 'prodbrand_' . $brand);
 			}
 		}
 
-		$this->_view->filters = $filters;
+		$this->_view->filters = $filtersExists;
 
-        if (!empty($_SERVER['QUERY_STRING']) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
-            $urlFilter = Filtering_Tools::normalizeFilterQuery();
+        if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $filtersExists = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
+            $urlFilter = array_intersect_key($urlFilter, $filtersExists);
+            // removing all
             $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
             if (empty($productIds)) {
                 return null;
@@ -362,9 +376,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
         }
 
-		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
+		return $this->_productMapper->fetchAll($enabledOnly, $filtersExists['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,
-			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount);
+			null, $filtersExists['tags'], $filtersExists['brands'], $this->_strictTagsCount);
 	}
 
 	/**

@@ -1,46 +1,105 @@
 <form class="plugin-filtering-widget filtering-form">
-    <?php foreach ($this->filters as $filterId => $filter) : ?>
-        <?php if (empty($filter['value'])) {
-            continue;
-        };
-        if (isset($this->settings[$filterId])) {
-            if ($this->settings[$filterId] === '1') {
-                continue;
-            }
-            if (is_array($this->settings[$filterId])) {
-                $filter['value'] = array_diff($filter['value'], $this->settings[$filterId]);
-            }
-        }
-        ?>
-        <ul>
-            <?php if (!empty($filter['value'])) : ?>
+    <ul>
+    <?php if (!empty($this->brands)) : ?>
+        <li>
+            <header><?php echo $this->translate('Brand'); ?></header>
+            <ul>
+            <?php foreach ($this->brands as $brand) :?>
                 <li>
-                    <header><?php echo $filter['label']; ?></header>
-                    <ul>
-                        <?php
-                        $filter['value'] = array_unique($filter['value']);
-                        foreach ($filter['value'] as $value) : ?>
-                            <?php
-                            $checked = '';
-                            if (array_key_exists($filter['name'], $this->currentFilters)
-                                && in_array($value, $this->currentFilters[$filter['name']])) {
-                                $checked = 'checked';
-                            }
-                            ;?>
-                            <li>
-                                <label>
-                                    <input type="checkbox"
-                                           name="<?php echo $filter['name']; ?>"
-                                           value="<?php echo $value; ?>"
-                                           <?php echo $checked; ?>
-                                        />
-                                    <a href="<?php echo $this->url().'?'.$filter['name'].'='.urlencode($value); ?>"><?php echo $value; ?></a></label>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <label>
+                        <input type="checkbox"
+                               name="brand"
+                               value="<?php echo $brand['name']; ?>"
+                               <?php if ($brand['checked']) echo 'checked'; ?>
+                            />
+                        <a href="<?php echo $this->url().'?brand='.urlencode($brand['name']); ?>"><?php echo $brand['name']; ?></a></label>
                 </li>
-            <?php endif; ?>
-        </ul>
+            <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+    <?php if (!empty($this->tags)) : ?>
+        <li>
+            <header><?php echo $this->translate('Category'); ?></header>
+            <ul>
+            <?php foreach ($this->tags as $tag) :?>
+                <li>
+                    <label>
+                        <input type="checkbox"
+                               name="category"
+                               value="<?php echo $tag['name']; ?>"
+                               <?php if ($tag['checked']) echo 'checked'; ?>
+                            />
+                        <a href="<?php echo $this->url().'?category='.urlencode($tag['name']); ?>"><?php echo $tag['name']; ?></a></label>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+    <?php if ($this->priceRange) :?>
+        <li class="filter-price" data-price='<?php echo json_encode($this->priceRange); ?>'>
+            <label class="filter-label">
+                <?php echo $this->translate('Price'); ?>
+                <span class="price-min"><?php echo empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']; ?></span>
+                &nbsp;-&nbsp;
+                <span class="price-max"><?php echo empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to']; ?></span>
+            </label>
+            <div class="slider"
+                 data-min="<?php echo $this->priceRange['min'];?>"
+                 data-max="<?php echo $this->priceRange['max'];?>" ></div>
+            <input type="hidden" name="price" value="<?php echo $this->priceRange['min'].'-'.$this->priceRange['max']; ?>"/>
+        </li>
+    <?php endif; ?>
+    <?php foreach ($this->filters as $filter) : ?>
+        <li>
+            <header><?php echo $filter['label']; ?></header>
+            <ul>
+                <?php
+                foreach ($filter['value'] as $value) : ?>
+                    <?php $checked = in_array($value, $filter['checked']); ?>
+                    <li>
+                        <label>
+                            <input type="checkbox"
+                                   name="<?php echo $filter['name']; ?>"
+                                   value="<?php echo $value; ?>"
+                                   <?php if ($checked) { echo 'checked'; }; ?>
+                                />
+                            <a href="<?php echo $this->url().'?'.$filter['name'].'='.urlencode($value); ?>"><?php echo $value; ?></a></label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
     <?php endforeach; ?>
+    </ul>
     <button><?php echo $this->translate('Apply filters');?></button>
 </form>
+<?php if ($this->priceRange) :?>
+<script>
+    $(function(){
+        $('div.slider').each(function () {
+            var self = this,
+                min = Math.floor(parseFloat($(this).data('min'))),
+                max = Math.ceil(parseFloat($(this).data('max'))),
+                from = $(this).find('span.')
+            $(this).slider({
+                range: true,
+                min: min,
+                max: max,
+                values: [ min, max ],
+                slide: function( event, ui ) {
+                    $(self).find('input[name=price]').val( ui.values[0] + " - " + ui.values[1] );
+                }
+            });
+
+            $(this).find('span.price-min,span.price-max')
+                .on('click', function(){
+                    $(this).prop('contenteditable', true);
+                })
+                .on('hover', function(){
+                    $(this).prop('contenteditable', false);
+                })
+            ;
+        });
+    });
+</script>
+<?php endif; ?>
