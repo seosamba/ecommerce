@@ -360,13 +360,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $filtersExists = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
-            $urlFilter = array_intersect_key($urlFilter, $filtersExists);
-            // removing all
-            $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
-            if (empty($productIds)) {
-                return null;
+            $priceAnd = '';
+            if (!empty($urlFilter['price'])) {
+                list($priceMin, $priceMax) = explode('-', reset($urlFilter['price']));
+                $priceAnd = '(p.price BETWEEN '.$priceMin.' AND '.$priceMax.')';
+                unset($urlFilter['price']);
             }
-            $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+            // removing all
+            $urlFilter = array_intersect_key($urlFilter, $filtersExists);
+            $idsWhere = '';
+            if (!empty($urlFilter)) {
+                $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
+                if (empty($productIds)) {
+                    return null;
+                }
+                $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+            }
+            $idsWhere = (!empty($idsWhere) ? ' AND ' : '' ) . $priceAnd;
         } elseif (preg_match('~^[0-9,]+$~', $this->_options[0])) {
             //if no filters passed in the product list we will check if it is a PL of product ids
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
@@ -375,6 +385,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (!empty($idsWhere)) {
             $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
         }
+
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filtersExists['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,
