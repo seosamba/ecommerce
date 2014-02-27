@@ -50,8 +50,8 @@
 
 <script id="tagTemplate" type="text/template">
 	<a href="javascript:;" class="fl-right ml1 mr1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
-	<label class="fl-left mr-grid checkbox_radio-wrap">
-        <input class="processed checkbox-upgrade filed-upgrade" type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span class="checkbox_radio"></span>
+	<label class="fl-left mr-grid">
+        <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
     </label>
     <span class="tag-editable text-overflow align-middle" title="Click to edit"><%= tag.get('name') %></span>
 </script>
@@ -81,7 +81,7 @@
         {{if id}}
         &nbsp;
         {{else}}
-        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span class="checkbox_radio"></span></label>
+        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
         <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
@@ -129,7 +129,7 @@
 		<span class="grid_2 alpha omega text-center mt5px"><?php echo $this->generalConfig['weightUnit']; ?></span>
 	</div>
 	<label class="grid_1 text-center mt5px">
-		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} /><span class="checkbox_radio"></span>
+		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
 	</label>
 	<div class="grid_1 text-center mt5px">
 		<button class="item-remove link error icon-remove icon16" title="<?php echo $this->translate('Delete'); ?>"</button>

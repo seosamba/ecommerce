@@ -670,6 +670,7 @@ define([
         renderOption: function(option){
             var optWidget = new ProductOptionView({model: option});
             optWidget.render().$el.appendTo('#options-holder');
+            checkboxRadio();
         },
         renderOptions: function(){
             $('#options-holder').empty();
