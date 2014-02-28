@@ -55,7 +55,11 @@ class Tools_FeedGenerator {
 		/**
 		 * @var $product Models_Model_Product
 		 */
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll();
+        $db = new Zend_Db_Table();
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll(
+            $db->getAdapter()->quoteInto('enabled = ?', '1')
+        );
+
 		if (empty($products)){
 			return false;
 		}
