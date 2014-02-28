@@ -247,7 +247,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $itemDefaultOptionsArray
                 );
 
-                $renderedContent[] = '<h1>'.$price.'</h1>';
                 if ($data['priceFilter']['min'] > $price || $data['priceFilter']['max'] < $price) {
                     return false;
                 }
