@@ -37,20 +37,21 @@
         </li>
     <?php endif; ?>
     <?php if ($this->priceRange) :?>
-        <li class="filter-price" data-price='<?php echo json_encode($this->priceRange); ?>'>
+        <?php
+        $priceRange = array(
+            'min' => (empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']),
+            'max' => (empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to'])
+        );
+        ?>
+        <li class="filter-price">
             <label class="filter-label">
                 <?php echo $this->translate('Price'); ?>
-<!--                <span class="price-min">--><?php //echo empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']; ?><!--</span>-->
-<!--                &nbsp;-&nbsp;-->
-<!--                <span class="price-max">--><?php //echo empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to']; ?><!--</span>-->
-                <input type="text" class="price-field price-min" value="<?php echo empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']; ?>"/>
-                <input type="text" class="price-field price-max" value="<?php echo empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to']; ?>"/>
-                <input type="hidden" name="price"/>
             </label>
-<!--            <div class="slider"-->
-<!--                 data-min="--><?php //echo $this->priceRange['min'];?><!--"-->
-<!--                 data-max="--><?php //echo $this->priceRange['max'];?><!--" ></div>-->
-<!--            <input type="hidden" name="price" value="--><?php //echo $this->priceRange['min'].'-'.$this->priceRange['max']; ?><!--"/>-->
+            <label><?php echo $this->translate('From'); ?></label>
+            <input type="text" class="price-field price-min" value="<?php echo $priceRange['min'] ?>"/>
+            <label><?php echo $this->translate('To'); ?></label>
+            <input type="text" class="price-field price-max" value="<?php echo $priceRange['max']; ?>"/>
+            <input type="hidden" name="price" value="<?php echo implode('-', $priceRange); ?>"/>
         </li>
     <?php endif; ?>
     <?php foreach ($this->filters as $filter) : ?>
