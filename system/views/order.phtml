@@ -1,6 +1,6 @@
 <?php $this->placeholder('headerContent')->set($this->translate('Order #').' '. $this->order->getId()); ?>
 <?php $countryList = Tools_Geo::getCountries(true); ?>
-<div class="h550" style="overflow-y: auto;">
+<div class="content scroll">
 	<div id="order-view" class="toaster-widget clearfix">
 		<div class="grid_12">
 			<div class="title padding5px"><?php echo $this->translate('Summary');?></div>
@@ -239,8 +239,3 @@
 		float: left;
 	}
 </style>
-<script>
-	$(function () {
-		$('#order-view').closest('.seotoaster').addClass('h600');
-	});
-</script>
