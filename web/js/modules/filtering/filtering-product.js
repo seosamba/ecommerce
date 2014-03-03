@@ -8,7 +8,7 @@ $(function () {
         data = $widget.find('input:checkbox:checked').serialize();
 
         $.ajax({
-            url: $('#website_url').val() + 'plugin/filtering/run/filterSettings/filterId/' + $widget.data('filterid'),
+            url: window.location.href,
             type: 'POST',
             data: data,
             success: function () {
@@ -16,10 +16,10 @@ $(function () {
             }
         });
     });
-    $widgets.on('change', 'input.filter-cb', function (e) {
-        var $subList = $(e.currentTarget).closest('li').find('ul');
-        $subList.find('input:checkbox')
-            .prop('checked', e.currentTarget.checked)
+    $widgets.on('change', 'input:checkbox[name^=hide]', function (e) {
+        var $subList = $(e.currentTarget).closest('li').find('ul input:checkbox');
+        console.log($subList);
+        $subList.prop('checked', e.currentTarget.checked)
             .prop('disabled', e.currentTarget.checked);
     });
     $widgets.find('div.slider').each(function () {

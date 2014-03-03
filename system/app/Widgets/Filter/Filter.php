@@ -116,6 +116,13 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         // if this user allowed to manage content
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && !$request->has('filter_preview')) {
             // render editable filter widget
+            if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
+                if ($request->isPost()) {
+                    $data = $request->getParam('hide', array());
+
+                    Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
+                }
+            }
             return $this->_renderWidgetEdit();
         }
 
@@ -150,8 +157,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         ));
 
         // assign tags to view with checked attributes
-        $this->_view->tags = array_map(
-            function ($tag) use ($appliedFilters) {
+        $this->_view->tags = array_filter(array_map(
+            function ($tag) use ($appliedFilters, $widgetSettings) {
+                if (isset($widgetSettings['tags']) && $widgetSettings['tags'] === 'all') {
+                    return null;
+                }
                 $tag = $tag->toArray();
                 $tag['checked'] = isset($appliedFilters['category']) && in_array(
                         $tag['name'],
@@ -160,7 +170,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 return $tag;
             },
             $this->_tags
-        );
+        ));
 
         // apply user values to price range filter
         if (!empty($appliedFilters['price'])) {
@@ -172,8 +182,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
 
         // mark selected brands
-        $this->_view->brands = array_map(
-            function ($brand) use ($appliedFilters) {
+        $this->_view->brands = array_filter(array_map(
+            function ($brand) use ($appliedFilters, $widgetSettings) {
+                if (isset($widgetSettings['brands']) && $widgetSettings['brands'] === 'all') {
+                    return null;
+                }
                 $brand['checked'] = isset($appliedFilters['brand']) && in_array(
                         $brand['name'],
                         $appliedFilters['brand']
@@ -181,7 +194,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 return $brand;
             },
             $this->_brands
-        );
+        ));
 
         return $this->_view->render('filter-product/widget.phtml');
     }
