@@ -87,21 +87,13 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
         $request = Zend_Controller_Front::getInstance()->getRequest();
 
-        $editMode = Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT);
-        if ($editMode) {
-            $layout = Zend_Layout::getMvcInstance()->getView();
-            $layout->headScript()->appendFile(
-                $this->_websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-product' . (APPLICATION_ENV === 'production' ? '.min' : '') . '.js'
-            );
-        }
-
         $tagsNames = explode(',', $this->_options[0]);
-        $tags = Models_Mapper_Tag::getInstance()->findByName($tagsNames, false);
+        $this->_tags = Models_Mapper_Tag::getInstance()->findByName($tagsNames, false);
         $tagIds = array_map(
             function ($tag) {
                 return $tag->getId();
             },
-            $tags
+            $this->_tags
         );
 
         // generating filter id
@@ -109,28 +101,39 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $filterId = substr(md5($filterId), 0, 16);
         $this->_view->filterId = $filterId;
 
-        $settings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
-        $this->_view->settings = $settings;
+        $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
+        $this->_widgetSettings = $widgetSettings;
 
         $eavMapper = Filtering_Mappers_Eav::getInstance();
 
         // fetch filters by given tags
-        $filters = $eavMapper->findFiltersByTags($tagIds);
+        $this->_filters = $eavMapper->findFiltersByTags($tagIds);
+        // fetch price range for filters
+        $this->_priceRange = $eavMapper->getPriceRange($tagIds);
+        // fetch brands
+        $this->_brands = $eavMapper->getBrands($tagIds);
+
+        // if this user allowed to manage content
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && !$request->has('filter_preview')) {
+            // render editable filter widget
+            return $this->_renderWidgetEdit();
+        }
 
         // get applied filters from query
         $appliedFilters = Filtering_Tools::normalizeFilterQuery();
 
-        $filters = array_map(
-            function ($filter) use ($appliedFilters, $settings) {
+        // mark disabled filters
+        $this->_view->filters = array_filter(array_map(
+            function ($filter) use ($appliedFilters, $widgetSettings) {
                 // opt out if isset in widget settings
-                if (array_key_exists($filter['attribute_id'], $settings)
-                    && $settings[$filter['attribute_id']] === '1') {
+                if (array_key_exists($filter['attribute_id'], $widgetSettings)
+                    && $widgetSettings[$filter['attribute_id']] === '1') {
                     return null;
                 }
                 if (!empty($filter['value'])) {
                     $values = array_unique($filter['value'], SORT_STRING);
-                    if (isset($settings[$filter['attribute_id']]) && is_array($settings[$filter['attribute_id']])) {
-                        $values = array_diff($values, $settings[$filter['attribute_id']]);
+                    if (isset($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {
+                        $values = array_diff($values, $widgetSettings[$filter['attribute_id']]);
                     }
                     $filter['value'] = $values;
                 } else {
@@ -143,11 +146,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 }
                 return $filter;
             },
-            $filters
-        );
+            $this->_filters
+        ));
 
-        $this->_view->filters = array_filter($filters);
-
+        // assign tags to view with checked attributes
         $this->_view->tags = array_map(
             function ($tag) use ($appliedFilters) {
                 $tag = $tag->toArray();
@@ -157,31 +159,75 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                     );
                 return $tag;
             },
-            $tags
+            $this->_tags
         );
 
-        // fetch price range
-        $priceRange = $eavMapper->getPriceRange($tagIds);
+        // apply user values to price range filter
         if (!empty($appliedFilters['price'])) {
             $price = array_pop($appliedFilters['price']);
-            list($priceRange['from'], $priceRange['to']) = explode('-', $price, 2);
+            list($this->_priceRange['from'], $this->_priceRange['to']) = explode('-', $price, 2);
             unset($appliedFilters['price'], $price);
         }
-        $this->_view->priceRange = $priceRange;
+        $this->_view->priceRange = $this->_priceRange;
 
 
-        // loading brands for current filter
-        $brands = $eavMapper->getBrands($tagIds);
-        $this->_view->brands = array_map(function($brand) use ($appliedFilters) {
-                $brand['checked'] = isset($appliedFilters['brand']) && in_array($brand['name'], $appliedFilters['brand']);
+        // mark selected brands
+        $this->_view->brands = array_map(
+            function ($brand) use ($appliedFilters) {
+                $brand['checked'] = isset($appliedFilters['brand']) && in_array(
+                        $brand['name'],
+                        $appliedFilters['brand']
+                    );
                 return $brand;
-            }, $brands);
+            },
+            $this->_brands
+        );
 
-        if ($editMode && !$request->has('filter_preview')) {
-            return $this->_view->render('filter-product/editor.phtml');
-        }
-
-//        $this->_view->currentFilters = $appliedFilters;
         return $this->_view->render('filter-product/widget.phtml');
+    }
+
+    private function _renderWidgetEdit ()
+    {
+        $layout = Zend_Layout::getMvcInstance()->getView();
+        $layout->headScript()->appendFile(
+            $this->_websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-product' . (APPLICATION_ENV === 'production' ? '.min' : '') . '.js'
+        );
+
+        $widgetSettings = $this->_widgetSettings;
+        $this->_view->settings = $widgetSettings;
+
+        $this->_view->tags = array_map(
+            function ($tag) {
+                return $tag->toArray();
+            },
+            $this->_tags
+        );
+
+        $this->_view->brands = $this->_brands;
+
+        $this->_view->filters = array_map(
+            function ($filter) use ($widgetSettings) {
+                // opt out if isset in widget settings
+                if (array_key_exists($filter['attribute_id'], $widgetSettings)
+                    && $widgetSettings[$filter['attribute_id']] === '1') {
+                    $filter['disabled'] = true;
+                }
+                if (!empty($filter['value'])) {
+                    $filter['value'] = array_unique($filter['value'], SORT_STRING);
+                    if (isset($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {
+                        $filter['disabled'] = $widgetSettings[$filter['attribute_id']];
+                    }
+                } else {
+                    $filter['disabled'] = true;
+                }
+
+                return $filter;
+            },
+            $this->_filters
+        );
+
+        $this->_view->priceRange = $this->_priceRange;
+
+        return $this->_view->render('filter-product/editor.phtml');
     }
 }

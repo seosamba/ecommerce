@@ -1,56 +1,90 @@
 <div class="plugin-filtering-widget plugin-filtering-wrap" data-filterid="<?php echo $this->filterId; ?>">
-    <h4><?php echo $this->translate('Filter Builder'); ?><br/>
-
-        <p><?php echo $this->translate('Tags'); ?>:&nbsp;<?php echo implode(' | ', $this->tags); ?></p>
-
+    <h4><?php echo $this->translate('Filter Widget Builder'); ?><br/>
         <p style="font-size: 80%">!!! <?php echo $this->translate('Checked filters will not be displayed to users'); ?>
             !!!</p>
     </h4>
     <ul>
     <?php if (!empty($this->tags)) : ?>
         <li>
-            <label class="filter-label"><?php echo $this->translate('Category');?></label>
+            <label class="filter-label">
+                <input type="checkbox" name="hide[tags]"
+                       value="all"
+                        <?php if (isset($this->settings['tags']) && $this->settings['tags'] === 'all' ): ?>
+                       checked
+                        <?php endif; ?>
+                    />
+                <?php echo $this->translate('Category');?>
+            </label>
             <ul>
-                <?php foreach ($this->tags as $tagId => $tagName) :?>
+                <?php foreach ($this->tags as $tag) :?>
                 <li>
                     <label>
-                        <?php
-                        $checked = false;
-                        $disabled = false;
-                        if (isset($this->settings['tags'])) {
-                            if ($this->settings['tags'] === '1') {
-                                $checked = $tagId;
-                                $disabled = true;
-                            } elseif ( is_array($this->settings['tags'])
-                                && in_array($tagId, $this->settings['tags']) ) {
-                                $checked = $tagId;
-                            }
-                        }
-                        echo $this->formCheckbox(
-                            'hide[tags][]',
-                            $tagId,
-                            array(
-                                'title'   => $this->translate('Check to hide from users'),
-                                'disable' => $disabled
-                            ),
-                            array(
-                                'checked'   => $tagId,
-                                'unChecked' => false
-                            )
-                        );
-                        echo $tagName; ?>
+                        <input type="checkbox" name="hide[tags][]"
+                               value="<?php echo $tags['id']; ?>"
+                                <?php if (isset($this->settings['tags'])
+                                && is_array($this->setting['tags'])
+                                && in_array($tag['id'], $this->settings['tags'])) :?>
+                               checked
+                                <?php endif; ?>
+                            />
+                        <?php echo $tag['name']; ?>
+                    </label></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+    <?php if (!empty($this->brands)) : ?>
+        <li>
+            <label class="filter-label">
+                <input type="checkbox" name="hide[brands]"
+                       value="all"
+                        <?php if (isset($this->settings['brands'])
+                            && $this->settings['brands'] === 'all' ): ?>
+                       checked
+                        <?php endif; ?>
+                    />
+                <?php echo $this->translate('Brands');?>
+            </label>
+            <ul>
+                <?php foreach ($this->brands as $brand) :?>
+                <li>
+                    <label>
+                        <input type="checkbox" name="hide[brands][]"
+                               value="<?php echo $brand['id']; ?>"
+                                <?php if (isset($this->settings['brands'])
+                                && is_array($this->setting['brands'])
+                                && in_array($brand['id'], $this->settings['brands'])) :?>
+                               checked
+                                <?php endif; ?>
+                            />
+                        <?php echo $brand['name']; ?>
                     </label></li>
                 <?php endforeach; ?>
             </ul>
         </li>
     <?php endif; ?>
     <?php if ($this->priceRange) :?>
-        <li>
-            <label class="filter-label"><?php echo $this->translate('Price');?></label>
-            <div class="slider"
-                 data-min="<?php echo $this->priceRange['min'];?>"
-                 data-max="<?php echo $this->priceRange['max'];?>" ></div>
-            <input type="hidden" name="price" />
+        <?php
+        $priceRange = array(
+            'min' => (empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']),
+            'max' => (empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to'])
+        );
+        ?>
+        <li class="filter-price">
+            <label class="filter-label">
+                <input type="checkbox" name="hide[price]"
+                       value="all"
+                        <?php if (!empty($this->settings['price'])): ?>
+                       checked
+                        <?php endif; ?>
+                    />
+                <?php echo $this->translate('Price'); ?>
+            </label>
+            <label><?php echo $this->translate('From'); ?></label>
+            <input type="text" class="price-field price-min" value="<?php echo $priceRange['min'] ?>"/>
+            <label><?php echo $this->translate('To'); ?></label>
+            <input type="text" class="price-field price-max" value="<?php echo $priceRange['max']; ?>"/>
+            <input type="hidden" name="price" value="<?php echo implode('-', $priceRange); ?>"/>
         </li>
     <?php endif; ?>
     <?php foreach ($this->filters as $filterId => $filter) : ?>
@@ -135,6 +169,7 @@
 
     .plugin-filtering-widget ul label.filter-label {
         font-weight: bold;
+        cursor: pointer;
     }
 
     .plugin-filtering-wrap {
