@@ -118,7 +118,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             // render editable filter widget
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
                 if ($request->isPost()) {
-                    $data = $request->getParam('hide', array());
+                    $data = $request->getParam('show', array());
 
                     Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
                 }
@@ -132,20 +132,17 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         // mark disabled filters
         $this->_view->filters = array_filter(array_map(
             function ($filter) use ($appliedFilters, $widgetSettings) {
-                // opt out if isset in widget settings
-                if (array_key_exists($filter['attribute_id'], $widgetSettings)
-                    && $widgetSettings[$filter['attribute_id']] === '1') {
+                // opt out if not exists in widget settings
+                if (!array_key_exists($filter['attribute_id'], $widgetSettings)
+                    || empty($widgetSettings[$filter['attribute_id']])
+                    || empty($filter['value'])) {
                     return null;
                 }
-                if (!empty($filter['value'])) {
-                    $values = array_unique($filter['value'], SORT_STRING);
-                    if (isset($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {
-                        $values = array_diff($values, $widgetSettings[$filter['attribute_id']]);
-                    }
-                    $filter['value'] = $values;
-                } else {
-                    return null;
-                }
+
+                $values = array_unique($filter['value'], SORT_STRING);
+                $values = array_intersect($values, $widgetSettings[$filter['attribute_id']]);
+                $filter['value'] = $values;
+
                 if (isset($appliedFilters[$filter['name']])) {
                     $filter['checked'] = $appliedFilters[$filter['name']];
                 } else {
@@ -159,10 +156,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         // assign tags to view with checked attributes
         $this->_view->tags = array_filter(array_map(
             function ($tag) use ($appliedFilters, $widgetSettings) {
-                if (isset($widgetSettings['tags']) && $widgetSettings['tags'] === 'all') {
+                $tag = $tag->toArray();
+                if (!isset($widgetSettings['tags']) || !is_array($widgetSettings['tags'])
+                    || !in_array($tag['id'], $widgetSettings['tags'])) {
                     return null;
                 }
-                $tag = $tag->toArray();
                 $tag['checked'] = isset($appliedFilters['category']) && in_array(
                         $tag['name'],
                         $appliedFilters['category']
@@ -184,14 +182,16 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         // mark selected brands
         $this->_view->brands = array_filter(array_map(
             function ($brand) use ($appliedFilters, $widgetSettings) {
-                if (isset($widgetSettings['brands']) && $widgetSettings['brands'] === 'all') {
-                    return null;
+                if (isset($widgetSettings['brands']) && is_array($widgetSettings['brands'])
+                    && in_array($brand['id'], $widgetSettings['brands'])
+                ) {
+
+                    $brand['checked'] = isset($appliedFilters['brand']) && in_array(
+                            $brand['name'],
+                            $appliedFilters['brand']
+                        );
+                    return $brand;
                 }
-                $brand['checked'] = isset($appliedFilters['brand']) && in_array(
-                        $brand['name'],
-                        $appliedFilters['brand']
-                    );
-                return $brand;
             },
             $this->_brands
         ));
@@ -210,13 +210,21 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->settings = $widgetSettings;
 
         $this->_view->tags = array_map(
-            function ($tag) {
-                return $tag->toArray();
+            function ($tag) use ($widgetSettings) {
+                $tag = $tag->toArray();
+                $tag['checked'] = (!empty($widgetSettings['tags']) && in_array($tag['id'], $widgetSettings['tags']));
+                return $tag;
             },
             $this->_tags
         );
 
-        $this->_view->brands = $this->_brands;
+        $this->_view->brands = array_map(
+            function ($brand) use ($widgetSettings) {
+                $brand['checked'] = (!empty($widgetSettings['brands']) && in_array($brand['id'], $widgetSettings['brands']));
+                return $brand;
+            },
+            $this->_brands
+        );
 
         $this->_view->filters = array_map(
             function ($filter) use ($widgetSettings) {

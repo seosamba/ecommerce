@@ -1,23 +1,5 @@
 <form class="plugin-filtering-widget filtering-form">
     <ul>
-    <?php if (!empty($this->brands)) : ?>
-        <li>
-            <header><?php echo $this->translate('Brand'); ?></header>
-            <ul>
-            <?php foreach ($this->brands as $brand) :?>
-                <li>
-                    <label>
-                        <input type="checkbox"
-                               name="brand"
-                               value="<?php echo $brand['name']; ?>"
-                               <?php if ($brand['checked']) echo 'checked'; ?>
-                            />
-                        <a href="<?php echo $this->url().'?brand='.urlencode($brand['name']); ?>"><?php echo $brand['name']; ?></a></label>
-                </li>
-            <?php endforeach; ?>
-            </ul>
-        </li>
-    <?php endif; ?>
     <?php if (!empty($this->tags)) : ?>
         <li>
             <header><?php echo $this->translate('Category'); ?></header>
@@ -36,7 +18,25 @@
             </ul>
         </li>
     <?php endif; ?>
-    <?php if ($this->priceRange) :?>
+    <?php if (!empty($this->brands)) : ?>
+        <li>
+            <header><?php echo $this->translate('Brand'); ?></header>
+            <ul>
+            <?php foreach ($this->brands as $brand) :?>
+                <li>
+                    <label>
+                        <input type="checkbox"
+                               name="brand"
+                               value="<?php echo $brand['name']; ?>"
+                               <?php if ($brand['checked']) echo 'checked'; ?>
+                            />
+                        <a href="<?php echo $this->url().'?brand='.urlencode($brand['name']); ?>"><?php echo $brand['name']; ?></a></label>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+    <?php if ($this->priceRange && !empty($this->settings['price'])) :?>
         <?php
         $priceRange = array(
             'min' => (empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']),

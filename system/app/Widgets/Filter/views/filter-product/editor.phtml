@@ -1,29 +1,21 @@
-<div class="plugin-filtering-widget plugin-filtering-wrap" data-filterid="<?php echo $this->filterId; ?>">
-    <h4><?php echo $this->translate('Filter Widget Builder'); ?><br/>
-        <p style="font-size: 80%">!!! <?php echo $this->translate('Checked filters will not be displayed to users'); ?>
-            !!!</p>
-    </h4>
+<form class="plugin-filtering-widget plugin-filtering-wrap" action="<?php echo $this->url();?>" method="post">
+    <input type="hidden" name="filterId" value="<?php echo $this->filterId; ?>" />
+    <h4><?php echo $this->translate('Filter Widget Builder'); ?></h4>
     <ul>
     <?php if (!empty($this->tags)) : ?>
         <li>
             <label class="filter-label">
-                <input type="checkbox" name="hide[tags]"
-                       value="all"
-                        <?php if (isset($this->settings['tags']) && $this->settings['tags'] === 'all' ): ?>
-                       checked
-                        <?php endif; ?>
-                    />
+                <input type="hidden" name="show[tags]" value="none"/>
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
                 <?php echo $this->translate('Category');?>
             </label>
             <ul>
                 <?php foreach ($this->tags as $tag) :?>
                 <li>
                     <label>
-                        <input type="checkbox" name="hide[tags][]"
-                               value="<?php echo $tags['id']; ?>"
-                                <?php if (isset($this->settings['tags'])
-                                && is_array($this->setting['tags'])
-                                && in_array($tag['id'], $this->settings['tags'])) :?>
+                        <input type="checkbox" name="show[tags][]"
+                               value="<?php echo $tag['id']; ?>"
+                                <?php if ($tag['checked']) :?>
                                checked
                                 <?php endif; ?>
                             />
@@ -36,24 +28,17 @@
     <?php if (!empty($this->brands)) : ?>
         <li>
             <label class="filter-label">
-                <input type="checkbox" name="hide[brands]"
-                       value="all"
-                        <?php if (isset($this->settings['brands'])
-                            && $this->settings['brands'] === 'all' ): ?>
-                       checked
-                        <?php endif; ?>
-                    />
+                <input type="hidden" name="show[brands]" value="none"/>
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
                 <?php echo $this->translate('Brands');?>
             </label>
             <ul>
                 <?php foreach ($this->brands as $brand) :?>
                 <li>
                     <label>
-                        <input type="checkbox" name="hide[brands][]"
+                        <input type="checkbox" name="show[brands][]"
                                value="<?php echo $brand['id']; ?>"
-                                <?php if (isset($this->settings['brands'])
-                                && is_array($this->setting['brands'])
-                                && in_array($brand['id'], $this->settings['brands'])) :?>
+                                <?php if ($brand['checked']) :?>
                                checked
                                 <?php endif; ?>
                             />
@@ -72,7 +57,7 @@
         ?>
         <li class="filter-price">
             <label class="filter-label">
-                <input type="checkbox" name="hide[price]"
+                <input type="checkbox" name="show[price]"
                        value="all"
                         <?php if (!empty($this->settings['price'])): ?>
                        checked
@@ -90,21 +75,8 @@
     <?php foreach ($this->filters as $filterId => $filter) : ?>
         <li data-attributeId="<?php echo $filterId; ?>">
             <label class="filter-label">
-                <?php
-                echo $this->formCheckbox(
-                    'hide[' . $filter['attribute_id'] . ']',
-                    (array_key_exists($filterId, $this->settings) && $this->settings[$filterId] === '1'),
-                    array(
-                        'title' => $this->translate('Check to hide from users'),
-                        'class' => 'filter-cb'
-                    ),
-                    array(
-                        'checked'   => true,
-                        'unChecked' => false
-                    )
-                );
-                echo $filter['label'];
-                ?>
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
+                <?php echo $filter['label']; ?>
             </label>
             <ul>
                 <?php $values = array_unique($filter['value']); ?>
@@ -127,7 +99,7 @@
                                 }
                             }
                             echo $this->formCheckbox(
-                                'hide[' . $filter['attribute_id'] . '][]',
+                                'show[' . $filter['attribute_id'] . '][]',
                                 $checked,
                                 array(
                                     'title'   => $this->translate('Check to hide from users'),
@@ -149,7 +121,7 @@
     <div class="footer">
         <button type="submit"><?php echo $this->translate('Save'); ?></button>
     </div>
-</div>
+</form>
 
 <style type="text/css">
     .plugin-filtering-widget ul {
@@ -191,5 +163,9 @@
 
     .plugin-filtering-wrap > .footer {
         border-top: 3px dashed #eee;
+    }
+
+    .plugin-filtering-wrap label > input[type=checkbox] {
+        cursor: pointer;
     }
 </style>
