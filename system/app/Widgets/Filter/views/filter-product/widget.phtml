@@ -36,7 +36,7 @@
             </ul>
         </li>
     <?php endif; ?>
-    <?php if ($this->priceRange && !empty($this->settings['price'])) :?>
+    <?php if ($this->priceRange) :?>
         <?php
         $priceRange = array(
             'min' => (empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']),

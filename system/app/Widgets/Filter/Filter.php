@@ -176,7 +176,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             list($this->_priceRange['from'], $this->_priceRange['to']) = explode('-', $price, 2);
             unset($appliedFilters['price'], $price);
         }
-        $this->_view->priceRange = $this->_priceRange;
+        if (!empty($widgetSettings['price'])) {
+            $this->_view->priceRange = $this->_priceRange;
+        }
 
 
         // mark selected brands
