@@ -209,6 +209,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS_MENU);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
+        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
 		Zend_Registry::set('acl', $acl);
 	}
 
