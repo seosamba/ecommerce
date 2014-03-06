@@ -36,6 +36,23 @@
 
     &:hover{
         background : @gray-light;
+
+        .image{
+            margin-bottom : @font-size-base * unit(@font-size-small) * @line-height * 2 + @padding-small-vertical * 2;
+        }
+
+        .name{
+            height   : auto;
+            position : absolute;
+            top      : 0;
+            bottom   : 1.75em;
+            left     : 0;
+            right    : 0;
+            z-index  : 10;
+            color    : @gray-dark;
+            overflow : auto;
+            .rgba(#fff, .95);
+        }
     }
 
     span{
@@ -82,6 +99,7 @@
         text-align : right;
         padding    : @padding-mini-vertical @padding-mini-horizontal;
         background : @gray-light;
+        .text-overflow();
     }
 
     .checkbox-del{
