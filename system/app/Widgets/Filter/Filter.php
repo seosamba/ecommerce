@@ -56,6 +56,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
     private function _renderBuilder()
     {
+        if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
+            return '';
+        }
         $layout = Zend_Layout::getMvcInstance()->getView();
         $layout->headScript()
             ->appendFile($this->_websiteUrl . 'system/js/external/underscore/underscore.min.js')
