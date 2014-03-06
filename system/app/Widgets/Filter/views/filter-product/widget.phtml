@@ -1,3 +1,4 @@
+<?php if (!empty($this->tags) || !empty($this->brands) || !empty($this->filters) || !empty($this->priceRange)) : ?>
 <form class="plugin-filtering-widget filtering-form">
     <ul>
     <?php if (!empty($this->tags)) : ?>
@@ -102,4 +103,5 @@
         });
     });
 </script>
+<?php endif; ?>
 <?php endif; ?>

@@ -5,8 +5,21 @@
     <?php if (!empty($this->tags)) : ?>
         <li>
             <label class="filter-label">
-                <input type="hidden" name="show[tags]" value="none"/>
-                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
+                <input type="hidden" name="show[tags]" value="none" />
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                    <?php
+                    $tagsChecked = array_reduce($this->tags, function($count, $tag) {
+                        if ($tag['checked']) {
+                            $count++;
+                        }
+                        return $count;
+                    });
+                    if ($tagsChecked == sizeof($this->tags)) {
+                        echo "checked";
+                    }
+                    unset($tagsChecked);
+                    ?>
+                    />
                 <?php echo $this->translate('Category');?>
             </label>
             <ul>
@@ -29,7 +42,20 @@
         <li>
             <label class="filter-label">
                 <input type="hidden" name="show[brands]" value="none"/>
-                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                    <?php
+                    $brandsChecked = array_reduce($this->brands, function($count, $brand) {
+                        if ($brand['checked']) {
+                            $count++;
+                        }
+                        return $count;
+                    });
+                    if ($brandsChecked == sizeof($this->brands)) {
+                        echo "checked";
+                    }
+                    unset($brandsChecked);
+                    ?>
+                    />
                 <?php echo $this->translate('Brands');?>
             </label>
             <ul>
@@ -48,30 +74,17 @@
             </ul>
         </li>
     <?php endif; ?>
-    <?php if ($this->priceRange) :?>
-        <?php
-        $priceRange = array(
-            'min' => (empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']),
-            'max' => (empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to'])
-        );
-        ?>
-        <li class="filter-price">
-            <label class="filter-label">
-                <input type="checkbox" name="show[price]"
-                       value="all"
-                        <?php if (!empty($this->settings['price'])): ?>
-                       checked
-                        <?php endif; ?>
-                    />
-                <?php echo $this->translate('Price'); ?>
-            </label>
-            <label><?php echo $this->translate('From'); ?></label>
-            <input type="text" class="price-field price-min" value="<?php echo $priceRange['min'] ?>"/>
-            <label><?php echo $this->translate('To'); ?></label>
-            <input type="text" class="price-field price-max" value="<?php echo $priceRange['max']; ?>"/>
-            <input type="hidden" name="price" value="<?php echo implode('-', $priceRange); ?>"/>
-        </li>
-    <?php endif; ?>
+    <li class="filter-price">
+        <label class="filter-label">
+            <input type="checkbox" name="show[price]"
+                   value="all"
+                    <?php if (!empty($this->settings['price'])): ?>
+                   checked
+                    <?php endif; ?>
+                />
+            <?php echo $this->translate('Price'); ?>
+        </label>
+    </li>
     <?php foreach ($this->filters as $filterId => $filter) : ?>
         <li data-attributeId="<?php echo $filterId; ?>">
             <label class="filter-label">

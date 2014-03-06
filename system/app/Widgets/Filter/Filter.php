@@ -104,6 +104,12 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $filterId = substr(md5($filterId), 0, 16);
         $this->_view->filterId = $filterId;
 
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && $request->isPost()) {
+            $data = $request->getParam('show', array());
+
+            Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
+        }
+
         $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
         $this->_widgetSettings = $widgetSettings;
 
@@ -119,13 +125,6 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         // if this user allowed to manage content
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && !$request->has('filter_preview')) {
             // render editable filter widget
-            if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
-                if ($request->isPost()) {
-                    $data = $request->getParam('show', array());
-
-                    Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
-                }
-            }
             return $this->_renderWidgetEdit();
         }
 
@@ -251,8 +250,6 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             },
             $this->_filters
         );
-
-        $this->_view->priceRange = $this->_priceRange;
 
         return $this->_view->render('filter-product/editor.phtml');
     }
