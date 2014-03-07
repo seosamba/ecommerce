@@ -82,7 +82,8 @@ define(['backbone',
             this.orders.info()['i18n'] = i18n;
             this.$('td.paginator').html(this.templates.paginator(this.orders.information));
         },
-        applyFilter: function(){
+        applyFilter: function() {
+            this.orders.currentPage = 0;
             this.orders.pager();
         },
         resetFilter: function(e){
