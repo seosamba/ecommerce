@@ -94,14 +94,10 @@ class Api_Filtering_Eav extends Api_Service_Abstract
         if (empty($tags)) {
             return false;
         }
-        $dbTable = new Zend_Db_Table('shopping_filtering_tags_has_attributes');
+        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+        $sql = "INSERT IGNORE INTO shopping_filtering_tags_has_attributes (attribute_id, tag_id) VALUES (:attribute_id, :tag_id)";
         foreach ($tags as $tagId) {
-            $dbTable->insert(
-                array(
-                    'attribute_id' => $eavContainer['attribute_id'],
-                    'tag_id'       => $tagId
-                )
-            );
+            $dbAdapter->query($sql, array('attribute_id' => $eavContainer['attribute_id'], 'tag_id' => $tagId));
         }
         return true;
     }

@@ -88,6 +88,7 @@
     <?php foreach ($this->filters as $filterId => $filter) : ?>
         <li data-attributeId="<?php echo $filterId; ?>">
             <label class="filter-label">
+                <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>]" value="0" />
                 <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
                 <?php echo $filter['label']; ?>
             </label>

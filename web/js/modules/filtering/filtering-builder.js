@@ -86,8 +86,14 @@ if (_.isUndefined(TFilter)) {
                         }
                     );
                 } else {
-                    self.renderAttribute(_.extend({tags: tags}, attrExists.toJSON()));
-                    $el.val('').blur();
+                    var $input = this.$el.find('.product-filters-list input[name=' + attrExists.get('name') + ']');
+                    if ($input.size()) {
+                        $el.val('').blur();
+                        $input.focus();
+                    } else {
+                        self.renderAttribute(_.extend({tags: tags}, attrExists.toJSON()));
+                        $el.val('').blur();
+                    }
                 }
             }
         },

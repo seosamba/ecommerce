@@ -66,6 +66,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             ->appendFile(
                 $this->_websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-builder' . (APPLICATION_ENV === 'production' ? '.min' : '') . '.js'
             );
+        $layout->headLink()->appendStylesheet($this->_websiteUrl . 'system/css/seotoaster-ui.css');
 
         $mapper = Filtering_Mappers_Eav::getInstance();
 
@@ -134,15 +135,20 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         // mark disabled filters
         $this->_view->filters = array_filter(array_map(
             function ($filter) use ($appliedFilters, $widgetSettings) {
+                if (empty($filter['value'])) {
+                    return null;
+                }
+
                 // opt out if not exists in widget settings
-                if (!array_key_exists($filter['attribute_id'], $widgetSettings)
-                    || empty($widgetSettings[$filter['attribute_id']])
-                    || empty($filter['value'])) {
+                if (array_key_exists($filter['attribute_id'], $widgetSettings)
+                    && empty($widgetSettings[$filter['attribute_id']])) {
                     return null;
                 }
 
                 $values = array_unique($filter['value'], SORT_STRING);
-                $values = array_intersect($values, $widgetSettings[$filter['attribute_id']]);
+                if (!empty($widgetSettings[$filter['attribute_id']])) {
+                    $values = array_intersect($values, $widgetSettings[$filter['attribute_id']]);
+                }
                 $filter['value'] = $values;
 
                 if (isset($appliedFilters[$filter['name']])) {
@@ -234,7 +240,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             function ($filter) use ($widgetSettings) {
                 // opt out if isset in widget settings
                 if (array_key_exists($filter['attribute_id'], $widgetSettings)
-                    && $widgetSettings[$filter['attribute_id']] === '1') {
+                    && $widgetSettings[$filter['attribute_id']] === '0') {
                     $filter['disabled'] = true;
                 }
                 if (!empty($filter['value'])) {
