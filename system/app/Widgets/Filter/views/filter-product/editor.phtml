@@ -5,7 +5,6 @@
     <?php if (!empty($this->tags)) : ?>
         <li>
             <label class="filter-label">
-                <input type="hidden" name="show[tags]" value="none" />
                 <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
                     <?php
                     $tagsChecked = array_reduce($this->tags, function($count, $tag) {
@@ -41,7 +40,6 @@
     <?php if (!empty($this->brands)) : ?>
         <li>
             <label class="filter-label">
-                <input type="hidden" name="show[brands]" value="none"/>
                 <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
                     <?php
                     $brandsChecked = array_reduce($this->brands, function($count, $brand) {
@@ -78,7 +76,7 @@
         <label class="filter-label">
             <input type="checkbox" name="show[price]"
                    value="all"
-                    <?php if (!empty($this->settings['price'])): ?>
+                    <?php if (!isset($this->settings['price']) || !empty($this->settings['price'])): ?>
                    checked
                     <?php endif; ?>
                 />
@@ -89,41 +87,32 @@
         <li data-attributeId="<?php echo $filterId; ?>">
             <label class="filter-label">
                 <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>]" value="0" />
-                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>" />
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                <?php
+                if ($filter['show'] === true ||
+                    (is_array($filter['show']) && sizeof($filter['value']) === sizeof($filter['show']))) {
+                    echo 'checked';
+                }
+                ?>
+                    />
                 <?php echo $filter['label']; ?>
             </label>
             <ul>
-                <?php $values = array_unique($filter['value']); ?>
+                <?php $values = $filter['value']; ?>
                 <?php foreach ($values as $value) : ?>
                     <li>
                         <label>
+                            <input type="checkbox" name="show[<?php echo $filter['attribute_id']; ?>][]"
+                                   value="<?php echo $value; ?>"
+                                   title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                   <?php if ($filter['show'] === true || (
+                                           is_array($filter['show']) && in_array($value, $filter['show'])
+                                       )) {
+                                       echo 'checked';
+                                   }
+                                   ?>
+                                />
                             <?php
-                            $checked = false;
-                            $disabled = false;
-                            if (isset($this->settings[$filterId])) {
-                                if ($this->settings[$filterId] === '1') {
-                                    $checked = $value;
-                                    $disabled = true;
-                                } elseif (is_array($this->settings[$filterId]) && in_array(
-                                        $value,
-                                        $this->settings[$filterId]
-                                    )
-                                ) {
-                                    $checked = $value;
-                                }
-                            }
-                            echo $this->formCheckbox(
-                                'show[' . $filter['attribute_id'] . '][]',
-                                $checked,
-                                array(
-                                    'title'   => $this->translate('Check to hide from users'),
-                                    'disable' => $disabled
-                                ),
-                                array(
-                                    'checked'   => $value,
-                                    'unChecked' => false
-                                )
-                            );
                             echo $value;
                             ?></label>
                     </li>

@@ -37,22 +37,33 @@
             </ul>
         </li>
     <?php endif; ?>
-    <?php if ($this->priceRange) :?>
-        <?php
-        $priceRange = array(
-            'min' => (empty($this->priceRange['from']) ? $this->priceRange['min'] : $this->priceRange['from']),
-            'max' => (empty($this->priceRange['to']) ? $this->priceRange['max'] : $this->priceRange['to'])
-        );
-        ?>
+    <?php if ($this->priceRange) : ?>
         <li class="filter-price">
+        <?php if ($this->priceRange === 'slider') : ?>
+            <div class="price-slider" data="<?php echo json_encode($this->priceRange); ?>"></div>
+        <?php else : ?>
             <label class="filter-label">
                 <?php echo $this->translate('Price'); ?>
             </label>
             <label><?php echo $this->translate('From'); ?></label>
-            <input type="text" class="price-field price-min" value="<?php echo $priceRange['min'] ?>"/>
+            <input type="text" class="price-field price-min"
+                   placeholder="<?php echo $this->priceRange['min'] ?>"
+                   value="<?php if (!empty($this->priceRange['from'])) echo $this->priceRange['from']; ?>"
+                />
             <label><?php echo $this->translate('To'); ?></label>
-            <input type="text" class="price-field price-max" value="<?php echo $priceRange['max']; ?>"/>
-            <input type="hidden" name="price" value="<?php echo implode('-', $priceRange); ?>"/>
+            <input type="text" class="price-field price-max"
+                   placeholder="<?php echo $this->priceRange['max']; ?>"
+                   value="<?php if (!empty($this->priceRange['to'])) echo $this->priceRange['to']; ?>"
+                />
+        <?php endif; ?>
+            <?php
+            if (!empty($this->priceRange['from']) && !empty($this->priceRange['to'])) {
+                $priceFilter = $this->priceRange['from'].'-'.$this->priceRange['to'];
+            } else {
+                $priceFilter = '';
+            }
+            ?>
+            <input type="hidden" name="price" value="<?php echo $priceFilter; ?>"/>
         </li>
     <?php endif; ?>
     <?php foreach ($this->filters as $filter) : ?>
@@ -80,27 +91,26 @@
 </form>
 <?php if ($this->priceRange) :?>
 <script>
-    $(function(){
-//        $('div.slider').each(function () {
-//            var self = this,
-//                min = Math.floor(parseFloat($(this).data('min'))),
-//                max = Math.ceil(parseFloat($(this).data('max'))),
-//                from = $(this).find('span.')
-//            $(this).slider({
-//                range: true,
-//                min: min,
-//                max: max,
-//                values: [ min, max ],
-//                slide: function( event, ui ) {
-//                    $(self).find('input[name=price]').val( ui.values[0] + " - " + ui.values[1] );
-//                }
-//            });
-//
-//
-//        });
+    $(function () {
+        <?php if ($this->priceRange === 'slider') :?>
+        $('div.price-slider').each(function () {
+            var self = this,
+                data = $(self).data();
+            $(this).slider({
+                range: true,
+                min: data.min,
+                max: data.max,
+                values: [ data.from, data.to ],
+                slide: function( event, ui ) {
+                    $(self).find('input[name=price]').val( ui.values[0] + '-' + ui.values[1] );
+                }
+            });
+        });
+        <?php else : ?>
         $(".price-field").on('change', function(){
            $('input[name=price]').val(''+parseFloat($(".price-min").val())+'-'+ parseFloat($(".price-max").val()));
         });
+        <?php endif; ?>
     });
 </script>
 <?php endif; ?>

@@ -368,7 +368,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
-            $priceAnd = '';
             if (!empty($urlFilter['price'])) {
                 list($priceMin, $priceMax) = explode('-', reset($urlFilter['price']));
                 $this->_priceFilter = array('min' => $priceMin, 'max' => $priceMax);
@@ -384,7 +383,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
                 $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
             }
-            $idsWhere = (!empty($idsWhere) ? ' AND ' : '' ) . $priceAnd;
         } elseif (preg_match('~^[0-9,]+$~', $this->_options[0])) {
             //if no filters passed in the product list we will check if it is a PL of product ids
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
