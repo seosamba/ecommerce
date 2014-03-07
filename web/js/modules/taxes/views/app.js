@@ -28,6 +28,7 @@ define([
                 var view = new RuleView({model: rule});
                 $('#rules').append(view.render().el);
             });
+            checkboxRadio();
         },
         save: function() {
             showSpinner();
