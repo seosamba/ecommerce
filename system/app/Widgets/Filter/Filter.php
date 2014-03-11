@@ -8,6 +8,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 {
     const CACHE_KEY_SETTINGS = 'settings';
 
+    const OPTION_PRICE_SLIDER = 'price-slider';
+
     private $_allowedOptions = array(
         'builder', 'product'
     );
@@ -185,6 +187,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             unset($appliedFilters['price'], $price);
         }
         if (!isset($widgetSettings['price']) || !empty($widgetSettings['price'])) {
+            $this->_view->priceSlider = in_array(self::OPTION_PRICE_SLIDER, $this->_options);
             $this->_view->priceRange = $this->_priceRange;
         }
 
