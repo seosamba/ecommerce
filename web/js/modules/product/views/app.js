@@ -516,7 +516,7 @@ define([
         validateProduct: function(){
             var error   = false;
 
-            if (!this.model.has('pageTemplate') || this.$('#product-pageTemplate').val() === '-1'){
+            if (this.$('#product-pageTemplate').val() === '-1'){
                 this.$('#product-pageTemplate').addClass('error');
                 error = true || error;
             } else {
