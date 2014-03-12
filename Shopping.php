@@ -586,7 +586,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $customerAttributes[$key] = preg_replace('`customer_`', '', $attrName);
             }
             $this->_view->customerAttributes = $customerAttributes;
-            $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN ? true : false;
+            $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
 			return $this->_view->render('clients.phtml');
 		}
 	}
