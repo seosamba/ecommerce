@@ -20,10 +20,10 @@ class Api_Store_Customer extends Api_Service_Abstract
             'allow' => array('get', 'post', 'put', 'delete')
         ),
         Tools_Security_Acl::ROLE_ADMIN => array(
-            'allow' => array('get', 'post', 'put', 'delete')
+            'allow' => array('get', 'post', 'put')
         ),
         Tools_Security_Acl::ROLE_MEMBER => array(
-            'allow' => array('get', 'put', 'delete')
+            'allow' => array('get', 'put')
         ),
         Tools_Security_Acl::ROLE_USER => array(
             'allow' => array('get', 'put')
