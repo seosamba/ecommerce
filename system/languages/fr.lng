@@ -599,7 +599,7 @@
         'select folder'=>'sélectionnez le dossier',
         'Owner' =>'Créateur',
         'Not set' =>'Aucun',
-        'For orders over'=>'pour les commandes de plus de',
+        'For orders over'=>'A partir de',
         'search quote by title, by creator, by client email & name' => 'rechercher devis par titre, par le créateur, par nom or email du client'
 
 );?>
