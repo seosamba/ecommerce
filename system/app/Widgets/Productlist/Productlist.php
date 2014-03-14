@@ -253,6 +253,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
             $renderedContent[] = Tools_Misc::preparingProductListing($templatePrepend.$data['templateContent'], $product, $dictionary, $data['noZeroPrice']);
 		});
+        if (!empty($this->_priceFilter)) {
+            $this->_view->totalCount = sizeof($renderedContent);
+        }
 		$this->_cacheTags = array_merge($this->_cacheTags, $cacheTags);
 		return implode('', $renderedContent);
 	}
