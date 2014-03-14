@@ -44,6 +44,7 @@ define([
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
+                checkboxRadio();
                 $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
