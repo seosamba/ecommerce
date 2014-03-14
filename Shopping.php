@@ -209,6 +209,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS_MENU);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
+        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
 		Zend_Registry::set('acl', $acl);
 	}
 
@@ -585,6 +586,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $customerAttributes[$key] = preg_replace('`customer_`', '', $attrName);
             }
             $this->_view->customerAttributes = $customerAttributes;
+            $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
 			return $this->_view->render('clients.phtml');
 		}
 	}

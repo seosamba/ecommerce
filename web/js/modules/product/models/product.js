@@ -24,7 +24,7 @@ define([
             }
         },
 		initialize: function (){
-            this.on('error', function(model, error) { showMessage(error, true); });
+            //this.on('error', function(model, error) { showMessage(error, true); });
         },
 		validate: function(attrs) {
 

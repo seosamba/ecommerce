@@ -44,6 +44,7 @@ define([
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
+                checkboxRadio();
                 $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
@@ -458,16 +459,16 @@ define([
 			    this.model.set({defaultOptions: this.model.get('options').toJSON()});
             }
 
-			if (!this.model.has('pageTemplate')){
-				var templateId = this.$('#product-pageTemplate').val();
-				if (templateId !== '-1') {
-                    this.model.set({pageTemplate: templateId});
-                } else {
-                    showMessage(_.isUndefined(i18n['Please, select product page template before saving'])?'Please, select product page template before saving':i18n['Please, select product page template before saving'], true);
-                    this.$('#product-pageTemplate').focus();
-                    return false;
-                }
-			}
+//			if (!this.model.has('pageTemplate')){
+//				var templateId = this.$('#product-pageTemplate').val();
+//				if (templateId !== '-1') {
+//                    this.model.set({pageTemplate: templateId});
+//                } else {
+//                    showMessage(_.isUndefined(i18n['Please, select product page template before saving'])?'Please, select product page template before saving':i18n['Please, select product page template before saving'], true);
+//                    this.$('#product-pageTemplate').focus();
+//                    return false;
+//                }
+//			}
 
             var newBrandName = $('#new-brand').val();
             if (newBrandName){
@@ -516,8 +517,17 @@ define([
         validateProduct: function(){
             var error   = false;
 
+            if (this.$('#product-pageTemplate').val() === '-1'){
+                this.$('#product-pageTemplate').addClass('error');
+                error = true || error;
+            } else {
+                var templateId = this.$('#product-pageTemplate').val();
+                this.model.set({pageTemplate: templateId});
+                this.$('#product-pageTemplate').removeClass('error');
+            }
+
             if (!this.model.has('name') || $.trim(this.model.get('name')) === ''){
-                this.$('#product-name').attr('error');
+                this.$('#product-name').addClass('error');
                 error = true || error;
             } else {
                 this.$('#product-name').removeClass('error');
@@ -545,10 +555,10 @@ define([
             }
 
             if (!this.model.has('photo')) {
-                this.$('#product-image-holder').addClass('error');
+                this.$('.product-preview').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-image-holder').removeClass('error');
+                this.$('.product-preview').removeClass('error');
             }
 
             if (!this.model.has('shortDescription') || $.trim(this.model.get('shortDescription')) === ''){
