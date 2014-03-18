@@ -1,7 +1,7 @@
 <?php $this->headTitle($this->translate('Manage customers')); ?>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
-    <td class="check-td align-middle"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
+    <td class="check-td"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
     <td class="email"><a href="mailto:${email}">${email}</a></td>
     <td class="group">
@@ -21,8 +21,8 @@
             <td><input type="text" class="customer-attribute" data-uid="${id}" data-attribute="customer_<?php echo $attrName?>" value="${<?php echo $attrName?>}" /></td>
         <?php endforeach; ?>
     <?php endif; ?>
-    <td class="date">${reg_date}</td>
-    <td class="total"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
+    <td class="date text-center">${reg_date}</td>
+    <td class="total text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
 
 <script id="customerDetailsTemplate" type="text/x-jquery-tmpl">
@@ -58,7 +58,7 @@
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
         </form>
     </div>
-    <table id="clients-table" class="widget">
+    <table id="clients-table" class="widget table-hover">
         <thead>
             <tr class="title-table ws-nowrap">
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
@@ -74,20 +74,20 @@
                         </th>
                     <?php endforeach; ?>
                 <?php endif; ?>
-	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
-	            <th class="sortable" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
+	            <th class="sortable text-center" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
+	            <th class="sortable text-center" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
             </tr>
         </thead>
         <tbody id="customer-list">
             <tr>
-	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="text-center">
+	            <td colspan="<?php echo 6 + count($this->customerAttributes); ?>" class="text-center">
                     <img src="<?php echo $this->websiteUrl;?>plugins/quote/web/images/spinner.gif" border="0" alt="loading..." />
                 </td>
             </tr>
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="ui-resizable text-left">
+	            <td colspan="2">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
                     <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>
@@ -102,7 +102,7 @@
 		            </select>
 	            </td>
 
-	            <td class="text-right">
+	            <td colspan="<?php echo 4 + count($this->customerAttributes); ?>" class="text-right">
 		            <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
 		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
 	            </td>

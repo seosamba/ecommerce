@@ -21,13 +21,13 @@
 
 
 	<!-- Filtering -->
-	<div id="filters" class="grid_5 alpha omega">
+	<div id="filters" class="grid_4 alpha omega">
 		<select id="tags" class="pselect chzn-select" name="product-tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
-        <label class="tooltip" title="<?php echo $this->translate('AND conditional');?>">
-            <input type="checkbox" id="strict-tags">
-        </label>
 	</div>
-    <div class="grid_4">
+    <label id="conditional" class="tooltip grid_1 alpha" title="<?php echo $this->translate('AND conditional');?>">
+        <input type="checkbox" id="strict-tags">
+    </label>
+    <div class="grid_4 alpha">
 		<select class="pselect" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
 	</div>
 
