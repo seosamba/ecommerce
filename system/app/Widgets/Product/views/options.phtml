@@ -32,30 +32,32 @@ unset($cur, $format);
 <?php foreach ($this->product->getDefaultOptions() as $option): ?>
     <?php $uniqName = 'product-'.$this->product->getId().'-option-'.$option['id']; ?>
     <?php
-    if (($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) && !empty($option['selection'])){
+    if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) {
         $options = array();
         $defaultId = null;
 	    $template = $option['type'] === Models_Model_Option::TYPE_RADIO ? ' <span>(%s%s)</span>' : ' (%s%s)';
-        foreach ($option['selection'] as $item) {
-            $options[$item['id']] = Models_Model_Option::TYPE_RADIO ? $this->escape($item['title']) : $item['title'];
-            if (floatval($item['priceValue']) != 0){
-	            if ($item['priceType'] === 'unit'){
-		            $price = floatval($item['priceValue']);
-		            if ($this->taxRate && (bool)$showWithTax){
-			            $price = $price + round(( $this->taxRate * $price) / 100, 2);
-		            }
-		            $item['priceValue'] = $this->currency($price);
-		            $pricesData['original'][$item['id']] = $item['priceSign'] . $price;
-                    $pricesData['current'][$item['id']] = $item['priceSign'] . $price;
-		            unset($price);
-	            } else {
-		            $pricesData['original'][$item['id']] = $item['priceSign'] . round($originalPrice / 100 * $item['priceValue'], 2);
-		            $pricesData['current'][$item['id']] = $item['priceSign'] . round($currentPrice / 100 * $item['priceValue'], 2);
-		            $item['priceValue'] = number_format($item['priceValue'], 2).'%';
-	            }
-                $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
+        if (!empty($option['selection'])) {
+            foreach ($option['selection'] as $item) {
+                $options[$item['id']] = Models_Model_Option::TYPE_RADIO ? $this->escape($item['title']) : $item['title'];
+                if (floatval($item['priceValue']) != 0){
+                    if ($item['priceType'] === 'unit'){
+                        $price = floatval($item['priceValue']);
+                        if ($this->taxRate && (bool)$showWithTax){
+                            $price = $price + round(( $this->taxRate * $price) / 100, 2);
+                        }
+                        $item['priceValue'] = $this->currency($price);
+                        $pricesData['original'][$item['id']] = $item['priceSign'] . $price;
+                        $pricesData['current'][$item['id']] = $item['priceSign'] . $price;
+                        unset($price);
+                    } else {
+                        $pricesData['original'][$item['id']] = $item['priceSign'] . round($originalPrice / 100 * $item['priceValue'], 2);
+                        $pricesData['current'][$item['id']] = $item['priceSign'] . round($currentPrice / 100 * $item['priceValue'], 2);
+                        $item['priceValue'] = number_format($item['priceValue'], 2).'%';
+                    }
+                    $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
+                }
+                if ($item['isDefault']) $defaultId = $item['id'];
             }
-            if ($item['isDefault']) $defaultId = $item['id'];
         }
     }
     ?>
