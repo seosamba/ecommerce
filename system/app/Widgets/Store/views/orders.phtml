@@ -97,7 +97,8 @@ echo $this->noLayout ? $this->headLink() : '';
 	<table id="orders-table" class="ui-helper-reset widget">
 		<thead>
 			<tr class="title-table">
-				<th>#</th>
+                <th><input type="checkbox" name="checkAllOrders" id="orders-check-all" value="1" title="Check/Uncheck All"></th>
+                <th>#</th>
 				<th class="sortable" data-sortkey="name"><?php echo $this->translate('Customer name');?></th>
 				<th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
 				<th class="sortable sortDown" data-sortkey="date"><?php echo $this->translate('Purchased on');?></th>
@@ -114,18 +115,25 @@ echo $this->noLayout ? $this->headLink() : '';
 		</thead>
 		<tbody id="orders-list">
             <?php if(isset($this->invoicePlugin)):?>	
-                <td colspan="11" style="text-align:center;">
+                <td colspan="8" style="text-align:center;">
             <?php else:?>
-                <td colspan="10" style="text-align:center;">
+                <td colspan="7" style="text-align:center;">
             <?php endif;?>  
 				<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading...">
 			</td>
 		</tbody>
 		<tfoot>
+        <td colspan="4">
+            <?php echo $this->translate('with selected do');?>
+            <select name="order-mass-action" id="mass-action">
+                <option value="0"><?php echo $this->translate('nothing');?></option>
+                <option value="exportOrders"><?php echo $this->translate('Export orders');?></option>
+            </select>
+        </td>
             <?php if(isset($this->invoicePlugin)):?>
-                <td colspan="11" class="paginator"></td>
+                <td colspan="8" class="paginator"></td>
             <?php else:?>
-                <td colspan="10" class="paginator"></td>
+                <td colspan="7" class="paginator"></td>
             <?php endif;?>
 		</tfoot>
 	</table>
