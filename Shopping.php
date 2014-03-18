@@ -87,6 +87,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
 
+    const SHIPPING_SUCCESS_MESSAGE = 'checkoutShippingSuccessMessage';
+
     const SHIPPING_TAX_RATE     = 'shippingTaxRate';
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';

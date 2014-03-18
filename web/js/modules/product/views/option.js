@@ -58,7 +58,7 @@ define([
 				data.isDefault = '1';
 			}
 			this.model.get('selection').add(data);
-            checkboxRadio();
+            checkboxRadioStyle();
 		},
 		renderSelection: function(selection){
 			if (!selection.has('_deleted')){

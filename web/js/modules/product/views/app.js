@@ -44,6 +44,7 @@ define([
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
+                checkboxRadioStyle();
                 $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
@@ -679,7 +680,7 @@ define([
         renderOption: function(option){
             var optWidget = new ProductOptionView({model: option});
             optWidget.render().$el.appendTo('#options-holder');
-            checkboxRadio();
+            checkboxRadioStyle();
         },
         renderOptions: function(){
             $('#options-holder').empty();
