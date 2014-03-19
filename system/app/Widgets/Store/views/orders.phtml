@@ -27,7 +27,7 @@ $this->headLink()
                 <input type="text" class="filter grid_6 alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
                 <input type="text" class="filter grid_6 omega" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
 			</div>
-			<div id="extra-filters-switch" class="fl-right pt15px"><a href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
+			<div id="extra-filters-switch" class="fl-right mr-grid pt15px"><a href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
             <div id="extra-filters" class="grid_12 hidden">
                 <hr>
 				<div class="grid_4 alpha">
@@ -92,9 +92,9 @@ $this->headLink()
 				<th class="sortable" data-sortkey="total"><?php echo $this->translate('Total price');?></th>
 				<th class="sortable" data-sortkey="shipping_price"><?php echo $this->translate('Shipping price');?></th>
 				<th style="min-width: 110px;"><?php echo $this->translate('Shipping via');?></th>
-				<th><?php echo $this->translate('Details');?></th>
+				<th class="text-center"><?php echo $this->translate('Details');?></th>
                 <?php if(isset($this->invoicePlugin)):?>
-                    <th><?php echo $this->translate('Invoice & packing slip');?></th>
+                    <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
 			</tr>
 		</thead>
@@ -104,7 +104,7 @@ $this->headLink()
             <?php else:?>
                 <td colspan="10" style="text-align:center;">
             <?php endif;?>
-                <img src="<?php echo $this->websiteUrl;?>plugins/quote/web/images/spinner.gif" border="0" alt="loading..." />
+                <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
 			</td>
 		</tbody>
 		<tfoot class="text-right">
