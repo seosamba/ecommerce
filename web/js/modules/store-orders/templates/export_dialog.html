@@ -3,8 +3,8 @@
     <% console.log(exportConfig) %>
     <form id="export-orders-form" action="<%= $('#website_url').val()+'plugin/shopping/run/exportOrders/orderIds/'+ordersIds %>" method="post">
         <% _.each(defaultConfig, function(exportConf, name){%>
-            <p class="grid_4">
-                <label><%= exportConf.label_name %>
+            <p class="grid_4 order-field-row" style="margin-top: 10px;">
+                <label class="pointer"><%= exportConf.label_name %>
                     <input type="checkbox" value="1" name="<%= name %>-checked"
                         <% if(_.isNull(exportConfig)) {%>
                                 checked="checked"
@@ -24,9 +24,9 @@
                 <% } %>
             </p>
         <%})%>
-
-        <label><%= _.isUndefined(i18n['Export all orders']) ? 'Export all orders':i18n['Export all orders'] %>
+        <p class="grid_12"><label class="fl-left mt10px pointer"><%= _.isUndefined(i18n['Export all orders']) ? 'Export all orders':i18n['Export all orders'] %>
         <input type="checkbox" name="allOrders" value="1"/></label>
-        <button type="submit"><%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %></button>
+        <button class="mt0px cl-none" type="submit"><%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %></button></p>
     </form>
 </div>
+

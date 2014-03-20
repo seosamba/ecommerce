@@ -108,7 +108,7 @@ $this->headLink()
                 <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
 			</td>
 		</tbody>
-        <tfoot class="text-right">
+        <tfoot>
         <td colspan="4">
             <?php echo $this->translate('with selected do');?>
             <select name="order-mass-action" id="mass-action">
@@ -117,9 +117,9 @@ $this->headLink()
             </select>
         </td>
         <?php if(isset($this->invoicePlugin)):?>
-                <td colspan="8" class="paginator"></td>
+                <td colspan="8" class="paginator text-right"></td>
             <?php else:?>
-                <td colspan="7" class="paginator"></td>
+                <td colspan="7" class="paginator text-right"></td>
             <?php endif;?>
 		</tfoot>
 	</table>

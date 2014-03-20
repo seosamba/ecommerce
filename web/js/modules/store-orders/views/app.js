@@ -109,7 +109,8 @@ define(['backbone',
                     $(dialog).dialog({
                         dialogClass: 'seotoaster',
                         width: 800,
-                        height: 500
+                        height: 500,
+                        resizable: false
                     });
                     return false;
                 });
