@@ -99,20 +99,24 @@ class Tools_Tax_Tax {
 	 *
 	 * @return int
 	 */
-	public static function getZone($address = null) {
+	public static function getZone($address = null, $withTaxable = true) {
 		if (is_null($address) || empty($address)){
 			return 0;
 		} else {
 			$address = Tools_Misc::clenupAddress($address);
 		}
         $zones = array();
-        $taxableZones = Models_Mapper_Tax::getInstance()->fetchAll();
         $zoneMapper = Models_Mapper_Zone::getInstance();
-        if(is_array($taxableZones) && !empty($taxableZones)) {
-            foreach($taxableZones as $taxZone){
-                $zoneIds[] =  $taxZone->getZoneId();
+        if($withTaxable){
+            $taxableZones = Models_Mapper_Tax::getInstance()->fetchAll();
+            if(is_array($taxableZones) && !empty($taxableZones)) {
+                foreach($taxableZones as $taxZone){
+                    $zoneIds[] =  $taxZone->getZoneId();
+                }
+                $zones =  $zoneMapper->fetchAll($zoneMapper->getDbTable()->getAdapter()->quoteInto('id IN(?)', $zoneIds));
             }
-            $zones =  $zoneMapper->fetchAll($zoneMapper->getDbTable()->getAdapter()->quoteInto('id IN(?)', $zoneIds));
+        }else{
+            $zones = $zoneMapper->fetchAll();
         }
 
 		if(is_array($zones) && !empty($zones)) {

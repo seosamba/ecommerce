@@ -133,11 +133,15 @@ define(['backbone',
             this.orders.info()['i18n'] = i18n;
             this.$('td.paginator').html(this.templates.paginator(this.orders.information));
         },
-        applyFilter: function() {
+        applyFilter: function(e) {
+            if(typeof e !== 'undefined'){
+                e.preventDefault();
+            }
             this.orders.currentPage = 0;
             this.orders.pager();
         },
         resetFilter: function(e){
+            e.preventDefault();
             var $form = $(e.currentTarget).closest('form');
             $form.find('input:text').val('').end()
                  .find('select.filter').val('0').trigger('liszt:updated');
