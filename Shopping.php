@@ -1064,9 +1064,105 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    public function ordersImportConfigAction() {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $this->_view->translator = $this->_translator;
+            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
+            $this->_layout->content = $this->_view->render('orders-import.phtml');
+            echo $this->_layout->render();
+        }
+    }
+
     public function importOrdersAction() {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $uploader = new Zend_File_Transfer_Adapter_Http();
+            $ordersCsv = $uploader->getFileInfo();
+            if(!$uploader->isValid()){
+               $this->_responseHelper->fail('');
+            }
+            $ordersData = $this->_createOrdersCsv($ordersCsv);
+            if($ordersData['error'] !== 1){
+                $ordersImportData = $ordersData['data'];
+                $ordersHeaders = $ordersData['headers'];
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $userModel  = new Application_Model_Models_User();
+                $cartSessionModel = new Models_Model_CartSession();
+                foreach($ordersImportData as $orderData) {
+                    $userEmail = $orderData[$ordersHeaders['user_email']];
+                    if(trim($userEmail) === ''){
+                        continue;
+                    }
+                    $userExist = $userMapper->findByEmail($orderData[$ordersHeaders['user_email']]);
+                    if(!$userExist instanceof Application_Model_Models_User) {
+                        $userModel->setEmail($orderData[$ordersHeaders['user_email']]);
+                        $userModel->setFullName($orderData[$ordersHeaders['user_name']]);
+                        $userModel->setPassword(microtime());
+                        $userModel->setRoleId(Shopping::ROLE_CUSTOMER);
+                        $userId = $userMapper->save($userModel);
+                    }
 
+                    $cartContent = array();
+
+                    //TODO if one of the products not exist should we import this order?
+                    $orderSku = explode(',', $orderData[$ordersHeaders['sku']]);
+                    foreach($orderSku as $sku){
+                        $product = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto("sku=?", $sku));
+                        if(!$product instanceof Models_Model_Product){
+                            continue;
+                        }
+                        $cartContent[]['product_id'] = $product->getId();
+                        $cartContent[]['price'] = $product->getPrice();
+                        $cartContent[]['qty'] = 1;
+                        $cartContent[]['tax'] = 0;
+                        $cartContent[]['tax_price'] = $product->getPrice();
+                    }
+
+                    if(!empty($cartContent)) {
+                        $notes = isset($ordersHeaders['notes']) ? $orderData[$ordersHeaders['notes']] : '';
+                        $cartSessionModel->setShippingPrice(0);
+                        $cartSessionModel->setBillingAddressId('');
+                        $cartSessionModel->setShippingAddressId('');
+                        $cartSessionModel->setStatus($orderData[$ordersHeaders['status']]);
+                        $cartSessionModel->setUserId($userId);
+                        $cartSessionModel->setUpdatedAt($orderData[$ordersHeaders['updated_at']]);
+                        $cartSessionModel->setCreatedAt($orderData[$ordersHeaders['updated_at']]);
+                        $cartSessionModel->setNotes($notes);
+                        $cartSessionModel->setCartContent($cartContent);
+                        $cartSessionModel->setSubTotal($orderData[$ordersHeaders['total']]);
+                        $cartSessionModel->setTotal($orderData[$ordersHeaders['total']]);
+                        $cartSessionModel->setGateway('');
+                        $cartIdModel = $cartSessionMapper->save($cartSessionModel);
+                    }
+                }
+            }
+            $this->_responseHelper->fail($ordersData['errorMessage']);
+        }
+    }
+
+    private function _createOrdersCsv($ordersCsv){
+        $ordersCsvFile = fopen($ordersCsv['file']['tmp_name'], 'r');
+        $minimumRequiredFields = array('user_email', 'sku', 'status', 'updated_at', 'total');
+        if($ordersCsv !== false){
+            while(($data = fgetcsv($ordersCsvFile, ',')) !== false){
+                $parsedCsv[] = $data;
+            }
+            fclose($ordersCsvFile);
+            if(!empty ($parsedCsv)) {
+                $headers = array_shift($parsedCsv);
+                $headers = array_flip(array_map('strtolower',  $headers));
+                $requiredFields = array_diff_key(array_flip($minimumRequiredFields), $headers);
+                if(!empty($requiredFields)) {
+                    return array('error' => 1, 'errorMessage' => $this->_translator->translate('Required fields missed'));
+                }
+                return array('error' => '0', 'data' => $parsedCsv, 'headers' => $headers);
+
+            } else{
+                return array('error' => 1, 'errorMessage' => $this->_translator->translate('Csv is empty'));
+            }
+        } else{
+            return array('error' => 1, 'errorMessage' => $this->_translator->translate('Error during reading csv'));
         }
     }
 
@@ -1100,7 +1196,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                 }
             }
-            $config = array('order_export_config' => serialize($exportFields));
+            $config = array(self::ORDER_EXPORT_CONFIG => serialize($exportFields));
             $shoppingConfigMapper->save($config);
             if (intval($exportAllOrders) === 1) {
                 $dataToExport = Models_Mapper_OrdersMapper::getInstance()->fetchOrdersForExport(
@@ -1166,6 +1262,21 @@ class Shopping extends Tools_Plugins_Abstract {
                 ),
                 'sku' => array('label' => 'sku', 'checked' => 1, 'label_name' => $this->_translator->translate('Sku')),
                 'mpn' => array('label' => 'mpn', 'checked' => 1, 'label_name' => $this->_translator->translate('Mpn')),
+                'product_name' => array('label' => 'product_name', 'checked' => 1, 'label_name' => $this->_translator->translate('Product name')),
+                'product_price' => array('label' => 'product_price', 'checked' => 1, 'label_name' => $this->_translator->translate('Product price')),
+                'product_tax' => array('label' => 'product_tax', 'checked' => 1, 'label_name' => $this->_translator->translate('Product tax')),
+                'product_tax_price' => array('label' => 'product_tax_price', 'checked' => 1, 'label_name' => $this->_translator->translate('Product tax price')),
+                'shipping_type' => array('label' => 'shipping_type', 'checked' => 1, 'label_name' => $this->_translator->translate('Shipping type')),
+                'shipping_service' => array('label' => 'shipping_service', 'checked' => 1, 'label_name' => $this->_translator->translate('Shipping service')),
+                'gateway' => array('label' => 'gateway', 'checked' => 1, 'label_name' => $this->_translator->translate('Gateway')),
+                'shipping_price' => array('label' => 'shipping_price', 'checked' => 1, 'label_name' => $this->_translator->translate('Shipping price')),
+                'discount_tax_rate' => array('label' => 'discount_tax_rate', 'checked' => 1, 'label_name' => $this->_translator->translate('Discount tax rate')),
+                'sub_total' => array('label' => 'sub_total', 'checked' => 1, 'label_name' => $this->_translator->translate('Sub total')),
+                'shipping_tax' => array('label' => 'shipping_tax', 'checked' => 1, 'label_name' => $this->_translator->translate('Shipping tax')),
+                'discount_tax' => array('label' => 'discount_tax', 'checked' => 1, 'label_name' => $this->_translator->translate('Discount tax')),
+                'sub_total_tax' => array('label' => 'sub_total_tax', 'checked' => 1, 'label_name' => $this->_translator->translate('Sub total tax')),
+                'total_tax' => array('label' => 'total_tax', 'checked' => 1, 'label_name' => $this->_translator->translate('Total tax')),
+                'discount' => array('label' => 'discount', 'checked' => 1, 'label_name' => $this->_translator->translate('Discount')),
                 'total' => array(
                     'label' => 'total',
                     'checked' => 1,

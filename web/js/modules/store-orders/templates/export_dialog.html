@@ -8,12 +8,20 @@
                     <input type="checkbox" value="1" name="<%= name %>-checked"
                         <% if(_.isNull(exportConfig)) {%>
                                 checked="checked"
-                        <% } else if(parseInt(exportConfig[name]['checked']) === 1) {%>
+                        <% } else if(typeof exportConfig[name] !== 'undefined' && parseInt(exportConfig[name]['checked']) === 1) {%>
                                 checked="checked"
                         <% } %>
                     />
                 </label>
-                <input type="text" name="<%= name %>" value="<%= _.isNull(exportConfig) ? name :exportConfig[name]['label'] %>"/>
+                <% if(_.isNull(exportConfig)) {%>
+                    <input type="text" name="<%= name %>" value="<%= name %>"/>
+                <% } else {%>
+                    <% if(typeof exportConfig[name] !== 'undefined') {%>
+                        <input type="text" name="<%= name %>" value="<%= exportConfig[name]['label'] %>"/>
+                    <% } else {%>
+                        <input type="text" name="<%= name %>" value="<%= name %>"/>
+                    <% } %>
+                <% } %>
             </p>
         <%})%>
 
