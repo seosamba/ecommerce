@@ -1,7 +1,7 @@
 /*======= Table =======*/
-table#orders-table { border:none; }
-table#orders-table th{ border-top:none; }
-table#orders-table td i{ color:#999; }
+/*table#orders-table { border:none; }*/
+/*table#orders-table th{ border-top:none; }*/
+/*table#orders-table td i{ color:#999; }*/
 table#orders-table td.shipping-data p { margin:0; }
 
 /* Profile header */

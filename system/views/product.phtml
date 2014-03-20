@@ -232,9 +232,9 @@
         </ul>
     </div>
     <div class="nav-links header grid_3 alpha omega">
-        <a class="show-list btn link inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+        <a class="show-list inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
         <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-        <a id="new-product" class="btn link inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+        <a id="new-product" class="inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
     </div>
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
@@ -396,7 +396,7 @@
     </div>
 
     <div class="footer grid_12">
-        <a href="javascript:;" class="delete-selected btn link error mt5px" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
+        <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
 		<button type="submit" name="submit" id="submit" value="Save"/><span class="icon-save"></span> <?php echo $this->translate('Save product'); ?></button>
     </div>
 </div>
