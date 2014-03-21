@@ -13,8 +13,8 @@
     }
 
     &.show-list{
-        height      : 160px;
-        line-height : 160px;
+        height      : 158px;
+        line-height : 158px;
         color       : darken(@gray-light, 10%);
 
         span{
@@ -30,7 +30,7 @@
         background : @gray-light;
 
         .image{
-            margin-bottom : @font-size-base * unit(@font-size-small) * @line-height * 2 + @padding-small-vertical * 2;
+            margin-bottom : round(@font-size-base * unit(@font-size-small) * @line-height * 2 + @padding-small-vertical * 2);
         }
 
         .name{
@@ -81,7 +81,7 @@
     }
 
     .name{
-        height   : @font-size-base * unit(@font-size-small) * @line-height * 2;
+        height   : round(@font-size-base * unit(@font-size-small) * @line-height * 2);
         padding  : @padding-small-vertical;
         overflow : hidden;
     }
