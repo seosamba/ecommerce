@@ -44,7 +44,7 @@ define([
             'click a[data-role=editProduct]': 'productAction',
             'click #toggle-current-tags': function(e){
                 e.preventDefault();
-                checkboxRadio();
+                checkboxRadioStyle();
                 $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
@@ -631,7 +631,7 @@ define([
                         _.each(response, function(related){
                             var view = new ProductListView({model: new ProductModel(related), showDelete: true});
                             view.delegateEvents({
-                                'click .icon-close': function(){
+                                'click .delete': function(){
                                     self.removeRelated(this.model.get('id'));
                                 }
                             })
@@ -680,7 +680,7 @@ define([
         renderOption: function(option){
             var optWidget = new ProductOptionView({model: option});
             optWidget.render().$el.appendTo('#options-holder');
-            checkboxRadio();
+            checkboxRadioStyle();
         },
         renderOptions: function(){
             $('#options-holder').empty();

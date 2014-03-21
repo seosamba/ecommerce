@@ -36,19 +36,22 @@
 <% } %>
     </p>
 </td>
-<td><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a></td>
+<td class="text-center">
+    <a href="javascript:;" class="tpopup" data-pheight="560" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a>
+</td>
 <% if(useInvoice == 'enabled') { %>
-   <td><a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
-           <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
-   </a>/
-   <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/">
-           <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
-   </a>
-       <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/packing/1/">
-           <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>" title="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>"/>
-       </a>/
-       <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
-           <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
-       </a>
-   </td>
+<td class="text-center">
+    <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
+        <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
+    </a>/
+    <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/">
+        <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
+    </a>
+    <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/packing/1/">
+        <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>" title="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>"/>
+    </a>/
+    <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
+        <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
+    </a>
+</td>
 <% } %>

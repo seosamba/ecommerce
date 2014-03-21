@@ -15,7 +15,7 @@ define([
             'click #clients-previous': 'goPreviousPage',
             'click #clients-next': 'goNextPage',
             'click th.sortable': 'sort',
-            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details').toggle()},
+            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details, .search-line').toggle()},
             'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #clients-search': 'searchClient',
@@ -67,7 +67,7 @@ define([
         },
         renderCustomerDetails: function(response, status) {
             if (status === "success") {
-                $('#clients-table').hide();
+                $('#clients-table, .search-line').hide();
                 $('#customer-details').find('#profile').html(response).end().show();
             }
         },
@@ -205,7 +205,8 @@ define([
             });
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
-                buttons: assignGroupsButtons
+                buttons: assignGroupsButtons,
+                resizable : false
             });
             return false;
         },
