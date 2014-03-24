@@ -3,7 +3,7 @@ define([
 	'backbone',
     '../collections/rules',
     '../../zones/collections/zones',
-    './rule',
+    './rule'
 ], function(_, Backbone, RulesCollection, ZonesCollection, RuleView){
 
     var rulesListView = Backbone.View.extend({
@@ -28,11 +28,22 @@ define([
                 var view = new RuleView({model: rule});
                 $('#rules').append(view.render().el);
             });
+            checkboxRadioStyle();
         },
         save: function() {
+            showSpinner();
+            $('[name="zoneId"]').removeClass('error')
             var self = this;
             $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON()}, function(response){
-                self.$el.closest('div.seotoaster').find('div.closebutton span.close').trigger('click');
+                self.$el.closest('.seotoaster').find('.closebutton .close').trigger('click');
+                hideSpinner();
+                showMessage('Saved');
+            }).fail(function() {
+                hideSpinner();
+                $('[name="zoneId"]').filter(function(){
+                    ($(this).val() == -1) ? $(this).addClass('error') : '';
+                });
+                showMessage('Please select zone', true);
             });
         },
         newRule: function(){

@@ -3,7 +3,7 @@ define([
 	'backbone'
 ], function(_, Backbone){
 	var ruleView = Backbone.View.extend({
-        className: 'taxrule grid_12 ui-corner-all',
+        className: 'taxrule clearfix mt10px',
         events: {
             'change input[name=default]': 'setDefault',
             'click .delete-rule': 'remove',

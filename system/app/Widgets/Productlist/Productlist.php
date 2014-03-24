@@ -124,7 +124,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
-		} else if (!intval($this->_options[0])) {
+		} elseif (!intval($this->_options[0])) {
 			return $this->_view->render('productlist.phtml');
 		} else {
 			$this->_view->offset = $this->_options[0];

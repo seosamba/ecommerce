@@ -13,43 +13,52 @@ class Forms_GeneralSettings extends Zend_Form {
 		
 		
 		$this->addElement('text', 'company', array(
-			'label' => 'Store front name'
+			'label' => 'Store front name',
+            'class' => 'grid_6 alpha'
 		));
 		
 		$this->addElement('text', 'email', array(
-			'label' => 'Store front e-mail'
+			'label' => 'Store front e-mail',
+            'class' => 'grid_6 alpha'
 		));
 		
 		$this->addElement('text', 'address1', array(
-			'label' => 'Address 1'
+			'label' => 'Address 1',
+            'class' => 'grid_6 alpha'
 		));
 		
 		$this->addElement('text', 'address2', array(
-			'label' => 'Address 2'
+			'label' => 'Address 2',
+            'class' => 'grid_6 alpha'
 		));
-		
+
 		$this->addElement('select', 'country', array(
-			'label' => 'Country',
+			'label'             => 'Country',
+            'class'             => 'grid_6 alpha',
             'disableTranslator' => 'true',
-			'multiOptions' => Tools_Geo::getCountries(true)
+			'multiOptions'      => Tools_Geo::getCountries(true)
 		));
 		
 		$this->addElement('text', 'city', array(
-			'label' => 'City'
+			'label' => 'City',
+            'class' => 'grid_6 alpha'
 		));
 		
 		$this->addElement('select', 'state', array(
-			'label' => 'State/Province/Region',
+			'label'             => 'State/Province/Region',
+            'class'             => 'grid_6 alpha',
             'disableTranslator' => 'true',
-			'multiOptions' => Tools_Geo::getState(null, true)
+			'multiOptions'      => Tools_Geo::getState(null, true)
 		));
 		
 		$this->addElement('text', 'zip', array(
-			'label' => 'Zip/Postal Code'
+			'label' => 'Zip/Postal Code',
+            'class' => 'grid_6 alpha'
 		));
 
 		$this->addElement('text', 'phone', array(
-			'label' => 'Phone'
+			'label' => 'Phone',
+            'class' => 'grid_6 alpha'
 		));
 	}
 

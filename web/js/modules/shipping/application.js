@@ -14,9 +14,8 @@ define(['backbone'], function(Backbone){
     var AppView = Backbone.View.extend({
         el: $('#shippers'),
         events: {
-            'click #submit': 'saveShipperConfig',
-            'click span[role=switch]': function (e){
-                var name =  $(e.currentTarget).prev('a').data('plugin'),
+            'click [role=switch]': function (e){
+                var name =  $(e.currentTarget).closest('li').find('a').data('plugin'),
                     plugin = this.shippers.get(name);
                 if (_.isUndefined(plugin)){
                     plugin = new ShipperModel({name: name, enabled: 0, config: null});
@@ -24,17 +23,14 @@ define(['backbone'], function(Backbone){
                 }
                 var status = plugin.get('enabled') === 1 ? 0 : 1;
                 if(status){
-                    $(e.currentTarget).parent('li').removeClass('disabled').addClass('enabled').find('span.icon-minus').removeClass('icon-minus').addClass('icon-checkmark');
+                    $(e.currentTarget).closest('li').removeClass('disabled').addClass('enabled');
                 }else{
-                    $(e.currentTarget).parent('li').removeClass('enabled').addClass('disabled').find('span.icon-checkmark').removeClass('icon-checkmark').addClass('icon-minus');
+                    $(e.currentTarget).closest('li').removeClass('enabled').addClass('disabled');
                 }
                 plugin.set('enabled', status);
                 plugin.save();
-                $(e.currentTarget).replaceWith(_.template(this.templates.button, plugin.toJSON()));
+                $(e.currentTarget).prop('checked', plugin.toJSON().enabled ? true : false);
             }
-        },
-        templates: {
-            button: '<span class="unit-over" role="switch"><% if (!!enabled) {%>Disable<% } else { %>Enable<% } %></span>'
         },
         initialize: function(){
             this.shippers = new ShipperCollection();
@@ -46,29 +42,14 @@ define(['backbone'], function(Backbone){
             $('ul.ui-tabs-nav a[data-plugin]').each(function(){
                 var plugin = self.shippers.get($(this).data('plugin'));
                 if (plugin) {
-                    $(this).after(_.template(self.templates.button, plugin.toJSON())).closest('li').addClass(!!plugin.get('enabled')?'enabled':'disabled');
+                    $(this).closest('li').addClass(!!plugin.get('enabled')?'enabled':'disabled').find(':checkbox').prop('checked', plugin.toJSON().enabled ? true : false);
                 } else {
-                    $(this).after('<span class="unit-over" role="switch">Enable</span>').closest('li').addClass('disabled');
+                    $(this).closest('li').addClass('disabled').find(':checkbox').prop('checked', false);
                 }
-                $(this).closest('li.enabled').prepend('<span class="icon-checkmark"></span>');
-                $(this).closest('li.disabled').prepend('<span class="icon-minus"></span>');
+                $(this).closest('li.enabled').prepend('<input class="switcher" type="checkbox" role="switch" checked/>');
+                $(this).closest('li.disabled').prepend('<input class="switcher" type="checkbox" role="switch"/>');
             });
-        },
-        saveShipperConfig: function(){
-            var index = this.$el.tabs( "option", "active" ),
-                currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
-            if (currentPane){
-                var form = currentPane.find('form');
-                $.ajax({
-                    url: form.attr('action'),
-                    data: form.serialize(),
-                    dataType: 'json',
-                    type: form.attr('method'),
-                    complete: function(response){
-                        form.trigger('formsave', response);
-                    }
-                });
-            }
+            checkboxRadioStyle();
         }
     });
 

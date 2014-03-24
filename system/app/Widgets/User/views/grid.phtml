@@ -38,10 +38,10 @@
             <?php if ($this->orders): ?>
                 <?php foreach ($this->orders as $order):?>
                     <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED ||
-                        $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')):?>
+                     $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')):?>
                     <tr data-role="cart" data-id="<?php echo $order->getId();?>">
                         <td><?php echo date("d-M-Y", strtotime($order->getCreatedAt()));?></td>
-                        <td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
+                        <td><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
                         <td><?php echo $this->currency(floatval($order->getTotal()));?></td>
                         <td class="user-orders-shipping-data">
                             <?php if($order->getShippingPrice() != 0):?>

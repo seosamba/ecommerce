@@ -82,10 +82,15 @@ define(['backbone',
             this.orders.info()['i18n'] = i18n;
             this.$('td.paginator').html(this.templates.paginator(this.orders.information));
         },
-        applyFilter: function(){
+        applyFilter: function(e) {
+            if(typeof e !== 'undefined'){
+                e.preventDefault();
+            }
+            this.orders.currentPage = 0;
             this.orders.pager();
         },
         resetFilter: function(e){
+            e.preventDefault();
             var $form = $(e.currentTarget).closest('form');
             $form.find('input:text').val('').end()
                  .find('select.filter').val('0').trigger('liszt:updated');
@@ -150,7 +155,7 @@ define(['backbone',
                 type: 'POST',
                 dataType: 'json',
                 beforeSend: function(){
-                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                 },
                 success: function(response) {
                     showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
@@ -181,7 +186,7 @@ define(['backbone',
                         type: 'POST',
                         dataType: 'json',
                         beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                         },
                         success: function(response) {
                             console.log(model.toJSON());

@@ -39,7 +39,8 @@ require([
         })
         jsBrandLogoUploader.bind('FileUploaded', function(uploader, file) {
             var timestamp = new Date().getTime();
-            var newSrc = $('#website_url').val()+'media/brands/small/'+file.name+'?'+timestamp,
+            var imageName = file.name.replace(/[^\w\d._]/gi, '-');
+            var newSrc = $('#website_url').val()+'media/brands/small/'+imageName.toLowerCase()+'?'+timestamp,
                 brand = Toastr.BrandLogos.brands.find(function(brand){ return brand.get('name') === Toastr.BrandLogos.filename; });
             if (brand !== undefined){
                 brand.set('src', newSrc);

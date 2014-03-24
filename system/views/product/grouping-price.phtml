@@ -1,20 +1,7 @@
-<style type="text/css">
-    #group-table_paginate a[role="button"] {
-        display: inline-block;
-        cursor: pointer;
-        padding: 4px 0;
-    }
-    #group-table_paginate a[role="button"]:not(:first-child) {
-        padding-left: 10px;
-    }
-</style>
-
-
-<div id="editing-grouping-price" class="grid_12 mt10px clearfix">
-    <p style="text-align: center; margin-bottom: 10px; font-weight: bold;"><?php echo $this->translate('Regular price').' = ';?><span id="group-regular-price"></span></p>
+<p class="message info fs18 text-center mb10px"><?php echo $this->translate('Regular price').' = ';?><span id="group-regular-price"></span></p>
+<div id="editing-grouping-price" class="grid_12 alpha omega form">
     <input type="hidden" id="group-products-id" name="group-products-id" value=""/>
     <input type="hidden" id="group-products-price" name="group-products-price" value=""/>
     <input type="hidden" id="group-products-price-symbol" name="group-products-price-symbol" value="<?php echo Zend_Registry::get('Zend_Currency')->getSymbol();?>"/>
-
 </div>
 

@@ -5,7 +5,6 @@ $this->headScript()->setAllowArbitraryAttributes(true)
 $this->headLink()
 	->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
 	->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
-echo $this->noLayout ? $this->headLink() : '';
 ?>
 <style>
 	#store-orders select.filter, .chzn-container-single .chzn-search input{
@@ -22,40 +21,27 @@ echo $this->noLayout ? $this->headLink() : '';
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <div id="store-orders" class="toaster-widget clearfix">
 	<div>
-		<form class="filters clearfix">
-			<div class="fl-left w600 mb10px">
-				<label class="mr5px fl-left wAuto bold"><?php echo $this->translate('Search');?></label>
-				<div class="wrap fl-none wAuto">
-					<input type="text" class="filter w200 margin0px mr10px" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
-					<input type="text" class="filter w250 margin0px" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
-				</div>
+		<form class="filters mb30px clearfix">
+			<div class="grid_7">
+				<label><?php echo $this->translate('Search');?></label>
+                <input type="text" class="filter grid_6 alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+                <input type="text" class="filter grid_6 omega" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
 			</div>
-			<div id="extra-filters-switch" class="mt3px fl-right" style="cursor:pointer;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</div>
-            <div id="extra-filters" class="both">
-				<div class="grid_3">
-					<label class="block wGrid100 bold"><?php echo $this->translate('By order amount');?></label>
-					<div class="oh">
-                            <label class="mr5px fl-left wAuto"><?php echo $this->translate('from');?></label>
-                            <div class="wrap"><input type="text" name="filter-from-amount" class="wGrid90"></div>
-                    </div>
-                    <div class="oh">
-                            <label class="mr5px fl-left wAuto"><?php echo $this->translate('to');?></label>
-                            <div class="wrap"><input class="wGrid90" type="text" name="filter-to-amount" ></div>
-                    </div>
+			<div id="extra-filters-switch" class="fl-right mr-grid pt15px"><a href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
+            <div id="extra-filters" class="grid_12 hidden">
+                <hr>
+				<div class="grid_4 alpha">
+					<label class="text-bold"><?php echo $this->translate('By order amount');?></label>
+                    <input class="grid_6 alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>">
+                    <input class="grid_6 omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>">
 				</div>
-				<div class="grid_3">
-					<label class="block wGrid100 bold"><?php echo $this->translate('By date');?></label>
-					<div class="oh">
-                        <label class="mr5px fl-left wAuto"><?php echo $this->translate('from');?></label>
-                        <div class="wrap"><input type="text" id="orders-filter-fromdate" name="filter-from-date" class="wGrid90"></div>
-                    </div>
-                    <div class="oh">
-                        <label class="mr5px fl-left wAuto"><?php echo $this->translate('to');?></label>
-                        <div class="wrap"><input type="text" id="orders-filter-todate" name="filter-to-date" class="wGrid90"></div>
-                    </div>
+				<div class="grid_4">
+					<label class="text-bold"><?php echo $this->translate('By date');?></label>
+                    <input class="grid_6 alpha" type="text" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>">
+                    <input class="grid_6 omega" type="text" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>">
 				</div>
-	            <div class="grid_2">
-		            <label class="block wGrid100 bold mb10px"><?php echo $this->translate('By order status');?></label>
+	            <div class="grid_4 omega">
+		            <label class="text-bold"><?php echo $this->translate('By order status');?></label>
                     <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
 		             <?php echo $this->formSelect('filter-status', null, array(
                         'class' => 'filter',
@@ -75,26 +61,26 @@ echo $this->noLayout ? $this->headLink() : '';
                         Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY)
                     )); ?>
 	            </div>
-				<div class="grid_4">
-					<label class="block wGrid100 bold mb10px"><?php echo $this->translate('By shipping destination');?></label>
+				<div class="grid_12 alpha omega mt20px">
+					<label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
 					<?php
                     $countryList = Tools_Geo::getCountries(true);
                     $countryList = array_merge(array('_' => ''), $countryList);
-					echo $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList );
-					echo $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), array('') );
+					echo '<div class="grid_4 alpha">' . $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
+					echo '<div class="grid_4">' . $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), array('') ) . '</div>';
 
 					$shippingServices = array_merge(array(''), $this->shippingServices);
-					echo $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices );
+					echo '<div class="grid_4 omega">' . $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
 					?>
 				</div>
-	            <div class="fl-right mb10px mrGrid1">
-                    <input type="button" class="blue-btn" name="filter-apply" id="orders-filter-apply-btn" value="<?php echo $this->translate('Apply filter');?>" >
-		            <input type="button" class="blue-btn" name="filter-reset" id="orders-filter-reset-btn" value="<?php echo $this->translate('Reset all filters');?>" >
+	            <div class="fl-right mt20px">
+                    <button class="green icon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
+		            <button class="red icon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>
 	            </div>
 			</div>
 		</form>
 	</div>
-	<table id="orders-table" class="ui-helper-reset widget">
+	<table id="orders-table" class="widget table-hover">
 		<thead>
 			<tr class="title-table">
 				<th>#</th>
@@ -106,9 +92,9 @@ echo $this->noLayout ? $this->headLink() : '';
 				<th class="sortable" data-sortkey="total"><?php echo $this->translate('Total price');?></th>
 				<th class="sortable" data-sortkey="shipping_price"><?php echo $this->translate('Shipping price');?></th>
 				<th style="min-width: 110px;"><?php echo $this->translate('Shipping via');?></th>
-				<th><?php echo $this->translate('Details');?></th>
+				<th class="text-center"><?php echo $this->translate('Details');?></th>
                 <?php if(isset($this->invoicePlugin)):?>
-                    <th><?php echo $this->translate('Invoice & packing slip');?></th>
+                    <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
 			</tr>
 		</thead>
@@ -117,11 +103,11 @@ echo $this->noLayout ? $this->headLink() : '';
                 <td colspan="11" style="text-align:center;">
             <?php else:?>
                 <td colspan="10" style="text-align:center;">
-            <?php endif;?>  
-				<img src="<?php echo $this->websiteUrl;?>system/images/loading.gif" alt="Loading...">
+            <?php endif;?>
+                <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
 			</td>
 		</tbody>
-		<tfoot>
+		<tfoot class="text-right">
             <?php if(isset($this->invoicePlugin)):?>
                 <td colspan="11" class="paginator"></td>
             <?php else:?>

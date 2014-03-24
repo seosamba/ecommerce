@@ -5,22 +5,29 @@
 ?>
 <script id="actionDiscountFreeshippingTmpl" type="text/template">
 <% if (type === 'discount'){ %>
-	<div id="discount-units-holder" style="display: inline-block">
+	<div id="discount-units-holder" class="grid_6 alpha omega">
 		<label><?php echo $this->translate('Discount amount:');?></label>
-		<?php echo $this->formText('data[discountAmount]'); ?>
+        <p class="labeled grid_7 alpha omega">
+            <?php echo $this->formText('data[discountAmount]', null, array(
+                    'class' => 'grid_6 alpha omega'
+                )); ?>
+            <label id="coupon-tax-discount" class="couponDiscountWithTax grid_6 alpha omega">0</label>
+        </p>
 		<?php echo $this->formSelect('data[discountUnits]', null, array(
-			'class' => 'input-auto'
+			'class' => 'grid_5 omega'
 		), array(
 			Store_Model_Coupon::DISCOUNT_UNITS       => $this->currency,
 			Store_Model_Coupon::DISCOUNT_PERCENTS    => '%'
 		));?>
 	</div>
-    <label><?php echo $this->translate('for orders over');?></label>
+    <label class="mt20px grid_3 text-center fs12 text-bold mb0px"><?php echo $this->translate('for orders over');?></label>
 <% } else { %>
-    <label><?php echo $this->translate('Free shipping for orders over');?></label>
+    <label class="mt25px grid_9 alpha text-right"><?php echo $this->translate('Free shipping for orders over');?></label>
 <% } %>
+    <div class="labeled grid_3 alpha mt1-5em">
 	<?php echo $this->formText('data[minOrderAmount]', 0, array(
-		'class' => 'input-mini'
+            'class' => 'grid_7 alpha omega'
 	)); ?>
-	<span class="unit"><?php echo $this->currency; ?></span>
+        <label class="unit grid_5 alpha omega"><?php echo $this->currency; ?></label>
+    </div>
 </script>

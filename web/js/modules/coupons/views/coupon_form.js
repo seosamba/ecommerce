@@ -14,7 +14,9 @@ define([
                     $('#scope').attr('disabled', 'disabled');
                 }
             },
-            'click #genCoupon': 'genCoupon'
+            'click #genCoupon': 'genCoupon',
+            'change #coupon-discount-tax-rate': 'saveDiscountTax',
+            'blur #data-discountAmount': 'precalculateDiscountTax'
         },
         templates: {
 
@@ -73,6 +75,7 @@ define([
                 success: function(response){
                     self.$el.trigger('reset');
                     self.$el.trigger('coupon:created');
+                    $('.couponDiscountWithTax').text(0);
                     hideSpinner();
                 },
                 error: function(response){
@@ -97,6 +100,36 @@ define([
             }
 
             $('#code').val(code);
+        },
+        saveDiscountTax:function(e){
+            var discountTaxValue = $(e.target).find(':selected').val();
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/saveDiscountTaxRate/',
+                type: 'POST',
+                data: {
+                    discountTaxValue:discountTaxValue
+                },
+                dataType: 'json',
+                success: function(response) {
+
+                }
+            });
+            return false;
+        },
+        precalculateDiscountTax:function(e){
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/precalculateDiscountTax/',
+                type: 'POST',
+                data: {
+                    discountAmount:$('#data-discountAmount').val(),
+                    discountTaxValue:$('#coupon-discount-tax-rate').find(':selected').val()
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $('.couponDiscountWithTax').text(response.responseText.discountResultValue);
+                }
+            });
+            return false;
         }
     });
 

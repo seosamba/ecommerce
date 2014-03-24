@@ -1,40 +1,28 @@
 <?php
 /**
- * GroupPriceObserver
+ * GroupPriceTools.php
  *
  */
-class Tools_GroupPriceObserver implements Interfaces_Observer {
-
-	private static $_configParams = null;
-
-    protected $_cacheTags      = array();
-
-	public function __construct() {
-		if (self::$_configParams === null) {
-			self::$_configParams = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-		}
-		$this->_cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
-	}
+class Tools_GroupPriceTools {
 
 
-	/**
-	 * @param $object Models_Model_Product
-	 */
-	public function notify($object) {
-        if (null === ($allCustomersGroups = $this->_cache->load('customers_groups', 'store_'))){
+	public static function calculateGroupPrice(Models_Model_Product $product, $productId){
+        $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+        $cacheTags  = array();
+        if (null === ($allCustomersGroups = $cache->load('customers_groups', 'store_'))){
             $dbTable = new Models_DbTable_CustomerInfo();
             $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
             $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
-            $this->_cache->save('customers_groups',  $allCustomersGroups, 'store_', array());
+            $cache->save('customers_groups',  $allCustomersGroups, 'store_', array());
         }
-        array_push($this->_cacheTags, 'product_price');
-        if (null === ($allProductsWithGroups = $this->_cache->load('products_groups_price', 'store_'))){
+        array_push($cacheTags, 'product_price');
+        if (null === ($allProductsWithGroups = $cache->load('products_groups_price', 'store_'))){
             $allProductsWithGroups = Store_Mapper_GroupPriceMapper::getInstance()->fetchAssocAll();
-            $this->_cache->save('products_groups_price',  $allProductsWithGroups, 'store_', is_array($this->_cacheTags) ? $this->_cacheTags : array());
+            $cache->save('products_groups_price',  $allProductsWithGroups, 'store_', is_array($cacheTags) ? $cacheTags : array());
         }
-        if (null === ($allProductsGroups = $this->_cache->load('products_groups', 'store_'))){
+        if (null === ($allProductsGroups = $cache->load('products_groups', 'store_'))){
             $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
-            $this->_cache->save('products_groups',  $allProductsGroups, 'store_', is_array($this->_cacheTags) ? $this->_cacheTags : array());
+            $cache->save('products_groups',  $allProductsGroups, 'store_', is_array($cacheTags) ? $cacheTags : array());
         }
         $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
         $currentUser = $sessionHelper->getCurrentUser()->getId();
@@ -42,10 +30,9 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
             if(array_key_exists($currentUser, $allCustomersGroups)){
                 $groupId = $allCustomersGroups[$currentUser]['group_id'];
                 if(isset($allProductsGroups[$groupId])){
-                    $productId = $object->getId();
                     if($productId != null){
                         $groupProductKey = $groupId.'_'.$productId;
-                        $priceNow = $object->getPrice();
+                        $priceNow = $product->getPrice();
                         $priceValue = $allProductsGroups[$groupId]['priceValue'];
                         $priceSign  = $allProductsGroups[$groupId]['priceSign'];
                         $priceType  = $allProductsGroups[$groupId]['priceType'];
@@ -66,13 +53,16 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
                         if($priceSign == 'plus'){
                             $resultPrice = $priceNow + $priceModificationValue;
                         }
-                        $object->setOriginalPrice($priceNow);
-                        $object->setGroupPriceEnabled(1);
-                        $object->setCurrentPrice($resultPrice);
+                        return $resultPrice;
                     }
+                    return $product->getPrice();
+
                 }
             }
         }
+        return $product->getPrice();
+
 	}
+
 
 }

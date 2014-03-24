@@ -174,7 +174,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     private function _renderEditproduct(){
-        if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
+        if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
              return false;
         }
         $html = sprintf('<a href="javascript:;" data-url="%splugin/shopping/run/product/id/%d" class="edit-product-btn tpopup">%s</a>',

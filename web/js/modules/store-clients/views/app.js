@@ -15,11 +15,13 @@ define([
             'click #clients-previous': 'goPreviousPage',
             'click #clients-next': 'goNextPage',
             'click th.sortable': 'sort',
-            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details').toggle()},
+            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details, .search-line').toggle()},
             'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #clients-search': 'searchClient',
-            'change select[name=groups]': 'assignGroup'
+            'change select[name=groups]': 'assignGroup',
+            'blur input.customer-attribute': 'changeCustomAttr',
+            'click th.customer-attribute':'deleteCustomAttr'
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -65,7 +67,7 @@ define([
         },
         renderCustomerDetails: function(response, status) {
             if (status === "success") {
-                $('#clients-table').hide();
+                $('#clients-table, .search-line').hide();
                 $('#customer-details').find('#profile').html(response).end().show();
             }
         },
@@ -203,7 +205,8 @@ define([
             });
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
-                buttons: assignGroupsButtons
+                buttons: assignGroupsButtons,
+                resizable : false
             });
             return false;
         },
@@ -235,7 +238,7 @@ define([
                 } else {
 
                 }
-            }, {classname:"errors", 'ok':'Yes', 'cancel':'No'});
+            }, {classname:"error", 'ok':'Yes', 'cancel':'No'});
 
 
         },
@@ -346,6 +349,44 @@ define([
                         return false;
                     }
 
+            });
+        },
+        changeCustomAttr:function(){
+            $('input.customer-attribute').on('blur', function(e){
+                var data = {};
+                data[$(this).data('attribute')] = $(this).val();
+
+                $.ajax({
+                    url: $('#website_url').val() + 'api/store/customer/id/' + $(this).data('uid'),
+                    method: 'PUT',
+                    data: JSON.stringify(data),
+                    complete: function(xhr, status, response) {
+                        if (status === 'error'){
+                            showMessage(status, true);
+                        } else {
+                            showMessage('Attribute saved!');
+                        }
+                    }
+                })
+            });
+        },
+        deleteCustomAttr:function(){
+            $('body').on('click', 'th.customer-attribute span', function(e){
+                var attrName = $(this).parent().data('custom');
+                showConfirm('Do you really want to delete this column? (Data will be deleted!)', function(){
+                    $.ajax({
+                        url: $('#website_url').val() + 'api/store/customer/attr/' + attrName,
+                        method: 'DELETE',
+                        data: JSON.stringify({attrName: attrName}),
+                        complete: function(xhr, status, response) {
+                            if (status === 'error'){
+                                showMessage(status, true);
+                            } else {
+                                window.location.reload();
+                            }
+                        }
+                    })
+                })
             });
         }
     });

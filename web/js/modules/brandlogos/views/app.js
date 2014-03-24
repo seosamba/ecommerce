@@ -15,11 +15,11 @@ define([
         },
         render: function(){
             var self = this;
-            this.$('ul.brand-list').empty();
+            this.$('.brand-list').empty();
             this.brands.each(function(brand, i){
                 if (!brand.has('src')){
                     var image = self.images.find(function(img){
-                        var brandName = brand.get('name').toLowerCase(),
+                        var brandName = brand.get('name').replace(/[^\w\d._]/gi, '-').toLowerCase(),
                             imgName = img.get('name').toLowerCase();
                             regExp = new RegExp('^'+brandName+'\\.(png|jpe?g|gif)$')
                         return !!regExp.test(imgName);
@@ -32,7 +32,7 @@ define([
                         self.filename = brand.get('name');
                         $('#brand-logo-uploader-pickfiles').trigger('click');
                     })
-                    .appendTo('#manage-logos ul.brand-list')
+                    .appendTo('#manage-logos .brand-list')
                     .addClass(((i+1)%6==0)?'omega':'');
             })
         },

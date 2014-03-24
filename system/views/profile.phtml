@@ -5,15 +5,15 @@
 	$.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
 </script>
 <div class="clearfix profile-header">
-	<div class="tt">
-		<div class="ot profile-picture textcentered">
+	<div class="grid_5">
+		<div class="grid_4 text-center profile-picture">
 			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
 		</div>
-		<div class="tt profile-main-info vcard">
+		<div class="grid_8 profile-main-info vcard">
 			<h2 class="client-fullname client-info"><span><?php echo $this->customer->getFullName();?></span>
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                     <input class="edit-client-fullname edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname" />
-                    <img data-client-param="client-fullname" class="edit-client-fullname edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 <?php endif;?>
             </h2>
          	<h4 class="client-email client-info"><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span><?php echo $this->customer->getEmail();?></span></a>
@@ -33,7 +33,7 @@
 						$lastSeenStamp = $lastSeen.' '.$this->translate(' days ago');
 					}
 				} else {
-					$lastSeenStamp = $this->translate('never');
+					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
 				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
 				?></p>
@@ -59,8 +59,7 @@
 		</div>
 	</div>
 
-
-	<div class="ot profile-actions">
+	<div class="grid_7 profile-actions">
 		<!--		<input type="button" class="blue-btn" value="--><?php //echo $this->translate('Edit profile');?><!--" />-->
 		<p class="title textcentered ui-state-default">
 			<img style="width: 16px; vertical-align: text-bottom;" src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAA/UlEQVR42r2VvQ3CMBBGswEjMIJHyASeIUV6qChSISRKpLR0jEDBABmBkpIRIk8QPks+3ekkfkzOsfSUxIm+p/PFSYUxRTAqAsPPvN6BEUzpWJcSBcolWSnRpJGT3oolK3ooSWMuwtinzCtwNG8qisEpL4CVfMa2R7xkBzlvWpFYskHfny1KG3FUjV+bi1jCInnfqketkhAt8PN6xMt14+DMinSwWv8AtuAuQp+gVx/PJl/EAZoBnNTzHZ1n9+iN5Ah8Lt8q0pLx3332SXRWkgAaU1EMFM11oP4lOLdHG/Ev6YC3QIscvWn6rbKtiPdID3wZEXOJk8VEpVlU9AI9gR1AIgkvUwAAAABJRU5ErkJggg==">
@@ -68,21 +67,21 @@
 		</p>
 		<ul class="stats clearfix">
 			<?php foreach ($this->stats as $key => $value) : ?>
-				<li class="oh <?php echo $key;?>" data-sort="<?php echo $this->translate('cs_'.$key);?>"><?php echo $value.' '.$this->translate('cs_'.$key);?></li>
+				<li class="grid_6 <?php echo $key;?>" data-sort="<?php echo $this->translate('cs_'.$key);?>"><?php echo $value.' '.$this->translate('cs_'.$key);?></li>
 			<?php endforeach; ?>
 		</ul>
 	</div>
 </div>
 
 
-<div id="profile-content">
+<div id="profile-content" class="mt30px">
 	<ul class="profile-nav">
 		<li><a href="#profile-orders-list"><?php echo $this->translate('Orders');?></a></li>
 		<li><a href="#profile-address-list"><?php echo $this->translate('Addresses');?></a></li>
 	</ul>
 
 	<div id="profile-orders-list" class="clearfix">
-		<table id="orders-table" border="1" class="widget">
+		<table id="orders-table" class="widget">
 			<thead>
 				<tr class="title-table">
 					<th>#</th>
@@ -92,9 +91,9 @@
                     <th><?php echo $this->translate('Shipping price');?></th>
                     <th><?php echo $this->translate('Shipping via');?></th>
                     <th style="width: 180px;"><?php echo $this->translate('Status');?></th>
-                    <th><?php echo $this->translate('Details');?></th>
+                    <th class="text-center"><?php echo $this->translate('Details');?></th>
                     <?php if(isset($this->invoicePlugin)):?>
-                        <th><?php echo $this->translate('View/Download Invoice');?></th>
+                        <th class="text-center"><?php echo $this->translate('View/Download Invoice');?></th>
                     <?php endif;?>
 				</tr>
 			</thead>
@@ -137,9 +136,9 @@
 					<td class="current-status"><?php echo $this->translate($status);?></td>
 
 
-					<td><a href="javascript:;" class="tpopup" data-pheight="600" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"><?php echo $this->translate('view');?></a></td>
+					<td class="text-center"><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"><?php echo $this->translate('view');?></a></td>
                     <?php if(isset($this->invoicePlugin)):?>
-                        <td>   
+                    <td class="text-center">
                         <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
                             <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
                                 <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
@@ -148,7 +147,7 @@
                                 <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="<?php echo $this->translate('Download invoice');?>" title="<?php echo $this->translate('Download invoice');?>"/>
                             </a>
                         <?php endif;?>
-                         </td>   
+                     </td>
                     <?php endif;?>
                 </tr>
 			<?php endforeach; ?>
@@ -187,7 +186,7 @@
 <script>
 	$('#profile-content').tabs();
 	$('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
-	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-all ui-corner-top" );
+	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
 	$(function(){
 		var oTable = $('#orders-table').dataTable({
 			bPaginate: false,
@@ -249,10 +248,10 @@
 		$(this).data('currentStatus', $(this).text());
 
 		var buttons = {
-			'refunded'  : '<button class="change-status btn btn-small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
-			'completed' : '<button class="change-status btn btn-small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
-			'canceled'  : '<button class="change-status btn btn-small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
-			'delivered' : '<button class="change-status btn btn-small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+			'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+			'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+			'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+			'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
 		}
 
 		var html = ''
@@ -289,7 +288,7 @@
 			id      = parseInt($(this).closest('tr').data('id')),
 			currentStatus = $(this).data('status');
 
-		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif">');
+		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
 
 		$.ajax({
 			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
@@ -307,10 +306,11 @@
 	});
 
     $('.edit-inline-profile').on('click', function(){
+        $(this).hide();
         var editClientElement = $(this).data('client-param');
         var clientElementData = $(this).closest('.client-info').find('span').text();
         $('.'+editClientElement+' span').hide();
-        $('.edit-'+editClientElement).val(clientElementData).show();
+        $('.edit-'+editClientElement).val(clientElementData).show().focus();
     });
 
     $('.edit-client-profile').on('blur', function(){
@@ -326,14 +326,15 @@
                 userId:$('#userId').val()
             }
         }).done(function(response) {
-                if(response.error == 1){
-                    smoke.alert(response.responseText,{'classname':'errors'});
-                }else{
-                    $('.edit-client-'+clientEditParam).hide();
-                    $('.client-'+clientEditParam+' span').text(editedValue).show();
-                    smoke.signal('<?php echo $this->translate('Saved');?>');
-                }
-            })
+            if(response.error == 1){
+                smoke.alert(response.responseText,{'classname':'errors'});
+            }else{
+                $('[data-client-param="client-'+clientEditParam+'"]').show();
+                $('.edit-client-'+clientEditParam).hide();
+                $('.client-'+clientEditParam+' span').text(editedValue).show();
+                smoke.signal('<?php echo $this->translate('Saved');?>');
+            }
+        });
         return false;
     });
 

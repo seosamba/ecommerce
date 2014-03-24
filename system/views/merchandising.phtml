@@ -1,50 +1,48 @@
 <?php
-$this->headTitle($this->translate('Merchandising'));
-$this->placeholder('headerContent')->set('Merchandising');
+    $this->headTitle($this->translate('Merchandising'));
+    //$this->placeholder('headerContent')->set('Merchandising');
 
-$this->headLink()->appendStylesheet($this->websiteUrl.'system/css/reset-widgets.css');
-$this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
+    $this->jQuery()->addJavascriptFile($this->websiteUrl . 'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 ?>
-<style>
-#merchandising .ui-tabs-panel {
-	overflow: hidden;
-}
-</style>
 
-<div id="merchandising" class="grid_12 mb10px h470">
-	<div class="mb5px">
-		<p style="text-align: center; font-weight: bold;"><?php echo $this->translate('Set parameters for cart wide promotions from this screen.');?></p>
-		<p style="text-align: center; font-weight: bold;"><?php echo $this->translate('Set item specific promotions in the "add/edit product" screen.'); ?></p>
-	</div>
-    <ul>
+<div id="merchandising" class="with-content-footer">
+    <ul class="header">
         <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
 	    <?php if (isset($this->plugins) && !empty($this->plugins)):?>
-			    <?php foreach ($this->plugins as $plugin) :?>
+            <?php foreach ($this->plugins as $plugin) :?>
 			    <?php
 	            $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
 	            $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
 	            ?>
 	    <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
-				<?php endforeach; ?>
-		    <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
         <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
-
 	</ul>
-	<div id="coupons" class="clearfix" style="padding: 5px">
+	<div id="coupons">
 		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	</div>
     <div id="group-pricing">
         <?php echo $this->partial('merchandising/grouping.phtml'); ?>
     </div>
+	<div class="message info grid_12">
+        <ol class="list-count-sign">
+            <li class="grid_6 alpha omega m0px"><?php echo $this->translate('Set parameters for cart wide promotions from this screen.'); ?></li>
+            <li class="grid_6 alpha omega m0px"><?php echo $this->translate('Set item specific promotions in the "add/edit product" screen.'); ?></li>
+        </ol>
+	</div>
 </div>
 
 <script>
-$(function(){
-	$('#merchandising').tabs();
-});
+    $(function () {
+        $('#merchandising').tabs({
+            beforeLoad: function(event, ui){
+                showSpinner('#merchandising');
+            }
+        });
+    });
 </script>
 
-<script src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"
-        data-main="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/modules/merchandising/config"></script>
+<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/libs/require.min.js" data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/modules/merchandising/config"></script>
 
 <?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->currency)); ?>
