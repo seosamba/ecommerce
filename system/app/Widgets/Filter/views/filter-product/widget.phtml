@@ -3,7 +3,7 @@
     <ul>
     <?php if (!empty($this->tags)) : ?>
         <li>
-            <header><?php echo $this->translate('Category'); ?></header>
+            <p class="filter-header"><?php echo $this->translate('Category'); ?></p>
             <ul>
             <?php foreach ($this->tags as $tag) :?>
                 <li>
@@ -39,7 +39,7 @@
     <?php endif; ?>
     <?php if ($this->priceRange) : ?>
         <li class="filter-price">
-            <label class="filter-label"><?php echo $this->translate('Price'); ?></label>
+            <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
         <?php if (empty($this->priceSlider)) : ?>
             <label><?php echo $this->translate('From'); ?></label>
             <input type="text" class="price-field price-min"
@@ -76,7 +76,7 @@
     <?php endif; ?>
     <?php foreach ($this->filters as $filter) : ?>
         <li>
-            <header><?php echo $filter['label']; ?></header>
+            <p class="filter-header"><?php echo $filter['label']; ?></p>
             <ul>
                 <?php
                 foreach ($filter['value'] as $value) : ?>

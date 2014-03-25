@@ -116,7 +116,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processFreebies($model);
         }
 
-        //proccess product parts if any
+        //process product parts if any
         $this->_processParts($model);
 
 		$model->notifyObservers();
