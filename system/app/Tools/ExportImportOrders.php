@@ -270,7 +270,6 @@ class Tools_ExportImportOrders
     public static function prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $response = Zend_Controller_Front::getInstance()->getResponse();
         unset($data['name']);
         unset($data['run']);
         unset($data['orderIds']);
@@ -316,15 +315,7 @@ class Tools_ExportImportOrders
                 fputcsv($expFile, $data, ',', '"');
             }
             fclose($expFile);
-            $ordersArchive = Tools_System_Tools::zip($filePath, $fileName);
-            $response->setHeader(
-                'Content-Disposition',
-                'attachment; filename=' . Tools_Filesystem_Tools::basename($ordersArchive)
-            )
-                ->setHeader('Content-type', 'application/force-download');
-            readfile($ordersArchive);
-            $response->sendResponse();
-            exit;
+            Tools_ExportImportOrders::downloadCsv($filePath, $fileName);
         }
 
     }
@@ -332,7 +323,6 @@ class Tools_ExportImportOrders
     public static function prepareImportOrdersReport($importErrors)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $response = Zend_Controller_Front::getInstance()->getResponse();
         if (empty($importErrors)) {
             exit;
         }
@@ -353,15 +343,7 @@ class Tools_ExportImportOrders
             fputcsv($expFile, $errorData, ',', '"');
         }
         fclose($expFile);
-        $ordersArchive = Tools_System_Tools::zip($filePath, $fileName);
-        $response->setHeader(
-            'Content-Disposition',
-            'attachment; filename=' . Tools_Filesystem_Tools::basename($ordersArchive)
-        )
-            ->setHeader('Content-type', 'application/force-download');
-        readfile($ordersArchive);
-        $response->sendResponse();
-        exit;
+        Tools_ExportImportOrders::downloadCsv($filePath, $fileName);
     }
 
     public static function addOrderAddress($customerId, $address, $type = null)
@@ -695,7 +677,6 @@ class Tools_ExportImportOrders
     public static function getSampleOrdersData()
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $response = Zend_Controller_Front::getInstance()->getResponse();
         $headers = array(
             'order_id',
             'updated_at',
@@ -804,6 +785,12 @@ class Tools_ExportImportOrders
             fputcsv($expFile, $data, ',', '"');
         }
         fclose($expFile);
+        Tools_ExportImportOrders::downloadCsv($filePath, $fileName);
+    }
+
+    public static function downloadCsv($filePath, $fileName)
+    {
+        $response = Zend_Controller_Front::getInstance()->getResponse();
         $ordersArchive = Tools_System_Tools::zip($filePath, $fileName);
         $response->setHeader(
             'Content-Disposition',
