@@ -2,16 +2,14 @@
 <?php $countryList = Tools_Geo::getCountries(true); ?>
 <div class="content scroll">
 	<div id="order-view" class="toaster-widget clearfix">
-		<div class="grid_12">
-			<div class="title padding5px"><?php echo $this->translate('Summary');?></div>
+		<div class="grid_12 mb20px">
+			<div class="title"><?php echo $this->translate('Summary');?></div>
 			<div><?php echo $this->translate("Placed on").' '.date('d M, Y', strtotime($this->order->getCreatedAt()));?></div>
 			<div><?php echo $this->translate("Placed from IP").' '. $this->order->getIpAddress();?></div>
 		</div>
 
-		<div class="mt10px">&nbsp;</div>
-
 		<div class="grid_6">
-			<div class="title padding5px"><?php echo $this->translate('Billing Address');?> <!--span>[edit]</span--></div>
+			<div class="title"><?php echo $this->translate('Billing Address');?> <!--span>[edit]</span--></div>
 			<div class="adr">
 				<?php if (null !== ($billingAddressId = $this->order->getBillingAddressId())): ?>
 					<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
@@ -40,7 +38,7 @@
 		</div>
 
 		<div class="grid_6">
-			<div class="title padding5px"><?php echo $this->translate('Shipping Address');?> <!--span>[edit]</span--></div>
+			<div class="title"><?php echo $this->translate('Shipping Address');?> <!--span>[edit]</span--></div>
 			<div class="adr">
 				<?php if (null !== ($shippingAddressId = $this->order->getShippingAddressId())): ?>
 					<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId); ?>
@@ -68,7 +66,7 @@
 		</div>
 
 		<div class="grid_12 mt20px mb20px">
-			<div class="title padding5px"><?php echo $this->translate("Order #%1\$s content", $this->order->getId());?></div>
+			<div class="title"><?php echo $this->translate("Order #%1\$s content", $this->order->getId());?></div>
 			<table style="width: 100%">
 				<thead>
 				<tr>
@@ -134,10 +132,12 @@
 				<?php endif; ?>
 				</tbody>
 				<tfoot>
+				<tr><td></td></tr>
 				<tr>
-					<td class="floatLeft"><?php echo $this->translate('Delivery comments');?>:</td>
-					<td class="floatLeft"><span class="order-notes"><?php echo $this->order->getNotes();?></span></td>
-					<td colspan="4"></td>
+					<td colspan="6" rowspan="3">
+                        <?php echo $this->translate('Delivery comments');?>:
+                        <p class="order-notes"><?php echo $this->order->getNotes();?></p>
+                    </td>
 					<td class="text-right"><?php echo $this->translate('Subtotal');?>:</td>
                     <?php if ($this->showPriceIncTax == 1): ?>
 					    <td><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
@@ -147,7 +147,6 @@
 				</tr>
                 <?php if ($this->order->getDiscount() > 0): ?>
                     <tr>
-                        <td colspan="5"></td>
                         <td class="text-right"><?php echo $this->translate('Discount');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
                             <td><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
@@ -157,7 +156,6 @@
                     </tr>
                 <?php endif; ?>
 				<tr>
-					<td colspan="5"></td>
 					<td class="text-right"><?php echo $this->translate('Shipping');?>:</td>
                     <?php if ($this->showPriceIncTax == 1): ?>
                         <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
@@ -166,7 +164,6 @@
                     <?php endif;?>
 				</tr>
                 <tr>
-                    <td colspan="5"></td>
                     <?php if (Tools_Misc::getTaxName() != ''): ?>
                         <?php $taxName = Tools_Misc::getTaxName(); ?>
                     <?php else: ?>
@@ -180,7 +177,7 @@
                     <td><?php echo $this->currency($this->order->getTotalTax());?></td>
                 </tr>
 				<tr>
-					<td colspan="5"></td>
+					<td colspan="6"></td>
 					<td class="text-right"><?php echo $this->translate('Grand Total');?>:</td>
 					<td><?php echo $this->currency($this->order->getTotal());?></td>
 				</tr>
@@ -190,52 +187,37 @@
 	</div>
 </div>
 <style>
-	.seotoaster {
-		background-color: #ffffff;
-	}
+	.title{
+        color         : #666;
+        font-weight   : bold;
+        border-bottom : 1px dashed #ddd;
+        margin        : 0 0 10px;
+    }
 
-	.title {
-		color: #666;
-		font-weight: bold;
-		border-bottom: 1px dashed #ddd;
-		margin: 10px 0;
-	}
+    .adr{
+        padding : 0 10px;
+    }
 
-	#order-view {
-		width: 900px;
-		margin: 0 auto;
-	}
+    table thead tr{
+        background-color : #666666;
+        color            : #eee;
+    }
 
-	.adr {
-		padding: 0 10px;
-	}
+    table td, table th{
+        padding : 4px 6px;
+    }
 
-	table thead tr {
-		background-color: #666666;
-		color: #eee;
-		text-shadow: 0 0 2px #333;
-	}
+    table tbody td{
+        vertical-align : middle;
+        border-bottom  : 1px solid #d3d3d3;
+    }
 
-	table td, table th {
-		padding: 4px 6px;
-	}
+    table tfoot td{
+        font-weight : bold;
+        color       : #777;
+    }
 
-	table tbody td {
-		vertical-align: middle;
-		border-bottom: 1px solid #d3d3d3;
-	}
-
-	table tfoot td {
-		font-weight: bold;
-		font-size: 14px;
-		color: #777;
-	}
-
-	table tfoot td.text-right {
-		text-align: right;
-	}
-
-	table tfoot td.floatLeft {
-		float: left;
-	}
+    table tfoot td[rowspan="3"]{
+        border-right : 1px solid #d3d3d3;
+    }
 </style>

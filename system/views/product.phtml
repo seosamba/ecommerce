@@ -138,7 +138,7 @@
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-        <a class="icon-close error small pointer" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
+        <a class="delete icon-close error small" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
     <% } else { %>
     <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>

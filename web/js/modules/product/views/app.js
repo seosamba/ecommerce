@@ -631,7 +631,7 @@ define([
                         _.each(response, function(related){
                             var view = new ProductListView({model: new ProductModel(related), showDelete: true});
                             view.delegateEvents({
-                                'click .icon-close': function(){
+                                'click .delete': function(){
                                     self.removeRelated(this.model.get('id'));
                                 }
                             })
