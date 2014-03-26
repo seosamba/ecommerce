@@ -59,7 +59,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 					'full_name', 'email'
 				))
                 ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
-                    array('imp.real_order_id'))
+                    array('real_order_id'=>'imp.real_order_id'))
 				->group('order.id');
 
 		if ($where){

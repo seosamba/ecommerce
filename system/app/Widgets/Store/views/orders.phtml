@@ -97,13 +97,14 @@ $this->headLink()
                 <?php if(isset($this->invoicePlugin)):?>
                     <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
+                <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('System order');?></th>
 			</tr>
 		</thead>
 		<tbody id="orders-list">
             <?php if(isset($this->invoicePlugin)):?>	
-                <td colspan="8" style="text-align:center;">
+                <td colspan="9" style="text-align:center;">
             <?php else:?>
-                 <td colspan="7" style="text-align:center;">
+                 <td colspan="8" style="text-align:center;">
             <?php endif;?>
                 <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
 			</td>
@@ -117,9 +118,9 @@ $this->headLink()
             </select>
         </td>
         <?php if(isset($this->invoicePlugin)):?>
-                <td colspan="8" class="paginator text-right"></td>
+                <td colspan="9" class="paginator text-right"></td>
             <?php else:?>
-                <td colspan="7" class="paginator text-right"></td>
+                <td colspan="8" class="paginator text-right"></td>
             <?php endif;?>
 		</tfoot>
 	</table>
