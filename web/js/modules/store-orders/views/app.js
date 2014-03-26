@@ -66,10 +66,12 @@ define(['backbone',
             if(e.target.checked){
                 this.orders.each(function(order){
                     ordersIds = _.union(ordersIds, [order.id]);
+                    order.set({checked: true});
                 });
             }else{
                 this.orders.each(function(order){
                     orderIdsExclude = _.union(orderIdsExclude, [order.id]);
+                    order.set({checked: false});
                 });
                 ordersIds = _.difference(ordersIds, orderIdsExclude);
             }

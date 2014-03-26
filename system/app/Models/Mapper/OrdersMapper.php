@@ -58,6 +58,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				->joinLeft(array('u' => 'user'), 'u.id = order.user_id', array(
 					'full_name', 'email'
 				))
+                ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
+                    array('imp.real_order_id'))
 				->group('order.id');
 
 		if ($where){
@@ -100,6 +102,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'product_price' => '(GROUP_CONCAT(oc.price))',
             'product_tax' => '(GROUP_CONCAT(oc.tax))',
             'product_tax_price' => '(GROUP_CONCAT(oc.tax_price))',
+            'product_qty' => '(GROUP_CONCAT(oc.qty))',
             'shipping_type' => 'order.shipping_type',
             'shipping_service' => 'order.shipping_service',
             'gateway' => 'order.gateway',

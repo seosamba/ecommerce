@@ -9,6 +9,7 @@ $this->placeholder('headerContent')->set($title);
 ?>
 
 <div id="uplodContainer" class="content-auto text-center pt10px pb10px">
+    <label for="switchSku" class="grid_12 mb20px pointer"><input type="checkbox" id="switchSku" name="switchSku" value="1"> <?php echo $this->translate('Use mpn as sku');?> </label>
     <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv');?></button>
 </div>
 
@@ -23,8 +24,16 @@ $this->placeholder('headerContent')->set($title);
             filters : [
                 {title : "Zip files", extensions : "csv"}
             ],
+            multipart_params : {
+                'switchSku' : ''
+            },
             init : {
                 FilesAdded: function(up, files) {
+                    if($('#switchSku').is(':checked')){
+                        uploader.settings.multipart_params.switchSku = $('#switchSku').is(':checked');
+                    }else{
+                        uploader.settings.multipart_params.switchSku = null;
+                    }
                     showSpinner();
                     up.start();
                 }
@@ -33,11 +42,14 @@ $this->placeholder('headerContent')->set($title);
         uploader.init();
         uploader.bind('FileUploaded', function(up, file, info) {
             hideSpinner();
-            if(info.response.error == '0'){
-                showMessage(info.response.reason, false, '5000');
+            var response = jQuery.parseJSON(info.response);
+            if(response.error == '0'){
+                showMessage(response.responseText, false, '5000');
             }else{
-                showMessage(info.response.reason, true, '5000');
+
+                showMessage(response.responseText, true, '5000');
             }
+            uploader.refresh();
         });
     });
 </script>
