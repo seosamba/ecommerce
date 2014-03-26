@@ -22,6 +22,7 @@ class Tools_ExportImportOrders
         $countries = Tools_Geo::getCountries(true);
         $states = Tools_Geo::getState(null, true);
         $importOrderDbTable = new Store_DbTable_ImportOrder();
+        $emailValidate = new Zend_Validate_EmailAddress();
         $productBySkuOrMpn = 'sku';
         if ($switchSku) {
             $productBySkuOrMpn = 'mpn';
@@ -50,7 +51,7 @@ class Tools_ExportImportOrders
                 $importHasError = true;
                 continue;
             }
-            if (trim($userEmail) === '') {
+            if (!$emailValidate->isValid($userEmail)) {
                 $importOrdersErrors[] = array($orderImportId, '', '+', '', '', '', '');
                 $importHasError = true;
                 continue;
@@ -93,10 +94,10 @@ class Tools_ExportImportOrders
                     break;
                 }
                 $cartContent[$key]['product_id'] = $existingProducts[$sku]['id'];
-                $cartContent[$key]['price'] = $orderProductPrice[$key];
-                $cartContent[$key]['qty'] = $orderProductQty[$key];
-                $cartContent[$key]['tax'] = $orderProductTax[$key];
-                $cartContent[$key]['tax_price'] = $orderProductPrice[$key] + $orderProductTax[$key];
+                $cartContent[$key]['price'] = is_numeric($orderProductPrice[$key]) ? $orderProductPrice[$key] : 0;
+                $cartContent[$key]['qty'] = intval($orderProductQty[$key]);
+                $cartContent[$key]['tax'] = is_numeric($orderProductTax[$key]) ? $orderProductTax[$key]: 0;
+                $cartContent[$key]['tax_price'] = $cartContent[$key]['price'] + $cartContent[$key]['tax'];
             }
 
             if (!empty($cartContent)) {
@@ -210,14 +211,14 @@ class Tools_ExportImportOrders
                     'shipping_type' => $shippingType,
                     'shipping_service' => $shippingService,
                     'shipping_tracking_id' => $shippingTrackingId,
-                    'sub_total' => $orderData[$ordersHeaders['sub_total']],
-                    'total_tax' => $totalTax,
-                    'total' => $orderData[$ordersHeaders['total']],
+                    'sub_total' => is_numeric($orderData[$ordersHeaders['sub_total']]) ? $orderData[$ordersHeaders['sub_total']] : 0,
+                    'total_tax' => is_numeric($totalTax) ? $totalTax : 0,
+                    'total' => is_numeric($orderData[$ordersHeaders['total']]) ? $orderData[$ordersHeaders['total']] : 0,
                     'notes' => $notes,
-                    'discount' => $discount,
-                    'shipping_tax' => $shippingTax,
-                    'discount_tax' => $discountTax,
-                    'sub_total_tax' => $subTotalTax,
+                    'discount' => is_numeric($discount) ? $discount : 0,
+                    'shipping_tax' => is_numeric($shippingTax) ? $shippingTax : 0,
+                    'discount_tax' => is_numeric($discountTax) ? $discountTax : 0,
+                    'sub_total_tax' => is_numeric($subTotalTax) ? $subTotalTax: 0,
                     'discount_tax_rate' => 0,
                     'created_at' => $date,
                     'updated_at' => $date
@@ -246,14 +247,6 @@ class Tools_ExportImportOrders
             }
         }
 
-        if ($importedContentData) {
-            $contentValues = implode(',', array_fill(0, count($importedContentData) / 8, '(?, ?, ?, ?, ?, ?, ?, ?)'));
-            $importContentStmt = $cartSessionContentDbTable->getAdapter()
-                ->prepare(
-                    'INSERT INTO shopping_cart_session_content (cart_id, product_id, options, price, qty, tax, tax_price, freebies) VALUES ' . $contentValues . ''
-                );
-            $importContentStmt->execute($importedContentData);
-        }
         if (!empty($importedOrdersData)) {
             $values = implode(',', array_fill(0, count($importedOrdersData) / 3, '(?, ?, ?)'));
             $importOrdersStmt = $importOrderDbTable->getAdapter()
@@ -261,6 +254,15 @@ class Tools_ExportImportOrders
                     'INSERT INTO shopping_import_orders (real_order_id, import_order_id, created_at) VALUES ' . $values . ''
                 );
             $importOrdersStmt->execute($importedOrdersData);
+        }
+
+        if ($importedContentData) {
+            $contentValues = implode(',', array_fill(0, count($importedContentData) / 8, '(?, ?, ?, ?, ?, ?, ?, ?)'));
+            $importContentStmt = $cartSessionContentDbTable->getAdapter()
+                ->prepare(
+                    'INSERT INTO shopping_cart_session_content (cart_id, product_id, options, price, qty, tax, tax_price, freebies) VALUES ' . $contentValues . ''
+                );
+            $importContentStmt->execute($importedContentData);
         }
         return array('error' => $importHasError, 'importErrorsIds' => $importOrdersErrors, 'importedOrdersIds' => $importedOrdersIds);
     }

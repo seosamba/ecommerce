@@ -1068,7 +1068,7 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             $this->_view->translator = $this->_translator;
-            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
+            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_IMPORTORDERS;
             $this->_layout->content = $this->_view->render('orders-import.phtml');
             echo $this->_layout->render();
         }
