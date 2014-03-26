@@ -11,6 +11,7 @@ class Tools_ExportImportOrders
         $importedOrdersIds = array();
         $importedContentData = array();
         $importedOrdersData = array();
+        $importHasError = false;
         $ordersImportData = $ordersData['data'];
         $ordersHeaders = $ordersData['headers'];
         $userMapper = Application_Model_Mappers_UserMapper::getInstance();
@@ -46,10 +47,12 @@ class Tools_ExportImportOrders
             $orderImportId = $orderData[$ordersHeaders['order_id']];
             if (array_key_exists($orderImportId, $importedOrders)) {
                 $importOrdersErrors[] = array($orderImportId, '+', '', '', '', '', '');
+                $importHasError = true;
                 continue;
             }
             if (trim($userEmail) === '') {
                 $importOrdersErrors[] = array($orderImportId, '', '+', '', '', '', '');
+                $importHasError = true;
                 continue;
             }
             if (!array_key_exists($userEmail, $existingUsers)) {
@@ -74,16 +77,19 @@ class Tools_ExportImportOrders
                 || $skuQuantity !== count($orderProductTax)
             ) {
                 $importOrdersErrors[] = array($orderImportId, '', '', '+', '', '', '');
+                $importHasError = true;
                 continue;
             }
 
             foreach ($orderProductSku as $key => $sku) {
                 if (trim($sku) === '') {
                     $importOrdersErrors[] = array($orderImportId, '', '', '', '+', '', '');
+                    $importHasError = true;
                     break;
                 }
                 if (!array_key_exists($sku, $existingProducts)) {
                     $importOrdersErrors[] = array($orderImportId, '', '', '', '', '+', '');
+                    $importHasError = true;
                     break;
                 }
                 $cartContent[$key]['product_id'] = $existingProducts[$sku]['id'];
@@ -119,6 +125,7 @@ class Tools_ExportImportOrders
                     ) && $shippingCountry !== '' && $shippingCountry !== null
                     ) {
                         $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '+');
+                        $importHasError = true;
                         break;
                     } elseif (trim($shippingCountry) === '') {
                         $shippingCountry = null;
@@ -159,6 +166,7 @@ class Tools_ExportImportOrders
                     ) !== ''
                     ) {
                         $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '+');
+                        $importHasError = true;
                         break;
                     } elseif (trim($billingCountry) === '') {
                         $billingCountry = null;
@@ -218,7 +226,7 @@ class Tools_ExportImportOrders
                 $newId = $cartSessionMapper->getDbTable()->insert($data);
 
                 foreach ($cartContent as $content) {
-                    $taxPrice = isset($content['product_tax_price']) ? $content['product_tax_price'] : $content['price'];
+                    $taxPrice = isset($content['tax_price']) ? $content['tax_price'] : $content['price'];
                     $freebies = is_null($content['freebies']) ? 0 : $content['freebies'];
                     array_push(
                         $importedContentData,
@@ -254,7 +262,7 @@ class Tools_ExportImportOrders
                 );
             $importOrdersStmt->execute($importedOrdersData);
         }
-        return array('importErrorsIds' => $importOrdersErrors, 'importedOrdersIds' => $importedOrdersIds);
+        return array('error' => $importHasError, 'importErrorsIds' => $importOrdersErrors, 'importedOrdersIds' => $importedOrdersIds);
     }
 
     public static function prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds)
@@ -680,6 +688,129 @@ class Tools_ExportImportOrders
                 'label_name' => $translator->translate('Billing address 2')
             )
         );
+    }
+
+    public static function getSampleOrdersData()
+    {
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $response = Zend_Controller_Front::getInstance()->getResponse();
+        $headers = array(
+            'order_id',
+            'updated_at',
+            'status',
+            'sku',
+            'mpn',
+            'product_price',
+            'product_tax',
+            'product_qty',
+            'shipping_type',
+            'shipping_service',
+            'gateway',
+            'shipping_price',
+            'discount_tax_rate',
+            'sub_total',
+            'shipping_tax',
+            'discount_tax',
+            'sub_total_tax',
+            'total_tax',
+            'discount',
+            'total',
+            'notes',
+            'shipping_tracking_id',
+            'user_name',
+            'user_email',
+            'shipping_firstname',
+            'shipping_lastname',
+            'shipping_company',
+            'shipping_email',
+            'shipping_phone',
+            'shipping_mobile',
+            'shipping_country',
+            'shipping_city',
+            'shipping_state',
+            'shipping_zip',
+            'shipping_address1',
+            'shipping_address2',
+            'billing_firstname',
+            'billing_lastname',
+            'billing_company',
+            'billing_email',
+            'billing_phone',
+            'billing_mobile',
+            'billing_country',
+            'billing_city',
+            'billing_state',
+            'billing_zip',
+            'billing_address1',
+            'billing_address2'
+        );
+        $ordersSampleData[] = array(
+            '245',
+            '2013-10-29 13:43:23',
+            'completed',
+            'DIAG01ASF,DIAG40BCX',
+            '3432863008003,3432863006894',
+            '15.00,112.47',
+            '5.00,0.00',
+            '2,1',
+            'Colissimo Suivi 48h',
+            'flatrateshipping',
+            'paypal',
+            '0',
+            '0',
+            '142.47',
+            '0',
+            '0',
+            '0',
+            '10.00',
+            '0',
+            '152.47',
+            'some info from customer',
+            'https://tools.usps.com/go/TrackConfirmAction_input?origTrackNum=12333',
+            'Jon Doe',
+            'jondoe@gmail.com',
+            'Jon',
+            'Doe',
+            'Joe company',
+            'jondoe@gmail.com',
+            '18002221222',
+            '18002221222',
+            'US',
+            'CALIFORNIA CITY',
+            'CA',
+            '93505',
+            '1156 High Street',
+            '',
+            'Jon',
+            'Doe',
+            'Joe company',
+            'jondoe@gmail.com',
+            '18002221222',
+            '18002221222',
+            'US',
+            'CALIFORNIA CITY',
+            'CA',
+            '93505',
+            '1156 High Street',
+            ''
+        );
+        $fileName = 'ordersSample.' . date("Y-m-d", time()) . '.csv';
+        $filePath = $websiteHelper->getPath() . $websiteHelper->getTmp() . $fileName;
+        $expFile = fopen($filePath, 'w');
+        fputcsv($expFile, $headers, ',', '"');
+        foreach ($ordersSampleData as $data) {
+            fputcsv($expFile, $data, ',', '"');
+        }
+        fclose($expFile);
+        $ordersArchive = Tools_System_Tools::zip($filePath, $fileName);
+        $response->setHeader(
+            'Content-Disposition',
+            'attachment; filename=' . Tools_Filesystem_Tools::basename($ordersArchive)
+        )
+            ->setHeader('Content-type', 'application/force-download');
+        readfile($ordersArchive);
+        $response->sendResponse();
+        exit;
     }
 
 }

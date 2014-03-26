@@ -9,7 +9,9 @@ $this->placeholder('headerContent')->set($title);
 ?>
 
 <div id="uplodContainer" class="content-auto text-center pt10px pb10px">
-    <label for="switchSku" class="grid_12 mb20px pointer"><input type="checkbox" id="switchSku" name="switchSku" value="1"> <?php echo $this->translate('Use mpn as sku');?> </label>
+
+    <a class="grid_4" title="" href="<?php echo $this->websiteUrl;?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate('Get sample data file');?></a>
+    <label for="switchSku" class="grid_8 mb20px pointer text-left"><input type="checkbox" id="switchSku" name="switchSku" value="1"> <?php echo $this->translate('Use mpn as sku');?> </label>
     <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv');?></button>
 </div>
 

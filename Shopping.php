@@ -1087,7 +1087,7 @@ class Shopping extends Tools_Plugins_Abstract {
             if ($ordersData['error'] !== 1) {
                 $ordersResult = Tools_ExportImportOrders::createOrders($ordersData, $switchSku);
                 $this->_sessionHelper->importOrdersErrors = $ordersResult['importErrorsIds'];
-                if (!empty($ordersResult['importErrorsIds'])) {
+                if ($ordersResult['error'] === true) {
                     $this->_responseHelper->fail(
                         $this->_translator->translate(
                             'Some orders have error during the import
@@ -1137,6 +1137,12 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_responseHelper->success(
                 array('export_config' => $exportConfig, 'defaultConfig' => $defaultOrderExportConfig)
             );
+        }
+    }
+
+    public function getOrdersImportSampleDataAction() {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            Tools_ExportImportOrders::getSampleOrdersData();
         }
     }
 
