@@ -1077,6 +1077,7 @@ class Shopping extends Tools_Plugins_Abstract {
     public function importOrdersAction()
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            ini_set("max_execution_time", 300);
             $uploader = new Zend_File_Transfer_Adapter_Http();
             $ordersCsv = $uploader->getFileInfo();
             $switchSku = $this->_request->getParam('switchSku');
