@@ -221,8 +221,21 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 						$select->where('p.id = ?', $val);
 						break;
 					case 'product-key':
-						$likeWhere = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
-						$select->where($likeWhere, '%'.$val.'%');
+                        $likeWhere = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
+                        if (strpos($val, ',')) {
+                            $valArr = array_filter(explode(',', $val));
+                            for ($i = 0; $i < sizeof($valArr); $i++) {
+                                if ($i == 0) {
+                                    $select->where($likeWhere, '%'.$valArr[$i].'%');
+                                }
+                                else {
+                                    $select->orWhere($likeWhere, '%'.$valArr[$i].'%');
+                                }
+                            }
+                        }
+                        else {
+                            $select->where($likeWhere, '%'.$val.'%');
+                        }
 						break;
 					case 'country':
 					case 'state':
