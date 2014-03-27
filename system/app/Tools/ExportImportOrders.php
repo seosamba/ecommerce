@@ -5,268 +5,6 @@
 class Tools_ExportImportOrders
 {
 
-    public static function createOrders($ordersData, $switchSku = false)
-    {
-        $importOrdersErrors = array();
-        $importedOrdersIds = array();
-        $importedContentData = array();
-        $importedOrdersData = array();
-        $importHasError = false;
-        $ordersImportData = $ordersData['data'];
-        $ordersHeaders = $ordersData['headers'];
-        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
-        $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
-        $productMapper = Models_Mapper_ProductMapper::getInstance();
-        $cartSessionContentDbTable = new Models_DbTable_CartSessionContent();
-        $userModel = new Application_Model_Models_User();
-        $countries = Tools_Geo::getCountries(true);
-        $states = Tools_Geo::getState(null, true);
-        $importOrderDbTable = new Store_DbTable_ImportOrder();
-        $emailValidate = new Zend_Validate_EmailAddress();
-        $productBySkuOrMpn = 'sku';
-        if ($switchSku) {
-            $productBySkuOrMpn = 'mpn';
-        }
-        $existingProducts = $productMapper->getDbTable()->getAdapter()->fetchAssoc(
-            $productMapper->getDbTable()->getAdapter()->select()->from(
-                'shopping_product',
-                array($productBySkuOrMpn, 'id')
-            )
-        );
-        $existingUsers = $userMapper->getDbTable()->getAdapter()->fetchAssoc(
-            $userMapper->getDbTable()->getAdapter()->select()->from('user', array('email', 'id'))
-        );
-        $importedOrders = $importOrderDbTable->getAdapter()->fetchAssoc(
-            $importOrderDbTable->getAdapter()->select()->from(
-                'shopping_import_orders',
-                array('import_order_id', 'real_order_id')
-            )
-        );
-
-        foreach ($ordersImportData as $orderData) {
-            $userEmail = $orderData[$ordersHeaders['user_email']];
-            $orderImportId = $orderData[$ordersHeaders['order_id']];
-            if (array_key_exists($orderImportId, $importedOrders)) {
-                $importOrdersErrors[] = array($orderImportId, '+', '', '', '', '', '');
-                $importHasError = true;
-                continue;
-            }
-            if (!$emailValidate->isValid($userEmail)) {
-                $importOrdersErrors[] = array($orderImportId, '', '+', '', '', '', '');
-                $importHasError = true;
-                continue;
-            }
-            if (!array_key_exists($userEmail, $existingUsers)) {
-                $userModel->setId(null);
-                $userModel->setEmail($orderData[$ordersHeaders['user_email']]);
-                $userModel->setFullName($orderData[$ordersHeaders['user_name']]);
-                $userModel->setPassword(microtime());
-                $userModel->setRoleId(Shopping::ROLE_CUSTOMER);
-                $userId = $userMapper->save($userModel);
-            } else {
-                $userId = $existingUsers[$userEmail]['id'];
-            }
-
-            $cartContent = array();
-
-            $orderProductSku = explode(',', $orderData[$ordersHeaders[$productBySkuOrMpn]]);
-            $orderProductPrice = explode(',', $orderData[$ordersHeaders['product_price']]);
-            $orderProductQty = explode(',', $orderData[$ordersHeaders['product_qty']]);
-            $orderProductTax = explode(',', $orderData[$ordersHeaders['product_tax']]);
-            $skuQuantity = count($orderProductSku);
-            if ($skuQuantity !== count($orderProductPrice) || $skuQuantity !== count($orderProductQty)
-                || $skuQuantity !== count($orderProductTax)
-            ) {
-                $importOrdersErrors[] = array($orderImportId, '', '', '+', '', '', '');
-                $importHasError = true;
-                continue;
-            }
-
-            foreach ($orderProductSku as $key => $sku) {
-                if (trim($sku) === '') {
-                    $importOrdersErrors[] = array($orderImportId, '', '', '', '+', '', '');
-                    $importHasError = true;
-                    break;
-                }
-                if (!array_key_exists($sku, $existingProducts)) {
-                    $importOrdersErrors[] = array($orderImportId, '', '', '', '', '+', '');
-                    $importHasError = true;
-                    break;
-                }
-                $cartContent[$key]['product_id'] = $existingProducts[$sku]['id'];
-                $cartContent[$key]['price'] = is_numeric($orderProductPrice[$key]) ? $orderProductPrice[$key] : 0;
-                $cartContent[$key]['qty'] = intval($orderProductQty[$key]);
-                $cartContent[$key]['tax'] = is_numeric($orderProductTax[$key]) ? $orderProductTax[$key]: 0;
-                $cartContent[$key]['tax_price'] = $cartContent[$key]['price'] + $cartContent[$key]['tax'];
-            }
-
-            if (!empty($cartContent)) {
-                $date = $orderData[$ordersHeaders['updated_at']];
-                $notes = isset($ordersHeaders['notes']) ? $orderData[$ordersHeaders['notes']] : '';
-                $gateway = isset($ordersHeaders['gateway']) ? $orderData[$ordersHeaders['gateway']] : '';
-                $shippingPrice = isset($ordersHeaders['shipping_price']) ? $orderData[$ordersHeaders['shipping_price']] : 0;
-                $discountTax = isset($ordersHeaders['discount_tax']) ? $orderData[$ordersHeaders['discount_tax']] : 0;
-                $subTotalTax = isset($ordersHeaders['sub_total_tax']) ? $orderData[$ordersHeaders['sub_total_tax']] : 0;
-                $discount = isset($ordersHeaders['discount']) ? $orderData[$ordersHeaders['discount']] : 0;
-                $shippingType = isset($ordersHeaders['shipping_type']) ? $orderData[$ordersHeaders['shipping_type']] : '';
-                $shippingService = isset($ordersHeaders['shipping_service']) ? $orderData[$ordersHeaders['shipping_service']] : '';
-                $shippingTrackingId = isset($ordersHeaders['shipping_tracking_id']) ? $orderData[$ordersHeaders['shipping_tracking_id']] : '';
-                $shippingTax = isset($ordersHeaders['shipping_tax']) ? $orderData[$ordersHeaders['shipping_tax']] : 0;
-                $totalTax = isset($ordersHeaders['total_tax']) ? $orderData[$ordersHeaders['total_tax']] : 0;
-
-                $shippingFirstName = isset($ordersHeaders['shipping_firstname']) ? $orderData[$ordersHeaders['shipping_firstname']] : '';
-                $shippingAddressId = null;
-                if ($shippingFirstName !== '') {
-                    $shippingAddress = array();
-                    //TODO states and countries identification
-                    $shippingCountry = isset($ordersHeaders['shipping_country']) ? $orderData[$ordersHeaders['shipping_country']] : null;
-                    if (!array_key_exists(
-                        $shippingCountry,
-                        $countries
-                    ) && $shippingCountry !== '' && $shippingCountry !== null
-                    ) {
-                        $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '+');
-                        $importHasError = true;
-                        break;
-                    } elseif (trim($shippingCountry) === '') {
-                        $shippingCountry = null;
-                    }
-                    $shippingState = isset($ordersHeaders['shipping_state']) ? $orderData[$ordersHeaders['shipping_state']] : '';
-                    $shippingState = array_search($shippingState, $states);
-                    if (!$shippingState) {
-                        $shippingState = null;
-                    }
-
-                    $shippingAddress['firstname'] = isset($ordersHeaders['shipping_firstname']) ? $orderData[$ordersHeaders['shipping_firstname']] : '';
-                    $shippingAddress['lastname'] = isset($ordersHeaders['shipping_lastname']) ? $orderData[$ordersHeaders['shipping_lastname']] : '';
-                    $shippingAddress['company'] = isset($ordersHeaders['shipping_company']) ? $orderData[$ordersHeaders['shipping_company']] : '';
-                    $shippingAddress['email'] = isset($ordersHeaders['shipping_email']) ? $orderData[$ordersHeaders['shipping_email']] : '';
-                    $shippingAddress['phone'] = isset($ordersHeaders['shipping_phone']) ? $orderData[$ordersHeaders['shipping_phone']] : '';
-                    $shippingAddress['mobile'] = isset($ordersHeaders['shipping_mobile']) ? $orderData[$ordersHeaders['shipping_mobile']] : '';
-                    $shippingAddress['country'] = $shippingCountry;
-                    $shippingAddress['city'] = isset($ordersHeaders['shipping_city']) ? $orderData[$ordersHeaders['shipping_city']] : '';
-                    $shippingAddress['state'] = $shippingState;
-                    $shippingAddress['zip'] = isset($ordersHeaders['shipping_zip']) ? $orderData[$ordersHeaders['shipping_zip']] : '';
-                    $shippingAddress['address1'] = isset($ordersHeaders['shipping_address1']) ? $orderData[$ordersHeaders['shipping_address1']] : '';
-                    $shippingAddress['address2'] = isset($ordersHeaders['shipping_address2']) ? $orderData[$ordersHeaders['shipping_address2']] : '';
-                    $shippingAddressId = Tools_ExportImportOrders::addOrderAddress(
-                        $userId,
-                        $shippingAddress,
-                        Models_Model_Customer::ADDRESS_TYPE_SHIPPING
-                    );
-                }
-
-                $billingFirstName = isset($ordersHeaders['billing_firstname']) ? $orderData[$ordersHeaders['billing_firstname']] : '';
-                $billingAddressId = null;
-                if ($billingFirstName !== '') {
-                    $billingAddress = array();
-                    //TODO states and countries identification
-                    $billingCountry = isset($ordersHeaders['billing_country']) ? $orderData[$ordersHeaders['billing_country']] : null;
-                    if (!array_key_exists($billingCountry, $countries) && $billingCountry !== null && trim(
-                        $billingCountry
-                    ) !== ''
-                    ) {
-                        $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '+');
-                        $importHasError = true;
-                        break;
-                    } elseif (trim($billingCountry) === '') {
-                        $billingCountry = null;
-                    }
-
-                    $billingState = isset($ordersHeaders['billing_state']) ? $orderData[$ordersHeaders['billing_state']] : '';
-                    $billingState = array_search($billingState, $states);
-                    if (!$billingState) {
-                        $billingState = null;
-                    }
-
-                    $billingAddress['firstname'] = isset($ordersHeaders['billing_firstname']) ? $orderData[$ordersHeaders['billing_firstname']] : '';
-                    $billingAddress['lastname'] = isset($ordersHeaders['billing_lastname']) ? $orderData[$ordersHeaders['billing_lastname']] : '';
-                    $billingAddress['company'] = isset($ordersHeaders['billing_company']) ? $orderData[$ordersHeaders['billing_company']] : '';
-                    $billingAddress['email'] = isset($ordersHeaders['billing_email']) ? $orderData[$ordersHeaders['billing_email']] : '';
-                    $billingAddress['phone'] = isset($ordersHeaders['billing_phone']) ? $orderData[$ordersHeaders['billing_phone']] : '';
-                    $billingAddress['mobile'] = isset($ordersHeaders['billing_mobile']) ? $orderData[$ordersHeaders['billing_mobile']] : '';
-                    $billingAddress['country'] = $billingCountry;
-                    $billingAddress['city'] = isset($ordersHeaders['billing_city']) ? $orderData[$ordersHeaders['billing_city']] : '';
-                    $billingAddress['state'] = $billingState;
-                    $billingAddress['zip'] = isset($ordersHeaders['billing_zip']) ? $orderData[$ordersHeaders['billing_zip']] : '';
-                    $billingAddress['address1'] = isset($ordersHeaders['billing_address1']) ? $orderData[$ordersHeaders['billing_address1']] : '';
-                    $billingAddress['address2'] = isset($ordersHeaders['billing_address2']) ? $orderData[$ordersHeaders['billing_address2']] : '';
-                    $billingAddressId = Tools_ExportImportOrders::addOrderAddress(
-                        $userId,
-                        $billingAddress,
-                        Models_Model_Customer::ADDRESS_TYPE_BILLING
-                    );
-                }
-
-                //new version of processing cart session content
-                $data = array(
-                    'ip_address' => '',
-                    'referer' => '',
-                    'user_id' => $userId,
-                    'status' => $orderData[$ordersHeaders['status']],
-                    'gateway' => $gateway,
-                    'shipping_address_id' => $shippingAddressId,
-                    'billing_address_id' => $billingAddressId,
-                    'shipping_price' => $shippingPrice,
-                    'shipping_type' => $shippingType,
-                    'shipping_service' => $shippingService,
-                    'shipping_tracking_id' => $shippingTrackingId,
-                    'sub_total' => is_numeric($orderData[$ordersHeaders['sub_total']]) ? $orderData[$ordersHeaders['sub_total']] : 0,
-                    'total_tax' => is_numeric($totalTax) ? $totalTax : 0,
-                    'total' => is_numeric($orderData[$ordersHeaders['total']]) ? $orderData[$ordersHeaders['total']] : 0,
-                    'notes' => $notes,
-                    'discount' => is_numeric($discount) ? $discount : 0,
-                    'shipping_tax' => is_numeric($shippingTax) ? $shippingTax : 0,
-                    'discount_tax' => is_numeric($discountTax) ? $discountTax : 0,
-                    'sub_total_tax' => is_numeric($subTotalTax) ? $subTotalTax: 0,
-                    'discount_tax_rate' => 0,
-                    'created_at' => $date,
-                    'updated_at' => $date
-                );
-
-                $newId = $cartSessionMapper->getDbTable()->insert($data);
-
-                foreach ($cartContent as $content) {
-                    $taxPrice = isset($content['tax_price']) ? $content['tax_price'] : $content['price'];
-                    $freebies = is_null($content['freebies']) ? 0 : $content['freebies'];
-                    array_push(
-                        $importedContentData,
-                        $newId,
-                        $content['product_id'],
-                        null,
-                        $content['price'],
-                        $content['qty'],
-                        $content['tax'],
-                        $taxPrice,
-                        $freebies
-                    );
-                }
-                $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '');
-                array_push($importedOrdersIds, $orderImportId);
-                array_push($importedOrdersData, $newId, $orderImportId, date(DATE_ATOM));
-            }
-        }
-
-        if (!empty($importedOrdersData)) {
-            $values = implode(',', array_fill(0, count($importedOrdersData) / 3, '(?, ?, ?)'));
-            $importOrdersStmt = $importOrderDbTable->getAdapter()
-                ->prepare(
-                    'INSERT INTO shopping_import_orders (real_order_id, import_order_id, created_at) VALUES ' . $values . ''
-                );
-            $importOrdersStmt->execute($importedOrdersData);
-        }
-
-        if ($importedContentData) {
-            $contentValues = implode(',', array_fill(0, count($importedContentData) / 8, '(?, ?, ?, ?, ?, ?, ?, ?)'));
-            $importContentStmt = $cartSessionContentDbTable->getAdapter()
-                ->prepare(
-                    'INSERT INTO shopping_cart_session_content (cart_id, product_id, options, price, qty, tax, tax_price, freebies) VALUES ' . $contentValues . ''
-                );
-            $importContentStmt->execute($importedContentData);
-        }
-        return array('error' => $importHasError, 'importErrorsIds' => $importOrdersErrors, 'importedOrdersIds' => $importedOrdersIds);
-    }
-
     public static function prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
@@ -366,7 +104,7 @@ class Tools_ExportImportOrders
         return null;
     }
 
-    public static function createOrdersCsv($ordersCsv)
+    public static function createOrdersCsv($ordersCsv, $switchSku = false)
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $ordersCsvFile = fopen($ordersCsv['file']['tmp_name'], 'r');
@@ -385,33 +123,299 @@ class Tools_ExportImportOrders
             'user_email',
             'shipping_firstname'
         );
+        $assignHeaders = false;
         if ($ordersCsv !== false) {
-            while (($data = fgetcsv($ordersCsvFile, ',')) !== false) {
-                $parsedCsv[] = $data;
+            while (($orderData = fgetcsv($ordersCsvFile, ',')) !== false) {
+                $parsedCsv[] = $orderData;
+                if (!$assignHeaders) {
+                    $ordersHeaders = array_flip(array_map('strtolower', $orderData));
+                    $requiredFields = array_diff_key(array_flip($minimumRequiredFields), $ordersHeaders);
+                    $assignHeaders = true;
+                    if (!empty($requiredFields)) {
+                        $errorMessage = '';
+                        foreach ($requiredFields as $fieldMissed => $key) {
+                            $errorMessage .= $fieldMissed . '<br />';
+                        }
+                        fclose($ordersCsvFile);
+                        return array(
+                            'error' => 1,
+                            'errorMessage' => $translator->translate(
+                                'Required fields missed'
+                            ) . '<br />' . $errorMessage
+                        );
+                    }
+                    $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                    $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+                    $cartSessionContentDbTable = new Models_DbTable_CartSessionContent();
+                    $userModel = new Application_Model_Models_User();
+                    $countries = Tools_Geo::getCountries(true);
+                    $states = Tools_Geo::getState(null, true);
+                    $importOrderDbTable = new Store_DbTable_ImportOrder();
+                    $emailValidate = new Zend_Validate_EmailAddress();
+                    $importOrdersErrors = array();
+                    $importedOrdersIds = array();
+                    $importedContentData = array();
+                    $importedOrdersData = array();
+                    $importHasError = false;
+                    $productBySkuOrMpn = 'sku';
+                    if ($switchSku) {
+                        $productBySkuOrMpn = 'mpn';
+                    }
+                    $existingProducts = $productMapper->getDbTable()->getAdapter()->fetchAssoc(
+                        $productMapper->getDbTable()->getAdapter()->select()->from(
+                            'shopping_product',
+                            array($productBySkuOrMpn, 'id')
+                        )
+                    );
+                    $existingUsers = $userMapper->getDbTable()->getAdapter()->fetchAssoc(
+                        $userMapper->getDbTable()->getAdapter()->select()->from('user', array('email', 'id'))
+                    );
+                    $importedOrders = $importOrderDbTable->getAdapter()->fetchAssoc(
+                        $importOrderDbTable->getAdapter()->select()->from(
+                            'shopping_import_orders',
+                            array('import_order_id', 'real_order_id')
+                        )
+                    );
+                    continue;
+                }
+                $userEmail = $orderData[$ordersHeaders['user_email']];
+                $orderImportId = $orderData[$ordersHeaders['order_id']];
+                if (array_key_exists($orderImportId, $importedOrders)) {
+                    $importOrdersErrors[] = array($orderImportId, '+', '', '', '', '', '');
+                    $importHasError = true;
+                    continue;
+                }
+                if (!$emailValidate->isValid($userEmail)) {
+                    $importOrdersErrors[] = array($orderImportId, '', '+', '', '', '', '');
+                    $importHasError = true;
+                    continue;
+                }
+                if (!array_key_exists($userEmail, $existingUsers)) {
+                    $userModel->setId(null);
+                    $userModel->setEmail($orderData[$ordersHeaders['user_email']]);
+                    $userModel->setFullName($orderData[$ordersHeaders['user_name']]);
+                    $userModel->setPassword(microtime());
+                    $userModel->setRoleId(Shopping::ROLE_CUSTOMER);
+                    $userId = $userMapper->save($userModel);
+                } else {
+                    $userId = $existingUsers[$userEmail]['id'];
+                }
+
+                $cartContent = array();
+
+                $orderProductSku = explode(',', $orderData[$ordersHeaders[$productBySkuOrMpn]]);
+                $orderProductPrice = explode(',', $orderData[$ordersHeaders['product_price']]);
+                $orderProductQty = explode(',', $orderData[$ordersHeaders['product_qty']]);
+                $orderProductTax = explode(',', $orderData[$ordersHeaders['product_tax']]);
+                $skuQuantity = count($orderProductSku);
+                if ($skuQuantity !== count($orderProductPrice) || $skuQuantity !== count($orderProductQty)
+                    || $skuQuantity !== count($orderProductTax)
+                ) {
+                    $importOrdersErrors[] = array($orderImportId, '', '', '+', '', '', '');
+                    $importHasError = true;
+                    continue;
+                }
+
+                foreach ($orderProductSku as $key => $sku) {
+                    if (trim($sku) === '') {
+                        $importOrdersErrors[] = array($orderImportId, '', '', '', '+', '', '');
+                        $importHasError = true;
+                        break;
+                    }
+                    if (!array_key_exists($sku, $existingProducts)) {
+                        $importOrdersErrors[] = array($orderImportId, '', '', '', '', '+', '');
+                        $importHasError = true;
+                        break;
+                    }
+                    $cartContent[$key]['product_id'] = $existingProducts[$sku]['id'];
+                    $cartContent[$key]['price'] = is_numeric($orderProductPrice[$key]) ? $orderProductPrice[$key] : 0;
+                    $cartContent[$key]['qty'] = intval($orderProductQty[$key]);
+                    $cartContent[$key]['tax'] = is_numeric($orderProductTax[$key]) ? $orderProductTax[$key] : 0;
+                    $cartContent[$key]['tax_price'] = $cartContent[$key]['price'] + $cartContent[$key]['tax'];
+                }
+
+                if (!empty($cartContent)) {
+                    $date = $orderData[$ordersHeaders['updated_at']];
+                    $notes = isset($ordersHeaders['notes']) ? $orderData[$ordersHeaders['notes']] : '';
+                    $gateway = isset($ordersHeaders['gateway']) ? $orderData[$ordersHeaders['gateway']] : '';
+                    $shippingPrice = isset($ordersHeaders['shipping_price']) ? $orderData[$ordersHeaders['shipping_price']] : 0;
+                    $discountTax = isset($ordersHeaders['discount_tax']) ? $orderData[$ordersHeaders['discount_tax']] : 0;
+                    $subTotalTax = isset($ordersHeaders['sub_total_tax']) ? $orderData[$ordersHeaders['sub_total_tax']] : 0;
+                    $discount = isset($ordersHeaders['discount']) ? $orderData[$ordersHeaders['discount']] : 0;
+                    $shippingType = isset($ordersHeaders['shipping_type']) ? $orderData[$ordersHeaders['shipping_type']] : '';
+                    $shippingService = isset($ordersHeaders['shipping_service']) ? $orderData[$ordersHeaders['shipping_service']] : '';
+                    $shippingTrackingId = isset($ordersHeaders['shipping_tracking_id']) ? $orderData[$ordersHeaders['shipping_tracking_id']] : '';
+                    $shippingTax = isset($ordersHeaders['shipping_tax']) ? $orderData[$ordersHeaders['shipping_tax']] : 0;
+                    $totalTax = isset($ordersHeaders['total_tax']) ? $orderData[$ordersHeaders['total_tax']] : 0;
+
+                    $shippingFirstName = isset($ordersHeaders['shipping_firstname']) ? $orderData[$ordersHeaders['shipping_firstname']] : '';
+                    $shippingAddressId = null;
+                    if ($shippingFirstName !== '') {
+                        $shippingAddress = array();
+                        //TODO states and countries identification
+                        $shippingCountry = isset($ordersHeaders['shipping_country']) ? $orderData[$ordersHeaders['shipping_country']] : null;
+                        if (!array_key_exists(
+                            $shippingCountry,
+                            $countries
+                        ) && $shippingCountry !== '' && $shippingCountry !== null
+                        ) {
+                            $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '+');
+                            $importHasError = true;
+                            continue;
+                        } elseif (trim($shippingCountry) === '') {
+                            $shippingCountry = null;
+                        }
+                        $shippingState = isset($ordersHeaders['shipping_state']) ? $orderData[$ordersHeaders['shipping_state']] : '';
+                        $shippingState = array_search($shippingState, $states);
+                        if (!$shippingState) {
+                            $shippingState = null;
+                        }
+
+                        $shippingAddress['firstname'] = isset($ordersHeaders['shipping_firstname']) ? $orderData[$ordersHeaders['shipping_firstname']] : '';
+                        $shippingAddress['lastname'] = isset($ordersHeaders['shipping_lastname']) ? $orderData[$ordersHeaders['shipping_lastname']] : '';
+                        $shippingAddress['company'] = isset($ordersHeaders['shipping_company']) ? $orderData[$ordersHeaders['shipping_company']] : '';
+                        $shippingAddress['email'] = isset($ordersHeaders['shipping_email']) ? $orderData[$ordersHeaders['shipping_email']] : '';
+                        $shippingAddress['phone'] = isset($ordersHeaders['shipping_phone']) ? $orderData[$ordersHeaders['shipping_phone']] : '';
+                        $shippingAddress['mobile'] = isset($ordersHeaders['shipping_mobile']) ? $orderData[$ordersHeaders['shipping_mobile']] : '';
+                        $shippingAddress['country'] = $shippingCountry;
+                        $shippingAddress['city'] = isset($ordersHeaders['shipping_city']) ? $orderData[$ordersHeaders['shipping_city']] : '';
+                        $shippingAddress['state'] = $shippingState;
+                        $shippingAddress['zip'] = isset($ordersHeaders['shipping_zip']) ? $orderData[$ordersHeaders['shipping_zip']] : '';
+                        $shippingAddress['address1'] = isset($ordersHeaders['shipping_address1']) ? $orderData[$ordersHeaders['shipping_address1']] : '';
+                        $shippingAddress['address2'] = isset($ordersHeaders['shipping_address2']) ? $orderData[$ordersHeaders['shipping_address2']] : '';
+                        $shippingAddressId = Tools_ExportImportOrders::addOrderAddress(
+                            $userId,
+                            $shippingAddress,
+                            Models_Model_Customer::ADDRESS_TYPE_SHIPPING
+                        );
+                    }
+
+                    $billingFirstName = isset($ordersHeaders['billing_firstname']) ? $orderData[$ordersHeaders['billing_firstname']] : '';
+                    $billingAddressId = null;
+                    if ($billingFirstName !== '') {
+                        $billingAddress = array();
+                        //TODO states and countries identification
+                        $billingCountry = isset($ordersHeaders['billing_country']) ? $orderData[$ordersHeaders['billing_country']] : null;
+                        if (!array_key_exists($billingCountry, $countries) && $billingCountry !== null && trim(
+                            $billingCountry
+                        ) !== ''
+                        ) {
+                            $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '+');
+                            $importHasError = true;
+                            continue;
+                        } elseif (trim($billingCountry) === '') {
+                            $billingCountry = null;
+                        }
+
+                        $billingState = isset($ordersHeaders['billing_state']) ? $orderData[$ordersHeaders['billing_state']] : '';
+                        $billingState = array_search($billingState, $states);
+                        if (!$billingState) {
+                            $billingState = null;
+                        }
+
+                        $billingAddress['firstname'] = isset($ordersHeaders['billing_firstname']) ? $orderData[$ordersHeaders['billing_firstname']] : '';
+                        $billingAddress['lastname'] = isset($ordersHeaders['billing_lastname']) ? $orderData[$ordersHeaders['billing_lastname']] : '';
+                        $billingAddress['company'] = isset($ordersHeaders['billing_company']) ? $orderData[$ordersHeaders['billing_company']] : '';
+                        $billingAddress['email'] = isset($ordersHeaders['billing_email']) ? $orderData[$ordersHeaders['billing_email']] : '';
+                        $billingAddress['phone'] = isset($ordersHeaders['billing_phone']) ? $orderData[$ordersHeaders['billing_phone']] : '';
+                        $billingAddress['mobile'] = isset($ordersHeaders['billing_mobile']) ? $orderData[$ordersHeaders['billing_mobile']] : '';
+                        $billingAddress['country'] = $billingCountry;
+                        $billingAddress['city'] = isset($ordersHeaders['billing_city']) ? $orderData[$ordersHeaders['billing_city']] : '';
+                        $billingAddress['state'] = $billingState;
+                        $billingAddress['zip'] = isset($ordersHeaders['billing_zip']) ? $orderData[$ordersHeaders['billing_zip']] : '';
+                        $billingAddress['address1'] = isset($ordersHeaders['billing_address1']) ? $orderData[$ordersHeaders['billing_address1']] : '';
+                        $billingAddress['address2'] = isset($ordersHeaders['billing_address2']) ? $orderData[$ordersHeaders['billing_address2']] : '';
+                        $billingAddressId = Tools_ExportImportOrders::addOrderAddress(
+                            $userId,
+                            $billingAddress,
+                            Models_Model_Customer::ADDRESS_TYPE_BILLING
+                        );
+                    }
+
+                    //new version of processing cart session content
+                    $data = array(
+                        'ip_address' => '',
+                        'referer' => '',
+                        'user_id' => $userId,
+                        'status' => $orderData[$ordersHeaders['status']],
+                        'gateway' => $gateway,
+                        'shipping_address_id' => $shippingAddressId,
+                        'billing_address_id' => $billingAddressId,
+                        'shipping_price' => $shippingPrice,
+                        'shipping_type' => $shippingType,
+                        'shipping_service' => $shippingService,
+                        'shipping_tracking_id' => $shippingTrackingId,
+                        'sub_total' => is_numeric(
+                            $orderData[$ordersHeaders['sub_total']]
+                        ) ? $orderData[$ordersHeaders['sub_total']] : 0,
+                        'total_tax' => is_numeric($totalTax) ? $totalTax : 0,
+                        'total' => is_numeric(
+                            $orderData[$ordersHeaders['total']]
+                        ) ? $orderData[$ordersHeaders['total']] : 0,
+                        'notes' => $notes,
+                        'discount' => is_numeric($discount) ? $discount : 0,
+                        'shipping_tax' => is_numeric($shippingTax) ? $shippingTax : 0,
+                        'discount_tax' => is_numeric($discountTax) ? $discountTax : 0,
+                        'sub_total_tax' => is_numeric($subTotalTax) ? $subTotalTax : 0,
+                        'discount_tax_rate' => 0,
+                        'created_at' => $date,
+                        'updated_at' => $date
+                    );
+
+                    $newId = $cartSessionMapper->getDbTable()->insert($data);
+
+                    foreach ($cartContent as $content) {
+                        $taxPrice = isset($content['tax_price']) ? $content['tax_price'] : $content['price'];
+                        $freebies = is_null($content['freebies']) ? 0 : $content['freebies'];
+                        array_push(
+                            $importedContentData,
+                            $newId,
+                            $content['product_id'],
+                            null,
+                            $content['price'],
+                            $content['qty'],
+                            $content['tax'],
+                            $taxPrice,
+                            $freebies
+                        );
+                    }
+                    $importOrdersErrors[] = array($orderImportId, '', '', '', '', '', '');
+                    array_push($importedOrdersIds, $orderImportId);
+                    array_push($importedOrdersData, $newId, $orderImportId, date(DATE_ATOM));
+                }
+            }
+
+            if (!empty($importedOrdersData)) {
+                $values = implode(',', array_fill(0, count($importedOrdersData) / 3, '(?, ?, ?)'));
+                $importOrdersStmt = $importOrderDbTable->getAdapter()
+                    ->prepare(
+                        'INSERT INTO shopping_import_orders (real_order_id, import_order_id, created_at) VALUES ' . $values . ''
+                    );
+                $importOrdersStmt->execute($importedOrdersData);
+            }
+
+            if ($importedContentData) {
+                $contentValues = implode(
+                    ',',
+                    array_fill(0, count($importedContentData) / 8, '(?, ?, ?, ?, ?, ?, ?, ?)')
+                );
+                $importContentStmt = $cartSessionContentDbTable->getAdapter()
+                    ->prepare(
+                        'INSERT INTO shopping_cart_session_content (cart_id, product_id, options, price, qty, tax, tax_price, freebies) VALUES ' . $contentValues . ''
+                    );
+                $importContentStmt->execute($importedContentData);
             }
             fclose($ordersCsvFile);
-            if (!empty ($parsedCsv)) {
-                $headers = array_shift($parsedCsv);
-                $headers = array_flip(array_map('strtolower', $headers));
-                $requiredFields = array_diff_key(array_flip($minimumRequiredFields), $headers);
-                if (!empty($requiredFields)) {
-                    $errorMessage = '';
-                    foreach ($requiredFields as $fieldMissed => $key) {
-                        $errorMessage .= $fieldMissed . '<br />';
-                    }
-                    return array(
-                        'error' => 1,
-                        'errorMessage' => $translator->translate('Required fields missed') . '<br />' . $errorMessage
-                    );
-                }
-                return array('error' => '0', 'data' => $parsedCsv, 'headers' => $headers);
+            return array(
+                'error' => $importHasError,
+                'importErrorsIds' => $importOrdersErrors,
+                'importedOrdersIds' => $importedOrdersIds
+            );
 
-            } else {
-                return array('error' => 1, 'errorMessage' => $translator->translate('Csv is empty'));
-            }
-        } else {
-            return array('error' => 1, 'errorMessage' => $translator->translate('Error during reading csv'));
         }
+        fclose($ordersCsvFile);
+        return array('error' => true, 'errorMessage' => 'Format error');
     }
 
 

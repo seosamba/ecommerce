@@ -1084,23 +1084,22 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$uploader->isValid()) {
                 $this->_responseHelper->fail('');
             }
-            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv);
-            if ($ordersData['error'] !== 1) {
-                $ordersResult = Tools_ExportImportOrders::createOrders($ordersData, $switchSku);
-                $this->_sessionHelper->importOrdersErrors = $ordersResult['importErrorsIds'];
-                if ($ordersResult['error'] === true) {
-                    $this->_responseHelper->fail(
-                        $this->_translator->translate(
-                            'Some orders have error during the import
-                                                            '
-                        ) . '<a id="downloadOrdersImportReport" href="' . $this->_websiteHelper->getUrl(
-                        ) . 'plugin/shopping/run/downloadImportOrdersReport/" >' .
-                            $this->_translator->translate('click download report') . '</a>'
-                    );
+            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $switchSku);
+            if ($ordersData['error'] === true) {
+                if(isset($ordersData['errorMessage'])){
+                    $this->_responseHelper->fail($ordersData['errorMessage']);
                 }
-                $this->_responseHelper->success($this->_translator->translate('Order import finished'));
+                $this->_sessionHelper->importOrdersErrors = $ordersData['importErrorsIds'];
+                $this->_responseHelper->fail(
+                    $this->_translator->translate(
+                        'Some orders have error during the import'
+                    ) . '<br/><a id="downloadOrdersImportReport" href="' . $this->_websiteHelper->getUrl(
+                    ) . 'plugin/shopping/run/downloadImportOrdersReport/" >' . $this->_translator->translate(
+                        'click download report'
+                    ) . '</a>'
+                );
             }
-            $this->_responseHelper->fail($ordersData['errorMessage']);
+            $this->_responseHelper->success($this->_translator->translate('Order import finished'));
         }
     }
 
