@@ -367,7 +367,7 @@ class Tools_ExportImportOrders
 
                     foreach ($cartContent as $content) {
                         $taxPrice = isset($content['tax_price']) ? $content['tax_price'] : $content['price'];
-                        $freebies = is_null($content['freebies']) ? 0 : $content['freebies'];
+                        $freebies = 0;
                         array_push(
                             $importedContentData,
                             $newId,
