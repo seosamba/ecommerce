@@ -147,7 +147,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                     return null;
                 }
 
-                $values = array_unique($filter['value'], SORT_STRING);
+                $values = array_filter(array_unique($filter['value'], SORT_STRING));
                 if (!empty($widgetSettings[$filter['attribute_id']])) {
                     $values = array_intersect($values, $widgetSettings[$filter['attribute_id']]);
                 }
@@ -258,7 +258,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                     $filter['show'] = true;
                 }
                 if (!empty($filter['value'])) {
-                    $filter['value'] = array_unique($filter['value'], SORT_STRING);
+                    $filter['value'] = array_filter(array_unique($filter['value'], SORT_STRING));
                     if (!empty($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {
                         $filter['show'] = $widgetSettings[$filter['attribute_id']];
                     }
