@@ -108,11 +108,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		$this->_processOptions($model);
 
-		if ($model->getRelated()){
+		if (is_array($model->getRelated())){
 			$this->_processRelated($model);
 		}
 
-        if ($model->getFreebies()){
+        if (is_array($model->getFreebies())){
             $this->_processFreebies($model);
         }
 
