@@ -28,11 +28,8 @@ if (_.isUndefined(TFilter)) {
             var self = this;
             this.$el.find('input.typeahead').autocomplete({
                 source: _.bind(this.autocomplete, this),
-                focus: function (event, ui) {
-                    return false;
-                },
                 select: function (event, ui) {
-                    self.renderAttribute(ui.item);
+                    self.renderAttribute(ui.item).find('input:text').focus();
                     $(this).val('').blur();
                     return false;
                 }
@@ -78,7 +75,7 @@ if (_.isUndefined(TFilter)) {
                                     name: model.get('name'),
                                     tags: tags
                                 };
-                                self.renderAttribute(attr);
+                                self.renderAttribute(attr).find('input:text').focus();
                             },
                             error: function (model, response) {
                                 showMessage(response.responseText, true);
@@ -86,13 +83,12 @@ if (_.isUndefined(TFilter)) {
                         }
                     );
                 } else {
-                    var $input = this.$el.find('.product-filters-list input[name=' + attrExists.get('name') + ']');
+                    $el.val('');
+                    var $input = this.$el.find('.product-filters-list input[name="' + attrExists.get('name') + '"]');
                     if ($input.size()) {
-                        $el.val('').blur();
                         $input.focus();
                     } else {
-                        self.renderAttribute(_.extend({tags: tags}, attrExists.toJSON()));
-                        $el.val('').blur();
+                        self.renderAttribute(_.extend({tags: tags}, attrExists.toJSON())).find('input:text').focus();
                     }
                 }
             }
@@ -117,16 +113,23 @@ if (_.isUndefined(TFilter)) {
             }
         },
         renderAttribute: function (attr, index) {
+            // prevent duplicating attributes
+            var exists = this.$el.find('input[name="' + attr.name + '"]'),
+                tags = [];
+            if (exists.size()) {
+                exists.focus();
+                return false;
+            }
             // caching list element
             if (_.isUndefined(this.list)) {
                 this.list = this.$el.find('.product-filters-list');
             }
-            var tags = [];
+
             if (_.has(attr, 'tags')) {
                 tags = attr.tags;
             }
 
-            $('<p>', {'class': 'filtering-attribute-widget'})
+            return $('<p>', {'class': 'filtering-attribute-widget'})
                 .append($('<label>').html(attr.label))
                 .append(
                     $('<input>', {type: 'text', name: attr.name, value: _.unescape(attr.value)})
@@ -160,6 +163,7 @@ if (_.isUndefined(TFilter)) {
                     }).map(function (attr) {
                         return {
                             attribute_id: attr.id,
+                            name: attr.name,
                             label: attr.label,
                             value: null
                         };

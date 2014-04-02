@@ -1,53 +1,55 @@
 <?php $widgetId = uniqid('widget-filtering-'); ?>
 <div class="filtering-builder-wrap" id="<?php echo $widgetId; ?>" data-productid="<?php echo $this->productId; ?>">
-    <div class="filtering-builder-controlls">
-        <h4><?php echo $this->translate('Filter Builder'); ?>:</h4>
-        <div class="product-filters-list">
-        </div>
+    <header><?php echo $this->translate('Manage product attributes'); ?>:</header>
+    <div class="product-filters-list">
+    </div>
+    <header><?php echo $this->translate('Attach attribute to this product'); ?>:</header>
+    <div class="tag-list">
         <p><?php echo $this->translate('Applies to tags'); ?>:</p>
-        <p class="apply-to-tags">
+        <div class="apply-to-tags">
         <?php
         if (!empty($this->tags)) {
             foreach($this->tags as $tag) { ?>
                 <label><input type="checkbox" name="tags[]" value="<?php echo $tag['id']; ?>"
-                              checked /><?php echo $tag['name']; ?></label>
+                              checked />&nbsp;<?php echo $tag['name']; ?></label>
         <?php
             }
         } else {
             echo '<label>'.$this->translate('No tags yet').'</label>';
         }
         ?>
-        </p>
-        <p><input type="text" class="typeahead" name="new-attribute" placeholder="Give a name to filter" /></p>
+        </div>
+        <div><input type="text" class="typeahead" name="new-attribute" placeholder="Give a name to filter" /></div>
     </div>
 </div>
 
 <style type="text/css">
-    .filtering-builder-wrap,
-    .filtering-builder-wrap div.filtering-builder-controlls,
-    .filtering-builder-wrap div.filtering-builder-content {
+    .filtering-builder-wrap  {
         overflow: hidden;
-        background-color: #fff;
-    }
-    .filtering-builder-wrap {
-        width: 100%;
-        overflow: hidden;
+        background-color: #EEEEEE;
         position: relative;
-        border: 3px dashed #eee;
     }
-    .filtering-builder-wrap div.filtering-builder-controlls {
-        background: rgba(248, 248, 248, 1);
-        padding: 10px 5px 5px 5px;
-        min-height: 30px;
+    .filtering-builder-wrap > * {
+        padding: 5px;
     }
-    .filtering-builder-wrap div.filtering-builder-controlls h4 {
-        padding: 3px;
-        color: #ccc;
+    .filtering-builder-wrap header {
+        font-size: 125%;
+        font-weight: bold;
+        color: #666;
         text-transform: uppercase;
     }
-    .filtering-builder-wrap div.filtering-builder-content {
-        padding: 5px;
-        background: background: rgba(250, 250, 250, 1);
+    .filtering-builder-wrap div.product-filters-list {
+        border-bottom: 3px dashed #fff;
+    }
+    .filtering-builder-wrap div.tag-list {
+
+    }
+    .filtering-builder-wrap div.tag-list div.apply-to-tags {
+        border: 2px dashed #fff;
+        margin: 10px;
+    }
+    .filtering-builder-wrap div.tag-list div.apply-to-tags p {
+
     }
 </style>
 
