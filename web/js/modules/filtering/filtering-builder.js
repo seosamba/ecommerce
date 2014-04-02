@@ -114,11 +114,10 @@ if (_.isUndefined(TFilter)) {
         },
         renderAttribute: function (attr, index) {
             // prevent duplicating attributes
-            var exists = this.$el.find('input[name="' + attr.name + '"]'),
+            var $exists = this.$el.find('input[name="' + attr.name + '"]'),
                 tags = [];
-            if (exists.size()) {
-                exists.focus();
-                return false;
+            if ($exists.size()) {
+                return $exists.closest('p.filtering-attribute-widget');
             }
             // caching list element
             if (_.isUndefined(this.list)) {
