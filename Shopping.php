@@ -417,7 +417,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		}, $zonesMapper->fetchAll());
 		$this->_view->states = Tools_Geo::getState();
 		$this->_view->countries = Tools_Geo::getCountries();
-		$this->_layout->content = $this->_view->render('zones.phtml');
+        $this->_layout->content = $this->_view->render('zones.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
 		echo $this->_layout->render();
 	}
 

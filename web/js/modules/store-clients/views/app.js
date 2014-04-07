@@ -310,6 +310,7 @@ define([
                         $(dialog).dialog({
                             width: 600,
                             dialogClass: 'seotoaster',
+                            resizable:false,
                             buttons: assignEmailService,
                             open: function(event, ui) {
                                 $('#marketing-services').on('change',  function(){
@@ -326,9 +327,9 @@ define([
                                                 return false;
                                             }else{
                                                 $('#subscribe-list').remove();
-                                                var subscribeList = '<div id="subscribe-list" style="margin-top: 15px;">';
+                                                var subscribeList = '<div class="mt10px" id="subscribe-list">';
                                                 $.each(response.responseText.list, function(value, listName){
-                                                    subscribeList += '<input style="margin-top:5px;" type="checkbox" name="list" value="'+value+'"/><label style="float:left; margin-right: 20px;">'+listName+'</label>'
+                                                    subscribeList += '<label class="fl-left mr30px pointer">'+listName+' <input type="checkbox" name="list" value="'+value+'"/></label>'
                                                 })
                                                 subscribeList += '</div>';
                                                 $('#marketing-services').after(subscribeList);
