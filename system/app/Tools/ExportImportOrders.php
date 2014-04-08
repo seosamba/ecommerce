@@ -104,14 +104,68 @@ class Tools_ExportImportOrders
         return null;
     }
 
-    public static function createOrdersCsv($ordersCsv, $switchSku = false)
+    public static function getOrderImportFieldsNames()
+    {
+        $orderImportFieldNames = array(
+            'order_id',
+            'updated_at',
+            'status',
+            'sku',
+            'mpn',
+            'product_price',
+            'product_tax',
+            'product_qty',
+            'shipping_type',
+            'shipping_service',
+            'gateway',
+            'shipping_price',
+            'discount_tax_rate',
+            'sub_total',
+            'shipping_tax',
+            'discount_tax',
+            'sub_total_tax',
+            'total_tax',
+            'discount',
+            'total',
+            'notes',
+            'shipping_tracking_id',
+            'user_name',
+            'user_email',
+            'shipping_firstname',
+            'shipping_lastname',
+            'shipping_company',
+            'shipping_email',
+            'shipping_phone',
+            'shipping_mobile',
+            'shipping_country',
+            'shipping_city',
+            'shipping_state',
+            'shipping_zip',
+            'shipping_address1',
+            'shipping_address2',
+            'billing_firstname',
+            'billing_lastname',
+            'billing_company',
+            'billing_email',
+            'billing_phone',
+            'billing_mobile',
+            'billing_country',
+            'billing_city',
+            'billing_state',
+            'billing_zip',
+            'billing_address1',
+            'billing_address2'
+        );
+        return $orderImportFieldNames;
+    }
+
+    public static function createOrdersCsv($ordersCsv, $switchSku = false, $importOrdersConfigFields)
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $ordersCsvFile = fopen($ordersCsv['file']['tmp_name'], 'r');
         $minimumRequiredFields = array(
             'order_id',
             'updated_at',
-            'status',
             'product_qty',
             'sku',
             'mpn',
@@ -123,13 +177,23 @@ class Tools_ExportImportOrders
             'user_email',
             'shipping_firstname'
         );
+
+        $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+        foreach ($importOrdersConfigFields as $exportFieldName => $exportFieldValue) {
+            $exportFields[$exportFieldName] = array('label' => $exportFieldValue, 'field' => $exportFieldName);
+        }
+        $config = array(Shopping::ORDER_IMPORT_CONFIG => serialize($exportFields));
+        $shoppingConfigMapper->save($config);
         $assignHeaders = false;
         if ($ordersCsv !== false) {
             while (($orderData = fgetcsv($ordersCsvFile, ',')) !== false) {
-                $parsedCsv[] = $orderData;
                 if (!$assignHeaders) {
                     $ordersHeaders = array_flip(array_map('strtolower', $orderData));
-                    $requiredFields = array_diff_key(array_flip($minimumRequiredFields), $ordersHeaders);
+                    $changedMinReqFields = array_intersect_key(
+                        $importOrdersConfigFields,
+                        array_flip($minimumRequiredFields)
+                    );
+                    $requiredFields = array_diff_key(array_flip(array_map('strtolower', $changedMinReqFields)), $ordersHeaders);
                     $assignHeaders = true;
                     if (!empty($requiredFields)) {
                         $errorMessage = '';
@@ -138,7 +202,7 @@ class Tools_ExportImportOrders
                         }
                         fclose($ordersCsvFile);
                         return array(
-                            'error' => 1,
+                            'error' => true,
                             'errorMessage' => $translator->translate(
                                 'Required fields missed'
                             ) . '<br />' . $errorMessage
@@ -179,8 +243,8 @@ class Tools_ExportImportOrders
                     );
                     continue;
                 }
-                $userEmail = $orderData[$ordersHeaders['user_email']];
-                $orderImportId = $orderData[$ordersHeaders['order_id']];
+                $userEmail = $orderData[$ordersHeaders[$importOrdersConfigFields['user_email']]];
+                $orderImportId = $orderData[$ordersHeaders[$importOrdersConfigFields['order_id']]];
                 if (array_key_exists($orderImportId, $importedOrders)) {
                     $importOrdersErrors[] = array($orderImportId, '+', '', '', '', '', '');
                     $importHasError = true;
@@ -193,8 +257,8 @@ class Tools_ExportImportOrders
                 }
                 if (!array_key_exists($userEmail, $existingUsers)) {
                     $userModel->setId(null);
-                    $userModel->setEmail($orderData[$ordersHeaders['user_email']]);
-                    $userModel->setFullName($orderData[$ordersHeaders['user_name']]);
+                    $userModel->setEmail($orderData[$ordersHeaders[$importOrdersConfigFields['user_email']]]);
+                    $userModel->setFullName($orderData[$ordersHeaders[$importOrdersConfigFields['user_name']]]);
                     $userModel->setPassword(microtime());
                     $userModel->setRoleId(Shopping::ROLE_CUSTOMER);
                     $userId = $userMapper->save($userModel);
@@ -204,10 +268,16 @@ class Tools_ExportImportOrders
 
                 $cartContent = array();
 
-                $orderProductSku = explode(',', $orderData[$ordersHeaders[$productBySkuOrMpn]]);
-                $orderProductPrice = explode(',', $orderData[$ordersHeaders['product_price']]);
-                $orderProductQty = explode(',', $orderData[$ordersHeaders['product_qty']]);
-                $orderProductTax = explode(',', $orderData[$ordersHeaders['product_tax']]);
+                $orderProductSku = explode(
+                    ',',
+                    $orderData[$ordersHeaders[$importOrdersConfigFields[$productBySkuOrMpn]]]
+                );
+                $orderProductPrice = explode(
+                    ',',
+                    $orderData[$ordersHeaders[$importOrdersConfigFields['product_price']]]
+                );
+                $orderProductQty = explode(',', $orderData[$ordersHeaders[$importOrdersConfigFields['product_qty']]]);
+                $orderProductTax = explode(',', $orderData[$ordersHeaders[$importOrdersConfigFields['product_tax']]]);
                 $skuQuantity = count($orderProductSku);
                 if ($skuQuantity !== count($orderProductPrice) || $skuQuantity !== count($orderProductQty)
                     || $skuQuantity !== count($orderProductTax)
@@ -236,25 +306,25 @@ class Tools_ExportImportOrders
                 }
 
                 if (!empty($cartContent)) {
-                    $date = $orderData[$ordersHeaders['updated_at']];
-                    $notes = isset($ordersHeaders['notes']) ? $orderData[$ordersHeaders['notes']] : '';
-                    $gateway = isset($ordersHeaders['gateway']) ? $orderData[$ordersHeaders['gateway']] : '';
-                    $shippingPrice = isset($ordersHeaders['shipping_price']) ? $orderData[$ordersHeaders['shipping_price']] : 0;
-                    $discountTax = isset($ordersHeaders['discount_tax']) ? $orderData[$ordersHeaders['discount_tax']] : 0;
-                    $subTotalTax = isset($ordersHeaders['sub_total_tax']) ? $orderData[$ordersHeaders['sub_total_tax']] : 0;
-                    $discount = isset($ordersHeaders['discount']) ? $orderData[$ordersHeaders['discount']] : 0;
-                    $shippingType = isset($ordersHeaders['shipping_type']) ? $orderData[$ordersHeaders['shipping_type']] : '';
-                    $shippingService = isset($ordersHeaders['shipping_service']) ? $orderData[$ordersHeaders['shipping_service']] : '';
-                    $shippingTrackingId = isset($ordersHeaders['shipping_tracking_id']) ? $orderData[$ordersHeaders['shipping_tracking_id']] : '';
-                    $shippingTax = isset($ordersHeaders['shipping_tax']) ? $orderData[$ordersHeaders['shipping_tax']] : 0;
-                    $totalTax = isset($ordersHeaders['total_tax']) ? $orderData[$ordersHeaders['total_tax']] : 0;
+                    $date = $orderData[$ordersHeaders[$importOrdersConfigFields['updated_at']]];
+                    $notes = isset($ordersHeaders[$importOrdersConfigFields['notes']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['notes']]] : '';
+                    $gateway = isset($ordersHeaders[$importOrdersConfigFields['gateway']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['gateway']]] : '';
+                    $shippingPrice = isset($ordersHeaders[$importOrdersConfigFields['shipping_price']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_price']]] : 0;
+                    $discountTax = isset($ordersHeaders[$importOrdersConfigFields['discount_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['discount_tax']]] : 0;
+                    $subTotalTax = isset($ordersHeaders[$importOrdersConfigFields['sub_total_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total_tax']]] : 0;
+                    $discount = isset($ordersHeaders[$importOrdersConfigFields['discount']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['discount']]] : 0;
+                    $shippingType = isset($ordersHeaders[$importOrdersConfigFields['shipping_type']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_type']]] : '';
+                    $shippingService = isset($ordersHeaders[$importOrdersConfigFields['shipping_service']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_service']]] : '';
+                    $shippingTrackingId = isset($ordersHeaders[$importOrdersConfigFields['shipping_tracking_id']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_tracking_id']]] : '';
+                    $shippingTax = isset($ordersHeaders[$importOrdersConfigFields['shipping_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_tax']]] : 0;
+                    $totalTax = isset($ordersHeaders[$importOrdersConfigFields['total_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['total_tax']]] : 0;
 
-                    $shippingFirstName = isset($ordersHeaders['shipping_firstname']) ? $orderData[$ordersHeaders['shipping_firstname']] : '';
+                    $shippingFirstName = isset($ordersHeaders[$importOrdersConfigFields['shipping_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_firstname']]] : '';
                     $shippingAddressId = null;
                     if ($shippingFirstName !== '') {
                         $shippingAddress = array();
                         //TODO states and countries identification
-                        $shippingCountry = isset($ordersHeaders['shipping_country']) ? $orderData[$ordersHeaders['shipping_country']] : null;
+                        $shippingCountry = isset($ordersHeaders[$importOrdersConfigFields['shipping_country']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_country']]] : null;
                         if (!array_key_exists(
                             $shippingCountry,
                             $countries
@@ -266,24 +336,24 @@ class Tools_ExportImportOrders
                         } elseif (trim($shippingCountry) === '') {
                             $shippingCountry = null;
                         }
-                        $shippingState = isset($ordersHeaders['shipping_state']) ? $orderData[$ordersHeaders['shipping_state']] : '';
+                        $shippingState = isset($ordersHeaders[$importOrdersConfigFields['shipping_state']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_state']]] : '';
                         $shippingState = array_search($shippingState, $states);
                         if (!$shippingState) {
                             $shippingState = null;
                         }
 
-                        $shippingAddress['firstname'] = isset($ordersHeaders['shipping_firstname']) ? $orderData[$ordersHeaders['shipping_firstname']] : '';
-                        $shippingAddress['lastname'] = isset($ordersHeaders['shipping_lastname']) ? $orderData[$ordersHeaders['shipping_lastname']] : '';
-                        $shippingAddress['company'] = isset($ordersHeaders['shipping_company']) ? $orderData[$ordersHeaders['shipping_company']] : '';
-                        $shippingAddress['email'] = isset($ordersHeaders['shipping_email']) ? $orderData[$ordersHeaders['shipping_email']] : '';
-                        $shippingAddress['phone'] = isset($ordersHeaders['shipping_phone']) ? $orderData[$ordersHeaders['shipping_phone']] : '';
-                        $shippingAddress['mobile'] = isset($ordersHeaders['shipping_mobile']) ? $orderData[$ordersHeaders['shipping_mobile']] : '';
+                        $shippingAddress['firstname'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_firstname']]] : '';
+                        $shippingAddress['lastname'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_lastname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_lastname']]] : '';
+                        $shippingAddress['company'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_company']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_company']]] : '';
+                        $shippingAddress['email'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_email']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_email']]] : '';
+                        $shippingAddress['phone'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_phone']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_phone']]] : '';
+                        $shippingAddress['mobile'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_mobile']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_mobile']]] : '';
                         $shippingAddress['country'] = $shippingCountry;
-                        $shippingAddress['city'] = isset($ordersHeaders['shipping_city']) ? $orderData[$ordersHeaders['shipping_city']] : '';
+                        $shippingAddress['city'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_city']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_city']]] : '';
                         $shippingAddress['state'] = $shippingState;
-                        $shippingAddress['zip'] = isset($ordersHeaders['shipping_zip']) ? $orderData[$ordersHeaders['shipping_zip']] : '';
-                        $shippingAddress['address1'] = isset($ordersHeaders['shipping_address1']) ? $orderData[$ordersHeaders['shipping_address1']] : '';
-                        $shippingAddress['address2'] = isset($ordersHeaders['shipping_address2']) ? $orderData[$ordersHeaders['shipping_address2']] : '';
+                        $shippingAddress['zip'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_zip']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_zip']]] : '';
+                        $shippingAddress['address1'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_address1']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_address1']]] : '';
+                        $shippingAddress['address2'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_address2']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_address2']]] : '';
                         $shippingAddressId = Tools_ExportImportOrders::addOrderAddress(
                             $userId,
                             $shippingAddress,
@@ -291,12 +361,12 @@ class Tools_ExportImportOrders
                         );
                     }
 
-                    $billingFirstName = isset($ordersHeaders['billing_firstname']) ? $orderData[$ordersHeaders['billing_firstname']] : '';
+                    $billingFirstName = isset($ordersHeaders[$importOrdersConfigFields['billing_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_firstname']]] : '';
                     $billingAddressId = null;
                     if ($billingFirstName !== '') {
                         $billingAddress = array();
                         //TODO states and countries identification
-                        $billingCountry = isset($ordersHeaders['billing_country']) ? $orderData[$ordersHeaders['billing_country']] : null;
+                        $billingCountry = isset($ordersHeaders[$importOrdersConfigFields['billing_country']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_country']]] : null;
                         if (!array_key_exists($billingCountry, $countries) && $billingCountry !== null && trim(
                             $billingCountry
                         ) !== ''
@@ -308,24 +378,24 @@ class Tools_ExportImportOrders
                             $billingCountry = null;
                         }
 
-                        $billingState = isset($ordersHeaders['billing_state']) ? $orderData[$ordersHeaders['billing_state']] : '';
+                        $billingState = isset($ordersHeaders[$importOrdersConfigFields['billing_state']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_state']]] : '';
                         $billingState = array_search($billingState, $states);
                         if (!$billingState) {
                             $billingState = null;
                         }
 
-                        $billingAddress['firstname'] = isset($ordersHeaders['billing_firstname']) ? $orderData[$ordersHeaders['billing_firstname']] : '';
-                        $billingAddress['lastname'] = isset($ordersHeaders['billing_lastname']) ? $orderData[$ordersHeaders['billing_lastname']] : '';
-                        $billingAddress['company'] = isset($ordersHeaders['billing_company']) ? $orderData[$ordersHeaders['billing_company']] : '';
-                        $billingAddress['email'] = isset($ordersHeaders['billing_email']) ? $orderData[$ordersHeaders['billing_email']] : '';
-                        $billingAddress['phone'] = isset($ordersHeaders['billing_phone']) ? $orderData[$ordersHeaders['billing_phone']] : '';
-                        $billingAddress['mobile'] = isset($ordersHeaders['billing_mobile']) ? $orderData[$ordersHeaders['billing_mobile']] : '';
+                        $billingAddress['firstname'] = isset($ordersHeaders[$importOrdersConfigFields['billing_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_firstname']]] : '';
+                        $billingAddress['lastname'] = isset($ordersHeaders[$importOrdersConfigFields['billing_lastname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_lastname']]] : '';
+                        $billingAddress['company'] = isset($ordersHeaders[$importOrdersConfigFields['billing_company']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_company']]] : '';
+                        $billingAddress['email'] = isset($ordersHeaders[$importOrdersConfigFields['billing_email']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_email']]] : '';
+                        $billingAddress['phone'] = isset($ordersHeaders[$importOrdersConfigFields['billing_phone']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_phone']]] : '';
+                        $billingAddress['mobile'] = isset($ordersHeaders[$importOrdersConfigFields['billing_mobile']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_mobile']]] : '';
                         $billingAddress['country'] = $billingCountry;
-                        $billingAddress['city'] = isset($ordersHeaders['billing_city']) ? $orderData[$ordersHeaders['billing_city']] : '';
+                        $billingAddress['city'] = isset($ordersHeaders[$importOrdersConfigFields['billing_city']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_city']]] : '';
                         $billingAddress['state'] = $billingState;
-                        $billingAddress['zip'] = isset($ordersHeaders['billing_zip']) ? $orderData[$ordersHeaders['billing_zip']] : '';
-                        $billingAddress['address1'] = isset($ordersHeaders['billing_address1']) ? $orderData[$ordersHeaders['billing_address1']] : '';
-                        $billingAddress['address2'] = isset($ordersHeaders['billing_address2']) ? $orderData[$ordersHeaders['billing_address2']] : '';
+                        $billingAddress['zip'] = isset($ordersHeaders[$importOrdersConfigFields['billing_zip']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_zip']]] : '';
+                        $billingAddress['address1'] = isset($ordersHeaders[$importOrdersConfigFields['billing_address1']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_address1']]] : '';
+                        $billingAddress['address2'] = isset($ordersHeaders[$importOrdersConfigFields['billing_address2']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_address2']]] : '';
                         $billingAddressId = Tools_ExportImportOrders::addOrderAddress(
                             $userId,
                             $billingAddress,
@@ -338,7 +408,7 @@ class Tools_ExportImportOrders
                         'ip_address' => '',
                         'referer' => '',
                         'user_id' => $userId,
-                        'status' => $orderData[$ordersHeaders['status']],
+                        'status' => $orderData[$ordersHeaders[$importOrdersConfigFields['status']]],
                         'gateway' => $gateway,
                         'shipping_address_id' => $shippingAddressId,
                         'billing_address_id' => $billingAddressId,
@@ -347,12 +417,12 @@ class Tools_ExportImportOrders
                         'shipping_service' => $shippingService,
                         'shipping_tracking_id' => $shippingTrackingId,
                         'sub_total' => is_numeric(
-                            $orderData[$ordersHeaders['sub_total']]
-                        ) ? $orderData[$ordersHeaders['sub_total']] : 0,
+                            $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]
+                        ) ? $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]] : 0,
                         'total_tax' => is_numeric($totalTax) ? $totalTax : 0,
                         'total' => is_numeric(
-                            $orderData[$ordersHeaders['total']]
-                        ) ? $orderData[$ordersHeaders['total']] : 0,
+                            $orderData[$ordersHeaders[$importOrdersConfigFields['total']]]
+                        ) ? $orderData[$ordersHeaders[$importOrdersConfigFields['total']]] : 0,
                         'notes' => $notes,
                         'discount' => is_numeric($discount) ? $discount : 0,
                         'shipping_tax' => is_numeric($shippingTax) ? $shippingTax : 0,
@@ -681,56 +751,7 @@ class Tools_ExportImportOrders
     public static function getSampleOrdersData()
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $headers = array(
-            'order_id',
-            'updated_at',
-            'status',
-            'sku',
-            'mpn',
-            'product_price',
-            'product_tax',
-            'product_qty',
-            'shipping_type',
-            'shipping_service',
-            'gateway',
-            'shipping_price',
-            'discount_tax_rate',
-            'sub_total',
-            'shipping_tax',
-            'discount_tax',
-            'sub_total_tax',
-            'total_tax',
-            'discount',
-            'total',
-            'notes',
-            'shipping_tracking_id',
-            'user_name',
-            'user_email',
-            'shipping_firstname',
-            'shipping_lastname',
-            'shipping_company',
-            'shipping_email',
-            'shipping_phone',
-            'shipping_mobile',
-            'shipping_country',
-            'shipping_city',
-            'shipping_state',
-            'shipping_zip',
-            'shipping_address1',
-            'shipping_address2',
-            'billing_firstname',
-            'billing_lastname',
-            'billing_company',
-            'billing_email',
-            'billing_phone',
-            'billing_mobile',
-            'billing_country',
-            'billing_city',
-            'billing_state',
-            'billing_zip',
-            'billing_address1',
-            'billing_address2'
-        );
+        $headers = Tools_ExportImportOrders::getOrderImportFieldsNames();
         $ordersSampleData[] = array(
             '245',
             '2013-10-29 13:43:23',

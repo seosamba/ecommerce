@@ -95,6 +95,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const ORDER_EXPORT_CONFIG = 'order_export_config';
 
+    const ORDER_IMPORT_CONFIG = 'order_import_config';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -1068,7 +1070,13 @@ class Shopping extends Tools_Plugins_Abstract {
     public function ordersImportConfigAction()
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $importConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(self::ORDER_IMPORT_CONFIG);
+            if ($importConfig !== null) {
+                $importConfig = unserialize($importConfig);
+                $this->_view->importConfig = $importConfig;
+            }
             $this->_view->translator = $this->_translator;
+            $this->_view->defaultImportsFileds = Tools_ExportImportOrders::getDefaultOrderExportConfig();
             $this->_layout->sectionId = Tools_Misc::SECTION_STORE_IMPORTORDERS;
             $this->_layout->content = $this->_view->render('orders-import.phtml');
             echo $this->_layout->render();
@@ -1082,12 +1090,17 @@ class Shopping extends Tools_Plugins_Abstract {
             $uploader = new Zend_File_Transfer_Adapter_Http();
             $ordersCsv = $uploader->getFileInfo();
             $switchSku = $this->_request->getParam('switchSku');
+            $importOrdersFields = $this->_request->getParam('importOrdersFields');
+            $importOrdersFields = explode(',', $importOrdersFields);
+            $realOrdersFields = $this->_request->getParam('realOrdersFields');
+            $realOrdersFields = explode(',', $realOrdersFields);
+            $importOrdersFieldsData = array_combine($realOrdersFields, $importOrdersFields);
             if (!$uploader->isValid()) {
                 $this->_responseHelper->fail('');
             }
-            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $switchSku);
+            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $switchSku, $importOrdersFieldsData);
             if ($ordersData['error'] === true) {
-                if(isset($ordersData['errorMessage'])){
+                if (isset($ordersData['errorMessage'])) {
                     $this->_responseHelper->fail($ordersData['errorMessage']);
                 }
                 $this->_sessionHelper->importOrdersErrors = $ordersData['importErrorsIds'];

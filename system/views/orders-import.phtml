@@ -1,53 +1,89 @@
 <?php
-$this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/plupload/plupload.js');
-$this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/plupload/plupload.html5.js');
-$this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/plupload/plupload.html4.js');
-$this->jQuery()->addJavascriptFile($this->websiteUrl.'system/js/external/plupload/plupload.flash.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.html5.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.html4.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.flash.js');
 $title = $this->translate('Import orders');
 $this->headTitle($title);
 $this->placeholder('headerContent')->set($title);
 ?>
 
-<div id="uplodContainer" class="content-auto text-center pt10px pb10px">
+<div id="uploadContainer" class="content-auto text-center pt10px pb10px">
+    <div class="grid_12">
+        <a class="grid_4" title=""
+           href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate(
+                'Get sample data file'
+            ); ?></a>
+        <label for="switchSku" class="grid_8 mb20px pointer text-left"><input type="checkbox" id="switchSku"
+                                                                              name="switchSku" value="1">
+            <?php echo $this->translate('Use mpn as sku'); ?>
+        </label>
 
-    <a class="grid_4" title="" href="<?php echo $this->websiteUrl;?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate('Get sample data file');?></a>
-    <label for="switchSku" class="grid_8 mb20px pointer text-left"><input type="checkbox" id="switchSku" name="switchSku" value="1"> <?php echo $this->translate('Use mpn as sku');?> </label>
-    <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv');?></button>
+        <div class="grid_12">
+            <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv'); ?></button>
+        </div>
+    </div>
+    <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
+    <?php foreach ($this->defaultImportsFileds as $importFields): ?>
+        <?php if (in_array($importFields['label'], $importFieldNames)): ?>
+            <label class="grid_3 mt5px">
+                <?php echo $importFields['label_name']; ?>
+                <?php if (isset($this->importConfig)): ?>
+                    <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                           value="<?php echo $this->importConfig[$importFields['label']]['label']; ?>"/>
+                <?php else: ?>
+                    <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                           value="<?php echo $importFields['label']; ?>"/>
+                <?php endif; ?>
+            </label>
+        <?php endif; ?>
+    <?php endforeach; ?>
 </div>
 
 <script type="text/javascript" charset="utf-8">
-    $(function() {
+    $(function () {
         var uploader = new plupload.Uploader({
-            runtimes : 'html5,flash,html4',
-            browse_button : 'pickOrders',
-            container : 'uplodContainer',
-            max_file_size : '100mb',
-            url : '<?php echo $this->websiteUrl?>plugin/shopping/run/importOrders/',
-            filters : [
-                {title : "Zip files", extensions : "csv"}
+            runtimes: 'html5,flash,html4',
+            browse_button: 'pickOrders',
+            container: 'uploadContainer',
+            max_file_size: '100mb',
+            url: '<?php echo $this->websiteUrl?>plugin/shopping/run/importOrders/',
+            filters: [
+                {title: "Zip files", extensions: "csv"}
             ],
-            multipart_params : {
-                'switchSku' : ''
+            multipart_params: {
+                'switchSku': '',
+                'importOrdersFields': '',
+                'realOrdersFields': ''
             },
-            init : {
-                FilesAdded: function(up, files) {
-                    if($('#switchSku').is(':checked')){
+            init: {
+                FilesAdded: function (up, files) {
+                    var realOrderFields = [];
+                    var importOrdersFields = [];
+                    $.each($('#uploadContainer').find('.import-field'), function (value) {
+                        importOrdersFields.push($(this).val());
+                        realOrderFields.push($(this).attr('name'));
+                    });
+                    uploader.settings.multipart_params.importOrdersFields = importOrdersFields;
+                    uploader.settings.multipart_params.realOrdersFields = realOrderFields;
+                    if ($('#switchSku').is(':checked')) {
                         uploader.settings.multipart_params.switchSku = $('#switchSku').is(':checked');
-                    }else{
+                    } else {
                         uploader.settings.multipart_params.switchSku = null;
                     }
+
                     showSpinner();
                     up.start();
                 }
             }
         });
         uploader.init();
-        uploader.bind('FileUploaded', function(up, file, info) {
+        uploader.bind('FileUploaded', function (up, file, info) {
             hideSpinner();
             var response = jQuery.parseJSON(info.response);
-            if(response.error == '0'){
+            if (response.error == '0') {
                 showMessage(response.responseText, false, '5000');
-            }else{
+            } else {
 
                 showMessage(response.responseText, true, '5000');
             }
