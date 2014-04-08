@@ -1089,7 +1089,6 @@ class Shopping extends Tools_Plugins_Abstract {
             ini_set("max_execution_time", 300);
             $uploader = new Zend_File_Transfer_Adapter_Http();
             $ordersCsv = $uploader->getFileInfo();
-            $switchSku = $this->_request->getParam('switchSku');
             $importOrdersFields = $this->_request->getParam('importOrdersFields');
             $importOrdersFields = explode(',', $importOrdersFields);
             $realOrdersFields = $this->_request->getParam('realOrdersFields');
@@ -1098,7 +1097,7 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$uploader->isValid()) {
                 $this->_responseHelper->fail('');
             }
-            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $switchSku, $importOrdersFieldsData);
+            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $importOrdersFieldsData);
             if ($ordersData['error'] === true) {
                 if (isset($ordersData['errorMessage'])) {
                     $this->_responseHelper->fail($ordersData['errorMessage']);
@@ -1154,7 +1153,8 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
-    public function getOrdersImportSampleDataAction() {
+    public function getOrdersImportSampleDataAction()
+    {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             Tools_ExportImportOrders::getSampleOrdersData();
         }

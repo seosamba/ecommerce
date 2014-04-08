@@ -9,20 +9,6 @@ $this->placeholder('headerContent')->set($title);
 ?>
 
 <div id="uploadContainer" class="content-auto text-center pt10px pb10px">
-    <div class="grid_12">
-        <a class="grid_4" title=""
-           href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate(
-                'Get sample data file'
-            ); ?></a>
-        <label for="switchSku" class="grid_8 mb20px pointer text-left"><input type="checkbox" id="switchSku"
-                                                                              name="switchSku" value="1">
-            <?php echo $this->translate('Use mpn as sku'); ?>
-        </label>
-
-        <div class="grid_12">
-            <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv'); ?></button>
-        </div>
-    </div>
     <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
     <?php foreach ($this->defaultImportsFileds as $importFields): ?>
         <?php if (in_array($importFields['label'], $importFieldNames)): ?>
@@ -38,6 +24,16 @@ $this->placeholder('headerContent')->set($title);
             </label>
         <?php endif; ?>
     <?php endforeach; ?>
+    <div class="grid_12 mt20px">
+        <a class="fl-left" title=""
+           href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate(
+                'Get sample data file'
+            ); ?></a>
+
+        <div class="fl-right">
+            <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv'); ?></button>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -52,7 +48,6 @@ $this->placeholder('headerContent')->set($title);
                 {title: "Zip files", extensions: "csv"}
             ],
             multipart_params: {
-                'switchSku': '',
                 'importOrdersFields': '',
                 'realOrdersFields': ''
             },
@@ -66,12 +61,6 @@ $this->placeholder('headerContent')->set($title);
                     });
                     uploader.settings.multipart_params.importOrdersFields = importOrdersFields;
                     uploader.settings.multipart_params.realOrdersFields = realOrderFields;
-                    if ($('#switchSku').is(':checked')) {
-                        uploader.settings.multipart_params.switchSku = $('#switchSku').is(':checked');
-                    } else {
-                        uploader.settings.multipart_params.switchSku = null;
-                    }
-
                     showSpinner();
                     up.start();
                 }

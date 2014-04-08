@@ -159,23 +159,15 @@ class Tools_ExportImportOrders
         return $orderImportFieldNames;
     }
 
-    public static function createOrdersCsv($ordersCsv, $switchSku = false, $importOrdersConfigFields)
+    public static function createOrdersCsv($ordersCsv, $importOrdersConfigFields)
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $ordersCsvFile = fopen($ordersCsv['file']['tmp_name'], 'r');
         $minimumRequiredFields = array(
             'order_id',
-            'updated_at',
-            'product_qty',
             'sku',
-            'mpn',
-            'product_price',
-            'product_tax',
-            'sub_total',
-            'total',
             'user_name',
-            'user_email',
-            'shipping_firstname'
+            'user_email'
         );
 
         $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
@@ -193,7 +185,9 @@ class Tools_ExportImportOrders
                         $importOrdersConfigFields,
                         array_flip($minimumRequiredFields)
                     );
-                    $requiredFields = array_diff_key(array_flip(array_map('strtolower', $changedMinReqFields)), $ordersHeaders);
+                    $importOrdersConfigFields = array_map('strtolower', $importOrdersConfigFields);
+                    $changedMinReqFields = array_map('strtolower', $changedMinReqFields);
+                    $requiredFields = array_diff_key(array_flip($changedMinReqFields), $ordersHeaders);
                     $assignHeaders = true;
                     if (!empty($requiredFields)) {
                         $errorMessage = '';
@@ -222,14 +216,11 @@ class Tools_ExportImportOrders
                     $importedContentData = array();
                     $importedOrdersData = array();
                     $importHasError = false;
-                    $productBySkuOrMpn = 'sku';
-                    if ($switchSku) {
-                        $productBySkuOrMpn = 'mpn';
-                    }
+                    $productBySku = 'sku';
                     $existingProducts = $productMapper->getDbTable()->getAdapter()->fetchAssoc(
                         $productMapper->getDbTable()->getAdapter()->select()->from(
                             'shopping_product',
-                            array($productBySkuOrMpn, 'id')
+                            array($productBySku, 'id', 'price')
                         )
                     );
                     $existingUsers = $userMapper->getDbTable()->getAdapter()->fetchAssoc(
@@ -270,23 +261,41 @@ class Tools_ExportImportOrders
 
                 $orderProductSku = explode(
                     ',',
-                    $orderData[$ordersHeaders[$importOrdersConfigFields[$productBySkuOrMpn]]]
+                    $orderData[$ordersHeaders[$importOrdersConfigFields[$productBySku]]]
                 );
-                $orderProductPrice = explode(
-                    ',',
-                    $orderData[$ordersHeaders[$importOrdersConfigFields['product_price']]]
-                );
-                $orderProductQty = explode(',', $orderData[$ordersHeaders[$importOrdersConfigFields['product_qty']]]);
-                $orderProductTax = explode(',', $orderData[$ordersHeaders[$importOrdersConfigFields['product_tax']]]);
                 $skuQuantity = count($orderProductSku);
-                if ($skuQuantity !== count($orderProductPrice) || $skuQuantity !== count($orderProductQty)
-                    || $skuQuantity !== count($orderProductTax)
-                ) {
+                if (!isset($orderData[$ordersHeaders[$importOrdersConfigFields['product_price']]])) {
+                    $orderProductPrice = false;
+                } else {
+                    $orderProductPrice = explode(
+                        ',',
+                        $orderData[$ordersHeaders[$importOrdersConfigFields['product_price']]]
+                    );
+                }
+                if (!isset($orderData[$ordersHeaders[$importOrdersConfigFields['product_qty']]])) {
+                    $orderProductQty = array_fill(0, $skuQuantity, 1);
+                } else {
+                    $orderProductQty = explode(
+                        ',',
+                        $orderData[$ordersHeaders[$importOrdersConfigFields['product_qty']]]
+                    );
+                }
+                if (!isset($orderData[$ordersHeaders[$importOrdersConfigFields['product_tax']]])) {
+                    $orderProductTax = false;
+                } else {
+                    $orderProductTax = explode(
+                        ',',
+                        $orderData[$ordersHeaders[$importOrdersConfigFields['product_tax']]]
+                    );
+                }
+                if ($skuQuantity !== count($orderProductQty)) {
                     $importOrdersErrors[] = array($orderImportId, '', '', '+', '', '', '');
                     $importHasError = true;
                     continue;
                 }
 
+                $subTotal = 0;
+                $subTotalTax = 0;
                 foreach ($orderProductSku as $key => $sku) {
                     if (trim($sku) === '') {
                         $importOrdersErrors[] = array($orderImportId, '', '', '', '+', '', '');
@@ -299,14 +308,35 @@ class Tools_ExportImportOrders
                         break;
                     }
                     $cartContent[$key]['product_id'] = $existingProducts[$sku]['id'];
-                    $cartContent[$key]['price'] = is_numeric($orderProductPrice[$key]) ? $orderProductPrice[$key] : 0;
+                    if (isset($orderProductPrice[$key]) && is_numeric($orderProductPrice[$key])) {
+                        $cartContent[$key]['price'] = $orderProductPrice[$key];
+                    } else {
+                        $cartContent[$key]['price'] = $existingProducts[$sku]['price'];
+                    }
                     $cartContent[$key]['qty'] = intval($orderProductQty[$key]);
-                    $cartContent[$key]['tax'] = is_numeric($orderProductTax[$key]) ? $orderProductTax[$key] : 0;
+                    if (isset($orderProductTax[$key]) && is_numeric($orderProductTax[$key])) {
+                        $cartContent[$key]['tax'] = $orderProductTax[$key];
+                    } else {
+                        $cartContent[$key]['tax'] = 0;
+                    }
                     $cartContent[$key]['tax_price'] = $cartContent[$key]['price'] + $cartContent[$key]['tax'];
+                    $subTotal += $cartContent[$key]['price'];
+                    if (!isset($ordersHeaders[$importOrdersConfigFields['sub_total_tax']])) {
+                        $subTotalTax += $cartContent[$key]['tax'];
+                    }
                 }
 
                 if (!empty($cartContent)) {
-                    $date = $orderData[$ordersHeaders[$importOrdersConfigFields['updated_at']]];
+                    if (isset($orderData[$ordersHeaders[$importOrdersConfigFields['updated_at']]])) {
+                        $date = $orderData[$ordersHeaders[$importOrdersConfigFields['updated_at']]];
+                    } else {
+                        $date = date(DATE_ATOM);
+                    }
+                    if(isset($ordersHeaders[$importOrdersConfigFields['notes']])) {
+                        $notes = $orderData[$ordersHeaders[$importOrdersConfigFields['notes']]];
+                    }else{
+
+                    }
                     $notes = isset($ordersHeaders[$importOrdersConfigFields['notes']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['notes']]] : '';
                     $gateway = isset($ordersHeaders[$importOrdersConfigFields['gateway']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['gateway']]] : '';
                     $shippingPrice = isset($ordersHeaders[$importOrdersConfigFields['shipping_price']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_price']]] : 0;
@@ -319,7 +349,12 @@ class Tools_ExportImportOrders
                     $shippingTax = isset($ordersHeaders[$importOrdersConfigFields['shipping_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_tax']]] : 0;
                     $totalTax = isset($ordersHeaders[$importOrdersConfigFields['total_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['total_tax']]] : 0;
 
-                    $shippingFirstName = isset($ordersHeaders[$importOrdersConfigFields['shipping_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_firstname']]] : '';
+                    if (isset($ordersHeaders[$importOrdersConfigFields['shipping_firstname']])) {
+                        $shippingFirstName = $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_firstname']]];
+                    } else {
+                        $shippingFirstName = $orderData[$ordersHeaders[$importOrdersConfigFields['user_email']]];
+                    }
+
                     $shippingAddressId = null;
                     if ($shippingFirstName !== '') {
                         $shippingAddress = array();
@@ -403,12 +438,27 @@ class Tools_ExportImportOrders
                         );
                     }
 
+                    $status = isset($ordersHeaders[$importOrdersConfigFields['status']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['status']]] : Models_Model_CartSession::CART_STATUS_COMPLETED;
                     //new version of processing cart session content
+                    if (isset($orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]) && is_numeric(
+                        $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]
+                    )
+                    ) {
+                        $subTotal = $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]];
+                    }
+                    if (isset($orderData[$ordersHeaders[$importOrdersConfigFields['total']]]) && is_numeric(
+                        $orderData[$ordersHeaders[$importOrdersConfigFields['total']]]
+                    )
+                    ) {
+                        $total = $orderData[$ordersHeaders[$importOrdersConfigFields['total']]];
+                    } else {
+                        $total = $subTotal + $shippingPrice + $discountTax + $subTotalTax;
+                    }
                     $data = array(
                         'ip_address' => '',
                         'referer' => '',
                         'user_id' => $userId,
-                        'status' => $orderData[$ordersHeaders[$importOrdersConfigFields['status']]],
+                        'status' => $status,
                         'gateway' => $gateway,
                         'shipping_address_id' => $shippingAddressId,
                         'billing_address_id' => $billingAddressId,
@@ -416,13 +466,9 @@ class Tools_ExportImportOrders
                         'shipping_type' => $shippingType,
                         'shipping_service' => $shippingService,
                         'shipping_tracking_id' => $shippingTrackingId,
-                        'sub_total' => is_numeric(
-                            $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]
-                        ) ? $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]] : 0,
+                        'sub_total' => $subTotal,
                         'total_tax' => is_numeric($totalTax) ? $totalTax : 0,
-                        'total' => is_numeric(
-                            $orderData[$ordersHeaders[$importOrdersConfigFields['total']]]
-                        ) ? $orderData[$ordersHeaders[$importOrdersConfigFields['total']]] : 0,
+                        'total' => $total,
                         'notes' => $notes,
                         'discount' => is_numeric($discount) ? $discount : 0,
                         'shipping_tax' => is_numeric($shippingTax) ? $shippingTax : 0,
