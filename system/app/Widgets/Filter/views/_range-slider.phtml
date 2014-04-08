@@ -1,0 +1,24 @@
+<?php
+$min = floor(floatval($this->min));
+$max = ceil(floatval($this->max));
+?>
+<p>
+    <?php echo $this->translate('From'); ?>
+    <span class="filter-from"><?php echo !empty($this->from) ? $this->from : $min; ?></span>
+    <?php echo $this->translate('to'); ?>
+    <span class="filter-to"><?php echo !empty($this->to) ? $this->to : $max; ?></span>
+</p>
+<div class="filter-slider"
+     data-min="<?php echo $min; ?>"
+     data-max="<?php echo $max; ?>"
+    <?php if (!empty($this->from)) { ?> data-from="<?php echo number_format($this->from, 2, '.', ''); ?>" <?php } ?>
+    <?php if (!empty($this->to)) { ?> data-to="<?php echo number_format($this->to, 2, '.', ''); ?>" <?php } ?>
+    ></div>
+<?php
+if (!empty($this->from) && !empty($this->to)) {
+    $filterRange = $this->from . '-' . $this->to;
+} else {
+    $filterRange = '';
+}
+?>
+<input type="hidden" class="filter-value" name="<?php echo $this->name; ?>" value="<?php echo $filterRange; ?>"/>

@@ -4,8 +4,10 @@ $(function () {
     var $widgets = $('form.plugin-filtering-widget');
     $widgets.on('change', 'input.mass-change:checkbox', function (e) {
         var $subList = $(e.currentTarget).closest('li').find('ul input:checkbox');
-        console.log($subList);
         $subList.prop('checked', e.currentTarget.checked);
+    });
+    $widgets.on('click', 'span.toggle-nested', function (e) {
+        $(e.currentTarget).next('ul').toggle();
     });
     $widgets.find('div.slider').each(function () {
         var min = Math.floor(parseFloat($(this).data('min'))),

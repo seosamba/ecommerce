@@ -86,20 +86,32 @@
     <?php foreach ($this->filters as $filterId => $filter) : ?>
         <li data-attributeId="<?php echo $filterId; ?>">
             <label class="filter-label">
-                <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>]" value="0" />
-                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
-                <?php
-                if ($filter['show'] === true ||
-                    (is_array($filter['show']) && sizeof($filter['value']) === sizeof($filter['show']))) {
-                    echo 'checked';
-                }
-                ?>
-                    />
+                <?php if ($filter['type'] === 'range') : ?>
+                    <input type="checkbox" name="show[<?php echo $filter['attribute_id']; ?>]" value="0"
+                        <?php if (!isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']])): ?>
+                        checked
+                        <?php endif; ?>
+                        />
+                <?php else : ?>
+                    <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>]" value="0" />
+                    <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                    <?php
+                    if ($filter['show'] === true ||
+                        (is_array($filter['show']) && sizeof($filter['value']) === sizeof($filter['show']))) {
+                        echo 'checked';
+                    }
+                    ?>
+                        />
+
+                <?php endif; ?>
                 <?php echo $filter['label']; ?>
             </label>
-            <ul>
-                <?php $values = $filter['value']; ?>
-                <?php foreach ($values as $value) : ?>
+            <?php if (!empty($filter['value'])) : ?>
+                <?php if (sizeof($filter['value']) > 10) { ?>
+                <span title="<?php echo $this->translate('show/hide nested elements'); ?>" class="toggle-nested">&#9678;</span>
+                <?php } ?>
+                <ul>
+                <?php foreach ($filter['value'] as $value) : ?>
                     <li>
                         <label>
                             <input type="checkbox" name="show[<?php echo $filter['attribute_id']; ?>][]"
@@ -117,7 +129,8 @@
                             ?></label>
                     </li>
                 <?php endforeach; ?>
-            </ul>
+                </ul>
+            <?php endif; ?>
         </li>
     <?php endforeach; ?>
     </ul>
@@ -136,6 +149,7 @@
         list-style: none;
         padding: 0;
         margin: 0;
+        position: relative;
     }
 
     .plugin-filtering-widget > ul > li:nth-child(odd) {
@@ -144,6 +158,13 @@
 
     .plugin-filtering-widget ul label.filter-label {
         font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .plugin-filtering-widget ul span.toggle-nested {
+        position: absolute;
+        top: 0;
+        right: 0;
         cursor: pointer;
     }
 

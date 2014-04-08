@@ -89,12 +89,23 @@ class Widgets_Filter_Filter extends Widgets_Abstract
     private function _renderProduct()
     {
         if (empty($this->_options)) {
+            throw new Exceptions_SeotoasterWidgetException('Filter widget: no options provided');
+        }
+
+        $options = array();
+        foreach ($this->_options as $option) {
+            if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
+                $options[$parts[1]] = explode(',', $parts[2]);
+            }
+        }
+
+        if (empty($options['tagnames'])) {
             throw new Exceptions_SeotoasterWidgetException('Filter widget: at least one tag name should be provided');
         }
+
         $request = Zend_Controller_Front::getInstance()->getRequest();
 
-        $tagsNames = explode(',', $this->_options[0]);
-        $this->_tags = Models_Mapper_Tag::getInstance()->findByName($tagsNames, false);
+        $this->_tags = Models_Mapper_Tag::getInstance()->findByName($options['tagnames'], false);
         $tagIds = array_map(
             function ($tag) {
                 return $tag->getId();
@@ -103,7 +114,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         );
 
         // generating filter id
-        $filterId = implode('_', array_merge(array($this->_toasterOptions['id']), $tagsNames));
+        $filterId = implode('_', array_merge(array($this->_toasterOptions['id']), $options['tagnames']));
         $filterId = substr(md5($filterId), 0, 16);
         $this->_view->filterId = $filterId;
 
@@ -151,13 +162,25 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 if (!empty($widgetSettings[$filter['attribute_id']])) {
                     $values = array_intersect($values, $widgetSettings[$filter['attribute_id']]);
                 }
-                $filter['value'] = $values;
 
                 if (isset($appliedFilters[$filter['name']])) {
                     $filter['checked'] = $appliedFilters[$filter['name']];
                 } else {
                     $filter['checked'] = array();
                 }
+
+                if (in_array($filter['name'], Filtering_Tools::$_rangeFilters)) {
+                    // prepare range filter
+                    $filter['type'] = 'range';
+                    $filter['max'] = max($values);
+                    $filter['min'] = min($values);
+                    unset($filter['value']);
+                } else {
+                    // prepare list filter
+                    $filter['value'] = $values;
+                    $filter['type'] = 'list';
+                }
+
                 return $filter;
             },
             $this->_filters
@@ -182,8 +205,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         // apply user values to price range filter
         if (!empty($appliedFilters['price'])) {
-            $price = array_pop($appliedFilters['price']);
-            list($this->_priceRange['from'], $this->_priceRange['to']) = explode('-', $price, 2);
+//            $price = array_pop($appliedFilters['price']);
+            $this->_priceRange = array_merge($this->_priceRange, $appliedFilters['price']);
+//            list($this->_priceRange['from'], $this->_priceRange['to']) = explode('-', $price, 2);
             unset($appliedFilters['price'], $price);
         }
         if (!isset($widgetSettings['price']) || !empty($widgetSettings['price'])) {
@@ -257,6 +281,15 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 } else {
                     $filter['show'] = true;
                 }
+
+                if (in_array($filter['name'], Filtering_Tools::$_rangeFilters)) {
+                    $filter['type'] = 'range';
+                    unset($filter['value']);
+                    return $filter;
+                } else {
+                    $filter['type'] = 'list';
+                }
+
                 if (!empty($filter['value'])) {
                     $filter['value'] = array_filter(array_unique($filter['value'], SORT_STRING));
                     if (!empty($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {

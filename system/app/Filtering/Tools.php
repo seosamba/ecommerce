@@ -7,6 +7,14 @@
 class Filtering_Tools
 {
 
+    public static $_rangeFilters = array(
+        'price',
+        'width',
+        'height',
+        'depth',
+        'weight'
+    );
+
     /**
      * Parse URL query string to array of filter params
      * @param string $queryString
@@ -29,11 +37,16 @@ class Filtering_Tools
                     $urlFilters[$filter] = array();
                 }
                 if (!empty($value)) {
-                    array_push($urlFilters[$filter], $value);
+                    if (!in_array($filter, self::$_rangeFilters)) {
+                        array_push($urlFilters[$filter], $value);
+                    } else {
+                        list ($urlFilters[$filter]['from'], $urlFilters[$filter]['to']) = explode('-', $value);
+                    }
                 }
+
             }
-            $urlFilters = array_filter($urlFilters);
         }
+        $urlFilters = array_filter($urlFilters);
 
         return $urlFilters;
     }
