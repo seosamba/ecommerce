@@ -41,7 +41,7 @@
         </li>
     <?php endif; ?>
     <?php if ($this->priceRange) : ?>
-        <li class="filter-price">
+        <li>
             <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
             <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
         </li>

@@ -240,7 +240,12 @@ class Filtering_Mappers_Eav
 
         foreach ($attributes as $name => $value) {
             $nameWhere = $dbAdapter->quoteInto('attr.name = ?', $name);
-            $valueWhere = $dbAdapter->quoteInto('eav.value IN (?)', $value);
+            if (isset($value['from']) && isset($value['to'])) {
+                $valueWhere = $dbAdapter->quoteInto('(eav.value BETWEEN ? ', $value['from']);
+                $valueWhere .= $dbAdapter->quoteInto(' AND ?)', $value['to']);
+            } else {
+                $valueWhere = $dbAdapter->quoteInto('eav.value IN (?)', $value);
+            }
             $select->orWhere($nameWhere . ' AND ' . $valueWhere);
         }
 
