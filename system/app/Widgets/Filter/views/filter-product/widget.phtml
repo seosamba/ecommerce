@@ -46,12 +46,12 @@
     <?php foreach ($this->filters as $filter) : ?>
         <li>
             <p class="filter-header"><?php echo $filter['label']; ?></p>
-        <?php if ($filter['type'] === 'range') : ?>
+        <?php if (!isset($filter['values'])) : ?>
             <?php echo $this->partial('_range-slider.phtml', $filter); ?>
         <?php else : ?>
             <ul>
                 <?php
-                foreach ($filter['value'] as $value) : ?>
+                foreach ($filter['values'] as $value => $count) : ?>
                     <?php $checked = in_array($value, $filter['checked']); ?>
                     <li>
                         <label>
@@ -60,7 +60,9 @@
                                    value="<?php echo $value; ?>"
                                    <?php if ($checked) { echo 'checked'; }; ?>
                                 />
-                            <a href="<?php echo $this->url().'?'.$filter['name'].'='.urlencode($value); ?>"><?php echo $value; ?></a></label>
+                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>"
+                               data-total="<?php echo $count; ?>"><?php echo $value; ?></a>
+                        </label>
                     </li>
                 <?php endforeach; ?>
             </ul>

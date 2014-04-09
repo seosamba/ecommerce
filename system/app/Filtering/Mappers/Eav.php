@@ -122,7 +122,13 @@ class Filtering_Mappers_Eav
         return $row->toArray();
     }
 
-    public function findFiltersByTags($tags)
+    /**
+     * Returns array of product filters relevant to specified tags
+     * @param      $tags    List of tags
+     * @param null $exclude List of filters to exclude
+     * @return array
+     */
+    public function findListFiltersByTags($tags, $exclude = null)
     {
         if (!is_array($tags)) {
             $tags = (array)$tags;
@@ -132,16 +138,27 @@ class Filtering_Mappers_Eav
         if (!empty($tags)) {
             $dbAdapter = Zend_Db_Table::getDefaultAdapter();
             $select = $dbAdapter->select()->from(
-                array('v' => $this->_valuesTable),
-                array('v.attribute_id', 'v.value')
+                array('eav' => $this->_valuesTable),
+                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(eav.product_id)')
             )
-                ->join(array('a' => $this->_attributesTable), 'a.id = v.attribute_id', array('a.name', 'a.label'))
                 ->join(
                     array('tha' => $this->_tagsRelationTable),
-                    'tha.attribute_id = v.attribute_id',
+                    'tha.attribute_id = eav.attribute_id',
                     null
                 )
+                ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label'))
                 ->where('tha.tag_id IN (?)', $tags)
+                ->where('a.name NOT IN (?)', Filtering_Tools::$_rangeFilters)
+                ->where(
+                    'eav.product_id IN (?)',
+                    $dbAdapter->fetchCol(
+                        $dbAdapter->select()
+                            ->from(array('p' => 'shopping_product'), array('DISTINCT(p.id)'))
+                            ->join(array('pht' => 'shopping_product_has_tag'), 'pht.product_id = p.id', null)
+                            ->where('pht.tag_ID IN (?)', $tags)
+                    )
+                )
+                ->group(array('eav.attribute_id', 'eav.value'))
                 ->order('a.label ASC');
 
             $data = $dbAdapter->fetchAll($select);
@@ -149,16 +166,60 @@ class Filtering_Mappers_Eav
                 foreach ($data as $item) {
                     $id = $item['attribute_id'];
                     if (!array_key_exists($id, $filters)) {
-                        $filters[$id] = $item;
+                        $filters[$id] = array(
+                            'attribute_id' => $id,
+                            'values'       => array(),
+                            'name'         => $item['name'],
+                            'label'        => $item['label']
+                        );
                     }
-                    if (!is_array($filters[$id]['value'])) {
-                        $filters[$id]['value'] = (array)$filters[$id]['value'];
-                    } else {
-                        array_push($filters[$id]['value'], $item['value']);
-                    }
-
+                    $filters[$id]['values'][$item['value']] = $item['count'];
                 }
             }
+        }
+        return $filters;
+    }
+
+    /**
+     * Returns array of range product filters relevant to specified tags
+     * @param      $tags    List of tags
+     * @param null $exclude List of filters to exclude
+     * @return array
+     */
+    public function findRangeFiltersByTags($tags, $exclude = null)
+    {
+        if (!is_array($tags)) {
+            $tags = (array)$tags;
+        }
+        $filters = array();
+
+        if (!empty($tags)) {
+            $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+            $select = $dbAdapter->select()->from(
+                array('eav' => $this->_valuesTable),
+                array('eav.attribute_id', 'min' => 'MIN(eav.value)', 'max' => 'MAX(eav.value)')
+            )
+                ->join(
+                    array('tha' => $this->_tagsRelationTable),
+                    'tha.attribute_id = eav.attribute_id',
+                    null
+                )
+                ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label'))
+                ->where('tha.tag_id IN (?)', $tags)
+                ->where('a.name IN (?)', Filtering_Tools::$_rangeFilters)
+                ->where(
+                    'eav.product_id IN (?)',
+                    $dbAdapter->fetchCol(
+                        $dbAdapter->select()
+                            ->from(array('p' => 'shopping_product'), array('DISTINCT(p.id)'))
+                            ->join(array('pht' => 'shopping_product_has_tag'), 'pht.product_id = p.id', null)
+                            ->where('pht.tag_ID IN (?)', $tags)
+                    )
+                )
+                ->group(array('eav.attribute_id'))
+                ->order('a.label ASC');
+
+            return $dbAdapter->fetchAssoc($select);
         }
         return $filters;
     }
@@ -220,13 +281,16 @@ class Filtering_Mappers_Eav
     {
         $select = $this->_dbAdapter->select()
             ->from(
-                array('p' => 'shopping_product'), null
+                array('p' => 'shopping_product'),
+                null
             )
             ->from(
-                array('b' => 'shopping_brands'), array('b.id', 'b.name')
+                array('b' => 'shopping_brands'),
+                array('b.id', 'b.name')
             )
             ->from(
-                array('t' => 'shopping_product_has_tag'), null
+                array('t' => 'shopping_product_has_tag'),
+                null
             )
             ->where('t.product_id = p.id')
             ->where('b.id = p.brand_id')

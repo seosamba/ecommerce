@@ -6,6 +6,9 @@
  */
 class Filtering_Tools
 {
+    const TYPE_LIST = 'list';
+
+    const TYPE_RANGE = 'range';
 
     public static $_rangeFilters = array(
         'price',

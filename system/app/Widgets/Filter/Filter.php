@@ -129,8 +129,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $eavMapper = Filtering_Mappers_Eav::getInstance();
 
-        // fetch filters by given tags
-        $this->_filters = $eavMapper->findFiltersByTags($tagIds);
+        // fetch list filters by given tags
+        $listFilters = $eavMapper->findListFiltersByTags($tagIds, $widgetSettings);
+        $rangeFilters = $eavMapper->findRangeFiltersByTags($tagIds, $widgetSettings);
+
+        $this->_filters = array_merge($listFilters, $rangeFilters);
         // fetch price range for filters
         $this->_priceRange = $eavMapper->getPriceRange($tagIds);
         // fetch brands
@@ -146,45 +149,23 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $appliedFilters = Filtering_Tools::normalizeFilterQuery();
 
         // mark disabled filters
-        $this->_view->filters = array_filter(array_map(
-            function ($filter) use ($appliedFilters, $widgetSettings) {
-                if (empty($filter['value'])) {
-                    return null;
-                }
-
-                // opt out if not exists in widget settings
-                if (array_key_exists($filter['attribute_id'], $widgetSettings)
-                    && empty($widgetSettings[$filter['attribute_id']])) {
-                    return null;
-                }
-
-                $values = array_filter(array_unique($filter['value'], SORT_STRING));
-                if (!empty($widgetSettings[$filter['attribute_id']])) {
-                    $values = array_intersect($values, $widgetSettings[$filter['attribute_id']]);
-                }
-
+        $this->_view->filters = array_map(
+            function ($filter) use ($appliedFilters) {
                 if (isset($appliedFilters[$filter['name']])) {
-                    $filter['checked'] = $appliedFilters[$filter['name']];
+                    if (isset($filter['values'])) {
+                        $filter['checked'] = $appliedFilters[$filter['name']];
+                    } else {
+                        $filter['from'] = $appliedFilters[$filter['name']]['from'];
+                        $filter['to'] = $appliedFilters[$filter['name']]['to'];
+                    }
                 } else {
                     $filter['checked'] = array();
-                }
-
-                if (in_array($filter['name'], Filtering_Tools::$_rangeFilters)) {
-                    // prepare range filter
-                    $filter['type'] = 'range';
-                    $filter['max'] = max($values);
-                    $filter['min'] = min($values);
-                    unset($filter['value']);
-                } else {
-                    // prepare list filter
-                    $filter['value'] = $values;
-                    $filter['type'] = 'list';
                 }
 
                 return $filter;
             },
             $this->_filters
-        ));
+        );
 
         // assign tags to view with checked attributes
         $this->_view->tags = array_filter(array_map(
