@@ -189,6 +189,7 @@ class Tools_ExportImportOrders
                     $changedMinReqFields = array_map('strtolower', $changedMinReqFields);
                     $requiredFields = array_diff_key(array_flip($changedMinReqFields), $ordersHeaders);
                     $assignHeaders = true;
+                    $notUsedFields = array_diff_key($ordersHeaders, array_flip($importOrdersConfigFields));
                     if (!empty($requiredFields)) {
                         $errorMessage = '';
                         foreach ($requiredFields as $fieldMissed => $key) {
@@ -332,12 +333,16 @@ class Tools_ExportImportOrders
                     } else {
                         $date = date(DATE_ATOM);
                     }
-                    if(isset($ordersHeaders[$importOrdersConfigFields['notes']])) {
+                    $notes = '';
+                    if (isset($ordersHeaders[$importOrdersConfigFields['notes']])) {
                         $notes = $orderData[$ordersHeaders[$importOrdersConfigFields['notes']]];
-                    }else{
-
+                    } else {
+                        if (!empty($notUsedFields)) {
+                            foreach ($notUsedFields as $key) {
+                                $notes .= $orderData[$key] . ' ';
+                            }
+                        }
                     }
-                    $notes = isset($ordersHeaders[$importOrdersConfigFields['notes']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['notes']]] : '';
                     $gateway = isset($ordersHeaders[$importOrdersConfigFields['gateway']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['gateway']]] : '';
                     $shippingPrice = isset($ordersHeaders[$importOrdersConfigFields['shipping_price']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_price']]] : 0;
                     $discountTax = isset($ordersHeaders[$importOrdersConfigFields['discount_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['discount_tax']]] : 0;
