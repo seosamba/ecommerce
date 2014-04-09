@@ -106,6 +106,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $request = Zend_Controller_Front::getInstance()->getRequest();
 
         $this->_tags = Models_Mapper_Tag::getInstance()->findByName($options['tagnames'], false);
+
+        if (empty($this->_tags)) {
+            return 'Given tags not found';
+        }
+
         $tagIds = array_map(
             function ($tag) {
                 return $tag->getId();
