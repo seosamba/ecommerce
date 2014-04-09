@@ -265,7 +265,7 @@ class Tools_ExportImportOrders
                     $orderData[$ordersHeaders[$importOrdersConfigFields[$productBySku]]]
                 );
                 $skuQuantity = count($orderProductSku);
-                if (!isset($orderData[$ordersHeaders[$importOrdersConfigFields['product_price']]])) {
+                if (!isset($ordersHeaders[$importOrdersConfigFields['product_price']])) {
                     $orderProductPrice = false;
                 } else {
                     $orderProductPrice = explode(
@@ -273,7 +273,7 @@ class Tools_ExportImportOrders
                         $orderData[$ordersHeaders[$importOrdersConfigFields['product_price']]]
                     );
                 }
-                if (!isset($orderData[$ordersHeaders[$importOrdersConfigFields['product_qty']]])) {
+                if (!isset($ordersHeaders[$importOrdersConfigFields['product_qty']])) {
                     $orderProductQty = array_fill(0, $skuQuantity, 1);
                 } else {
                     $orderProductQty = explode(
@@ -281,7 +281,7 @@ class Tools_ExportImportOrders
                         $orderData[$ordersHeaders[$importOrdersConfigFields['product_qty']]]
                     );
                 }
-                if (!isset($orderData[$ordersHeaders[$importOrdersConfigFields['product_tax']]])) {
+                if (!isset($ordersHeaders[$importOrdersConfigFields['product_tax']])) {
                     $orderProductTax = false;
                 } else {
                     $orderProductTax = explode(
@@ -328,7 +328,7 @@ class Tools_ExportImportOrders
                 }
 
                 if (!empty($cartContent)) {
-                    if (isset($orderData[$ordersHeaders[$importOrdersConfigFields['updated_at']]])) {
+                    if (isset($ordersHeaders[$importOrdersConfigFields['updated_at']])) {
                         $date = $orderData[$ordersHeaders[$importOrdersConfigFields['updated_at']]];
                     } else {
                         $date = date(DATE_ATOM);
