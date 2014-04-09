@@ -31,7 +31,10 @@
                                value="<?php echo $brand['name']; ?>"
                                <?php if ($brand['checked']) echo 'checked'; ?>
                             />
-                        <a href="<?php echo $this->url().'?brand='.urlencode($brand['name']); ?>"><?php echo $brand['name']; ?></a></label>
+                        <a href="<?php echo $this->url().'?brand='.urlencode($brand['name']); ?>">
+                            <?php echo $brand['name'] . '&nbsp['. $brand['count'].']'; ?>
+                        </a>
+                    </label>
                 </li>
             <?php endforeach; ?>
             </ul>
@@ -60,8 +63,9 @@
                                    value="<?php echo $value; ?>"
                                    <?php if ($checked) { echo 'checked'; }; ?>
                                 />
-                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>"
-                               data-total="<?php echo $count; ?>"><?php echo $value; ?></a>
+                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
+                                <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                            </a>
                         </label>
                     </li>
                 <?php endforeach; ?>

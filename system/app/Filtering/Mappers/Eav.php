@@ -216,8 +216,7 @@ class Filtering_Mappers_Eav
                             ->where('pht.tag_ID IN (?)', $tags)
                     )
                 )
-                ->group(array('eav.attribute_id'))
-                ->order('a.label ASC');
+                ->group(array('eav.attribute_id'));
 
             return $dbAdapter->fetchAssoc($select);
         }
@@ -282,7 +281,7 @@ class Filtering_Mappers_Eav
         $select = $this->_dbAdapter->select()
             ->from(
                 array('p' => 'shopping_product'),
-                null
+                array('count' => 'COUNT(p.id)')
             )
             ->from(
                 array('b' => 'shopping_brands'),
