@@ -445,13 +445,13 @@ class Tools_ExportImportOrders
 
                     $status = isset($ordersHeaders[$importOrdersConfigFields['status']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['status']]] : Models_Model_CartSession::CART_STATUS_COMPLETED;
                     //new version of processing cart session content
-                    if (isset($orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]) && is_numeric(
+                    if (isset($ordersHeaders[$importOrdersConfigFields['sub_total']]) && is_numeric(
                         $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]
                     )
                     ) {
                         $subTotal = $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]];
                     }
-                    if (isset($orderData[$ordersHeaders[$importOrdersConfigFields['total']]]) && is_numeric(
+                    if (isset($ordersHeaders[$importOrdersConfigFields['total']]) && is_numeric(
                         $orderData[$ordersHeaders[$importOrdersConfigFields['total']]]
                     )
                     ) {
