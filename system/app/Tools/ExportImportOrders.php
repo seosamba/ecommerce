@@ -111,7 +111,6 @@ class Tools_ExportImportOrders
             'updated_at',
             'status',
             'sku',
-            'mpn',
             'product_price',
             'product_tax',
             'product_qty',
@@ -174,7 +173,7 @@ class Tools_ExportImportOrders
         foreach ($importOrdersConfigFields as $exportFieldName => $exportFieldValue) {
             $exportFields[$exportFieldName] = array('label' => $exportFieldValue, 'field' => $exportFieldName);
         }
-        $config = array(Shopping::ORDER_IMPORT_CONFIG => serialize($exportFields));
+        $config = array(Shopping::ORDER_IMPORT_CONFIG => serialize(array('default_import_order' =>$exportFields)));
         $shoppingConfigMapper->save($config);
         $assignHeaders = false;
         if ($ordersCsv !== false) {
@@ -808,7 +807,6 @@ class Tools_ExportImportOrders
             '2013-10-29 13:43:23',
             'completed',
             'DIAG01ASF,DIAG40BCX',
-            '3432863008003,3432863006894',
             '15.00,112.47',
             '5.00,0.00',
             '2,1',

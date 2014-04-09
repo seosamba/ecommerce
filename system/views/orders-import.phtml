@@ -16,10 +16,10 @@ $this->placeholder('headerContent')->set($title);
                 <?php echo $importFields['label_name']; ?>
                 <?php if (isset($this->importConfig)): ?>
                     <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
-                           value="<?php echo $this->importConfig[$importFields['label']]['label']; ?>"/>
+                           placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $this->importConfig['default_import_order'][$importFields['label']]['label']; ?>"/>
                 <?php else: ?>
                     <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
-                           value="<?php echo $importFields['label']; ?>"/>
+                           placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $importFields['label']; ?>"/>
                 <?php endif; ?>
             </label>
         <?php endif; ?>
