@@ -5,6 +5,12 @@
 class Tools_ExportImportOrders
 {
 
+    const DEFAULT_IMPORT_ORDER = 'default_import_order';
+
+    const PRESTASHOP_IMPORT_ORDER = 'prestashop_import_order';
+
+    const MAGENTO_IMPORT_ORDER = 'magento_import_order';
+
     public static function prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
@@ -158,7 +164,7 @@ class Tools_ExportImportOrders
         return $orderImportFieldNames;
     }
 
-    public static function createOrdersCsv($ordersCsv, $importOrdersConfigFields)
+    public static function createOrdersCsv($ordersCsv, $importOrdersConfigFields, $currentTemplateName)
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $ordersCsvFile = fopen($ordersCsv['file']['tmp_name'], 'r');
@@ -170,10 +176,18 @@ class Tools_ExportImportOrders
         );
 
         $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $exportConfig = $shoppingConfigMapper->getConfigParam(Shopping::ORDER_IMPORT_CONFIG);
+
         foreach ($importOrdersConfigFields as $exportFieldName => $exportFieldValue) {
             $exportFields[$exportFieldName] = array('label' => $exportFieldValue, 'field' => $exportFieldName);
         }
-        $config = array(Shopping::ORDER_IMPORT_CONFIG => serialize(array('default_import_order' =>$exportFields)));
+        if ($exportConfig !== null) {
+            $exportConfig = unserialize($exportConfig);
+            $exportConfig[$currentTemplateName] = $exportFields;
+            $config = array(Shopping::ORDER_IMPORT_CONFIG =>serialize($exportConfig));
+        }else{
+            $config = array(Shopping::ORDER_IMPORT_CONFIG => serialize(array($currentTemplateName =>$exportFields)));
+        }
         $shoppingConfigMapper->save($config);
         $assignHeaders = false;
         if ($ordersCsv !== false) {
@@ -551,7 +565,7 @@ class Tools_ExportImportOrders
             'updated_at' => array(
                 'label' => 'updated_at',
                 'checked' => 1,
-                'label_name' => $translator->translate('Updated At')
+                'label_name' => $translator->translate('Updated At (Last order date)')
             ),
             'status' => array(
                 'label' => 'status',

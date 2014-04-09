@@ -8,22 +8,33 @@ $this->headTitle($title);
 $this->placeholder('headerContent')->set($title);
 ?>
 
-<div id="uploadContainer" class="content-auto text-center pt10px pb10px">
+<div id="uploadContainer" class="content-auto text-center">
     <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
-    <?php foreach ($this->defaultImportsFileds as $importFields): ?>
-        <?php if (in_array($importFields['label'], $importFieldNames)): ?>
-            <label class="grid_3 mt5px">
-                <?php echo $importFields['label_name']; ?>
-                <?php if (isset($this->importConfig)): ?>
-                    <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
-                           placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $this->importConfig['default_import_order'][$importFields['label']]['label']; ?>"/>
-                <?php else: ?>
-                    <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
-                           placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $importFields['label']; ?>"/>
-                <?php endif; ?>
-            </label>
-        <?php endif; ?>
-    <?php endforeach; ?>
+    <div id="import-orders-templates">
+        <ul>
+            <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
+                <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
+            <?php endforeach;?>
+        </ul>
+        <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
+            <div id="<?php echo $orderTemplateName;?>">
+                <?php foreach ($this->defaultImportsFileds as $importFields): ?>
+                    <?php if (in_array($importFields['label'], $importFieldNames)): ?>
+                        <label class="grid_3 mt5px">
+                            <?php echo $importFields['label_name']; ?>
+                            <?php if (isset($this->importConfig[$orderTemplateName])): ?>
+                                <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                                       placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $this->importConfig[$orderTemplateName][$importFields['label']]['label']; ?>"/>
+                            <?php else: ?>
+                                <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                                       placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $importFields['label']; ?>"/>
+                            <?php endif; ?>
+                        </label>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endforeach;?>
+    </div>
     <div class="grid_12 mt20px">
         <a class="fl-left" title=""
            href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate(
@@ -49,18 +60,24 @@ $this->placeholder('headerContent')->set($title);
             ],
             multipart_params: {
                 'importOrdersFields': '',
-                'realOrdersFields': ''
+                'realOrdersFields': '',
+                'templateName': '',
+                'currentTemplateName':''
             },
             init: {
                 FilesAdded: function (up, files) {
                     var realOrderFields = [];
                     var importOrdersFields = [];
-                    $.each($('#uploadContainer').find('.import-field'), function (value) {
+                    var allImportFields = [];
+                    var currentTabId = $(".ui-state-active").find('a').attr("href");
+                    var currentTemplateName = $(currentTabId).attr('id');
+                    $.each($(currentTabId).find('.import-field'), function (value) {
                         importOrdersFields.push($(this).val());
                         realOrderFields.push($(this).attr('name'));
                     });
                     uploader.settings.multipart_params.importOrdersFields = importOrdersFields;
                     uploader.settings.multipart_params.realOrdersFields = realOrderFields;
+                    uploader.settings.multipart_params.currentTemplateName = currentTemplateName;
                     showSpinner();
                     up.start();
                 }
@@ -78,6 +95,8 @@ $this->placeholder('headerContent')->set($title);
             }
             uploader.refresh();
         });
+
+        $('#import-orders-templates').tabs();
     });
 </script>
 

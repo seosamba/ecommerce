@@ -1075,6 +1075,13 @@ class Shopping extends Tools_Plugins_Abstract {
                 $importConfig = unserialize($importConfig);
                 $this->_view->importConfig = $importConfig;
             }
+            $this->_view->ordersImportTemplates = array(
+                Tools_ExportImportOrders::DEFAULT_IMPORT_ORDER => $this->_translator->translate('Default template'),
+                Tools_ExportImportOrders::PRESTASHOP_IMPORT_ORDER => $this->_translator->translate(
+                    'Prestashop template'
+                ),
+                Tools_ExportImportOrders::MAGENTO_IMPORT_ORDER => $this->_translator->translate('Magento template')
+            );
             $this->_view->translator = $this->_translator;
             $this->_view->defaultImportsFileds = Tools_ExportImportOrders::getDefaultOrderExportConfig();
             $this->_layout->sectionId = Tools_Misc::SECTION_STORE_IMPORTORDERS;
@@ -1092,12 +1099,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $importOrdersFields = $this->_request->getParam('importOrdersFields');
             $importOrdersFields = explode(',', $importOrdersFields);
             $realOrdersFields = $this->_request->getParam('realOrdersFields');
+            $currentTemplateName = $this->_request->getParam('currentTemplateName');
             $realOrdersFields = explode(',', $realOrdersFields);
             $importOrdersFieldsData = array_combine($realOrdersFields, $importOrdersFields);
             if (!$uploader->isValid()) {
                 $this->_responseHelper->fail('');
             }
-            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $importOrdersFieldsData);
+            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $importOrdersFieldsData, $currentTemplateName);
             if ($ordersData['error'] === true) {
                 if (isset($ordersData['errorMessage'])) {
                     $this->_responseHelper->fail($ordersData['errorMessage']);
