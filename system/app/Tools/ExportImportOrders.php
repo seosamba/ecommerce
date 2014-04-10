@@ -164,7 +164,7 @@ class Tools_ExportImportOrders
         return $orderImportFieldNames;
     }
 
-    public static function createOrdersCsv($ordersCsv, $importOrdersConfigFields, $currentTemplateName)
+    public static function createOrdersCsv($ordersCsv, $importOrdersConfigFields, $currentTemplateName, $defaultOrderStatus)
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $ordersCsvFile = fopen($ordersCsv['file']['tmp_name'], 'r');
@@ -456,7 +456,7 @@ class Tools_ExportImportOrders
                         );
                     }
 
-                    $status = isset($ordersHeaders[$importOrdersConfigFields['status']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['status']]] : Models_Model_CartSession::CART_STATUS_COMPLETED;
+                    $status = isset($ordersHeaders[$importOrdersConfigFields['status']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['status']]] : $defaultOrderStatus;
                     //new version of processing cart session content
                     if (isset($ordersHeaders[$importOrdersConfigFields['sub_total']]) && is_numeric(
                         $orderData[$ordersHeaders[$importOrdersConfigFields['sub_total']]]

@@ -9,8 +9,22 @@ $this->placeholder('headerContent')->set($title);
 ?>
 
 <div id="uploadContainer" class="content-auto text-center">
+    <div class="grid_12">
+        <label class="grid_4 mt5px"><?php echo $this->translate('Please choose default order status');?></label>
+        <select class="grid_4" name="order-status" id="order-status">
+            <option value="0"><?php echo $this->translate('Choose default order status');?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED);?></option>
+        </select>
+    </div>
     <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
-    <div id="import-orders-templates">
+    <div id="import-orders-templates" class="grid_12 mt15px">
         <ul>
             <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
                 <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
@@ -61,7 +75,7 @@ $this->placeholder('headerContent')->set($title);
             multipart_params: {
                 'importOrdersFields': '',
                 'realOrdersFields': '',
-                'templateName': '',
+                'defaultOrderStatus': '',
                 'currentTemplateName':''
             },
             init: {
@@ -78,6 +92,13 @@ $this->placeholder('headerContent')->set($title);
                     uploader.settings.multipart_params.importOrdersFields = importOrdersFields;
                     uploader.settings.multipart_params.realOrdersFields = realOrderFields;
                     uploader.settings.multipart_params.currentTemplateName = currentTemplateName;
+                    var defaultOrderStatus = $('#order-status :selected').val();
+                    if(parseInt(defaultOrderStatus) === 0){
+                        showMessage('<?php echo $this->translate('Please choose default order status');?>', true, '5000');
+                        uploader.splice();
+                        return false;
+                    }
+                    uploader.settings.multipart_params.defaultOrderStatus = defaultOrderStatus;
                     showSpinner();
                     up.start();
                 }

@@ -1100,12 +1100,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $importOrdersFields = explode(',', $importOrdersFields);
             $realOrdersFields = $this->_request->getParam('realOrdersFields');
             $currentTemplateName = $this->_request->getParam('currentTemplateName');
+            $defaultOrderStatus = $this->_request->getParam('defaultOrderStatus');
             $realOrdersFields = explode(',', $realOrdersFields);
             $importOrdersFieldsData = array_combine($realOrdersFields, $importOrdersFields);
             if (!$uploader->isValid()) {
                 $this->_responseHelper->fail('');
             }
-            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $importOrdersFieldsData, $currentTemplateName);
+            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $importOrdersFieldsData, $currentTemplateName, $defaultOrderStatus);
             if ($ordersData['error'] === true) {
                 if (isset($ordersData['errorMessage'])) {
                     $this->_responseHelper->fail($ordersData['errorMessage']);
