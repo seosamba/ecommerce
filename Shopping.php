@@ -870,7 +870,7 @@ class Shopping extends Tools_Plugins_Abstract {
 						$msg[] = $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.');
 					}
 				} else {
-					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
+					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
 				}
 			}
 
