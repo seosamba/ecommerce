@@ -372,8 +372,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
             if (!empty($urlFilter['price'])) {
-                list($priceMin, $priceMax) = explode('-', reset($urlFilter['price']));
-                $this->_priceFilter = array('min' => $priceMin, 'max' => $priceMax);
+                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to']);
                 unset($urlFilter['price']);
             }
             // removing all
