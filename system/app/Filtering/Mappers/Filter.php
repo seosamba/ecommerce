@@ -43,7 +43,7 @@ class Filtering_Mappers_Filter
         $row->setFromArray(
             array(
                 'filter_id' => $filterId,
-                'settings'  => serialize($settings)
+                'settings'  => json_encode($settings)
             )
         );
 
@@ -57,7 +57,7 @@ class Filtering_Mappers_Filter
             $data = $row->toArray();
         }
         if (!empty($data['settings'])) {
-            return unserialize($data['settings']);
+            return json_decode($data['settings'], true);
         }
 
         return array();

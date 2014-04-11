@@ -105,18 +105,13 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $request = Zend_Controller_Front::getInstance()->getRequest();
 
-        $this->_tags = Models_Mapper_Tag::getInstance()->findByName($options['tagnames'], false);
+        $this->_tags = Models_Mapper_Tag::getInstance()->findByName($options['tagnames'], true);
 
         if (empty($this->_tags)) {
             return 'Given tags not found';
         }
 
-        $tagIds = array_map(
-            function ($tag) {
-                return $tag->getId();
-            },
-            $this->_tags
-        );
+        $tagIds = array_keys($this->_tags);
 
         // generating filter id
         $filterId = implode('_', array_merge(array($this->_toasterOptions['id']), $options['tagnames']));
@@ -141,7 +136,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_filters = array_merge($listFilters, $rangeFilters);
         // fetch price range for filters
         $this->_priceRange = $eavMapper->getPriceRange($tagIds);
-        // fetch brands
+        $this->_priceRange['name'] = 'price';
+        $this->_priceRange['label'] = 'Price';
+
         $this->_brands = $eavMapper->getBrands($tagIds);
 
         // if this user allowed to manage content
@@ -173,54 +170,30 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         );
 
         // assign tags to view with checked attributes
-        $this->_view->tags = array_filter(array_map(
-            function ($tag) use ($appliedFilters, $widgetSettings) {
-                $tag = $tag->toArray();
-                if (isset($widgetSettings['tags']) && is_array($widgetSettings['tags'])
-                    && !in_array($tag['id'], $widgetSettings['tags'])) {
-                    return null;
-                }
-                $tag['checked'] = isset($appliedFilters['category']) && in_array(
-                        $tag['name'],
-                        $appliedFilters['category']
-                    );
-                return $tag;
-            },
-            $this->_tags
-        ));
+        $this->_view->tags = array(
+            'name' => 'category',
+            'values' => array_values($this->_tags),
+            'checked' => !empty($appliedFilters['category']) ? $appliedFilters['category'] : array(),
+            'nocount' => true
+        );
+
+        // assign brands to view with checked attributes
+        $this->_view->brands = array(
+            'name' => 'brand',
+            'values' => $this->_brands,
+            'checked' => !empty($appliedFilters['brand']) ? $appliedFilters['brand'] : array()
+        );
 
         // apply user values to price range filter
         if (!empty($appliedFilters['price'])) {
-//            $price = array_pop($appliedFilters['price']);
             $this->_priceRange = array_merge($this->_priceRange, $appliedFilters['price']);
-//            list($this->_priceRange['from'], $this->_priceRange['to']) = explode('-', $price, 2);
             unset($appliedFilters['price'], $price);
         }
         if (!isset($widgetSettings['price']) || !empty($widgetSettings['price'])) {
-            $this->_view->priceSlider = in_array(self::OPTION_PRICE_SLIDER, $this->_options);
             $this->_view->priceRange = $this->_priceRange;
         }
 
-
-        // mark selected brands
-        $this->_view->brands = array_filter(array_map(
-            function ($brand) use ($appliedFilters, $widgetSettings) {
-                if (isset($widgetSettings['brands']) && is_array($widgetSettings['brands'])
-                    && !in_array($brand['id'], $widgetSettings['brands'])
-                ) {
-                    return null;
-                }
-
-                    $brand['checked'] = isset($appliedFilters['brand']) && in_array(
-                            $brand['name'],
-                            $appliedFilters['brand']
-                        );
-                return $brand;
-            },
-            $this->_brands
-        ));
-
-        return $this->_view->render('filter-product/widget.phtml');
+        return $this->_view->render('filter-widget.phtml');
     }
 
     private function _renderWidgetEdit ()
@@ -235,7 +208,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $this->_view->tags = array_map(
             function ($tag) use ($widgetSettings) {
-                $tag = $tag->toArray();
+//                $tag = $tag->toArray();
                 if (!isset($widgetSettings['tags'])) {
                     $tag['checked'] = true;
                 } else {
@@ -269,27 +242,27 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 }
 
                 if (in_array($filter['name'], Filtering_Tools::$_rangeFilters)) {
-                    $filter['type'] = 'range';
-                    unset($filter['value']);
+                    if (isset($filter['values'])) {
+                        unset($filter['values']);
+                    }
                     return $filter;
                 } else {
-                    $filter['type'] = 'list';
+                    if (!empty($filter['values'])) {
+                        if (!empty($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {
+                            $filter['show'] = (bool) $widgetSettings[$filter['attribute_id']];
+                        }
+                    } else {
+                        $filter['show'] = false;
+                    }
                 }
 
-                if (!empty($filter['value'])) {
-                    $filter['value'] = array_filter(array_unique($filter['value'], SORT_STRING));
-                    if (!empty($widgetSettings[$filter['attribute_id']]) && is_array($widgetSettings[$filter['attribute_id']])) {
-                        $filter['show'] = $widgetSettings[$filter['attribute_id']];
-                    }
-                } else {
-                    $filter['show'] = false;
-                }
+
 
                 return $filter;
             },
             $this->_filters
         );
 
-        return $this->_view->render('filter-product/editor.phtml');
+        return $this->_view->render('filter-editor.phtml');
     }
 }

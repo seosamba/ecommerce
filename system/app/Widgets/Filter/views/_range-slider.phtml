@@ -11,8 +11,8 @@ $max = ceil(floatval($this->max));
 <div class="filter-slider"
      data-min="<?php echo $min; ?>"
      data-max="<?php echo $max; ?>"
-    <?php if (!empty($this->from)) { ?> data-from="<?php echo number_format($this->from, 2, '.', ''); ?>" <?php } ?>
-    <?php if (!empty($this->to)) { ?> data-to="<?php echo number_format($this->to, 2, '.', ''); ?>" <?php } ?>
+    <?php if (!empty($this->from)) { ?> data-from="<?php echo $this->from; ?>" <?php } ?>
+    <?php if (!empty($this->to)) { ?> data-to="<?php echo $this->to; ?>" <?php } ?>
     ></div>
 <?php
 if (!empty($this->from) && !empty($this->to)) {

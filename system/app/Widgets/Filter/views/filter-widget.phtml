@@ -3,41 +3,12 @@
     <ul>
     <?php if (!empty($this->tags)) : ?>
         <li>
-            <p class="filter-header"><?php echo $this->translate('Category'); ?></p>
-            <ul>
-            <?php foreach ($this->tags as $tag) :?>
-                <li>
-                    <label>
-                        <input type="checkbox"
-                               name="category"
-                               value="<?php echo $tag['name']; ?>"
-                               <?php if ($tag['checked']) echo 'checked'; ?>
-                            />
-                        <a href="<?php echo $this->url().'?category='.urlencode($tag['name']); ?>"><?php echo $tag['name']; ?></a></label>
-                </li>
-            <?php endforeach; ?>
-            </ul>
+            <?php echo $this->partial('_list.phtml', $this->tags); ?>
         </li>
     <?php endif; ?>
     <?php if (!empty($this->brands)) : ?>
         <li>
-            <p class="filter-header"><?php echo $this->translate('Brand'); ?></p>
-            <ul>
-            <?php foreach ($this->brands as $brand) :?>
-                <li>
-                    <label>
-                        <input type="checkbox"
-                               name="brand"
-                               value="<?php echo $brand['name']; ?>"
-                               <?php if ($brand['checked']) echo 'checked'; ?>
-                            />
-                        <a href="<?php echo $this->url().'?brand='.urlencode($brand['name']); ?>">
-                            <?php echo $brand['name'] . '&nbsp['. $brand['count'].']'; ?>
-                        </a>
-                    </label>
-                </li>
-            <?php endforeach; ?>
-            </ul>
+            <?php echo $this->partial('_list.phtml', $this->brands); ?>
         </li>
     <?php endif; ?>
     <?php if ($this->priceRange) : ?>
@@ -61,7 +32,7 @@
                             <input type="checkbox"
                                    name="<?php echo $filter['name']; ?>"
                                    value="<?php echo $value; ?>"
-                                   <?php if ($checked) { echo 'checked'; }; ?>
+                                   <?php if ($checked) { ?> checked <?php }; ?>
                                 />
                             <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
                                 <?php echo $value . '&nbsp;[' . $count . ']'; ?>
@@ -76,15 +47,9 @@
     </ul>
     <button><?php echo $this->translate('Apply filters');?></button>
 </form>
-<?php if ($this->priceRange) :?>
 <script>
     $(function () {
-        <?php if (empty($this->priceSlider)) : ?>
-        $(".price-field").on('change', function(){
-           $('input[name=price]').val(''+parseFloat($(".price-min").val())+'-'+ parseFloat($(".price-max").val()));
-        });
-        <?php endif; ?>
-        $('div.price-slider, .filter-slider').each(function () {
+        $('.filter-slider').each(function () {
             var self = this,
                 data = $(self).data();
             $(this).slider({
@@ -104,5 +69,4 @@
         });
     });
 </script>
-<?php endif; ?>
 <?php endif; ?>

@@ -197,24 +197,19 @@ class Filtering_Mappers_Eav
             $dbAdapter = Zend_Db_Table::getDefaultAdapter();
             $select = $dbAdapter->select()->from(
                 array('eav' => $this->_valuesTable),
-                array('eav.attribute_id', 'min' => 'MIN(eav.value)', 'max' => 'MAX(eav.value)')
-            )
-                ->join(
-                    array('tha' => $this->_tagsRelationTable),
-                    'tha.attribute_id = eav.attribute_id',
-                    null
+                array(
+                    'eav.attribute_id',
+                    'min' => new Zend_Db_Expr('MIN( CAST(eav.value AS DECIMAL(8)) )'),
+                    'max' => new Zend_Db_Expr('MAX( CAST(eav.value AS DECIMAL(8)) )')
                 )
+            )
                 ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label'))
-                ->where('tha.tag_id IN (?)', $tags)
                 ->where('a.name IN (?)', Filtering_Tools::$_rangeFilters)
                 ->where(
                     'eav.product_id IN (?)',
-                    $dbAdapter->fetchCol(
-                        $dbAdapter->select()
-                            ->from(array('p' => 'shopping_product'), array('DISTINCT(p.id)'))
-                            ->join(array('pht' => 'shopping_product_has_tag'), 'pht.product_id = p.id', null)
-                            ->where('pht.tag_ID IN (?)', $tags)
-                    )
+                    $dbAdapter->select()
+                        ->from(array('pht' => 'shopping_product_has_tag'), 'DISTINCT(pht.product_id)')
+                        ->where('pht.tag_ID IN (?)', $tags)
                 )
                 ->group(array('eav.attribute_id'));
 
@@ -281,27 +276,37 @@ class Filtering_Mappers_Eav
         return $result;
     }
 
+    /**
+     * Returns array of brand => count pairs for given tags
+     * @param $productTags Product tags to filer with
+     * @return array
+     */
     public function getBrands($productTags)
     {
         $select = $this->_dbAdapter->select()
             ->from(
                 array('p' => 'shopping_product'),
-                array('count' => 'COUNT(p.id)')
+                null
             )
             ->from(
                 array('b' => 'shopping_brands'),
-                array('b.id', 'b.name')
+                array('b.name')
             )
             ->from(
                 array('t' => 'shopping_product_has_tag'),
                 null
+            )
+            ->columns(
+                array(
+                    'count' => 'COUNT(p.id)'
+                )
             )
             ->where('t.product_id = p.id')
             ->where('b.id = p.brand_id')
             ->where('t.tag_id IN (?)', $productTags)
             ->group('b.id');
 
-        $result = $this->_dbAdapter->fetchAll($select);
+        $result = $this->_dbAdapter->fetchPairs($select);
 
         return $result;
     }
