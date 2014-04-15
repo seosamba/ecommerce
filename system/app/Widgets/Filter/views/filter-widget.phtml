@@ -1,0 +1,72 @@
+<?php if (!empty($this->tags) || !empty($this->brands) || !empty($this->filters) || !empty($this->priceRange)) : ?>
+<form class="plugin-filtering-widget filtering-form">
+    <ul>
+    <?php if (!empty($this->tags)) : ?>
+        <li>
+            <?php echo $this->partial('_list.phtml', $this->tags); ?>
+        </li>
+    <?php endif; ?>
+    <?php if (!empty($this->brands)) : ?>
+        <li>
+            <?php echo $this->partial('_list.phtml', $this->brands); ?>
+        </li>
+    <?php endif; ?>
+    <?php if ($this->priceRange) : ?>
+        <li>
+            <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
+            <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
+        </li>
+    <?php endif; ?>
+    <?php foreach ($this->filters as $filter) : ?>
+        <li>
+            <p class="filter-header"><?php echo $filter['label']; ?></p>
+        <?php if (!isset($filter['values'])) : ?>
+            <?php echo $this->partial('_range-slider.phtml', $filter); ?>
+        <?php else : ?>
+            <ul>
+                <?php
+                foreach ($filter['values'] as $value => $count) : ?>
+                    <?php $checked = in_array($value, $filter['checked']); ?>
+                    <li>
+                        <label>
+                            <input type="checkbox"
+                                   name="<?php echo $filter['name']; ?>"
+                                   value="<?php echo $value; ?>"
+                                   <?php if ($checked) { ?> checked <?php }; ?>
+                                />
+                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
+                                <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                            </a>
+                        </label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+    <button><?php echo $this->translate('Apply filters');?></button>
+</form>
+<script>
+    $(function () {
+        $('.filter-slider').each(function () {
+            var self = this,
+                data = $(self).data();
+            $(this).slider({
+                range: true,
+                min: parseFloat(data.min),
+                max: parseFloat(data.max),
+                values: [ parseFloat(data.from || data.min), parseFloat(data.to || data.max) ],
+                slide: function( event, ui ) {
+                    var $wrapper = $(self).closest('li');
+                    if ($wrapper.length) {
+                        $('span.filter-from', $wrapper).text(ui.values[0]);
+                        $('span.filter-to', $wrapper).text(ui.values[1]);
+                        $('input.filter-value', $wrapper).val( ui.values[0] + '-' + ui.values[1] );
+                    }
+                }
+            });
+        });
+    });
+</script>
+<?php endif; ?>

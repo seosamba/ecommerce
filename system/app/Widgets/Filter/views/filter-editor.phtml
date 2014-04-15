@@ -1,0 +1,198 @@
+<form class="plugin-filtering-widget plugin-filtering-wrap" action="<?php echo $this->url();?>" method="post">
+    <input type="hidden" name="filterId" value="<?php echo $this->filterId; ?>" />
+    <h4><?php echo $this->translate('Filter Widget Builder'); ?></h4>
+    <ul>
+    <?php if (!empty($this->tags)) : ?>
+        <li>
+            <label class="filter-label">
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                    <?php
+                    $tagsChecked = array_reduce($this->tags, function($count, $tag) {
+                        if ($tag['checked']) {
+                            $count++;
+                        }
+                        return $count;
+                    });
+                    if ($tagsChecked == sizeof($this->tags)) {
+                        echo "checked";
+                    }
+                    unset($tagsChecked);
+                    ?>
+                    />
+                <?php echo $this->translate('Category');?>
+            </label>
+            <ul>
+                <?php foreach ($this->tags as $tag) :?>
+                <li>
+                    <label>
+                        <input type="checkbox" name="show[tags][]"
+                               value="<?php echo $tag['id']; ?>"
+                                <?php if ($tag['checked']) :?>
+                               checked
+                                <?php endif; ?>
+                            />
+                        <?php echo $tag['name']; ?>
+                    </label></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+    <?php if (!empty($this->brands)) : ?>
+        <li>
+            <label class="filter-label">
+                <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                    <?php
+                    $brandsChecked = array_reduce($this->brands, function($count, $brand) {
+                        if ($brand['checked']) {
+                            $count++;
+                        }
+                        return $count;
+                    });
+                    if ($brandsChecked == sizeof($this->brands)) {
+                        echo "checked";
+                    }
+                    unset($brandsChecked);
+                    ?>
+                    />
+                <?php echo $this->translate('Brands');?>
+            </label>
+            <ul>
+                <?php foreach ($this->brands as $brand) :?>
+                <li>
+                    <label>
+                        <input type="checkbox" name="show[brands][]"
+                               value="<?php echo $brand['id']; ?>"
+                                <?php if ($brand['checked']) :?>
+                               checked
+                                <?php endif; ?>
+                            />
+                        <?php echo $brand['name']; ?>
+                    </label></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+    <?php endif; ?>
+    <li class="filter-price">
+        <label class="filter-label">
+            <input type="hidden" name="show[price]" value="0" />
+            <input type="checkbox" name="show[price]"
+                   value="1"
+                    <?php if (!isset($this->settings['price']) || !empty($this->settings['price'])): ?>
+                   checked
+                    <?php endif; ?>
+                />
+            <?php echo $this->translate('Price'); ?>
+        </label>
+    </li>
+    <?php foreach ($this->filters as $filterId => $filter) : ?>
+        <li data-attributeId="<?php echo $filterId; ?>">
+            <label class="filter-label">
+                <?php if (!isset($filter['values'])) : ?>
+                    <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>]" value="all"/>
+                    <input type="checkbox" name="show[<?php echo $filter['attribute_id']; ?>]" value=""
+                        <?php if (!isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']])): ?>
+                        checked
+                        <?php endif; ?>
+                        />
+                <?php else : ?>
+                    <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>]" value="" />
+                    <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all');?>"
+                    <?php
+                    if ($filter['show'] === true ||
+                        (is_array($filter['show']) && sizeof($filter['values']) === sizeof($filter['show']))) {
+                        echo 'checked';
+                    }
+                    ?>
+                        />
+
+                <?php endif; ?>
+                <?php echo $filter['label']; ?>
+            </label>
+            <?php if (!empty($filter['values'])) : ?>
+                <?php if (sizeof($filter['values']) > 10) { ?>
+                <span title="<?php echo $this->translate('show/hide nested elements'); ?>" class="toggle-nested">&#177;</span>
+                <?php } ?>
+                <ul>
+                <?php foreach ($filter['values'] as $value => $count) : ?>
+                    <li>
+                        <label>
+                            <input type="hidden" name="show[<?php echo $filter['attribute_id']; ?>][]" value="<?php echo $value; ?>"/>
+                            <input type="checkbox" name="show[<?php echo $filter['attribute_id']; ?>][]"
+                                   value=""
+                                   title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                   <?php if ($filter['show'] === true || (
+                                           is_array($filter['show']) && in_array($value, $filter['show'])
+                                       )) {
+                                       echo 'checked';
+                                   }
+                                   ?>
+                                />
+                            <?php
+                            echo $value;
+                            ?></label>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+    <div class="footer">
+        <button type="submit"><?php echo $this->translate('Save'); ?></button>
+    </div>
+</form>
+
+<style type="text/css">
+    .plugin-filtering-widget ul {
+        margin: 0 0 0 10px;
+        padding: 5px;
+    }
+
+    .plugin-filtering-widget ul li {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+    }
+
+    .plugin-filtering-widget > ul > li:nth-child(odd) {
+        background-color: #eee;
+    }
+
+    .plugin-filtering-widget ul label.filter-label {
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .plugin-filtering-widget ul span.toggle-nested {
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+    }
+
+    .plugin-filtering-wrap {
+        width: auto;
+        overflow: hidden;
+        position: relative;
+        border: 3px dashed #eee;
+    }
+
+    .plugin-filtering-wrap > h4 {
+        border-bottom: 3px dashed #eee;
+        padding: 3px;
+        text-transform: uppercase;
+    }
+
+    .plugin-filtering-wrap > h4 > span {
+        font-size: 80%;
+    }
+
+    .plugin-filtering-wrap > .footer {
+        border-top: 3px dashed #eee;
+    }
+
+    .plugin-filtering-wrap label > input[type=checkbox] {
+        cursor: pointer;
+    }
+</style>
