@@ -151,7 +151,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('showPriceIncTax', '1'),
 ('state', '5'),
 ('weightUnit', 'kg'),
-('zip', '94117');
+('zip', '94117')
+('version', '2.2.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
