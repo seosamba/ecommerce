@@ -5,10 +5,9 @@
         <?php if (!empty($this->tags)) : ?>
             <li>
                 <label class="filter-label">
-                    <input type="hidden" name="show[tags]" value=""/>
                     <input type="checkbox" class="mass-change"
                            title="<?php echo $this->translate('toggle all'); ?>"
-                        <?php if (empty($this->settings['tags']) || sizeof($this->tags) === sizeof($this->settings['tags']) ) { ?>
+                        <?php if (!empty($this->settings['tags']) && sizeof($this->tags) === sizeof($this->settings['tags']) ) { ?>
                             checked
                         <?php } ?>
                         />
@@ -19,7 +18,7 @@
                         <li>
                             <label>
                                 <input type="checkbox" name="show[tags][<?php echo $tag; ?>]" value="1"
-                                    <?php if (empty($this->settings['tags']) || isset($this->settings['tags'][$tag])) { ?>
+                                    <?php if (!empty($this->settings['tags']) && isset($this->settings['tags'][$tag])) { ?>
                                         checked
                                     <?php } ?>
                                     />
@@ -32,9 +31,8 @@
         <?php if (!empty($this->brands)) : ?>
             <li>
                 <label class="filter-label">
-                    <input type="hidden" name="show[brands]" value=""/>
                     <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
-                        <?php if (empty($this->settings['brands']) || sizeof($this->brands) === sizeof($this->settings['brands']) ) : ?>
+                        <?php if (!empty($this->settings['brands']) && sizeof($this->brands) === sizeof($this->settings['brands']) ) : ?>
                             checked
                         <?php endif; ?>
                         />
@@ -47,7 +45,7 @@
                         <li>
                             <label>
                                 <input type="checkbox" name="show[brands][<?php echo $brand; ?>]" value="1"
-                                    <?php if (empty($this->settings['brands']) || isset($this->settings['brands'][$brand])) : ?>
+                                    <?php if (!empty($this->settings['brands']) && isset($this->settings['brands'][$brand])) : ?>
                                         checked
                                     <?php endif; ?>
                                     />
@@ -59,7 +57,6 @@
         <?php endif; ?>
         <li class="filter-price">
             <label class="filter-label">
-                <input type="hidden" name="show[price]" value="0"/>
                 <input type="checkbox" name="show[price]" value="1"
                     <?php if (!isset($this->settings['price']) || !empty($this->settings['price'])): ?>
                         checked
