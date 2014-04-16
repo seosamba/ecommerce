@@ -206,30 +206,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $widgetSettings = $this->_widgetSettings;
         $this->_view->settings = $widgetSettings;
 
-        $this->_view->tags = array_map(
-            function ($tag) use ($widgetSettings) {
-//                $tag = $tag->toArray();
-                if (!isset($widgetSettings['tags'])) {
-                    $tag['checked'] = true;
-                } else {
-                    $tag['checked'] = (!empty($widgetSettings['tags']) && in_array($tag['id'], $widgetSettings['tags']));
-                }
-                return $tag;
-            },
-            $this->_tags
-        );
+        $this->_view->tags = $this->_tags;
 
-        $this->_view->brands = array_map(
-            function ($brand) use ($widgetSettings) {
-                if (!isset($widgetSettings['brands'])) {
-                    $brand['checked'] = true;
-                } else {
-                    $brand['checked'] = (!empty($widgetSettings['brands']) && in_array($brand['id'], $widgetSettings['brands']));
-                }
-                return $brand;
-            },
-            $this->_brands
-        );
+        $this->_view->brands = $this->_brands;
 
         $this->_view->filters = array_map(
             function ($filter) use ($widgetSettings) {
