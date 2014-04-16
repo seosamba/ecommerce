@@ -133,7 +133,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $listFilters = $eavMapper->findListFiltersByTags($tagIds, $widgetSettings);
         $rangeFilters = $eavMapper->findRangeFiltersByTags($tagIds, $widgetSettings);
 
-        $this->_filters = array_merge($listFilters, $rangeFilters);
+        $this->_filters = array_merge($rangeFilters, $listFilters);
         // fetch price range for filters
         $this->_priceRange = $eavMapper->getPriceRange($tagIds);
         $this->_priceRange['name'] = 'price';
