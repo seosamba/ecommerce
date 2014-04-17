@@ -27,6 +27,7 @@ define(['backbone',
             this.orders = new OrdersCollection;
             this.orders.server_api = _.extend(this.orders.server_api, {
                 'id': function() { return $('input[name=search]').val(); },
+                'user':  function() { return $('input[name=user-name]').val(); },
                 'filter': function() {
                     return {
                         'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),

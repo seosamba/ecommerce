@@ -81,6 +81,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
 			$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
+            $user = filter_var($this->_request->getParam('user'), FILTER_SANITIZE_STRING);
 			$sortOrder = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
 
 			if ($sortOrder){
@@ -96,6 +97,10 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			} else {
 				$sortOrder = 'order.created_at DESC';
 			}
+
+            if ($user){
+                return $orderMapper->fetchAll(array('user' => $user));
+            }
 
 			if (is_array($filter)){
 				if (isset($filter['country'])) {
