@@ -170,7 +170,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 		));
 
         if (!$validator->isValid($srcData['sku'])){
-	        $this->_error($this->_translator->translate('You already have a product with this SKU'), self::REST_STATUS_OK);
+	        $this->_error(htmlentities($this->_translator->translate('You already have a product with this SKU')), self::REST_STATUS_BAD_REQUEST);
         }
 
         try {

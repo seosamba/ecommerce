@@ -87,6 +87,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
 
+    const SHIPPING_SUCCESS_MESSAGE = 'checkoutShippingSuccessMessage';
+
     const SHIPPING_TAX_RATE     = 'shippingTaxRate';
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
@@ -211,6 +213,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS_MENU);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
+        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
 		Zend_Registry::set('acl', $acl);
 	}
 
@@ -420,7 +423,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		}, $zonesMapper->fetchAll());
 		$this->_view->states = Tools_Geo::getState();
 		$this->_view->countries = Tools_Geo::getCountries();
-		$this->_layout->content = $this->_view->render('zones.phtml');
+        $this->_layout->content = $this->_view->render('zones.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
 		echo $this->_layout->render();
 	}
 
@@ -593,6 +597,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $customerAttributes[$key] = preg_replace('`customer_`', '', $attrName);
             }
             $this->_view->customerAttributes = $customerAttributes;
+            $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
 			return $this->_view->render('clients.phtml');
 		}
 	}
@@ -877,7 +882,7 @@ class Shopping extends Tools_Plugins_Abstract {
 						$msg[] = $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.');
 					}
 				} else {
-					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
+					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
 				}
 			}
 

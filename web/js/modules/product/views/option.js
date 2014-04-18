@@ -58,6 +58,7 @@ define([
 				data.isDefault = '1';
 			}
 			this.model.get('selection').add(data);
+            checkboxRadioStyle();
 		},
 		renderSelection: function(selection){
 			if (!selection.has('_deleted')){

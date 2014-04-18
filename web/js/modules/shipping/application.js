@@ -49,7 +49,7 @@ define(['backbone'], function(Backbone){
                 $(this).closest('li.enabled').prepend('<input class="switcher" type="checkbox" role="switch" checked/>');
                 $(this).closest('li.disabled').prepend('<input class="switcher" type="checkbox" role="switch"/>');
             });
-            checkboxRadio();
+            checkboxRadioStyle();
         }
     });
 

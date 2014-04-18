@@ -55,7 +55,11 @@ class Tools_FeedGenerator {
 		/**
 		 * @var $product Models_Model_Product
 		 */
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll();
+        $db = new Zend_Db_Table();
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll(
+            $db->getAdapter()->quoteInto('enabled = ?', '1')
+        );
+
 		if (empty($products)){
 			return false;
 		}
@@ -65,9 +69,9 @@ class Tools_FeedGenerator {
                 continue;
             }
 			$item = $feed->createElement('item');
-			$item->appendChild($feed->createElement('title', htmlentities($product->getName())));
+			$item->appendChild($feed->createElement('title', $product->getName()));
 			$item->appendChild($feed->createElement('link', $websiteUrl.$productPage->getUrl()));
-			$item->appendChild($feed->createElement('description', htmlentities($product->getShortDescription())));
+			$item->appendChild($feed->createElement('description', $product->getShortDescription()));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
 			$item->appendChild($feed->createElement('g:availability', 'in stock'));
@@ -85,7 +89,7 @@ class Tools_FeedGenerator {
 			}
 			unset($tags);
 
-			$item->appendChild($feed->createElement('g:image_link', htmlentities($websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto()))));
+			$item->appendChild($feed->createElement('g:image_link',$websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto())));
 
 			if (null !== ($weight = $product->getWeight())){
 				$item->appendChild($feed->createElement('g:shipping_weight', $weight.' '.$this->_shoppingConfig['weightUnit'] ));

@@ -1,10 +1,10 @@
 <?php $this->headTitle($this->translate('Manage customers')); ?>
 
 <script id="tableRowTemplate" type="text/x-jquery-tmpl">
-    <td class="check-td textcentered"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
+    <td class="check-td"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
-    <td class="email textcentered"><a href="mailto:${email}">${email}</a></td>
-    <td class="group textcentered">
+    <td class="email"><a href="mailto:${email}">${email}</a></td>
+    <td class="group">
         <?php if(!empty($this->allGroups)):?>
             <select name="groups">
                 <option value="0"><?php echo $this->translate('select');?></option>
@@ -21,8 +21,8 @@
             <td><input type="text" class="customer-attribute" data-uid="${id}" data-attribute="customer_<?php echo $attrName?>" value="${<?php echo $attrName?>}" /></td>
         <?php endforeach; ?>
     <?php endif; ?>
-    <td class="date textcentered">${reg_date}</td>
-    <td class="total textcentered"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
+    <td class="date text-center">${reg_date}</td>
+    <td class="total text-center"><span>{{if total_amount}}${total_amount}{{else}}0{{/if}}</span> (${total_orders})</td>
 </script>
 
 <script id="customerDetailsTemplate" type="text/x-jquery-tmpl">
@@ -51,42 +51,43 @@
 	echo $this->noLayout ? $this->headScript() : '';
 ?>
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
-<div id="clients" class="ui-helper-clearfix toaster-widget">
-    <table id="clients-table" class="widget" style="width: 100%">
+<div id="clients" class="toaster-widget">
+    <div class="search-line mt20px mb20px clearfix">
+        <input type="text" id="clients-search" class="grid_6 alpha" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
+        <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post">
+            <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
+        </form>
+    </div>
+    <table id="clients-table" class="widget table-hover">
         <thead>
-            <tr class="search-line">
-				<th colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="gray-bg">
-					<label class="mt5px"><?php echo $this->translate('Search');?></label>
-					<input type="text" id="clients-search" name="clients-search" placeholder="<?php echo $this->translate('by name or email');?>"/>
-                </th>
-	            <th class="gray-bg">
-                    <form id="export-users-form" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post">
-	                    <a href="javascript:;" class="textcentered" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
-                    </form>
-                </th>
-            </tr>
-            <tr class="title-table">
+            <tr class="title-table ws-nowrap">
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
                 <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
                 <?php if (is_array($this->customerAttributes)): ?>
                     <?php foreach ($this->customerAttributes as $attrName): ?>
-                        <th class="customer-attribute" data-custom="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate(mb_convert_case(preg_replace('`_`', ' ', $attrName), MB_CASE_TITLE, 'UTF-8'));?><span class="icomoon-cancel red"></span></th>
+                        <th class="customer-attribute" data-custom="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate(mb_convert_case(preg_replace('`_`', ' ', $attrName), MB_CASE_TITLE, 'UTF-8'));?>
+                            <?php if ($this->superAdmin === true): ?>
+                                <span class="icon-cancel red"></span>
+                            <?php endif ?>
+                        </th>
                     <?php endforeach; ?>
                 <?php endif; ?>
-	            <th class="sortable" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
-	            <th class="sortable" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
+	            <th class="sortable text-center" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
+	            <th class="sortable text-center" data-sortkey="total_amount"><?php echo $this->translate('Total Spend (orders)');?></th>
             </tr>
         </thead>
         <tbody id="customer-list">
             <tr>
-	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class=" textcentered"><img src="<?php echo $this->websiteUrl;?>/system/images/loading.gif"/></td>
+	            <td colspan="<?php echo 6 + count($this->customerAttributes); ?>" class="text-center">
+                    <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
+                </td>
             </tr>
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="ui-resizable text-left">
+	            <td colspan="2">
 		            <?php echo $this->translate('with selected do');?>
 					<!-- @todo add some actions -->
                     <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>
@@ -101,7 +102,7 @@
 		            </select>
 	            </td>
 
-	            <td class="textcentered">
+	            <td colspan="<?php echo 4 + count($this->customerAttributes); ?>" class="text-right">
 		            <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
 		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
 	            </td>
@@ -110,11 +111,9 @@
     </table>
 
 	<div id="customer-details">
-		<div class="toolbar">
+		<div class="toolbar mt10px mb30px">
 			<a href="javascript:;" class="link btn-text">[ &#8678; <?php echo $this->translate('back to clients list');?> ]</a>
 		</div>
-		<div id="profile">
-
-		</div>
+		<div id="profile"></div>
 	</div>
 </div>

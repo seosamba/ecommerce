@@ -15,7 +15,7 @@ define([
             'click #clients-previous': 'goPreviousPage',
             'click #clients-next': 'goNextPage',
             'click th.sortable': 'sort',
-            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details').toggle()},
+            'click #customer-details div.toolbar a:first': function() {$('#clients-table,#customer-details, .search-line').toggle()},
             'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #clients-search': 'searchClient',
@@ -67,7 +67,7 @@ define([
         },
         renderCustomerDetails: function(response, status) {
             if (status === "success") {
-                $('#clients-table').hide();
+                $('#clients-table, .search-line').hide();
                 $('#customer-details').find('#profile').html(response).end().show();
             }
         },
@@ -205,7 +205,8 @@ define([
             });
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
-                buttons: assignGroupsButtons
+                buttons: assignGroupsButtons,
+                resizable : false
             });
             return false;
         },
@@ -309,6 +310,7 @@ define([
                         $(dialog).dialog({
                             width: 600,
                             dialogClass: 'seotoaster',
+                            resizable:false,
                             buttons: assignEmailService,
                             open: function(event, ui) {
                                 $('#marketing-services').on('change',  function(){
@@ -325,9 +327,9 @@ define([
                                                 return false;
                                             }else{
                                                 $('#subscribe-list').remove();
-                                                var subscribeList = '<div id="subscribe-list" style="margin-top: 15px;">';
+                                                var subscribeList = '<div class="mt10px" id="subscribe-list">';
                                                 $.each(response.responseText.list, function(value, listName){
-                                                    subscribeList += '<input style="margin-top:5px;" type="checkbox" name="list" value="'+value+'"/><label style="float:left; margin-right: 20px;">'+listName+'</label>'
+                                                    subscribeList += '<label class="fl-left mr30px pointer">'+listName+' <input type="checkbox" name="list" value="'+value+'"/></label>'
                                                 })
                                                 subscribeList += '</div>';
                                                 $('#marketing-services').after(subscribeList);

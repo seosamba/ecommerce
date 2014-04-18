@@ -50,8 +50,8 @@
 
 <script id="tagTemplate" type="text/template">
 	<a href="javascript:;" class="fl-right ml1 mr1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
-	<label class="fl-left mr-grid checkbox_radio-wrap">
-        <input class="processed checkbox-upgrade filed-upgrade" type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/><span class="checkbox_radio"></span>
+	<label class="fl-left mr-grid">
+        <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
     </label>
     <span class="tag-editable text-overflow align-middle" title="Click to edit"><%= tag.get('name') %></span>
 </script>
@@ -81,7 +81,7 @@
         {{if id}}
         &nbsp;
         {{else}}
-        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /><span class="checkbox_radio"></span></label>
+        <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
         <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
@@ -129,16 +129,16 @@
 		<span class="grid_2 alpha omega text-center mt5px"><?php echo $this->generalConfig['weightUnit']; ?></span>
 	</div>
 	<label class="grid_1 text-center mt5px">
-		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} /><span class="checkbox_radio"></span>
+		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
 	</label>
-	<div class="grid_1 text-center mt5px">
-		<button class="item-remove link error icon-remove icon16" title="<?php echo $this->translate('Delete'); ?>"</button>
+	<div class="grid_1 text-center">
+		<button class="item-remove link error icon-remove fs16" title="<?php echo $this->translate('Delete'); ?>"</button>
 	</div>
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-        <a class="icon-close error small pointer" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
+        <a class="delete icon-close error small" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
     <% } else { %>
     <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>
@@ -232,9 +232,9 @@
         </ul>
     </div>
     <div class="nav-links header grid_3 alpha omega">
-        <a class="show-list btn link inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+        <a class="show-list inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
         <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-        <a id="new-product" class="btn link inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+        <a id="new-product" class="inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
     </div>
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
@@ -341,12 +341,10 @@
         <div id="preview-box" class="grid_4 omega tabs-gray mt2-25em">
 			<ul>
 				<li><a href="#quick-preview"><?php echo $this->translate('Preview'); ?></a></li>
-				<li><a href="#merchandising"><?php echo $this->translate('Merchandising'); ?></a></li>
+				<!--li><a href="#merchandising"><?php echo $this->translate('Merchandising'); ?></a></li-->
 			</ul>
-			<div id="quick-preview">
-			</div>
-			<div id="merchandising">
-			</div>
+			<div id="quick-preview"></div>
+			<!--div id="merchandising"></div-->
         </div>
     </div>
 
@@ -398,7 +396,7 @@
     </div>
 
     <div class="footer grid_12">
-        <a href="javascript:;" class="delete-selected btn link error mt5px" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
+        <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
 		<button type="submit" name="submit" id="submit" value="Save"/><span class="icon-save"></span> <?php echo $this->translate('Save product'); ?></button>
     </div>
 </div>

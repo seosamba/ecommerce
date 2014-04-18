@@ -20,10 +20,10 @@ class Api_Store_Customer extends Api_Service_Abstract
             'allow' => array('get', 'post', 'put', 'delete')
         ),
         Tools_Security_Acl::ROLE_ADMIN => array(
-            'allow' => array('get', 'post', 'put', 'delete')
+            'allow' => array('get', 'post', 'put')
         ),
         Tools_Security_Acl::ROLE_MEMBER => array(
-            'allow' => array('get', 'put', 'delete')
+            'allow' => array('get', 'put')
         ),
         Tools_Security_Acl::ROLE_USER => array(
             'allow' => array('get', 'put')
@@ -91,6 +91,10 @@ class Api_Store_Customer extends Api_Service_Abstract
                 }
                 $user->setPassword(false);
                 Application_Model_Mappers_UserMapper::getInstance()->save($user);
+                $mailWatchdog = new Tools_Mail_Watchdog(array(
+                    'trigger'  => Tools_StoreMailWatchdog::TRIGGER_CUSTOMERCHANGEATTR,
+                ));
+                $mailWatchdog->notify($user);
                 return array('status' => 'ok');
             }
         }
