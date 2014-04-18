@@ -37,7 +37,8 @@ define(['backbone',
                         'date-from': $('input[name=filter-from-date]', '#store-orders form.filters').val(),
                         'date-to': $('input[name=filter-to-date]', '#store-orders form.filters').val(),
                         'amount-from': $('input[name=filter-from-amount]', '#store-orders form.filters').val(),
-                        'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val()
+                        'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val(),
+                        'user': $('input[name=user-name]', '#store-orders form.filters').val()
                     };
                 }
             });
