@@ -98,9 +98,6 @@ class Api_Store_Orders extends Api_Service_Abstract {
 				$sortOrder = 'order.created_at DESC';
 			}
 
-            if ($user){
-                return $orderMapper->fetchAll(array('user' => $user));
-            }
 
 			if (is_array($filter)){
 				if (isset($filter['country'])) {

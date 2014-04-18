@@ -27,7 +27,6 @@ define(['backbone',
             this.orders = new OrdersCollection;
             this.orders.server_api = _.extend(this.orders.server_api, {
                 'id': function() { return $('input[name=search]').val(); },
-                'user':  function() { return $('input[name=user-name]').val(); },
                 'filter': function() {
                     return {
                         'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),
@@ -38,7 +37,8 @@ define(['backbone',
                         'date-from': $('input[name=filter-from-date]', '#store-orders form.filters').val(),
                         'date-to': $('input[name=filter-to-date]', '#store-orders form.filters').val(),
                         'amount-from': $('input[name=filter-from-amount]', '#store-orders form.filters').val(),
-                        'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val()
+                        'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val(),
+                        'user': $('input[name=user-name]', '#store-orders form.filters').val()
                     };
                 }
             });
