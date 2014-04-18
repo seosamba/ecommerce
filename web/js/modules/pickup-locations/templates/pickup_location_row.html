@@ -1,0 +1,41 @@
+<div class="group-price-row grid_12 alpha omega group-id-<%= group.get('id') %>">
+    <input type="hidden" name="groupId" value="<%= group.get('id') %>"/>
+
+    <label class="grid_4 mt5px text-right ml0"><%= group.get('groupName') %></label>
+
+    <select class="grid_1 alpha" name="priceSign">
+        <% if (group.has('priceSign') && group.get('priceSign') == 'plus') {%>
+        <option selected="selected" value="plus">+</option>
+        <% } else {%>
+        <option value="plus">+</option>
+        <% } %>
+        <% if (group.has('priceSign') && group.get('priceSign') == 'minus') {%>
+        <option selected="selected" value="minus">-</option>
+        <% } else {%>
+        <option value="minus">-</option>
+        <% } %>
+    </select>
+
+    <% if (group.has('priceValue')) {%>
+    <input class="grid_2 alpha" type="text" name="priceValue" value="<%= group.get('priceValue') %>"/>
+<% } else {%>
+    <input class="grid_2 alpha" type="text" name="priceValue" value=""/>
+<% } %>
+
+
+    <select class="grid_1 alpha omega groupPriceType" name="priceType">
+        <% if (group.has('priceType') && group.get('priceType') == 'percent') {%>
+            <option selected="selected" value="percent">%</option>
+        <% } else {%>
+            <option value="percent">%</option>
+        <% } %>
+        <% if (group.has('priceType') && group.get('priceType') == 'unit') {%>
+            <option selected="selected" value="unit">unit</option>
+        <% } else {%>
+            <option value="unit">unit</option>
+        <% } %>
+    </select>
+    <div class="grid_1 alpha omega text-center group-price-final mt5px"></div>
+    <a class="icon-remove error grid_1 mt5px" data-role="delete" data-cid="<%= group.get('id') %>" href="javascript:;"></a>
+
+</div>

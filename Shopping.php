@@ -1063,4 +1063,16 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    protected function pickupLocationAction(){
+        $pickupLocationMapper  = Store_Mapper_PickupLocationMapper::getInstance();
+        $pickupLocationCategory = Store_Mapper_PickupLocationCategoryMapper::getInstance();
+        $this->_view->pickupLocationsCategories = array_map(function ($pickupCategory) {
+                return $pickupCategory->toArray();
+            }, $pickupLocationCategory->fetchAll());
+        $this->_view->countries = Tools_Geo::getCountries();
+        $this->_layout->content = $this->_view->render('pickup-location.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
+        echo $this->_layout->render();
+    }
+
 }
