@@ -1,78 +1,134 @@
 <?php
-    $this->headTitle($this->translate('Manage zones'));
-    $this->headScript()->setAllowArbitraryAttributes(true)
-        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/pickup-locations/config'));
+$this->headTitle($this->translate('Manage zones'));
+$this->headScript()->setAllowArbitraryAttributes(true)
+    ->appendFile(
+        $this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+        null,
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/pickup-locations/config')
+    );
 ?>
 
-<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
+<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage(); ?>"/>
 <div id="manage-pickup-locations">
-   <ul class="header">
-       <?php foreach($this->pickupLocationsCategories as $category):?>
-           <li><a data-category-id="<?php echo $category['id'];?>" href="#pickup-category-<?php echo $category['id'];?>"><?php echo $category['name'];?></a></li>
-       <?php endforeach;?>
-       <li class="add-new-pickup-location">
-           <a id="new-pickup-location-btn" class="ui-tabs-anchor icon-plus fs16"></a>
+    <ul class="header">
+        <?php foreach ($this->pickupLocationsCategories as $category): ?>
+            <li><a data-category-id="<?php echo $category['id']; ?>"
+                   href="#pickup-category-<?php echo $category['id']; ?>"><?php echo $category['name']; ?></a></li>
+        <?php endforeach; ?>
+        <li class="add-new-pickup-location">
+            <a id="new-pickup-location-btn" class="ui-tabs-anchor icon-plus fs16"></a>
         </li>
-   </ul>
-    <?php foreach($this->pickupLocationsCategories as $category):?>
-        <div id="pickup-category-<?php echo $category['id'];?>""></div>
-    <?php endforeach;?>
-    <?php $hidden = '';?>
-    <?php if(empty($this->pickupLocationsCategories)):?>
-        <?php $hidden = 'hidden';?>
-    <?php endif;?>
+    </ul>
+    <?php foreach ($this->pickupLocationsCategories as $category): ?>
+    <div id="pickup-category-<?php echo $category['id']; ?>"
+    ">
+</div>
+<?php endforeach; ?>
+<?php $hidden = ''; ?>
+<?php if (empty($this->pickupLocationsCategories)): ?>
+    <?php $hidden = 'hidden'; ?>
+<?php endif; ?>
 
-<form id="edit-pickup-location" class="grid_12 alpha omega background mt20px <?php echo $hidden;?>">
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('Name');?></label><input type="text" name="location-name" /></p>
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('Address 1');?></label><input type="text" name="address1" /></p>
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('Address 2');?></label><input type="text" name="address2" /></p>
-    <p class="grid_3 mt10px fl-right hidden"><label><?php echo $this->translate('Working hours');?></label>
-        <label><?php echo $this->translate('Sunday');?></label><input type="text" name="working_hours[]" />
-        <label><?php echo $this->translate('Monday');?></label><input type="text" name="working_hours[]"  />
-        <label><?php echo $this->translate('Tuesday');?></label><input type="text" name="working_hours[]"  />
-        <label><?php echo $this->translate('Wednesday');?></label><input type="text" name="working_hours[]"  />
-        <label><?php echo $this->translate('Thursday');?></label><input type="text" name="working_hours[]" />
-        <label><?php echo $this->translate('Friday');?></label><input type="text" name="working_hours[]"  />
-        <label><?php echo $this->translate('Saturday');?></label><input type="text" name="working_hours[]"  />
-    </p>
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('City');?></label><input type="text" name="city" /></p>
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('Country');?></label>
-    <select name="country">
-        <?php foreach($this->countries as $country):?>
-            <option value="<?php echo $country['name'];?>"><?php echo $country['name'];?></option>
-        <?php endforeach;?>
-    </select>
+<label class="category-label grid_3 mt5px <?php echo $hidden; ?>"><?php echo $this->translate('Change category name'); ?></label><input
+    class="change-category-label grid_4 <?php echo $hidden; ?>" name="change-category-label"/>
+
+<form id="edit-pickup-location" class="grid_12 background mt20px <?php echo $hidden; ?>" method="POST">
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('Name'); ?></label>
+        <input type="text" name="location-name" class="location-name"/>
     </p>
 
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('Phone');?></label><input type="text" name="phone" /></p>
-    <p class="grid_3 mt10px"><label><?php echo $this->translate('Zip');?></label><input type="text" name="zip" /></p>
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('Address 1'); ?></label>
+        <input type="text" name="address1" class="location-address1"/>
+    </p>
 
-    <button class="grid_2 omega mt2-25em icon-plus" type="submit"/><?php echo $this->translate('Create'); ?></button>
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('Address 2'); ?></label>
+        <input type="text" name="address2" class="location-address2"/>
+    </p>
+
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('City'); ?></label>
+        <input type="text" name="city" class="location-city"/>
+    </p>
+
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('Zip'); ?></label>
+        <input type="text" name="zip" class="location-zip"/>
+    </p>
+
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('Country'); ?></label>
+        <select name="country" class="location-country">
+            <?php foreach ($this->countries as $country): ?>
+                <option value="<?php echo $country['name']; ?>"><?php echo $country['name']; ?></option>
+            <?php endforeach; ?>
+        </select>
+    </p>
+    <p class="grid_3 mt10px"><label><?php echo $this->translate('Phone'); ?></label>
+        <input type="text" name="phone" class="location-phone"/>
+    </p>
+
+    <p class="grid_3 mt35px text-center" id="working_hours">
+        <a class="working-hours-dialog" href="javascript:;"><?php echo $this->translate('Working hours'); ?></a>
+    </p>
+    <input type="hidden" name="id" id="location-edit-id"/>
+
+    <button class="grid_2 omega icon-plus" type="submit"/>
+    <?php echo $this->translate('Create or Update'); ?>
+    </button>
 </form>
-    <div class="content-footer grid_12">
-        <div class="grid_12 alpha omega mb20px mt15px location-table <?php echo $hidden;?>"">
-            <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
-                <thead class="header-inner">
-                <tr>
-                    <th><?php echo $this->translate('Name');?></th>
-                    <th><?php echo $this->translate('Address1');?></th>
-                    <th><?php echo $this->translate('City' );?></th>
-                    <th><?php echo $this->translate('Country');?></th>
-                    <th><?php echo $this->translate('Phone');?></th>
-                    <th class="w10 text-center"><?php echo $this->translate( 'Action' ); ?></th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-        <a id="delete-pickup-location-category" class="delete-selected-category error <?php echo $hidden;?>" href="javascript:;">[ <?php echo $this->translate( 'Delete location category' ); ?> ]</a>
-    </div>
+
+<div class="working-hours-list grid_12 alpha omega hidden" title="<?php echo $this->translate('Working hours'); ?>">
+    <p class="grid_6 mt20px"><label><?php echo $this->translate('Sunday'); ?></label>
+        <input type="text" name="working-hours-sunday"/>
+    </p>
+
+    <p class="grid_6"><label><?php echo $this->translate('Monday'); ?></label>
+        <input type="text" name="working-hours-monday"/>
+    </p>
+
+    <p class="grid_6"><label><?php echo $this->translate('Tuesday'); ?></label>
+        <input type="text" name="working-hours-tuesday"/>
+    </p>
+
+    <p class="grid_6"><label><?php echo $this->translate('Wednesday'); ?></label>
+        <input type="text" name="working-hours-wednesday"/>
+    </p>
+
+    <p class="grid_6"><label><?php echo $this->translate('Thursday'); ?></label>
+        <input type="text" name="working-hours-thursday"/>
+    </p>
+
+    <p class="grid_6"><label><?php echo $this->translate('Friday'); ?></label>
+        <input type="text" name="working-hours-friday"/>
+    </p>
+
+    <p class="grid_6"><label><?php echo $this->translate('Saturday'); ?></label>
+        <input type="text" name="working-hours-saturday"/>
+    </p>
+</div>
+<div class="content-footer grid_12">
+    <div class="grid_12 alpha omega mb20px mt15px location-table <?php echo $hidden; ?>"
+    ">
+    <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
+        <thead class="header-inner">
+        <tr>
+            <th><?php echo $this->translate('Name'); ?></th>
+            <th><?php echo $this->translate('Address1'); ?></th>
+            <th><?php echo $this->translate('Address2'); ?></th>
+            <th><?php echo $this->translate('City'); ?></th>
+            <th><?php echo $this->translate('Zip'); ?></th>
+            <th><?php echo $this->translate('Country'); ?></th>
+            <th><?php echo $this->translate('Phone'); ?></th>
+            <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<a id="delete-pickup-location-category" class="delete-selected-category error <?php echo $hidden; ?>"
+   href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a>
+</div>
 </div>
 
-
-
 <script>
-<?php $this->jQuery()->onLoadCaptureStart();?>
+    <?php $this->jQuery()->onLoadCaptureStart();?>
     $('#manage-pickup-locations').tabs();
-<?php $this->jQuery()->onLoadCaptureEnd();?>
+    <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

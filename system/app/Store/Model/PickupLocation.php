@@ -2,21 +2,22 @@
 /**
  * Class Store_Model_PickupLocation
  */
-class Store_Model_PickupLocation extends Application_Model_Models_Abstract {
+class Store_Model_PickupLocation extends Application_Model_Models_Abstract
+{
 
     protected $_name;
 
     protected $_country;
 
-	protected $_city;
+    protected $_city;
 
-	protected $_address1;
+    protected $_address1;
 
-	protected $_address2;
+    protected $_address2;
 
-	protected $_phone;
+    protected $_phone;
 
-	protected $_zip;
+    protected $_zip;
 
     protected $_workingHours;
 
@@ -111,7 +112,6 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract {
     {
         return $this->_locationCategoryId;
     }
-
 
 
 }

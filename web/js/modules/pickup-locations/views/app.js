@@ -10,7 +10,8 @@ define([
         events: {
             'click #new-pickup-location-btn': 'addCategory',
             'click .ui-state-default': 'activeTab',
-            'click #delete-pickup-location-category': 'deleteCategory'
+            'click #delete-pickup-location-category': 'deleteCategory',
+            'blur .change-category-label': 'changeCategoryName'
         },
         templates: {},
         initialize: function(){
@@ -27,14 +28,32 @@ define([
             $('.location-table').removeClass('hidden');
             $('#edit-pickup-location').removeClass('hidden');
             $('.delete-selected-category').removeClass('hidden');
+            $('.change-category-label').removeClass('hidden');
+            $('.category-label').removeClass('hidden');
+            $('#location-edit-id').val('');
+            $('#edit-pickup-location').attr('method', 'POST');
             showSpinner();
             this.pickupLocation = new PickupLocationCollection();
             this.pickupLocation.on('reset', this.render, this);
             this.pickupLocationTable.render();
         },
+        changeCategoryName: function(){
+            var currentCategoryId = $(".ui-state-active").find('a').data('category-id');
+            var categoryName = $('.change-category-label').val();
+            $.ajax({
+                url: $('#website_url').val()+'api/store/pickuplocationcategories/id/'+currentCategoryId+'/categoryName/'+categoryName,
+                type: 'PUT',
+                dataType: 'json',
+                success: function(response) {
+                    $(".ui-state-active").find('a').text(response.name);
+                    $('#manage-pickup-locations').tabs("refresh");
+                }
+            });
+        },
         deleteCategory: function(){
             var currentCategoryId = $(".ui-state-active").find('a').data('category-id');
             var index = $('#manage-pickup-locations').tabs('option', 'active');
+            var self = this;
             showConfirm('Are you sure?', function(){
                 $.ajax({
                     url: $('#website_url').val()+'api/store/pickuplocationcategories/id/'+currentCategoryId+'/',
@@ -45,6 +64,10 @@ define([
                         var panelId = tab.attr( "aria-controls" );
                         $( "#" + panelId ).remove();
                         $('#manage-pickup-locations').tabs("refresh");
+                        $('#edit-pickup-location').trigger('pickupLocation:created');
+                        if(_.isNull($(".ui-state-active").find('a').data('category-id'))){
+                            self.hideConfig();
+                        }
                     }
                 });
             });
@@ -63,6 +86,15 @@ define([
                     self.$el.tabs('refresh');
                 }
             });
+        },
+        hideConfig: function(){
+            $('.location-table').addClass('hidden');
+            $('#edit-pickup-location').addClass('hidden');
+            $('.delete-selected-category').addClass('hidden');
+            $('.change-category-label').addClass('hidden');
+            $('#location-edit-id').val('');
+            $('.category-label').addClass('hidden');
+            $('#edit-pickup-location').attr('method', 'POST');
         }
     });
 
