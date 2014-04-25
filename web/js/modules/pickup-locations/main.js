@@ -23,23 +23,16 @@ define([ './views/app' ], function(AppView){
             $('#progressbar .value').text(file.percent);
         })
         jsPickupLogoUploader.bind('FileUploaded', function(uploader, file) {
-            var websiteUrl = $('#website_url').val(),
-                catId      = $('.ui-state-active').find('a').data('category-id'),
-                catName    = $('.change-category-label').val();
-            $.ajax({
-                url:      websiteUrl+'api/store/pickuplocationcategories/id/'+catId+'/categoryName/'+catName
-                    +'/categoryImg/'+file.name,
-                type:     'PUT',
-                dataType: 'json',
-                success:   function(response) {
-                    var src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+file.name;
-
-                    var currentCategoryId = $('.ui-state-active').find('a').data('category-id');
-                    Toastr.StorePickupLocation.PickupLoationCategories.categories.get(currentCategoryId).set('img', file.name);
-
-                    $('.uploader-category-logo img').attr('src', src);
-                }
-            });
+            var websiteUrl = $('#website_url').val();
+            var currentCategoryId = $('.ui-state-active').find('a').data('category-id');
+            var category = Toastr.StorePickupLocation.PickupLoationCategories.categories.get(currentCategoryId);
+            var imageName = file.name;
+            category.set('img', imageName);
+            category.save(category, {
+                success: function(model, response) {
+                var src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+imageName;
+                $('.uploader-category-logo img').attr('src', src);
+            }});
             $('#progressbar').delay(800).fadeOut();
         });
     });
