@@ -93,6 +93,14 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
 
+    const QUANTITY_PICKUP_LOCATION_ON_SCREEN = 6;
+
+    const AMOUNT_TYPE_UP_TO = 'up to';
+
+    const AMOUNT_TYPE_OVER = 'over';
+
+    const AMOUNT_TYPE_EACH_OVER = 'eachover';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -284,20 +292,45 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_view->shoppingConfig = $this->_configMapper->getConfigParams();
 
-		$markupConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_MARKUP);
+        $shippingConfigMapper = Models_Mapper_ShippingConfigMapper::getInstance();
+		$markupConfig = $shippingConfigMapper->find(self::SHIPPING_MARKUP);
 		$markupForm = new Forms_Shipping_MarkupShipping();
 		if (isset($markupConfig['config']) && !empty($markupConfig['config'])) {
 			$markupForm->populate($markupConfig['config']);
 		}
 		$freeShippingForm = new Forms_Shipping_FreeShipping();
-		$freeShippingConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_FREESHIPPING);
+		$freeShippingConfig = $shippingConfigMapper->find(self::SHIPPING_FREESHIPPING);
 		if (isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])) {
 			$freeShippingForm->populate($freeShippingConfig['config']);
 		}
+
+        $pickupShippingForm = new Forms_Shipping_PickupShipping();
+        $pickupShippingConfig = $shippingConfigMapper->find(self::SHIPPING_PICKUP);
+        $defaultPickup = true;
+        if (isset($pickupShippingConfig['config']) && !empty($pickupShippingConfig['config'])) {
+            $defaultPickup = false;
+            if($pickupShippingConfig['config']['defaultPickupConfig'] === '1'){
+                $defaultPickup = true;
+            }
+            $pickupShippingForm->populate($pickupShippingConfig['config']);
+        }
+        if($defaultPickup){
+            $pickupShippingForm->getElement('defaultPickupConfig')->setValue(1);
+        }
+        $pickupLocationsCategories = Store_Mapper_PickupLocationCategoryMapper::getInstance()->fetchAll();
+        $this->_view->locationCategories = $pickupLocationsCategories;
+        $this->_view->defaultPickup = $defaultPickup;
 		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$this->_view->freeForm = $freeShippingForm;
 		$this->_view->markupForm = $markupForm;
-
+        $this->_view->pickupForm = $pickupShippingForm;
+        $pickupLocationMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+        $this->_view->pickupLocationConfigZones = $pickupLocationMapper->getLocationZones();
+        $pickupLocationConfig = $pickupLocationMapper->getConfig();
+        if(empty($pickupLocationConfig)) {
+            $pickupLocationConfig = array('1'=>array('id'=>1, 'amount_type_limit'=>Shopping::AMOUNT_TYPE_UP_TO, 'amount_limit'=>0));
+        }
+        $this->_view->pickupLocationConf = $pickupLocationConfig;
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -735,7 +768,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					$form = new Forms_Shipping_FreeShipping();
 					break;
 				case self::SHIPPING_PICKUP:
-//					$form = new Forms_Shipping_Pickup();
+					$form = new Forms_Shipping_PickupShipping();
 					break;
 				case self::SHIPPING_MARKUP:
 					$form = new Forms_Shipping_MarkupShipping();
@@ -744,11 +777,38 @@ class Shopping extends Tools_Plugins_Abstract {
 					break;
 			}
 			if ($this->_request->isPost()) {
-				if ($form->isValid($this->_request->getParams())) {
-					$config = array(
-						'name'   => $name,
-						'config' => $form->getValues()
-					);
+                if ($form->isValid($this->_request->getParams())) {
+                    if ($name === self::SHIPPING_PICKUP) {
+                        $pickupLocationConfig = $this->_request->getParams();
+                        $config = array(
+                            'name' => $name,
+                            'config' => array(
+                                'title' => $pickupLocationConfig['title'],
+                                'units' => $pickupLocationConfig['units'],
+                                'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig']
+                            )
+                        );
+                        if (isset($pickupLocationConfig['configData']) && !empty($pickupLocationConfig['configData'])) {
+                            $pickupLocationsConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                            $pickupLocationsConfigModel = new Store_Model_PickupLocationConfig();
+                            foreach ($pickupLocationConfig['configData'] as $location) {
+                                if ($location['amountLimit'] === '0') {
+                                    $pickupLocationsConfigMapper->deleteConfig($location['configRowId']);
+                                } else {
+                                    $pickupLocationsConfigModel->setId($location['configRowId']);
+                                    $pickupLocationsConfigModel->setAmountLimit($location['amountLimit']);
+                                    $pickupLocationsConfigModel->setAmountTypeLimit($location['amountType']);
+                                    $pickupLocationsConfigModel->setLocationZones($location['zoneWithAmount']);
+                                    $pickupLocationsConfigMapper->save($pickupLocationsConfigModel);
+                                }
+                            }
+                        }
+                    } else {
+                        $config = array(
+                            'name' => $name,
+                            'config' => $form->getValues()
+                        );
+                    }
 					Models_Mapper_ShippingConfigMapper::getInstance()->save($config);
 				}
 			} else {
@@ -1063,16 +1123,30 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
-    protected function pickupLocationAction(){
-        $pickupLocationMapper  = Store_Mapper_PickupLocationMapper::getInstance();
+    protected function pickupLocationAction()
+    {
         $pickupLocationCategory = Store_Mapper_PickupLocationCategoryMapper::getInstance();
-        $this->_view->pickupLocationsCategories = array_map(function ($pickupCategory) {
+        $this->_view->pickupLocationsCategories = array_map(
+            function ($pickupCategory) {
                 return $pickupCategory->toArray();
-            }, $pickupLocationCategory->fetchAll());
+            },
+            $pickupLocationCategory->fetchAll()
+        );
         $this->_view->countries = Tools_Geo::getCountries();
         $this->_layout->content = $this->_view->render('pickup-location.phtml');
         $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
         echo $this->_layout->render();
+    }
+
+    public function deletePickupLocationAction(){
+        if(Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $locationId = filter_var($this->_request->getParam('locationId'), FILTER_SANITIZE_NUMBER_INT);
+            if($locationId){
+                $pickupLocationCategory = Store_Mapper_PickupLocationConfigMapper::getInstance()->deleteConfig($locationId);
+                $this->_responseHelper->success('');
+            }
+
+        }
     }
 
 }
