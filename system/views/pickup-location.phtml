@@ -7,7 +7,19 @@ $this->headScript()->setAllowArbitraryAttributes(true)
         array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/pickup-locations/config')
     );
 ?>
-
+<div class="hidden">
+    <?php
+    echo $this->formHidden('things-select-folder', Shopping::PICKUP_LOGOS_FOLDER);
+    $thingsUploader = $this->toasterUploader(
+        array(
+             'id'            => 'pickup-logo-uploader',
+             'caption'       => $this->translate('Upload category logos'),
+             'caller'        => 'media',
+             'noMultiupload' => true
+        ));
+    echo $thingsUploader;
+    ?>
+</div>
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage(); ?>"/>
 <div id="manage-pickup-locations">
     <ul class="header">
@@ -29,9 +41,19 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     <?php $hidden = 'hidden'; ?>
 <?php endif; ?>
 
-<label class="category-label grid_3 mt5px <?php echo $hidden; ?>"><?php echo $this->translate('Change category name'); ?></label><input
-    class="change-category-label grid_4 <?php echo $hidden; ?>" name="change-category-label"/>
+<label class="category-label grid_3 mt10px <?php echo $hidden; ?>"><?php echo $this->translate('Change category name'); ?></label>
+<input class="change-category-label grid_4 mt5px <?php echo $hidden; ?>" name="change-category-label"/>
 
+<div class="uploader-category-logo grid_5 text-right hidden">
+    <div id="progressbar" class="hidden grid_5 prefix_5 mt10px">
+        <span class="label"><b class="value">0</b></span>
+    </div>
+    <?php if (isset($this->pickupLocationsCategories[0]['img']) && $this->pickupLocationsCategories[0]['img'] !== null): ?>
+    <img src='<?php echo $this->websiteUrl; ?>media/<?php echo Shopping::PICKUP_LOGOS_FOLDER.'/small/'.$this->pickupLocationsCategories[0]['img'] ?>' width="50"/>
+    <?php else: ?>
+    <img src='<?php echo $this->websiteUrl; ?>system/images/noimage.png' width="50"/>
+    <?php endif; ?>
+</div>
 <form id="edit-pickup-location" class="grid_12 background mt20px <?php echo $hidden; ?>" method="POST">
     <p class="grid_3 mt10px"><label><?php echo $this->translate('Name'); ?></label>
         <input type="text" name="location-name" class="location-name"/>

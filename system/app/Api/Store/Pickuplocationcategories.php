@@ -52,8 +52,9 @@ class Api_Store_Pickuplocationcategories extends Api_Service_Abstract
 
     public function putAction()
     {
-        $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+        $id           = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
         $categoryName = filter_var($this->_request->getParam('categoryName'), FILTER_SANITIZE_STRING);
+        $categoryImg  = filter_var($this->_request->getParam('categoryImg'), FILTER_SANITIZE_STRING);
 
         if (!$id || !$categoryName) {
             $this->_error();
@@ -62,6 +63,10 @@ class Api_Store_Pickuplocationcategories extends Api_Service_Abstract
         $pickupLocationCategory = $pickupLocationCategoryMapper->find($id);
         if ($pickupLocationCategory instanceof Store_Model_PickupLocationCategory) {
             $pickupLocationCategory->setName($categoryName);
+            if (!empty($categoryImg)) {
+                $pickupLocationCategory->setImg($categoryImg);
+            }
+
             $pickupLocationCategoryMapper->save($pickupLocationCategory);
             return $pickupLocationCategory->toArray();
         } else {

@@ -9,7 +9,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_URL = 'product-pages.html';
 	const PRODUCT_DEFAULT_LIMIT = 30;
 
-	const BRAND_LOGOS_FOLDER = 'brands';
+	const BRAND_LOGOS_FOLDER  = 'brands';
+    const PICKUP_LOGOS_FOLDER = 'pickup-logos';
 	/**
 	 * New system role 'customer'
 	 *

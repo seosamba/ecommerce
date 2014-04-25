@@ -19,7 +19,8 @@ class Store_Mapper_PickupLocationCategoryMapper extends Application_Model_Mapper
             $model = new $this->_model($model);
         }
         $data = array(
-            'name' => $model->getName()
+            'name' => $model->getName(),
+            'img'  => $model->getImg()
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);
