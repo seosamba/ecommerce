@@ -2,9 +2,10 @@ define([
 	'backbone',
     './pickup_location_form',
     './pickup_location_table',
-    '../collections/pickup-location'
+    '../collections/pickup-location',
+    './pickup_location_cat'
 ], function(Backbone,
-            PickupLocationFormView, PickupLocationTableView, PickupLocationCollection){
+            PickupLocationFormView, PickupLocationTableView, PickupLocationCollection, PickupLocationCatView){
     var MainView = Backbone.View.extend({
         el: $('#manage-pickup-locations'),
         events: {
@@ -16,6 +17,10 @@ define([
         templates: {},
         initialize: function(){
             showSpinner();
+            this.PickupLoationCategories = new PickupLocationCatView();
+            this.PickupLoationCategories.render();
+
+
             this.PickupLocationForm = new PickupLocationFormView();
             this.PickupLocationForm.render();
 
@@ -30,9 +35,22 @@ define([
             $('.delete-selected-category').removeClass('hidden');
             $('.change-category-label').removeClass('hidden');
             $('.category-label').removeClass('hidden');
+            $('.uploader-category-logo').removeClass('hidden');
             $('#location-edit-id').val('');
             $('#edit-pickup-location').attr('method', 'POST');
             showSpinner();
+            $(".ui-state-active").find('a').data('category-id');
+
+            // Set img
+            var currentCategoryId = $('.ui-state-active').find('a').data('category-id'),
+                currentCategory   = this.PickupLoationCategories.categories.get(currentCategoryId),
+                websiteUrl        = $('#website_url').val(),
+                src               = websiteUrl+'system/images/noimage.png';
+            if (typeof(currentCategory) != 'undefined' && !_.isNull(currentCategory.get('img'))) {
+                src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+currentCategory.get('img');
+            }
+            $('.uploader-category-logo img').attr('src', src);
+
             this.pickupLocation = new PickupLocationCollection();
             this.pickupLocation.on('reset', this.render, this);
             this.pickupLocationTable.render();
