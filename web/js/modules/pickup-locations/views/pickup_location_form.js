@@ -14,7 +14,9 @@ define([
             this.$el.attr('action', $('#website_url').val()+'api/store/pickuplocations');
         },
         render: function(){
-             return this;
+            $('#location-edit-id').val('');
+            $('#edit-pickup-location').attr('method', 'POST');
+            return this;
         },
         submit: function(e){
             e.preventDefault();

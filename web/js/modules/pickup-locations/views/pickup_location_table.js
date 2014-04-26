@@ -20,7 +20,7 @@ define([
 
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 5,
+                "iDisplayLength": 4,
                 "bPaginate": true,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs

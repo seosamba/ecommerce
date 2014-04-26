@@ -16,13 +16,29 @@ define([
         initialize: function(){
             this.categories = new PickupLocationCategoriesCollection();
             this.categories.on('change', this.render, this);
-
+            this.categories.on('reset', this.renderCategory, this);
+            this.categories.on('add', this.renderCategory, this);
         },
         render: function(){
             this.categories.fetch();
         },
         triggerUpload: function() {
             $('#pickup-logo-uploader-pickfiles').trigger('click');
+        },
+        renderCategory: function(){
+
+            var currentCategoryId = $('.ui-state-active').find('a').data('category-id');
+
+            // Set img
+            if(!_.isNull(currentCategoryId)){
+                var currentCategory   = this.categories.get(currentCategoryId),
+                    websiteUrl        = $('#website_url').val(),
+                    src               = websiteUrl+'system/images/noimage.png';
+                if (!_.isNull(currentCategory.get('img'))) {
+                    src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+currentCategory.get('img');
+                }
+                $('.uploader-category-logo img').attr('src', src);
+            }
         },
         changeCategoryName: function(e) {
             var currentCategoryId = $(".ui-state-active").find('a').data('category-id');
@@ -59,12 +75,14 @@ define([
             var model = this.categories.get(currentCategoryId);
             showConfirm('Are you sure?', function(){
                 if (model){
+                    showSpinner();
                     model.destroy({success:function(){
                         var tab = $('#manage-pickup-locations').find('.ui-tabs-nav li:eq('+index+')').remove();
                         var panelId = tab.attr( "aria-controls" );
                         $( "#" + panelId ).remove();
                         $('#manage-pickup-locations').tabs("refresh");
                         $('#edit-pickup-location').trigger('pickupLocation:created');
+                        $('#edit-pickup-location').trigger('pickupLocation:deleted');
                         if(_.isNull($(".ui-state-active").find('a').data('category-id'))){
                             self.hideConfig();
                         }
@@ -73,13 +91,7 @@ define([
             });
         },
         hideConfig: function(){
-            $('.location-table').addClass('hidden');
-            $('#edit-pickup-location').addClass('hidden');
-            $('.delete-selected-category').addClass('hidden');
-            $('.change-category-label').addClass('hidden');
-            $('#location-edit-id').val('');
-            $('.category-label').addClass('hidden');
-            $('.uploader-category-logo').addClass('hidden');
+            $('#pickup-location-config').addClass('hidden');
             $('#edit-pickup-location').attr('method', 'POST');
         }
     });

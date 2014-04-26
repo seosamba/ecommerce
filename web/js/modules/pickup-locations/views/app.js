@@ -25,36 +25,18 @@ define([
             this.pickupLocationTable.render();
 
             this.PickupLocationForm.$el.on('pickupLocation:created', _.bind(this.pickupLocationTable.render, this.pickupLocationTable));
+            this.PickupLocationForm.$el.on('pickupLocation:deleted', _.bind(this.PickupLoationCategories.render, this.PickupLoationCategories));
         },
         activeTab: function(){
             this.showConfig();
-            $('#location-edit-id').val('');
-            $('#edit-pickup-location').attr('method', 'POST');
             showSpinner();
-
-            this.categories = new PickupLocationCategoriesCollection();
+            this.PickupLocationForm.render();
             this.PickupLoationCategories.render();
-
-            // Set img
-            var currentCategoryId = $('.ui-state-active').find('a').data('category-id'),
-                currentCategory   = this.PickupLoationCategories.categories.get(currentCategoryId),
-                websiteUrl        = $('#website_url').val(),
-                src               = websiteUrl+'system/images/noimage.png';
-            if (typeof(currentCategory) != 'undefined' && !_.isNull(currentCategory.get('img'))) {
-                src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+currentCategory.get('img');
-            }
-            $('.uploader-category-logo img').attr('src', src);
-            this.pickupLocation = new PickupLocationCollection();
-            this.pickupLocation.on('reset', this.render, this);
             this.pickupLocationTable.render();
+
         },
         showConfig: function(){
-            $('.location-table').removeClass('hidden');
-            $('#edit-pickup-location').removeClass('hidden');
-            $('.delete-selected-category').removeClass('hidden');
-            $('.change-category-label').removeClass('hidden');
-            $('.category-label').removeClass('hidden');
-            $('.uploader-category-logo').removeClass('hidden');
+            $('#pickup-location-config').removeClass('hidden');
         }
     });
 
