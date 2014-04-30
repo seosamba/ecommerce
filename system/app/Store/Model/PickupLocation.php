@@ -19,6 +19,10 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_zip;
 
+    protected $_lng;
+
+    protected $_lat;
+
     protected $_workingHours;
 
     protected $_locationCategoryId;
@@ -26,6 +30,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setName($name)
     {
         $this->_name = $name;
+        return $this;
     }
 
     public function getName()
@@ -36,6 +41,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setAddress1($address1)
     {
         $this->_address1 = $address1;
+        return $this;
     }
 
     public function getAddress1()
@@ -46,6 +52,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setAddress2($address2)
     {
         $this->_address2 = $address2;
+        return $this;
     }
 
     public function getAddress2()
@@ -56,6 +63,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setCity($city)
     {
         $this->_city = $city;
+        return $this;
     }
 
     public function getCity()
@@ -66,6 +74,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setCountry($country)
     {
         $this->_country = $country;
+        return $this;
     }
 
     public function getCountry()
@@ -76,6 +85,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setPhone($phone)
     {
         $this->_phone = $phone;
+        return $this;
     }
 
     public function getPhone()
@@ -86,6 +96,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setZip($zip)
     {
         $this->_zip = $zip;
+        return $this;
     }
 
     public function getZip()
@@ -96,6 +107,7 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setWorkingHours($workingHours)
     {
         $this->_workingHours = $workingHours;
+        return $this;
     }
 
     public function getWorkingHours()
@@ -106,11 +118,34 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function setLocationCategoryId($locationCategoryId)
     {
         $this->_locationCategoryId = $locationCategoryId;
+        return $this;
     }
 
     public function getLocationCategoryId()
     {
         return $this->_locationCategoryId;
+    }
+
+    public function setLng($lng)
+    {
+        $this->_lng = $lng;
+        return $this;
+    }
+
+    public function getLng()
+    {
+        return $this->_lng;
+    }
+
+    public function setLat($lat)
+    {
+        $this->_lat = $lat;
+        return $this;
+    }
+
+    public function getLat()
+    {
+        return $this->_lat;
     }
 
 

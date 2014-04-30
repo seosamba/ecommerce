@@ -65,6 +65,9 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $pickupLocationModel->setCity($data['city']);
         $pickupLocationModel->setPhone($data['phone']);
         $pickupLocationModel->setZip($data['zip']);
+        $coordinates = Tools_Geo::getMapCoordinates($data['country'].' '.$data['city'].' '.$data['address'].' '.$data['zip']);
+        $pickupLocationModel->setLat($coordinates['lat']);
+        $pickupLocationModel->setLng($coordinates['lng']);
         $pickupLocationModel->setWorkingHours(serialize($workingHours));
         $pickupLocationModel->setName($data['location-name']);
         $pickupLocationModel->setLocationCategoryId($data['categoryId']);
@@ -100,6 +103,9 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             $pickupLocationModel->setWorkingHours(serialize($workingHours));
             $pickupLocationModel->setName($data['location-name']);
             $pickupLocationModel->setLocationCategoryId($data['categoryId']);
+            $coordinates = Tools_Geo::getMapCoordinates($data['country'].' '.$data['city'].' '.$data['address'].' '.$data['zip']);
+            $pickupLocationModel->setLat($coordinates['lat']);
+            $pickupLocationModel->setLng($coordinates['lng']);
             $pickupLocationMapper->save($pickupLocationModel);
         } else {
             $this->_error();

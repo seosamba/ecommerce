@@ -44,11 +44,13 @@ define([
             var currentCategoryId = $(".ui-state-active").find('a').data('category-id');
             var categoryName = $(e.currentTarget).val();
             var currentCategory = this.categories.get(currentCategoryId);
+            var self = this;
 
             currentCategory.set('name', categoryName);
             currentCategory.save(currentCategory, {success:function(model, response) {
                 $(".ui-state-active").find('a').text(categoryName);
                 $('#manage-pickup-locations').tabs("refresh");
+                self.categories.get(currentCategoryId).set('name', categoryName);
             }});
 
         },

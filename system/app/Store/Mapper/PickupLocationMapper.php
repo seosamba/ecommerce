@@ -27,7 +27,9 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'working_hours' => $model->getWorkingHours(),
             'phone' => $model->getPhone(),
             'location_category_id' => $model->getLocationCategoryId(),
-            'name' => $model->getName()
+            'name' => $model->getName(),
+            'lat'  => $model->getLat(),
+            'lng'  => $model->getLng()
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);

@@ -14,6 +14,7 @@ class Store_Model_PickupLocationConfig extends Application_Model_Models_Abstract
     public function setAmountLimit($amountLimit)
     {
         $this->_amountLimit = $amountLimit;
+        return $this;
     }
 
     public function getAmountLimit()
@@ -24,6 +25,7 @@ class Store_Model_PickupLocationConfig extends Application_Model_Models_Abstract
     public function setAmountTypeLimit($amountTypeLimit)
     {
         $this->_amountTypeLimit = $amountTypeLimit;
+        return $this;
     }
 
     public function getAmountTypeLimit()
@@ -34,6 +36,7 @@ class Store_Model_PickupLocationConfig extends Application_Model_Models_Abstract
     public function setLocationZones($locationZones)
     {
         $this->_locationZones = $locationZones;
+        return $this;
     }
 
     public function getLocationZones()

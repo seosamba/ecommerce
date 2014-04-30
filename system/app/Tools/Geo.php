@@ -124,4 +124,17 @@ class Tools_Geo {
 		return 'https://maps.googleapis.com/maps/api/staticmap?'.http_build_query($params);
 	}
 
+    /**
+     * Get coordinates latitude and longitude
+     */
+    public static function getMapCoordinates($address) {
+        // replace all the white space with "+" sign to match with google search pattern
+        $url      = 'http://maps.google.com/maps/api/geocode/json?sensor=false&address='.str_replace(' ', '+', $address);
+        $response = file_get_contents($url);
+        //generate array object from the response from the web
+        $json     = json_decode($response, true);
+
+        return array('lat' => $json['results'][0]['geometry']['location']['lat'], 'lng' => $json['results'][0]['geometry']['location']['lng']);
+    }
+
 }
