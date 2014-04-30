@@ -217,6 +217,10 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 			} else {
 				$key = strtolower($key);
 				switch($key){
+                    case 'user':
+                        $likeWhere = "CONCAT(TRIM(s_adr.firstname), ' ',  TRIM(s_adr.lastname)) LIKE ?  OR CONCAT(TRIM(b_adr.firstname), ' ',  TRIM(b_adr.lastname)) LIKE ?";
+                        $select->where($likeWhere, '%' . $val . '%');
+                        break;
 					case 'product-id':
 						$select->where('p.id = ?', $val);
 						break;

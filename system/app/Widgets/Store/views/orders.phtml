@@ -24,8 +24,9 @@ $this->headLink()
 		<form class="filters mb30px clearfix">
 			<div class="grid_7">
 				<label><?php echo $this->translate('Search');?></label>
-                <input type="text" class="filter grid_6 alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
-                <input type="text" class="filter grid_6 omega" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
+                <input type="text" class="filter grid_4 alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+                <input type="text" class="filter grid_4 omega" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
+                <input type="text" class="filter grid_4 omega" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
 			</div>
 			<div id="extra-filters-switch" class="fl-right mr-grid pt15px"><a href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
             <div id="extra-filters" class="grid_12 hidden">
@@ -53,7 +54,7 @@ $this->headLink()
                         Models_Model_CartSession::CART_STATUS_PROCESSING => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING),
                         Models_Model_CartSession::CART_STATUS_COMPLETED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED),
                         Models_Model_CartSession::CART_STATUS_SHIPPED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED),
-                         Models_Model_CartSession::CART_STATUS_DELIVERED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
+                        Models_Model_CartSession::CART_STATUS_DELIVERED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
                         Models_Model_CartSession::CART_STATUS_CANCELED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED),
                         Models_Model_CartSession::CART_STATUS_REFUNDED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED),
                         Tools_Misc::CS_ALIAS_PENDING => $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING),

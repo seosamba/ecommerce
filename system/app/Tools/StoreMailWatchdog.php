@@ -15,6 +15,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_CUSTOMER    = 'customer';
 
+    const TRIGGER_CUSTOMERCHANGEATTR = 't_userchangeattr';
+
     const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
 
     const SHIPPING_TYPE = 'shipping';
