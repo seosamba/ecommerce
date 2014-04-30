@@ -71,7 +71,8 @@ define([
             $('.working-hours-list').dialog({
                 dialogClass: 'seotoaster',
                 buttons: assignWorkingHoursButtons,
-                resizable : false
+                resizable : false,
+                modal: true
             });
             return false;
 
