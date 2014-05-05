@@ -37,12 +37,13 @@ define([
                 this.renderAllSelections();
             }
             if (this.model.has('isTemplate')){
-                this.$('input[name=isTemplate]').attr('checked', 'checked');
+                this.$('input[name=isTemplate]').attr('checked', 'checked').parent().hide();
                 this.$('input[name=templateName]').show();
             } else {
-                this.$('input[name=isTemplate]').removeAttr('checked');
+                this.$('input[name=isTemplate]').removeAttr('checked').parent().show();
                 this.$('input[name=templateName]').hide();
             }
+            checkboxRadioStyle();
             return this;
 		},
 		typeChange: function(e){
