@@ -39,6 +39,8 @@ class MagicSpaces_Freebies_Freebies extends Tools_MagicSpaces_Abstract {
 			if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
 				preg_match_all('~data-pid="([0-9]+)"~u', $this->_spaceContent, $found);
 				if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
+                    $product->setFreebies(array());
+                    $productMapper->save($product);
 					return false;
 				}
 			}
