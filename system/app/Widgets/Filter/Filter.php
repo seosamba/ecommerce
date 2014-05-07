@@ -8,7 +8,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 {
     const CACHE_KEY_SETTINGS = 'settings';
 
+    const CACHE_KEY_OTHERS_ARRAY = 'others_filter_';
+
     const OPTION_PRICE_SLIDER = 'price-slider';
+
+    const FILTER_OTHERS = '_other';
 
     private $_allowedOptions = array(
         'builder', 'product'
@@ -149,6 +153,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         // get applied filters from query
         $appliedFilters = Filtering_Tools::normalizeFilterQuery();
+        $this->_view->appliedFilters = $appliedFilters;
 
         // mark disabled filters
         $this->_view->filters = array_map(
