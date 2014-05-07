@@ -72,6 +72,10 @@ class Tools_FeedGenerator {
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
 			$item->appendChild($feed->createElement('g:availability', 'in stock'));
+
+            if ($product->getCurrentPrice() !== null && $product->getExtraProperties()) {
+                $product->setCurrentPrice(null);
+            }
             $item->appendChild(
                 $feed->createElement(
                     'g:price',
