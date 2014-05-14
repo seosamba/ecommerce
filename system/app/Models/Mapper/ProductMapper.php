@@ -169,7 +169,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
 				->where('pt.tag_id IN (?)', $tags);
 
-            // we need product with all the tags at the same time ('AND' loginc)
+            // we need product with all the tags at the same time ('AND' logic)
             if($strictTagsCount) {
                 $select->having('COUNT(*) = ?', sizeof($tags));
             }
@@ -178,7 +178,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         if ((bool)$search) {
             $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
 
-	        if($organicSearch) {
+	        if ($organicSearch) {
 
                 $brandDbTable = new Models_DbTable_Brand();
                 $entries      = $brandDbTable->getAdapter()->fetchAll(
@@ -189,11 +189,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 $brandExists  = is_array($entries) && !empty($entries);
 
                 $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?';
-                if(is_array($search)) {
+                if (is_array($search)) {
 
                     $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false);
-                    foreach($search as $key => $term) {
-                        $subWhere->orWhere($likeWhere, $term.'%');
+                    foreach($search as $term) {
+                        $subWhere->orWhere($likeWhere, '%'.$term.'%');
                     }
 
                     $subWhere = implode(' ', $subWhere->getPart('WHERE'));
@@ -207,7 +207,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 }
 
             } else {
-                if (empty($tags)){
+                if (empty($tags)) {
                     $select
                         ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', array())
                         ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());

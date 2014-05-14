@@ -162,8 +162,8 @@ class Tools_ShoppingCart {
 	/**
 	 *
 	 * @param Models_Model_Product $item
-	 * @param type                 $options
-	 * @return itemPrice
+	 * @param array                $options
+	 * @return float Item price with applied tax
 	 */
 	public function calculateProductPrice(Models_Model_Product $item, $options = array()) {
 		$itemTax = Tools_Tax_Tax::calculateProductTax($item);
