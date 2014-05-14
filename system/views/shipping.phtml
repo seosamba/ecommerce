@@ -218,7 +218,9 @@ $(function(){
             });
             if(overRestriction > 1){
                 showMessage('<?php echo $this->translate('You can setup only one over option')?>', true);
+                hideSpinner();
                 return false;
+
             }
 
             var defaultPickupConfig = 0;

@@ -102,6 +102,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const AMOUNT_TYPE_EACH_OVER = 'eachover';
 
+    const COMPARE_BY_AMOUNT = 'amount';
+
+    const COMPARE_BY_WEIGHT = 'weight';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */

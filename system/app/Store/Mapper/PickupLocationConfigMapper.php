@@ -76,6 +76,65 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
+    public function getLocations($comparator, $locationId = false)
+    {
+        $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
+        $where = $pickupLocationsZonesConfig->getAdapter()->quoteInto('shplz.pickup_location_category_id <> ?', 0);
+        if ($locationId) {
+            $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.id = ?', $locationId);
+        }
+        $where .= ' AND (( ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+            'splc.amount_type_limit  = ?',
+            Shopping::AMOUNT_TYPE_UP_TO
+        );
+        $where .= ' AND  ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+            'splc.amount_limit  >= ?',
+            $comparator
+        ) . ' )';
+        $where .= ' OR ( ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+            'splc.amount_type_limit  = ?',
+            Shopping::AMOUNT_TYPE_OVER
+        );
+        $where .= ' AND  ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+            'splc.amount_limit  <= ?',
+            $comparator
+        ) . ' )';
+        $where .= ' OR ( ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+            'splc.amount_type_limit  = ?',
+            Shopping::AMOUNT_TYPE_EACH_OVER
+        );
+        $where .= ' AND  ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+            'splc.amount_limit  <= ?',
+            $comparator
+        ) . ' ))';
+
+        $select = $pickupLocationsZonesConfig->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(array('shplz' => 'shopping_pickup_location_zones'), array('price' => 'amount_location_category'))
+            ->joinLeft(
+                array('shpl' => 'shopping_pickup_location'),
+                'shplz.pickup_location_category_id=shpl.location_category_id'
+            )
+            ->joinLeft(
+                array('shplcat' => 'shopping_pickup_location_category'),
+                'shplz.pickup_location_category_id=shplcat.id',
+                array('imgName' => 'img')
+            )
+            ->joinLeft(
+                array('splc' => 'shopping_pickup_location_config'),
+                'splc.id=shplz.config_id',
+                array('limitType' => 'amount_type_limit', 'amount_limit')
+            )->group('shpl.id');
+
+        $select->where($where);
+        if ($locationId) {
+            return $pickupLocationsZonesConfig->getAdapter()->fetchRow($select);
+        }
+        return $pickupLocationsZonesConfig->getAdapter()->fetchAll($select);
+
+
+    }
+
 
     public function deleteConfig($configId)
     {
