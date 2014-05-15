@@ -193,11 +193,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
                     $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false);
                     foreach($search as $term) {
-                        $subWhere->orWhere($likeWhere, '%'.$term.'%');
+                        $subWhere->where($likeWhere, '%'.$term.'%');
                     }
 
                     $subWhere = implode(' ', $subWhere->getPart('WHERE'));
-                    if($brandExists) {
+                    if ($brandExists) {
                         $select->where($subWhere);
                     } else {
                         $select->orWhere($subWhere);
