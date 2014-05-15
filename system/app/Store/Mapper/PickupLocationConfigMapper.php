@@ -29,7 +29,7 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         $existRow = $this->fetchAll($where);
         if (!empty($existRow)) {
             $this->getDbTable()->update($data, $where);
-        }else{
+        } else {
             $this->getDbTable()->insert($data);
         }
         $this->_saveLocationZones($data['id'], $locationZones);
@@ -76,12 +76,30 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
-    public function getLocations($comparator, $locationId = false)
+    public function getLocations($comparator, $locationId = false, $coordinates = array())
     {
         $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
         $where = $pickupLocationsZonesConfig->getAdapter()->quoteInto('shplz.pickup_location_category_id <> ?', 0);
         if ($locationId) {
             $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.id = ?', $locationId);
+        }
+        if (!empty($coordinates)) {
+            $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+                'shpl.lat >= ?',
+                $coordinates['latitudeStart']
+            );
+            $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+                'shpl.lat <= ?',
+                $coordinates['latitudeEnd']
+            );
+            $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+                'shpl.lng >= ?',
+                $coordinates['longitudeStart']
+            );
+            $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+                'shpl.lng <= ?',
+                $coordinates['longitudeEnd']
+            );
         }
         $where .= ' AND (( ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
             'splc.amount_type_limit  = ?',

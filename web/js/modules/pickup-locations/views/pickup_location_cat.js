@@ -33,11 +33,12 @@ define([
             if(!_.isNull(currentCategoryId)){
                 var currentCategory   = this.categories.get(currentCategoryId),
                     websiteUrl        = $('#website_url').val(),
-                    src               = websiteUrl+'system/images/noimage.png';
+                    src               = websiteUrl+'system/images/noimage.png',
+                    timestamp = new Date().getTime();
                 if (!_.isNull(currentCategory.get('img'))) {
                     src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+currentCategory.get('img');
                 }
-                $('.uploader-category-logo img').attr('src', src);
+                $('.uploader-category-logo img').attr('src', src+'?'+timestamp);
             }
         },
         changeCategoryName: function(e) {
