@@ -96,6 +96,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 				$this->_error(null, self::REST_STATUS_NOT_FOUND);
 			}
 		} else {
+			$order  = filter_var($this->_request->getParam('order', null), FILTER_SANITIZE_STRING);
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
 			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_SANITIZE_NUMBER_INT);
 			$key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING);
@@ -105,9 +106,9 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
 
             $organicSearch = filter_var($this->_request->getParam('os', 0), FILTER_SANITIZE_NUMBER_INT);
-            if($key && $organicSearch) {
+            if ($key && $organicSearch) {
                 $key = explode(' ', $key);
-                $filter['brands'] = $key;
+//                $filter['brands'] = $key;
             }
 
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
@@ -116,7 +117,7 @@ class Api_Store_Products extends Api_Service_Abstract {
             $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
 			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
 
-				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, array(), $offset, $limit, (bool)$key?$key:null,
+				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, $order, $offset, $limit, (bool)$key?$key:null,
 					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 					(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
                     $strictTagsCount,

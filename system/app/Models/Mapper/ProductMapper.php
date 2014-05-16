@@ -140,112 +140,136 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	 * @param array|null $brands List of brand names to filter by
 	 * @return array|null List of products
 	 */
-	public function fetchAll($where = null, $order = null, $offset = null, $limit = null,
-	                         $search = null, $tags = null, $brands = null, $strictTagsCount = false, $organicSearch = false) {
-		$entities = array();
+    public function fetchAll(
+        $where = null,
+        $order = null,
+        $offset = null,
+        $limit = null,
+        $search = null,
+        $tags = null,
+        $brands = null,
+        $strictTagsCount = false,
+        $organicSearch = false
+    ) {
+        $entities = array();
 
-		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
-				->from(array('p' => 'shopping_product'))
-				->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
-				->group('p.id');
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+            ->from(array('p' => 'shopping_product'))
+            ->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
+            ->group('p.id');
 
-		if (!is_null($order)) {
-			$select->order($order);
-		}
+        if (!is_null($order)) {
+            $select->order($order);
+        }
 
-		if (!empty($where)){
-			$select->where($where);
-		}
+        if (!empty($where)) {
+            $select->where($where);
+        }
 
-		if (!empty($brands)){
-			if (!is_array($brands)) $brands = (array) $brands;
+        if (!empty($brands)) {
+            if (!is_array($brands)) {
+                $brands = (array)$brands;
+            }
             $select->where('b.name in (?)', $brands);
-		}
+        }
 
-		if (!empty($tags)){
-			if (!is_array($tags)) $tags = (array) $tags;
+        if (!empty($tags)) {
+            if (!is_array($tags)) {
+                $tags = (array)$tags;
+            }
 
-			$select->from(array('t' => 'shopping_tags'), null)
+            $select->from(array('t' => 'shopping_tags'), null)
                 ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
-				->where('pt.tag_id IN (?)', $tags);
+                ->where('pt.tag_id IN (?)', $tags);
 
             // we need product with all the tags at the same time ('AND' logic)
-            if($strictTagsCount) {
+            if ($strictTagsCount) {
                 $select->having('COUNT(*) = ?', sizeof($tags));
-            }
-		}
-
-        if ((bool)$search) {
-            $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ? OR b.name LIKE ?';
-
-	        if ($organicSearch) {
-
-                $brandDbTable = new Models_DbTable_Brand();
-                $entries      = $brandDbTable->getAdapter()->fetchAll(
-                    $brandDbTable
-                        ->select()
-                        ->where('name in (?)', $brands)
-                );
-                $brandExists  = is_array($entries) && !empty($entries);
-
-                $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?';
-                if (is_array($search)) {
-
-                    $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false);
-                    foreach($search as $term) {
-                        $subWhere->where($likeWhere, '%'.$term.'%');
-                    }
-
-                    $subWhere = implode(' ', $subWhere->getPart('WHERE'));
-                    if ($brandExists) {
-                        $select->where($subWhere);
-                    } else {
-                        $select->orWhere($subWhere);
-                    }
-                } else {
-                    $select->orWhere($likeWhere, $search.'%');
-                }
-
-            } else {
-                if (empty($tags)) {
-                    $select
-                        ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', array())
-                        ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
-                    $likeWhere .= ' OR t.name LIKE ?';
-                }
-                $select->where($likeWhere, '%'.$search.'%');
             }
         }
 
-		if (self::$_logSelectResultLength === false){
-			$select->limit($limit, $offset);
-		}
+        if ((bool)$search) {
+            $likeWhere = array(
+                'p.name LIKE ?',
+                'p.sku LIKE ?',
+                'p.mpn LIKE ?',
+                'b.name LIKE ?',
+                't.name LIKE ?'
+            );
 
-		Tools_System_Tools::debugMode() && error_log($select->__toString());
-		$resultSet = $this->getDbTable()->fetchAll($select);
+            $likeWhere = implode(' OR ', $likeWhere);
 
-		if(count($resultSet) === 0) {
-			return null;
-		}
+            if (empty($tags)) {
+                $select
+                    ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', array())
+                    ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
+            }
 
-		if (self::$_logSelectResultLength === true){
-			self::$_lastSelectResultLength = sizeof($resultSet);
-			$tmp = array();
-			$maxOffset = (sizeof($resultSet) < ($offset + $limit)) ? sizeof($resultSet) : $offset + $limit;
-			for ($offset; $offset < $maxOffset; $offset++){
-				if ($resultSet->offsetExists($offset)){
-					$resultSet->seek($offset);
-					array_push($tmp, $resultSet->current());
-				}
-			}
-			$resultSet = $tmp;
-		}
+            if ($organicSearch) {
 
-		foreach ($resultSet as $row) {
-			array_push($entities, $this->_toModel($row));
-		}
-		return $entities;
-	}
+//                $brandDbTable = new Models_DbTable_Brand();
+//                $entries      = $brandDbTable->getAdapter()->fetchAll(
+//                    $brandDbTable
+//                        ->select()
+//                        ->where('name in (?)', $brands)
+//                );
+//                $brandExists  = is_array($entries) && !empty($entries);
+
+//                $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?';
+                if (is_array($search)) {
+
+                    $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(
+                        false
+                    );
+                    foreach ($search as $term) {
+                        $subWhere->where($likeWhere, '%' . $term . '%');
+                    }
+
+                    $subWhere = implode(' ', $subWhere->getPart('WHERE'));
+//                    if ($brandExists) {
+                    $select->where($subWhere);
+//                    } else {
+//                        $select->orWhere($subWhere);
+//                    }
+                } else {
+                    $select->orWhere($likeWhere, '%' . $search . '%');
+                }
+
+            } else {
+
+                $select->where($likeWhere, '%' . $search . '%');
+            }
+        }
+
+        if (self::$_logSelectResultLength === false) {
+            $select->limit($limit, $offset);
+        }
+
+        Tools_System_Tools::debugMode() && error_log($select->__toString());
+        $resultSet = $this->getDbTable()->fetchAll($select);
+
+        if (count($resultSet) === 0) {
+            return null;
+        }
+
+        if (self::$_logSelectResultLength === true) {
+            self::$_lastSelectResultLength = sizeof($resultSet);
+            $tmp = array();
+            $maxOffset = (sizeof($resultSet) < ($offset + $limit)) ? sizeof($resultSet) : $offset + $limit;
+            for ($offset; $offset < $maxOffset; $offset++) {
+                if ($resultSet->offsetExists($offset)) {
+                    $resultSet->seek($offset);
+                    array_push($tmp, $resultSet->current());
+                }
+            }
+            $resultSet = $tmp;
+        }
+
+        foreach ($resultSet as $row) {
+            array_push($entities, $this->_toModel($row));
+        }
+        return $entities;
+    }
 
 	public function find($id) {
 		$result = $this->getDbTable()->find($id);
@@ -262,7 +286,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
 		return $this->_toModel($row);
 	}
-	
+
 	public function findByPageId($id) {
 		$productRow = $this->getDbTable()->fetchRow(array('page_id = ?' => $id));
 		if (!empty ($productRow)){
