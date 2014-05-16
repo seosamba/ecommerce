@@ -165,6 +165,16 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                     }
                 }
+
+                $pickup = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_PICKUP);
+                $defaultPickup = false;
+                if ($pickup && (bool)$pickup['enabled']) {
+                    if (isset($pickup['config']['defaultPickupConfig']) && $pickup['config']['defaultPickupConfig'] === '1' || $pickup['config'] === null) {
+                        $defaultPickup = true;
+                    }
+                }
+                $this->_view->defaultPickup = $defaultPickup;
+
                 $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];
                 $this->_view->weightSign = $shoppingConfig['weightUnit'];
                 $this->_view->cartContent = $cartContent;
