@@ -153,6 +153,49 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
 
     }
 
+    public function saveCartPickupLocation($cartId, $address = array())
+    {
+        if(!empty($address)){
+            $pickupLocationsCart = new Store_DbTable_PickupLocationCart();
+            $where = $pickupLocationsCart->getAdapter()->quoteInto('cart_id = ?', $cartId);
+            $cartLocationExist = $pickupLocationsCart->getAdapter()->fetchAll(
+                $pickupLocationsCart->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->from(
+                    'shopping_pickup_location_cart'
+                )->where($where)
+            );
+            $data = array(
+                'cart_id' => $cartId,
+                'address1' => $address['address1'],
+                'address2' => $address['address2'],
+                'zip' => $address['zip'],
+                'country' => $address['country'],
+                'city' => $address['city'],
+                'working_hours' => $address['working_hours'],
+                'phone' => $address['phone'],
+                'location_category_id' => $address['location_category_id'],
+                'name' => $address['name'],
+                'lat'  => $address['lat'],
+                'lng'  => $address['lng']
+            );
+            if (empty($cartLocationExist)) {
+                $pickupLocationsCart->insert($data, $where);
+            } else {
+                $pickupLocationsCart->update($data, $where);
+            }
+        }
+    }
+
+    public function getCartPickupLocationByCartId($cartId)
+    {
+        $pickupLocationsCart = new Store_DbTable_PickupLocationCart();
+        $where = $pickupLocationsCart->getAdapter()->quoteInto('shplc.cart_id = ?', $cartId);
+        $select = $pickupLocationsCart->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(array('shplc' => 'shopping_pickup_location_cart'))
+            ->where($where);
+        return $pickupLocationsCart->getAdapter()->fetchRow($select);
+
+    }
 
     public function deleteConfig($configId)
     {

@@ -172,6 +172,9 @@ class Widgets_Store_Store extends Widgets_Abstract {
                     if (isset($pickup['config']['defaultPickupConfig']) && $pickup['config']['defaultPickupConfig'] === '1' || $pickup['config'] === null) {
                         $defaultPickup = true;
                     }
+                    $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                    $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($cartId);
+                    $this->_view->pickupLocationData = $pickupLocationData;
                 }
                 $this->_view->defaultPickup = $defaultPickup;
 
@@ -186,7 +189,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$errmsg = 'store:postpurchasereport missing cart id';
 		return Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) ? '<b>'.$errmsg.'</b>' : '<!-- '.$errmsg.' -->' ;
 	}
-    
+
     protected function _getOptions($productId, $options) {
 		$actualOptions  = array();
 		$product        = Models_Mapper_ProductMapper::getInstance()->find($productId);
