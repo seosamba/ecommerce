@@ -86,7 +86,7 @@
         <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
-    <button class="fl-right remove-option icon inverse-error icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
+    <button class="fl-right remove-option icon error inverse icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -233,9 +233,9 @@
         </ul>
     </div>
     <div class="nav-links header grid_3 alpha omega">
-        <a class="show-list inverse-info icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+        <a class="show-list info inverse icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
         <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-        <a id="new-product" class="inverse-success icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+        <a id="new-product" class="success inverse icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
     </div>
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
