@@ -197,6 +197,18 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
 
     }
 
+    public function getUserAddressByUserId($userId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('scs.user_id = ?', $userId);
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(array('splc' => 'shopping_pickup_location_cart'), array())
+            ->joinLeft(array('scs' => 'shopping_cart_session'), 'splc.cart_id=scs.id', array('shipping_address_id'))
+            ->joinLeft(array('sca' => 'shopping_customer_address'), 'sca.id=scs.shipping_address_id', array())
+            ->where($where);
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
+
     public function deleteConfig($configId)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto("id = ?", $configId);

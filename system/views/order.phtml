@@ -48,22 +48,82 @@
                     <span class="first-name"><?php echo $shippingAddress['firstname'];?></span>
 					<span class="last-name"><?php echo $shippingAddress['lastname'];?></span>
 					<br/>
-					<span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
-					<br/>
-					<span class="locality"><?php
-						echo $shippingAddress['city'] .
-								($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');
-						?></span>
-					<span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
-					<span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
-					<br/>
-					<span><?php echo $countryList[$shippingAddress['country']];?></span>
-					<span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                    <?php if ($this->order->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                        <span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                        <br/>
+                        <span class="phone"><?php echo $shippingAddress['mobile'];?></span>
+                    <?php else:?>
+                        <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
+                        <br/>
+                        <span class="locality"><?php
+                            echo $shippingAddress['city'] .
+                                    ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');
+                            ?></span>
+                        <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+                        <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
+                        <br/>
+                        <span><?php echo $countryList[$shippingAddress['country']];?></span>
+                        <span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                    <?php endif;?>
 				<?php else: ?>
 					<p><?php echo $this->translate('not provided');?></p>
 				<?php endif;?>
 			</div>
 		</div>
+        <div class="grid_12 mt10px">
+            <?php if ($this->order->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                <div class="pickup-location-info">
+                    <div class="title"><?php echo $this->translate('Location info'); ?>:</div>
+                    <span
+                        class="location-name"><?php echo $this->pickupLocationData['name']; ?></span><br/>
+                    <span
+                        class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2']; ?></span>
+                    <br/>
+                        <span class="locality"><?php
+                            echo $shippingAddress['city'] .
+                                ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');
+                            ?></span>
+                    <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']);
+                        echo $state['state']; ?></span>
+                    <span class="postal-code"><?php echo $shippingAddress['zip']; ?></span>
+                    <br/>
+                    <span><?php echo $countryList[$shippingAddress['country']]; ?></span>
+                    <span
+                        class="location-phone"><?php echo $this->pickupLocationData['phone']; ?></span><br/>
+                    <?php $pickupWorkingHours = unserialize($this->pickupLocationData['working_hours']); ?>
+                    <div class="location-working-hours">
+                        <?php echo $this->translate('Sunday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['sunday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['sunday']; ?></span>
+                        <?php echo $this->translate('Monday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['monday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['monday']; ?></span>
+                        <?php echo $this->translate('Tuesday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['tuesday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['tuesday']; ?></span>
+                        <?php echo $this->translate('Wednesday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['wednesday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['wednesday']; ?></span>
+                        <?php echo $this->translate('Thursday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['thursday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['thursday']; ?></span>
+                        <?php echo $this->translate('Friday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['friday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['friday']; ?></span>
+                        <?php echo $this->translate('Saturday'); ?>:
+                        <span><?php echo ($pickupWorkingHours['saturday'] === '') ? $this->translate(
+                                'not provided'
+                            ) : $pickupWorkingHours['saturday']; ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
 
 		<div class="grid_12 mt20px mb20px">
 			<div class="title"><?php echo $this->translate("Order #%1\$s content", $this->order->getId());?></div>

@@ -740,6 +740,16 @@ class Shopping extends Tools_Plugins_Abstract {
 
 				$this->_responseHelper->response($status->toArray(), false);
 			}
+
+            $defaultPickup = true;
+            $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+            $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($id);
+            if (!empty($pickupLocationData)) {
+                $defaultPickup = false;
+                $this->_view->pickupLocationData = $pickupLocationData;
+            }
+            $this->_view->defaultPickup = $defaultPickup;
+
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
 			$this->_layout->content = $this->_view->render('order.phtml');
