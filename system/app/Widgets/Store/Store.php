@@ -166,14 +166,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
                     }
                 }
 
-                $pickup = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_PICKUP);
-                $defaultPickup = false;
-                if ($pickup && (bool)$pickup['enabled']) {
-                    if (isset($pickup['config']['defaultPickupConfig']) && $pickup['config']['defaultPickupConfig'] === '1' || $pickup['config'] === null) {
-                        $defaultPickup = true;
-                    }
-                    $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
-                    $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($cartId);
+                $defaultPickup = true;
+                $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($cartId);
+                if (!empty($pickupLocationData)) {
+                    $defaultPickup = false;
                     $this->_view->pickupLocationData = $pickupLocationData;
                 }
                 $this->_view->defaultPickup = $defaultPickup;
