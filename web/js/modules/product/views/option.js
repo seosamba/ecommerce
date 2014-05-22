@@ -11,7 +11,7 @@ define([
         className: 'option-wrapper grid_12 alpha omega mt10px background',
 
 		events: {
-			'click button.remove-option': 'kill',
+			'click .remove-option': 'kill',
 			'click .add-selection-btn': 'addSelection',
 			'change select.option-type-select': 'typeChange',
 			'change input.option-title': 'titleChange',
