@@ -71,7 +71,8 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'phone',
-			'label'    => 'Phone'
+			'label'    => 'Phone',
+            'value'    => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
 		)));
 
 //		$this->addElement(new Zend_Form_Element_Hash(array(

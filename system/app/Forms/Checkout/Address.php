@@ -63,7 +63,8 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
                 
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'mobile',
-			'label'    => 'Mobile'
+			'label'    => 'Mobile',
+            'value'    => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
 		)));
 
 		$emailValidator = new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL);

@@ -34,6 +34,7 @@ class Forms_Checkout_Pickup extends Zend_Form {
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'phone',
             'label'    => 'Phone',
+            'value'    => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
 //            'required' => true
         )));
 
