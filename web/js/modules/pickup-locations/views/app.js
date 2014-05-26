@@ -32,6 +32,7 @@ define([
             showSpinner();
             this.PickupLocationForm.render();
             this.PickupLoationCategories.render();
+            this.pickupLocationTable.pickupLocation.currentPage = 0;
             this.pickupLocationTable.render();
 
         },

@@ -14,23 +14,28 @@ define([
             }
         },
         paginator_ui: {
-            firstPage: 1,
-            currentPage: 1,
-            perPage: 20,
-            key: ''
-         },
+            firstPage:    0,
+            currentPage:  0,
+            perPage:     5,
+            totalPages:  10
+        },
         server_api: {
             count: true,
-            limit: function(){ return this.perPage; },
-            offset: function(){ return (this.currentPage - this.firstPage) * this.perPage; },
+            limit: function() { return this.perPage; },
+            offset: function() { return this.currentPage * this.perPage },
             key: function(){ return this.key; },
             categoryId:function(){ return this.categoryId; }
         },
         parse: function(response, xhr){
-            this.totalCount = _.has(response, 'totalCount') ? response.totalCount : response.length;
-            this.totalPages = Math.ceil(this.totalCount / this.perPage);
-            return _.has(response, 'data') ? response.data : response;
+            if (this.server_api.count){
+                this.totalRecords = response.totalRecords;
+            } else {
+                this.totalRecords = response.length;
+            }
+            this.totalPages = Math.floor(this.totalRecords / this.perPage);
+            return this.server_api.count ? response.data : response;
         }
+
     });
 
     return PickupLocationCollection;

@@ -1,0 +1,37 @@
+<div>
+<% if (firstPage != currentPage) { %>
+    <a href="#" class="page" data-page="first"><%= _.isUndefined(i18n['First']) ? 'First':i18n['First'] %></a>
+<% } %>
+
+<% if (currentPage > firstPage) { %>
+    <a href="#" class="page" data-page="prev"><%= _.isUndefined(i18n['Previous']) ? 'Previous':i18n['Previous'] %></a>
+<% } %>
+
+<% if (currentPage - 3 > firstPage) { %>
+    <span>...</span>
+<% } %>
+
+<% for (p=currentPage-3; p<=currentPage+3; p++) { %>
+    <% if (p < firstPage || p > lastPage) continue %>
+    <% if (currentPage == p) { %>
+        <span class="page selected"><%= p+1 %></span>
+    <% } else { %>
+        <a href="#" class="page" data-page="<%= p %>"><%= p+1 %></a>
+    <% } %>
+<% } %>
+
+<% if (currentPage + 3 < lastPage) { %>
+<span>...</span>
+<% } %>
+
+<% if (currentPage < totalPages) { %>
+    <a href="#" class="page" data-page="next"><%= _.isUndefined(i18n['Next']) ? 'Next':i18n['Next'] %></a>
+<% } %>
+
+<% if (lastPage != currentPage) { %>
+    <a href="#" class="page" data-page="last"><%= _.isUndefined(i18n['Last']) ? 'Last':i18n['Last'] %></a>
+<% } %>
+</div>
+<div>
+    <%= _.isUndefined(i18n['Total']) ? 'Total':i18n['Total'] %> <%= totalRecords %> <%= _.isUndefined(i18n['locations found']) ? 'locations found':i18n['locations found'] %>
+</div>

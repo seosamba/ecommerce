@@ -25,21 +25,44 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
         $categoryId = filter_var($this->_request->getParam('categoryId'), FILTER_SANITIZE_NUMBER_INT);
         $pickupLocationMapper = Store_Mapper_PickupLocationMapper::getInstance();
+        $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        $offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
+        $sortOrder = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
         if ($id) {
             $data = $pickupLocationMapper->find($id);
         } elseif ($categoryId) {
-            $data = $pickupLocationMapper->fetchByCategory($categoryId);
+            $count = (bool)$this->_request->has('count');
+            if ($count) {
+                $pickupLocationMapper->lastQueryResultCount($count);
+            }
+            $data = $pickupLocationMapper->fetchAll($categoryId, $sortOrder, $limit, $offset);
+            if (isset($data['data'])) {
+                $locationInfo = array_map(
+                    function ($pickupLocation) {
+                        $pickupLocationData = $pickupLocation;
+                        $pickupLocationData['workingHours'] = unserialize($pickupLocationData['workingHours']);
+                        return $pickupLocationData;
+                    },
+                    $data['data']
+                );
+                $data['data'] = $locationInfo;
+                return $data;
+            }
         } else {
             $data = $pickupLocationMapper->fetchAll();
         }
-        return array_map(
-            function ($pickupLocation) {
-                $pickupLocationData = $pickupLocation->toArray();
-                $pickupLocationData['workingHours'] = unserialize($pickupLocationData['workingHours']);
-                return $pickupLocationData;
-            },
-            $data
-        );
+        if ($data !== null) {
+            return array_map(
+                function ($pickupLocation) {
+                    $pickupLocationData = $pickupLocation;
+                    $pickupLocationData['workingHours'] = unserialize($pickupLocationData['workingHours']);
+                    return $pickupLocationData;
+                },
+                $data
+            );
+
+        }
+        return array();
     }
 
     public function postAction()

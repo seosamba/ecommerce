@@ -12,6 +12,12 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
 
     protected $_dbTable = 'Store_DbTable_PickupLocation';
 
+    protected static $_lastQueryResultCount = false;
+
+    public function lastQueryResultCount($flag){
+        self::$_lastQueryResultCount = (bool) $flag;
+        return $this;
+    }
 
     public function save($model)
     {
@@ -41,10 +47,31 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
         return $result;
     }
 
-    public function fetchByCategory($categoryId)
+    public function fetchAll($categoryId = null, $order = null, $limit = null, $offset = null)
     {
-        $where = $this->getDbTable()->getAdapter()->quoteInto('location_category_id = ?', $categoryId);
-        return $this->fetchAll($where);
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(array('shopping_pickup_location'));
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        if ($categoryId) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('location_category_id = ?', $categoryId);
+            $select->where($where);
+        }
+
+        if (self::$_lastQueryResultCount) {
+            $data = $this->getDbTable()->fetchAll($select)->toArray();
+            return array(
+                'totalRecords' => sizeof($data),
+                'data' => array_slice($data, $offset, $limit),
+                'offset' => $offset,
+                'limit' => $limit
+            );
+        }
+        $select->limit($limit, $offset);
+        return $this->getDbTable()->fetchAll($select)->toArray();
     }
 
     public function delete($id)

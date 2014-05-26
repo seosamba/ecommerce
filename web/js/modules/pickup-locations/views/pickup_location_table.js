@@ -1,30 +1,24 @@
 define([
-	'backbone',
+    'backbone',
     '../collections/pickup-location',
+    'text!../templates/paginator.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
-            PickupLocationCollection
-            ){
+            PickupLocationCollection,PaginatorTmpl, i18n
+    ){
 
     var PickupLocationTableView = Backbone.View.extend({
         el: $('#pickup-locations-table'),
         events: {
             'click a[data-role=delete]': 'deleteLocation',
-            'click a[data-role=edit]'  : 'editLocation'
+            'click a[data-role=edit]'  : 'editLocation',
+            'click td.location-paginator a.page': 'navigate'
         },
-        templates: {},
+        templates: {
+            paginator: _.template(PaginatorTmpl)
+        },
         initialize: function(options){
-            var aoColumnDefs = [
-                { "bSortable": false, "aTargets": [ -1 ] }
-            ];
-
-            this.$el.dataTable({
-                'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 4,
-                "bPaginate": true,
-                "bAutoWidth": false,
-                "aoColumnDefs": aoColumnDefs
-            });
             this.pickupLocation = new PickupLocationCollection();
 
             this.pickupLocation.on('reset', this.renderLocations, this);
@@ -37,21 +31,26 @@ define([
             this.pickupLocation.pager();
         },
         renderLocations: function(){
-            this.$el.fnClearTable();
+            this.$el.find('tbody').empty();
             this.pickupLocation.each(this.renderLocation, this);
+            this.pickupLocation.info()['i18n'] = i18n;
+            this.$('td.location-paginator').html(this.templates.paginator(this.pickupLocation.information));
         },
         renderLocation: function(pickupLocation){
+            this.$el.find('tbody').append(
+                '<tr>'+
+                    '<td>'+pickupLocation.get('name')+'</td>'+
+                    '<td>'+pickupLocation.get('address1')+'</td>'+
+                    '<td>'+pickupLocation.get('address2')+'</td>'+
+                    '<td>'+pickupLocation.get('city')+'</td>'+
+                    '<td>'+pickupLocation.get('zip')+'</td>'+
+                    '<td>'+pickupLocation.get('country')+'</td>'+
+                    '<td>'+pickupLocation.get('phone')+'</td>'+
+                    '<td><a class="icon-pencil icon14" data-role="edit" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a> ' +
+                    '<a class="icon-remove error icon14" data-role="delete" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a></td>'+
+                    '</tr>'
 
-            this.$el.fnAddData([
-                '<span>'+pickupLocation.get('name')+'</span>',
-                '<span>'+pickupLocation.get('address1')+'</span>',
-                '<span>'+pickupLocation.get('address2')+'</span>',
-                '<span>'+pickupLocation.get('city')+'</span>',
-                '<span>'+pickupLocation.get('zip')+'</span>',
-                '<span>'+pickupLocation.get('country')+'</span>',
-                '<span>'+pickupLocation.get('phone')+'</span>',
-                '<a class="icon-pencil icon14" data-role="edit" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a> <a class="icon-remove error icon14" data-role="delete" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a>',
-            ]);
+            );
         },
         editLocation: function(e){
             var locationId = $(e.currentTarget).data('cid');
@@ -79,6 +78,29 @@ define([
         },
         resetLocation: function(){
             this.$el.fnClearTable();
+        },
+        navigate: function(e){
+            e.preventDefault();
+
+            var page = $(e.currentTarget).data('page');
+            if ($.isNumeric(page)){
+                this.pickupLocation.goTo(page);
+            } else {
+                switch(page){
+                    case 'first':
+                        this.pickupLocation.goTo(this.pickupLocation.firstPage);
+                        break;
+                    case 'last':
+                        this.pickupLocation.goTo(this.pickupLocation.totalPages);
+                        break;
+                    case 'prev':
+                        this.pickupLocation.requestPreviousPage();
+                        break;
+                    case 'next':
+                        this.pickupLocation.requestNextPage();
+                        break;
+                }
+            }
         }
     });
 

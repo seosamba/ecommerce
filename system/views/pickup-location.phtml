@@ -131,7 +131,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 </p>
             </div>
             <div class="content-footer grid_12">
-                <div class="grid_12 alpha omega mb20px mt15px location-table">
+                <div class="grid_12 alpha omega mt15px location-table">
                     <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
                         <thead class="header-inner">
                         <tr>
@@ -146,10 +146,13 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                         </tr>
                         </thead>
                         <tbody></tbody>
+                        <tfoot class="text-center">
+                        <tr><td colspan="8" class="location-paginator"></td></tr>
+                        </tfoot>
                     </table>
                 </div>
-                <a id="delete-pickup-location-category" class="delete-selected-category error"
-                   href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a>
+                <div class="grid_12"><a id="delete-pickup-location-category" class="delete-selected-category error"
+                   href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a></div>
             </div>
         </div>
     </div>
@@ -160,3 +163,8 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     $('#manage-pickup-locations').tabs();
     <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
+<style>
+    #pickup-locations-table{
+        word-break: normal;
+    }
+    <style>
