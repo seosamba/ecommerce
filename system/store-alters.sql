@@ -8,6 +8,9 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `discount_tax` decimal(10,2) NOT 
 ALTER TABLE `shopping_cart_session` ADD COLUMN `sub_total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub total Tax' AFTER `discount_tax`;
 ALTER TABLE `shopping_quote` ADD COLUMN `creator_id` int(10) unsigned DEFAULT '0' AFTER `edited_by`;
 
+-- 23/02/2014
+-- version: 2.1.2
+
 -- 15/04/2014
 -- version: 2.2.0
 CREATE TABLE IF NOT EXISTS `shopping_filtering_attributes` (

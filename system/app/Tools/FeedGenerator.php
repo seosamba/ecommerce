@@ -55,10 +55,7 @@ class Tools_FeedGenerator {
 		/**
 		 * @var $product Models_Model_Product
 		 */
-        $db = new Zend_Db_Table();
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll(
-            $db->getAdapter()->quoteInto('enabled = ?', '1')
-        );
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled = '1'");
 
 		if (empty($products)){
 			return false;
@@ -75,7 +72,17 @@ class Tools_FeedGenerator {
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
 			$item->appendChild($feed->createElement('g:condition', 'new'));
 			$item->appendChild($feed->createElement('g:availability', 'in stock'));
-			$item->appendChild($feed->createElement('g:price', ($product->getCurrentPrice()!==null?$product->getCurrentPrice():$product->getPrice()).' '.$this->_shoppingConfig['currency']));
+
+            if ($product->getCurrentPrice() !== null && $product->getExtraProperties()) {
+                $product->setCurrentPrice(null);
+            }
+            $item->appendChild(
+                $feed->createElement(
+                    'g:price',
+                    number_format(Tools_ShoppingCart::getInstance()->calculateProductPrice($product, $product->getDefaultOptions()), 2, '.', '')
+                    . ' ' . $this->_shoppingConfig['currency']
+                )
+            );
 			$item->appendChild($feed->createElement('g:brand', $product->getBrand()));
 
 			if ($product->getMpn()){
@@ -89,7 +96,12 @@ class Tools_FeedGenerator {
 			}
 			unset($tags);
 
-			$item->appendChild($feed->createElement('g:image_link',$websiteUrl.$this->_websiteHelper->getMedia().str_replace(DIRECTORY_SEPARATOR,'/product/', $product->getPhoto())));
+            $item->appendChild(
+                $feed->createElement(
+                    'g:image_link',
+                    Tools_Misc::prepareProductImage($product->getPhoto())
+                )
+            );
 
 			if (null !== ($weight = $product->getWeight())){
 				$item->appendChild($feed->createElement('g:shipping_weight', $weight.' '.$this->_shoppingConfig['weightUnit'] ));
@@ -107,10 +119,6 @@ class Tools_FeedGenerator {
 				}
 
 			}
-
-//			if ($this->_shoppingConfig['country'] === 'US' && $product->getTaxClass()){
-//				$item->appendChild($feed->createElement('g:tax', Tools_Tax_Tax::calculateProductTax($product)));
-//			}
 
 			$channel->appendChild($item);
 			unset($item, $product);

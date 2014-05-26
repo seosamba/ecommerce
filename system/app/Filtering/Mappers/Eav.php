@@ -239,6 +239,20 @@ class Filtering_Mappers_Eav
                 $valueWhere = $dbAdapter->quoteInto('(eav.value BETWEEN ? ', $value['from']);
                 $valueWhere .= $dbAdapter->quoteInto(' AND ?)', $value['to']);
             } else {
+                if (is_array($value)) {
+                    $otherIndex = array_search(Widgets_Filter_Filter::FILTER_OTHERS, $value);
+                    if ($otherIndex !== false) {
+                        unset($value[$otherIndex]);
+                        $data = Zend_Controller_Action_HelperBroker::getExistingHelper('cache')
+                            ->load(md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $name));
+                        if ($data) {
+                            $value = array_merge($value, $data);
+                        }
+                    }
+                }
+                if (empty($value)) {
+                    continue;
+                }
                 $valueWhere = $dbAdapter->quoteInto('eav.value IN (?)', $value);
             }
             $select->orWhere($nameWhere . ' AND ' . $valueWhere);
