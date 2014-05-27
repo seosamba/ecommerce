@@ -34,7 +34,11 @@ define([
                 var currentCategory   = this.categories.get(currentCategoryId),
                     websiteUrl        = $('#website_url').val(),
                     src               = websiteUrl+'system/images/noimage.png',
-                    timestamp = new Date().getTime();
+                    timestamp = new Date().getTime(),
+                    externalCategory = currentCategory.get('externalCategory');
+                if (!_.isNull(externalCategory)) {
+                    $('.imported-category').text(externalCategory);
+                }
                 if (!_.isNull(currentCategory.get('img'))) {
                     src = websiteUrl+'media/'+$('#things-select-folder').val()+'/small/'+currentCategory.get('img');
                 }

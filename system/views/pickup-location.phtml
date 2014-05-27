@@ -43,10 +43,11 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     <div class="content">
         <div id="pickup-location-config" class="<?php echo $hidden; ?>">
             <label class="category-label grid_3 mt10px"><?php echo $this->translate('Change category name'); ?></label>
-            <input class="change-category-label grid_4 mt5px" name="change-category-label"/>
+            <input class="change-category-label grid_3 mt5px" name="change-category-label"/>
+            <div class="grid_2 mt10px"><span class="imported-category"></span></div>
 
-            <div class="uploader-category-logo grid_5 text-right">
-                <div id="progressbar" class="hidden grid_5 prefix_5 mt10px">
+            <div class="uploader-category-logo grid_4 text-right">
+                <div id="progressbar" class="hidden grid_4 prefix_5 mt10px">
                     <span class="label"><b class="value">0</b></span>
                 </div>
                 <?php if (isset($this->pickupLocationsCategories[0]['img']) && $this->pickupLocationsCategories[0]['img'] !== null): ?>
