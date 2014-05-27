@@ -27,6 +27,8 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_locationCategoryId;
 
+    protected $_notes;
+
     public function setName($name)
     {
         $this->_name = $name;
@@ -148,5 +150,15 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
         return $this->_lat;
     }
 
+    public function setNotes($notes)
+    {
+        $this->_notes = $notes;
+        return $this;
+    }
+
+    public function getNotes()
+    {
+        return $this->_notes;
+    }
 
 }
