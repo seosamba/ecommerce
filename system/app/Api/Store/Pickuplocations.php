@@ -40,7 +40,7 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
                 $locationInfo = array_map(
                     function ($pickupLocation) {
                         $pickupLocationData = $pickupLocation;
-                        $pickupLocationData['workingHours'] = unserialize($pickupLocationData['workingHours']);
+                        $pickupLocationData['workingHours'] = unserialize($pickupLocationData['working_hours']);
                         return $pickupLocationData;
                     },
                     $data['data']
@@ -55,7 +55,7 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             return array_map(
                 function ($pickupLocation) {
                     $pickupLocationData = $pickupLocation;
-                    $pickupLocationData['workingHours'] = unserialize($pickupLocationData['workingHours']);
+                    $pickupLocationData['workingHours'] = unserialize($pickupLocationData['working_hours']);
                     return $pickupLocationData;
                 },
                 $data
