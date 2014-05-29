@@ -1,12 +1,12 @@
 <?php if (!empty($this->tags) || !empty($this->brands) || !empty($this->filters) || !empty($this->priceRange)) : ?>
 <form class="plugin-filtering-widget filtering-form">
     <ul>
-    <?php if (!empty($this->tags)) : ?>
+    <?php if (!empty($this->tags) && !empty($this->tags['values'])) : ?>
         <li>
             <?php echo $this->partial('_list.phtml', $this->tags); ?>
         </li>
     <?php endif; ?>
-    <?php if (!empty($this->brands)) : ?>
+    <?php if (!empty($this->brands) && !empty($this->brands['values'])) : ?>
         <li>
             <?php echo $this->partial('_list.phtml', $this->brands); ?>
         </li>

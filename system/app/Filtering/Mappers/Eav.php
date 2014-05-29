@@ -91,9 +91,9 @@ class Filtering_Mappers_Eav
 
     /**
      * Save entity-attributev-value container into database
-     * @param $productId     Entity ID
-     * @param $attributeId   Attribute ID
-     * @param $value         Value
+     * @param int $productId     Entity ID
+     * @param int $attributeId   Attribute ID
+     * @param string $value         Value
      * @return array Saved EAV container data
      * @throws Exceptions_SeotoasterException
      */
@@ -124,11 +124,10 @@ class Filtering_Mappers_Eav
 
     /**
      * Returns array of product filters relevant to specified tags
-     * @param      $tags    List of tags
-     * @param null $exclude List of filters to exclude
+     * @param array $tags    List of tags
      * @return array
      */
-    public function findListFiltersByTags($tags, $exclude = null)
+    public function findListFiltersByTags($tags)
     {
         if (!is_array($tags)) {
             $tags = (array)$tags;
@@ -182,11 +181,10 @@ class Filtering_Mappers_Eav
 
     /**
      * Returns array of range product filters relevant to specified tags
-     * @param      $tags    List of tags
-     * @param null $exclude List of filters to exclude
+     * @param array $tags    List of tags
      * @return array
      */
-    public function findRangeFiltersByTags($tags, $exclude = null)
+    public function findRangeFiltersByTags($tags)
     {
         if (!is_array($tags)) {
             $tags = (array)$tags;
@@ -292,10 +290,11 @@ class Filtering_Mappers_Eav
 
     /**
      * Returns array of brand => count pairs for given tags
-     * @param $productTags Product tags to filer with
+     * @param $productTags array Product tags to filer with
+     * @param $filterByNames null|array List of allowed brand names
      * @return array
      */
-    public function getBrands($productTags)
+    public function getBrands($productTags, $filterByNames = null)
     {
         $select = $this->_dbAdapter->select()
             ->from(
@@ -319,6 +318,10 @@ class Filtering_Mappers_Eav
             ->where('b.id = p.brand_id')
             ->where('t.tag_id IN (?)', $productTags)
             ->group('b.id');
+
+        if (is_array($filterByNames) && !empty($filterByNames)) {
+            $select->where('b.name IN (?)', $filterByNames);
+        }
 
         $result = $this->_dbAdapter->fetchPairs($select);
 
