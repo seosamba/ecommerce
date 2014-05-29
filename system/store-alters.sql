@@ -44,6 +44,10 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   KEY `product_id` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 29/05/2014
+-- version: 2.2.1
+ALTER TABLE `shopping_quote` ADD COLUMN `internal_note` text COLLATE utf8_unicode_ci AFTER `disclaimer`;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `shopping_config` SET `value`='2.2.1' WHERE `name`='version';
+UPDATE `shopping_config` SET `value`='2.2.2' WHERE `name`='version';
 SELECT value FROM `shopping_config` WHERE `name` = 'version';
