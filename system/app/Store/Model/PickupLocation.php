@@ -29,6 +29,8 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_notes;
 
+    protected $_weight;
+
     public function setName($name)
     {
         $this->_name = $name;
@@ -160,5 +162,17 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     {
         return $this->_notes;
     }
+
+    public function setWeight($weight)
+    {
+        $this->_weight = $weight;
+        return $this;
+    }
+
+    public function getWeight()
+    {
+        return $this->_weight;
+    }
+
 
 }

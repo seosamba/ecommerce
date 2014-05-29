@@ -76,12 +76,16 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
-    public function getLocations($comparator, $locationId = false, $coordinates = array())
+    public function getLocations($comparator, $locationId = false, $coordinates = array(), $maxWeight = false)
     {
         $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
         $where = $pickupLocationsZonesConfig->getAdapter()->quoteInto('shplz.pickup_location_category_id <> ?', 0);
         if ($locationId) {
             $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.id = ?', $locationId);
+        }
+        if($maxWeight){
+            $where .= ' AND (' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.weight > ?', $maxWeight);
+            $where .= ' OR shpl.weight IS NULL) ';
         }
         if (!empty($coordinates)) {
             $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
