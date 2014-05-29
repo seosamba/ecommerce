@@ -80,7 +80,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 	}
 
 	public function notify($object) {
-		if (!$object){
+        if (!$object || $this->_options['service'] !== Application_Model_Models_TriggerAction::SERVICE_TYPE_EMAIL){
 			return false;
 		}
 

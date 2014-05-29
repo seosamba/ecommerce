@@ -1,17 +1,18 @@
 <?php if (!empty($this->tags) || !empty($this->brands) || !empty($this->filters) || !empty($this->priceRange)) : ?>
 <form class="plugin-filtering-widget filtering-form">
     <ul>
-    <?php if (!empty($this->tags)) : ?>
+    <?php if (!empty($this->tags) && !empty($this->tags['values'])) : ?>
         <li>
             <?php echo $this->partial('_list.phtml', $this->tags); ?>
         </li>
     <?php endif; ?>
-    <?php if (!empty($this->brands)) : ?>
+    <?php if (!empty($this->brands) && !empty($this->brands['values'])) : ?>
         <li>
             <?php echo $this->partial('_list.phtml', $this->brands); ?>
         </li>
     <?php endif; ?>
     <?php if ($this->priceRange) : ?>
+        <?php $this->priceRange['useCurrency'] = true; ?>
         <li>
             <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
             <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
@@ -78,10 +79,28 @@
         </li>
     <?php endforeach; ?>
     </ul>
-    <button><?php echo $this->translate('Apply filters');?></button>
+    <a class="reset" href="<?php echo $this->url(); ?>"><?php echo $this->translate('Reset filters'); ?></a>
+    <button type="submit"><?php echo $this->translate('Apply filters');?></button>
 </form>
 <script>
     $(function () {
+        var moneyFormat = JSON.parse('<?php echo json_encode(Tools_Misc::getCurrencyFormat()); ?>');
+        
+        if (!window.accounting) {
+            //if we have require.js loaded on page then we use it
+            if (typeof define === 'function' && define.amd) {
+                require([$('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js'], function (a) {
+                    window.accounting = a;
+                });
+            } else { //otherwise we load accounting.js in old-school manner
+                var script = document.createElement('script');
+                script.type = 'text/javascript';// script.async = true;
+                script.src = $('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js';
+                var scr = document.getElementsByTagName('script')[0];
+                scr.parentNode.insertBefore(script, scr);
+            }
+        }
+
         $('.filter-slider').each(function () {
             var self = this,
                 data = $(self).data();
@@ -93,8 +112,8 @@
                 slide: function( event, ui ) {
                     var $wrapper = $(self).closest('li');
                     if ($wrapper.length) {
-                        $('span.filter-from', $wrapper).text(ui.values[0]);
-                        $('span.filter-to', $wrapper).text(ui.values[1]);
+                        $('span.filter-from', $wrapper).text(accounting.formatMoney(ui.values[0], moneyFormat));
+                        $('span.filter-to', $wrapper).text(accounting.formatMoney(ui.values[1], moneyFormat));
                         $('input.filter-value', $wrapper).val( ui.values[0] + '-' + ui.values[1] );
                     }
                 }

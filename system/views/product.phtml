@@ -54,7 +54,7 @@
 	<label class="fl-left mr-grid">
         <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
     </label>
-    <span class="tag-editable text-overflow align-middle" title="Click to edit"><%= tag.get('name') %></span>
+    <span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
@@ -86,7 +86,7 @@
         <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
-    <button class="fl-right remove-option icon error inverse icon-close icon16" title="<?php echo $this->translate('Delete option'); ?>"></button>
+    <a href="javascript:;" class="fl-right remove-option error inverse icon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -133,7 +133,7 @@
 		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
 	</label>
 	<div class="grid_1 text-center">
-		<button class="item-remove icon link error icon-remove" title="<?php echo $this->translate('Delete'); ?>"</button>
+		<button class="item-remove btn icon link error icon-remove" title="<?php echo $this->translate('Delete'); ?>"</button>
 	</div>
 </script>
 
