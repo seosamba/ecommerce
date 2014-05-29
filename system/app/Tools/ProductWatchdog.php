@@ -214,10 +214,9 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
         }
 
         $searchIndex = Tools_Search_Tools::initIndex();
-        $docs = $searchIndex->find((string)$page->getId());
 
         Tools_Search_Tools::removeFromIndex($page->getId());
-        $page->setH1(implode(', ', array($this->_object->getName(), $this->_object->getSku(), $page->getH1())));
+        $page->setH1(implode(', ', array($this->_object->getName(), $this->_object->getSku(), $this->_object->getMpn(), $page->getH1())));
         $page->setTeaserText(
             implode(
                 PHP_EOL,
