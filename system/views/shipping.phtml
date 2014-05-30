@@ -98,7 +98,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                             <label><?php echo $this->translate('Select location category');?></label>
                             <?php for($i = 1; $i < Shopping::QUANTITY_PICKUP_LOCATION_ON_SCREEN + 1; $i++):?>
                                 <select data-pickup-category-select ="<?php echo $i;?>" class='pickup-location-category grid_2 alpha' name="pickup-location-category-<?php echo $i;?>">
-                                    <?php $savedLocationCategory = isset($this->pickupLocationConfigZones['1_'.$i])? $this->pickupLocationConfigZones['1_'.$i]['pickup_location_category_id']: 0;?>
+                                    <?php $savedLocationCategory = isset($this->locationZonesInfo[$i-1])? $this->locationZonesInfo[$i-1]['pickup_location_category_id']: 0;?>
                                     <option value="0" <?php if($savedLocationCategory === 0) echo 'selected="selected"';?>><?php echo $this->translate('select');?></option>
                                     <?php if(isset($this->locationCategories) && !empty($this->locationCategories)):?>
                                         <?php foreach($this->locationCategories as $locationCategory):?>

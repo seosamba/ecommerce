@@ -331,6 +331,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_view->pickupForm = $pickupShippingForm;
         $pickupLocationMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
         $this->_view->pickupLocationConfigZones = $pickupLocationMapper->getLocationZones();
+        $this->_view->locationZonesInfo = $pickupLocationMapper->getLocationZonesInfo(self::QUANTITY_PICKUP_LOCATION_ON_SCREEN);
         $pickupLocationConfig = $pickupLocationMapper->getConfig();
         if(empty($pickupLocationConfig)) {
             $pickupLocationConfig = array('1'=>array('id'=>1, 'amount_type_limit'=>Shopping::AMOUNT_TYPE_UP_TO, 'amount_limit'=>0));
