@@ -8,7 +8,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 {
     const CACHE_KEY_SETTINGS = 'settings';
 
+    const CACHE_KEY_OTHERS_ARRAY = 'others_filter_';
+
     const OPTION_PRICE_SLIDER = 'price-slider';
+
+    const FILTER_OTHERS = '_other';
 
     private $_allowedOptions = array(
         'builder', 'product'
@@ -149,38 +153,69 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         // get applied filters from query
         $appliedFilters = Filtering_Tools::normalizeFilterQuery();
+        $this->_view->appliedFilters = $appliedFilters;
 
         // mark disabled filters
-        $this->_view->filters = array_map(
-            function ($filter) use ($appliedFilters) {
-                if (isset($appliedFilters[$filter['name']])) {
-                    if (isset($filter['values'])) {
-                        $filter['checked'] = $appliedFilters[$filter['name']];
-                    } else {
-                        $filter['from'] = $appliedFilters[$filter['name']]['from'];
-                        $filter['to'] = $appliedFilters[$filter['name']]['to'];
+        $this->_view->filters = array_filter(
+            array_map(
+                function ($filter) use ($appliedFilters, $widgetSettings) {
+                    if (isset($widgetSettings[$filter['name']]) && !is_array($widgetSettings[$filter['name']])) {
+                        return null;
                     }
-                } else {
-                    $filter['checked'] = array();
-                }
+                    if (isset($appliedFilters[$filter['name']])) {
+                        if (isset($filter['values'])) {
+                            $filter['checked'] = $appliedFilters[$filter['name']];
+                        } else {
+                            $filter['from'] = $appliedFilters[$filter['name']]['from'];
+                            $filter['to'] = $appliedFilters[$filter['name']]['to'];
+                        }
+                    } else {
+                        $filter['checked'] = array();
+                    }
 
-                return $filter;
-            },
-            $this->_filters
+                    return $filter;
+                },
+                $this->_filters
+            )
         );
 
+        if (!empty($widgetSettings['tags'])) {
+            $showList = $widgetSettings['tags'];
+            $tagValues = array_filter(
+                $this->_tags,
+                function ($tag) use ($showList) {
+                    return array_key_exists($tag, $showList);
+                }
+            );
+            unset($showList);
+        } else {
+            $tagValues = array_values($this->_tags);
+        }
         // assign tags to view with checked attributes
         $this->_view->tags = array(
             'name' => 'category',
-            'values' => array_values($this->_tags),
+            'values' => $tagValues,
             'checked' => !empty($appliedFilters['category']) ? $appliedFilters['category'] : array(),
             'nocount' => true
         );
 
+        if (!empty($widgetSettings['brands'])) {
+            $brandValues = array();
+            if (is_array($widgetSettings['brands'])) {
+                foreach ($this->_brands as $brandName => $itemCount) {
+                    if (!array_key_exists($brandName, $widgetSettings['brands'])) {
+                        continue;
+                    }
+                    $brandValues[$brandName] = $itemCount;
+                }
+            }
+        } else {
+            $brandValues = $this->_brands;
+        }
         // assign brands to view with checked attributes
         $this->_view->brands = array(
             'name' => 'brand',
-            'values' => $this->_brands,
+            'values' => $brandValues,
             'checked' => !empty($appliedFilters['brand']) ? $appliedFilters['brand'] : array()
         );
 

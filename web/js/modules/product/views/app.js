@@ -324,7 +324,7 @@ define([
             } else {
                 $('#product-tags-available').append(view.$el);
             }
-            if ($('div.tagid-'+tag.get('id'), '#product-tags-current').size()){
+            if ($('.tagid-'+tag.get('id'), '#product-tags-current').size()){
                 view.$el.addClass('tag-current').find('input:checkbox').prop({
                     disabled: true,
                     checked: true
@@ -336,8 +336,9 @@ define([
             $('#product-tags-available').empty();
             this.tags.each(this.renderTag, this);
             var paginatorData = {
+                pages: 2,
                 collection : 'tags',
-                cssClass: 'grid_4 omega mt5px'
+                cssClass: 'grid_7 omega mt5px'
             };
 
             $('.paginator', '#tag-tab').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));

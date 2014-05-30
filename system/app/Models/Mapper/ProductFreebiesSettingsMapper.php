@@ -52,4 +52,20 @@ class Models_Mapper_ProductFreebiesSettingsMapper extends Application_Model_Mapp
         return $this->getDbTable()->getAdapter()->fetchAll($select);
     }
 
+    public function getProductHasFreebiesByPageId($productId){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('shopping_product_has_freebies'))
+            ->where($where);
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
+
+    public function getFreebiesIdsByProductId($productId){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from('shopping_product_has_freebies', array('freebies_id'))
+            ->where($where);
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
+
 }

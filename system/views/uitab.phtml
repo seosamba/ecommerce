@@ -113,16 +113,14 @@
 		    launch: function() {
 			    var children = $(this).find('span#products');
 			    if(!children.length) {
-                    $('tr.mceFirst').show();
+                    $('.mce-toolbar-grp').removeClass('hidden');
                     $('.above-editor-links').removeClass('grid_4').addClass('grid_8');
                     $('#tabs').removeClass('grid_8').addClass('grid_4');
                 } else {
                     $('.above-editor-links').removeClass('grid_8').addClass('grid_4');
                     $('#tabs').removeClass('grid_4').addClass('grid_8');
                     //hiding mce controls
-                    $('tr.mceFirst').hide();
-                    $('table#content_tbl').width('100%');
-                    $('table#content_tbl').height('435px');
+                    $('.mce-toolbar-grp').addClass('hidden');
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');
@@ -135,7 +133,7 @@
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
-                $('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((template) ? ':' + template : '') + '}');
+                tinymce.activeEditor.execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((template) ? ':' + template : '') + '}');
 		    },
 		    insertList: function() {
 			    var shortCode = '{$productlist:';
@@ -154,7 +152,7 @@
                             ids.push($(productContainer).attr('id'));
                         });
                         shortCode += ':' + ids.join(',') + '}';
-                        $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                        tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                     } else {
                         showSpinner();
                         $.when($.getJSON($('#website_url').val() + 'api/store/products/offset/0/limit/1000000/', {key: $('#search').val()}, function(response) {
@@ -169,7 +167,7 @@
                             });
                         })).done(function() {
                             shortCode += ':' + ids.join(',') + '}';
-                            $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                            tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                         });
                     }
                 } else {
@@ -193,7 +191,7 @@
                     shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                     //ordering
                     shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
-                    $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                    tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                 }
 
 		    },
