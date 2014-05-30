@@ -61,6 +61,7 @@ define([
             $('.location-address2').val(model.get('address2'));
             $('.location-city').val(model.get('city'));
             $('.location-zip').val(model.get('zip'));
+            $('.location-weight').val(model.get('weight'));
             $('.location-country [value="'+model.get('country')+'"]').prop('selected', true);
             $('.location-phone').val(model.get('phone'));
             _.each(workingHours, function(value, name){

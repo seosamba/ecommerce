@@ -90,7 +90,11 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     <input type="text" name="phone" class="location-phone"/>
                 </p>
 
-                <p class="grid_3 mt35px text-center" id="working_hours">
+                <p class="grid_3 mt10px"><label><?php echo $this->translate('Weight'); ?></label>
+                    <input type="text" name="weight" class="location-weight"/>
+                </p>
+
+                <p class="grid_3 mt15px text-center fl-left" id="working_hours">
                     <a class="working-hours-dialog" href="javascript:;"><?php echo $this->translate(
                             'Working hours'
                         ); ?></a>

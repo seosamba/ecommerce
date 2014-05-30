@@ -35,7 +35,8 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'location_category_id' => $model->getLocationCategoryId(),
             'name' => $model->getName(),
             'lat'  => $model->getLat(),
-            'lng'  => $model->getLng()
+            'lng'  => $model->getLng(),
+            'weight' => $model->getWeight()
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);

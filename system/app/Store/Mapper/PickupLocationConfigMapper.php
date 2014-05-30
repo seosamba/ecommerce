@@ -76,6 +76,19 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
+
+    public function getLocationZonesInfo($zonesQuantity)
+    {
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(
+                'shopping_pickup_location_zones',
+                array(
+                    'pickup_location_category_id',
+                )
+            )->limit($zonesQuantity);
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
+
     public function getLocations($comparator, $locationId = false, $coordinates = array(), $maxWeight = false)
     {
         $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
@@ -85,7 +98,9 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         }
         if($maxWeight){
             $where .= ' AND (' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.weight > ?', $maxWeight);
-            $where .= ' OR shpl.weight IS NULL) ';
+            $where .= ' OR shpl.weight IS NULL';
+            $where .= ' OR '. $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.weight = ?', 0);
+            $where .= ' ) ';
         }
         if (!empty($coordinates)) {
             $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
