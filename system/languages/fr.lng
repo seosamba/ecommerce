@@ -285,7 +285,7 @@
         'Select all'=>'Sélectionner tous',
         'Name'=>'Nom',
         'Brand'=>'Marque',
-        'Sku'=>'No',
+        'Sku'=>'Sku',
         'Mpn'=>'Mpn',
         'Free shipping'=>'Livraison gratuite',
         'Weight'=>'Poids',

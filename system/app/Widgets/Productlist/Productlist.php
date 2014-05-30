@@ -29,6 +29,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      */
     const OPTION_FILTERABLE = 'filterable';
 
+    /**
+     * Option to apply "AND" logic for tags filtering
+     */
+    const OPTION_STRICT_TAGS_COUNT = 'and';
+
 	/**
 	 * Product list default offset (used for portional load)
 	 */
@@ -116,8 +121,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
-        $this->_strictTagsCount = (strtolower(end($this->_options)) == 'and');
-
+        $this->_strictTagsCount = in_array(self::OPTION_STRICT_TAGS_COUNT, $this->_options);
 
 		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
 		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {

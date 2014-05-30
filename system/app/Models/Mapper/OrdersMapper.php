@@ -58,6 +58,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				->joinLeft(array('u' => 'user'), 'u.id = order.user_id', array(
 					'full_name', 'email'
 				))
+                ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
+                    array('real_order_id'=>'imp.real_order_id'))
 				->group('order.id');
 
 		if ($where){
@@ -87,6 +89,118 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
 
+    public function fetchOrdersForExport($orderIds = array(), $excludeFields = array())
+    {
+        $defaultFields = array(
+            'order_id' => 'order.id',
+            'updated_at' => 'order.updated_at',
+            'status' => 'order.status',
+            'total_products' => 'COUNT(DISTINCT oc.id)',
+            'sku' => '(GROUP_CONCAT(DISTINCT(sku)))',
+            'mpn' => '(GROUP_CONCAT(DISTINCT(mpn)))',
+            'product_name' => '(GROUP_CONCAT(DISTINCT(sp.name)))',
+            'product_price' => '(GROUP_CONCAT(oc.price))',
+            'product_tax' => '(GROUP_CONCAT(oc.tax))',
+            'product_tax_price' => '(GROUP_CONCAT(oc.tax_price))',
+            'product_qty' => '(GROUP_CONCAT(oc.qty))',
+            'shipping_type' => 'order.shipping_type',
+            'shipping_service' => 'order.shipping_service',
+            'gateway' => 'order.gateway',
+            'shipping_price' => 'order.shipping_price',
+            'discount_tax_rate' => 'order.discount_tax_rate',
+            'sub_total' => 'order.sub_total',
+            'shipping_tax' => 'order.shipping_tax',
+            'discount_tax' => 'order.discount_tax',
+            'sub_total_tax' => 'order.sub_total_tax',
+            'total_tax' => 'order.total_tax',
+            'discount' => 'order.discount',
+            'total' => 'order.total',
+            'notes' => 'order.notes',
+            'shipping_tracking_id' => 'order.shipping_tracking_id',
+            'brand' => 'sb.name',
+            'user_name' => 'u.full_name',
+            'user_email' => 'u.email',
+            'shipping_firstname' => 's_adr.firstname',
+            'shipping_lastname' => 's_adr.lastname',
+            'shipping_company' => 's_adr.company',
+            'shipping_email' => 's_adr.email',
+            'shipping_phone' => 's_adr.phone',
+            'shipping_mobile' => 's_adr.mobile',
+            'shipping_country' => 's_adr.country',
+            'shipping_city' => 's_adr.city',
+            'shipping_state' => 'sls_s.name',
+            'shipping_zip' => 's_adr.zip',
+            'shipping_address1' => 's_adr.address1',
+            'shipping_address2' => 's_adr.address2',
+            'billing_firstname' => 'b_adr.firstname',
+            'billing_lastname' => 'b_adr.lastname',
+            'billing_company' => 'b_adr.company',
+            'billing_email' => 'b_adr.email',
+            'billing_phone' => 'b_adr.phone',
+            'billing_mobile' => 'b_adr.mobile',
+            'billing_country' => 'b_adr.country',
+            'billing_city' => 'b_adr.city',
+            'billing_state' => 'sls_b.name',
+            'billing_zip' => 'b_adr.zip',
+            'billing_address1' => 'b_adr.address1',
+            'billing_address2' => 'b_adr.address2'
+        );
+
+        if (!empty($excludeFields)) {
+            foreach ($excludeFields as $fieldName => $fieldValue) {
+                unset($defaultFields[$fieldName]);
+            }
+        }
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(
+                array('order' => 'shopping_cart_session'),
+                $defaultFields
+            )
+            ->joinLeft(array('oc' => 'shopping_cart_session_content'), 'oc.cart_id = order.id', array(''))
+            ->joinLeft(
+                array('sp' => 'shopping_product'),
+                'oc.product_id = sp.id',
+                array('')
+            )
+            ->joinLeft(
+                array('sb' => 'shopping_brands'),
+                'sp.brand_id = sb.id',
+                array()
+            )
+            ->joinLeft(
+                array('u' => 'user'),
+                'u.id = order.user_id',
+                array('')
+            )
+            ->joinLeft(
+                array('s_adr' => 'shopping_customer_address'),
+                's_adr.id = order.shipping_address_id',
+                array('')
+            )
+            ->joinLeft(
+                array('b_adr' => 'shopping_customer_address'),
+                'b_adr.id = order.billing_address_id',
+                array('')
+            )
+            ->joinLeft(
+                array('sls_s' => 'shopping_list_state'),
+                'sls_s.id = s_adr.state',
+                array('')
+            )
+            ->joinLeft(
+                array('sls_b' => 'shopping_list_state'),
+                'sls_b.id = b_adr.state',
+                array('')
+            )
+            ->group('order.id');
+        if (!empty($orderIds)) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('order.id IN (?)', $orderIds);
+            $select->where($where);
+        }
+        return $this->getDbTable()->fetchAll($select)->toArray();
+    }
+
 	private function _parseWhere(Zend_Db_Table_Select $select, $where){
 		if (isset($where['product-id']) || isset($where['product-key'])){
 			$select->join(array('p' => 'shopping_product'), 'p.id = oc.product_id', null);
@@ -111,8 +225,21 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 						$select->where('p.id = ?', $val);
 						break;
 					case 'product-key':
-						$likeWhere = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
-						$select->where($likeWhere, '%'.$val.'%');
+                        $likeWhere = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
+                        if (strpos($val, ',')) {
+                            $valArr = array_filter(explode(',', $val));
+                            for ($i = 0; $i < sizeof($valArr); $i++) {
+                                if ($i == 0) {
+                                    $select->where($likeWhere, '%'.$valArr[$i].'%');
+                                }
+                                else {
+                                    $select->orWhere($likeWhere, '%'.$valArr[$i].'%');
+                                }
+                            }
+                        }
+                        else {
+                            $select->where($likeWhere, '%'.$val.'%');
+                        }
 						break;
 					case 'country':
 					case 'state':
