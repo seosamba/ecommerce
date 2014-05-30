@@ -8,7 +8,7 @@
     </h3>
     <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo trim($this->websiteUrl, '/').$_SERVER['REQUEST_URI']; ?>" method="post">
 	    <input type="text" name="code" required>
-	    <input type="submit" value="<?php echo $this->translate('Apply'); ?>">
+	    <button class="btn" type="submit"><?php echo $this->translate('Apply'); ?></button>
 	</form>
 	<div class="coupon-msg"></div>
 </div>
