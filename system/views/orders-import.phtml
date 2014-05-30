@@ -1,0 +1,127 @@
+<?php
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.html5.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.html4.js');
+$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.flash.js');
+$title = $this->translate('Import orders');
+$this->headTitle($title);
+$this->placeholder('headerContent')->set($title);
+?>
+
+<div id="uploadContainer" class="content-auto text-center">
+    <div class="grid_12">
+        <label class="grid_4 mt5px"><?php echo $this->translate('Please choose default order status');?></label>
+        <select class="grid_4" name="order-status" id="order-status">
+            <option value="0"><?php echo $this->translate('Choose default order status');?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED);?></option>
+            <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED);?></option>
+        </select>
+    </div>
+    <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
+    <div id="import-orders-templates" class="grid_12 mt15px">
+        <ul>
+            <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
+                <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
+            <?php endforeach;?>
+        </ul>
+        <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
+            <div id="<?php echo $orderTemplateName;?>">
+                <?php foreach ($this->defaultImportsFileds as $importFields): ?>
+                    <?php if (in_array($importFields['label'], $importFieldNames)): ?>
+                        <label class="grid_3 mt5px">
+                            <?php echo $importFields['label_name']; ?>
+                            <?php if (isset($this->importConfig[$orderTemplateName])): ?>
+                                <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                                       placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $this->importConfig[$orderTemplateName][$importFields['label']]['label']; ?>"/>
+                            <?php else: ?>
+                                <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                                       placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $importFields['label']; ?>"/>
+                            <?php endif; ?>
+                        </label>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endforeach;?>
+    </div>
+    <div class="grid_12 mt20px">
+        <a class="fl-left" title=""
+           href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate(
+                'Get sample data file'
+            ); ?></a>
+
+        <div class="fl-right">
+            <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv'); ?></button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $(function () {
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,html4',
+            browse_button: 'pickOrders',
+            container: 'uploadContainer',
+            max_file_size: '100mb',
+            url: '<?php echo $this->websiteUrl?>plugin/shopping/run/importOrders/',
+            filters: [
+                {title: "Zip files", extensions: "csv"}
+            ],
+            multipart_params: {
+                'importOrdersFields': '',
+                'realOrdersFields': '',
+                'defaultOrderStatus': '',
+                'currentTemplateName':''
+            },
+            init: {
+                FilesAdded: function (up, files) {
+                    var realOrderFields = [];
+                    var importOrdersFields = [];
+                    var allImportFields = [];
+                    var currentTabId = $(".ui-state-active").find('a').attr("href");
+                    var currentTemplateName = $(currentTabId).attr('id');
+                    $.each($(currentTabId).find('.import-field'), function (value) {
+                        importOrdersFields.push($(this).val());
+                        realOrderFields.push($(this).attr('name'));
+                    });
+                    uploader.settings.multipart_params.importOrdersFields = importOrdersFields;
+                    uploader.settings.multipart_params.realOrdersFields = realOrderFields;
+                    uploader.settings.multipart_params.currentTemplateName = currentTemplateName;
+                    var defaultOrderStatus = $('#order-status :selected').val();
+                    if(parseInt(defaultOrderStatus) === 0){
+                        showMessage('<?php echo $this->translate('Please choose default order status');?>', true, '5000');
+                        uploader.splice();
+                        return false;
+                    }
+                    uploader.settings.multipart_params.defaultOrderStatus = defaultOrderStatus;
+                    showSpinner();
+                    up.start();
+                }
+            }
+        });
+        uploader.init();
+        uploader.bind('FileUploaded', function (up, file, info) {
+            hideSpinner();
+            var response = jQuery.parseJSON(info.response);
+            if (response.error == '0') {
+                showMessage(response.responseText, false, '5000');
+            } else {
+
+                showMessage(response.responseText, true, '5000');
+            }
+            uploader.refresh();
+        });
+
+        $('#import-orders-templates').tabs();
+    });
+</script>
+
+
+
+
+			

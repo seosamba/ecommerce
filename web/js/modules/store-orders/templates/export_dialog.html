@@ -1,0 +1,32 @@
+<div class="clearfix" style="width: 100%" title="<%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %>">
+    <% console.log(ordersIds) %>
+    <% console.log(exportConfig) %>
+    <form id="export-orders-form" action="<%= $('#website_url').val()+'plugin/shopping/run/exportOrders/orderIds/'+ordersIds %>" method="post">
+        <% _.each(defaultConfig, function(exportConf, name){%>
+            <p class="grid_2 order-field-row" style="margin-top: 10px;">
+                <label class="pointer"><%= exportConf.label_name %>
+                    <input type="checkbox" value="1" name="<%= name %>-checked"
+                        <% if(_.isNull(exportConfig)) {%>
+                                checked="checked"
+                        <% } else if(typeof exportConfig[name] !== 'undefined' && parseInt(exportConfig[name]['checked']) === 1) {%>
+                                checked="checked"
+                        <% } %>
+                    />
+                </label>
+                <% if(_.isNull(exportConfig)) {%>
+                    <input type="text" name="<%= name %>" value="<%= name %>"/>
+                <% } else {%>
+                    <% if(typeof exportConfig[name] !== 'undefined') {%>
+                        <input type="text" name="<%= name %>" value="<%= exportConfig[name]['label'] %>"/>
+                    <% } else {%>
+                        <input type="text" name="<%= name %>" value="<%= name %>"/>
+                    <% } %>
+                <% } %>
+            </p>
+        <%})%>
+        <p class="grid_12"><label class="fl-left mt10px pointer"><%= _.isUndefined(i18n['Export all orders']) ? 'Export all orders':i18n['Export all orders'] %>
+        <input type="checkbox" name="allOrders" value="1"/></label>
+        <button class="mt0px cl-none" type="submit"><%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %></button></p>
+    </form>
+</div>
+
