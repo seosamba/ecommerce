@@ -86,6 +86,7 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 			'name'   => 'calculateAndCheckout',
 			'ignore' => true,
 			'label'  => 'Calculate shipping and checkout',
+            'type'   => 'submit',
 			'decorators' => array('ViewHelper')
 		)));
 

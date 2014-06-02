@@ -129,6 +129,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'name'   => 'checkout',
 			'ignore' => true,
 			'label'  => 'Next',
+            'type'   => 'submit',
 			'decorators' => array('ViewHelper')
 		)));
 

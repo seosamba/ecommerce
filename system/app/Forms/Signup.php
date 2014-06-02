@@ -52,6 +52,7 @@ class Forms_Signup extends Zend_Form {
             'name'   => 'signup',
             'ignore' => true,
             'label'  => 'Next',
+            'type'   => 'submit',
             'decorators' => array('ViewHelper')
         )));
 
