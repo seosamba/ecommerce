@@ -82,10 +82,11 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 			array('HtmlTag', array('tag' => 'div'))
 		));
 
-		$this->addElement(new Zend_Form_Element_Submit(array(
+		$this->addElement(new Zend_Form_Element_Button(array(
 			'name'   => 'calculateAndCheckout',
 			'ignore' => true,
 			'label'  => 'Calculate shipping and checkout',
+            'type'   => 'submit',
 			'decorators' => array('ViewHelper')
 		)));
 

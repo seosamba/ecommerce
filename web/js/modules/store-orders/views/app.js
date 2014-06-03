@@ -2,29 +2,33 @@ define(['backbone',
     '../collections/orders',
     './order',
     'text!../templates/paginator.html',
+    'text!../templates/export_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl,i18n
+        PaginatorTmpl, ExportTemplate, i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
         events: {
             'click #extra-filters-switch': function(){ $('#extra-filters', this.el).slideToggle(); } ,
             'change input.filter': 'applyFilter',
+            'change #orders-check-all': 'checkAllOrders',
             'click #orders-filter-apply-btn': 'applyFilter',
             'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
             'click td.shipping-service .setTracking': 'changeTracking',
             'click #orders-filter-reset-btn': 'resetFilter',
-            'change select[name="order-mass-action"]': 'massAction'
+            'change select[name="order-mass-action"]': 'massAction',
+            'change input[name="check-order[]"]': 'toggleOrder'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
         },
         initialize: function(){
             this.orders = new OrdersCollection;
+            this.orders.ordersChecked = [];
             this.orders.server_api = _.extend(this.orders.server_api, {
                 'id': function() { return $('input[name=search]').val(); },
                 'filter': function() {
@@ -37,7 +41,8 @@ define(['backbone',
                         'date-from': $('input[name=filter-from-date]', '#store-orders form.filters').val(),
                         'date-to': $('input[name=filter-to-date]', '#store-orders form.filters').val(),
                         'amount-from': $('input[name=filter-from-amount]', '#store-orders form.filters').val(),
-                        'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val()
+                        'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val(),
+                        'user': $('input[name=user-name]', '#store-orders form.filters').val()
                     };
                 }
             });
@@ -56,15 +61,64 @@ define(['backbone',
             }
             $(e.currentTarget).val(0);
         },
-        invoicesAction: function(orders){
-            console.log(orders);
-            smoke.confirm(_.isUndefined(i18n['Download invoices from the current page?'])?'Download invoices from the current page?':i18n['Download invoices from the current page?'], function(e) {
-                if(e) {
-                    window.location= $('#website_url').val()+'plugin/invoicetopdf/run/massDownloadInvoice/cartId/388/dwn/1/packing/1/';
-                } else {
+        checkAllOrders: function(e) {
+            var ordersIds = this.orders.ordersChecked;
+            var orderIdsExclude = [];
+            if(e.target.checked){
+                this.orders.each(function(order){
+                    ordersIds = _.union(ordersIds, [order.id]);
+                    order.set({checked: true});
+                });
+            }else{
+                this.orders.each(function(order){
+                    orderIdsExclude = _.union(orderIdsExclude, [order.id]);
+                    order.set({checked: false});
+                });
+                ordersIds = _.difference(ordersIds, orderIdsExclude);
+            }
+            this.orders.ordersChecked = ordersIds;
+        },
+        toggleOrder: function(e) {
+            var orderId = $(e.target).val();
+            if(e.target.checked){
+                this.orders.ordersChecked = _.union(this.orders.ordersChecked, [orderId]);
+            }else{
+                var filtered = _.filter(this.orders.ordersChecked, function(item) {
+                    return item !== orderId
+                });
+                this.orders.ordersChecked = filtered;
+            }
+        },
+        exportOrdersAction: function(){
+            if(this.orders.ordersChecked.length){
+                var checkedOrders = this.orders.ordersChecked.join(',');
+                var exportOrderButton  = _.isUndefined(i18n['Export']) ? 'Export':i18n['Export'];
+                var exportOrderButtons = {};
+                exportOrderButtons[exportOrderButton] = function() {
+                    $(this).dialog('close');
+                };
+                $.ajax({
+                    url: $('#website_url').val()+'plugin/shopping/run/getOrderExportConfig/',
+                    type: 'GET',
+                    dataType: 'json'
 
-                }
-            }, {classname:"errors", 'ok':_.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], 'cancel':_.isUndefined(i18n['No'])?'No':i18n['No']});
+                }).done(function(response) {
+                    var dialog = _.template(ExportTemplate, {
+                        ordersIds: checkedOrders,
+                        i18n:i18n,
+                        'defaultConfig': response.responseText.defaultConfig,
+                        'exportConfig': response.responseText.export_config
+                    });
+                    $(dialog).dialog({
+                        dialogClass: 'seotoaster',
+                        width: '75%',
+                        height: '750',
+                        resizable: false
+                    });
+                    return false;
+                });
+
+            }
         },
         resetFilters: function(){
             this.$('form.filters > :input').val('');

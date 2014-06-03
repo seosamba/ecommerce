@@ -1,0 +1,124 @@
+<?php if (!empty($this->tags) || !empty($this->brands) || !empty($this->filters) || !empty($this->priceRange)) : ?>
+<form class="plugin-filtering-widget filtering-form">
+    <ul>
+    <?php if (!empty($this->tags) && !empty($this->tags['values'])) : ?>
+        <li>
+            <?php echo $this->partial('_list.phtml', $this->tags); ?>
+        </li>
+    <?php endif; ?>
+    <?php if (!empty($this->brands) && !empty($this->brands['values'])) : ?>
+        <li>
+            <?php echo $this->partial('_list.phtml', $this->brands); ?>
+        </li>
+    <?php endif; ?>
+    <?php if ($this->priceRange) : ?>
+        <?php $this->priceRange['useCurrency'] = true; ?>
+        <li>
+            <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
+            <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
+        </li>
+    <?php endif; ?>
+    <?php foreach ($this->filters as $filter) : ?>
+        <li>
+            <p class="filter-header"><?php echo $filter['label']; ?></p>
+        <?php if (!isset($filter['values'])) : ?>
+            <?php echo $this->partial('_range-slider.phtml', $filter); ?>
+        <?php else : ?>
+            <ul>
+                <?php
+                $others = array();
+                ksort($filter['values']);
+                foreach ($filter['values'] as $value => $count) : ?>
+                    <?php if (intval($count) === 1) {
+                        array_push($others, $value);
+                        continue;
+                    }
+                    ?>
+                    <?php $checked = in_array($value, $filter['checked']); ?>
+                    <li>
+                        <label>
+                            <input type="checkbox"
+                                   name="<?php echo $filter['name']; ?>"
+                                   value="<?php echo $value; ?>"
+                                   <?php if ($checked) { ?> checked <?php }; ?>
+                                />
+                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
+                                <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                            </a>
+                        </label>
+                    </li>
+                <?php endforeach; ?>
+                <?php if (!empty($others)) : ?>
+                    <?php
+                    Zend_Controller_Action_HelperBroker::getExistingHelper('cache')->save(
+                        md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $filter['name']),
+                        $others,
+                        '',
+                        array(),
+                        Helpers_Action_Cache::CACHE_LONG
+                    );
+                    ?>
+                    <li>
+                        <label>
+                            <input type="checkbox"
+                                   name="<?php echo $filter['name']; ?>"
+                                   value="<?php echo Widgets_Filter_Filter::FILTER_OTHERS; ?>"
+                                   <?php if (!empty($this->appliedFilters[$filter['name']])
+                                   && in_array(Widgets_Filter_Filter::FILTER_OTHERS, $this->appliedFilters[$filter['name']])) { ?>
+                                   checked
+                                   <?php }; ?>
+                                />
+                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
+                                <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                            </a>
+                        </label>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+    <a class="reset" href="<?php echo $this->url(); ?>"><?php echo $this->translate('Reset filters'); ?></a>
+    <button class="btn" type="submit"><?php echo $this->translate('Apply filters');?></button>
+</form>
+<script>
+    $(function () {
+        var moneyFormat = JSON.parse('<?php echo json_encode(Tools_Misc::getCurrencyFormat()); ?>');
+        
+        if (!window.accounting) {
+            //if we have require.js loaded on page then we use it
+            if (typeof define === 'function' && define.amd) {
+                require([$('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js'], function (a) {
+                    window.accounting = a;
+                });
+            } else { //otherwise we load accounting.js in old-school manner
+                var script = document.createElement('script');
+                script.type = 'text/javascript';// script.async = true;
+                script.src = $('#website_url').val() + 'plugins/shopping/web/js/libs/accounting.min.js';
+                var scr = document.getElementsByTagName('script')[0];
+                scr.parentNode.insertBefore(script, scr);
+            }
+        }
+
+        $('.filter-slider').each(function () {
+            var self = this,
+                data = $(self).data();
+            $(this).slider({
+                range: true,
+                min: parseFloat(data.min),
+                max: parseFloat(data.max),
+                values: [ parseFloat(data.from || data.min), parseFloat(data.to || data.max) ],
+                slide: function( event, ui ) {
+                    var $wrapper = $(self).closest('li');
+                    if ($wrapper.length) {
+                        $('span.filter-from', $wrapper).text(accounting.formatMoney(ui.values[0], moneyFormat));
+                        $('span.filter-to', $wrapper).text(accounting.formatMoney(ui.values[1], moneyFormat));
+                        $('input.filter-value', $wrapper).val( ui.values[0] + '-' + ui.values[1] );
+                    }
+                }
+            });
+        });
+    });
+</script>
+<?php endif; ?>

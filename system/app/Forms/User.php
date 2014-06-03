@@ -10,11 +10,6 @@ class Forms_User extends Zend_Form {
 
         $this->setDecorators(array('FormElements', 'Form'));
 
-        $this->setElementFilters(array(
-            new Zend_Filter_StripTags(),
-            new Zend_Filter_StringTrim()
-        ));
-
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'       => 'newEmail',
             'label'      => 'New email',
@@ -99,10 +94,12 @@ class Forms_User extends Zend_Form {
             ),
         )));
 
-        $this->addElement(new Zend_Form_Element_Submit(array(
+        $this->addElement(new Zend_Form_Element_Button(array(
             'name'   => 'saveUser',
             'ignore' => true,
             'label'  => 'Save changes',
+            'type'   => 'submit',
+            'class'  => 'btn icon-save',
             'decorators' => array('ViewHelper')
         )));
 
@@ -111,6 +108,11 @@ class Forms_User extends Zend_Form {
             'Errors',
             'Label',
             array('HtmlTag', array('tag' => 'p'))
+        ));
+
+        $this->setElementFilters(array(
+            new Zend_Filter_StripTags(),
+            new Zend_Filter_StringTrim()
         ));
 
         $this->getElement('saveUser')->removeDecorator('Label');

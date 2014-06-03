@@ -17,11 +17,6 @@ class Forms_Checkout_Pickup extends Zend_Form {
 
         $this->setDecorators(array('FormElements', 'Form'));
 
-        $this->setElementFilters(array(
-            new Zend_Filter_StripTags(),
-            new Zend_Filter_StringTrim()
-        ));
-
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'firstname',
             'label'    => 'First Name',
@@ -68,6 +63,11 @@ class Forms_Checkout_Pickup extends Zend_Form {
             'Errors',
             'Label',
             array('HtmlTag', array('tag' => 'p'))
+        ));
+
+        $this->setElementFilters(array(
+            new Zend_Filter_StripTags(),
+            new Zend_Filter_StringTrim()
         ));
 
         $this->getElement('submitpickup')->removeDecorator('Label');

@@ -85,8 +85,10 @@
 				<?php endif; ?>
 				<span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
 				<br/>
-				<span><?php echo $countries[$shippingAddress['country']];?></span>
-				<br/>
+                <?php if(isset($countries[$shippingAddress['country']])):?>
+				    <span><?php echo $countries[$shippingAddress['country']];?></span>
+				    <br/>
+                <?php endif; ?>
 				<?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
 					<span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
 					<br/>

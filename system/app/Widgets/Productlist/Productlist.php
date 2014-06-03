@@ -24,6 +24,16 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	const OPTTYPE_ORDER = 'order';
 
+    /**
+     * Option to apply product list filtering via URI params
+     */
+    const OPTION_FILTERABLE = 'filterable';
+
+    /**
+     * Option to apply "AND" logic for tags filtering
+     */
+    const OPTION_STRICT_TAGS_COUNT = 'and';
+
 	/**
 	 * Product list default offset (used for portional load)
 	 */
@@ -86,6 +96,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$layout = Zend_Layout::getMvcInstance();
 		$layout->getView()->headScript()->appendFile(Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl()
 				. 'plugins/shopping/web/js/product-options.js');
+
+        if (in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
+        }
 	}
 
 	public function _load() {
@@ -107,8 +121,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
-        $this->_strictTagsCount = (strtolower(end($this->_options)) == 'and');
-
+        $this->_strictTagsCount = in_array(self::OPTION_STRICT_TAGS_COUNT, $this->_options);
 
 		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
 		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
@@ -151,8 +164,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$wesiteData = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
 		// init variables we will use in closure
-		$renderedContent = '';
-		$currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
+		$renderedContent = array();
+
 		$data = array(
 			'mediaPath'           => $this->_websiteHelper->getUrl() . $this->_websiteHelper->getMedia(),
 			'templateContent'     => $template->getContent(),
@@ -166,9 +179,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			return '';
 		}
 
+        if (!empty($this->_priceFilter)) {
+            $data['priceFilter'] = $this->_priceFilter;
+        }
+
 		$cacheTags = array();
 		// here we go - proccessing the list
-		array_walk($products, function ($product) use (&$renderedContent, $currency, $data, &$cacheTags) {
+		array_walk($products, function ($product) use (&$renderedContent, $data, &$cacheTags) {
 			array_push($cacheTags, 'prodid_' . $product->getId());
 			if (strpos($data['templateContent'], '$store:addtocart') !== false) {
 				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
@@ -177,15 +194,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				$storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId(), 'checkbox'));
 			}
 			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
-			if ($data['mediaServersAllowed']) {
-				$mediaServer = Tools_Content_Tools::getMediaServer();
-				if ($mediaServer) {
-					$data['mediaPath'] = str_replace($data['websiteUrl'], $mediaServer . '.' . $data['domain'], $data['mediaPath']);
-				}
-			}
+//			if ($data['mediaServersAllowed']) {
+//				$mediaServer = Tools_Content_Tools::getMediaServer();
+//				if ($mediaServer) {
+//					$data['mediaPath'] = str_replace($data['websiteUrl'], $mediaServer . '.' . $data['domain'], $data['mediaPath']);
+//				}
+//			}
 			// proccessing product photo and get some data
-//			$productPhotoData = explode('/', $product->getPhoto());
-//			$photoUrlPart = $data['mediaPath'] . $productPhotoData[0];
 			$shortDesc = $product->getShortDescription();
 			$templatePrepend = '<!--pid="' . $product->getId() . '"-->';
 
@@ -195,30 +210,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				$view->product = $product;
 				$productOptionsView = $view->render('options.phtml');
 			}
-			//preparing default price with applied default options
-			$itemDefaultOptionsArray = array();
-            $productDefaultOptions   = $product->getDefaultOptions();
-            if(is_array($productDefaultOptions) && !empty($productDefaultOptions)) {
-                foreach ($productDefaultOptions as $option) {
-                    if(!isset($option['selection'])) {
-                        continue;
-                    }
-                    foreach ($option['selection'] as $item) {
-                        if ($item['isDefault'] == 1) {
-                            $itemDefaultOptionsArray[$option['id']] = $item['id'];
-                        }
-                    }
-                }
-            }
+
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
-                //'$product:photourl'                   => $photoUrlPart . '/product/' . $productPhotoData[1],
-                //'$product:photourl:product'           => $photoUrlPart . '/product/' . $productPhotoData[1],
-                //'$product:photourl:small'             => $photoUrlPart . '/small/' . $productPhotoData[1],
-                //'$product:photourl:medium'            => $photoUrlPart . '/medium/' . $productPhotoData[1],
-                //'$product:photourl:large'             => $photoUrlPart . '/large/' . $productPhotoData[1],
-                //'$product:photourl:original'          => $photoUrlPart . '/original/' . $productPhotoData[1],
                 '$product:url'                        => $product->getPage() ? $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),
@@ -234,10 +229,39 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:options'                    => isset($productOptionsView) ? $productOptionsView : ''
             );
 
-            $renderedContent .= Tools_Misc::preparingProductListing($templatePrepend.$data['templateContent'], $product, $dictionary, $data['noZeroPrice']);
+            if (isset($data['priceFilter'])) {
+                //preparing default price with applied default options
+                $itemDefaultOptionsArray = array();
+                $productDefaultOptions   = $product->getDefaultOptions();
+                if(is_array($productDefaultOptions) && !empty($productDefaultOptions)) {
+                    foreach ($productDefaultOptions as $option) {
+                        if(!isset($option['selection'])) {
+                            continue;
+                        }
+                        foreach ($option['selection'] as $item) {
+                            if ($item['isDefault'] == 1) {
+                                $itemDefaultOptionsArray[$option['id']] = $item['id'];
+                            }
+                        }
+                    }
+                }
+
+                $price = Tools_ShoppingCart::getInstance()->calculateProductPrice(
+                    $product,
+                    $itemDefaultOptionsArray
+                );
+
+                if ($data['priceFilter']['min'] > $price || $data['priceFilter']['max'] < $price) {
+                    return false;
+                }
+            }
+            $renderedContent[] = Tools_Misc::preparingProductListing($templatePrepend.$data['templateContent'], $product, $dictionary, $data['noZeroPrice']);
 		});
+        if (!empty($this->_priceFilter)) {
+            $this->_view->totalCount = sizeof($renderedContent);
+        }
 		$this->_cacheTags = array_merge($this->_cacheTags, $cacheTags);
-		return $renderedContent;
+		return implode('', $renderedContent);
 	}
 
 
@@ -276,13 +300,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		return $content;
 	}
 
-	/**
-	 * Load the right products set
-	 *
-	 * @return array
-	 */
-	private function _loadProducts($enabled = true) {
+    /**
+     * Load the right products set
+     * @param bool $enabled Filter only enabled products
+     * @return array|null
+     */
+    private function _loadProducts($enabled = true) {
 		$enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
+
+
 		if (empty($this->_options)) {
 			array_push($this->_cacheTags, 'prodid_all');
 			return $this->_productMapper->fetchAll($enabledOnly, null, 0, $this->_limit);
@@ -297,6 +323,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				$filters[$parts[1]] = explode(',', $parts[2]);
 			}
 		}
+
+        // fetching filters from query string
+        $urlFilter = Filtering_Tools::normalizeFilterQuery();
+
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
 			$filters['order'] = array_map(function ($field) {
@@ -311,7 +341,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}, $filters['order']);
 		}
 
-		if (isset($filters['tagnames']) && !empty($filters['tagnames'])){
+        if (!empty($urlFilter['category'])) {
+            $filters['tagnames'] = $urlFilter['category'];
+            unset($urlFilter['category']);
+        }
+		if (isset($filters['tagnames']) && !empty($filters['tagnames'])) {
 			$tags = Models_Mapper_Tag::getInstance()->findByName($filters['tagnames'], true);
 			if ($tags){
 				$filters['tags'] = array_keys($tags);
@@ -327,6 +361,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 		}
 
+        if (!empty($urlFilter['brand'])) {
+            $filters['brands'] = $urlFilter['brand'];
+            unset($urlFilter['brand']);
+        }
 		if (!empty($filters['brands'])) {
 			foreach ($filters['brands'] as $brand) {
 				array_push($this->_cacheTags, 'prodbrand_' . $brand);
@@ -335,11 +373,31 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$this->_view->filters = $filters;
 
-		//if no filters passed in the product list we will check if it is a PL of product ids
-		if (preg_match('~^[0-9,]+$~', $this->_options[0])) {
+        if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
+            if (!empty($urlFilter['price'])) {
+                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to']);
+                unset($urlFilter['price']);
+            }
+            // removing all
+            $urlFilter = array_intersect_key($urlFilter, $attr);
+            $idsWhere = '';
+            if (!empty($urlFilter)) {
+                $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
+                if (empty($productIds)) {
+                    return null;
+                }
+                $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+            }
+        } elseif (preg_match('~^[0-9,]+$~', $this->_options[0])) {
+            //if no filters passed in the product list we will check if it is a PL of product ids
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
-			$enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
 		}
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,

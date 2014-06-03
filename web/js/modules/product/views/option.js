@@ -11,7 +11,7 @@ define([
         className: 'option-wrapper grid_12 alpha omega mt10px background',
 
 		events: {
-			'click button.remove-option': 'kill',
+			'click .remove-option': 'kill',
 			'click .add-selection-btn': 'addSelection',
 			'change select.option-type-select': 'typeChange',
 			'change input.option-title': 'titleChange',
@@ -37,12 +37,13 @@ define([
                 this.renderAllSelections();
             }
             if (this.model.has('isTemplate')){
-                this.$('input[name=isTemplate]').attr('checked', 'checked');
+                this.$('input[name=isTemplate]').attr('checked', 'checked').parent().hide();
                 this.$('input[name=templateName]').show();
             } else {
-                this.$('input[name=isTemplate]').removeAttr('checked');
+                this.$('input[name=isTemplate]').removeAttr('checked').parent().show();
                 this.$('input[name=templateName]').hide();
             }
+            checkboxRadioStyle();
             return this;
 		},
 		typeChange: function(e){

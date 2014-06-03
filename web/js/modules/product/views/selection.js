@@ -46,6 +46,7 @@ define([
 			} else {
 				this.model.set({'_deleted': true});
 			}
+            checkboxRadioStyle();
 			this.remove();
 		},
 		changeDefault: function(){

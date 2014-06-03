@@ -15,6 +15,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_CUSTOMER    = 'customer';
 
+    const TRIGGER_CUSTOMERCHANGEATTR = 't_userchangeattr';
+
     const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
 
     const SHIPPING_TYPE = 'shipping';
@@ -78,7 +80,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 	}
 
 	public function notify($object) {
-		if (!$object || $this->_options['service'] !== Application_Model_Models_TriggerAction::SERVICE_TYPE_EMAIL) {
+        if (!$object || $this->_options['service'] !== Application_Model_Models_TriggerAction::SERVICE_TYPE_EMAIL){
 			return false;
 		}
 

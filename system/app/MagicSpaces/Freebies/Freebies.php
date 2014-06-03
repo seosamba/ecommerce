@@ -39,6 +39,13 @@ class MagicSpaces_Freebies_Freebies extends Tools_MagicSpaces_Abstract {
 			if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
 				preg_match_all('~data-pid="([0-9]+)"~u', $this->_spaceContent, $found);
 				if(!isset($found[1]) || !is_array($found[1]) || empty($found[1])) {
+                    if(Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+                        $existFreebies = $freebiesSettingsMapper->getProductHasFreebiesByPageId($product->getId());
+                        if(!empty($existFreebies)){
+                            $product->setFreebies(array());
+                            $productMapper->save($product);
+                        }
+                    }
 					return false;
 				}
 			}
@@ -50,9 +57,17 @@ class MagicSpaces_Freebies_Freebies extends Tools_MagicSpaces_Abstract {
             $this->_view->currentFreebiesQuantity   = $freebiesExist['quantity'];
         }
         $this->_view->currentProductId = $productId;
-        if(isset($found[1]) && !empty($found[1])){
-		    $product->setFreebies($found[1]);
-            $productMapper->save($product);
+        if(Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            if(isset($found[1]) && !empty($found[1])){
+                $existFreebies = $freebiesSettingsMapper->getFreebiesIdsByProductId($product->getId());
+                $oldFreebiesChanged = array_diff($existFreebies, $found[1]);
+                $newFreebiesChanged = array_diff($found[1], $existFreebies);
+
+                if(!empty($oldFreebiesChanged ) || !empty($newFreebiesChanged)){
+                    $product->setFreebies($found[1]);
+                    $productMapper->save($product);
+                }
+            }
         }
 	}
 }

@@ -24,8 +24,9 @@ $this->headLink()
 		<form class="filters mb30px clearfix">
 			<div class="grid_7">
 				<label><?php echo $this->translate('Search');?></label>
-                <input type="text" class="filter grid_6 alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
-                <input type="text" class="filter grid_6 omega" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
+                <input type="text" class="filter grid_4 alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+                <input type="text" class="filter grid_4 omega" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
+                <input type="text" class="filter grid_4 omega" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
 			</div>
 			<div id="extra-filters-switch" class="fl-right mr-grid pt15px"><a href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
             <div id="extra-filters" class="grid_12 hidden">
@@ -53,7 +54,7 @@ $this->headLink()
                         Models_Model_CartSession::CART_STATUS_PROCESSING => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING),
                         Models_Model_CartSession::CART_STATUS_COMPLETED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED),
                         Models_Model_CartSession::CART_STATUS_SHIPPED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED),
-                         Models_Model_CartSession::CART_STATUS_DELIVERED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
+                        Models_Model_CartSession::CART_STATUS_DELIVERED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
                         Models_Model_CartSession::CART_STATUS_CANCELED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED),
                         Models_Model_CartSession::CART_STATUS_REFUNDED => $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED),
                         Tools_Misc::CS_ALIAS_PENDING => $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING),
@@ -74,8 +75,8 @@ $this->headLink()
 					?>
 				</div>
 	            <div class="fl-right mt20px">
-                    <button class="green icon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
-		            <button class="red icon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>
+                    <button class="btn green icon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
+		            <button class="btn red icon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>
 	            </div>
 			</div>
 		</form>
@@ -83,7 +84,8 @@ $this->headLink()
 	<table id="orders-table" class="widget table-hover">
 		<thead>
 			<tr class="title-table">
-				<th>#</th>
+                <th><input type="checkbox" name="checkAllOrders" id="orders-check-all" value="1" title="Check/Uncheck All"></th>
+                <th>#</th>
 				<th class="sortable" data-sortkey="name"><?php echo $this->translate('Customer name');?></th>
 				<th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
 				<th class="sortable sortDown" data-sortkey="date"><?php echo $this->translate('Purchased on');?></th>
@@ -96,22 +98,30 @@ $this->headLink()
                 <?php if(isset($this->invoicePlugin)):?>
                     <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
+                <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('System order');?></th>
 			</tr>
 		</thead>
 		<tbody id="orders-list">
             <?php if(isset($this->invoicePlugin)):?>	
-                <td colspan="11" style="text-align:center;">
+                <td colspan="9" style="text-align:center;">
             <?php else:?>
-                <td colspan="10" style="text-align:center;">
+                 <td colspan="8" style="text-align:center;">
             <?php endif;?>
                 <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
 			</td>
 		</tbody>
-		<tfoot class="text-right">
-            <?php if(isset($this->invoicePlugin)):?>
-                <td colspan="11" class="paginator"></td>
+        <tfoot>
+        <td colspan="4">
+            <?php echo $this->translate('with selected do');?>
+            <select name="order-mass-action" id="mass-action">
+                <option value="0"><?php echo $this->translate('nothing');?></option>
+                <option value="exportOrders"><?php echo $this->translate('Export orders');?></option>
+            </select>
+        </td>
+        <?php if(isset($this->invoicePlugin)):?>
+                <td colspan="9" class="paginator text-right"></td>
             <?php else:?>
-                <td colspan="10" class="paginator"></td>
+                <td colspan="8" class="paginator text-right"></td>
             <?php endif;?>
 		</tfoot>
 	</table>

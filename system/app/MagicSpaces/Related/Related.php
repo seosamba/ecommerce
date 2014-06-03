@@ -23,7 +23,6 @@ class MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 	private function _saveRelatedProducts() {
 		$mapper  = Models_Mapper_ProductMapper::getInstance();
 		$product = $mapper->findByPageId($this->_toasterData['id']);
-        $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
 		if(!$product instanceof Models_Model_Product) {
 			if(Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
 				$this->_spaceContent = '<h3>Cannot load product. This magic space (' . $this->_name . ') can be used only on product pages.</h3>' . $this->_spaceContent;
@@ -43,20 +42,18 @@ class MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 				}
 			}
 		}
-        $cacheKeyPrefix = implode('-', $found[1]);
-        if (null === ($relatedProductsData = $cacheHelper->load(
-            'related_products-' . $this->_toasterData['id'] . '-' . $cacheKeyPrefix,
-            'related_products'
-        ))
-        ) {
-            $product->setRelated($found[1]);
-            $mapper->save($product);
-            $cacheHelper->save(
-                'related_products-' . $this->_toasterData['id'] . '-' . $cacheKeyPrefix,
-                $found[1],
-                'related_products',
-                Helpers_Action_Cache::CACHE_LONG
-            );
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $where = $mapper->getDbTable()->getAdapter()->quoteInto('product_id = ?', $product->getId());
+            $select = $mapper->getDbTable()->getAdapter()->select()
+                ->from('shopping_product_has_related', array('related_id'))
+                ->where($where);
+            $relatedExist = $mapper->getDbTable()->getAdapter()->fetchCol($select);
+            $oldRelatedChanged = array_diff($relatedExist, $found[1]);
+            $newRelatedChanged = array_diff($found[1], $relatedExist);
+            if (!empty($oldRelatedChanged) || !empty($newRelatedChanged)) {
+                $product->setRelated($found[1]);
+                $mapper->save($product);
+            }
         }
 	}
 }

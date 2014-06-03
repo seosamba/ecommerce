@@ -1,3 +1,4 @@
+<td class="check-order textcentered"><input type="checkbox" name="check-order[]" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> title=""/></td>
 <td class="order-id"><%= id %></td>
 <td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
 <td><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
@@ -55,3 +56,4 @@
     </a>
 </td>
 <% } %>
+  <td><%= _.isNull(real_order_id) ? _.isUndefined(i18n['Yes']) ? 'Yes':i18n['Yes']: _.isUndefined(i18n['No']) ? 'No':i18n['No']%></td>
