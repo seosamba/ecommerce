@@ -16,7 +16,7 @@
 		<ul class="zone-countries list-bordered h150px"></ul>
         <div class="footer grid_12">
             <a href="javascript:;" class="clearprop error" data-property="countries">[ <?php echo $this->translate( 'clear' ); ?> ]</a>
-            <button class="btn open-dialog fl-right" data-name="add-country"><?php echo $this->translate( 'Add Country' ); ?></button>
+            <button class="btn icon-plus open-dialog fl-right" data-name="add-country"><?php echo $this->translate( 'Add Country' ); ?></button>
         </div>
 	</div>
 	<div class="states grid_6 omega">
@@ -26,14 +26,15 @@
 		<ul class="zone-states list-bordered h150px"></ul>
         <div class="footer grid_12">
             <a href="javascript:;" class="clearprop error" data-property="states">[ <?php echo $this->translate( 'clear' ); ?> ]</a>
-            <button class="btn open-dialog fl-right" data-name="add-state"><?php echo $this->translate( 'Add State' ); ?></button>
+            <button class="btn icon-plus open-dialog fl-right" data-name="add-state"><?php echo $this->translate( 'Add State' ); ?></button>
         </div>
 	</div>
 	<div class="grid_12 alpha omega mt15px">
         <div class="header-inner pl2 pr2 text-center">
             <span class="fl-left"><?php echo $this->translate( 'Postal codes' ); ?></span>
-            <a href="javascript:;" class="clearprop fl-right" data-property="zip">[ <?php echo $this->translate( 'clear' ); ?>
-                                                                                  ]</a>
+            <a href="javascript:;" class="clearprop fl-right error" data-property="zip">
+                [ <?php echo $this->translate( 'clear' ); ?> ]
+            </a>
             <em><?php echo $this->translate( 'Insert list of zip/postal codes: one per line' ); ?></em>
         </div>
         <textarea class="zone-zip"><%= zip . join( '\n' ) %></textarea>
