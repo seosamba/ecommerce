@@ -70,8 +70,8 @@
         <input class="grid_8 alpha omega option-title" type="text" value="${title}"/>
 	</div>
 	<div class="grid_4">
-        <label class="grid_3 alpha omega text-center mt5px"><?php echo $this->translate('Type'); ?></label>
-        <select class="option-type-select grid_9 alpha omega">
+        <label class="grid_4 alpha omega text-center mt5px"><?php echo $this->translate('Type'); ?></label>
+        <select class="option-type-select grid_8 alpha omega">
             <option value="dropdown"><?php echo $this->translate('Dropdown Box');?></option>
             <option value="radio"><?php echo $this->translate('Radio Switch');?></option>
             <option value="text"><?php echo $this->translate('Text Field');?></option>
@@ -86,7 +86,7 @@
         <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
-    <a href="javascript:;" class="fl-right remove-option error inverse icon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
+    <a href="javascript:;" class="fl-right remove-option btn icon link error icon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -183,8 +183,8 @@
                 <a id="product-list-back-link" class="hide icon-chevron-right" href="javascript:;" onclick="$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
             <div class="grid_5">
-                <label class="grid_2 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?>:</label>
-                <input class="grid_10 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
+                <label class="grid_3 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?>:</label>
+                <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
             </div>
         </div>
         <div id="product-list-holder" class="content-footer scroll pl2 pr2" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
@@ -350,15 +350,15 @@
     </div>
 
     <div id="tag-tab">
-        <div class="grid_2 alpha mt5px">
+        <div class="fl-left mr-grid mt5px">
             <a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ]</a>
-        </div>
-		<div class="grid_3 alpha omega">
-            <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
         <div class="paginator">
             <!-- placeholder for pagination -->
-        </div>  
+        </div>
+		<div class="wrap">
+            <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
+        </div>
 
         <ul id="product-tags-current" class="product-tags list-tags list-inline grid_12 alpha omega mb0px mt10px" style="display:none;"></ul>
 
