@@ -127,14 +127,21 @@ class Tools_Geo {
     /**
      * Get coordinates latitude and longitude
      */
-    public static function getMapCoordinates($address) {
+    public static function getMapCoordinates($address)
+    {
         // replace all the white space with "+" sign to match with google search pattern
-        $url      = 'http://maps.google.com/maps/api/geocode/json?sensor=false&address='.str_replace(' ', '+', $address);
+        $url = 'http://maps.google.com/maps/api/geocode/json?sensor=false&address=' . str_replace(' ', '+', $address);
         $response = file_get_contents($url);
         //generate array object from the response from the web
-        $json     = json_decode($response, true);
+        $json = json_decode($response, true);
+        if (empty($json['results'])) {
+            return array('lat' => null, 'lng' => null);
+        }
 
-        return array('lat' => $json['results'][0]['geometry']['location']['lat'], 'lng' => $json['results'][0]['geometry']['location']['lng']);
+        return array(
+            'lat' => $json['results'][0]['geometry']['location']['lat'],
+            'lng' => $json['results'][0]['geometry']['location']['lng']
+        );
     }
 
 }
