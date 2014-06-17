@@ -181,12 +181,16 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         if (!empty($widgetSettings['tags'])) {
             $showList = $widgetSettings['tags'];
-            $tagValues = array_filter(
-                $this->_tags,
-                function ($tag) use ($showList) {
-                    return array_key_exists($tag, $showList);
-                }
-            );
+            if(is_array($showList)) {
+                $tagValues = array_filter(
+                    $this->_tags,
+                    function ($tag) use ($showList) {
+                        return array_key_exists($tag, $showList);
+                    }
+                );
+            }else{
+                $tagValues = array();
+            }
             unset($showList);
         } else {
             $tagValues = array_values($this->_tags);

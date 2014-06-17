@@ -48,10 +48,11 @@ class Forms_Signup extends Zend_Form {
 	        'ignore'    => true
         ));
 
-        $this->addElement(new Zend_Form_Element_Submit(array(
+        $this->addElement(new Zend_Form_Element_Button(array(
             'name'   => 'signup',
             'ignore' => true,
             'label'  => 'Next',
+            'type'   => 'submit',
             'decorators' => array('ViewHelper')
         )));
 

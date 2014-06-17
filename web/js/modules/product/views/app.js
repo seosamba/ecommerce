@@ -338,7 +338,7 @@ define([
             var paginatorData = {
                 pages: 2,
                 collection : 'tags',
-                cssClass: 'grid_7 omega mt5px'
+                cssClass: 'fl-right ml-grid mt5px'
             };
 
             $('.paginator', '#tag-tab').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
