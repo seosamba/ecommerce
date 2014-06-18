@@ -187,7 +187,7 @@
                 <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
             </div>
         </div>
-        <div id="product-list-holder" class="content-footer scroll pl2 pr2" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
+        <div id="product-list-holder" class="content-footer scroll pl2 pr2 column_8 full-width" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
         <div class="footer text-right grid_12">
 			<a id="massaction" class="fl-left" href="javascript:;">run mass action</a>
         	<div class="paginator"><!-- placeholder for paginator --></div>
@@ -360,9 +360,9 @@
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-        <ul id="product-tags-current" class="product-tags list-tags list-inline grid_12 alpha omega mb0px mt10px" style="display:none;"></ul>
+        <ul id="product-tags-current" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width" style="display:none;"></ul>
 
-        <ul id="product-tags-available" class="product-tags list-tags list-inline grid_12 alpha omega mb0px mt10px"></ul>
+        <ul id="product-tags-available" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width"></ul>
     </div>
     <!-- #tag-tab -->
 
@@ -380,7 +380,7 @@
     <!-- End Tab 3 -->
 
     <div id="related-tab" class="scroll">
-        <div id="related-holder" class="grid_12 alpha omega">
+        <div id="related-holder" class="column_8 full-width">
             <a href="javascript:;" data-listtype="related" class="show-list productlisting icon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
             <span class="spinner"></span>
         </div>
