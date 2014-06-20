@@ -31,7 +31,7 @@ $this->placeholder('headerContent')->set($title);
             <?php endforeach;?>
         </ul>
         <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
-            <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 360px;">
+            <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 370px;">
                 <?php foreach ($this->defaultImportsFileds as $importFields): ?>
                     <?php if (in_array($importFields['label'], $importFieldNames)): ?>
                         <label class="grid_3 mb10px">
