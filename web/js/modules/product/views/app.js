@@ -183,8 +183,18 @@ define([
                             showMessage(response.responseText, true);
                         }
                     });
+                    // Reset tag collection
+                    this.tags.nameTag     = '';
+                    this.tags.currentPage = 1;
+                    this.tags.fetch();
                 }
 			}
+            else {
+                // Search tag
+                this.tags.nameTag     = name;
+                this.tags.currentPage = 1;
+                this.tags.fetch();
+            }
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
