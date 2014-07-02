@@ -57,6 +57,10 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   PRIMARY KEY (`real_order_id`,`import_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 01/06/2014
+-- version: 2.2.3
+ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);
+
 -- These alters are always the latest and updated version of the database
-UPDATE `shopping_config` SET `value`='2.2.3' WHERE `name`='version';
+UPDATE `shopping_config` SET `value`='2.2.4' WHERE `name`='version';
 SELECT value FROM `shopping_config` WHERE `name` = 'version';

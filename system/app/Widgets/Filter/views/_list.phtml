@@ -7,13 +7,13 @@
         <li>
             <label>
                 <input type="checkbox"
-                       name="brand"
+                       name="<?php echo $this->name; ?>"
                        value="<?php echo $value; ?>"
                     <?php if (in_array($value, $this->checked)) { ?>
                         checked
                     <?php } ?>
                     />
-                <a href="<?php echo $this->url() . '?brand=' . urlencode($value); ?>">
+                <a href="<?php echo $this->url() . '?' . $this->name . '=' . urlencode($value); ?>">
                     <?php echo $value; ?><?php if(empty($this->nocount)) { echo '&nbsp[' . $count . ']'; } ?>
                 </a>
             </label>

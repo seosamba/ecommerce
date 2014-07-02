@@ -334,9 +334,9 @@ class Tools_ExportImportOrders
                         $cartContent[$key]['tax'] = 0;
                     }
                     $cartContent[$key]['tax_price'] = $cartContent[$key]['price'] + $cartContent[$key]['tax'];
-                    $subTotal += $cartContent[$key]['price'];
+                    $subTotal += $cartContent[$key]['price']*$cartContent[$key]['qty'];
                     if (!isset($ordersHeaders[$importOrdersConfigFields['sub_total_tax']])) {
-                        $subTotalTax += $cartContent[$key]['tax'];
+                        $subTotalTax += $cartContent[$key]['tax']*$cartContent[$key]['qty'];
                     }
                 }
 

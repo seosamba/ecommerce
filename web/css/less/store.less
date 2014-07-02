@@ -68,6 +68,7 @@
                 padding      : 0;
                 height       : 80px;
                 width        : 80px;
+                overflow     : hidden;
                 .border-radius(100px);
 
                 img{
@@ -110,7 +111,7 @@
                 border-top  : 1px dashed #bbb;
                 display     : block;
                 text-align  : center;
-                color       : @brand-blue;
+                color       : @brand-info;
             }
         }
 
@@ -129,12 +130,7 @@
         .product-tags{
 
             .tag-widget{
-                background : @gray-light;
                 font-size  : @font-size-small;
-                margin-top : 1%;
-                padding    : @padding-small-vertical;
-                float      : left;
-                .grid-elements(5, 1, true);
 
                 &:hover, &.tag-current{
                 }
@@ -204,7 +200,7 @@
 #manage-logos{
     .brand-list{
         &>*{
-            .grid-elements(8, 1, true);
+//            .grid-elements(8, 1, true);
             margin-bottom : 1%;
 
             img{
@@ -243,7 +239,7 @@
     }
 
     .zone-zip{
-        height : 130px;
+        height : 125px;
     }
 }
 
@@ -270,7 +266,7 @@
 #shipping-config{
 
     #shippers{
-        height : 385px;
+        height : 382px;
 
         ul{
             li{

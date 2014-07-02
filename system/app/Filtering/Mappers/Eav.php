@@ -138,7 +138,7 @@ class Filtering_Mappers_Eav
             $dbAdapter = Zend_Db_Table::getDefaultAdapter();
             $select = $dbAdapter->select()->from(
                 array('eav' => $this->_valuesTable),
-                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(eav.product_id)')
+                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(DISTINCT(eav.product_id))')
             )
                 ->join(
                     array('tha' => $this->_tagsRelationTable),

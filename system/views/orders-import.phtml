@@ -8,9 +8,9 @@ $this->headTitle($title);
 $this->placeholder('headerContent')->set($title);
 ?>
 
-<div id="uploadContainer" class="content-auto text-center">
-    <div class="grid_12">
-        <label class="grid_4 mt5px"><?php echo $this->translate('Please choose default order status');?></label>
+<div id="uploadContainer" class="content-auto">
+    <div class="clearfix">
+        <label class="grid_4 mt5px text-bold"><?php echo $this->translate('Please choose default order status');?></label>
         <select class="grid_4" name="order-status" id="order-status">
             <option value="0"><?php echo $this->translate('Choose default order status');?></option>
             <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?></option>
@@ -31,10 +31,10 @@ $this->placeholder('headerContent')->set($title);
             <?php endforeach;?>
         </ul>
         <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
-            <div id="<?php echo $orderTemplateName;?>">
+            <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 370px;">
                 <?php foreach ($this->defaultImportsFileds as $importFields): ?>
                     <?php if (in_array($importFields['label'], $importFieldNames)): ?>
-                        <label class="grid_3 mt5px">
+                        <label class="grid_3 mb10px">
                             <?php echo $importFields['label_name']; ?>
                             <?php if (isset($this->importConfig[$orderTemplateName])): ?>
                                 <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
@@ -49,16 +49,15 @@ $this->placeholder('headerContent')->set($title);
             </div>
         <?php endforeach;?>
     </div>
-    <div class="grid_12 mt20px">
-        <a class="fl-left" title=""
-           href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/"><?php echo $this->translate(
-                'Get sample data file'
-            ); ?></a>
+    <footer class="grid_12 text-right">
+        <a class="btn icon-box-add success" title="" href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/">
+            <?php echo $this->translate('Get sample data file'); ?>
+        </a>
 
-        <div class="fl-right">
-            <button id="pickOrders"><?php echo $this->translator->translate('Upload orders csv'); ?></button>
-        </div>
-    </div>
+        <a id="pickOrders" class="btn icon-box-remove" href="javascript:;">
+            <?php echo $this->translator->translate('Upload orders csv'); ?>
+        </a>
+    </footer>
 </div>
 
 <script type="text/javascript" charset="utf-8">
