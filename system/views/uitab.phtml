@@ -113,14 +113,14 @@
 		    launch: function() {
 			    var children = $(this).find('span#products');
 			    if(!children.length) {
-                    $('.mce-toolbar-grp').removeClass('hidden');
+                    $('.mce-toolbar-grp').show();
                     $('.above-editor-links').removeClass('grid_4').addClass('grid_8');
                     $('#tabs').removeClass('grid_8').addClass('grid_4');
                 } else {
                     $('.above-editor-links').removeClass('grid_8').addClass('grid_4');
                     $('#tabs').removeClass('grid_4').addClass('grid_8');
                     //hiding mce controls
-                    $('.mce-toolbar-grp').addClass('hidden');
+                    $('.mce-toolbar-grp').hide();
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');
