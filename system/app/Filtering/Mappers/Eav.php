@@ -327,4 +327,20 @@ class Filtering_Mappers_Eav
 
         return $result;
     }
+
+
+    /**
+     * Return attribute data by attribute name
+     * @param $attrName
+     * @param $productId int
+     */
+    public function getByAttrName($attrName, $productId)
+    {
+        $where = $this->_dbAdapter->quoteInto('sfa.name = ?', $attrName);
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('sfv.product_id = ?', $productId);
+        $select = $this->_dbAdapter->select()->from(array('sfv' => 'shopping_filtering_values'))
+            ->joinLeft(array('sfa' => 'shopping_filtering_attributes'), 'sfv.attribute_id=sfa.id')
+            ->where($where);
+        return $this->_dbAdapter->fetchRow($select);
+    }
 }
