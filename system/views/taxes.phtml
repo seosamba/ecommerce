@@ -6,33 +6,7 @@
 ?>
 
 <script id="ruleTemplate" type="text/template">
-	<% if (!(typeof(id) == 'undefined')) { %>
-        <input type="hidden" name="rule-id" value="<%= id %>" />
-    <% } %>
-    <label class="grid_1 text-center mt5px">
-        <input type="radio" name="default" <% if (isDefault == 1) { %> checked="checked" <% } %> />
-    </label>
-    <div class="grid_4">
-        <select name="zoneId" data-reflection="property">
-            <option value="-1"><?php echo $this->translate('Select zone');?></option>
-        <% _.each(app.zones.toJSON(), function(zone) { %>
-            <option value="<%= zone.id %>" <% if(zone.id == zoneId) { %>selected="selected"<% } %> ><%= zone.name %></option>
-        <% }) %>
-        </select>
-    </div>
-    <div class="grid_2 labeled">
-        <input class="grid_8 alpha omega text-center" type="text" name="rate1" data-reflection="property" value="<%= rate1 %>" placeholder="0"/><span class="label grid_4 alpha omega">%</span>
-    </div>
-    <div class="grid_2 labeled">
-        <input class="grid_8 alpha omega text-center" type="text" name="rate2" data-reflection="property" value="<%= rate2 %>" placeholder="0"/><span class="label grid_4 alpha omega">%</span>
-    </div>
-    <div class="grid_2 labeled">
-        <input class="grid_8 alpha omega text-center" type="text" name="rate3" data-reflection="property" value="<%= rate3 %>" placeholder="0"/><span class="label grid_4 alpha omega">%</span>
-    </div>
-    <div class="grid_1 text-center mt5px">
-        <a href="javascript:;" class="delete-rule icon-remove icon16 error"></a>
-    </div>
-</script>
+	</script>
 <?php
 $this->placeholder('headerContent')->captureStart();
     echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
@@ -56,8 +30,8 @@ $this->placeholder('headerContent')->captureEnd();
 	</div>
 
     <div class="footer grid_12">
-        <button id="new-rule-btn" class="btn icon-plus success"><?php echo $this->translate('Add new');?></button>
-        <button id="save-btn" class="btn icon-save"><?php echo $this->translate('Save and close');?></button>
+        <button id="new-rule-btn" class="btn ticon-plus success"><?php echo $this->translate('Add new');?></button>
+        <button id="save-btn" class="btn ticon-save"><?php echo $this->translate('Save and close');?></button>
     </div>
 </div>
 
