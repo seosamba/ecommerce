@@ -125,7 +125,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'ignore'    => true
 		));
 
-		$this->addElement(new Zend_Form_Element_Button(array(
+		$this->addElement(new Zend_Form_Element_Submit(array(
 			'name'   => 'checkout',
 			'ignore' => true,
 			'label'  => 'Next',
