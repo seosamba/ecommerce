@@ -191,7 +191,6 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
         );
         if (($page = $this->_object->getPage()) instanceof Application_Model_Models_Page) {
             $cacheTags[] = 'pageid_' . $page->getId();
-            $this->_cacheHelper->clean('Widgets_Product_Product_byPage_' . $page->getId(), 'store_');
         }
 
         $tags = $this->_object->getTags();
