@@ -50,7 +50,12 @@
 </script>
 
 <script id="tagTemplate" type="text/template">
-	</script>
+	<a href="javascript:;" class="fl-right ml1 mr1 ticon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
+	<label class="fl-left mr-grid">
+        <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
+    </label>
+    <span class="tag-editable" title="Click to edit"><%= tag.get('name') %></span>
+</script>
 
 <script id="optionLibraryTemplate" type="text/template">
 	<option value="-1" disabled="disabled" selected="selected">select from library</option>

@@ -75,31 +75,20 @@ class Widgets_Product_Product extends Widgets_Abstract {
             array_shift($this->_options);
         }
         else {
-            $productCacheId = strtolower(__CLASS__).'_byPage_'.$this->_toasterOptions['id'];
+            $productCacheId = __CLASS__ . '_byPage_' . $this->_toasterOptions['id'];
             if ($this->_cacheable) {
-                $pageData = $this->_cache->load($this->_cacheId, $this->_cachePrefix);
-                if (isset($pageData['data'][$productCacheId])) {
-                    $this->_product = $pageData['data'][$productCacheId];
+                $this->_product = $this->_cache->load($productCacheId, 'store_');
                 }
-                unset($pageData);
-            }
             if (is_null($this->_product)) {
                 $this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
                 if ($this->_cacheable && !is_null($this->_product)) {
-                    $pageData = $this->_cache->update(
-                        $this->_cacheId,
+                    $this->_cache->save(
                         $productCacheId,
                         $this->_product,
-                        $this->_cachePrefix,
-                        array('prodid_'.$this->_product->getId()),
-                        $this->_cacheLifeTime
+                        'store_',
+                        array('productwidget', 'prodid_' . $this->_product->getId()),
+                        Helpers_Action_Cache::CACHE_NORMAL
                     );
-
-                    if ($pageData !== false) {
-                        $this->_cacheData = $pageData;
-                    }
-
-                    unset($pageData);
                 }
             }
             $this->_type = array_shift($this->_options);
