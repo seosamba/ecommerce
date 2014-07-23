@@ -401,7 +401,7 @@ define([
                     }).closest('.tag-widget').addClass('tag-current');
 
                     view.render().$el
-                        .find('.icon-remove').remove().end()
+                        .find('.ticon-remove').remove().end()
                         .find('input:checkbox').prop('checked', true).end()
                         .appendTo(container);
 

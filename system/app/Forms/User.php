@@ -99,7 +99,7 @@ class Forms_User extends Zend_Form {
             'ignore' => true,
             'label'  => 'Save changes',
             'type'   => 'submit',
-            'class'  => 'btn icon-save',
+            'class'  => 'btn ticon-save',
             'decorators' => array('ViewHelper')
         )));
 

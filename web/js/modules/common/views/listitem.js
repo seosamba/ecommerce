@@ -25,16 +25,16 @@ define([
                 default:
                 case 'add':
                     if(_.isUndefined(this.model.state)){
-                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item icon-plus success fl-right pointer"></span>');
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="add-item ticon-plus success fl-right pointer"></span>');
                     }else{
-                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item icon-plus success fl-right pointer"></span>');
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="add-item ticon-plus success fl-right pointer"></span>');
                     }
                     break;
                 case 'delete':
                     if(_.isUndefined(this.model.state)){
-                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item icon-close error fl-right pointer"></span>');
+                        this.$el.append('<span data-element-country="'+this.model.country+'" class="remove-item ticon-close error fl-right pointer"></span>');
                     }else{
-                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item icon-close error fl-right pointer"></span>');
+                        this.$el.append('<span data-element-state="'+this.model.country+'-'+this.model.state+'" class="remove-item ticon-close error fl-right pointer"></span>');
                     }
                     break;
             }

@@ -51,7 +51,7 @@ define([
             this.$el.fnAddData([
                 '<span class="groupName-table">'+group.get('groupName')+'</span>',
                 '<span>'+priceSign+' '+group.get('priceValue')+' '+priceType+'</span>',
-                '<a class="icon-pencil icon14" data-role="edit" data-cid="'+group.get('id')+'" href="javascript:;"></a> <a class="icon-remove error icon14" data-role="delete" data-cid="'+group.get('id')+'" href="javascript:;"></a>',
+                '<a class="ticon-pencil icon14" data-role="edit" data-cid="'+group.get('id')+'" href="javascript:;"></a> <a class="ticon-remove error icon14" data-role="delete" data-cid="'+group.get('id')+'" href="javascript:;"></a>',
             ]);
         },
         deleteGroup: function(e){

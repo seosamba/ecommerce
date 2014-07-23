@@ -24,7 +24,7 @@
 
     <div class="grid_2 alpha omega mt0px">
         <label class="grid_4 alpha"><?php echo $this->translate('Code');?></label>
-        <a id="genCoupon" class="grid_8 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="icon-refresh"></span></a>
+        <a id="genCoupon" class="grid_8 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="ticon-refresh"></span></a>
         <?php echo $this->formText('code', null, array(
             'data-validator' => array('notempty'),
             'placeholder'    => $this->translate('Enter coupon code')
@@ -51,20 +51,20 @@
             <?php echo $this->formText('startDate', date('d-M-Y'), array(
                 'class' => 'datepicker'
             )); ?>
-            <i class="icon-calendar icon16"></i>
+            <i class="ticon-calendar icon16"></i>
         </span>
         <label class="grid_2 text-center mt5px">- <?php echo $this->translate('to');?> -</label>
         <span class="labeled icon left grid_5 alpha omega">
             <?php echo $this->formText('endDate', date('d-M-Y', strtotime('+1 month')), array(
                 'class' => 'datepicker'
             )); ?>
-            <i class="icon-calendar icon16"></i>
+            <i class="ticon-calendar icon16"></i>
         </span>
 	</div>
 
 	<div class="grid_6 alpha omega" id="coupon-action"></div>
 
-	<button class="btn grid_2 omega mt2-25em icon-plus" type="submit"/><?php echo $this->translate('Create'); ?></button>
+	<button class="btn grid_2 omega mt2-25em ticon-plus" type="submit"/><?php echo $this->translate('Create'); ?></button>
 </form>
 
 <div class="mt15px grid_12 alpha omega">
