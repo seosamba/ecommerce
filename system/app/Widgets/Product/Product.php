@@ -73,21 +73,33 @@ class Widgets_Product_Product extends Widgets_Abstract {
             $this->_product = $this->_productMapper->find(intval($this->_options[0]));
             $this->_type = self::TYPE_PRODUCTLISTING;
             array_shift($this->_options);
-        } else {
-            $productCacheId = __CLASS__ . '_byPage_' . $this->_toasterOptions['id'];
+        }
+        else {
+            $productCacheId = strtolower(__CLASS__).'_byPage_'.$this->_toasterOptions['id'];
             if ($this->_cacheable) {
-                $this->_product = $this->_cache->load($productCacheId, 'store_');
+                $pageData = $this->_cache->load($this->_cacheId, $this->_cachePrefix);
+                if (isset($pageData['data'][$productCacheId])) {
+                    $this->_product = $pageData['data'][$productCacheId];
+                }
+                unset($pageData);
             }
             if (is_null($this->_product)) {
                 $this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
                 if ($this->_cacheable && !is_null($this->_product)) {
-                    $this->_cache->save(
+                    $pageData = $this->_cache->update(
+                        $this->_cacheId,
                         $productCacheId,
                         $this->_product,
-                        'store_',
-                        array('productwidget', 'prodid_' . $this->_product->getId()),
-                        Helpers_Action_Cache::CACHE_NORMAL
+                        $this->_cachePrefix,
+                        array('prodid_'.$this->_product->getId()),
+                        $this->_cacheLifeTime
                     );
+
+                    if ($pageData !== false) {
+                        $this->_cacheData = $pageData;
+                    }
+
+                    unset($pageData);
                 }
             }
             $this->_type = array_shift($this->_options);

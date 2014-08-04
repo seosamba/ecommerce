@@ -26,6 +26,7 @@
             padding-left : 5px;
 
             a{
+                .inline-block();
                 .icon-size(28px);
 
                 &:hover{
@@ -38,7 +39,7 @@
 
         #image-list{
 
-            &>.box{
+            & > .box{
                 width  : 9%;
                 margin : 0.5%;
 
@@ -111,7 +112,7 @@
                 border-top  : 1px dashed #bbb;
                 display     : block;
                 text-align  : center;
-                color       : @brand-blue;
+                color       : @brand-info;
             }
         }
 
@@ -119,7 +120,7 @@
             &:focus{
                 width : 50% !important;
 
-                &+#product-brand{
+                & + #product-brand{
                     width : 31.333% !important;
                 }
             }
@@ -130,12 +131,7 @@
         .product-tags{
 
             .tag-widget{
-                background : @gray-light;
-                font-size  : @font-size-small;
-                margin-top : 1%;
-                padding    : @padding-small-vertical;
-                float      : left;
-                .grid-elements(5, 1, true);
+                font-size : @font-size-small;
 
                 &:hover, &.tag-current{
                 }
@@ -204,8 +200,8 @@
 //==================================================
 #manage-logos{
     .brand-list{
-        &>*{
-            .grid-elements(8, 1, true);
+        & > *{
+            //            .grid-elements(8, 1, true);
             margin-bottom : 1%;
 
             img{

@@ -67,11 +67,16 @@ class Api_Store_Tags extends Api_Service_Abstract {
 			}
 		} else {
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
-			$limit = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
-			$count = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
-
-
-			$result = Models_Mapper_Tag::getInstance()->fetchAll(null, array('name'), $offset, $limit, $count);
+			$limit  = filter_var($this->_request->getParam('limit', false), FILTER_VALIDATE_INT);
+			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+            $name   = filter_var($this->_request->getParam('name', false), FILTER_SANITIZE_STRING);
+			$result = Models_Mapper_Tag::getInstance()->fetchAll(
+                (!empty($name)) ? "name LIKE '$name%'" : null,
+                array('name'),
+                $offset,
+                $limit,
+                $count
+            );
 			if ($result) {
 				if ($count && isset($result['data'])) {
 					$result['data'] = array_map(function ($tag) {

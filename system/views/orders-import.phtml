@@ -31,7 +31,7 @@ $this->placeholder('headerContent')->set($title);
             <?php endforeach;?>
         </ul>
         <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
-            <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 360px;">
+            <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 370px;">
                 <?php foreach ($this->defaultImportsFileds as $importFields): ?>
                     <?php if (in_array($importFields['label'], $importFieldNames)): ?>
                         <label class="grid_3 mb10px">
@@ -50,11 +50,11 @@ $this->placeholder('headerContent')->set($title);
         <?php endforeach;?>
     </div>
     <footer class="grid_12 text-right">
-        <a class="btn icon-box-add success" title="" href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/">
+        <a class="btn ticon-box-add success" title="" href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/">
             <?php echo $this->translate('Get sample data file'); ?>
         </a>
 
-        <a id="pickOrders" class="btn icon-box-remove" href="javascript:;">
+        <a id="pickOrders" class="btn ticon-box-remove" href="javascript:;">
             <?php echo $this->translator->translate('Upload orders csv'); ?>
         </a>
     </footer>

@@ -168,11 +168,11 @@
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
 						   title="<?php echo $product['name']; ?>" target="_blank">
 							<img src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
-							     alt="<?php echo $product['name']; ?>"/>
+							     width="100" height="100" alt="<?php echo $product['name']; ?>"/>
 						</a>
 					<?php else: ?>
 						<img src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
-						     alt="<?php echo $product['name']; ?>"/>
+						     width="100" height="100" alt="<?php echo $product['name']; ?>"/>
 					<?php endif;?>
 				</td>
 				<td class="product-info">

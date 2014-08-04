@@ -183,8 +183,18 @@ define([
                             showMessage(response.responseText, true);
                         }
                     });
+                    // Reset tag collection
+                    this.tags.nameTag     = '';
+                    this.tags.currentPage = 1;
+                    this.tags.fetch();
                 }
 			}
+            else {
+                // Search tag
+                this.tags.nameTag     = name;
+                this.tags.currentPage = 1;
+                this.tags.fetch();
+            }
 		},
 		newOption: function(){
 			var newOption = new ProductOption();
@@ -391,7 +401,7 @@ define([
                     }).closest('.tag-widget').addClass('tag-current');
 
                     view.render().$el
-                        .find('.icon-remove').remove().end()
+                        .find('.ticon-remove').remove().end()
                         .find('input:checkbox').prop('checked', true).end()
                         .appendTo(container);
 

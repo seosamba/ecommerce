@@ -138,7 +138,7 @@ class Filtering_Mappers_Eav
             $dbAdapter = Zend_Db_Table::getDefaultAdapter();
             $select = $dbAdapter->select()->from(
                 array('eav' => $this->_valuesTable),
-                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(eav.product_id)')
+                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(DISTINCT(eav.product_id))')
             )
                 ->join(
                     array('tha' => $this->_tagsRelationTable),
@@ -326,5 +326,21 @@ class Filtering_Mappers_Eav
         $result = $this->_dbAdapter->fetchPairs($select);
 
         return $result;
+    }
+
+
+    /**
+     * Return attribute data by attribute name
+     * @param $attrName
+     * @param $productId int
+     */
+    public function getByAttrName($attrName, $productId)
+    {
+        $where = $this->_dbAdapter->quoteInto('sfa.name = ?', $attrName);
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('sfv.product_id = ?', $productId);
+        $select = $this->_dbAdapter->select()->from(array('sfv' => 'shopping_filtering_values'))
+            ->joinLeft(array('sfa' => 'shopping_filtering_attributes'), 'sfv.attribute_id=sfa.id')
+            ->where($where);
+        return $this->_dbAdapter->fetchRow($select);
     }
 }

@@ -50,7 +50,7 @@
 </script>
 
 <script id="tagTemplate" type="text/template">
-	<a href="javascript:;" class="fl-right ml1 mr1 icon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
+	<a href="javascript:;" class="fl-right ml1 mr1 ticon-close error" title="<?php echo $this->translate('Delete'); ?>"></a>
 	<label class="fl-left mr-grid">
         <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
     </label>
@@ -86,7 +86,7 @@
         <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
-    <a href="javascript:;" class="fl-right remove-option btn icon link error icon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
+    <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -99,7 +99,7 @@
 		<div class="grid_1"></div>
 	</div>
 	<div class="option-list-holder grid_12 alpha omega"></div>
-	<a class="add-selection-btn grid_12 alpha omega mt20px btn success icon-plus" href="javascript:;"><?php echo $this->translate('Add new selection');?></a>
+	<a class="add-selection-btn grid_12 alpha omega mt20px btn success ticon-plus" href="javascript:;"><?php echo $this->translate('Add new selection');?></a>
 </script>
 
 <script id="listItemTemplate" type="text/x-jquery-tmpl">
@@ -133,13 +133,13 @@
 		<input type="radio" name="isDefault[${_parent}]" value="${title}" {{if isDefault == '1'}}checked="checked"{{/if}} />
 	</label>
 	<div class="grid_1 text-center">
-		<button class="item-remove btn icon link error icon-remove" title="<?php echo $this->translate('Delete'); ?>"</button>
+		<button class="item-remove btn icon link error ticon-remove" title="<?php echo $this->translate('Delete'); ?>"</button>
 	</div>
 </script>
 
 <script id="productListingTemplate" type="text/x-jquery-tmpl">
 	<% if (showDelete) { %>
-        <a class="delete icon-close error small" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
+        <a class="delete ticon-close error small" href="javascript:;" title="<?php echo $this->translate('Delete');?>"></a>
     <% } else { %>
     <a href="<?php echo $this->url(array('id' => null)); ?>/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<?php echo $this->translate('Edit'); ?> <%= name %>">
 		<% } %>
@@ -180,14 +180,14 @@
     <div id="product-list" class="show-right">
         <div class="header shadow">
             <div class="closebutton">
-                <a id="product-list-back-link" class="hide icon-chevron-right" href="javascript:;" onclick="$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
+                <a id="product-list-back-link" class="hide-block ticon-chevron-right" href="javascript:;" onclick="$('#product-image-folder').val('0');" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
             <div class="grid_5">
                 <label class="grid_3 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?>:</label>
                 <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
             </div>
         </div>
-        <div id="product-list-holder" class="content-footer scroll pl2 pr2" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
+        <div id="product-list-holder" class="content-footer scroll pl2 pr2 column_8 full-width" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
         <div class="footer text-right grid_12">
 			<a id="massaction" class="fl-left" href="javascript:;">run mass action</a>
         	<div class="paginator"><!-- placeholder for paginator --></div>
@@ -198,7 +198,7 @@
     <div id="image-select-dialog" class="show-left w100">
         <div class="header text-center">
             <div class="closebutton">
-                <a class="hide icon-chevron-left" href="javascript:;" onclick="$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
+                <a class="hide-block ticon-chevron-left" href="javascript:;" onclick="$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
             </div>
 			<?php /*echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); */?>
         </div>
@@ -209,8 +209,8 @@
     </div>
 
     <div class="tabs-nav-wrap grid_9 alpha omega">
-        <span class="arrow left icon-arrow-left-3"></span>
-        <span class="arrow right icon-arrow-right-3"></span>
+        <span class="arrow left ticon-arrow-left3"></span>
+        <span class="arrow right ticon-arrow-right3"></span>
         <ul class="header">
             <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
             <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
@@ -233,9 +233,9 @@
         </ul>
     </div>
     <div class="nav-links header grid_3 alpha omega">
-        <a class="show-list info inverse icon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+        <a class="show-list info inverse ticon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
         <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-        <a id="new-product" class="success inverse icon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+        <a id="new-product" class="success inverse ticon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
     </div>
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
@@ -247,7 +247,7 @@
                     <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mb5px small'), $this->imageDirList); ?>
                     <div class="product-preview page-preview">
                         <img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
-                        <span class="icon-folder-upload"><?php echo $this->translate('Choose you image');?></span>
+                        <span class="ticon-folder-upload"><?php echo $this->translate('Choose you image');?></span>
                         <input type="hidden" id="things-new-folder" value="products"/>
                         <?php
                             $uploader = $this->toasterUploader(array('id' => 'product-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'filters' => array("image"), 'caption' => " "));
@@ -360,9 +360,9 @@
             <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
         </div>
 
-        <ul id="product-tags-current" class="product-tags list-tags list-inline grid_12 alpha omega mb0px mt10px" style="display:none;"></ul>
+        <ul id="product-tags-current" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width" style="display:none;"></ul>
 
-        <ul id="product-tags-available" class="product-tags list-tags list-inline grid_12 alpha omega mb0px mt10px"></ul>
+        <ul id="product-tags-available" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width"></ul>
     </div>
     <!-- #tag-tab -->
 
@@ -380,25 +380,25 @@
     <!-- End Tab 3 -->
 
     <div id="related-tab" class="scroll">
-        <div id="related-holder" class="grid_12 alpha omega">
-            <a href="javascript:;" data-listtype="related" class="show-list productlisting icon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
+        <div id="related-holder" class="column_8 full-width">
+            <a href="javascript:;" data-listtype="related" class="show-list productlisting ticon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
             <span class="spinner"></span>
         </div>
     </div>
 
     <div id="coupon-tab">
-        <p class="blockquote info fs12 hidden"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
+        <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
         <?php echo $this->partial('merchandising/coupon.phtml'); ?>
     </div>
 
     <div id="group-pricing-tab">
-        <p class="blockquote fs12 mb10px hidden"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
+        <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
         <?php echo $this->partial('product/grouping-price.phtml'); ?>
     </div>
 
     <div class="footer grid_12">
         <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
-		<button class="btn icon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
+		<button class="btn ticon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
     </div>
 </div>
 

@@ -198,6 +198,8 @@ define([
             });
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
+                width: 960,
+                maxHeight : ($(window).height()-$(window).height()*0.1),
                 buttons: tagButtons
             });
             return false;

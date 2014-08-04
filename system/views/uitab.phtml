@@ -3,7 +3,7 @@
 	<!-- Product listing selector -->
     <div class="grid_12 alpha omega">
         <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
-            <h4 class="message error text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
+            <h4 class="message warning text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
         <?php else: ?>
             <div id="template-selector" class="grid_6 alpha">
 				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
@@ -40,7 +40,7 @@
             <option value="date"><?php echo $this->translate('Date'); ?></option>
 		</select>
 	</div>
-	<div id="product-products" class="grid_12 alpha omega"></div>
+	<div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
 	<a href="javascript:;" id="btn-create" class="grid_12 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
 
@@ -113,14 +113,14 @@
 		    launch: function() {
 			    var children = $(this).find('span#products');
 			    if(!children.length) {
-                    $('.mce-toolbar-grp').removeClass('hidden');
+                    $('.mce-toolbar-grp').show();
                     $('.above-editor-links').removeClass('grid_4').addClass('grid_8');
                     $('#tabs').removeClass('grid_8').addClass('grid_4');
                 } else {
                     $('.above-editor-links').removeClass('grid_8').addClass('grid_4');
                     $('#tabs').removeClass('grid_4').addClass('grid_8');
                     //hiding mce controls
-                    $('.mce-toolbar-grp').addClass('hidden');
+                    $('.mce-toolbar-grp').hide();
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');

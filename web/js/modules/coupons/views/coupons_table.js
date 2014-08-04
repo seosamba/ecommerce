@@ -56,7 +56,7 @@ define([
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
                 coupon.get('action'),
-                '<a class="icon-remove error icon14" data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;"></a>'
+                '<a class="ticon-remove error icon14" data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;"></a>'
             ]);
         },
         deleteCoupon: function(e){

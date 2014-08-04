@@ -69,7 +69,7 @@
                     <?php foreach ($this->customerAttributes as $attrName): ?>
                         <th class="customer-attribute" data-custom="<?php echo $this->translate($attrName) ?>"><?php echo $this->translate(mb_convert_case(preg_replace('`_`', ' ', $attrName), MB_CASE_TITLE, 'UTF-8'));?>
                             <?php if ($this->superAdmin === true): ?>
-                                <span class="icon-cancel red"></span>
+                                <span class="ticon-cancel red"></span>
                             <?php endif ?>
                         </th>
                     <?php endforeach; ?>
