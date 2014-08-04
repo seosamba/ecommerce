@@ -5,9 +5,10 @@
         <?php if (!empty($this->tags)) : ?>
             <li>
                 <label class="filter-label">
+                    <input type="hidden" name="show[tags]" value="none" />
                     <input type="checkbox" class="mass-change"
                            title="<?php echo $this->translate('toggle all'); ?>"
-                        <?php if (!empty($this->settings['tags']) && sizeof($this->tags) === sizeof($this->settings['tags']) ) { ?>
+                        <?php if (empty($this->settings['tags']) || (is_array($this->settings['tags']) && sizeof($this->tags) === sizeof($this->settings['tags']) ) ) { ?>
                             checked
                         <?php } ?>
                         />
@@ -18,7 +19,7 @@
                         <li>
                             <label>
                                 <input type="checkbox" name="show[tags][<?php echo $tag; ?>]" value="1"
-                                    <?php if (!empty($this->settings['tags']) && isset($this->settings['tags'][$tag])) { ?>
+                                    <?php if (empty($this->settings['tags']) || (is_array($this->settings['tags']) && isset($this->settings['tags'][$tag]))) { ?>
                                         checked
                                     <?php } ?>
                                     />
@@ -31,8 +32,9 @@
         <?php if (!empty($this->brands)) : ?>
             <li>
                 <label class="filter-label">
+                    <input type="hidden" name="show[brands]" value="none" />
                     <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
-                        <?php if (!empty($this->settings['brands']) && sizeof($this->brands) === sizeof($this->settings['brands']) ) : ?>
+                        <?php if (empty($this->settings['brands']) || (is_array($this->settings['brands']) && sizeof($this->brands) === sizeof($this->settings['brands']) ) ) : ?>
                             checked
                         <?php endif; ?>
                         />
@@ -45,7 +47,7 @@
                         <li>
                             <label>
                                 <input type="checkbox" name="show[brands][<?php echo $brand; ?>]" value="1"
-                                    <?php if (!empty($this->settings['brands']) && isset($this->settings['brands'][$brand])) : ?>
+                                    <?php if (empty($this->settings['brands'])  || (is_array($this->settings['brands']) && isset($this->settings['brands'][$brand]))) : ?>
                                         checked
                                     <?php endif; ?>
                                     />
@@ -57,8 +59,9 @@
         <?php endif; ?>
         <li class="filter-price">
             <label class="filter-label">
+                <input type="hidden" name="show[price]" value="0" />
                 <input type="checkbox" name="show[price]" value="1"
-                    <?php if (!isset($this->settings['price']) || !empty($this->settings['price'])): ?>
+                    <?php if (!isset($this->settings['price']) || $this->settings['price']): ?>
                         checked
                     <?php endif; ?>
                     />
@@ -66,18 +69,20 @@
             </label>
         </li>
         <?php foreach ($this->filters as $filterId => $filter) : ?>
-            <?php $show = !empty($this->settings[$filter['name']]); ?>
+            <?php $show = !isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]); ?>
             <li data-attributeId="<?php echo $filterId; ?>">
                 <label class="filter-label">
+                    <input type="hidden" name="show[<?php echo $filter['name']; ?>]" value="none" />
                     <?php if (!isset($filter['values'])) : ?>
                         <input type="checkbox" name="show[<?php echo $filter['name']; ?>]" value="1"
-                            <?php if ($show): ?>
+                            <?php if (!isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']])): ?>
                                 checked
                             <?php endif; ?>
                             />
                     <?php else : ?>
                         <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
-                            <?php if ($show && sizeof($this->settings[$filter['name']]) === sizeof($filter['values'])) { ?>
+                            <?php if (!isset($this->settings[$filter['name']]) || (is_array($this->settings[$filter['name']])
+                                && sizeof($this->settings[$filter['name']]) === sizeof($filter['values']))) { ?>
                                 checked
                             <?php } ?>
                             />
@@ -98,7 +103,8 @@
                                            name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
                                            value="1"
                                            title="<?php echo $this->translate('Check to hide from users'); ?>"
-                                        <?php if ($show && isset($this->settings[$filter['name']][$value])) { ?>
+                                        <?php if (!isset($this->settings[$filter['name']]) ||
+                                            (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) { ?>
                                             checked
                                         <?php } ?>
                                         />
@@ -113,7 +119,7 @@
         <?php endforeach; ?>
     </ul>
     <div class="footer">
-        <button type="submit"><?php echo $this->translate('Save'); ?></button>
+        <button class="btn" type="submit"><?php echo $this->translate('Save'); ?></button>
     </div>
 </form>
 

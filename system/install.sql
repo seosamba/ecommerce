@@ -651,3 +651,12 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   KEY `attribute_id` (`attribute_id`),
   KEY `product_id` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
+  `real_order_id` int(10) unsigned NOT NULL,
+  `import_order_id` VARCHAR(255) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`real_order_id`,`import_order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);

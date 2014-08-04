@@ -8,7 +8,7 @@ define([
 		template: _.template($('#tagTemplate').html()),
 		nameInput: null,
 		events: {
-			"click .icon-close": "kill",
+			"click .ticon-close": "kill",
 			"dblclick .tag-editable": "edit",
 			"keypress .tag-editable": "preventLineBreak",
 			"blur .tag-editable": "save"

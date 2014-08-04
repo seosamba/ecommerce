@@ -4,9 +4,13 @@ $max = ceil(floatval($this->max));
 ?>
 <p>
     <?php echo $this->translate('From'); ?>
-    <span class="filter-from"><?php echo !empty($this->from) ? $this->from : $min; ?></span>
+    <?php
+    $from =  !empty($this->from) ? $this->from : $min;
+    $to =  !empty($this->to) ? $this->to : $max;
+    ?>
+    <span class="filter-from"><?php echo $this->useCurrency ? $this->currency($from) : $from; ?></span>
     <?php echo $this->translate('to'); ?>
-    <span class="filter-to"><?php echo !empty($this->to) ? $this->to : $max; ?></span>
+    <span class="filter-to"><?php echo $this->useCurrency ? $this->currency($to) : $to; ?></span>
 </p>
 <div class="filter-slider"
      data-min="<?php echo $min; ?>"

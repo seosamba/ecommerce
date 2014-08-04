@@ -26,6 +26,8 @@ class Tools_Misc {
 
 	const SECTION_STORE_MERCHANDISING   = 'merchandising';
 
+    const SECTION_STORE_IMPORTORDERS    = 'ordersimportconfig';
+
     const CS_ALIAS_PENDING              = 'new_quote';
 
     const CS_ALIAS_PROCESSING           = 'quote_sent';
@@ -51,7 +53,8 @@ class Tools_Misc {
         self::SECTION_STORE_SHIPPINGCONFIG  => 'shopping-cart-shipping-calculator.html',
         self::SECTION_STORE_ADDEDITPRODUCT  => 'ecommerce-cms.html',
         self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html',
-		self::SECTION_STORE_MERCHANDISING   => 'ecommerce-marketing.html'
+		self::SECTION_STORE_MERCHANDISING   => 'ecommerce-marketing.html',
+        self::SECTION_STORE_IMPORTORDERS    => 'import-orders.html'
     );
     
     /**

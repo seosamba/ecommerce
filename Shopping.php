@@ -95,6 +95,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const ORDER_CONFIG  = 'orderconfig';
 
+    const ORDER_EXPORT_CONFIG = 'order_export_config';
+
+    const ORDER_IMPORT_CONFIG = 'order_import_config';
+
 	/**
 	 * Cache prefix for use in shopping system
 	 */
@@ -1072,6 +1076,108 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_responseHelper->success(array('discountResultValue' => $couponDiscountAmount));
             }
             $this->_responseHelper->success(array('discountResultValue' => $couponDiscountAmount));
+        }
+    }
+
+    public function ordersImportConfigAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $importConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(self::ORDER_IMPORT_CONFIG);
+            if ($importConfig !== null) {
+                $importConfig = unserialize($importConfig);
+                $this->_view->importConfig = $importConfig;
+            }
+            $this->_view->ordersImportTemplates = array(
+                Tools_ExportImportOrders::DEFAULT_IMPORT_ORDER => $this->_translator->translate('Default template'),
+                Tools_ExportImportOrders::PRESTASHOP_IMPORT_ORDER => $this->_translator->translate(
+                    'Prestashop template'
+                ),
+                Tools_ExportImportOrders::MAGENTO_IMPORT_ORDER => $this->_translator->translate('Magento template')
+            );
+            $this->_view->translator = $this->_translator;
+            $this->_view->defaultImportsFileds = Tools_ExportImportOrders::getDefaultOrderExportConfig();
+            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_IMPORTORDERS;
+            $this->_layout->content = $this->_view->render('orders-import.phtml');
+            echo $this->_layout->render();
+        }
+    }
+
+    public function importOrdersAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            ini_set("max_execution_time", 300);
+            $uploader = new Zend_File_Transfer_Adapter_Http();
+            $ordersCsv = $uploader->getFileInfo();
+            $importOrdersFields = $this->_request->getParam('importOrdersFields');
+            $importOrdersFields = explode(',', $importOrdersFields);
+            $realOrdersFields = $this->_request->getParam('realOrdersFields');
+            $currentTemplateName = $this->_request->getParam('currentTemplateName');
+            $defaultOrderStatus = $this->_request->getParam('defaultOrderStatus');
+            $realOrdersFields = explode(',', $realOrdersFields);
+            $importOrdersFieldsData = array_combine($realOrdersFields, $importOrdersFields);
+            if (!$uploader->isValid()) {
+                $this->_responseHelper->fail('');
+            }
+            $ordersData = Tools_ExportImportOrders::createOrdersCsv($ordersCsv, $importOrdersFieldsData, $currentTemplateName, $defaultOrderStatus);
+            if ($ordersData['error'] === true) {
+                if (isset($ordersData['errorMessage'])) {
+                    $this->_responseHelper->fail($ordersData['errorMessage']);
+                }
+                $this->_sessionHelper->importOrdersErrors = $ordersData['importErrorsIds'];
+                $this->_responseHelper->fail(
+                    $this->_translator->translate(
+                        'Some orders have error during the import'
+                    ) . '<br/><a id="downloadOrdersImportReport" href="' . $this->_websiteHelper->getUrl(
+                    ) . 'plugin/shopping/run/downloadImportOrdersReport/" >' . $this->_translator->translate(
+                        'click download report'
+                    ) . '</a>'
+                );
+            }
+            $this->_responseHelper->success($this->_translator->translate('Order import finished'));
+        }
+    }
+
+    public function downloadImportOrdersReportAction()
+    {
+        if (Tools_Security_Acl::isAllowed(
+            self::RESOURCE_STORE_MANAGEMENT
+        ) && isset($this->_sessionHelper->importOrdersErrors)
+        ) {
+            Tools_ExportImportOrders::prepareImportOrdersReport($this->_sessionHelper->importOrdersErrors);
+        }
+    }
+
+    public function exportOrdersAction()
+    {
+        $ordersIds = filter_var($this->_request->getParam('orderIds'), FILTER_SANITIZE_STRING);
+        $data = $this->_request->getParams();
+        $ordersIds = explode(',', $ordersIds);
+        $exportAllOrders = filter_var($this->_request->getParam('allOrders'), FILTER_SANITIZE_NUMBER_INT);
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)
+            && is_array($ordersIds)
+        ) {
+            Tools_ExportImportOrders::prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds);
+        }
+    }
+
+    public function getOrderExportConfigAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $exportConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(self::ORDER_EXPORT_CONFIG);
+            if ($exportConfig !== null) {
+                $exportConfig = unserialize($exportConfig);
+            }
+            $defaultOrderExportConfig = Tools_ExportImportOrders::getDefaultOrderExportConfig();
+            $this->_responseHelper->success(
+                array('export_config' => $exportConfig, 'defaultConfig' => $defaultOrderExportConfig)
+            );
+        }
+    }
+
+    public function getOrdersImportSampleDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            Tools_ExportImportOrders::getSampleOrdersData();
         }
     }
 

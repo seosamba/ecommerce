@@ -26,6 +26,7 @@
             padding-left : 5px;
 
             a{
+                .inline-block();
                 .icon-size(28px);
 
                 &:hover{
@@ -38,7 +39,7 @@
 
         #image-list{
 
-            &>.box{
+            & > .box{
                 width  : 9%;
                 margin : 0.5%;
 
@@ -68,6 +69,7 @@
                 padding      : 0;
                 height       : 80px;
                 width        : 80px;
+                overflow     : hidden;
                 .border-radius(100px);
 
                 img{
@@ -110,16 +112,16 @@
                 border-top  : 1px dashed #bbb;
                 display     : block;
                 text-align  : center;
-                color       : @brand-blue;
+                color       : @brand-info;
             }
         }
 
         #new-brand{
             &:focus{
-                width : 50%;
+                width : 50% !important;
 
-                &+#product-brand{
-                    width : 31.333%;
+                & + #product-brand{
+                    width : 31.333% !important;
                 }
             }
         }
@@ -129,14 +131,14 @@
         .product-tags{
 
             .tag-widget{
-                font-size  : @font-size-small;
-                margin-top : 1%;
-                .grid-elements(5, 1, true);
+                font-size : @font-size-small;
 
                 &:hover, &.tag-current{
                 }
 
                 .tag-editable{
+                    display : block;
+                    .text-overflow();
                 }
             }
         }
@@ -198,8 +200,8 @@
 //==================================================
 #manage-logos{
     .brand-list{
-        &>*{
-            .grid-elements(8, 1, true);
+        & > *{
+            //            .grid-elements(8, 1, true);
             margin-bottom : 1%;
 
             img{
@@ -238,7 +240,7 @@
     }
 
     .zone-zip{
-        height : 130px;
+        height : 125px;
     }
 }
 
@@ -265,7 +267,7 @@
 #shipping-config{
 
     #shippers{
-        height : 385px;
+        height : 382px;
 
         ul{
             li{

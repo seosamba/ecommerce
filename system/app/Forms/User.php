@@ -94,10 +94,12 @@ class Forms_User extends Zend_Form {
             ),
         )));
 
-        $this->addElement(new Zend_Form_Element_Submit(array(
+        $this->addElement(new Zend_Form_Element_Button(array(
             'name'   => 'saveUser',
             'ignore' => true,
             'label'  => 'Save changes',
+            'type'   => 'submit',
+            'class'  => 'btn ticon-save',
             'decorators' => array('ViewHelper')
         )));
 

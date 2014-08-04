@@ -18,7 +18,7 @@ define([
             ProductRowView,
             PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl, FreeShippingDialogTmpl, i18n){
     var MainView = Backbone.View.extend({
-        el: $('#store-products table.products-table'),
+        el: $('#store-products'),
         events: {
             'change input[name="check-all"]': function(e) {
                 this.products.each(function(prod){
@@ -198,6 +198,8 @@ define([
             });
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
+                width: 960,
+                maxHeight : ($(window).height()-$(window).height()*0.1),
                 buttons: tagButtons
             });
             return false;

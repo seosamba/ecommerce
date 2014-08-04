@@ -91,9 +91,9 @@ class Filtering_Mappers_Eav
 
     /**
      * Save entity-attributev-value container into database
-     * @param $productId     Entity ID
-     * @param $attributeId   Attribute ID
-     * @param $value         Value
+     * @param int $productId     Entity ID
+     * @param int $attributeId   Attribute ID
+     * @param string $value         Value
      * @return array Saved EAV container data
      * @throws Exceptions_SeotoasterException
      */
@@ -124,11 +124,10 @@ class Filtering_Mappers_Eav
 
     /**
      * Returns array of product filters relevant to specified tags
-     * @param      $tags    List of tags
-     * @param null $exclude List of filters to exclude
+     * @param array $tags    List of tags
      * @return array
      */
-    public function findListFiltersByTags($tags, $exclude = null)
+    public function findListFiltersByTags($tags)
     {
         if (!is_array($tags)) {
             $tags = (array)$tags;
@@ -139,7 +138,7 @@ class Filtering_Mappers_Eav
             $dbAdapter = Zend_Db_Table::getDefaultAdapter();
             $select = $dbAdapter->select()->from(
                 array('eav' => $this->_valuesTable),
-                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(eav.product_id)')
+                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(DISTINCT(eav.product_id))')
             )
                 ->join(
                     array('tha' => $this->_tagsRelationTable),
@@ -182,11 +181,10 @@ class Filtering_Mappers_Eav
 
     /**
      * Returns array of range product filters relevant to specified tags
-     * @param      $tags    List of tags
-     * @param null $exclude List of filters to exclude
+     * @param array $tags    List of tags
      * @return array
      */
-    public function findRangeFiltersByTags($tags, $exclude = null)
+    public function findRangeFiltersByTags($tags)
     {
         if (!is_array($tags)) {
             $tags = (array)$tags;
@@ -239,6 +237,20 @@ class Filtering_Mappers_Eav
                 $valueWhere = $dbAdapter->quoteInto('(eav.value BETWEEN ? ', $value['from']);
                 $valueWhere .= $dbAdapter->quoteInto(' AND ?)', $value['to']);
             } else {
+                if (is_array($value)) {
+                    $otherIndex = array_search(Widgets_Filter_Filter::FILTER_OTHERS, $value);
+                    if ($otherIndex !== false) {
+                        unset($value[$otherIndex]);
+                        $data = Zend_Controller_Action_HelperBroker::getExistingHelper('cache')
+                            ->load(md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $name));
+                        if ($data) {
+                            $value = array_merge($value, $data);
+                        }
+                    }
+                }
+                if (empty($value)) {
+                    continue;
+                }
                 $valueWhere = $dbAdapter->quoteInto('eav.value IN (?)', $value);
             }
             $select->orWhere($nameWhere . ' AND ' . $valueWhere);
@@ -278,10 +290,11 @@ class Filtering_Mappers_Eav
 
     /**
      * Returns array of brand => count pairs for given tags
-     * @param $productTags Product tags to filer with
+     * @param $productTags array Product tags to filer with
+     * @param $filterByNames null|array List of allowed brand names
      * @return array
      */
-    public function getBrands($productTags)
+    public function getBrands($productTags, $filterByNames = null)
     {
         $select = $this->_dbAdapter->select()
             ->from(
@@ -306,8 +319,28 @@ class Filtering_Mappers_Eav
             ->where('t.tag_id IN (?)', $productTags)
             ->group('b.id');
 
+        if (is_array($filterByNames) && !empty($filterByNames)) {
+            $select->where('b.name IN (?)', $filterByNames);
+        }
+
         $result = $this->_dbAdapter->fetchPairs($select);
 
         return $result;
+    }
+
+
+    /**
+     * Return attribute data by attribute name
+     * @param $attrName
+     * @param $productId int
+     */
+    public function getByAttrName($attrName, $productId)
+    {
+        $where = $this->_dbAdapter->quoteInto('sfa.name = ?', $attrName);
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('sfv.product_id = ?', $productId);
+        $select = $this->_dbAdapter->select()->from(array('sfv' => 'shopping_filtering_values'))
+            ->joinLeft(array('sfa' => 'shopping_filtering_attributes'), 'sfv.attribute_id=sfa.id')
+            ->where($where);
+        return $this->_dbAdapter->fetchRow($select);
     }
 }

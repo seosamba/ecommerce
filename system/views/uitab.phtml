@@ -3,7 +3,7 @@
 	<!-- Product listing selector -->
     <div class="grid_12 alpha omega">
         <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
-            <h4 class="message error text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
+            <h4 class="message warning text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
         <?php else: ?>
             <div id="template-selector" class="grid_6 alpha">
 				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
@@ -40,7 +40,7 @@
             <option value="date"><?php echo $this->translate('Date'); ?></option>
 		</select>
 	</div>
-	<div id="product-products" class="grid_12 alpha omega"></div>
+	<div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
 	<a href="javascript:;" id="btn-create" class="grid_12 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
 
@@ -113,16 +113,14 @@
 		    launch: function() {
 			    var children = $(this).find('span#products');
 			    if(!children.length) {
-                    $('tr.mceFirst').show();
+                    $('.mce-toolbar-grp').show();
                     $('.above-editor-links').removeClass('grid_4').addClass('grid_8');
                     $('#tabs').removeClass('grid_8').addClass('grid_4');
                 } else {
                     $('.above-editor-links').removeClass('grid_8').addClass('grid_4');
                     $('#tabs').removeClass('grid_4').addClass('grid_8');
                     //hiding mce controls
-                    $('tr.mceFirst').hide();
-                    $('table#content_tbl').width('100%');
-                    $('table#content_tbl').height('435px');
+                    $('.mce-toolbar-grp').hide();
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');
@@ -135,7 +133,7 @@
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
-                $('textarea.tinymce').tinymce().execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((template) ? ':' + template : '') + '}');
+                tinymce.activeEditor.execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((template) ? ':' + template : '') + '}');
 		    },
 		    insertList: function() {
 			    var shortCode = '{$productlist:';
@@ -154,7 +152,7 @@
                             ids.push($(productContainer).attr('id'));
                         });
                         shortCode += ':' + ids.join(',') + '}';
-                        $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                        tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                     } else {
                         showSpinner();
                         $.when($.getJSON($('#website_url').val() + 'api/store/products/offset/0/limit/1000000/', {key: $('#search').val()}, function(response) {
@@ -169,7 +167,7 @@
                             });
                         })).done(function() {
                             shortCode += ':' + ids.join(',') + '}';
-                            $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                            tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                         });
                     }
                 } else {
@@ -193,7 +191,7 @@
                     shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                     //ordering
                     shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
-                    $('textarea.tinymce').tinymce().execCommand('mceInsertContent', false, shortCode);
+                    tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                 }
 
 		    },
