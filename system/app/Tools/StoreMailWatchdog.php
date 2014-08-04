@@ -92,9 +92,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 			throw new Exceptions_SeotoasterException('Missing template for action email trigger');
 		}
 
-		$this->_mailer
-				->setMailFromLabel($this->_storeConfig['company'])
-				->setSubject($this->_options['subject']);
+        $this->_subject = $this->_options['subject'];
+		$this->_mailer->setMailFromLabel($this->_storeConfig['company']);
 
 		if (!empty($this->_options['from'])){
 			$this->_mailer->setMailFrom($this->_options['from']);
@@ -117,7 +116,9 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		if (!$this->_mailer->getMailFrom() || !$this->_mailer->getMailTo()) {
 			throw new Exceptions_SeotoasterException('Missing required "from" and "to" fields');
 		}
-		$this->_mailer->setBody($this->_entityParser->parse($this->_template));
+
+        $this->_mailer->setSubject($this->_entityParser->parse($this->_subject));
+        $this->_mailer->setBody($this->_entityParser->parse($this->_template));
 
 		return ($this->_mailer->send() !== false);
 	}
