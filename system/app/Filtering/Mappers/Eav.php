@@ -161,9 +161,8 @@ class Filtering_Mappers_Eav
                     )
                     ->group(array('eav.attribute_id', 'eav.value'))
                     ->order('a.label ASC');
+                $data = $dbAdapter->fetchAll($select);
             }
-
-            $data = $dbAdapter->fetchAll($select);
             if (!empty($data)) {
                 foreach ($data as $item) {
                     $id = $item['attribute_id'];
