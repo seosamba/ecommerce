@@ -136,29 +136,32 @@ class Filtering_Mappers_Eav
 
         if (!empty($tags)) {
             $dbAdapter = Zend_Db_Table::getDefaultAdapter();
-            $select = $dbAdapter->select()->from(
-                array('eav' => $this->_valuesTable),
-                array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(DISTINCT(eav.product_id))')
-            )
-                ->join(
-                    array('tha' => $this->_tagsRelationTable),
-                    'tha.attribute_id = eav.attribute_id',
-                    null
+            $tagsIds = $dbAdapter->fetchCol(
+                $dbAdapter->select()
+                    ->from(array('p' => 'shopping_product'), array('DISTINCT(p.id)'))
+                    ->join(array('pht' => 'shopping_product_has_tag'), 'pht.product_id = p.id', null)
+                    ->where('pht.tag_ID IN (?)', $tags)
+            );
+            $data = array();
+            if(!empty($tagsIds)){
+                $select = $dbAdapter->select()->from(
+                    array('eav' => $this->_valuesTable),
+                    array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(DISTINCT(eav.product_id))')
                 )
-                ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label'))
-                ->where('tha.tag_id IN (?)', $tags)
-                ->where('a.name NOT IN (?)', Filtering_Tools::$_rangeFilters)
-                ->where(
-                    'eav.product_id IN (?)',
-                    $dbAdapter->fetchCol(
-                        $dbAdapter->select()
-                            ->from(array('p' => 'shopping_product'), array('DISTINCT(p.id)'))
-                            ->join(array('pht' => 'shopping_product_has_tag'), 'pht.product_id = p.id', null)
-                            ->where('pht.tag_ID IN (?)', $tags)
+                    ->join(
+                        array('tha' => $this->_tagsRelationTable),
+                        'tha.attribute_id = eav.attribute_id',
+                        null
                     )
-                )
-                ->group(array('eav.attribute_id', 'eav.value'))
-                ->order('a.label ASC');
+                    ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label'))
+                    ->where('tha.tag_id IN (?)', $tags)
+                    ->where('a.name NOT IN (?)', Filtering_Tools::$_rangeFilters)
+                    ->where(
+                        'eav.product_id IN (?)', $tagsIds
+                    )
+                    ->group(array('eav.attribute_id', 'eav.value'))
+                    ->order('a.label ASC');
+            }
 
             $data = $dbAdapter->fetchAll($select);
             if (!empty($data)) {
