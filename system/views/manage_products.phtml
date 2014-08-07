@@ -4,10 +4,6 @@
     $this->headScript()->setAllowArbitraryAttributes(true)
             ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
 			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-products/config'));
-
-	$this->headLink()
-			->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
-			->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
 <div id="store-products" class="toaster-widget store-widget">
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
@@ -76,8 +72,3 @@
 		</tfoot>
 	</table>
 </div>
-<!-- chosen init fix -->
-<style type="text/css">
-    .chzn-container-multi {min-width: 300px}
-    .chzn-choices input{min-height: 2.3em}
-</style>
