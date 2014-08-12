@@ -458,6 +458,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	    foreach ($generators as $method) {
 		    $type = strtolower(str_replace('_render', '', $method));
 		    array_push($allowedOptions, array(
+                'group'  => $translator->translate('Shopping Shortcuts'),
 			    'alias'  => $translator->translate('Product '.$type),
 			    'option' => 'product:'.$type
 		    ));

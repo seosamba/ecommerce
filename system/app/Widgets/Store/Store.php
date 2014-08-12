@@ -75,6 +75,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 					$description = null;
 				}
 				array_push($allowedOptions, array(
+                    'group'  => $translator->translate('Shopping Shortcuts'),
 					'alias'  => $translator->translate('Store' .' '. $name. (isset($description) ? ' - '.$description: '')),
 					'option' => 'store:'.strtolower($name)
 				));
