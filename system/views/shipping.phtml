@@ -55,6 +55,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             <?php foreach($this->shippingPlugins as $plugin): ?>
                 <li><a data-plugin="<?php echo $plugin->getName(); ?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute'); ?>"><?php echo $plugin->getName(); ?></a></li>
             <?php endforeach; ?>
+                <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
             </ul>
             <div id="pane-container" class="grid_8 omega scroll">
             <div id="markup">
@@ -92,6 +93,19 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                         </p>
                     </fieldset>
                 </form>
+            </div>
+            <div id="orderconfig">
+                <?php $this->orderConfigForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
+                    <form action="<?php echo $this->orderConfigForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
+                        <?php echo $this->orderConfigForm->getElement('shipper')->renderViewHelper(); ?>
+                        <fieldset class="background">
+                            <legend class="background large p5px"><?php echo $this->translate('Minimum order'); ?></legend>
+                            <p class="labeled">
+                                <?php echo $this->orderConfigForm->getElement('quantity')->setAttrib('class', 'grid_2 alpha fl-right')->renderViewHelper(); ?>
+                                <label class="grid_4 omega" for="cartamount"><?php echo $this->orderConfigForm->getElement('quantity')->getLabel(); ?></label>
+                            </p>
+                        </fieldset>
+                    </form>
             </div>
         </div>
     </div>
