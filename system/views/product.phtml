@@ -83,7 +83,7 @@
         &nbsp;
         {{else}}
         <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
-        <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+        <input class="hide" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
     <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
