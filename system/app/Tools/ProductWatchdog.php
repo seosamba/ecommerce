@@ -7,11 +7,22 @@
 class Tools_ProductWatchdog extends Tools_System_GarbageCollector
 {
 
+    protected static $_indexProductPage = true;
+
     public function __construct($params = array())
     {
         parent::__construct($params);
         $this->_cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
         $this->_websiteConfig = Zend_Registry::get('website');
+    }
+
+    /**
+     * Enable/disable product page indexing for internal search
+     * @param $flag boolean True - enable, false - disable
+     */
+    public static function enableProductPageIndexing($flag)
+    {
+        self::$_indexProductPage = (bool)$flag;
     }
 
 
@@ -171,7 +182,9 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
 
             $this->_cleanUpCache();
         }
-        $this->_updateSearchIndex();
+        if ((bool) self::$_indexProductPage) {
+            $this->_updateSearchIndex();
+        }
     }
 
     protected function _runOnDelete()
@@ -212,10 +225,22 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
             $page = Application_Model_Mappers_PageMapper::getInstance()->find($page['id']);
         }
 
-        $searchIndex = Tools_Search_Tools::initIndex();
-
         Tools_Search_Tools::removeFromIndex($page->getId());
         $page->setH1(implode(', ', array($this->_object->getName(), $this->_object->getSku(), $this->_object->getMpn(), $page->getH1())));
+
+        if (!empty($this->_object->tags) && is_array($this->_object->tags)){
+            $tags = implode(
+                ', ',
+                array_map(
+                    function ($t) {
+                        return $t['name'];
+                    },
+                    $this->_object->tags
+                )
+            );
+        } else {
+            $tags = '';
+        }
         $page->setTeaserText(
             implode(
                 PHP_EOL,
@@ -223,15 +248,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
                     $this->_object->getShortDescription(),
                     $this->_object->getFullDescription(),
                     $page->getTeaserText(),
-                    implode(
-                        ', ',
-                        array_map(
-                            function ($t) {
-                                return $t['name'];
-                            },
-                            $this->_object->tags
-                        )
-                    )
+                    $tags
                 )
             )
         );
