@@ -62,5 +62,6 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
 ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);
 
 -- These alters are always the latest and updated version of the database
-UPDATE `shopping_config` SET `value`='2.2.4' WHERE `name`='version';
-SELECT value FROM `shopping_config` WHERE `name` = 'version';
+UPDATE `plugin` SET `version`='2.2.4' WHERE `name`='shopping';
+SELECT version FROM `plugin` WHERE `name` = 'shopping';
+
