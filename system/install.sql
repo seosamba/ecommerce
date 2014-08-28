@@ -501,11 +501,6 @@ INSERT INTO `email_triggers_recipient` (`recipient`) VALUES
 ('customer'),
 ('sales person');
 
-INSERT INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
-('1', 'store_newcustomer', 'Tools_StoreMailWatchdog'),
-('1', 'store_neworder', 'Tools_StoreMailWatchdog'),
-('1', 'store_trackingnumber', 'Tools_StoreMailWatchdog');
-
 DROP TABLE IF EXISTS `shopping_coupon`;
 CREATE TABLE IF NOT EXISTS `shopping_coupon` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Coupon ID',
@@ -649,6 +644,7 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   `value` tinytext COLLATE utf8_unicode_ci NOT NULL COMMENT 'Attribute Value',
   PRIMARY KEY (`id`),
   UNIQUE KEY `attribute_id_2` (`attribute_id`,`product_id`),
+  UNIQUE KEY `attribute_id_3` (`attribute_id`,`product_id`),
   KEY `attribute_id` (`attribute_id`),
   KEY `product_id` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -659,6 +655,8 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`real_order_id`,`import_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);
 
 CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   `real_order_id` int(10) unsigned NOT NULL,
