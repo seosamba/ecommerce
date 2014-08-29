@@ -305,10 +305,11 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
   `cart_id` int(10) unsigned DEFAULT NULL,
   `product_id` int(10) unsigned DEFAULT NULL,
   `options` text,
-  `price` decimal(10,4) DEFAULT NULL COMMENT  'Price w/o Tax',
+  `price` decimal(10,4) DEFAULT NULL COMMENT 'Price w/o Tax',
   `qty` int(10) unsigned DEFAULT NULL,
-  `tax` decimal(10,4) DEFAULT NULL COMMENT  'Tax Price',
-  `tax_price` decimal(10,4) DEFAULT NULL COMMENT  'Price + Tax',
+  `tax` decimal(10,4) DEFAULT NULL COMMENT 'Tax Price',
+  `tax_price` decimal(10,4) DEFAULT NULL COMMENT 'Price + Tax',
+  `freebies` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -663,6 +664,21 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   `import_order_id` VARCHAR(255) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`real_order_id`,`import_order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_freebies_settings` (
+  `prod_id` int(10) unsigned NOT NULL,
+  `price_value` decimal(10,4) DEFAULT 0,
+  `quantity` int(4) unsigned DEFAULT 0,
+  PRIMARY KEY (`prod_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `shopping_product_has_freebies` (
+  `product_id` int(10) unsigned NOT NULL,
+  `freebies_id` int(10) unsigned NOT NULL,
+  `freebies_quantity` int(4) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`freebies_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `version` = '2.2.4' WHERE `name` = 'shopping';
