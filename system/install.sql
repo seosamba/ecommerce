@@ -152,6 +152,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('state', '5'),
 ('weightUnit', 'kg'),
 ('zip', '94117'),
+('noZeroPrice', '1'),
 ('version', '2.2.4');
 
 DROP TABLE IF EXISTS `shopping_product`;
@@ -288,7 +289,11 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_tax_rate` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '0',
   `sub_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total',
+  `shipping_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Shipping Tax',
+  `discount_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Discount Tax',
+  `sub_total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub total Tax',
   `total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Total Tax',
   `total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total + Total Tax + Shipping',
   `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
@@ -617,6 +622,21 @@ INSERT INTO `template_type` (`id`, `title`) VALUES
 ('typeproduct', 'Product page'),
 ('typelisting', 'Product listing');
 
+CREATE TABLE IF NOT EXISTS `shopping_product_freebies_settings` (
+  `prod_id` int(10) unsigned NOT NULL,
+  `price_value` decimal(10,4) DEFAULT 0,
+  `quantity` int(4) unsigned DEFAULT 0,
+  PRIMARY KEY (`prod_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `shopping_product_has_freebies` (
+  `product_id` int(10) unsigned NOT NULL,
+  `freebies_id` int(10) unsigned NOT NULL,
+  `freebies_quantity` int(4) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`freebies_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_filtering_attributes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Attribute ID',
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Attribute Name',
@@ -645,7 +665,6 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   `value` tinytext COLLATE utf8_unicode_ci NOT NULL COMMENT 'Attribute Value',
   PRIMARY KEY (`id`),
   UNIQUE KEY `attribute_id_2` (`attribute_id`,`product_id`),
-  UNIQUE KEY `attribute_id_3` (`attribute_id`,`product_id`),
   KEY `attribute_id` (`attribute_id`),
   KEY `product_id` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -655,30 +674,6 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   `import_order_id` VARCHAR(255) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`real_order_id`,`import_order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);
-
-CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
-  `real_order_id` int(10) unsigned NOT NULL,
-  `import_order_id` VARCHAR(255) NOT NULL,
-  `created_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`real_order_id`,`import_order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `shopping_product_freebies_settings` (
-  `prod_id` int(10) unsigned NOT NULL,
-  `price_value` decimal(10,4) DEFAULT 0,
-  `quantity` int(4) unsigned DEFAULT 0,
-  PRIMARY KEY (`prod_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-
-CREATE TABLE IF NOT EXISTS `shopping_product_has_freebies` (
-  `product_id` int(10) unsigned NOT NULL,
-  `freebies_id` int(10) unsigned NOT NULL,
-  `freebies_quantity` int(4) unsigned NOT NULL,
-  PRIMARY KEY (`product_id`,`freebies_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `version` = '2.2.4' WHERE `name` = 'shopping';
