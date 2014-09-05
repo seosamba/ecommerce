@@ -176,6 +176,33 @@
             }
         }
     }
+    #product-inventory{
+        & when (@webkit = true){
+            &::-webkit-input-placeholder{
+                font-size: 20px;
+                position:relative;
+                top:-4px;}
+        }
+        // Safari and Chrome
+        & when (@moz = true){
+        // Firefox 4-18
+            &:-moz-placeholder{
+                font-size: 20px;
+                position:relative;
+                top:-4px;}
+        // Firefox 19+
+            &::-moz-placeholder{
+                font-size: 20px;
+                position:relative;
+                top:-4px;}
+        }
+        & when (@ie = true){
+            &:-ms-input-placeholder{
+                font-size: 20px;
+                position:relative;
+                top:-4px;}
+        }
+    }
 }
 
 #merchandising{
