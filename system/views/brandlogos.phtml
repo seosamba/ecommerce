@@ -1,32 +1,48 @@
 <?php
-$this->headTitle('Manage brand logos');
-$this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/brandlogos/main'));
-$this->placeholder('headerContent')->set($this->translate('Manage brand logos'));
+$this->inlineScript()
+    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+    ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+        null,
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/brandlogos/main')
+    );
+
+$this->headLink()
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
-
-<div class="content-footer scroll">
-    <div class="hidden">
+<div class="seotoaster container">
     <?php
-        echo $this->formHidden('things-select-folder', Shopping::BRAND_LOGOS_FOLDER);
-        $thingsUploader = $this->toasterUploader(
-            array(
-                'id'      => 'brand-logo-uploader',
-                'caption' => $this->translate('Upload brand logos'),
-                'caller'  => 'media',
-                'noMultiupload' => true
-            ));
-        echo $thingsUploader;
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'headerText'  => $this->translate('Manage brand logos'),
+            'helpSection' => $this->helpSection
+        )
+    );
     ?>
-    </div>
+    <div class="content-footer scroll">
+        <div class="hidden">
+        <?php
+            echo $this->formHidden('things-select-folder', Shopping::BRAND_LOGOS_FOLDER);
+            $thingsUploader = $this->toasterUploader(
+                array(
+                    'id'      => 'brand-logo-uploader',
+                    'caption' => $this->translate('Upload brand logos'),
+                    'caller'  => 'media',
+                    'noMultiupload' => true
+                ));
+            echo $thingsUploader;
+        ?>
+        </div>
 
-    <div id="manage-logos" class="grid_12">
-        <ul class="brand-list list-images column_8 full-width"></ul>
-        <span class="spinner"></span>
+        <div id="manage-logos" class="grid_12">
+            <ul class="brand-list list-images column_8 full-width"></ul>
+            <span class="spinner"></span>
+        </div>
     </div>
-</div>
-<div class="footer grid_12">
-    <div id="progressbar" class="hidden">
-        <span class="label"><?php echo $this->translate('Uploading');?>&nbsp;<b class="value">0</b></span>
+    <div class="footer grid_12">
+        <div id="progressbar" class="hidden">
+            <span class="label"><?php echo $this->translate('Uploading');?>&nbsp;<b class="value">0</b></span>
+        </div>
     </div>
 </div>

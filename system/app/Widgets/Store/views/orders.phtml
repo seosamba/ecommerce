@@ -1,12 +1,16 @@
 <?php
-$this->headScript()->setAllowArbitraryAttributes(true)
+$this->inlineScript()->setAllowArbitraryAttributes(true)
 		->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
-		->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/addresschain.jquery.js');
+		->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/addresschain.jquery.js')
+        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+            null,
+            array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/store-orders/main.js')
+        );
 $this->headLink()
 	->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
 	->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
-<style>
+<style>orders-table
 	#store-orders select.filter, .chzn-container-single .chzn-search input{
 		width: 100% !important;
         float: none;
@@ -102,11 +106,11 @@ $this->headLink()
 			</tr>
 		</thead>
 		<tbody id="orders-list">
-            <?php if(isset($this->invoicePlugin)):?>	
-                <td colspan="9" style="text-align:center;">
-            <?php else:?>
-                 <td colspan="8" style="text-align:center;">
-            <?php endif;?>
+        <?php if(isset($this->invoicePlugin)):?>
+            <td colspan="13" style="text-align:center;">
+        <?php else:?>
+             <td colspan="8" style="text-align:center;">
+        <?php endif;?>
                 <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
 			</td>
 		</tbody>
@@ -168,4 +172,3 @@ $(function(){
 	});
 });
 </script>
-<script data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/modules/store-orders/main.js" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/js/libs/require.min.js"></script>

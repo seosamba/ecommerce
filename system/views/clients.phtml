@@ -44,11 +44,11 @@
 </script>
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <?php
-    $this->headScript()->setAllowArbitraryAttributes(true)
-		    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
-			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-clients/config'));
+    $this->inlineScript()
+        ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+        ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-clients/config'));
 
-	echo $this->noLayout ? $this->headScript() : '';
+	$this->noLayout ? $this->inlineScript() : '';
 ?>
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="clients" class="toaster-widget">
