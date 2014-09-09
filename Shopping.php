@@ -144,7 +144,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		parent::__construct($options, $seotoasterData);
 
 		$this->_layout = new Zend_Layout();
-		$this->_layout->setLayoutPath(__DIR__ . '/system/views/');
+        $this->_layout->setLayoutPath(Zend_Layout::getMvcInstance()->getLayoutPath());
 
 		if ($viewScriptPath = Zend_Layout::getMvcInstance()->getView()->getScriptPaths()) {
 			$this->_view->setScriptPath($viewScriptPath);
