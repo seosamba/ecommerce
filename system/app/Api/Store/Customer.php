@@ -79,14 +79,18 @@ class Api_Store_Customer extends Api_Service_Abstract
 
             if ($user instanceof Application_Model_Models_User) {
 
-                Application_Model_Mappers_UserMapper::getInstance()->loadUserAttributes($user);
+                if (array_key_exists('mobile', $data)) {
+                    $q = true;
+                } else {
+                    Application_Model_Mappers_UserMapper::getInstance()->loadUserAttributes($user);
 
-                foreach ($data as $attribute => $value) {
-                    $setter = 'set' . ucfirst(strtolower($attribute));
-                    if (method_exists($user, $setter)) {
-                        $user->$setter($value);
-                    } else {
-                        $user->setAttribute($attribute, $value);
+                    foreach ($data as $attribute => $value) {
+                        $setter = 'set' . ucfirst(strtolower($attribute));
+                        if (method_exists($user, $setter)) {
+                            $user->$setter($value);
+                        } else {
+                            $user->setAttribute($attribute, $value);
+                        }
                     }
                 }
                 $user->setPassword(false);

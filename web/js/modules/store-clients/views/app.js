@@ -21,6 +21,7 @@ define([
             'keyup #clients-search': 'searchClient',
             'change select[name=groups]': 'assignGroup',
             'blur input.customer-attribute': 'changeCustomAttr',
+            'blur input.mobile-number': 'changeMobileNumber',
             'click th.customer-attribute':'deleteCustomAttr'
         },
         initialize: function(){
@@ -366,6 +367,25 @@ define([
                             showMessage(status, true);
                         } else {
                             showMessage('Attribute saved!');
+                        }
+                    }
+                })
+            });
+        },
+        changeMobileNumber:function(){
+            $('input.mobile-number').on('blur', function(e){
+                var data = {};
+                data['mobile'] = $(this).val();
+                console.log(data);
+                $.ajax({
+                    url: $('#website_url').val() + 'api/store/customer/id/' + $(this).data('uid'),
+                    method: 'PUT',
+                    data: JSON.stringify(data),
+                    complete: function(xhr, status, response) {
+                        if (status === 'error'){
+                            showMessage(status, true);
+                        } else {
+                            showMessage('Number saved!');
                         }
                     }
                 })
