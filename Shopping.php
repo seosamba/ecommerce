@@ -341,10 +341,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
+                $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
+                        ->setMobilePhone($mobilePhone)
 						->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
