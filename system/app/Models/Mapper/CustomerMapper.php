@@ -115,22 +115,6 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		return null;
 	}
 
-	public function addMobile(Models_Model_Customer $customer, $mobile){
-		$addressTable = new Models_DbTable_CustomerAddress();
-		if (!empty($mobile)){
-			$address = Tools_Misc::clenupAddress($address);
-			$address['id'] = Tools_Misc::getAddressUniqKey($address);
-			$address['user_id'] = $customer->getId();
-			if (null === ($row = $addressTable->find($address['id'])->current())) {
-				$row = $addressTable->createRow();
-			}
-			$row->setFromArray($address);
-
-			return $row->save();
-		}
-		return null;
-	}
-
 	public function fetchAll($where = null, $order = array()){
 		$this->_dbTable = 'Application_Model_DbTable_User';
 		$entries = array();
@@ -209,9 +193,9 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 			$select->orWhere('user.full_name LIKE ?', '%'.$search.'%')
 					->orWhere('user.email LIKE ?', '%'.$search.'%');
 		}
-        $q = $select->assemble();
+
 		$select->limit($limit, $offset);
-//		error_log($select->__toString());
+
 		return $userDbTable->fetchAll($select)->toArray();
 	}
 }

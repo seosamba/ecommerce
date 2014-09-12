@@ -71,7 +71,10 @@ class Api_Store_Customer extends Api_Service_Abstract
         $data = json_decode($this->_request->getRawBody(), true);
 
         if ($id && !empty($data)) {
-            if ($id !== Tools_ShoppingCart::getInstance()->getCustomer()->getId() && !Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            if ($id !== Tools_ShoppingCart::getInstance()->getCustomer()->getId() && !Tools_Security_Acl::isAllowed(
+                Shopping::RESOURCE_STORE_MANAGEMENT
+            )
+            ) {
                 $this->_error(self::REST_STATUS_FORBIDDEN);
             }
 
@@ -79,29 +82,27 @@ class Api_Store_Customer extends Api_Service_Abstract
 
             if ($user instanceof Application_Model_Models_User) {
 
-                if (array_key_exists('mobile', $data)) {
-                    $q = true;
-                } else {
-                    Application_Model_Mappers_UserMapper::getInstance()->loadUserAttributes($user);
+                Application_Model_Mappers_UserMapper::getInstance()->loadUserAttributes($user);
 
-                    foreach ($data as $attribute => $value) {
-                        $setter = 'set' . ucfirst(strtolower($attribute));
-                        if (method_exists($user, $setter)) {
-                            $user->$setter($value);
-                        } else {
-                            $user->setAttribute($attribute, $value);
-                        }
+                foreach ($data as $attribute => $value) {
+                    $setter = 'set' . ucfirst(strtolower($attribute));
+                    if (method_exists($user, $setter)) {
+                        $user->$setter($value);
+                    } else {
+                        $user->setAttribute($attribute, $value);
                     }
                 }
                 $user->setPassword(false);
                 Application_Model_Mappers_UserMapper::getInstance()->save($user);
                 $mailWatchdog = new Tools_Mail_Watchdog(array(
-                    'trigger'  => Tools_StoreMailWatchdog::TRIGGER_CUSTOMERCHANGEATTR,
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_CUSTOMERCHANGEATTR,
                 ));
                 $mailWatchdog->notify($user);
                 return array('status' => 'ok');
             }
+
         }
+
     }
 
 

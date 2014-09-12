@@ -372,24 +372,23 @@ define([
                 })
             });
         },
-        changeMobileNumber:function(){
-            $('input.mobile-number').on('blur', function(e){
-                var data = {};
-                data['mobile'] = $(this).val();
-                console.log(data);
-                $.ajax({
-                    url: $('#website_url').val() + 'api/store/customer/id/' + $(this).data('uid'),
-                    method: 'PUT',
-                    data: JSON.stringify(data),
-                    complete: function(xhr, status, response) {
-                        if (status === 'error'){
-                            showMessage(status, true);
-                        } else {
-                            showMessage('Number saved!');
-                        }
-                    }
-                })
+        changeMobileNumber:function(e){
+            var target = e.currentTarget,
+                data = {};
+            data['mobilePhone'] = $(target).val();
+            $.ajax({
+               url: $('#website_url').val() + 'api/toaster/users/id/' + $(target).data('uid'),
+               method: 'PUT',
+               data: JSON.stringify(data),
+               complete: function(xhr, status, response) {
+                   if (status === 'error'){
+                       showMessage(status, true);
+                   } else {
+                       showMessage(_.isUndefined(i18n['Number saved!'])?'Number saved!':i18n['Number saved!']);
+                   }
+               }
             });
+
         },
         deleteCustomAttr:function(){
             $('body').on('click', 'th.customer-attribute span', function(e){
