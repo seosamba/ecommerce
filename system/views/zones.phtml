@@ -1,5 +1,5 @@
 <?php
-$this->inlineScript()
+$this->headScript()
     ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
     ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
         null,
@@ -53,7 +53,8 @@ $this->headLink()
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
         array(
 //            'headerText'  => $this->translate('Shipping configuration'),
-            'helpSection' => $this->helpSection
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
         )
     );
     ?>
@@ -124,6 +125,6 @@ $(document).one('zones:loaded', function () {
         }
     });
     hideSpinner();
-})
+});
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

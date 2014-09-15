@@ -1,5 +1,5 @@
 <?php
-$this->inlineScript()->setAllowArbitraryAttributes(true)
+$this->headScript()->setAllowArbitraryAttributes(true)
 		->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
 		->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/addresschain.jquery.js')
         ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
@@ -10,7 +10,7 @@ $this->headLink()
 	->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css')
 	->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css');
 ?>
-<style>orders-table
+<style>
 	#store-orders select.filter, .chzn-container-single .chzn-search input{
 		width: 100% !important;
         float: none;

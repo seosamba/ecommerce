@@ -1,5 +1,5 @@
 <?php
-$this->inlineScript()
+$this->headScript()
     ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
     ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
         null,
@@ -51,7 +51,8 @@ $this->placeholder('headerContent')->captureEnd();
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
         array(
             'headerText'  => $this->translate('Manage taxes'),
-            'helpSection' => $this->helpSection
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
         )
     );
 ?>

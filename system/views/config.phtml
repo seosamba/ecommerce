@@ -1,5 +1,5 @@
 <?php
-$this->inlineScript()
+$this->headScript()
     ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js')
     ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
         null,
@@ -15,8 +15,8 @@ $this->headLink()
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
         array(
-            //            'headerText'  => $this->translate('Merchandising'),
-            'helpSection' => $this->helpSection
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
         )
     );
 ?>

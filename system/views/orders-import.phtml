@@ -10,13 +10,14 @@ $this->headLink()
 ?>
 <div id="uploadContainer" class="seotoaster container">
 <?php
-echo $this->partial(
-    'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
-    array(
-        'headerText'  => $this->translate('Import orders'),
-        'helpSection' => $this->helpSection
-    )
-);
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'headerText'  => $this->translate('Import orders'),
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
+        )
+    );
 ?>
     <div class="content-auto">
         <div class="clearfix">
