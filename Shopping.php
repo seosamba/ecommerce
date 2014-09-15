@@ -969,7 +969,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $where = $userMapper->getDbTable()->getAdapter()->quoteInto("id <> ?", $this->_sessionHelper->getCurrentUser()->getId());
                     $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
-                    $emailAlreadyExist = $userMapper->fetchAll($where);
+                    $emailAlreadyExist = $userMapper->fetchAll($where, array(), true);
                     if(!empty($emailAlreadyExist)){
                         $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
                     }
