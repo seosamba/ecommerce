@@ -71,7 +71,10 @@ class Api_Store_Customer extends Api_Service_Abstract
         $data = json_decode($this->_request->getRawBody(), true);
 
         if ($id && !empty($data)) {
-            if ($id !== Tools_ShoppingCart::getInstance()->getCustomer()->getId() && !Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            if ($id !== Tools_ShoppingCart::getInstance()->getCustomer()->getId() && !Tools_Security_Acl::isAllowed(
+                Shopping::RESOURCE_STORE_MANAGEMENT
+            )
+            ) {
                 $this->_error(self::REST_STATUS_FORBIDDEN);
             }
 
@@ -92,12 +95,14 @@ class Api_Store_Customer extends Api_Service_Abstract
                 $user->setPassword(false);
                 Application_Model_Mappers_UserMapper::getInstance()->save($user);
                 $mailWatchdog = new Tools_Mail_Watchdog(array(
-                    'trigger'  => Tools_StoreMailWatchdog::TRIGGER_CUSTOMERCHANGEATTR,
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_CUSTOMERCHANGEATTR,
                 ));
                 $mailWatchdog->notify($user);
                 return array('status' => 'ok');
             }
+
         }
+
     }
 
 
