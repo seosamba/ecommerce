@@ -790,6 +790,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($cartId) {
 			Tools_ShoppingCart::getInstance()->clean();
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
+            $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
 				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
