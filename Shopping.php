@@ -341,10 +341,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
+                $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
+                        ->setMobilePhone($mobilePhone)
 						->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
@@ -788,6 +790,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($cartId) {
 			Tools_ShoppingCart::getInstance()->clean();
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
+            $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
 				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
@@ -969,7 +972,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $where = $userMapper->getDbTable()->getAdapter()->quoteInto("id <> ?", $this->_sessionHelper->getCurrentUser()->getId());
                     $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
-                    $emailAlreadyExist = $userMapper->fetchAll($where);
+                    $emailAlreadyExist = $userMapper->fetchAll($where, array(), true);
                     if(!empty($emailAlreadyExist)){
                         $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
                     }

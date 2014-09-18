@@ -45,6 +45,10 @@
 					<span class="locality"><?php echo $billingAddressDefault['city'];?></span>
 					<span class="region"><?php $state = Tools_Geo::getStateById($billingAddressDefault['state']); echo $state['state']; ?></span>
 					<span class="postal-code"><?php echo $billingAddressDefault['zip'];?></span>
+                    <?php if(isset($billingAddressDefault['mobile'])):?>
+                        <br />
+                        <span class="mobile"><?php echo $billingAddressDefault['mobile'];?></span>
+                    <?php endif;?>
 				</div>
 			<?php endif;?>
 			<?php if ($shippingAddressDefault = $this->customer->getDefaultAddress('shipping')) : ?>
@@ -54,6 +58,10 @@
 					<span class="locality"><?php echo $shippingAddressDefault['city'];?></span>
 					<span class="region"><?php $state = Tools_Geo::getStateById($shippingAddressDefault['state']); echo $state['state']; ?></span>
 					<span class="postal-code"><?php echo $shippingAddressDefault['zip'];?></span>
+                    <?php if(isset($shippingAddressDefault['mobile'])):?>
+                        <br />
+                        <span class="mobile"><?php echo $shippingAddressDefault['mobile'];?></span>
+                    <?php endif;?>
 				</div>
 			<?php endif;?>
 		</div>
@@ -173,8 +181,13 @@
 			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
 			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
 			<br />
-			<span><?php echo $countryList[$billingAddress['country']];?></span>
-<!--			<a class="delete-lnk" href="javascript:;" title="--><?php //echo $this->translate('Delete this address');?><!--"><img src="/system/images/delete.png" alt="[x]"></a>-->
+            <?php if(isset($billingAddress['country'])):?>
+			    <span><?php echo $countryList[$billingAddress['country']];?></span>
+            <?php endif;?>
+            <?php if(isset($billingAddress['mobile'])):?>
+                <br />
+                <span class="mobile"><?php echo $billingAddress['mobile'];?></span>
+            <?php endif;?>
 		</div>
 	</div>
 	<?php endforeach; ?>

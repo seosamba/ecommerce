@@ -42,6 +42,12 @@ class Forms_Signup extends Zend_Form {
 	        'class'      => array('required')
         )));
 
+        $this->addElement(new Zend_Form_Element_Text(array(
+             'name'       => 'mobile',
+             'label'      => 'Mobile',
+             'value'      => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
+        )));
+
         $this->addElement('hidden', 'step', array(
             'value' => Shopping::KEY_CHECKOUT_SIGNUP,
             'decorators' => array('ViewHelper'),
