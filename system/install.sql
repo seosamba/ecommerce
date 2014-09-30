@@ -153,7 +153,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('weightUnit', 'kg'),
 ('zip', '94117'),
 ('noZeroPrice', '1'),
-('version', '2.2.4');
+('version', '2.3.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
