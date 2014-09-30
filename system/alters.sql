@@ -68,7 +68,10 @@ UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'optio
 UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeclientlogin';
 UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeshippingterms';
 
+-- 30/09/2014
+-- version: 2.2.5
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.2.5' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.3.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
