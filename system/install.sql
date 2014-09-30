@@ -676,4 +676,4 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   PRIMARY KEY (`real_order_id`,`import_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.2.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.3.0' WHERE `name` = 'shopping';
