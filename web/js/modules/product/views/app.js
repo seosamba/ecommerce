@@ -588,6 +588,7 @@ define([
             switch (type){
                 case 'edit':
                     this.model.clear({silent:true}).set(this.products.get(pid).toJSON());
+                    this.model.get('options').on('add', this.renderOption, this);
                     this.render();
                     if (window.history && window.history.pushState){
                         var loc = window.location;
