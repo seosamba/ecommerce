@@ -36,7 +36,7 @@ define([
 			'click #delete': 'deleteProduct',
             'keypress input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
-            'mouseover #option-library': 'fetchOptionLibrary',
+            'click a[href="#options-tab"]': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
             'change #product-list-holder input.marker': 'markProducts',
             'click #massaction': 'massAction',
