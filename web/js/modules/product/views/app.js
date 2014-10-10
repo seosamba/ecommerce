@@ -521,6 +521,7 @@ define([
                         self.products && self.products.pager();
                         $('#new-product').trigger('click');
                         showMessage(_.isUndefined(i18n['Product deleted'])?'Product deleted':i18n['Product deleted']);
+                        location.reload();
                     }
                 });
 			});
