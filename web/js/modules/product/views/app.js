@@ -432,13 +432,6 @@ define([
                     checked: true
                 });
             }
-//            disabled lazy load because don't needed for now
-//            if (this.$('#product-list-holder').children().size() === this.products.size()){
-//                this.$('#product-list-holder').find('img.lazy').lazyload({
-//                    container: this.$('#product-list-holder'),
-//                    effect: 'fadeIn'
-//                }).removeClass('lazy');
-//            }
         },
         renderProducts: function(){
             if (this.products.size()){
@@ -470,36 +463,12 @@ define([
 			    this.model.set({defaultOptions: this.model.get('options').toJSON()});
             }
 
-//			if (!this.model.has('pageTemplate')){
-//				var templateId = this.$('#product-pageTemplate').val();
-//				if (templateId !== '-1') {
-//                    this.model.set({pageTemplate: templateId});
-//                } else {
-//                    showMessage(_.isUndefined(i18n['Please, select product page template before saving'])?'Please, select product page template before saving':i18n['Please, select product page template before saving'], true);
-//                    this.$('#product-pageTemplate').focus();
-//                    return false;
-//                }
-//			}
-
             var newBrandName = $('#new-brand').val();
             if (newBrandName){
                 this.addNewBrand(newBrandName).$('#new-brand').val('');
             }
 
             this.model.save();
-//			if (this.model.isNew()){
-//				this.model.save(null, {success: function(model, response){
-//                    if (self.products !== null) {
-//                        self.products.add(model);
-//                    }
-//                    showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
-//                }, error: this.processSaveError});
-//			} else {
-//				this.model.save(null, {success: function(model, response){
-//					showMessage('Product saved.<br/> Go to your search engine optimized product landing page here.');
-//                    self.render();
-//				}, error: this.processSaveError});
-//			}
 
             if (newInLibrary && self.hasOwnProperty('optionLibrary')){
                 self.optionLibrary.fetch();
@@ -528,9 +497,9 @@ define([
 		},
         validateProduct: function(){
             var error   = false;
-
-            if (this.$('#product-pageTemplate').val() === '-1'){
+            if (!this.$('#product-pageTemplate').val()){
                 this.$('#product-pageTemplate').addClass('error');
+                $('.missing-template').addClass('error');
                 error = true || error;
             } else {
                 var templateId = this.$('#product-pageTemplate').val();
