@@ -226,20 +226,22 @@ class Widgets_Store_Store extends Widgets_Abstract {
             return;
         }
         $registry = Zend_Registry::getInstance();
-        if ($registry->isRegistered('ConfirmationCartId')) {
-            $cartSession = $registry->get('ConfirmationCartId');
-        } else {
-            $cartId = $sessionHelper->storeCartSessionConversionKey;
-            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(
-                intval($cartId)
-            );
-            $registry->set('ConfirmationCartId', $cartSession);
-            unset($sessionHelper->storeCartSessionConversionKey);
-        }
+        if (isset($sessionHelper->storeCartSessionConversionKey) || $registry->isRegistered('ConfirmationCartId')) {
+            if ($registry->isRegistered('ConfirmationCartId')) {
+                $cartSession = $registry->get('ConfirmationCartId');
+            } else {
+                $cartId = $sessionHelper->storeCartSessionConversionKey;
+                $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(
+                    intval($cartId)
+                );
+                $registry->set('ConfirmationCartId', $cartSession);
+                unset($sessionHelper->storeCartSessionConversionKey);
+            }
 
-        $methodName = 'get' . ucfirst(trim(strtolower($this->_options[1])));
-        if (method_exists($cartSession, $methodName)) {
-            return $cartSession->$methodName();
+            $methodName = 'get' . ucfirst(trim(strtolower($this->_options[1])));
+            if (method_exists($cartSession, $methodName)) {
+                return $cartSession->$methodName();
+            }
         }
     }
 }
