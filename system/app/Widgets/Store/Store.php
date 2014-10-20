@@ -222,20 +222,21 @@ class Widgets_Store_Store extends Widgets_Abstract {
     protected function _makeOptionConfirmationCode()
     {
         $sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
-        if (!isset($this->_options[1]) || !isset($sessionHelper->storeCartSessionConversionKey)) {
+        if (!isset($this->_options[1])) {
             return;
         }
         $registry = Zend_Registry::getInstance();
         if ($registry->isRegistered('ConfirmationCartId')) {
-            $cartId = $registry->get('ConfirmationCartId');
+            $cartSession = $registry->get('ConfirmationCartId');
         } else {
             $cartId = $sessionHelper->storeCartSessionConversionKey;
-            $registry->set('ConfirmationCartId', $cartId);
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(
+                intval($cartId)
+            );
+            $registry->set('ConfirmationCartId', $cartSession);
             unset($sessionHelper->storeCartSessionConversionKey);
         }
-        $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(
-            intval($cartId)
-        );
+
         $methodName = 'get' . ucfirst(trim(strtolower($this->_options[1])));
         if (method_exists($cartSession, $methodName)) {
             return $cartSession->$methodName();
