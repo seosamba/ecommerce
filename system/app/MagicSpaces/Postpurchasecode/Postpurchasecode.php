@@ -5,11 +5,10 @@ class MagicSpaces_Postpurchasecode_Postpurchasecode extends Tools_MagicSpaces_Ab
     protected function _run()
     {
         $registry = Zend_Registry::getInstance();
-        if ($registry->isRegistered('ConfirmationCartId')) {
+        if ($registry->isRegistered('postPurchaseCart')) {
             return $this->_spaceContent;
         }
         return '';
-
     }
 
 }
