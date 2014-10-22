@@ -146,6 +146,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                     return $this->$rendererName($sid);
                 }
             }
+        }elseif(in_array('config', $this->_options, true)) {
+            if(isset($this->_shoppingConfig[$this->_options[1]])){
+                return $this->_shoppingConfig[$this->_options[1]];
+            }
+            return '';
         } else {
             $option = strtolower(array_shift($this->_options));
             $methodName = '_render' . ucfirst(strtolower(trim($option)));
@@ -608,14 +613,19 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $addressKey = $this->_options[0];
             if (isset($addressData[$addressKey])) {
                 if (self::ADDRESS_COUNTRY === $addressKey) {
+                    if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+                        return $addressData[$addressKey];
+                    }
                     $countries = Tools_Geo::getCountries(true);
                     return $countries[$addressData[$addressKey]];
+
                 }
                 if (self::ADDRESS_STATE === $addressKey) {
                     $state = Tools_Geo::getStateById($addressData[$addressKey]);
-                    if (empty($state['state'])) {
+                    if (!empty($state['state'])) {
                         return $state['state'];
                     }
+                    return '';
                 }
                 return $addressData[$addressKey];
             }
