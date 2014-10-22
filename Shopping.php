@@ -104,7 +104,9 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CACHE_PREFIX = 'store_';
 
-	/**
+    const KEY_FOR_ACTION_LINK   = 'link_to_action';
+
+    /**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
 	protected $_jsonHelper;
@@ -269,12 +271,16 @@ class Shopping extends Tools_Plugins_Abstract {
 				$this->_jsonHelper->direct($form->getMessages());
 			}
 		}
+
 		$form->populate($config);
 		$this->_view->form = $form;
-		$this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
-		$this->_layout->content = $this->_view->render('config.phtml');
-		$this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
-		echo $this->_layout->render();
+        $linksArray = Shopping::getPostPurchaseAndLandingPageLinks();
+        $this->_view->purchaseactionlink = (isset($linksArray[self::OPTION_THANKYOU])) ? $linksArray[self::OPTION_THANKYOU] : NULL;
+        $this->_view->storeclientloginlink  = (isset($linksArray[self::OPTION_STORE_CLIENT_LOGIN])) ? $linksArray[self::OPTION_STORE_CLIENT_LOGIN] : '';
+        $this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
+        $this->_layout->content = $this->_view->render('config.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
+        echo $this->_layout->render();
 	}
 
 	/**
@@ -1184,6 +1190,23 @@ class Shopping extends Tools_Plugins_Abstract {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             Tools_ExportImportOrders::getSampleOrdersData();
         }
+    }
+
+    /**
+     *  Return links for 'thank you'  and 'client area' pages
+     *
+     * @return array
+     */
+    public static function getPostPurchaseAndLandingPageLinks(){
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+        $arrayLinks = array();
+        if ($thankyou = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_THANKYOU, true)){
+            $arrayLinks[self::OPTION_THANKYOU] = $websiteHelper->getUrl().$thankyou->getUrl();
+        }
+        if ($client_landing = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_STORE_CLIENT_LOGIN, true)){
+            $arrayLinks[self::OPTION_STORE_CLIENT_LOGIN] = $websiteHelper->getUrl().$client_landing->getUrl();
+        }
+        return $arrayLinks;
     }
 
 }
