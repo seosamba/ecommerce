@@ -155,7 +155,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
         $select = $userDbTable->select()
 				->setIntegrityCheck(false)
-				->from('user',array('id', 'full_name', 'email', 'reg_date' ))
+				->from('user',array('id', 'full_name', 'email', 'reg_date', 'mobile_phone' ))
 				->joinLeft(
 					array('cart' => 'shopping_cart_session'),
                     $joinCondition,
@@ -195,7 +195,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		}
 
 		$select->limit($limit, $offset);
-//		error_log($select->__toString());
+
 		return $userDbTable->fetchAll($select)->toArray();
 	}
 }

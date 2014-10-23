@@ -267,6 +267,8 @@ class Tools_ExportImportOrders
                     $userModel->setPassword(microtime());
                     $userModel->setRoleId(Shopping::ROLE_CUSTOMER);
                     $userId = $userMapper->save($userModel);
+                    $existingUsers[$userModel->getEmail()]['id'] = $userId;
+                    $existingUsers[$userModel->getEmail()]['email'] = $userModel->getEmail();
                 } else {
                     $userId = $existingUsers[$userEmail]['id'];
                 }

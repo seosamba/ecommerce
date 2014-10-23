@@ -83,7 +83,7 @@
         &nbsp;
         {{else}}
         <label class="block mt5px"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
-        <input class="hidden" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+        <input class="hide" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
         {{/if}}
 	</div>
     <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
@@ -247,7 +247,7 @@
                     <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mb5px small'), $this->imageDirList); ?>
                     <div class="product-preview page-preview">
                         <img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
-                        <span class="ticon-folder-upload"><?php echo $this->translate('Choose you image');?></span>
+                        <span class="ticon-folder-upload"><?php echo $this->translate('Choose your image');?></span>
                         <input type="hidden" id="things-new-folder" value="products"/>
                         <?php
                             $uploader = $this->toasterUploader(array('id' => 'product-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'filters' => array("image"), 'caption' => " "));
@@ -312,20 +312,26 @@
         <div class="grid_4 omega mt0px">
             <fieldset>
                 <div class="grid_12 alpha omega">
-                    <label for="product-pageTemplate"><?php echo $this->translate('Select a product page template');?></label>
-                    <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
-                        <option value="-1" disabled="disable"><?php echo $this->translate('Select Template');?></option>
-                        <?php foreach ($this->templateList as $tmpl) : ?>
-                        <option value="<?php echo $tmpl->getName(); ?>"><?php echo $tmpl->getName(); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <?php if(!empty($this->templateList)):?>
+                        <label for="product-pageTemplate"><?php echo $this->translate('Select a product page template');?></label>
+                        <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
+                            <option value="-1" disabled="disable"><?php echo $this->translate('Select Template');?></option>
+                            <?php foreach ($this->templateList as $tmpl) : ?>
+                            <option value="<?php echo $tmpl->getName(); ?>"><?php echo $tmpl->getName(); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php else:?>
+                        <div id="templatelist"><h4 class="missing-template message warning text-normal mb10px mt10px">
+                                <strong><?php echo $this->translate('Warning!');?> </strong><?php echo $this->translate('You don\'t have any product template.');?> [ <a href="<?php echo $this->websiteUrl;?>backend/backend_theme/template/"><?php echo $this->translate('Create one now');?>.</a> ]
+                            </h4></div>
+                    <?php endif;?>
                 </div>
                 <div class="grid_6 alpha labeled mt1-5em">
                     <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
                     <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->generalConfig['currency']; ?></label>
                 </div>
                 <div class="grid_6 omega labeled mt1-5em">
-                    <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="0">
+                    <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="&infin;">
                     <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                 </div>
                 <div class="grid_12 alpha omega mt1-5em labeled">

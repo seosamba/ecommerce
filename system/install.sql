@@ -152,7 +152,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('state', '5'),
 ('weightUnit', 'kg'),
 ('zip', '94117'),
-('version', '2.2.0');
+('noZeroPrice', '1'),
+('version', '2.3.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -288,7 +289,11 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_tax_rate` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '0',
   `sub_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total',
+  `shipping_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Shipping Tax',
+  `discount_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Discount Tax',
+  `sub_total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub total Tax',
   `total_tax` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Total Tax',
   `total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total + Total Tax + Shipping',
   `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
@@ -305,10 +310,11 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
   `cart_id` int(10) unsigned DEFAULT NULL,
   `product_id` int(10) unsigned DEFAULT NULL,
   `options` text,
-  `price` decimal(10,4) DEFAULT NULL COMMENT  'Price w/o Tax',
+  `price` decimal(10,4) DEFAULT NULL COMMENT 'Price w/o Tax',
   `qty` int(10) unsigned DEFAULT NULL,
-  `tax` decimal(10,4) DEFAULT NULL COMMENT  'Tax Price',
-  `tax_price` decimal(10,4) DEFAULT NULL COMMENT  'Price + Tax',
+  `tax` decimal(10,4) DEFAULT NULL COMMENT 'Tax Price',
+  `tax_price` decimal(10,4) DEFAULT NULL COMMENT 'Price + Tax',
+  `freebies` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -389,11 +395,11 @@ ALTER TABLE `shopping_customer_info`
 ALTER TABLE `shopping_tax`
   ADD CONSTRAINT `shopping_tax_ibfk_1` FOREIGN KEY (`zoneId`) REFERENCES `shopping_zone` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
-INSERT INTO `page_option` (`id`, `title`, `context`, `active`) VALUES
-('option_checkout', 'The cart checkout page', 'Cart and checkout', 1),
-('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1),
-('option_storeclientlogin', 'Store client landing page', 'Cart and checkout', 1),
-('option_storeshippingterms', 'Shipping terms and conditions', 'Cart and checkout', 1);
+INSERT INTO `page_option` (`id`, `title`, `context`, `active`, `option_usage`) VALUES
+('option_checkout', 'The cart checkout page', 'Cart and checkout', 1, 'once'),
+('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1, 'once'),
+('option_storeclientlogin', 'Store client landing page', 'Cart and checkout', 1, 'once'),
+('option_storeshippingterms', 'Shipping terms and conditions', 'Cart and checkout', 1, 'once');
 
 INSERT INTO `shopping_zone` (`id`, `name`) VALUES
 (1, 'US'),
@@ -500,11 +506,6 @@ INSERT INTO `shopping_zone_state` (`zone_id`, `state_id`) VALUES
 INSERT INTO `email_triggers_recipient` (`recipient`) VALUES
 ('customer'),
 ('sales person');
-
-INSERT INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
-('1', 'store_newcustomer', 'Tools_StoreMailWatchdog'),
-('1', 'store_neworder', 'Tools_StoreMailWatchdog'),
-('1', 'store_trackingnumber', 'Tools_StoreMailWatchdog');
 
 DROP TABLE IF EXISTS `shopping_coupon`;
 CREATE TABLE IF NOT EXISTS `shopping_coupon` (
@@ -621,6 +622,21 @@ INSERT INTO `template_type` (`id`, `title`) VALUES
 ('typeproduct', 'Product page'),
 ('typelisting', 'Product listing');
 
+CREATE TABLE IF NOT EXISTS `shopping_product_freebies_settings` (
+  `prod_id` int(10) unsigned NOT NULL,
+  `price_value` decimal(10,4) DEFAULT 0,
+  `quantity` int(4) unsigned DEFAULT 0,
+  PRIMARY KEY (`prod_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `shopping_product_has_freebies` (
+  `product_id` int(10) unsigned NOT NULL,
+  `freebies_id` int(10) unsigned NOT NULL,
+  `freebies_quantity` int(4) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`,`freebies_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_filtering_attributes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Attribute ID',
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Attribute Name',
@@ -648,6 +664,7 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   `attribute_id` int(10) unsigned NOT NULL COMMENT 'Attribute ID',
   `value` tinytext COLLATE utf8_unicode_ci NOT NULL COMMENT 'Attribute Value',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `attribute_id_2` (`attribute_id`,`product_id`),
   KEY `attribute_id` (`attribute_id`),
   KEY `product_id` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -659,4 +676,4 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   PRIMARY KEY (`real_order_id`,`import_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);
+UPDATE `plugin` SET `version` = '2.3.0' WHERE `name` = 'shopping';

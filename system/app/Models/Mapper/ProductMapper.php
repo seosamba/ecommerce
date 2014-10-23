@@ -76,14 +76,14 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 		);
 
 		if ($model->getId()){
-			$data['updated_at'] = date(DATE_ATOM);
+			$data['updated_at'] = date(Tools_System_Tools::DATE_MYSQL);
 			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
 			$result = $this->getDbTable()->update($data, $where);
 			$model->registerObserver(new Tools_ProductWatchdog(array(
 				'action' => Tools_Cache_GarbageCollector::CLEAN_ONUPDATE
 			)));
 		} else {
-			$data['created_at'] = date(DATE_ATOM);
+			$data['created_at'] = date(Tools_System_Tools::DATE_MYSQL);
 			$id = $this->getDbTable()->insert($data);
 			if ($id){
 				$model->setId($id);

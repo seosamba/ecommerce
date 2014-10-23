@@ -94,6 +94,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
 
+
     const QUANTITY_PICKUP_LOCATION_ON_SCREEN = 6;
 
     const AMOUNT_TYPE_UP_TO = 'up to';
@@ -105,6 +106,8 @@ class Shopping extends Tools_Plugins_Abstract {
     const COMPARE_BY_AMOUNT = 'amount';
 
     const COMPARE_BY_WEIGHT = 'weight';
+
+    const ORDER_CONFIG  = 'orderconfig';
 
     const ORDER_EXPORT_CONFIG = 'order_export_config';
 
@@ -308,6 +311,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (isset($markupConfig['config']) && !empty($markupConfig['config'])) {
 			$markupForm->populate($markupConfig['config']);
 		}
+        $orderConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::ORDER_CONFIG);
+        $orderConfigForm = new Forms_Shipping_OrderConfig();
+        if(isset($orderConfig['config'])){
+            $orderConfigForm->populate($orderConfig['config']);
+        }
 		$freeShippingForm = new Forms_Shipping_FreeShipping();
 		$freeShippingConfig = $shippingConfigMapper->find(self::SHIPPING_FREESHIPPING);
 		if (isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])) {
@@ -342,6 +350,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $pickupLocationConfig = array('1'=>array('id'=>1, 'amount_type_limit'=>Shopping::AMOUNT_TYPE_UP_TO, 'amount_limit'=>0));
         }
         $this->_view->pickupLocationConf = $pickupLocationConfig;
+        $this->_view->orderConfigForm = $orderConfigForm;
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -373,10 +382,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
+                $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
+                        ->setMobilePhone($mobilePhone)
 						->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
@@ -776,7 +787,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$bundledShippers = array(
 			self::SHIPPING_FREESHIPPING,
 			self::SHIPPING_PICKUP,
-			self::SHIPPING_MARKUP
+			self::SHIPPING_MARKUP,
+            self::ORDER_CONFIG
 		);
 
 		if (!in_array($name, $bundledShippers)) {
@@ -794,6 +806,9 @@ class Shopping extends Tools_Plugins_Abstract {
 				case self::SHIPPING_MARKUP:
 					$form = new Forms_Shipping_MarkupShipping();
 					break;
+                case self::ORDER_CONFIG:
+                    $form = new Forms_Shipping_OrderConfig();
+                    break;
 				default:
 					break;
 			}
@@ -853,6 +868,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($cartId) {
 			Tools_ShoppingCart::getInstance()->clean();
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
+            $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
 				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
@@ -996,26 +1012,28 @@ class Shopping extends Tools_Plugins_Abstract {
 		//fetch list of product images
 		$productImages = $dbAdapter->fetchCol("SELECT DISTINCT photo FROM `shopping_product`");
 
-		// return prepared data to the toaster
-		return array(
-			'pages'  => $pages,
-			'tables' => array(
-				'shopping_product'                  => $productsSql,
-				'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
-				'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
-				'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
-				'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
-				'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
-				'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
-				'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
-				'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
-				'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
-			),
-			'media'  => empty($productImages) ? null : array_map(function ($img) {
-				list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
-				return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
-			}, $productImages)
-		);
+        $result = array('pages'  => $pages,
+                        'media'  => empty($productImages) ? null : array_map(function ($img) {
+                                    list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
+                                    return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
+                                }, $productImages)
+        );
+
+        if(!empty($productsIds)) {
+            array_merge($result, array('tables' => array('shopping_product' => $productsSql,
+                                                         'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
+                                                         'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
+                                                         'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
+                                                         'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
+                                                         'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
+                                                         'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
+                                                         'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
+                                                         'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
+                                                         'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
+            )));
+        }
+        // return prepared data to the toaster
+        return $result;
 	}
 
     public function editAccountAction(){
@@ -1032,7 +1050,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $where = $userMapper->getDbTable()->getAdapter()->quoteInto("id <> ?", $this->_sessionHelper->getCurrentUser()->getId());
                     $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
-                    $emailAlreadyExist = $userMapper->fetchAll($where);
+                    $emailAlreadyExist = $userMapper->fetchAll($where, array(), true);
                     if(!empty($emailAlreadyExist)){
                         $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
                     }

@@ -21,6 +21,7 @@ define([
             'keyup #clients-search': 'searchClient',
             'change select[name=groups]': 'assignGroup',
             'blur input.customer-attribute': 'changeCustomAttr',
+            'blur input.mobile-number': 'changeMobileNumber',
             'click th.customer-attribute':'deleteCustomAttr'
         },
         initialize: function(){
@@ -370,6 +371,24 @@ define([
                     }
                 })
             });
+        },
+        changeMobileNumber:function(e){
+            var target = e.currentTarget,
+                data = {};
+            data['mobilePhone'] = $(target).val();
+            $.ajax({
+               url: $('#website_url').val() + 'api/toaster/users/id/' + $(target).data('uid'),
+               method: 'PUT',
+               data: JSON.stringify(data),
+               complete: function(xhr, status, response) {
+                   if (status === 'error'){
+                       showMessage(status, true);
+                   } else {
+                       showMessage(_.isUndefined(i18n['Number saved!'])?'Number saved!':i18n['Number saved!']);
+                   }
+               }
+            });
+
         },
         deleteCustomAttr:function(){
             $('body').on('click', 'th.customer-attribute span', function(e){
