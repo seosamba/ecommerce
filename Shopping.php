@@ -104,8 +104,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CACHE_PREFIX = 'store_';
 
-    const KEY_FOR_ACTION_LINK   = 'link_to_action';
-
     /**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -274,9 +272,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		$form->populate($config);
 		$this->_view->form = $form;
-        $linksArray = Shopping::getPostPurchaseAndLandingPageLinks();
-        $this->_view->purchaseactionlink = (isset($linksArray[self::OPTION_THANKYOU])) ? $linksArray[self::OPTION_THANKYOU] : NULL;
-        $this->_view->storeclientloginlink  = (isset($linksArray[self::OPTION_STORE_CLIENT_LOGIN])) ? $linksArray[self::OPTION_STORE_CLIENT_LOGIN] : '';
         $this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
         $this->_layout->content = $this->_view->render('config.phtml');
         $this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
@@ -1198,15 +1193,23 @@ class Shopping extends Tools_Plugins_Abstract {
      * @return array
      */
     public static function getPostPurchaseAndLandingPageLinks(){
-        $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $arrayLinks = array();
-        if ($thankyou = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_THANKYOU, true)){
-            $arrayLinks[self::OPTION_THANKYOU] = $websiteHelper->getUrl().$thankyou->getUrl();
+
+        $pageOptionsDbRable = new Application_Model_DbTable_PageOption();
+        $select = $pageOptionsDbRable->getAdapter()->select()->from(array('po' => 'page_option'), array('pho.option_id','p.url'))
+                                                             ->joinLeft(array('pho' => 'page_has_option'), 'po.id = pho.option_id', array())
+                                                             ->joinLeft(array('p' => 'page'), 'p.id = pho.page_id', array())
+                                                             ->where('pho.option_id IN (?)', array(self::OPTION_THANKYOU, self::OPTION_STORE_CLIENT_LOGIN));
+        $fertchResult = $pageOptionsDbRable->getAdapter()->fetchAll($select);
+
+        $result = array();
+        foreach($fertchResult as $row){
+            if($row['option_id'] == self::OPTION_STORE_CLIENT_LOGIN){
+                $result[self::OPTION_STORE_CLIENT_LOGIN] = $row['url'];
+            } else if($row['option_id'] == self::OPTION_THANKYOU){
+                $result[self::OPTION_THANKYOU] = $row['url'];
+            }
         }
-        if ($client_landing = Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(self::OPTION_STORE_CLIENT_LOGIN, true)){
-            $arrayLinks[self::OPTION_STORE_CLIENT_LOGIN] = $websiteHelper->getUrl().$client_landing->getUrl();
-        }
-        return $arrayLinks;
+        return $result;
     }
 
 }
