@@ -29,7 +29,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                    href="#pickup-category-<?php echo $category['id']; ?>"><?php echo $category['name']; ?></a></li>
         <?php endforeach; ?>
         <li class="add-new-pickup-location">
-            <a id="new-pickup-location-btn" class="ui-tabs-anchor icon-plus fs16"></a>
+            <a id="new-pickup-location-btn" class="ui-tabs-anchor ticon-plus fs16"></a>
         </li>
     </ul>
     <?php foreach ($this->pickupLocationsCategories as $category): ?>
@@ -100,12 +100,12 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                         ); ?></a>
                 </p>
                 <input type="hidden" name="id" id="location-edit-id"/>
-                <button class="grid_2 omega icon-plus" type="submit"/>
+                <button class="grid_3 btn omega ticon-plus" type="submit"/>
                 <?php echo $this->translate('Create or Update'); ?>
                 </button>
             </form>
 
-            <div class="working-hours-list grid_12 alpha omega hidden"
+            <div class="working-hours-list grid_12 alpha omega hide"
                  title="<?php echo $this->translate('Working hours'); ?>">
                 <p class="grid_6 mt20px"><label><?php echo $this->translate('Sunday'); ?></label>
                     <input type="text" name="working-hours-sunday"/>
@@ -136,7 +136,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 </p>
             </div>
             <div class="content-footer grid_12">
-                <div class="grid_12 alpha omega mt15px location-table">
+                <div class="grid_12 alpha omega location-table">
                     <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
                         <thead class="header-inner">
                         <tr>
@@ -172,4 +172,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     #pickup-locations-table{
         word-break: normal;
     }
-    <style>
+    .ui-dialog{
+        position: absolute;
+    }
+<style>

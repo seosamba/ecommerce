@@ -37,17 +37,21 @@ define([
             this.$('td.location-paginator').html(this.templates.paginator(this.pickupLocation.information));
         },
         renderLocation: function(pickupLocation){
+            var locationName = pickupLocation.get('name');
+            if(locationName.length > 25){
+               locationName = locationName.substr(0, 25)+'...';
+            }
             this.$el.find('tbody').append(
                 '<tr>'+
-                    '<td>'+pickupLocation.get('name')+'</td>'+
+                    '<td>'+locationName+'</td>'+
                     '<td>'+pickupLocation.get('address1')+'</td>'+
                     '<td>'+pickupLocation.get('address2')+'</td>'+
                     '<td>'+pickupLocation.get('city')+'</td>'+
                     '<td>'+pickupLocation.get('zip')+'</td>'+
                     '<td>'+pickupLocation.get('country')+'</td>'+
                     '<td>'+pickupLocation.get('phone')+'</td>'+
-                    '<td><a class="icon-pencil icon14" data-role="edit" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a> ' +
-                    '<a class="icon-remove error icon14" data-role="delete" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a></td>'+
+                    '<td class="text-center"><a class="ticon-pencil icon14" data-role="edit" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a> ' +
+                    '<a class="ticon-remove error icon14" data-role="delete" data-cid="'+pickupLocation.get('id')+'" href="javascript:;"></a></td>'+
                     '</tr>'
 
             );

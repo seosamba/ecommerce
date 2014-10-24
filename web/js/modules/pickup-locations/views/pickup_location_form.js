@@ -68,11 +68,13 @@ define([
                 $(this).dialog('close');
             };
 
+
             $('.working-hours-list').dialog({
-                dialogClass: 'seotoaster',
                 buttons: assignWorkingHoursButtons,
+                width: 350,
+                dialogClass: 'seotoaster',
                 resizable : false,
-                modal: true
+                modal     : true
             });
             return false;
 
