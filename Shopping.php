@@ -536,7 +536,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit));
+			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
 			$content = $widget->setProducts($products)->setCleanListOnly(true)->render();
 			unset($widget);
 		}
