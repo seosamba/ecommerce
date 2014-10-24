@@ -57,9 +57,10 @@ define([
             );
         },
         editLocation: function(e){
-            var locationId = $(e.currentTarget).data('cid');
-            var model = this.pickupLocation.get(locationId);
-            var workingHours = model.get('workingHours');
+            var locationId = $(e.currentTarget).data('cid'),
+                model = this.pickupLocation.get(locationId),
+                workingHours = model.get('workingHours');
+
             $('.location-name').val(model.get('name'));
             $('.location-address1').val(model.get('address1'));
             $('.location-address2').val(model.get('address2'));
@@ -75,11 +76,14 @@ define([
             $('#edit-pickup-location').attr('method', 'PUT');
         },
         deleteLocation: function(e){
-            var cid = $(e.currentTarget).data('cid');
-            var model = this.pickupLocation.get(cid);
-            if (model){
-                model.destroy();
-            }
+            var cid = $(e.currentTarget).data('cid'),
+                model = this.pickupLocation.get(cid);
+
+            showConfirm('Are you sure want to delete', function(){
+                if (model){
+                    model.destroy();
+                }
+            });
         },
         resetLocation: function(){
             this.$el.fnClearTable();

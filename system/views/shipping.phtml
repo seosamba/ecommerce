@@ -86,7 +86,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                         <legend class="background large p5px"><?php echo $this->translate('Shipping pickup configuration'); ?></legend>
                         <p class="grid_6 alpha labeled icon right">
                             <?php echo $this->pickupForm->getElement('title')->setAttrib('class', 'grid_8 alpha omega fl-right')->renderViewHelper();?>
-                            <i class="tooltip info icon-info-sign icon16" title="<?php echo $this->translate('custom title');?>"></i>
+                            <i class="tooltip info ticon-info-sign icon16" title="<?php echo $this->translate('custom title');?>"></i>
                             <?php echo $this->pickupForm->getElement('title')->addDecorator('Label', array('class' => 'grid_4 alpha omega'))->renderLabel();?>
                         </p>
                         <p class="grid_6 omega labeled">
@@ -125,7 +125,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                                         <input class="amount-limit-value grid_8 alpha omega" type="text" name="amount-limit-value"  value="<?php echo $confRow['amount_limit'];?>" />
                                         <label class="amount-limit-value-label grid_4 alpha omega"></label>
                                     </p>
-                                    <button class="remove-pickup-location-zone link fl-right icon inverse-error icon-close" title="<?php echo $this->translate('Remove');?>"></button>
+                                    <button class="remove-pickup-location-zone link fl-right btn icon inverse-error ticon-close" title="<?php echo $this->translate('Remove');?>"></button>
                                     <div class="grid_12 omega">
                                         <?php for($i = 1; $i < Shopping::QUANTITY_PICKUP_LOCATION_ON_SCREEN + 1; $i++):?>
                                             <?php $amountValue = isset($this->pickupLocationConfigZones[$confRow['id'].'_'.$i])? $this->pickupLocationConfigZones[$confRow['id'].'_'.$i]['amount_location_category']: 0;?>
@@ -136,7 +136,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                             <?php endforeach;?>
                         <?php endif;?>
 
-                        <span class="add-pickup-config btn block success icon-plus"><?php echo $this->translate('Add more pickup config');?></span>
+                        <span class="add-pickup-config btn block success ticon-plus"><?php echo $this->translate('Add more pickup config');?></span>
                     </div>
                 </form>
                 <div class="grid_12 clear"></div>
@@ -197,20 +197,22 @@ $(function(){
 
     $('.footer #submit').on('click', function(e){
         showSpinner();
-        var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
-        var indexOfPluginTab = index + 1;
+        var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')'),
+            indexOfPluginTab = index + 1;
+
         if($('#ui-id-'+indexOfPluginTab+'').data('plugin') === '<?php echo Shopping::SHIPPING_PICKUP;?>'){
             e.preventDefault();
 
-            var configRows = $('.pickup-location-conf-row');
-            var configData = [];
-            var configRowId = 0;
-            var amountZoneObject = [];
-            var zoneSelectId = 0;
-            var zoneId = 0;
-            var zoneAmount = 0;
-            var amountTypeLimit = '';
-            var overRestriction = 0;
+            var configRows = $('.pickup-location-conf-row'),
+                configData = [],
+                configRowId = 0,
+                amountZoneObject = [],
+                zoneSelectId = 0,
+                zoneId = 0,
+                zoneAmount = 0,
+                amountTypeLimit = '',
+                overRestriction = 0,
+                defaultPickupConfig = 0;
 
             $.each(configRows, function(){
                 configRowId = $(this).data('pickup-location-row');
@@ -237,7 +239,6 @@ $(function(){
 
             }
 
-            var defaultPickupConfig = 0;
             if($('#defaultPickupConfig').is(':checked')){
                 defaultPickupConfig = 1;
             }
@@ -289,15 +290,18 @@ $(function(){
 
     $('.pickup-config-form').on('click', '.remove-pickup-location-zone', function(e){
         e.preventDefault();
-        var locationRow = $(this).closest('.pickup-location-conf-row');
-        var locationId = locationRow.data('pickup-location-row');
-        $.post($('#website_url').val()+'plugin/shopping/run/deletePickupLocation/', {locationId:locationId}, function(response){
-            if($('.pickup-config-form').find('.pickup-location-conf-row').length > 1){
-                locationRow.remove();
-            }else{
-                locationRow.find('input').val(0);
-            }
-        }, 'json');
+        var locationRow = $(this).closest('.pickup-location-conf-row'),
+            locationId = locationRow.data('pickup-location-row');
+
+        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function(){
+            $.post($('#website_url').val()+'plugin/shopping/run/deletePickupLocation/', {locationId:locationId}, function(response){
+                if($('.pickup-config-form').find('.pickup-location-conf-row').length > 1){
+                    locationRow.remove();
+                }else{
+                    locationRow.find('input').val(0);
+                }
+            }, 'json');
+       });
     });
 
     var previousCategory = '';
@@ -305,18 +309,19 @@ $(function(){
     $('.pickup-location-category').on('focus', function(){
         previousCategory = this.value;
     }).change(function() {
-            var selectId = $(this).data('pickup-category-select');
-            var selectedCategory = $(this).find('option:selected').val();
-            var selectElements = $('.pickup-location-category:not([data-pickup-category-select="'+selectId+'"])');
+            var selectId = $(this).data('pickup-category-select'),
+                selectedCategory = $(this).find('option:selected').val(),
+                selectElements = $('.pickup-location-category:not([data-pickup-category-select="'+selectId+'"])');
+
             selectElements.find('option[value="'+selectedCategory+'"]').prop('disabled', true);
             selectElements.find('option[value="0"]').prop('disabled', false);
             selectElements.find('option[value="'+previousCategory+'"]').prop('disabled', false);
     });
 
     $('.add-pickup-config').on('click', function(e){
-        var lastPickupLocationRateRow     = $('.pickup-location-conf-row').last();
-        var numberOfRow         = lastPickupLocationRateRow.data('pickup-location-row');
-        var rowDiv = '<fieldset class="pickup-location-conf-row background mb10px" data-pickup-location-row="'+(numberOfRow+1)+'">'+lastPickupLocationRateRow.html()+'</fieldset>';
+        var lastPickupLocationRateRow     = $('.pickup-location-conf-row').last(),
+            numberOfRow         = lastPickupLocationRateRow.data('pickup-location-row'),
+            rowDiv = '<fieldset class="pickup-location-conf-row background mb10px" data-pickup-location-row="'+(numberOfRow+1)+'">'+lastPickupLocationRateRow.html()+'</fieldset>';
         lastPickupLocationRateRow.after(rowDiv);
         $('.pickup-location-conf-row').last().find('input[type=text]').val(0);
     });
