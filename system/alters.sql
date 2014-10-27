@@ -69,7 +69,7 @@ UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'optio
 UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeshippingterms';
 
 -- 24/10/2014
--- version: 2.3.1
+-- version: 2.3.0
 CREATE TABLE IF NOT EXISTS `shopping_pickup_location_category` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
