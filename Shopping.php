@@ -942,17 +942,20 @@ class Shopping extends Tools_Plugins_Abstract {
         );
 
         if(!empty($productsIds)) {
-            array_merge($result, array('tables' => array('shopping_product' => $productsSql,
-                                                         'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
-                                                         'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
-                                                         'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
-                                                         'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
-                                                         'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
-                                                         'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
-                                                         'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
-                                                         'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
-                                                         'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
-            )));
+            $result = array_merge($result, array(
+                'tables' => array(
+                    'shopping_product'                  => $productsSql,
+                    'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
+                    'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
+                    'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
+                    'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
+                    'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
+                    'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
+                    'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
+                    'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
+                    'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
+                )
+            ));
         }
         // return prepared data to the toaster
         return $result;
