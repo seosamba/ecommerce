@@ -17,11 +17,15 @@ define([ './views/app' ], function(AppView){
         jsPickupLogoUploader.bind('BeforeUpload', function(uploader, file) {
             $('#progressbar').fadeIn().progressbar({value: 0});
             file.name = 'catid'+$('.ui-state-active').find('a').data('category-id')+'.'+file.name.split('.').pop();
+            jsPickupLogoUploader.settings.resize = {
+                width : 32,
+                quality : 90
+            }
         });
         jsPickupLogoUploader.bind('UploadProgress', function(uploader, file) {
             $('#progressbar').progressbar({value: file.percent});
             $('#progressbar .value').text(file.percent);
-        })
+        });
         jsPickupLogoUploader.bind('FileUploaded', function(uploader, file) {
             var websiteUrl = $('#website_url').val();
             var timestamp = new Date().getTime();
