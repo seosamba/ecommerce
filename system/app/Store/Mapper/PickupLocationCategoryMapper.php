@@ -13,6 +13,10 @@ class Store_Mapper_PickupLocationCategoryMapper extends Application_Model_Mapper
     protected $_dbTable = 'Store_DbTable_PickupLocationCategory';
 
 
+    /**
+     * @param Store_Model_PickupLocationCategory $model
+     * @return bool|mixed
+     */
     public function save($model)
     {
         if (!$model instanceof $this->_model) {
@@ -20,7 +24,7 @@ class Store_Mapper_PickupLocationCategoryMapper extends Application_Model_Mapper
         }
         $data = array(
             'name' => $model->getName(),
-            'img'  => $model->getImg()
+            'img' => $model->getImg()
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);
@@ -32,6 +36,12 @@ class Store_Mapper_PickupLocationCategoryMapper extends Application_Model_Mapper
         return $result;
     }
 
+    /**
+     * Delete pickup location category id
+     *
+     * @param int $id
+     * @return array
+     */
     public function delete($id)
     {
         $result = array();

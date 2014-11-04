@@ -14,11 +14,18 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
 
     protected static $_lastQueryResultCount = false;
 
-    public function lastQueryResultCount($flag){
-        self::$_lastQueryResultCount = (bool) $flag;
+    public function lastQueryResultCount($flag)
+    {
+        self::$_lastQueryResultCount = (bool)$flag;
         return $this;
     }
 
+    /**
+     * Save pickup locations data
+     *
+     * @param Store_Model_PickupLocation $model
+     * @return bool|mixed
+     */
     public function save($model)
     {
         if (!$model instanceof $this->_model) {
@@ -34,8 +41,8 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'phone' => $model->getPhone(),
             'location_category_id' => $model->getLocationCategoryId(),
             'name' => $model->getName(),
-            'lat'  => $model->getLat(),
-            'lng'  => $model->getLng(),
+            'lat' => $model->getLat(),
+            'lng' => $model->getLng(),
             'weight' => $model->getWeight()
         );
         if ($model->getId() === null) {
@@ -48,6 +55,15 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
         return $result;
     }
 
+    /**
+     * Get pickup locations data
+     *
+     * @param int $categoryId (category(zone id) of the pickup locations)
+     * @param string $order OPTIONAL An SQL ORDER clause.
+     * @param int $limit OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
+     * @return array
+     */
     public function fetchAll($categoryId = null, $order = null, $limit = null, $offset = null)
     {
         $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
@@ -75,6 +91,12 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
         return $this->getDbTable()->fetchAll($select)->toArray();
     }
 
+    /**
+     * Delete single pickup location
+     *
+     * @param int $id
+     * @return array
+     */
     public function delete($id)
     {
         $result = array();

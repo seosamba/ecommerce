@@ -12,7 +12,11 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
 
     protected $_dbTable = 'Store_DbTable_PickupLocationConfig';
 
-
+    /**
+     * Save pickup locations config
+     *
+     * @param Store_Model_PickupLocationConfig $model
+     */
     public function save($model)
     {
         if (!$model instanceof $this->_model) {
@@ -36,6 +40,12 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
 
     }
 
+    /**
+     * Process and save location zones
+     *
+     * @param int $configId Pickup location config id
+     * @param array $zones
+     */
     private function _saveLocationZones($configId, $zones)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto("config_id=?", $configId);
@@ -53,6 +63,11 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         }
     }
 
+    /**
+     * Get pickup location config
+     *
+     * @return array
+     */
     public function getConfig()
     {
         $select = $this->getDbTable()->getAdapter()->select()
@@ -60,6 +75,11 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
+    /**
+     * Get pickup locations zones
+     *
+     * @return array
+     */
     public function getLocationZones()
     {
         $select = $this->getDbTable()->getAdapter()->select()
@@ -77,6 +97,12 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
     }
 
 
+    /**
+     * Get pickup locations zones full info
+     *
+     * @param int $zonesQuantity An SQL LIMIT count
+     * @return array
+     */
     public function getLocationZonesInfo($zonesQuantity)
     {
         $select = $this->getDbTable()->getAdapter()->select()
@@ -89,18 +115,40 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchAll($select);
     }
 
-    public function getLocations($comparator, $locationId = false, $coordinates = array(), $maxWeight = false)
-    {
+    /**
+     * Get shipping pickup location data
+     *
+     * @param $comparator (find by price or by weight)
+     * @param bool $locationId (find by pickup location id)
+     * @param array $coordinates (location coordinates latitudeStart, latitudeEnd, longitudeStart, longitudeEnd)
+     * @param bool $maxWeight  (limit by weight)
+     * @param bool $groupByCities (group by cities)
+     * @param array $searchBy (search by specific fields like: city, country, etc ...)
+     * @return array|mixed
+     */
+    public function getLocations(
+        $comparator,
+        $locationId = false,
+        $coordinates = array(),
+        $maxWeight = false,
+        $groupByCities = false,
+        $searchBy = array()
+    ) {
         $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
         $where = $pickupLocationsZonesConfig->getAdapter()->quoteInto('shplz.pickup_location_category_id <> ?', 0);
         if ($locationId) {
             $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.id = ?', $locationId);
         }
-        if($maxWeight){
+        if ($maxWeight) {
             $where .= ' AND (' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.weight > ?', $maxWeight);
             $where .= ' OR shpl.weight IS NULL';
-            $where .= ' OR '. $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.weight = ?', 0);
+            $where .= ' OR ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.weight = ?', 0);
             $where .= ' ) ';
+        }
+        if (!empty($searchBy)) {
+            foreach ($searchBy as $field => $value) {
+                $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto($field . ' = ?', $value);
+            }
         }
         if (!empty($coordinates)) {
             $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
@@ -161,7 +209,16 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
                 array('splc' => 'shopping_pickup_location_config'),
                 'splc.id=shplz.config_id',
                 array('limitType' => 'amount_type_limit', 'amount_limit')
-            )->group('shpl.id');
+            );
+        if ($groupByCities) {
+            $where .= ' AND  ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto(
+                'shpl.city  <> ?',
+                ''
+            );
+            $select->group(array('shpl.city', 'shpl.country'));
+        } else {
+            $select->group('shpl.id');
+        }
 
         $select->where($where);
         if ($locationId) {
@@ -172,9 +229,15 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
 
     }
 
+    /**
+     * Save cart pickup locations
+     *
+     * @param int $cartId Shopping cart id
+     * @param array $address (address1, address2, zip, country, city, working_hours, phone, location_category_id, name, lat, lng)
+     */
     public function saveCartPickupLocation($cartId, $address = array())
     {
-        if(!empty($address)){
+        if (!empty($address)) {
             $pickupLocationsCart = new Store_DbTable_PickupLocationCart();
             $where = $pickupLocationsCart->getAdapter()->quoteInto('cart_id = ?', $cartId);
             $cartLocationExist = $pickupLocationsCart->getAdapter()->fetchAll(
@@ -193,8 +256,8 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
                 'phone' => $address['phone'],
                 'location_category_id' => $address['location_category_id'],
                 'name' => $address['name'],
-                'lat'  => $address['lat'],
-                'lng'  => $address['lng']
+                'lat' => $address['lat'],
+                'lng' => $address['lng']
             );
             if (empty($cartLocationExist)) {
                 $pickupLocationsCart->insert($data, $where);
@@ -204,6 +267,12 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         }
     }
 
+    /**
+     * Get pickup location by cart id
+     *
+     * @param int $cartId
+     * @return mixed
+     */
     public function getCartPickupLocationByCartId($cartId)
     {
         $pickupLocationsCart = new Store_DbTable_PickupLocationCart();
@@ -216,6 +285,12 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
 
     }
 
+    /**
+     * Get pickup location user address by user id
+     *
+     * @param int $userId
+     * @return array
+     */
     public function getUserAddressByUserId($userId)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('scs.user_id = ?', $userId);
@@ -228,6 +303,11 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         return $this->getDbTable()->getAdapter()->fetchCol($select);
     }
 
+    /**
+     * Delete pickup location config by id
+     *
+     * @param int $configId
+     */
     public function deleteConfig($configId)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto("id = ?", $configId);

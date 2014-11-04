@@ -77,13 +77,17 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                 <?php $this->pickupForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
                 <form class="pickup-config-form mt10px" name="pickup-config-form" action="<?php echo $this->websiteUrl.$this->pickupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
                     <?php echo $this->pickupForm->getElement('shipper')->renderViewHelper(); ?>
-                    <lable>
+                    <label>
                         <?php echo $this->pickupForm->getElement('defaultPickupConfig')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
                         <?php echo $this->translate('Default pickup behaviour');?>
-                    </lable>
+                    </label>
 
                     <fieldset class="config-fields-pickup-config mt10px background hidden">
                         <legend class="background large p5px"><?php echo $this->translate('Shipping pickup configuration'); ?></legend>
+                        <label>
+                            <?php echo $this->pickupForm->getElement('searchEnabled')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
+                            <?php echo $this->translate('Display location search on checkout');?>
+                        </label>
                         <p class="grid_6 alpha labeled icon right">
                             <?php echo $this->pickupForm->getElement('title')->setAttrib('class', 'grid_8 alpha omega fl-right')->renderViewHelper();?>
                             <i class="tooltip info ticon-info-sign icon16" title="<?php echo $this->translate('custom title');?>"></i>
@@ -110,7 +114,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                             <?php endfor;?>
                         </div>
                     </fieldset>
-                    <div id="pickup-location-config-grid" class="mt20px scroll h150px hidden">
+                    <div id="pickup-location-config-grid" class="mt10px scroll h150px hidden">
                         <?php if(isset($this->pickupLocationConf) && !empty($this->pickupLocationConf)):?>
                             <?php foreach($this->pickupLocationConf as $confRow):?>
                                 <fieldset class="pickup-location-conf-row background mb10px" data-pickup-location-row="<?php echo $confRow['id'];?>">
@@ -212,7 +216,8 @@ $(function(){
                 zoneAmount = 0,
                 amountTypeLimit = '',
                 overRestriction = 0,
-                defaultPickupConfig = 0;
+                defaultPickupConfig = 0,
+                searchEnabled = 0;
 
             $.each(configRows, function(){
                 configRowId = $(this).data('pickup-location-row');
@@ -243,6 +248,10 @@ $(function(){
                 defaultPickupConfig = 1;
             }
 
+            if($('#searchEnabled').is(':checked')){
+                searchEnabled = 1;
+            }
+
             $.ajax({
                 type: "POST",
                 url: $('.pickup-config-form').attr('action'),
@@ -252,7 +261,8 @@ $(function(){
                     title:$('#title').val(),
                     units:$('#units option:selected').val(),
                     shipper:'<?php echo Shopping::SHIPPING_PICKUP;?>',
-                    defaultPickupConfig:defaultPickupConfig
+                    defaultPickupConfig:defaultPickupConfig,
+                    searchEnabled:searchEnabled
                 }
             }).done(function(response) {
                 if(response.done){

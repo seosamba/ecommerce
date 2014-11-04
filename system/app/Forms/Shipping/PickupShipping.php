@@ -46,6 +46,14 @@ class Forms_Shipping_PickupShipping extends Zend_Form
         );
 
         $this->addElement(
+            'checkbox',
+            'searchEnabled',
+            array(
+                'label' => 'Display location search on checkout'
+            )
+        );
+
+        $this->addElement(
             'select',
             'units',
             array(

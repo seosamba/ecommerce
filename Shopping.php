@@ -821,7 +821,8 @@ class Shopping extends Tools_Plugins_Abstract {
                             'config' => array(
                                 'title' => $pickupLocationConfig['title'],
                                 'units' => $pickupLocationConfig['units'],
-                                'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig']
+                                'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig'],
+                                'searchEnabled' => $pickupLocationConfig['searchEnabled']
                             )
                         );
                         if (isset($pickupLocationConfig['configData']) && !empty($pickupLocationConfig['configData'])) {
@@ -1162,6 +1163,9 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    /**
+     * Pickup locations zones config
+     */
     protected function pickupLocationAction()
     {
         $pickupLocationCategory = Store_Mapper_PickupLocationCategoryMapper::getInstance();
@@ -1177,11 +1181,15 @@ class Shopping extends Tools_Plugins_Abstract {
         echo $this->_layout->render();
     }
 
-    public function deletePickupLocationAction(){
-        if(Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+    /**
+     * Delete pickup location config row
+     */
+    public function deletePickupLocationAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $locationId = filter_var($this->_request->getParam('locationId'), FILTER_SANITIZE_NUMBER_INT);
-            if($locationId){
-                $pickupLocationCategory = Store_Mapper_PickupLocationConfigMapper::getInstance()->deleteConfig($locationId);
+            if ($locationId) {
+                Store_Mapper_PickupLocationConfigMapper::getInstance()->deleteConfig($locationId);
                 $this->_responseHelper->success('');
             }
         }
