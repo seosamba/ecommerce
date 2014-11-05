@@ -700,6 +700,9 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `notes` text 	COLLATE utf8_unicode_ci DEFAULT NULL,
   `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
+  INDEX `country` (`country`),
+  INDEX `city` (`city`),
+  INDEX `country_city` (`city`, `country`),
   FOREIGN KEY (`location_category_id`)
         REFERENCES `shopping_pickup_location_category`(`id`)
         ON DELETE CASCADE
