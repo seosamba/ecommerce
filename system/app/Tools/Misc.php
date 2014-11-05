@@ -5,44 +5,45 @@
  *
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
-class Tools_Misc {
+class Tools_Misc
+{
 
     /**
      * Localized list of names for currencies
      */
     const KEY_CURRENCY_LIST = 'currency_list';
 
-    const SECTION_STORE_MANAGEZONES     = 'zones';
+    const SECTION_STORE_MANAGEZONES = 'zones';
 
-    const SECTION_STORE_TAXES           = 'taxes';
+    const SECTION_STORE_TAXES = 'taxes';
 
-    const SECTION_STORE_CONFIG          = 'storeconfig';
+    const SECTION_STORE_CONFIG = 'storeconfig';
 
-    const SECTION_STORE_SHIPPINGCONFIG  = 'shippingconfig';
+    const SECTION_STORE_SHIPPINGCONFIG = 'shippingconfig';
 
-    const SECTION_STORE_ADDEDITPRODUCT  = 'addproduct';
+    const SECTION_STORE_ADDEDITPRODUCT = 'addproduct';
 
-    const SECTION_STORE_BRANDLOGOS      = 'brandlogos';
+    const SECTION_STORE_BRANDLOGOS = 'brandlogos';
 
-    const SECTION_STORE_MERCHANDISING   = 'merchandising';
+    const SECTION_STORE_MERCHANDISING = 'merchandising';
 
-    const SECTION_STORE_IMPORTORDERS    = 'ordersimportconfig';
+    const SECTION_STORE_IMPORTORDERS = 'ordersimportconfig';
 
-    const CS_ALIAS_PENDING              = 'new_quote';
+    const CS_ALIAS_PENDING = 'new_quote';
 
-    const CS_ALIAS_PROCESSING           = 'quote_sent';
+    const CS_ALIAS_PROCESSING = 'quote_sent';
 
-    const CS_ALIAS_LOST_OPPORTUNITY     = 'lost_opportunity';
+    const CS_ALIAS_LOST_OPPORTUNITY = 'lost_opportunity';
 
-    const EXCHANGE_PATH              =  'https://query.yahooapis.com/v1/public/yql?q=';
+    const EXCHANGE_PATH = 'https://query.yahooapis.com/v1/public/yql?q=';
 
-    const EXCHANGE_ADDITIONAL_PARAMS =  '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
+    const EXCHANGE_ADDITIONAL_PARAMS = '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
 
     /*
      * Changes for name inc. Tax 
      * Put in array country abbr and name for change 'AU'=>'GST'
      */
-    public static $_taxName     = array('AU'=>'GST', 'FR'=>'TVA');
+    public static $_taxName = array('AU' => 'GST', 'FR' => 'TVA');
 
     public static $_weightUnits = array(
         'kg' => 'Kilogram (kg)',
@@ -50,15 +51,15 @@ class Tools_Misc {
     );
 
 
-    public static $_helpHashMap  = array(
-        self::SECTION_STORE_MANAGEZONES     => 'shopping-cart-shipping-tax-zones.html',
-        self::SECTION_STORE_TAXES           => 'shopping-cart-tax-calculation.html',
-        self::SECTION_STORE_CONFIG          => 'setup-online-shopping-cart.html',
-        self::SECTION_STORE_SHIPPINGCONFIG  => 'shopping-cart-shipping-calculator.html',
-        self::SECTION_STORE_ADDEDITPRODUCT  => 'ecommerce-cms.html',
-        self::SECTION_STORE_BRANDLOGOS      => 'e-commerce-product-brands.html',
-        self::SECTION_STORE_MERCHANDISING   => 'ecommerce-marketing.html',
-        self::SECTION_STORE_IMPORTORDERS    => 'import-orders.html'
+    public static $_helpHashMap = array(
+        self::SECTION_STORE_MANAGEZONES => 'shopping-cart-shipping-tax-zones.html',
+        self::SECTION_STORE_TAXES => 'shopping-cart-tax-calculation.html',
+        self::SECTION_STORE_CONFIG => 'setup-online-shopping-cart.html',
+        self::SECTION_STORE_SHIPPINGCONFIG => 'shopping-cart-shipping-calculator.html',
+        self::SECTION_STORE_ADDEDITPRODUCT => 'ecommerce-cms.html',
+        self::SECTION_STORE_BRANDLOGOS => 'e-commerce-product-brands.html',
+        self::SECTION_STORE_MERCHANDISING => 'ecommerce-marketing.html',
+        self::SECTION_STORE_IMPORTORDERS => 'import-orders.html'
     );
 
     /**
@@ -226,27 +227,41 @@ class Tools_Misc {
         "ZWL" => "Zimbabwean Dollar"
     );
 
-    public static function getShippingPluginContent($shippingPlugin) {
+    public static function getShippingPluginContent($shippingPlugin)
+    {
         $className = ucfirst($shippingPlugin);
-        $method    = 'getConfigScreen';
-        if(class_exists($className) && method_exists($className, $method)) {
-            return preg_replace('~name="([-_\w\s\d]+)([\[\]]{0,2})"~','name="shippingExternal[$1]$2"', $className::$method());
+        $method = 'getConfigScreen';
+        if (class_exists($className) && method_exists($className, $method)) {
+            return preg_replace(
+                '~name="([-_\w\s\d]+)([\[\]]{0,2})"~',
+                'name="shippingExternal[$1]$2"',
+                $className::$method()
+            );
         }
     }
 
-    public static function getCurrencyList(){
-        $cacheHelper   = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
-        if(($data = $cacheHelper->load(self::KEY_CURRENCY_LIST, 'store_')) === null) {
+    public static function getCurrencyList()
+    {
+        $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+        if (($data = $cacheHelper->load(self::KEY_CURRENCY_LIST, 'store_')) === null) {
             $zendCurrenciesList = Zend_Locale::getTranslationList('NameToCurrency');
             $data = array();
-            foreach (self::$_currenciesFilter as $currency => $name){
-                if (array_key_exists($currency, $zendCurrenciesList)){
+            foreach (self::$_currenciesFilter as $currency => $name) {
+                if (array_key_exists($currency, $zendCurrenciesList)) {
                     $currencySymbol = Zend_Locale::getTranslation($currency, 'CurrencySymbol');
-                    $data[$currency] = ucwords($zendCurrenciesList[$currency]) . ($currencySymbol !== false ? ' ('.$currencySymbol.')' : '' ) ;
+                    $data[$currency] = ucwords(
+                        $zendCurrenciesList[$currency]
+                    ) . ($currencySymbol !== false ? ' (' . $currencySymbol . ')' : '');
                 }
             }
             asort($data);
-            $cacheHelper->save(self::KEY_CURRENCY_LIST, $data, 'store_', array('locale'), Helpers_Action_Cache::CACHE_LONG);
+            $cacheHelper->save(
+                self::KEY_CURRENCY_LIST,
+                $data,
+                'store_',
+                array('locale'),
+                Helpers_Action_Cache::CACHE_LONG
+            );
         }
         return $data;
     }
@@ -256,33 +271,38 @@ class Tools_Misc {
      *
      * @return array
      */
-    public static function getCurrencyFormat() {
+    public static function getCurrencyFormat()
+    {
         $currency = Zend_Registry::get('Zend_Currency');
-        $format   = strtr($currency->toCurrency(0), array('0' => 'x', '.'=> '', ',' => '', $currency->getSymbol() => '%s' ));
+        $format = strtr(
+            $currency->toCurrency(0),
+            array('0' => 'x', '.' => '', ',' => '', $currency->getSymbol() => '%s')
+        );
         return array(
-            'decimal'   => preg_replace('/.*0([\.,])0.*/u', '$1', $currency->toCurrency(0) ),
-            'thousand'  => preg_replace('/.*1(.?)000.*/u', '$1', $currency->toCurrency(1000)),
-            'symbol'    => $currency->getSymbol(),
-            'format'    => preg_replace('/x+/', '%v', $format),
+            'decimal' => preg_replace('/.*0([\.,])0.*/u', '$1', $currency->toCurrency(0)),
+            'thousand' => preg_replace('/.*1(.?)000.*/u', '$1', $currency->toCurrency(1000)),
+            'symbol' => $currency->getSymbol(),
+            'format' => preg_replace('/x+/', '%v', $format),
             'precision' => 2
         );
     }
 
-    public static function clenupAddress($address) {
-        $_addressTmpl   = array(
-            'address_type'  => '',
-            'firstname'     => '',
-            'lastname'      => '',
-            'company'       => '',
-            'email'         => '',
-            'address1'      => '',
-            'address2'      => '',
-            'country'       => '',
-            'city'          => '',
-            'state'         => '',
-            'zip'           => '',
-            'phone'         => '',
-            'mobile'        => ''
+    public static function clenupAddress($address)
+    {
+        $_addressTmpl = array(
+            'address_type' => '',
+            'firstname' => '',
+            'lastname' => '',
+            'company' => '',
+            'email' => '',
+            'address1' => '',
+            'address2' => '',
+            'country' => '',
+            'city' => '',
+            'state' => '',
+            'zip' => '',
+            'phone' => '',
+            'mobile' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);
@@ -290,21 +310,23 @@ class Tools_Misc {
         return $address;
     }
 
-    public static function getAddressUniqKey($address) {
+    public static function getAddressUniqKey($address)
+    {
         $address = self::clenupAddress($address);
         return md5(http_build_query($address));
     }
 
-    public static function getDefaultProductOptions(Models_Model_Product $product) {
+    public static function getDefaultProductOptions(Models_Model_Product $product)
+    {
         $productOptions = $product->getDefaultOptions();
-        if(!is_array($productOptions) || empty($productOptions)) {
+        if (!is_array($productOptions) || empty($productOptions)) {
             return array();
         }
-        foreach($productOptions as $option) {
-            if(isset($option['selection']) && is_array($option['selection']) && !empty($option['selection'])) {
+        foreach ($productOptions as $option) {
+            if (isset($option['selection']) && is_array($option['selection']) && !empty($option['selection'])) {
                 $selections = $option['selection'];
-                foreach($selections as $selectionData) {
-                    if(!$selectionData['isDefault']) {
+                foreach ($selections as $selectionData) {
+                    if (!$selectionData['isDefault']) {
                         continue;
                     }
                     return array(
@@ -317,15 +339,17 @@ class Tools_Misc {
         }
     }
 
-    public static function getCheckoutPage() {
+    public static function getCheckoutPage()
+    {
         return Application_Model_Mappers_PageMapper::getInstance()->fetchByOption(Shopping::OPTION_CHECKOUT, true);
     }
 
-    public static function getTaxName() {
+    public static function getTaxName()
+    {
         $country = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country');
-        if(isset($country) && array_key_exists($country, self::$_taxName)){
+        if (isset($country) && array_key_exists($country, self::$_taxName)) {
             return self::$_taxName[$country];
-        }else{
+        } else {
             return '';
         }
     }
@@ -334,76 +358,91 @@ class Tools_Misc {
      * Currency Conversion by Yahoo Finance Xchange Service
      *
      * @param $price
-     * @param $currency
+     * @param string $currency (USD, AUD, etc...)
      * @return float currency rate
      */
-    public static function getConvertedPriceByCurrency($price, $currency) {
-        $amount = number_format($price,2,".",",");
+    public static function getConvertedPriceByCurrency($price, $currency)
+    {
+        $amount = number_format($price, 2, ".", ",");
         $translator = Zend_Registry::get('Zend_Translate');
         $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
-        $yqlQuery = 'SELECT * FROM yahoo.finance.xchange WHERE pair IN ("'.$shoppingCurrency.$currency.'")';
-        $requestUrl = self::EXCHANGE_PATH.urlencode($yqlQuery).self::EXCHANGE_ADDITIONAL_PARAMS;
+        $yqlQuery = 'SELECT * FROM yahoo.finance.xchange WHERE pair IN ("' . $currency . $shoppingCurrency . '")';
+        $requestUrl = self::EXCHANGE_PATH . urlencode($yqlQuery) . self::EXCHANGE_ADDITIONAL_PARAMS;
         $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, $requestUrl);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        $responce = curl_exec($ch);
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        $response = curl_exec($ch);
         curl_close($ch);
-        $resultDecode = json_decode($responce);
-        if ($resultDecode->error){
-            throw new Exceptions_SeotoasterPluginException($translator->translate('Can not automatically convert: '.$shoppingCurrency.' to '.$currency));
+        $resultDecode = json_decode($response);
+        if ($resultDecode->error) {
+            throw new Exceptions_SeotoasterPluginException($translator->translate(
+                'Can not automatically convert:'
+            ) . ' ' . $shoppingCurrency . ' ' . $translator->translate('to') . ' ' . $currency);
         }
 
-        return number_format($amount/$resultDecode->query->results->rate->Rate, 2);
+        return number_format($amount / $resultDecode->query->results->rate->Rate, 2);
     }
 
 
-
-    public static function prepareProductImage($photoSrc, $newSize = 'product'){
+    public static function prepareProductImage($photoSrc, $newSize = 'product')
+    {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
-        $websiteUrl    = (Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('mediaServers') ? Tools_Content_Tools::applyMediaServers($websiteHelper->getUrl()) : $websiteHelper->getUrl());
-        if (preg_match('~^https?://.*~', $photoSrc)){
+        $websiteUrl = (Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig(
+            'mediaServers'
+        ) ? Tools_Content_Tools::applyMediaServers($websiteHelper->getUrl()) : $websiteHelper->getUrl());
+        if (preg_match('~^https?://.*~', $photoSrc)) {
             $tmp = parse_url($photoSrc);
             $path = explode('/', trim($tmp['path'], '/'));
-            if (is_array($path)){
+            if (is_array($path)) {
                 $imgName = array_pop($path);
                 $guessSize = array_pop($path);
-                if (in_array($guessSize, array('small', 'medium', 'large', 'original')) && $guessSize !== $newSize ){
+                if (in_array($guessSize, array('small', 'medium', 'large', 'original')) && $guessSize !== $newSize) {
                     $guessSize = $newSize;
                 }
-                return $tmp['scheme'] .'://'. implode('/', array(
-                    $tmp['host'],
-                    implode('/', $path),
-                    $guessSize,
-                    $imgName
-                ));
+                return $tmp['scheme'] . '://' . implode(
+                    '/',
+                    array(
+                        $tmp['host'],
+                        implode('/', $path),
+                        $guessSize,
+                        $imgName
+                    )
+                );
             }
             return $photoSrc;
         } else {
-            $photoSrc = str_replace('/', '/'.$newSize.'/', $photoSrc);
+            $photoSrc = str_replace('/', '/' . $newSize . '/', $photoSrc);
             return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
         }
     }
 
 
-    public static function getJsTranslationLanguage(){
+    public static function getJsTranslationLanguage()
+    {
         $miscConfig = Zend_Registry::get('misc');
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
         $translator = Zend_Registry::get('Zend_Translate');
         $locale = $translator->getLocale();
-        $translationFilePath =  $websiteHelper->getPath().$miscConfig['pluginsPath'].'shopping'.DIRECTORY_SEPARATOR.'web'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'nls'.DIRECTORY_SEPARATOR.$locale.'_ln.js';
-        if(!file_exists($translationFilePath)){
+        $translationFilePath = $websiteHelper->getPath(
+        ) . $miscConfig['pluginsPath'] . 'shopping' . DIRECTORY_SEPARATOR . 'web' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'nls' . DIRECTORY_SEPARATOR . $locale . '_ln.js';
+        if (!file_exists($translationFilePath)) {
             return 'en_US';
         }
         return $locale;
 
     }
 
-    public static function getDefaultCheckoutErrorMessage(){
+    public static function getDefaultCheckoutErrorMessage()
+    {
         $translator = Zend_Registry::get('Zend_Translate');
-        $checkoutErrorMessage = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::SHIPPING_ERROR_MESSAGE);
-        if($checkoutErrorMessage === null){
-            $checkoutErrorMessage = $translator->translate('There is an issue with the shipping information provided, please contact us for support.');
+        $checkoutErrorMessage = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(
+            Shopping::SHIPPING_ERROR_MESSAGE
+        );
+        if ($checkoutErrorMessage === null) {
+            $checkoutErrorMessage = $translator->translate(
+                'There is an issue with the shipping information provided, please contact us for support.'
+            );
         }
         return $checkoutErrorMessage;
     }
@@ -415,31 +454,44 @@ class Tools_Misc {
      *
      * @return string
      */
-    public static function preparingProductListing($templateContent, $product, $dictionary = array(), $noZeroPrice = 0) {
-        $translator   = Zend_Registry::get('Zend_Translate');
+    public static function preparingProductListing($templateContent, $product, $dictionary = array(), $noZeroPrice = 0)
+    {
+        $translator = Zend_Registry::get('Zend_Translate');
         $entityParser = new Tools_Content_EntityParser();
 
         //setting up the entity parser
         $entityParser->addToDictionary($dictionary);
 
         // fetching $product:price and $product:freeshipping widgets and rendering them via native widget
-        if (preg_match_all('~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~', $templateContent, $productPriceWidgets)) {
+        if (preg_match_all(
+            '~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~',
+            $templateContent,
+            $productPriceWidgets
+        )
+        ) {
             $replacements = array();
             foreach ($productPriceWidgets[1] as $key => $widgetData) {
-                if(!$product->getPage() instanceof Application_Model_Models_Page) {
+                if (!$product->getPage() instanceof Application_Model_Models_Page) {
                     continue;
                 }
-                $args   = array_filter(explode(':', $widgetData));
-                $widget = Tools_Factory_WidgetFactory::createWidget('product', $args, array('id' => $product->getPage()->getId()));
-                $key    = trim($productPriceWidgets[0][$key], '{}');
+                $args = array_filter(explode(':', $widgetData));
+                $widget = Tools_Factory_WidgetFactory::createWidget(
+                    'product',
+                    $args,
+                    array('id' => $product->getPage()->getId())
+                );
+                $key = trim($productPriceWidgets[0][$key], '{}');
                 $replacements[$key] = $widget->render();
 
                 if ($widgetData === 'price' || $widgetData === 'price:original') {
-                    if ((int) $noZeroPrice === 1 && floatval($product->getPrice()) == 0) {
-                        $replacements[$key]                                  = '';
-                        $replacements['$store:addtocart']                    = '<a class="tcart-add go-to-product" href="'.($product->getPage() ? $product->getPage()->getUrl() : 'javascript:;').'">'.$translator->translate('Go to product').'</a>';
-                        $replacements['$store:addtocart:'.$product->getId()] = $replacements['$store:addtocart'];
-                        $replacements['$store:addtocart:checkbox']           = $replacements['$store:addtocart'];
+                    if ((int)$noZeroPrice === 1 && floatval($product->getPrice()) == 0) {
+                        $replacements[$key] = '';
+                        $replacements['$store:addtocart'] = '<a class="tcart-add go-to-product" href="' . ($product->getPage(
+                        ) ? $product->getPage()->getUrl() : 'javascript:;') . '">' . $translator->translate(
+                            'Go to product'
+                        ) . '</a>';
+                        $replacements['$store:addtocart:' . $product->getId()] = $replacements['$store:addtocart'];
+                        $replacements['$store:addtocart:checkbox'] = $replacements['$store:addtocart'];
                     }
                 }
             }
