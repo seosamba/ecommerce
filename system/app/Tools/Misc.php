@@ -39,7 +39,6 @@ class Tools_Misc
 
     const EXCHANGE_ADDITIONAL_PARAMS = '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
 
-    const CACHEABLE = true;
 
     /*
      * Changes for name inc. Tax 
@@ -369,11 +368,7 @@ class Tools_Misc
         $translator = Zend_Registry::get('Zend_Translate');
         $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
         $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
-        if (self::CACHEABLE == true) {
-            $currRate = $cacheHelper->load('currency_' . $currency . '_to_' . $shoppingCurrency, 'store_');
-        } else {
-            $currRate = null;
-        }
+        $currRate = $cacheHelper->load('currency_' . $currency . '_to_' . $shoppingCurrency, 'store_');
         if (is_null($currRate)) {
             $yqlQuery = 'SELECT * FROM yahoo.finance.xchange WHERE pair IN ("' . $currency . $shoppingCurrency . '")';
             $requestUrl = self::EXCHANGE_PATH . urlencode($yqlQuery) . self::EXCHANGE_ADDITIONAL_PARAMS;
@@ -390,10 +385,8 @@ class Tools_Misc
                     ) . ' ' . $shoppingCurrency . ' ' . $translator->translate('to') . ' ' . $currency);
             } else {
                 $currRate = $resultDecode->query->results->rate->Rate;
-                if (self::CACHEABLE == true) {
-                    $cacheHelper->save('currency_' . $currency . '_to_' . $shoppingCurrency, $currRate, 'store_',
+                $cacheHelper->save('currency_' . $currency . '_to_' . $shoppingCurrency, $currRate, 'store_',
                         array(), Helpers_Action_Cache::CACHE_LONG);
-                }
             }
         }
         return number_format($amount / $currRate, 2);
