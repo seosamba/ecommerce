@@ -39,6 +39,7 @@ class Tools_Misc
 
     const EXCHANGE_ADDITIONAL_PARAMS = '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
 
+
     /*
      * Changes for name inc. Tax 
      * Put in array country abbr and name for change 'AU'=>'GST'
@@ -359,29 +360,36 @@ class Tools_Misc
      *
      * @param $price
      * @param string $currency (USD, AUD, etc...)
-     * @return float currency rate
+     * @return float converted price
      */
     public static function getConvertedPriceByCurrency($price, $currency)
     {
         $amount = number_format($price, 2, ".", ",");
         $translator = Zend_Registry::get('Zend_Translate');
         $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
-        $yqlQuery = 'SELECT * FROM yahoo.finance.xchange WHERE pair IN ("' . $currency . $shoppingCurrency . '")';
-        $requestUrl = self::EXCHANGE_PATH . urlencode($yqlQuery) . self::EXCHANGE_ADDITIONAL_PARAMS;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $requestUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $resultDecode = json_decode($response);
-        if ($resultDecode->error) {
-            throw new Exceptions_SeotoasterPluginException($translator->translate(
-                'Can not automatically convert:'
-            ) . ' ' . $shoppingCurrency . ' ' . $translator->translate('to') . ' ' . $currency);
+        $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+        $currRate = $cacheHelper->load('currency_' . $currency . '_to_' . $shoppingCurrency, 'store_');
+        if (is_null($currRate)) {
+            $yqlQuery = 'SELECT * FROM yahoo.finance.xchange WHERE pair IN ("' . $currency . $shoppingCurrency . '")';
+            $requestUrl = self::EXCHANGE_PATH . urlencode($yqlQuery) . self::EXCHANGE_ADDITIONAL_PARAMS;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $requestUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            $response = curl_exec($ch);
+            curl_close($ch);
+            $resultDecode = json_decode($response);
+            if ($response === false) {
+                throw new Exceptions_SeotoasterPluginException($translator->translate(
+                        'Can not automatically convert:'
+                    ) . ' ' . $shoppingCurrency . ' ' . $translator->translate('to') . ' ' . $currency);
+            } else {
+                $currRate = $resultDecode->query->results->rate->Rate;
+                $cacheHelper->save('currency_' . $currency . '_to_' . $shoppingCurrency, $currRate, 'store_',
+                        array(), Helpers_Action_Cache::CACHE_LONG);
+            }
         }
-
-        return number_format($amount / $resultDecode->query->results->rate->Rate, 2);
+        return number_format($amount / $currRate, 2);
     }
 
 
