@@ -1,8 +1,9 @@
+<?php $this->headTitle('Manage product'); ?>
 <?php
 $this->headScript()
     ->appendFile($this->websiteUrl.'system/js/external/waypoints/waypoints.min.js')
     ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
-    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+//    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
     ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
         null,
         array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/product/config')
@@ -261,7 +262,7 @@ $this->headLink()
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mb5px small'), $this->imageDirList); ?>
                         <div class="product-preview page-preview">
                             <img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
-                            <span class="ticon-folder-upload"><?php echo $this->translate('Choose you image');?></span>
+                            <span class="ticon-folder-upload"><?php echo $this->translate('Choose your image');?></span>
                             <input type="hidden" id="things-new-folder" value="products"/>
                             <?php
                                 $uploader = $this->toasterUploader(array('id' => 'product-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'filters' => array("image"), 'caption' => " "));
@@ -326,6 +327,7 @@ $this->headLink()
             <div class="grid_4 omega mt0px">
                 <fieldset>
                     <div class="grid_12 alpha omega">
+                    <?php if(!empty($this->templateList)):?>
                         <label for="product-pageTemplate"><?php echo $this->translate('Select a product page template');?></label>
                         <select name="product-pageTemplate" id="product-pageTemplate" data-reflection="pageTemplate">
                             <option value="-1" disabled="disable"><?php echo $this->translate('Select Template');?></option>
@@ -333,6 +335,13 @@ $this->headLink()
                             <option value="<?php echo $tmpl->getName(); ?>"><?php echo $tmpl->getName(); ?></option>
                             <?php endforeach; ?>
                         </select>
+                    <?php else:?>
+                        <div id="templatelist">
+                            <h4 class="missing-template message warning text-normal mb10px mt10px">
+                                <strong><?php echo $this->translate('Warning!');?> </strong><?php echo $this->translate('You don\'t have any product template.');?> [ <a href="<?php echo $this->websiteUrl;?>backend/backend_theme/template/"><?php echo $this->translate('Create one now');?>.</a> ]
+                            </h4>
+                        </div>
+                    <?php endif;?>
                     </div>
                     <div class="grid_6 alpha labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>

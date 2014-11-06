@@ -153,7 +153,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('weightUnit', 'kg'),
 ('zip', '94117'),
 ('noZeroPrice', '1'),
-('version', '2.2.4');
+('version', '2.3.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -395,11 +395,11 @@ ALTER TABLE `shopping_customer_info`
 ALTER TABLE `shopping_tax`
   ADD CONSTRAINT `shopping_tax_ibfk_1` FOREIGN KEY (`zoneId`) REFERENCES `shopping_zone` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
-INSERT INTO `page_option` (`id`, `title`, `context`, `active`) VALUES
-('option_checkout', 'The cart checkout page', 'Cart and checkout', 1),
-('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1),
-('option_storeclientlogin', 'Store client landing page', 'Cart and checkout', 1),
-('option_storeshippingterms', 'Shipping terms and conditions', 'Cart and checkout', 1);
+INSERT INTO `page_option` (`id`, `title`, `context`, `active`, `option_usage`) VALUES
+('option_checkout', 'The cart checkout page', 'Cart and checkout', 1, 'once'),
+('option_storethankyou', 'Post purchase "Thank you" page', 'Cart and checkout', 1, 'once'),
+('option_storeclientlogin', 'Store client landing page', 'Cart and checkout', 1, 'once'),
+('option_storeshippingterms', 'Shipping terms and conditions', 'Cart and checkout', 1, 'once');
 
 INSERT INTO `shopping_zone` (`id`, `name`) VALUES
 (1, 'US'),
@@ -676,4 +676,4 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
   PRIMARY KEY (`real_order_id`,`import_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.2.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.3.0' WHERE `name` = 'shopping';

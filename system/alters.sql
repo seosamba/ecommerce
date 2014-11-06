@@ -61,7 +61,17 @@ CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
 -- version: 2.2.3
 ALTER TABLE `shopping_filtering_values` ADD UNIQUE (`attribute_id`, `product_id`);
 
+-- 29/09/2014
+-- version: 2.2.4
+UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_checkout';
+UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storethankyou';
+UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeclientlogin';
+UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeshippingterms';
+
+-- 30/09/2014
+-- version: 2.2.5
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.2.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.3.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

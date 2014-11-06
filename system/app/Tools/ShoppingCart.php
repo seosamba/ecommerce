@@ -342,20 +342,22 @@ class Tools_ShoppingCart {
 						$product->setPrice($cartItem['price']);
 					}
 
-                    $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
-                    if($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())){
-                        $product->setGroupPriceEnabled(1);
-                        $priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
-                        $product->setPrice($priceForGroup);
-                        $cartItem['price'] = $priceForGroup;
-                        $cartItem['groupPriceEnabled'] = 1;
-                    }
+                    if (isset($cartItem['groupPriceEnabled'])) {
+                        $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
+                        if ($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())) {
+                            $product->setGroupPriceEnabled(1);
+                            $priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
+                            $product->setPrice($priceForGroup);
+                            $cartItem['price'] = $priceForGroup;
+                            $cartItem['groupPriceEnabled'] = 1;
+                        }
 
-                    if($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())){
-                        $cartItem['groupPriceEnabled'] = 0;
-                        $product->setGroupPriceEnabled(0);
-                        $product->setPrice($cartItem['originalPrice']);
-                        $cartItem['price'] = $cartItem['originalPrice'];
+                        if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
+                            $cartItem['groupPriceEnabled'] = 0;
+                            $product->setGroupPriceEnabled(0);
+                            $product->setPrice($cartItem['originalPrice']);
+                            $cartItem['price'] = $cartItem['originalPrice'];
+                        }
                     }
 
 					$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
@@ -610,23 +612,7 @@ class Tools_ShoppingCart {
 		}
 
 		$cartSessionContent = array();
-//		if ($this->getContent()){
-//			foreach ($this->getContent() as $uniqKey => $item) {
-//				$data = array(
-//					'product_id' => isset($item['product_id']) ? $item['product_id'] : $item['id'],
-//					'price'      => $item['price'],
-//					'qty'        => $item['qty'],
-//					'tax'        => $item['tax'],
-//					'tax_price'  => $item['taxPrice'],
-//					'options'    => isset($item['options']) ? $item['options'] : array()
-//				);
-//
-//				foreach ($item['options'] as $option) {
-//					$data['options'][$option['option_id']] = isset($option['id']) ? $option['id'] : $option['title'];
-//				}
-//				array_push($cartSessionContent, $data);
-//			}
-//		}
+
 		$cartSession->setCartContent($this->getContent())
 				->setIpAddress($_SERVER['REMOTE_ADDR'])
 				->setOptions($this->calculate());
@@ -641,11 +627,19 @@ class Tools_ShoppingCart {
 			$cartSession->setReferer($customer->getReferer());
 		}
 
-		if (null !== ($shippingData = $this->getShippingData())) {
-			$cartSession->setShippingPrice($shippingData['price'])
-					->setShippingType($shippingData['type'])
-					->setShippingService($shippingData['service']);
-		}
+        if (null !== ($shippingData = $this->getShippingData())) {
+            $cartSession->setShippingPrice($shippingData['price']);
+            if (isset($shippingData['type'])) {
+                $cartSession->setShippingType($shippingData['type']);
+            } else {
+                $cartSession->setShippingType(null);
+            }
+            if (isset($shippingData['service'])) {
+                $cartSession->setShippingService($shippingData['service']);
+            } else {
+                $cartSession->setShippingService(null);
+            }
+        }
 
 		if ($this->getNotes()) {
 			$cartSession->setNotes($this->getNotes());
