@@ -208,7 +208,12 @@
         </div>
     </div>
 
-    <div class="tabs-nav-wrap grid_9 alpha omega">
+    <div class="nav-links header fl-right">
+        <a class="show-list info inverse ticon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
+        <span class="text-line"><?php echo $this->translate('Product'); ?></span>
+        <a id="new-product" class="success inverse ticon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
+    </div>
+    <div class="tabs-nav-wrap">
         <span class="arrow left ticon-arrow-left3"></span>
         <span class="arrow right ticon-arrow-right3"></span>
         <ul class="header">
@@ -231,11 +236,6 @@
                 </li>
             <?php endforeach; ?>
         </ul>
-    </div>
-    <div class="nav-links header grid_3 alpha omega">
-        <a class="show-list info inverse ticon-edit" href="javascript:;" data-listtype="edit" title="<?php echo $this->translate('Edit product'); ?>"></a>
-        <span class="text-line"><?php echo $this->translate('Product'); ?></span>
-        <a id="new-product" class="success inverse ticon-plus-sign" href="#new" title="<?php echo $this->translate('New product'); ?>"></a>
     </div>
     <!--------- MAIN INFO -------------->
     <input type="hidden" name="mediaPath" value="<?php echo $this->websiteConfig['media']; ?>" id="media-path"/>
