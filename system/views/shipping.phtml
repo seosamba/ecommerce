@@ -75,7 +75,7 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             </div>
             <div id="pickup">
                 <?php $this->pickupForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
-                <form class="pickup-config-form mt10px" name="pickup-config-form" action="<?php echo $this->websiteUrl.$this->pickupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
+                <form class="pickup-config-form mt10px" name="pickup-config-form" action="<?php echo $this->pickupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
                     <?php echo $this->pickupForm->getElement('shipper')->renderViewHelper(); ?>
                     <label>
                         <?php echo $this->pickupForm->getElement('defaultPickupConfig')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
