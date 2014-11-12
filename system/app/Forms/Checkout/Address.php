@@ -112,7 +112,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'ViewHelper',
 			'Label',
 			'Errors',
-			array('HtmlTag', array('tag' => 'div'))
+			array('HtmlTag', array('tag' => 'p'))
 		));
 
 		if (isset($shippingTocCheckbox)){
