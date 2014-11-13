@@ -79,6 +79,11 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
     $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
     });
+
+    $('body').on('click', 'a.load_screen', function(e){
+        e.preventDefault();
+        $(".close").get(0).click();
+    })
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
 
@@ -105,12 +110,19 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
 				<?php echo $elem->renderLabel();?>
                 <?php echo $elem->renderViewHelper();?>
 			</div>
-			<?php endforeach; ?>
+            <?php endforeach; ?>
+            <?php if($subform->getId() == 'display' && sizeof(Shopping::getPostPurchaseAndLandingPageLinks()) > 0 ):?>
+                <?php $links = Shopping::getPostPurchaseAndLandingPageLinks();?>
+                <?php if(!empty($links[Shopping::OPTION_THANKYOU])) :?>
+                    <div><a href="<?php echo $this->websiteUrl.$links[Shopping::OPTION_THANKYOU]; ?>" target="_blank"><?php echo $this->translate('Your post purchase page');?></a></div>
+                <?php endif;?>
+                <?php if(!empty($links[Shopping::OPTION_STORE_CLIENT_LOGIN])) :?>
+                    <div><a href="<?php echo $this->websiteUrl.$links[Shopping::OPTION_STORE_CLIENT_LOGIN]; ?>" target="_blank"><?php echo $this->translate('Your client area page');?></a></div>
+                <?php endif;?>
+            <?php endif;?>
 		</fieldset>
-	<?php endforeach; ?>
+    <?php endforeach; ?>
 	</form>
-
-	<?php //echo $this->form; ?>
     <div class="footer grid_12">
 	    <button id="save-btn" class="btn ticon-save mr-grid"><?php echo $this->translate('Save');?></button>
     </div>

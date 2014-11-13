@@ -104,7 +104,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CACHE_PREFIX = 'store_';
 
-	/**
+    /**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
 	protected $_jsonHelper;
@@ -269,12 +269,13 @@ class Shopping extends Tools_Plugins_Abstract {
 				$this->_jsonHelper->direct($form->getMessages());
 			}
 		}
+
 		$form->populate($config);
 		$this->_view->form = $form;
-		$this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
-		$this->_layout->content = $this->_view->render('config.phtml');
-		$this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
-		echo $this->_layout->render();
+        $this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
+        $this->_layout->content = $this->_view->render('config.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
+        echo $this->_layout->render();
 	}
 
 	/**
@@ -1187,6 +1188,31 @@ class Shopping extends Tools_Plugins_Abstract {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             Tools_ExportImportOrders::getSampleOrdersData();
         }
+    }
+
+    /**
+     *  Return links for 'thank you'  and 'client area' pages
+     *
+     * @return array
+     */
+    public static function getPostPurchaseAndLandingPageLinks(){
+
+        $pageOptionsDbRable = new Application_Model_DbTable_PageOption();
+        $select = $pageOptionsDbRable->getAdapter()->select()->from(array('po' => 'page_option'), array('pho.option_id','p.url'))
+                                                             ->joinLeft(array('pho' => 'page_has_option'), 'po.id = pho.option_id', array())
+                                                             ->joinLeft(array('p' => 'page'), 'p.id = pho.page_id', array())
+                                                             ->where('pho.option_id IN (?)', array(self::OPTION_THANKYOU, self::OPTION_STORE_CLIENT_LOGIN));
+        $fertchResult = $pageOptionsDbRable->getAdapter()->fetchAll($select);
+
+        $result = array();
+        foreach($fertchResult as $row){
+            if($row['option_id'] == self::OPTION_STORE_CLIENT_LOGIN){
+                $result[self::OPTION_STORE_CLIENT_LOGIN] = $row['url'];
+            } else if($row['option_id'] == self::OPTION_THANKYOU){
+                $result[self::OPTION_THANKYOU] = $row['url'];
+            }
+        }
+        return $result;
     }
 
 }
