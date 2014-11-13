@@ -33,7 +33,17 @@ class Tools_Misc {
     const CS_ALIAS_PROCESSING           = 'quote_sent';
 
     const CS_ALIAS_LOST_OPPORTUNITY     = 'lost_opportunity';
-    
+
+    /**
+     * Option for the client page
+     */
+    const OPTION_STORE_CLIENT_LOGIN = 'option_storeclientlogin';
+
+    /**
+     * Option for the page options system
+     */
+    const OPTION_THANKYOU = 'option_storethankyou';
+
     /*
      * Changes for name inc. Tax 
      * Put in array country abbr and name for change 'AU'=>'GST'

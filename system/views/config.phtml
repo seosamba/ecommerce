@@ -79,11 +79,6 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
     $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
     });
-
-    $('body').on('click', 'a.load_screen', function(e){
-        e.preventDefault();
-        $(".close").get(0).click();
-    })
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
 
@@ -111,15 +106,22 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
                 <?php echo $elem->renderViewHelper();?>
 			</div>
             <?php endforeach; ?>
-            <?php if($subform->getId() == 'display' && sizeof(Shopping::getPostPurchaseAndLandingPageLinks()) > 0 ):?>
-                <?php $links = Shopping::getPostPurchaseAndLandingPageLinks();?>
-                <?php if(!empty($links[Shopping::OPTION_THANKYOU])) :?>
-                    <div><a href="<?php echo $this->websiteUrl.$links[Shopping::OPTION_THANKYOU]; ?>" target="_blank"><?php echo $this->translate('Your post purchase page');?></a></div>
-                <?php endif;?>
-                <?php if(!empty($links[Shopping::OPTION_STORE_CLIENT_LOGIN])) :?>
-                    <div><a href="<?php echo $this->websiteUrl.$links[Shopping::OPTION_STORE_CLIENT_LOGIN]; ?>" target="_blank"><?php echo $this->translate('Your client area page');?></a></div>
-                <?php endif;?>
-            <?php endif;?>
+            <?php if ($subform->getId() == 'display' && sizeof(Shopping::getPostPurchaseAndLandingPageLinks()) > 0): ?>
+                <?php $links = Shopping::getPostPurchaseAndLandingPageLinks(); ?>
+                <?php $pagesArray = array(
+                    Tools_Misc::OPTION_THANKYOU => $this->translate('Your post purchase page'),
+                    Tools_Misc::OPTION_STORE_CLIENT_LOGIN => $this->translate('Your client area page')
+                )
+                ?>
+                <?php array_walk($pagesArray, function ($value, $key) use ($links) {
+                    if (array_key_exists($key, $links)) {
+                        ?>
+                        <div><a href="<?php echo $this->websiteUrl . $links[$key]['url']; ?>"
+                                target="_blank"><?php echo $value; ?></a></div>
+                    <?php
+                    }
+                }) ?>
+            <?php endif; ?>
 		</fieldset>
     <?php endforeach; ?>
 	</form>

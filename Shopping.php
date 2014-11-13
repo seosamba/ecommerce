@@ -51,27 +51,20 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CHECKOUT_PAGE_CACHE_ID = 'cart_checkoutpage';
 
-	/**
-	 * Option for the client page
-	 */
-	const OPTION_STORE_CLIENT_LOGIN = 'option_storeclientlogin';
-
-	/**
+    /**
 	 * Option for the page options system.
 	 */
 	const OPTION_CHECKOUT = 'option_checkout';
 
 	const OPTION_STORE_SHIPPING_TERMS = 'option_storeshippingterms';
 
-	/**
-	 * Option for the page options system
-	 */
-	const OPTION_THANKYOU = 'option_storethankyou';
+    const KEY_CHECKOUT_SIGNUP = 'signup';
 
-	const KEY_CHECKOUT_SIGNUP = 'signup';
-	const KEY_CHECKOUT_ADDRESS = 'address';
-	const KEY_CHECKOUT_SHIPPER = 'shipper';
-	const KEY_CHECKOUT_PICKUP = 'pickup';
+    const KEY_CHECKOUT_ADDRESS = 'address';
+
+    const KEY_CHECKOUT_SHIPPER = 'shipper';
+
+    const KEY_CHECKOUT_PICKUP = 'pickup';
 
 	const SHIPPING_FREESHIPPING = 'freeshipping';
 
@@ -1192,24 +1185,15 @@ class Shopping extends Tools_Plugins_Abstract {
      *
      * @return array
      */
-    public static function getPostPurchaseAndLandingPageLinks(){
-
+    public static function getPostPurchaseAndLandingPageLinks()
+    {
         $pageOptionsDbRable = new Application_Model_DbTable_PageOption();
-        $select = $pageOptionsDbRable->getAdapter()->select()->from(array('po' => 'page_option'), array('pho.option_id','p.url'))
-                                                             ->joinLeft(array('pho' => 'page_has_option'), 'po.id = pho.option_id', array())
-                                                             ->joinLeft(array('p' => 'page'), 'p.id = pho.page_id', array())
-                                                             ->where('pho.option_id IN (?)', array(self::OPTION_THANKYOU, self::OPTION_STORE_CLIENT_LOGIN));
-        $fertchResult = $pageOptionsDbRable->getAdapter()->fetchAll($select);
-
-        $result = array();
-        foreach($fertchResult as $row){
-            if($row['option_id'] == self::OPTION_STORE_CLIENT_LOGIN){
-                $result[self::OPTION_STORE_CLIENT_LOGIN] = $row['url'];
-            } else if($row['option_id'] == self::OPTION_THANKYOU){
-                $result[self::OPTION_THANKYOU] = $row['url'];
-            }
-        }
-        return $result;
+        $select = $pageOptionsDbRable->getAdapter()->select()->from(array('po' => 'page_option'),
+            array('pho.option_id', 'p.url'))
+            ->joinLeft(array('pho' => 'page_has_option'), 'po.id = pho.option_id', array())
+            ->joinLeft(array('p' => 'page'), 'p.id = pho.page_id', array())
+            ->where('pho.option_id IN (?)', array(Tools_Misc::OPTION_THANKYOU, Tools_Misc::OPTION_STORE_CLIENT_LOGIN));
+        return $pageOptionsDbRable->getAdapter()->fetchAssoc($select);
     }
 
 }
