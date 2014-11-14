@@ -106,8 +106,8 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
                 <?php echo $elem->renderViewHelper();?>
 			</div>
             <?php endforeach; ?>
-            <?php if ($subform->getId() == 'display' && sizeof(Shopping::getPostPurchaseAndLandingPageLinks()) > 0): ?>
-                <?php $links = Shopping::getPostPurchaseAndLandingPageLinks(); ?>
+            <?php if ($subform->getId() === 'display' && sizeof(Tools_Misc::getPostPurchaseAndLandingPageLinks()) > 0): ?>
+                <?php $links = Tools_Misc::getPostPurchaseAndLandingPageLinks(); ?>
                 <?php $pagesArray = array(
                     Tools_Misc::OPTION_THANKYOU => $this->translate('Your post purchase page'),
                     Tools_Misc::OPTION_STORE_CLIENT_LOGIN => $this->translate('Your client area page')
