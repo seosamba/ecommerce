@@ -52,11 +52,21 @@ class Shopping extends Tools_Plugins_Abstract {
 	const CHECKOUT_PAGE_CACHE_ID = 'cart_checkoutpage';
 
     /**
+     * Option for the client page
+     */
+    const OPTION_STORE_CLIENT_LOGIN = 'option_storeclientlogin';
+
+    /**
 	 * Option for the page options system.
 	 */
 	const OPTION_CHECKOUT = 'option_checkout';
 
 	const OPTION_STORE_SHIPPING_TERMS = 'option_storeshippingterms';
+
+    /**
+     * Option for the page options system
+     */
+    const OPTION_THANKYOU = 'option_storethankyou';
 
     const KEY_CHECKOUT_SIGNUP = 'signup';
 
