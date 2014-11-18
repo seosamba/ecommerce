@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
 
 -- 29/05/2014
 -- version: 2.2.1
-ALTER TABLE `shopping_quote` ADD COLUMN `internal_note` text COLLATE utf8_unicode_ci AFTER `disclaimer`;
+
 
 -- 30/05/2014
 -- version: 2.2.2
