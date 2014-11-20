@@ -167,9 +167,10 @@ define([
             this.model.set({freeShipping: this.$('#free-shipping').prop('checked') ? 1 :0 });
         },
 		newTag: function(e){
-			var name = $.trim(e.currentTarget.value);
+			var name = $.trim(e.currentTarget.value),
+                tagValidation = new RegExp(/[^\u0080-\uFFFF\w\s-]+/gi);
             if (e.keyCode == 13 && name !== '') {
-                if (name.indexOf(',') > 0) {
+                if(tagValidation.test(name)){
                     showMessage(_.isUndefined(i18n['Tag name should contain only letters, digits and spaces'])?'Tag name should contain only letters, digits and spaces':i18n['Tag name should contain only letters, digits and spaces'], true);
                     $(e.currentTarget).blur();
                     return false;
