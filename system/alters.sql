@@ -142,7 +142,6 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
 UPDATE `template_type` SET `title` = 'Checkout' WHERE `id` = 'typecheckout';
 UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 
-
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.3.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
