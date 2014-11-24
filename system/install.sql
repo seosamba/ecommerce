@@ -618,8 +618,8 @@ CREATE TABLE IF NOT EXISTS `shopping_group_price` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `template_type` (`id`, `title`) VALUES
-('typecheckout', 'Checkout page'),
-('typeproduct', 'Product page'),
+('typecheckout', 'Checkout'),
+('typeproduct', 'Product'),
 ('typelisting', 'Product listing');
 
 CREATE TABLE IF NOT EXISTS `shopping_product_freebies_settings` (
@@ -742,4 +742,4 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.3.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.3.2' WHERE `name` = 'shopping';
