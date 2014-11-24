@@ -42,6 +42,23 @@
 			<?php else: ?>
 				<span><?php echo $this->translate('not provided');?></span>
 			<?php endif;?>
+            <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                <div class="pickup-location-info">
+                    <h4 class="title"><?php echo $this->translate('Location info');?>:</h4>
+                    <p><?php echo $this->translate('Location name');?>: <span class="location-name"><?php echo $this->pickupLocationData['name'];?></span></p>
+                    <p><?php echo $this->translate('Location phone');?>: <span class="location-phone"><?php echo $this->pickupLocationData['phone'];?></span></p>
+                    <?php $pickupWorkingHours = unserialize($this->pickupLocationData['working_hours']);?>
+                    <div class="location-working-hours">
+                        <p><?php echo $this->translate('Sunday');?>: <span><?php echo $pickupWorkingHours['sunday'];?></span></p>
+                        <p><?php echo $this->translate('Monday');?>: <span><?php echo $pickupWorkingHours['monday'];?></span></p>
+                        <p><?php echo $this->translate('Tuesday');?>: <span><?php echo $pickupWorkingHours['tuesday'];?></span></p>
+                        <p><?php echo $this->translate('Wednesday');?>: <span><?php echo $pickupWorkingHours['wednesday'];?></span></p>
+                        <p><?php echo $this->translate('Thursday');?>: <span><?php echo $pickupWorkingHours['thursday'];?></span></p>
+                        <p><?php echo $this->translate('Friday');?>: <span><?php echo $pickupWorkingHours['friday'];?></span></p>
+                        <p><?php echo $this->translate('Saturday');?>: <span><?php echo $pickupWorkingHours['saturday'];?></span></p>
+                    </div>
+                </div>
+            <?php endif;?>
 		</div>
 	</div>
 
@@ -58,7 +75,7 @@
             <span><?php echo $shippingAddress['firstname'];?></span>
 			<span><?php echo $shippingAddress['lastname'];?></span>
 			<br/>
-			<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP) : ?>
+			<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && $this->defaultPickup) : ?>
 			<span><?php echo $shippingAddress['phone'];?></span>
 		</div>
 		<h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
@@ -75,7 +92,23 @@
 			<span><?php echo $this->shoppingConfig['country'];?></span>
 			<br/>
 			<img src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig, 640, 300); ?>" alt="">
-			<?php else : ?>
+            <?php elseif($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                <span><?php echo $shippingAddress['phone'];?></span>
+                </div>
+                <h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
+                <div>
+                    <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
+                    <br/>
+                    <span class="locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
+                    <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+                    <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
+                    <br/>
+                    <span><?php echo $countries[$shippingAddress['country']];?></span>
+                    <br/>
+                   <a href="<?php echo 'https://maps.google.com/?q='.$shippingAddress['address1'].'+'.$shippingAddress['city'].'+'.$shippingAddress['state'];?>" target="_blank">
+                     <img src="<?php echo Tools_Geo::generateStaticGmaps($shippingAddress, 640, 300); ?>" alt="">
+                   </a>
+            <?php else : ?>
 				<span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
 				<br/>
 				<span class="locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
@@ -284,6 +317,32 @@
 			<?php else: ?>
 				<span><?php echo $this->translate('not provided');?></span>
 			<?php endif;?>
+            <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                <div class="pickup-location-info">
+                    <span style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Location info');?>:</span>
+                    <br/>
+                    <?php echo $this->translate('Location name');?>: <span class="location-name"><?php echo $this->pickupLocationData['name'];?></span>
+                    <br/>
+                    <?php echo $this->translate('Location phone');?>: <span class="location-phone"><?php echo $this->pickupLocationData['phone'];?></span>
+                    <br/>
+                    <?php $pickupWorkingHours = unserialize($this->pickupLocationData['working_hours']);?>
+                    <div class="location-working-hours">
+                        <?php echo $this->translate('Sunday');?>: <span><?php echo $pickupWorkingHours['sunday'];?></span>
+                        <br/>
+                        <?php echo $this->translate('Monday');?>: <span><?php echo $pickupWorkingHours['monday'];?></span>
+                        <br/>
+                        <?php echo $this->translate('Tuesday');?>: <span><?php echo $pickupWorkingHours['tuesday'];?></span>
+                        <br/>
+                        <?php echo $this->translate('Wednesday');?>: <span><?php echo $pickupWorkingHours['wednesday'];?></span>
+                        <br/>
+                        <?php echo $this->translate('Thursday');?>: <span><?php echo $pickupWorkingHours['thursday'];?></span>
+                        <br/>
+                        <?php echo $this->translate('Friday');?>: <span><?php echo $pickupWorkingHours['friday'];?></span>
+                        <br/>
+                        <?php echo $this->translate('Saturday');?>: <span><?php echo $pickupWorkingHours['saturday'];?></span>
+                    </div>
+                </div>
+            <?php endif;?>
 		</p>
 	</div>
 
@@ -300,31 +359,63 @@
 		<p style="color:#444444;">
 			<?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
 				<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId); ?>
-                <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
-                    <span><?php echo $shippingAddress['company'];?></span><br />
+
+                <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                    <span><?php echo $shippingAddress['firstname'];?></span>
+                    <span><?php echo $shippingAddress['lastname'];?></span>
+                    <br/>
+                    <?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
+                        <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
+                        <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <br />
+                    <span class="title"
+                          style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Pickup location');?>
+                        :</span>
+                    <br />
+                    <span><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
+                    <br/>
+                    <span><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
+                    <?php $state = Tools_Geo::getStateById($shippingAddress['state']); ?>
+                    <?php if (isset($state['state']) && $state['state'] != ''): ?>
+                        <span><?php echo $state['state'] . ',';?></span>
+                    <?php endif; ?>
+                    <span><?php echo $shippingAddress['zip'];?></span>
+                    <br/>
+                    <span><?php echo $countries[$shippingAddress['country']];?></span>
+                    <br/>
+                <?php else:?>
+                        <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
+                            <span><?php echo $shippingAddress['company'];?></span><br />
+                        <?php endif;?>
+                        <span><?php echo $shippingAddress['firstname'];?></span>
+                        <span><?php echo $shippingAddress['lastname'];?></span>
+                        <br/>
+                        <span><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
+                        <br/>
+                        <span><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
+                        <?php $state = Tools_Geo::getStateById($shippingAddress['state']); ?>
+                        <?php if (isset($state['state']) && $state['state'] != ''): ?>
+                            <span><?php echo $state['state'] . ',';?></span>
+                        <?php endif; ?>
+                        <span><?php echo $shippingAddress['zip'];?></span>
+                        <br/>
+                        <span><?php echo $countries[$shippingAddress['country']];?></span>
+                        <br/>
+                        <?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
+                            <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+                            <br/>
+                        <?php endif; ?>
+                        <?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
+                            <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+                            <br/>
+                        <?php endif; ?>
                 <?php endif;?>
-				<span><?php echo $shippingAddress['firstname'];?></span>
-				<span><?php echo $shippingAddress['lastname'];?></span>
-				<br/>
-				<span><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
-				<br/>
-				<span><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
-				<?php $state = Tools_Geo::getStateById($shippingAddress['state']); ?>
-				<?php if (isset($state['state']) && $state['state'] != ''): ?>
-					<span><?php echo $state['state'] . ',';?></span>
-				<?php endif; ?>
-				<span><?php echo $shippingAddress['zip'];?></span>
-				<br/>
-				<span><?php echo $countries[$shippingAddress['country']];?></span>
-				<br/>
-				<?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
-					<span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
-					<br/>
-				<?php endif; ?>
-				<?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
-					<span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
-					<br/>
-				<?php endif; ?>
+
 			<?php else: ?>
 				<span><?php echo $this->translate('not provided');?></span>
 			<?php endif;?>

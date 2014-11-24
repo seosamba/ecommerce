@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
 
 -- 29/05/2014
 -- version: 2.2.1
-ALTER TABLE `shopping_quote` ADD COLUMN `internal_note` text COLLATE utf8_unicode_ci AFTER `disclaimer`;
+
 
 -- 30/05/2014
 -- version: 2.2.2
@@ -68,10 +68,81 @@ UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'optio
 UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeclientlogin';
 UPDATE `page_option` SET `option_usage`='once' WHERE `page_option`.`id` = 'option_storeshippingterms';
 
--- 30/09/2014
--- version: 2.2.5
+-- 24/10/2014
+-- version: 2.3.0
+CREATE TABLE IF NOT EXISTS `shopping_pickup_location_category` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `img` varchar(300) COLLATE utf8_unicode_ci NULL,
+  `external_category` varchar(200) COLLATE utf8_unicode_ci NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `address1` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `address2` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zip` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `country` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `city` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `working_hours` TEXT COLLATE utf8_unicode_ci NOT NULL,
+  `phone` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `location_category_id` int(10) unsigned NOT NULL,
+  `lat` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `notes` text 	COLLATE utf8_unicode_ci DEFAULT NULL,
+  `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `country` (`country`),
+  INDEX `city` (`city`),
+  INDEX `country_city` (`city`, `country`),
+  FOREIGN KEY (`location_category_id`)
+        REFERENCES `shopping_pickup_location_category`(`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_pickup_location_config` (
+  `id` int(10) unsigned NOT NULL,
+  `amount_type_limit` enum('up to','over','eachover') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `amount_limit` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_pickup_location_zones` (
+  `config_id` int(10) unsigned NOT NULL,
+  `pickup_location_category_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `amount_location_category` decimal(10,2) DEFAULT NULL,
+  `config_zone_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`config_id`, `config_zone_id`),
+  FOREIGN KEY (`config_id`)
+        REFERENCES `shopping_pickup_location_config`(`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
+  `cart_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `address1` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `address2` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zip` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `country` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `city` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `working_hours` TEXT COLLATE utf8_unicode_ci NOT NULL,
+  `phone` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `location_category_id` int(10) unsigned NOT NULL,
+  `lat` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`cart_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 24/11/2014
+-- version: 2.3.1
+-- Rename titles for templates
+UPDATE `template_type` SET `title` = 'Checkout' WHERE `id` = 'typecheckout';
+UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.3.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.3.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

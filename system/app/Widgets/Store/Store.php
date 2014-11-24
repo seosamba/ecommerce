@@ -160,6 +160,16 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                     }
                 }
+
+                $defaultPickup = true;
+                $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($cartId);
+                if (!empty($pickupLocationData)) {
+                    $defaultPickup = false;
+                    $this->_view->pickupLocationData = $pickupLocationData;
+                }
+                $this->_view->defaultPickup = $defaultPickup;
+
                 $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];
                 $this->_view->weightSign = $shoppingConfig['weightUnit'];
                 $this->_view->cartContent = $cartContent;
@@ -171,7 +181,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$errmsg = 'store:postpurchasereport missing cart id';
 		return Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) ? '<b>'.$errmsg.'</b>' : '<!-- '.$errmsg.' -->' ;
 	}
-    
+
     protected function _getOptions($productId, $options) {
 		$actualOptions  = array();
 		$product        = Models_Mapper_ProductMapper::getInstance()->find($productId);
