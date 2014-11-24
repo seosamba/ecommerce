@@ -91,7 +91,7 @@ $this->headLink()
                 <form class="pickup-config-form mt10px" name="pickup-config-form" action="<?php echo $this->pickupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
                     <?php echo $this->pickupForm->getElement('shipper')->renderViewHelper(); ?>
                     <label>
-                        <?php echo $this->pickupForm->getElement('defaultPickupConfig')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
+                        <?php echo $this->pickupForm->getElement('defaultPickupConfig')->renderViewHelper(); ?>
                         <?php echo $this->translate('Default pickup behaviour');?>
                     </label>
 
