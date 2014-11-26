@@ -471,7 +471,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->states = Tools_Geo::getState();
 		$this->_view->countries = Tools_Geo::getCountries();
         $this->_layout->content = $this->_view->render('zones.phtml');
-        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
 		echo $this->_layout->render();
 	}
 
@@ -1270,12 +1269,15 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         $ordersIds = filter_var($this->_request->getParam('orderIds'), FILTER_SANITIZE_STRING);
         $data = $this->_request->getParams();
-        $ordersIds = explode(',', $ordersIds);
-        $exportAllOrders = filter_var($this->_request->getParam('allOrders'), FILTER_SANITIZE_NUMBER_INT);
-        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)
-            && is_array($ordersIds)
-        ) {
-            Tools_ExportImportOrders::prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds);
+        $ordersIds = empty($ordersIds) ? array() : explode(',', $ordersIds);
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            if (!empty($ordersIds)) {
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            } else {
+                parse_str($data['filters'], $res);
+                $data['filters'] = Tools_FilterOrders::filter($res);
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            }
         }
     }
 

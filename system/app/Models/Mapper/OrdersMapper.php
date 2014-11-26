@@ -89,7 +89,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
 
-    public function fetchOrdersForExport($orderIds = array(), $excludeFields = array())
+    public function fetchOrdersForExport($orderIds = array(), $excludeFields = array(), $filter = array())
     {
         $defaultFields = array(
             'order_id' => 'order.id',
@@ -197,6 +197,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
         if (!empty($orderIds)) {
             $where = $this->getDbTable()->getAdapter()->quoteInto('order.id IN (?)', $orderIds);
             $select->where($where);
+        } else {
+            $where = (array) $filter;
+            $this->_parseWhere($select, $where);
         }
         return $this->getDbTable()->fetchAll($select)->toArray();
     }
