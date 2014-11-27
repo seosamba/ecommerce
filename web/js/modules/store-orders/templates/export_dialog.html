@@ -23,7 +23,12 @@
                 <% } %>
             </p>
         <%})%>
-        <p class="grid_12"><button class="mt0px cl-none" type="submit"><%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %></button></p>
+        <p class="grid_12">
+            <label class="fl-left mt10px pointer"><%= _.isUndefined(i18n['Export all orders']) ? 'Export all orders':i18n['Export all orders'] %>
+                <input type="checkbox" name="allOrders" value="1"/>
+            </label>
+            <button class="mt0px cl-none" type="submit"><%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %></button>
+        </p>
     </form>
 </div>
 
