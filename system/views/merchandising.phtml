@@ -18,12 +18,16 @@
             <?php endforeach; ?>
         <?php endif; ?>
         <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
+        <li><a href="#quantity-discount"><?php echo $this->translate('Quantity discount');?></a></li>
 	</ul>
 	<div id="coupons">
 		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
 	</div>
     <div id="group-pricing">
         <?php echo $this->partial('merchandising/grouping.phtml'); ?>
+    </div>
+    <div id="quantity-discount">
+        <?php echo $this->partial('merchandising/quantity-discount.phtml'); ?>
     </div>
 	<div class="message info grid_12">
         <ul class="list-count-sign column_2 full-width">

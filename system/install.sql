@@ -742,4 +742,26 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+INSERT INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_GroupPriceObserver');
+
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `discount_quantity` int(4) unsigned NOT NULL,
+  `discount_price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `apply_scope` enum('local', 'global') DEFAULT 'local',
+  `discount_amount` DECIMAL(10,4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
+  `product_id` int(10) unsigned NOT NULL,
+  `discount_quantity` int(4) unsigned NOT NULL,
+  `discount_price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `status` enum('enabled', 'disabled') DEFAULT 'enabled',
+  `amount` DECIMAL(10,4) DEFAULT NULL,
+  PRIMARY KEY (`product_id`, `discount_quantity`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 UPDATE `plugin` SET `version` = '2.3.1' WHERE `name` = 'shopping';

@@ -13,7 +13,7 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
 	protected $_dbTable = 'Store_DbTable_Group';
 
 	/**
-	 * Save coupon model to DB
+	 * Save group model to DB
 	 * @param $model Store_Model_Group
 	 * @return Store_Model_Group
 	 */
