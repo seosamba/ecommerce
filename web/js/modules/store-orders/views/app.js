@@ -90,13 +90,8 @@ define(['backbone',
             }
         },
         exportOrdersAction: function(){
-            var orders = [];
-            var filters = [];
-            if(this.orders.ordersChecked.length){
-                orders = this.orders.ordersChecked.join(',');
-            } else {
-                filters = this.orders.server_api.filter();
-            }
+            var orders = this.orders.ordersChecked.join(',');
+            var filters = this.orders.server_api.filter();
             var exportOrderButton  = _.isUndefined(i18n['Export']) ? 'Export':i18n['Export'];
             var exportOrderButtons = {};
             exportOrderButtons[exportOrderButton] = function() {

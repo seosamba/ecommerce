@@ -1,5 +1,5 @@
 <div class="clearfix" style="width: 100%" title="<%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %>">
-    <% filter = (!_.isEmpty(ordersIds)) ? 'orderIds/'+ordersIds : 'filters/'+filters %>
+    <% filter = (_.isEmpty(ordersIds)) ? 'filters/'+filters : 'orderIds/'+ordersIds+'/filters/'+filters %>
     <form id="export-orders-form" action="<%= $('#website_url').val()+'plugin/shopping/run/exportOrders/'+filter %>" method="post">
         <% _.each(defaultConfig, function(exportConf, name){%>
             <p class="grid_2 order-field-row" style="margin-top: 10px;">
@@ -24,7 +24,7 @@
             </p>
         <%})%>
         <p class="grid_12">
-            <label class="fl-left mt10px pointer"><%= _.isUndefined(i18n['Export all orders']) ? 'Export all orders':i18n['Export all orders'] %>
+            <label class="fl-left mt10px pointer"><%= _.isUndefined(i18n['Export all orders matching filter']) ? 'Export all orders matching filter':i18n['Export all orders matching filter'] %>
                 <input type="checkbox" name="allOrders" value="1"/>
             </label>
             <button class="mt0px cl-none" type="submit"><%= _.isUndefined(i18n['Export orders']) ? 'Export orders':i18n['Export orders'] %></button>
