@@ -90,35 +90,34 @@ define(['backbone',
             }
         },
         exportOrdersAction: function(){
-            if(this.orders.ordersChecked.length){
-                var checkedOrders = this.orders.ordersChecked.join(',');
-                var exportOrderButton  = _.isUndefined(i18n['Export']) ? 'Export':i18n['Export'];
-                var exportOrderButtons = {};
-                exportOrderButtons[exportOrderButton] = function() {
-                    $(this).dialog('close');
-                };
-                $.ajax({
-                    url: $('#website_url').val()+'plugin/shopping/run/getOrderExportConfig/',
-                    type: 'GET',
-                    dataType: 'json'
+            var orders = this.orders.ordersChecked.join(',');
+            var filters = this.orders.server_api.filter();
+            var exportOrderButton  = _.isUndefined(i18n['Export']) ? 'Export':i18n['Export'];
+            var exportOrderButtons = {};
+            exportOrderButtons[exportOrderButton] = function() {
+                $(this).dialog('close');
+            };
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/getOrderExportConfig/',
+                type: 'GET',
+                dataType: 'json'
 
-                }).done(function(response) {
-                    var dialog = _.template(ExportTemplate, {
-                        ordersIds: checkedOrders,
-                        i18n:i18n,
-                        'defaultConfig': response.responseText.defaultConfig,
-                        'exportConfig': response.responseText.export_config
-                    });
-                    $(dialog).dialog({
-                        dialogClass: 'seotoaster',
-                        width: '75%',
-                        height: '750',
-                        resizable: false
-                    });
-                    return false;
+            }).done(function(response) {
+                var dialog = _.template(ExportTemplate, {
+                    ordersIds: orders,
+                    filters: $.param(filters),
+                    i18n:i18n,
+                    'defaultConfig': response.responseText.defaultConfig,
+                    'exportConfig': response.responseText.export_config
                 });
-
-            }
+                $(dialog).dialog({
+                    dialogClass: 'seotoaster',
+                    width: '75%',
+                    height: '750',
+                    resizable: false
+                });
+                return false;
+            });
         },
         resetFilters: function(){
             this.$('form.filters > :input').val('');
@@ -243,7 +242,6 @@ define(['backbone',
                             el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                         },
                         success: function(response) {
-                            console.log(model.toJSON());
                             if (response.hasOwnProperty('error') && !response.error){
                                 showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
                             }

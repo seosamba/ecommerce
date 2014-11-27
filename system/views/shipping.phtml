@@ -55,8 +55,9 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
             <?php foreach($this->shippingPlugins as $plugin): ?>
                 <li><a data-plugin="<?php echo $plugin->getName(); ?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute'); ?>"><?php echo $plugin->getName(); ?></a></li>
             <?php endforeach; ?>
+                <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
             </ul>
-            <div id="pane-container" class="grid_8 omega scroll">
+            <div id="pane-container" class="grid_8 omega">
             <div id="markup">
                 <?php $this->markupForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
                 <form action="<?php echo $this->markupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
@@ -73,7 +74,76 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                  </form>
             </div>
             <div id="pickup">
-                <label class="message info"><?php echo $this->translate('When this option is checked user will be given the option to pick their stuff up at your store location.'); ?></label>
+                <?php $this->pickupForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
+                <form class="pickup-config-form mt10px" name="pickup-config-form" action="<?php echo $this->pickupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
+                    <?php echo $this->pickupForm->getElement('shipper')->renderViewHelper(); ?>
+                    <label>
+                        <?php echo $this->pickupForm->getElement('defaultPickupConfig')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
+                        <?php echo $this->translate('Default pickup behaviour');?>
+                    </label>
+
+                    <fieldset class="config-fields-pickup-config mt10px background hidden">
+                        <legend class="background large p5px"><?php echo $this->translate('Shipping pickup configuration'); ?></legend>
+                        <label>
+                            <?php echo $this->pickupForm->getElement('searchEnabled')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
+                            <?php echo $this->translate('Display location search on checkout');?>
+                        </label>
+                        <p class="grid_6 alpha labeled icon right">
+                            <?php echo $this->pickupForm->getElement('title')->setAttrib('class', 'grid_8 alpha omega fl-right')->renderViewHelper();?>
+                            <i class="tooltip info ticon-info-sign icon16" title="<?php echo $this->translate('custom title');?>"></i>
+                            <?php echo $this->pickupForm->getElement('title')->addDecorator('Label', array('class' => 'grid_4 alpha omega'))->renderLabel();?>
+                        </p>
+                        <p class="grid_6 omega labeled">
+                            <label class="grid_3 alpha omega fl-right"><span class="amount-limit-value-label"></span>/<span class="currency-value"><?php echo $this->shoppingConfig['currency'];?></span></label>
+                            <?php echo $this->pickupForm->getElement('units')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
+                            <?php echo $this->pickupForm->getElement('units')->addDecorator('Label', array('class' => 'grid_3 alpha omega'))->renderLabel(); ?>
+                        </p>
+
+                        <div class="grid_12 omega">
+                            <label><?php echo $this->translate('Select location category');?></label>
+                            <?php for($i = 1; $i < Shopping::QUANTITY_PICKUP_LOCATION_ON_SCREEN + 1; $i++):?>
+                                <select data-pickup-category-select ="<?php echo $i;?>" class='pickup-location-category grid_2 alpha' name="pickup-location-category-<?php echo $i;?>">
+                                    <?php $savedLocationCategory = isset($this->locationZonesInfo[$i-1])? $this->locationZonesInfo[$i-1]['pickup_location_category_id']: 0;?>
+                                    <option value="0" <?php if($savedLocationCategory === 0) echo 'selected="selected"';?>><?php echo $this->translate('select');?></option>
+                                    <?php if(isset($this->locationCategories) && !empty($this->locationCategories)):?>
+                                        <?php foreach($this->locationCategories as $locationCategory):?>
+                                            <option value="<?php echo $locationCategory->getId();?>" <?php echo ($savedLocationCategory == $locationCategory->getId() ?'selected="selected"':'');?>><?php echo $locationCategory->getName();?> </option>
+                                        <?php endforeach;?>
+                                    <?php endif;?>
+                                </select>
+                            <?php endfor;?>
+                        </div>
+                    </fieldset>
+                    <div id="pickup-location-config-grid" class="mt10px scroll h150px hidden">
+                        <?php if(isset($this->pickupLocationConf) && !empty($this->pickupLocationConf)):?>
+                            <?php foreach($this->pickupLocationConf as $confRow):?>
+                                <fieldset class="pickup-location-conf-row background mb10px" data-pickup-location-row="<?php echo $confRow['id'];?>">
+                                    <p class="grid_7 ">
+                                        <select name="amount-type-limit" class="amount-type-limit">
+                                            <option value="<?php echo Shopping::AMOUNT_TYPE_UP_TO;?>" <?php echo (isset($confRow['amount_type_limit']) && $confRow['amount_type_limit'] === Shopping::AMOUNT_TYPE_UP_TO ?'selected="selected"':'');?>><?php echo $this->translate(Shopping::AMOUNT_TYPE_UP_TO);?></option>
+                                            <option value="<?php echo Shopping::AMOUNT_TYPE_OVER;?>"  <?php echo (isset($confRow['amount_type_limit']) && $confRow['amount_type_limit'] === Shopping::AMOUNT_TYPE_OVER ?'selected="selected"':'');?>><?php echo $this->translate(Shopping::AMOUNT_TYPE_OVER);?></option>
+                                            <option value="<?php echo Shopping::AMOUNT_TYPE_EACH_OVER;?>" <?php echo (isset($confRow['amount_type_limit']) && $confRow['amount_type_limit'] === Shopping::AMOUNT_TYPE_EACH_OVER ?'selected="selected"':'');?>><?php echo $this->translate('Each additional weight/currency unit over');?></option>
+                                        </select>
+                                    </p>
+                                    <p class="grid_3 mt0px labeled">
+                                        <input class="amount-limit-value grid_8 alpha omega" type="text" name="amount-limit-value"  value="<?php echo $confRow['amount_limit'];?>" />
+                                        <label class="amount-limit-value-label grid_4 alpha omega"></label>
+                                    </p>
+                                    <button class="remove-pickup-location-zone link fl-right btn icon inverse-error ticon-close" title="<?php echo $this->translate('Remove');?>"></button>
+                                    <div class="grid_12 omega">
+                                        <?php for($i = 1; $i < Shopping::QUANTITY_PICKUP_LOCATION_ON_SCREEN + 1; $i++):?>
+                                            <?php $amountValue = isset($this->pickupLocationConfigZones[$confRow['id'].'_'.$i])? $this->pickupLocationConfigZones[$confRow['id'].'_'.$i]['amount_location_category']: 0;?>
+                                            <input class="grid_2 alpha amount-zone-value" type="text" data-amount-zone="<?php echo $i;?>" name="amount-zone-value" value="<?php echo $amountValue;?>" />
+                                        <?php endfor;?>
+                                    </div>
+                                </fieldset>
+                            <?php endforeach;?>
+                        <?php endif;?>
+
+                        <span class="add-pickup-config btn block success ticon-plus"><?php echo $this->translate('Add more pickup config');?></span>
+                    </div>
+                </form>
+                <div class="grid_12 clear"></div>
             </div>
             <div id="freeshipping">
                 <?php $this->freeForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
@@ -93,13 +163,26 @@ $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/
                     </fieldset>
                 </form>
             </div>
+            <div id="orderconfig">
+                <?php $this->orderConfigForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
+                    <form action="<?php echo $this->orderConfigForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
+                        <?php echo $this->orderConfigForm->getElement('shipper')->renderViewHelper(); ?>
+                        <fieldset class="background">
+                            <legend class="background large p5px"><?php echo $this->translate('Minimum order'); ?></legend>
+                            <p class="labeled">
+                                <?php echo $this->orderConfigForm->getElement('quantity')->setAttrib('class', 'grid_2 alpha fl-right')->renderViewHelper(); ?>
+                                <label class="grid_4 omega" for="cartamount"><?php echo $this->orderConfigForm->getElement('quantity')->getLabel(); ?></label>
+                            </p>
+                        </fieldset>
+                    </form>
+            </div>
         </div>
     </div>
 </div>
 </div>
 
 <div class="footer grid_12">
-    <?php echo $this->formButton('submit', 'Save', array('class' => 'btn icon-save', 'type' => 'submit')); ?>
+    <?php echo $this->formButton('submit', 'Save', array('class' => 'btn ticon-save', 'type' => 'submit')); ?>
 </div>
 
 <script>
@@ -116,10 +199,80 @@ $(function(){
         }
     });
 
-    $('.footer #submit').on('click', function(){
+    $('.footer #submit').on('click', function(e){
         showSpinner();
-        var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')');
-        if(currentPane){
+        var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')'),
+            indexOfPluginTab = index + 1;
+
+        if($('#ui-id-'+indexOfPluginTab+'').data('plugin') === '<?php echo Shopping::SHIPPING_PICKUP;?>'){
+            e.preventDefault();
+
+            var configRows = $('.pickup-location-conf-row'),
+                configData = [],
+                configRowId = 0,
+                amountZoneObject = [],
+                zoneSelectId = 0,
+                zoneId = 0,
+                zoneAmount = 0,
+                amountTypeLimit = '',
+                overRestriction = 0,
+                defaultPickupConfig = 0,
+                searchEnabled = 0;
+
+            $.each(configRows, function(){
+                configRowId = $(this).data('pickup-location-row');
+                amountZoneObject = $(this).find('.amount-zone-value');
+                var zoneWithAmount = [];
+                $.each(amountZoneObject, function(){
+                    zoneSelectId = $(this).data('amount-zone');
+                    zoneId = $('select[name="pickup-location-category-'+zoneSelectId+'"] option:selected').val();
+                    zoneAmount = $(this).val();
+                    zoneWithAmount[zoneSelectId] = {zoneAmount:zoneAmount, zoneId:zoneId};
+
+                });
+                amountTypeLimit = $(this).find('.amount-type-limit option:selected').val();
+                if(amountTypeLimit === '<?php echo Shopping::AMOUNT_TYPE_OVER;?>' || amountTypeLimit === '<?php echo Shopping::AMOUNT_TYPE_EACH_OVER;?>'){
+                    overRestriction += 1;
+                }
+                configData.push({configRowId:configRowId, amountType:$(this).find('.amount-type-limit option:selected').val(),
+                    amountLimit:$(this).find('.amount-limit-value').val(), zoneWithAmount:zoneWithAmount});
+            });
+            if(overRestriction > 1){
+                showMessage('<?php echo $this->translate('You can setup only one over option')?>', true);
+                hideSpinner();
+                return false;
+
+            }
+
+            if($('#defaultPickupConfig').is(':checked')){
+                defaultPickupConfig = 1;
+            }
+
+            if($('#searchEnabled').is(':checked')){
+                searchEnabled = 1;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: $('.pickup-config-form').attr('action'),
+                dataType: "json",
+                data: {
+                    configData:configData,
+                    title:$('#title').val(),
+                    units:$('#units option:selected').val(),
+                    shipper:'<?php echo Shopping::SHIPPING_PICKUP;?>',
+                    defaultPickupConfig:defaultPickupConfig,
+                    searchEnabled:searchEnabled
+                }
+            }).done(function(response) {
+                if(response.done){
+                    $('#shippers').tabs('load', index);
+                        showMessage('<?php echo $this->translate('Saved')?>', false);
+                }
+
+            });
+            return false;
+        }else if(currentPane){
             var form = currentPane.find('form');
             $.ajax({
                 url      : form.attr('action'),
@@ -133,5 +286,65 @@ $(function(){
             });
         }
     });
+
+    $('.pickup-config-form').on('change', '#units', function(e){
+        switch ($(this).val()){
+            case 'amount':
+                $('.amount-limit-value-label').text('<?php echo $this->shoppingConfig['currency'];?>');
+                break;
+            case 'weight':
+                $('.amount-limit-value-label').text('<?php echo $this->shoppingConfig['weightUnit'];?>');
+                break;
+        }
+    });
+
+    $('.pickup-config-form').on('click', '.remove-pickup-location-zone', function(e){
+        e.preventDefault();
+        var locationRow = $(this).closest('.pickup-location-conf-row'),
+            locationId = locationRow.data('pickup-location-row');
+
+        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function(){
+            $.post($('#website_url').val()+'plugin/shopping/run/deletePickupLocation/', {locationId:locationId}, function(response){
+                if($('.pickup-config-form').find('.pickup-location-conf-row').length > 1){
+                    locationRow.remove();
+                }else{
+                    locationRow.find('input').val(0);
+                }
+            }, 'json');
+       });
+    });
+
+    var previousCategory = '';
+
+    $('.pickup-location-category').on('focus', function(){
+        previousCategory = this.value;
+    }).change(function() {
+            var selectId = $(this).data('pickup-category-select'),
+                selectedCategory = $(this).find('option:selected').val(),
+                selectElements = $('.pickup-location-category:not([data-pickup-category-select="'+selectId+'"])');
+
+            selectElements.find('option[value="'+selectedCategory+'"]').prop('disabled', true);
+            selectElements.find('option[value="0"]').prop('disabled', false);
+            selectElements.find('option[value="'+previousCategory+'"]').prop('disabled', false);
+    });
+
+    $('.add-pickup-config').on('click', function(e){
+        var lastPickupLocationRateRow     = $('.pickup-location-conf-row').last(),
+            numberOfRow         = lastPickupLocationRateRow.data('pickup-location-row'),
+            rowDiv = '<fieldset class="pickup-location-conf-row background mb10px" data-pickup-location-row="'+(numberOfRow+1)+'">'+lastPickupLocationRateRow.html()+'</fieldset>';
+        lastPickupLocationRateRow.after(rowDiv);
+        $('.pickup-location-conf-row').last().find('input[type=text]').val(0);
+    });
+
+
+    $('#defaultPickupConfig').on('change', function(){
+        $('.config-fields-pickup-config').toggleClass('hidden');
+        $('#pickup-location-config-grid').toggleClass('hidden');
+    });
+    <?php if(!$this->defaultPickup):?>
+        $('.config-fields-pickup-config').toggleClass('hidden');
+        $('#pickup-location-config-grid').toggleClass('hidden');
+    <?php endif ;?>
+    $('#units').trigger('change');
 });
 </script>

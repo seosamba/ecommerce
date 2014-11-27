@@ -6,8 +6,8 @@
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
 	<div class="grid_6 alpha suffix_6 mb10px">
-		<label class="grid_3 mt5px alpha"><?php echo $this->translate( 'Zone Name' ); ?>:</label>
-		<input type="text" class="zone-name grid_9 alpha omega" value="<%= name %>" placeholder="enter name for zone"/>
+		<label class="grid_3 alpha omega mt5px"><?php echo $this->translate( 'Zone Name' ); ?>:</label>
+		<input type="text" class="zone-name grid_9 omega" value="<%= name %>" placeholder="enter name for zone"/>
 	</div>
 	<div class="countries grid_6 alpha">
 		<div class="header-inner pl2 pr2">
@@ -16,7 +16,7 @@
 		<ul class="zone-countries list-bordered h150px"></ul>
         <div class="footer grid_12">
             <a href="javascript:;" class="clearprop error" data-property="countries">[ <?php echo $this->translate( 'clear' ); ?> ]</a>
-            <button class="btn icon-plus open-dialog fl-right" data-name="add-country"><?php echo $this->translate( 'Add Country' ); ?></button>
+            <button class="btn ticon-plus open-dialog fl-right" data-name="add-country"><?php echo $this->translate( 'Add Country' ); ?></button>
         </div>
 	</div>
 	<div class="states grid_6 omega">
@@ -26,7 +26,7 @@
 		<ul class="zone-states list-bordered h150px"></ul>
         <div class="footer grid_12">
             <a href="javascript:;" class="clearprop error" data-property="states">[ <?php echo $this->translate( 'clear' ); ?> ]</a>
-            <button class="btn icon-plus open-dialog fl-right" data-name="add-state"><?php echo $this->translate( 'Add State' ); ?></button>
+            <button class="btn ticon-plus open-dialog fl-right" data-name="add-state"><?php echo $this->translate( 'Add State' ); ?></button>
         </div>
 	</div>
 	<div class="grid_12 alpha omega mt15px">
@@ -45,13 +45,13 @@
     <div id="zone">
         <ul class="header">
             <li class="add-new-zone">
-                <a id="new-zone-btn" class="ui-tabs-anchor icon-plus fs16" title="Hotkey: Ctrl+N"></a>
+                <a id="new-zone-btn" class="ui-tabs-anchor ticon-plus icon16" title="Hotkey: Ctrl+N"></a>
             </li>
         </ul>
     </div>
     <div class="footer grid_12">
         <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?> ]</a>
-        <button id="save-btn" class="btn icon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
+        <button id="save-btn" class="btn ticon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
     </div>
 </div>
 
@@ -60,7 +60,7 @@
         <ul id="country-list" class="list-bordered mt10px h200px" tabindex="0"></ul>
         <div class="footer labeled icon right">
             <input id="country-filter" type="text" placeholder="<?php echo $this->translate( 'Start typing country name here' ); ?>" size="30"/>
-            <span class="icon-search"></span>
+            <span class="ticon-search"></span>
         </div>
     </div>
 

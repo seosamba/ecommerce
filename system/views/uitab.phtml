@@ -3,7 +3,7 @@
 	<!-- Product listing selector -->
     <div class="grid_12 alpha omega">
         <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
-            <h4 class="message error text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
+            <h4 class="message warning text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
         <?php else: ?>
             <div id="template-selector" class="grid_6 alpha">
 				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
@@ -102,6 +102,7 @@
                 });
 
                 $(document).on('keypress', '#search', function(e) {
+                    $('.ui-helper-hidden-accessible').show();
                     if(e.keyCode == 13) {
                         $('.ui-autocomplete').hide();
                         self.searchTerm = null;
@@ -111,16 +112,8 @@
 
     	    },
 		    launch: function() {
-			    var children = $(this).find('span#products');
-			    if(!children.length) {
-                    $('.mce-toolbar-grp').removeClass('hidden');
-                    $('.above-editor-links').removeClass('grid_4').addClass('grid_8');
-                    $('#tabs').removeClass('grid_8').addClass('grid_4');
-                } else {
-                    $('.above-editor-links').removeClass('grid_8').addClass('grid_4');
-                    $('#tabs').removeClass('grid_4').addClass('grid_8');
-                    //hiding mce controls
-                    $('.mce-toolbar-grp').addClass('hidden');
+			    var children = $(this).find('#products');
+			    if(children.length) {
                     //loading store data
 				    uiTab.loadStoreData('tags');
 				    uiTab.loadStoreData('brands');
@@ -197,6 +190,9 @@
 		    },
 		    loadStoreData : function(dataType, filter, force) {
                 showSpinner();
+                if(typeof  filter !== 'undefined'){
+                    $('.ui-helper-hidden-accessible').hide();
+                }
                 //if data type already loaded - return
                 if($('#' + dataType + ' option').length) {
                     return false;

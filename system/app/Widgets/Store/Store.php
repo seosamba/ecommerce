@@ -9,7 +9,6 @@
 class Widgets_Store_Store extends Widgets_Abstract {
 
 	/**
-	 * @todo see how it works in real life
 	 * @var bool
 	 */
 	protected $_cacheable      = false;
@@ -47,7 +46,6 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$this->_view = new Zend_View();
 		$this->_view->websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
 		$this->_view->setScriptPath(realpath(__DIR__.DIRECTORY_SEPARATOR.'views'));
-//		$this->_view->addScriptPath(realpath(__DIR__.'/../../../views/'));
 	}
 
 
@@ -75,6 +73,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 					$description = null;
 				}
 				array_push($allowedOptions, array(
+                    'group'  => $translator->translate('Shopping Shortcuts'),
 					'alias'  => $translator->translate('Store' .' '. $name. (isset($description) ? ' - '.$description: '')),
 					'option' => 'store:'.strtolower($name)
 				));
@@ -154,10 +153,6 @@ class Widgets_Store_Store extends Widgets_Abstract {
 				$this->_view->shoppingConfig = $shoppingConfig;
                 foreach ($cartContent as $key=>$product){
                     $productObject = $productMapper->find($product['product_id']);
-//                    if(!empty($product['options'])){
-//                        $optionsData = $this->_getOptions($product['product_id'], $product['options']);
-//                        $cartContent[$key]['options'] = $optionsData;
-//                    }
                     if($productObject !== null){
                         $cartContent[$key]['mpn']      = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
@@ -165,6 +160,16 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                     }
                 }
+
+                $defaultPickup = true;
+                $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($cartId);
+                if (!empty($pickupLocationData)) {
+                    $defaultPickup = false;
+                    $this->_view->pickupLocationData = $pickupLocationData;
+                }
+                $this->_view->defaultPickup = $defaultPickup;
+
                 $this->_view->showPriceIncTax = $shoppingConfig['showPriceIncTax'];
                 $this->_view->weightSign = $shoppingConfig['weightUnit'];
                 $this->_view->cartContent = $cartContent;
@@ -176,7 +181,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$errmsg = 'store:postpurchasereport missing cart id';
 		return Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) ? '<b>'.$errmsg.'</b>' : '<!-- '.$errmsg.' -->' ;
 	}
-    
+
     protected function _getOptions($productId, $options) {
 		$actualOptions  = array();
 		$product        = Models_Mapper_ProductMapper::getInstance()->find($productId);
@@ -223,4 +228,30 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 		return $this->_view->render('coupon.phtml');
 	}
+
+    protected function _makeOptionConfirmationCode()
+    {
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
+        if (!isset($this->_options[1])) {
+            return;
+        }
+        $registry = Zend_Registry::getInstance();
+        if (isset($sessionHelper->storeCartSessionConversionKey) || $registry->isRegistered('ConfirmationCartId')) {
+            if ($registry->isRegistered('ConfirmationCartId')) {
+                $cartSession = $registry->get('ConfirmationCartId');
+            } else {
+                $cartId = $sessionHelper->storeCartSessionConversionKey;
+                $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(
+                    intval($cartId)
+                );
+                $registry->set('ConfirmationCartId', $cartSession);
+                unset($sessionHelper->storeCartSessionConversionKey);
+            }
+
+            $methodName = 'get' . ucfirst(trim(strtolower($this->_options[1])));
+            if (method_exists($cartSession, $methodName)) {
+                return $cartSession->$methodName();
+            }
+        }
+    }
 }

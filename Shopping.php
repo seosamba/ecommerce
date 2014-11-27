@@ -9,7 +9,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_URL = 'product-pages.html';
 	const PRODUCT_DEFAULT_LIMIT = 30;
 
-	const BRAND_LOGOS_FOLDER = 'brands';
+	const BRAND_LOGOS_FOLDER  = 'brands';
+    const PICKUP_LOGOS_FOLDER = 'pickup-logos';
 	/**
 	 * New system role 'customer'
 	 *
@@ -93,9 +94,25 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
 
+
+    const QUANTITY_PICKUP_LOCATION_ON_SCREEN = 6;
+
+    const AMOUNT_TYPE_UP_TO = 'up to';
+
+    const AMOUNT_TYPE_OVER = 'over';
+
+    const AMOUNT_TYPE_EACH_OVER = 'eachover';
+
+    const COMPARE_BY_AMOUNT = 'amount';
+
+    const COMPARE_BY_WEIGHT = 'weight';
+
+    const ORDER_CONFIG  = 'orderconfig';
+
     const ORDER_EXPORT_CONFIG = 'order_export_config';
 
     const ORDER_IMPORT_CONFIG = 'order_import_config';
+
 
 	/**
 	 * Cache prefix for use in shopping system
@@ -288,20 +305,52 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_view->shoppingConfig = $this->_configMapper->getConfigParams();
 
-		$markupConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_MARKUP);
+        $shippingConfigMapper = Models_Mapper_ShippingConfigMapper::getInstance();
+		$markupConfig = $shippingConfigMapper->find(self::SHIPPING_MARKUP);
 		$markupForm = new Forms_Shipping_MarkupShipping();
 		if (isset($markupConfig['config']) && !empty($markupConfig['config'])) {
 			$markupForm->populate($markupConfig['config']);
 		}
+        $orderConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::ORDER_CONFIG);
+        $orderConfigForm = new Forms_Shipping_OrderConfig();
+        if(isset($orderConfig['config'])){
+            $orderConfigForm->populate($orderConfig['config']);
+        }
 		$freeShippingForm = new Forms_Shipping_FreeShipping();
-		$freeShippingConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::SHIPPING_FREESHIPPING);
+		$freeShippingConfig = $shippingConfigMapper->find(self::SHIPPING_FREESHIPPING);
 		if (isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])) {
 			$freeShippingForm->populate($freeShippingConfig['config']);
 		}
+
+        $pickupShippingForm = new Forms_Shipping_PickupShipping();
+        $pickupShippingConfig = $shippingConfigMapper->find(self::SHIPPING_PICKUP);
+        $defaultPickup = true;
+        if (isset($pickupShippingConfig['config']) && !empty($pickupShippingConfig['config'])) {
+            $defaultPickup = false;
+            if($pickupShippingConfig['config']['defaultPickupConfig'] === '1'){
+                $defaultPickup = true;
+            }
+            $pickupShippingForm->populate($pickupShippingConfig['config']);
+        }
+        if($defaultPickup){
+            $pickupShippingForm->getElement('defaultPickupConfig')->setValue(1);
+        }
+        $pickupLocationsCategories = Store_Mapper_PickupLocationCategoryMapper::getInstance()->fetchAll();
+        $this->_view->locationCategories = $pickupLocationsCategories;
+        $this->_view->defaultPickup = $defaultPickup;
 		$this->_view->config = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 		$this->_view->freeForm = $freeShippingForm;
 		$this->_view->markupForm = $markupForm;
-
+        $this->_view->pickupForm = $pickupShippingForm;
+        $pickupLocationMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+        $this->_view->pickupLocationConfigZones = $pickupLocationMapper->getLocationZones();
+        $this->_view->locationZonesInfo = $pickupLocationMapper->getLocationZonesInfo(self::QUANTITY_PICKUP_LOCATION_ON_SCREEN);
+        $pickupLocationConfig = $pickupLocationMapper->getConfig();
+        if(empty($pickupLocationConfig)) {
+            $pickupLocationConfig = array('1'=>array('id'=>1, 'amount_type_limit'=>Shopping::AMOUNT_TYPE_UP_TO, 'amount_limit'=>0));
+        }
+        $this->_view->pickupLocationConf = $pickupLocationConfig;
+        $this->_view->orderConfigForm = $orderConfigForm;
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -333,10 +382,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
+                $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
 				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
+                        ->setMobilePhone($mobilePhone)
 						->setPassword(md5(uniqid('customer_' . time())));
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
@@ -526,7 +577,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit));
+			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
 			$content = $widget->setProducts($products)->setCleanListOnly(true)->render();
 			unset($widget);
 		}
@@ -706,6 +757,16 @@ class Shopping extends Tools_Plugins_Abstract {
 
 				$this->_responseHelper->response($status->toArray(), false);
 			}
+
+            $defaultPickup = true;
+            $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+            $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($id);
+            if (!empty($pickupLocationData)) {
+                $defaultPickup = false;
+                $this->_view->pickupLocationData = $pickupLocationData;
+            }
+            $this->_view->defaultPickup = $defaultPickup;
+
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
 			$this->_layout->content = $this->_view->render('order.phtml');
@@ -726,7 +787,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$bundledShippers = array(
 			self::SHIPPING_FREESHIPPING,
 			self::SHIPPING_PICKUP,
-			self::SHIPPING_MARKUP
+			self::SHIPPING_MARKUP,
+            self::ORDER_CONFIG
 		);
 
 		if (!in_array($name, $bundledShippers)) {
@@ -739,20 +801,51 @@ class Shopping extends Tools_Plugins_Abstract {
 					$form = new Forms_Shipping_FreeShipping();
 					break;
 				case self::SHIPPING_PICKUP:
-//					$form = new Forms_Shipping_Pickup();
+					$form = new Forms_Shipping_PickupShipping();
 					break;
 				case self::SHIPPING_MARKUP:
 					$form = new Forms_Shipping_MarkupShipping();
 					break;
+                case self::ORDER_CONFIG:
+                    $form = new Forms_Shipping_OrderConfig();
+                    break;
 				default:
 					break;
 			}
 			if ($this->_request->isPost()) {
-				if ($form->isValid($this->_request->getParams())) {
-					$config = array(
-						'name'   => $name,
-						'config' => $form->getValues()
-					);
+                if ($form->isValid($this->_request->getParams())) {
+                    if ($name === self::SHIPPING_PICKUP) {
+                        $pickupLocationConfig = $this->_request->getParams();
+                        $config = array(
+                            'name' => $name,
+                            'config' => array(
+                                'title' => $pickupLocationConfig['title'],
+                                'units' => $pickupLocationConfig['units'],
+                                'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig'],
+                                'searchEnabled' => $pickupLocationConfig['searchEnabled']
+                            )
+                        );
+                        if (isset($pickupLocationConfig['configData']) && !empty($pickupLocationConfig['configData'])) {
+                            $pickupLocationsConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                            $pickupLocationsConfigModel = new Store_Model_PickupLocationConfig();
+                            foreach ($pickupLocationConfig['configData'] as $location) {
+                                if ($location['amountLimit'] === '0') {
+                                    $pickupLocationsConfigMapper->deleteConfig($location['configRowId']);
+                                } else {
+                                    $pickupLocationsConfigModel->setId($location['configRowId']);
+                                    $pickupLocationsConfigModel->setAmountLimit($location['amountLimit']);
+                                    $pickupLocationsConfigModel->setAmountTypeLimit($location['amountType']);
+                                    $pickupLocationsConfigModel->setLocationZones($location['zoneWithAmount']);
+                                    $pickupLocationsConfigMapper->save($pickupLocationsConfigModel);
+                                }
+                            }
+                        }
+                    } else {
+                        $config = array(
+                            'name' => $name,
+                            'config' => $form->getValues()
+                        );
+                    }
 					Models_Mapper_ShippingConfigMapper::getInstance()->save($config);
 				}
 			} else {
@@ -776,6 +869,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if ($cartId) {
 			Tools_ShoppingCart::getInstance()->clean();
 			$this->_sessionHelper->storeCartSessionKey = $cartId;
+            $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
 				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
@@ -919,26 +1013,31 @@ class Shopping extends Tools_Plugins_Abstract {
 		//fetch list of product images
 		$productImages = $dbAdapter->fetchCol("SELECT DISTINCT photo FROM `shopping_product`");
 
-		// return prepared data to the toaster
-		return array(
-			'pages'  => $pages,
-			'tables' => array(
-				'shopping_product'                  => $productsSql,
-				'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
-				'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
-				'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
-				'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
-				'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
-				'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
-				'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
-				'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
-				'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
-			),
-			'media'  => empty($productImages) ? null : array_map(function ($img) {
-				list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
-				return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
-			}, $productImages)
-		);
+        $result = array('pages'  => $pages,
+                        'media'  => empty($productImages) ? null : array_map(function ($img) {
+                                    list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
+                                    return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
+                                }, $productImages)
+        );
+
+        if(!empty($productsIds)) {
+            $result = array_merge($result, array(
+                'tables' => array(
+                    'shopping_product'                  => $productsSql,
+                    'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
+                    'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
+                    'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
+                    'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
+                    'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
+                    'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
+                    'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
+                    'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
+                    'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
+                )
+            ));
+        }
+        // return prepared data to the toaster
+        return $result;
 	}
 
     public function editAccountAction(){
@@ -955,7 +1054,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $where = $userMapper->getDbTable()->getAdapter()->quoteInto("id <> ?", $this->_sessionHelper->getCurrentUser()->getId());
                     $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
-                    $emailAlreadyExist = $userMapper->fetchAll($where);
+                    $emailAlreadyExist = $userMapper->fetchAll($where, array(), true);
                     if(!empty($emailAlreadyExist)){
                         $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
                     }
@@ -1067,6 +1166,38 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    /**
+     * Pickup locations zones config
+     */
+    protected function pickupLocationAction()
+    {
+        $pickupLocationCategory = Store_Mapper_PickupLocationCategoryMapper::getInstance();
+        $this->_view->pickupLocationsCategories = array_map(
+            function ($pickupCategory) {
+                return $pickupCategory->toArray();
+            },
+            $pickupLocationCategory->fetchAll()
+        );
+        $this->_view->countries = Tools_Geo::getCountries();
+        $this->_layout->content = $this->_view->render('pickup-location.phtml');
+        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
+        echo $this->_layout->render();
+    }
+
+    /**
+     * Delete pickup location config row
+     */
+    public function deletePickupLocationAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $locationId = filter_var($this->_request->getParam('locationId'), FILTER_SANITIZE_NUMBER_INT);
+            if ($locationId) {
+                Store_Mapper_PickupLocationConfigMapper::getInstance()->deleteConfig($locationId);
+                $this->_responseHelper->success('');
+            }
+        }
+    }
+
     public function ordersImportConfigAction()
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
@@ -1139,12 +1270,15 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         $ordersIds = filter_var($this->_request->getParam('orderIds'), FILTER_SANITIZE_STRING);
         $data = $this->_request->getParams();
-        $ordersIds = explode(',', $ordersIds);
-        $exportAllOrders = filter_var($this->_request->getParam('allOrders'), FILTER_SANITIZE_NUMBER_INT);
-        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)
-            && is_array($ordersIds)
-        ) {
-            Tools_ExportImportOrders::prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds);
+        $ordersIds = ($data['allOrders'] == 1 || empty($ordersIds)) ? array() : explode(',', $ordersIds);
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            if (!empty($ordersIds)) {
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            } else {
+                parse_str($data['filters'], $res);
+                $data['filters'] = Tools_FilterOrders::filter($res);
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            }
         }
     }
 
@@ -1166,6 +1300,7 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             Tools_ExportImportOrders::getSampleOrdersData();
+
         }
     }
 

@@ -32,7 +32,18 @@ define([
         },
         save: function() {
             showSpinner();
-            $('[name="zoneId"]').removeClass('error')
+            var taxError = false;
+            $('[name="zoneId"]').removeClass('error').filter(function(){
+                if($(this).val() == -1){
+                    $(this).addClass('error');
+                    taxError = true;
+                }
+            });
+            if (taxError) {
+                hideSpinner();
+                showMessage('Please select zone', true);
+                return false;
+            }
             var self = this;
             $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON()}, function(response){
                 self.$el.closest('.seotoaster').find('.closebutton .close').trigger('click');
@@ -40,10 +51,6 @@ define([
                 showMessage('Saved');
             }).fail(function() {
                 hideSpinner();
-                $('[name="zoneId"]').filter(function(){
-                    ($(this).val() == -1) ? $(this).addClass('error') : '';
-                });
-                showMessage('Please select zone', true);
             });
         },
         newRule: function(){

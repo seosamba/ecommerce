@@ -14,8 +14,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
     const FILTER_OTHERS = '_other';
 
+    const FILTER_READONLY = 'readonly';
+
     private $_allowedOptions = array(
-        'builder', 'product'
+        'builder', 'product', 'attribute'
     );
 
     protected function _init()
@@ -282,5 +284,28 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         );
 
         return $this->_view->render('filter-editor.phtml');
+    }
+
+    private function _renderAttribute()
+    {
+        if (isset($this->_options[0])) {
+            $readonly = array_search(self::FILTER_READONLY, $this->_options);
+            $eavMapper = Filtering_Mappers_Eav::getInstance();
+            $pageId = intval($this->_toasterOptions['id']);
+            $product = Models_Mapper_ProductMapper::getInstance()->findByPageId($pageId);
+            if (!$product instanceof Models_Model_Product) {
+                throw new Exceptions_SeotoasterWidgetException('This is not a product page');
+            }
+            if ($readonly) {
+                $attributeExist = $eavMapper->getByAttrName($this->_options[0], $product->getId());
+                if (!empty($attributeExist)) {
+                    return $attributeExist['value'];
+                }
+                return '';
+            }
+
+        } elseif (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            return $this->_translator->translate('Attribute name is missing');
+        }
     }
 }

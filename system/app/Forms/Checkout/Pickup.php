@@ -39,6 +39,11 @@ class Forms_Checkout_Pickup extends Zend_Form {
         )));
 
         $this->addElement(new Zend_Form_Element_Text(array(
+                'name'     => 'mobile',
+                'label'    => 'Mobile'
+        )));
+
+        $this->addElement(new Zend_Form_Element_Text(array(
             'name'       => 'email',
             'label'      => 'E-mail',
             'validators' => array('EmailAddress'),
