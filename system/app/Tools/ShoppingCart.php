@@ -57,7 +57,9 @@ class Tools_ShoppingCart {
 
 	protected $_discount = 0;
 
-	private function __construct() {
+    protected $_productDiscounts = array();
+
+    private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -234,7 +236,8 @@ class Tools_ShoppingCart {
                 'freeShipping'     => $item->getFreeShipping(),
                 'freebies'         => $item->getFreebies(),
                 'groupPriceEnabled' => $item->getGroupPriceEnabled(),
-                'originalPrice'     => $item->getPrice()
+                'originalPrice'     => $item->getPrice(),
+                'productDiscounts'  => $item->getProductDiscounts()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;
@@ -342,23 +345,8 @@ class Tools_ShoppingCart {
 						$product->setPrice($cartItem['price']);
 					}
 
-                    if (isset($cartItem['groupPriceEnabled'])) {
-                        $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
-                        if ($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())) {
-                            $product->setGroupPriceEnabled(1);
-                            $priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
-                            $product->setPrice($priceForGroup);
-                            $cartItem['price'] = $priceForGroup;
-                            $cartItem['groupPriceEnabled'] = 1;
-                        }
-
-                        if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
-                            $cartItem['groupPriceEnabled'] = 0;
-                            $product->setGroupPriceEnabled(0);
-                            $product->setPrice($cartItem['originalPrice']);
-                            $cartItem['price'] = $cartItem['originalPrice'];
-                        }
-                    }
+                    $cartItem = Tools_DiscountTools::applyDiscountRules($cartItem);
+                    $product->setPrice($cartItem['price']);
 
 					$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
 					$cartItem['taxPrice'] = $cartItem['price'] + $cartItem['tax'];
@@ -899,4 +887,16 @@ class Tools_ShoppingCart {
     public function getDiscountTaxRate() {
         return $this->_discountTaxRate;
     }
+
+    public function setProductDiscounts($productDiscounts)
+    {
+        $this->_productDiscounts = $productDiscounts;
+        return $this;
+    }
+
+    public function getProductDiscounts()
+    {
+        return $this->_productDiscounts;
+    }
+
 }

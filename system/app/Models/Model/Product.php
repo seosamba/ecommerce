@@ -61,6 +61,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_originalPrice = 0;
 
+    protected $_productDiscounts = array();
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -316,5 +318,16 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     public function setOriginalPrice($originalPrice) {
         $this->_originalPrice = $originalPrice;
+    }
+
+    public function setProductDiscounts($productDiscounts)
+    {
+        $this->_productDiscounts = $productDiscounts;
+        return $this;
+    }
+
+    public function getProductDiscounts()
+    {
+        return $this->_productDiscounts;
     }
 }

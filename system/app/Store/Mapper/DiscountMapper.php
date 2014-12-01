@@ -55,6 +55,34 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
     }
 
     /**
+     * Get discounts config data
+     *
+     * @param int $quantity
+     * @param int $productId
+     * @return array
+     */
+    public function getDiscountDataConfig($quantity, $productId)
+    {
+        $whereLocal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
+        $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
+        $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('status = ?', 'enabled');
+        $selectLocal = $this->getDbTable()->getAdapter()->select()->from(
+            'shopping_quantity_discount_product',
+            array('discount_quantity', 'discount_price_sign', 'discount_price_type', 'amount')
+        )
+            ->where($whereLocal);
+        $localProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectLocal);
+        $whereGlobal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
+        $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
+            'shopping_quantity_discount',
+            array('discount_quantity', 'discount_price_sign', 'discount_price_type', 'amount' => 'discount_amount')
+        )
+            ->where($whereGlobal);
+        $globalProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectGlobal);
+        return $localProductConfig + $globalProductConfig;
+    }
+
+    /**
      * Delete discount
      * @param int $id
      * @return bool Result of operation

@@ -3,10 +3,10 @@
  * GroupPriceTools.php
  *
  */
-class Tools_GroupPriceTools {
+class Tools_GroupPriceTools extends Tools_DiscountRulesTools {
 
 
-	public static function calculateGroupPrice(Models_Model_Product $product, $productId){
+	public static function prepareDiscountRule($cartItem){
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
         $cacheTags  = array();
         if (null === ($allCustomersGroups = $cache->load('customers_groups', 'store_'))){
@@ -30,9 +30,8 @@ class Tools_GroupPriceTools {
             if(array_key_exists($currentUser, $allCustomersGroups)){
                 $groupId = $allCustomersGroups[$currentUser]['group_id'];
                 if(isset($allProductsGroups[$groupId])){
-                    if($productId != null){
-                        $groupProductKey = $groupId.'_'.$productId;
-                        $priceNow = $product->getPrice();
+                    if($cartItem['id'] != null){
+                        $groupProductKey = $groupId.'_'.$cartItem['id'];
                         $priceValue = $allProductsGroups[$groupId]['priceValue'];
                         $priceSign  = $allProductsGroups[$groupId]['priceSign'];
                         $priceType  = $allProductsGroups[$groupId]['priceType'];
@@ -41,26 +40,12 @@ class Tools_GroupPriceTools {
                             $priceSign  = $allProductsWithGroups[$groupProductKey]['priceSign'];
                             $priceType  = $allProductsWithGroups[$groupProductKey]['priceType'];
                         }
-                        if($priceType == 'percent'){
-                            $priceModificationValue = $priceNow*$priceValue/100;
-                        }
-                        if($priceType == 'unit'){
-                            $priceModificationValue = $priceValue;
-                        }
-                        if($priceSign == 'minus'){
-                            $resultPrice = $priceNow - $priceModificationValue;
-                        }
-                        if($priceSign == 'plus'){
-                            $resultPrice = $priceNow + $priceModificationValue;
-                        }
-                        return $resultPrice;
+                        return array('name' => 'groupprice', 'discount' => $priceValue, 'type' => $priceType, 'sign' => $priceSign);
                     }
-                    return $product->getPrice();
-
                 }
             }
         }
-        return $product->getPrice();
+        return array('name' => 'groupprice', 'discount' => 0, 'type' => '', 'sign' => '');
 
 	}
 
