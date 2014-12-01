@@ -1,0 +1,83 @@
+<?php $currency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency'); ?>
+<input type="hidden" name="quantity-discount-currency" class="discount-currency" value="<?php echo $currency ?>">
+<form id="quantity-discount-form" class="grid_12 alpha omega background">
+    <div class="grid_2 alpha">
+        <?php echo $this->formText(
+            'quantity',
+            null,
+            array(
+                'class' => 'new-discount-quantity',
+                'placeholder' => $this->translate('Enter quantity')
+            )
+        ); ?>
+    </div>
+
+    <div class="grid_1 alpha omega mt0px">
+        <?php echo $this->formSelect(
+            'priceSign',
+            null,
+            array(
+                'id' => 'discount-quantity-sign',
+            ),
+            array(
+                'plus' => '+',
+                'minus' => '-'
+            )
+        ); ?>
+
+    </div>
+    <div class="grid_2 mt0px">
+        <?php echo $this->formText(
+            'amount',
+            null,
+            array(
+                'class' => 'new-discount-quantity-price-value',
+                'placeholder' => $this->translate('Enter value')
+            )
+        ); ?>
+    </div>
+    <div class="grid_1 alpha omega mt0px">
+        <?php echo $this->formSelect(
+            'priceType',
+            null,
+            array(
+                'id' => 'discount-quantity-price-type',
+            ),
+            array(
+                'percent' => '%',
+                'unit' => $currency
+            )
+        ); ?>
+
+    </div>
+
+    <label class="grid_2 mt5px pointer" for="disc-status">
+        <?php echo $this->formCheckbox(
+            'status',
+            'disabled',
+            array(
+                'id' => 'disc-status'
+            )
+        ); ?>
+        <?php echo $this->translate('Disabled'); ?>
+    </label>
+    <input type="hidden" id="productId" name="productId" value=""/>
+    <button class="btn grid_4 omega mt0px ticon-plus" type="submit"><?php echo $this->translate(
+            'Create or update discount'
+        ); ?></button>
+
+</form>
+
+<div class="grid_12 alpha omega mt15px">
+    <table id="quantity-discount-table" class="table-striped table-hover small mb10px">
+        <thead class="header-inner">
+        <tr>
+            <th><?php echo $this->translate('Quantity'); ?></th>
+            <th><?php echo $this->translate('Default price modifier'); ?></th>
+            <th><?php echo $this->translate('Status'); ?></th>
+            <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
