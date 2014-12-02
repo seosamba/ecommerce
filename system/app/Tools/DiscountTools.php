@@ -40,13 +40,12 @@ class Tools_DiscountTools
      * precalculating discount for single item
      *
      * @param $price
-     * @param ex: array('name', 'type', 'sign', 'discount') $discountData
+     * @param ex: array('type', 'sign', 'discount') $discountData
      * @param bool if true subtraction will be analyzed like addition and in reverse $reverse
      * @return mixed
      */
     public static function applyDiscountData($price, $discountData, $reverse = false)
     {
-        $resultPrice = $price;
         $priceModificationValue = 0;
         if ($discountData['type'] === 'percent') {
             $priceModificationValue = $price * $discountData['discount'] / 100;
@@ -56,20 +55,20 @@ class Tools_DiscountTools
         }
         if ($reverse) {
             if ($discountData['sign'] === 'minus') {
-                $resultPrice = $price + $priceModificationValue;
+                $price = $price + $priceModificationValue;
             }
             if ($discountData['sign'] === 'plus') {
-                $resultPrice = $price - $priceModificationValue;
+                $price = $price - $priceModificationValue;
             }
         } else {
             if ($discountData['sign'] === 'minus') {
-                $resultPrice = $price - $priceModificationValue;
+                $price = $price - $priceModificationValue;
             }
             if ($discountData['sign'] === 'plus') {
-                $resultPrice = $price + $priceModificationValue;
+                $price = $price + $priceModificationValue;
             }
         }
-        return $resultPrice;
+        return $price;
     }
 
     /**
