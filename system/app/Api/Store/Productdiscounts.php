@@ -43,17 +43,29 @@ class Api_Store_Productdiscounts extends Api_Service_Abstract {
     public function getAction() {
         $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
         $quantity = filter_var($this->_request->getParam('quantity'), FILTER_SANITIZE_NUMBER_INT);
-        $discountMapper = Store_Mapper_DiscountProductMapper::getInstance();
         if ($id && empty($quantity)) {
-            $where = $discountMapper->getDbTable()->getAdapter()->quoteInto('product_id=?', $id);
+            $discountMapper = Store_Mapper_DiscountMapper::getInstance();
+            $data = $discountMapper->getDiscountDataConfig($id);
+            foreach ($data as &$discount) {
+                $discount['id'] = null;
+                $discount['productId'] = $id;
+                $discount['priceSign'] = $discount['price_sign'];
+                $discount['priceType'] = $discount['price_type'];
+                if(empty($discount['status']))
+                    $discount['status'] = '';
+                unset($discount['price_type'], $discount['price_sign'], $discount['product_id']);
+            }
+            return  array_merge(array(), $data);
+
         } else {
+            $discountMapper = Store_Mapper_DiscountProductMapper::getInstance();
             $where[] = $discountMapper->getDbTable()->getAdapter()->quoteInto('product_id = ?', $id);
             $where[] = $discountMapper->getDbTable()->getAdapter()->quoteInto('quantity = ?', $quantity);
+            $data = $discountMapper->fetchAll($where);
+            return array_map(function ($discount) {
+                    return $discount->toArray();
+                }, $data);
         }
-        $data = $discountMapper->fetchAll($where);
-        return array_map(function ($discount) {
-                return $discount->toArray();
-            }, $data);
 
     }
 
