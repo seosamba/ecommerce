@@ -10,16 +10,16 @@ class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
 
         if (!empty($cartItem['id'])) {
             $discountsConfigData = Store_Mapper_DiscountMapper::getInstance()->getDiscountDataConfig(
-                $cartItem['qty'],
-                $cartItem['id']
+                $cartItem['id'],
+                $cartItem['qty']
             );
             if (!empty($discountsConfigData)) {
                 $discountConfig = array_shift($discountsConfigData);
                 return array(
                     'name' => 'quantitydiscount',
                     'discount' => $discountConfig['amount'],
-                    'type' => $discountConfig['discount_price_type'],
-                    'sign' => $discountConfig['discount_price_sign']
+                    'type' => $discountConfig['price_type'],
+                    'sign' => $discountConfig['price_sign']
                 );
             }
         }

@@ -61,23 +61,27 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
      * @param int $productId
      * @return array
      */
-    public function getDiscountDataConfig($quantity, $productId)
+    public function getDiscountDataConfig($productId, $quantity = false)
     {
-        $whereLocal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
-        $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
+        $whereLocal = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
         $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('status = ?', 'enabled');
+        if ($quantity) {
+            $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('quantity <= ?', $quantity);
+        }
         $selectLocal = $this->getDbTable()->getAdapter()->select()->from(
             'shopping_quantity_discount_product',
-            array('discount_quantity', 'discount_price_sign', 'discount_price_type', 'amount')
+            array('quantity', 'price_sign', 'price_type', 'amount', 'status', 'product_id')
         )
             ->where($whereLocal);
         $localProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectLocal);
-        $whereGlobal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
         $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
             'shopping_quantity_discount',
-            array('discount_quantity', 'discount_price_sign', 'discount_price_type', 'amount' => 'discount_amount')
-        )
-            ->where($whereGlobal);
+            array('quantity' => 'discount_quantity', 'price_sign' => 'discount_price_sign', 'price_type' => 'discount_price_type', 'amount' => 'discount_amount')
+        );
+        if ($quantity) {
+            $whereGlobal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
+            $selectGlobal->where($whereGlobal);
+        }
         $globalProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectGlobal);
         return $localProductConfig + $globalProductConfig;
     }
