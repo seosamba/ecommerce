@@ -74,7 +74,7 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
             'shopping_quantity_discount_product',
             array('quantity', 'price_sign', 'price_type', 'amount', 'status', 'product_id')
         )
-            ->where($whereLocal)->order('quantity');
+            ->where($whereLocal);
         $localProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectLocal);
         $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
             'shopping_quantity_discount',
@@ -82,10 +82,12 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
         );
         if ($quantity) {
             $whereGlobal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
-            $selectGlobal->where($whereGlobal)->order('quantity');
+            $selectGlobal->where($whereGlobal);
         }
         $globalProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectGlobal);
-        return $localProductConfig + $globalProductConfig;
+        $result = $localProductConfig + $globalProductConfig;
+        ksort($result);
+        return $result;
     }
 
     /**
