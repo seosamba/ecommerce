@@ -61,10 +61,12 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
      * @param int $productId
      * @return array
      */
-    public function getDiscountDataConfig($productId, $quantity = false)
+    public function getDiscountDataConfig($productId, $quantity = false, $status = false)
     {
         $whereLocal = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
-        $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('status = ?', 'enabled');
+        if ($status) {
+            $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('status = ?', $status);
+        }
         if ($quantity) {
             $whereLocal .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('quantity <= ?', $quantity);
         }
@@ -72,7 +74,7 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
             'shopping_quantity_discount_product',
             array('quantity', 'price_sign', 'price_type', 'amount', 'status', 'product_id')
         )
-            ->where($whereLocal);
+            ->where($whereLocal)->order('quantity');
         $localProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectLocal);
         $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
             'shopping_quantity_discount',
@@ -80,7 +82,7 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
         );
         if ($quantity) {
             $whereGlobal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
-            $selectGlobal->where($whereGlobal);
+            $selectGlobal->where($whereGlobal)->order('quantity');
         }
         $globalProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectGlobal);
         return $localProductConfig + $globalProductConfig;

@@ -5,16 +5,19 @@
 class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
 {
 
+    const LOCAL_DISCOUNT_ENABLED = 'enabled';
+
     public static function prepareDiscountRule($cartItem)
     {
 
         if (!empty($cartItem['id'])) {
             $discountsConfigData = Store_Mapper_DiscountMapper::getInstance()->getDiscountDataConfig(
                 $cartItem['id'],
-                $cartItem['qty']
+                $cartItem['qty'],
+                self::LOCAL_DISCOUNT_ENABLED
             );
             if (!empty($discountsConfigData)) {
-                $discountConfig = array_shift($discountsConfigData);
+                $discountConfig = array_pop($discountsConfigData);
                 return array(
                     'name' => 'quantitydiscount',
                     'discount' => $discountConfig['amount'],
