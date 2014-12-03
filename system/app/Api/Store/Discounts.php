@@ -100,7 +100,12 @@ class Api_Store_Discounts extends Api_Service_Abstract {
 			}
 		}
         Store_Mapper_DiscountMapper::getInstance()->save($model);
-		return $model->toArray();
+
+        if ($data['applyScope'] === self::QUANTITY_DISCOUNT_GLOBAL) {
+            Store_Mapper_DiscountProductMapper::getInstance()->deleteAll($data['discountQuantity']);
+        }
+
+        return $model->toArray();
 	}
 
 	public function putAction() {

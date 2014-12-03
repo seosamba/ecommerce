@@ -48,6 +48,7 @@ class Store_Mapper_DiscountProductMapper extends Application_Model_Mappers_Abstr
     /**
      * Delete discount
      * @param int $id
+     * @param int quantity
      * @return bool Result of operation
      */
     public function delete($id, $quantity)
@@ -55,6 +56,20 @@ class Store_Mapper_DiscountProductMapper extends Application_Model_Mappers_Abstr
         if ($id && $quantity) {
             $where[] = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $id);
             $where[] = $this->getDbTable()->getAdapter()->quoteInto('quantity = ?', $quantity);
+            return (bool)$this->getDbTable()->delete($where);
+        }
+        return false;
+    }
+
+    /**
+     * Delete All local discounts
+     * @param int $quantity
+     * @return bool Result of operation
+     */
+    public function deleteAll($quantity)
+    {
+        if ($quantity) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('quantity = ?', $quantity);
             return (bool)$this->getDbTable()->delete($where);
         }
         return false;
