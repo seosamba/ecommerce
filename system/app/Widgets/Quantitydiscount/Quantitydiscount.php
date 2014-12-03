@@ -48,15 +48,12 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
             throw new Exceptions_SeotoasterWidgetException('No options provided');
         }
 
-        $this->_view->websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
-
         self::$_shoppingConfig || self::$_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams(
         );
 
         $this->_view = new Zend_View(array(
             'scriptPath' => dirname(__FILE__) . '/views'
         ));
-
 
         $this->_productMapper = Models_Mapper_ProductMapper::getInstance();
         if ($this->_currency === null) {
