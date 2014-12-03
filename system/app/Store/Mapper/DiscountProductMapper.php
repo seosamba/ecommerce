@@ -57,5 +57,6 @@ class Store_Mapper_DiscountProductMapper extends Application_Model_Mappers_Abstr
             $where[] = $this->getDbTable()->getAdapter()->quoteInto('quantity = ?', $quantity);
             return (bool)$this->getDbTable()->delete($where);
         }
+        return false;
     }
 }

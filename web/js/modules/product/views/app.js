@@ -85,6 +85,7 @@ define([
                     break;
                     case '#coupon-tab':
                     case '#group-pricing-tab':
+                    case '#quantity-discount-tab':
                         if (self.model.isNew()){
                             showMessage(_.isUndefined(i18n['Please save product information first'])?'Please save product information first':i18n['Please save product information first'], true);
                             return false;
@@ -110,6 +111,7 @@ define([
 
             this.discountTable.$el.on('discount:deleted', _.bind(this.discountTable.render, this.discountTable));
             this.discountTable.$el.on('discount:add', _.bind(this.discountTable.render, this.discountTable));
+            this.discountTable.$el.on('discount:edit', _.bind(this.discountForm.render, this.discountForm));
 
 		},
         initProducts: function(){

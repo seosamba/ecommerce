@@ -20,9 +20,10 @@ define([
 
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 5,
+                "iDisplayLength": 12,
                 "bPaginate": true,
                 "bAutoWidth": false,
+                "aaSorting": [],
                 "aoColumnDefs": aoColumnDefs
             });
             this.quantityDiscounts = new DiscountQuantityCollection();

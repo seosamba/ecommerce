@@ -19,9 +19,10 @@ define([
 
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 5,
+                "iDisplayLength": 12,
                 "bPaginate": true,
                 "bAutoWidth": false,
+                "aaSorting": [],
                 "aoColumnDefs": aoColumnDefs
             });
             this.quantityDiscounts = new DiscountQuantityCollection();
@@ -37,7 +38,7 @@ define([
             this.quantityDiscounts.each(this.renderQuantityDiscount, this);
         },
         renderQuantityDiscount: function (quantityDiscount) {
-            var priceType = $('.discount-currency').val(),
+            var priceType = $('.discount-currency').val(), status = quantityDiscount.get('status'),
                 priceSign = '-';
             if (quantityDiscount.get('priceType') === 'percent') {
                 priceType = '%';
@@ -45,22 +46,32 @@ define([
             if (quantityDiscount.get('priceSign') === 'plus') {
                 priceSign = '+';
             }
+            if (status == '') {
+                status = 'GLOBAL DISCOUNT';
+            }
+            var pId = quantityDiscount.get('productId'), quan = parseInt(quantityDiscount.get('quantity')), ps = quantityDiscount.get('priceSign'),
+                pt = quantityDiscount.get('priceType'), pa = quantityDiscount.get('amount');
             this.$el.fnAddData([
                 '<span class="discount-quantity">' + quantityDiscount.get('quantity') + '</span>',
                 '<span>' + priceSign + ' ' + quantityDiscount.get('amount') + ' ' + priceType + '</span>',
-                '<span>' + quantityDiscount.get('status') + '</span>',
-                '<a class="ticon-pencil icon14" data-role="edit" data-cid="' + quantityDiscount.get('productId') + '" data-quantity="' + quantityDiscount.get('quantity') +
-                    '" href="javascript:;"></a> <a class="ticon-remove error icon14" data-role="delete"  data-quantity="' + quantityDiscount.get('quantity')+ '"  data-cid="'  +
-                    quantityDiscount.get('productId') + '"  href="javascript:;"></a>'
+                '<span>' + status + '</span>',
+                '<a class="ticon-pencil icon14" data-role="edit" data-cid="' + pId + '" data-quantity="' + quan +
+                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" href="javascript:;"></a>' +
+                ' <a class="ticon-remove error icon14" data-role="delete"  data-cid="' + pId + '" data-quantity="' + quan +
+                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '"  href="javascript:;"></a>'
             ]);
         },
         deleteQuantityDiscount: function (e) {
-            var cid = $(e.currentTarget).data('cid'), quantity = $(e.currentTarget).data('quantity'),
-                self = this;
+            var self = this;
             showConfirm('Are you sure?', function () {
                 showSpinner();
                 $.ajax({
-                    url: $('#website_url').val() + 'api/store/productdiscounts/id/'+cid+'/quantity/'+quantity,
+                    url: $('#website_url').val() + 'api/store/productdiscounts/id/' +
+                    $(e.currentTarget).data('cid') +
+                    '/quantity/' + $(e.currentTarget).data('quantity') +
+                    '/amount/' + $(e.currentTarget).data('amount') +
+                    '/priceSign/' + $(e.currentTarget).data('sign') +
+                    '/priceType/' + $(e.currentTarget).data('type'),
                     type: 'DELETE',
                     dataType: 'json'
                 }).done(function (response) {
@@ -71,28 +82,19 @@ define([
             })
         },
         editQuantityDiscount: function (e) {
-            var cid = $(e.currentTarget).data('cid'), quantity = $(e.currentTarget).data('quantity');
-            $.ajax({
-                url: $('#website_url').val() + 'api/store/productdiscounts/id/',
-                data: {
-                    id: cid,
-                    quantity: quantity
-                },
-                type: 'GET',
-                dataType: 'json'
 
-            }).done(function (response) {
-                var status = response[0].status;
+                var status = status;
                 if (status === 'disabled') {
                     $('#disc-status').prop('checked', true);
                 } else {
                     $('#disc-status').prop('checked', false);
                 }
-                $('#quantity').val(response[0].quantity);
-                $('#discount-quantity-price-type').val(response[0].priceType).prop('selected', true);
-                $('#discount-quantity-sign').val(response[0].priceSign).prop('selected', true);
-                $('#amount').val(response[0].amount).focus();
-            })
+                $('#quantity').val($(e.currentTarget).data('quantity'));
+                $('#discount-quantity-price-type').val($(e.currentTarget).data('type')).prop('selected', true);
+                $('#discount-quantity-sign').val($(e.currentTarget).data('sign')).prop('selected', true);
+                $('#amount').val($(e.currentTarget).data('amount')).focus();
+            console.log($(e.currentTarget));
+
         }
     });
 

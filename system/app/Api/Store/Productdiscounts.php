@@ -131,11 +131,28 @@ class Api_Store_Productdiscounts extends Api_Service_Abstract {
      * @return JSON Result of operations
      */
     public function deleteAction() {
-        $params = filter_var_array($this->_request->getParams(), FILTER_SANITIZE_NUMBER_INT);
-        if (!$params['id'] || !$params['quantity']) {
+        $rawParams = $this->_request->getParams();
+        $params['productId'] = (int) $rawParams['id'];
+        $params['quantity'] = (int) $rawParams['quantity'];
+        if (!$params['productId'] || !$params['quantity']) {
             $this->_error();
         }
-        return Store_Mapper_DiscountProductMapper::getInstance()->delete($params['id'], $params['quantity']);
+        $res = Store_Mapper_DiscountProductMapper::getInstance()->delete($params['productId'], $params['quantity']);
+        if(!$res) {
+            $model = new Store_Model_DiscountProduct($params);
+            if (is_array($params)) {
+                $params['amount'] = (int) $rawParams['amount'];
+                $params['priceSign'] = filter_var($rawParams['priceSign'], FILTER_SANITIZE_STRING);
+                $params['priceType'] = filter_var($rawParams['priceType'], FILTER_SANITIZE_STRING);
+                $params['status'] = 'disabled';
+                foreach ($params as $key => $value) {
+                    $model->{'set' . ucfirst($key)}($value);
+                }
+            }
+            Store_Mapper_DiscountProductMapper::getInstance()->save($model);
+            $res = $model->toArray();
+        }
+        return $res;
     }
 
 
