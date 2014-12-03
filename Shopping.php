@@ -1270,12 +1270,15 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         $ordersIds = filter_var($this->_request->getParam('orderIds'), FILTER_SANITIZE_STRING);
         $data = $this->_request->getParams();
-        $ordersIds = explode(',', $ordersIds);
-        $exportAllOrders = filter_var($this->_request->getParam('allOrders'), FILTER_SANITIZE_NUMBER_INT);
-        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)
-            && is_array($ordersIds)
-        ) {
-            Tools_ExportImportOrders::prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds);
+        $ordersIds = ($data['allOrders'] == 1 || empty($ordersIds)) ? array() : explode(',', $ordersIds);
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            if (!empty($ordersIds)) {
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            } else {
+                parse_str($data['filters'], $res);
+                $data['filters'] = Tools_FilterOrders::filter($res);
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            }
         }
     }
 

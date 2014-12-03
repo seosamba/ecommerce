@@ -131,15 +131,18 @@
 				<thead>
 				<tr>
 					<th><?php echo $this->translate('Product');?></th>
-					<th><?php echo $this->translate('Mpn');?></th>
-                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-					    <th><?php echo $this->translate('Original Price'); ?></th>
+					<th class="text-center"><?php echo $this->translate('Mpn');?></th>
+                    <?php
+                    $colSpan = 0;
+                    if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <?php $colSpan = 1; ?>
+					    <th class="text-center"><?php echo $this->translate('Original Price'); ?></th>
                     <?php endif;?>
-					<th><?php echo $this->translate('Price'); ?></th>
-					<th><?php echo $this->translate('Qty'); ?></th>
-					<th><?php echo $this->translate('Subtotal'); ?></th>
-					<th><?php echo $this->translate('Tax'); ?></th>
-					<th><?php echo $this->translate('Total'); ?></th>
+					<th class="text-center"><?php echo $this->translate('Price'); ?></th>
+					<th class="text-center"><?php echo $this->translate('Qty'); ?></th>
+					<th class="text-center"><?php echo $this->translate('Subtotal'); ?></th>
+					<th class="text-center"><?php echo $this->translate('Tax'); ?></th>
+					<th class="text-center"><?php echo $this->translate('Total'); ?></th>
 				</tr>
 				</thead>
 				<tbody>
@@ -166,41 +169,41 @@
 									     alt="<?php echo $product->getName(); ?>"/>
 								<?php endif;?>
 								<br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?></td>
-							<td class="textcentered"><?php echo $product->getMpn();?></td>
+							<td class="text-center"><?php echo $product->getMpn();?></td>
                             <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-							    <td class="textcentered"><?php echo $this->currency($item['original_price']);?></td>
+							    <td class="text-center"><?php echo $this->currency($item['original_price']);?></td>
                             <?php endif;?>
-                            <td class="textcentered">
+                            <td class="text-center">
                             <?php if($item['freebies'] == 1):?>
 							    <?php echo $this->translate('free');?>
                             <?php else:?>
                                 <?php echo $this->currency($item['price']);?>
                             <?php endif;?>
                             </td>
-							<td class="textcentered"><?php echo $item['qty'];?></td>
+							<td class="text-center"><?php echo $item['qty'];?></td>
                             <?php if($item['freebies'] == 1):?>
-                                <td class="textcentered"><?php echo $this->translate('free');?></td>
-                                <td class="textcentered"><?php echo $this->translate('free');?></td>
-                                <td class="textcentered"><?php echo $this->translate('free');?></td>
+                                <td class="text-center"><?php echo $this->translate('free');?></td>
+                                <td class="text-center"><?php echo $this->translate('free');?></td>
+                                <td class="text-center"><?php echo $this->translate('free');?></td>
                             <?php else:?>
-                                <td class="textcentered"><?php echo $this->currency($item['qty'] * $item['price']);?></td>
-                                <td class="textcentered"><?php echo $this->currency($item['qty'] * $item['tax']);?></td>
-                                <td class="textcentered"><?php echo $this->currency($item['qty'] * $item['tax_price']);?></td>
+                                <td class="text-center"><?php echo $this->currency($item['qty'] * $item['price']);?></td>
+                                <td class="text-center"><?php echo $this->currency($item['qty'] * $item['tax']);?></td>
+                                <td class="text-center"><?php echo $this->currency($item['qty'] * $item['tax_price']);?></td>
                             <?php endif;?>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
 				</tbody>
 				<tfoot>
-				<tr><td></td></tr>
+				<tr><td colspan="<?php echo $colSpan + 7 ?>"></td></tr>
 				<tr>
-					<td colspan="8">
+					<td colspan="<?php echo $colSpan + 7 ?>">
                         <?php echo $this->translate('Delivery comments');?>:
                         <p class="order-notes text-normal"><?php echo $this->order->getNotes();?></p>
                     </td>
 				</tr>
 				<tr>
-					<td colspan="6" rowspan="4"></td>
+					<td colspan="<?php echo $colSpan + 5 ?>" rowspan="4"></td>
 					<td class="text-right"><?php echo $this->translate('Subtotal');?>:</td>
                     <?php if ($this->showPriceIncTax == 1): ?>
 					    <td><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
