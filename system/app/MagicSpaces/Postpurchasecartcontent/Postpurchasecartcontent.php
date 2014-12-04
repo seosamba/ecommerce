@@ -1,8 +1,5 @@
 <?php
 /**
- * MAGICSPACE: postpurchasecode
- * {postpurchasecode} ... {/postpurchasecode} - Postpurchasecode magic space is used to specify place where to display
- * information about purchase
  * MAGICSPACE: postpurchasecartcontent
  * {postpurchasecartcontent[:somename]} ... {/postpurchasecartcontent} - Postpurchasecartcontent magic space is used to specify place where to display
  * for each element of purchase. You should provide optional name if you want use several magicspaces on one page.
