@@ -1,63 +1,75 @@
 <?php
-$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.js');
-$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.html5.js');
-$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.html4.js');
-$this->jQuery()->addJavascriptFile($this->websiteUrl . 'system/js/external/plupload/plupload.flash.js');
-$title = $this->translate('Import orders');
-$this->headTitle($title);
-$this->placeholder('headerContent')->set($title);
+$this->inlineScript()
+    ->appendFile($this->websiteUrl.'system/js/external/plupload/plupload.js')
+    ->appendFile($this->websiteUrl.'system/js/external/plupload/plupload.html5.js')
+    ->appendFile($this->websiteUrl.'system/js/external/plupload/plupload.html4.js')
+    ->appendFile($this->websiteUrl.'system/js/external/plupload/plupload.flash.js');
+
+$this->headLink()
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
-
-<div id="uploadContainer" class="content-auto">
-    <div class="clearfix">
-        <label class="grid_4 mt5px text-bold"><?php echo $this->translate('Please choose default order status');?></label>
-        <select class="grid_4" name="order-status" id="order-status">
-            <option value="0"><?php echo $this->translate('Choose default order status');?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED);?></option>
-            <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED);?></option>
-        </select>
-    </div>
-    <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
-    <div id="import-orders-templates" class="grid_12 mt15px">
-        <ul>
+<div id="uploadContainer" class="seotoaster container">
+<?php
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'headerText'  => $this->translate('Import orders'),
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
+        )
+    );
+?>
+    <div class="content-auto">
+        <div class="clearfix">
+            <label class="grid_4 mt5px text-bold"><?php echo $this->translate('Please choose default order status');?></label>
+            <select class="grid_4" name="order-status" id="order-status">
+                <option value="0"><?php echo $this->translate('Choose default order status');?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED);?></option>
+                <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED);?></option>
+            </select>
+        </div>
+        <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
+        <div id="import-orders-templates" class="grid_12 mt15px">
+            <ul>
+                <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
+                    <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
+                <?php endforeach;?>
+            </ul>
             <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
-                <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
+                <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 370px;">
+                    <?php foreach ($this->defaultImportsFileds as $importFields): ?>
+                        <?php if (in_array($importFields['label'], $importFieldNames)): ?>
+                            <label class="grid_3 mb10px">
+                                <?php echo $importFields['label_name']; ?>
+                                <?php if (isset($this->importConfig[$orderTemplateName])): ?>
+                                    <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                                           placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $this->importConfig[$orderTemplateName][$importFields['label']]['label']; ?>"/>
+                                <?php else: ?>
+                                    <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
+                                           placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $importFields['label']; ?>"/>
+                                <?php endif; ?>
+                            </label>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
             <?php endforeach;?>
-        </ul>
-        <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
-            <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 370px;">
-                <?php foreach ($this->defaultImportsFileds as $importFields): ?>
-                    <?php if (in_array($importFields['label'], $importFieldNames)): ?>
-                        <label class="grid_3 mb10px">
-                            <?php echo $importFields['label_name']; ?>
-                            <?php if (isset($this->importConfig[$orderTemplateName])): ?>
-                                <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
-                                       placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $this->importConfig[$orderTemplateName][$importFields['label']]['label']; ?>"/>
-                            <?php else: ?>
-                                <input type="text" class="import-field" name="<?php echo $importFields['label']; ?>"
-                                       placeholder="<?php echo $importFields['label']; ?>" value="<?php echo $importFields['label']; ?>"/>
-                            <?php endif; ?>
-                        </label>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </div>
-        <?php endforeach;?>
-    </div>
-    <footer class="grid_12 text-right">
-        <a class="btn ticon-box-add success" title="" href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/">
-            <?php echo $this->translate('Get sample data file'); ?>
-        </a>
+        </div>
+        <footer class="grid_12 text-right">
+            <a class="btn ticon-box-add success" title="" href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/">
+                <?php echo $this->translate('Get sample data file'); ?>
+            </a>
 
-        <a id="pickOrders" class="btn ticon-box-remove" href="javascript:;">
-            <?php echo $this->translator->translate('Upload orders csv'); ?>
-        </a>
-    </footer>
+            <a id="pickOrders" class="btn ticon-box-remove" href="javascript:;">
+                <?php echo $this->translator->translate('Upload orders csv'); ?>
+            </a>
+        </footer>
+    </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">

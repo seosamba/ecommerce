@@ -1,9 +1,57 @@
 <?php
-//$this->headTitle($this->translate('Manage config'));
-//$this->placeholder('headerContent')->set($this->translate('Manage store config'));
+$this->headScript()
+    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js')
+    ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+        null,
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/merchandising/config')
+    );
 
-$this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
+$this->headLink()
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
+
+<div id="config" class="seotoaster container">
+<?php
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
+        )
+    );
+?>
+    <ul class="header">
+	    <?php $subForms = $this->form->getSubForms(); ?>
+        <?php foreach ($subForms as $subform): ?>
+            <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
+        <?php endforeach; ?>
+        <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
+            <?php foreach($this->configTabs as $configTab): ?>
+                <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
+            <?php endforeach; ?>
+        <?php endif; ?>
+	</ul>
+
+	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<?php foreach ($subForms as $subform) :?>
+		<fieldset id="<?php echo $subform->getId();?>-tab">
+			<?php foreach ($subform->getElements() as $elem):?>
+			<div>
+                <?php $labelText = $this->translate($elem->getLabel());?>
+                <?php $elem->setLabel($labelText);?>
+				<?php echo $elem->renderLabel();?>
+                <?php echo $elem->renderViewHelper();?>
+			</div>
+			<?php endforeach; ?>
+		</fieldset>
+	<?php endforeach; ?>
+	</form>
+
+	<?php //echo $this->form; ?>
+    <div class="footer grid_12">
+	    <button id="save-btn" class="btn ticon-save mr-grid"><?php echo $this->translate('Save');?></button>
+    </div>
+</div>
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
@@ -81,37 +129,3 @@ $this->jQuery()->addJavascriptFile($this->websiteUrl.'plugins/shopping/web/js/li
     });
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
-
-<div id="config">
-    <ul class="header">
-	    <?php $subForms = $this->form->getSubForms(); ?>
-        <?php foreach ($subForms as $subform): ?>
-            <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $subform->getLegend(); ?></a></li>
-        <?php endforeach; ?>
-        <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
-            <?php foreach($this->configTabs as $configTab): ?>
-                <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
-            <?php endforeach; ?>
-        <?php endif; ?>
-	</ul>
-
-	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
-	<?php foreach ($subForms as $subform) :?>
-		<fieldset id="<?php echo $subform->getId();?>-tab">
-			<?php foreach ($subform->getElements() as $elem):?>
-			<div>
-                <?php $labelText = $this->translate($elem->getLabel());?>
-                <?php $elem->setLabel($labelText);?>
-				<?php echo $elem->renderLabel();?>
-                <?php echo $elem->renderViewHelper();?>
-			</div>
-			<?php endforeach; ?>
-		</fieldset>
-	<?php endforeach; ?>
-	</form>
-
-	<?php //echo $this->form; ?>
-    <div class="footer grid_12">
-	    <button id="save-btn" class="btn ticon-save mr-grid"><?php echo $this->translate('Save');?></button>
-    </div>
-</div>
