@@ -754,14 +754,15 @@ CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
+CREATE TABLE `shopping_quantity_discount_product` (
   `product_id` int(10) unsigned NOT NULL,
   `quantity` int(4) unsigned NOT NULL,
   `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
   `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` enum('enabled','disabled') COLLATE utf8_unicode_ci DEFAULT 'enabled',
   `amount` decimal(10,4) DEFAULT NULL,
-  PRIMARY KEY (`product_id`,`quantity`)
+  PRIMARY KEY (`product_id`,`quantity`),
+  CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `version` = '2.3.1' WHERE `name` = 'shopping';
