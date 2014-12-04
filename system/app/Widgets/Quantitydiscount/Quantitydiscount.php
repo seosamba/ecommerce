@@ -93,13 +93,18 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
             self::LOCAL_DISCOUNT_ENABLED
         );
         $quantityDiscountData = array();
+        $currentPrice = $this->_product->getCurrentPrice();
+        if (empty($currentPrice)) {
+            $currentPrice = $this->_product->getPrice();
+        }
         if (!empty($quantityDiscountConfig)) {
             foreach ($quantityDiscountConfig as $configItem) {
                 $configItem['discount'] = $configItem['amount'];
                 $configItem['sign'] = $configItem['price_sign'];
                 $configItem['type'] = $configItem['price_type'];
+
                 $quantityDiscountData[$configItem['quantity']]['price'] = Tools_DiscountTools::applyDiscountData(
-                    $this->_product->getCurrentPrice(),
+                    $currentPrice,
                     $configItem
                 );
                 $quantityDiscountData[$configItem['quantity']]['type'] = $configItem['price_type'];
