@@ -228,30 +228,4 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 		return $this->_view->render('coupon.phtml');
 	}
-
-    protected function _makeOptionConfirmationCode()
-    {
-        $sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
-        if (!isset($this->_options[1])) {
-            return;
-        }
-        $registry = Zend_Registry::getInstance();
-        if (isset($sessionHelper->storeCartSessionConversionKey) || $registry->isRegistered('ConfirmationCartId')) {
-            if ($registry->isRegistered('ConfirmationCartId')) {
-                $cartSession = $registry->get('ConfirmationCartId');
-            } else {
-                $cartId = $sessionHelper->storeCartSessionConversionKey;
-                $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(
-                    intval($cartId)
-                );
-                $registry->set('ConfirmationCartId', $cartSession);
-                unset($sessionHelper->storeCartSessionConversionKey);
-            }
-
-            $methodName = 'get' . ucfirst(trim(strtolower($this->_options[1])));
-            if (method_exists($cartSession, $methodName)) {
-                return $cartSession->$methodName();
-            }
-        }
-    }
 }
