@@ -1,8 +1,13 @@
 <?php
-    $this->headTitle($this->translate('Manage taxes'));
-    $this->headScript()->setAllowArbitraryAttributes(true)
-        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/taxes.js'));
-    echo $this->headScript();
+$this->headScript()
+    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+    ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+        null,
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/taxes.js')
+    );
+
+$this->headLink()
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
 <script id="ruleTemplate" type="text/template">
@@ -40,8 +45,18 @@ $this->placeholder('headerContent')->captureStart();
 $this->placeholder('headerContent')->captureEnd();
 ?>
 
-<div id="manage-taxes">
-	<div class="content-medium-footer">
+<div id="manage-taxes" class="seotoaster container">
+<?php
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'headerText'  => $this->translate('Manage taxes'),
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
+        )
+    );
+?>
+    <div class="content-medium-footer">
         <div class="header-inner grid_12">
             <div class="grid_1 alpha omega text-center"><?php echo $this->translate('Default');?></div>
             <div class="grid_4"><?php echo $this->translate('Zone');?></div>
@@ -53,7 +68,7 @@ $this->placeholder('headerContent')->captureEnd();
         <div id="rules" class="grid_12">
             <!-- container for rules -->
         </div>
-	</div>
+    </div>
 
     <div class="footer grid_12">
         <button id="new-rule-btn" class="btn ticon-plus success"><?php echo $this->translate('Add new');?></button>

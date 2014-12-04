@@ -11,7 +11,7 @@ class Tools_ExportImportOrders
 
     const MAGENTO_IMPORT_ORDER = 'magento_import_order';
 
-    public static function prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds)
+    public static function prepareOrdersDataForExport($data, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
         unset($data['name']);
@@ -19,6 +19,8 @@ class Tools_ExportImportOrders
         unset($data['orderIds']);
         unset($data['controller']);
         unset($data['action']);
+        $filters = $data['filters'];
+        unset($data['filters']);
         $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
         $excludeFields = array();
         foreach ($data as $exportFieldName => $exportFieldValue) {
@@ -37,17 +39,11 @@ class Tools_ExportImportOrders
         }
         $config = array(Shopping::ORDER_EXPORT_CONFIG => serialize($exportFields));
         $shoppingConfigMapper->save($config);
-        if (intval($exportAllOrders) === 1) {
-            $dataToExport = Models_Mapper_OrdersMapper::getInstance()->fetchOrdersForExport(
-                array(),
-                $excludeFields
-            );
-        } else {
-            $dataToExport = Models_Mapper_OrdersMapper::getInstance()->fetchOrdersForExport(
+        $dataToExport = Models_Mapper_OrdersMapper::getInstance()->fetchOrdersForExport(
                 $ordersIds,
-                $excludeFields
+                $excludeFields,
+                $filters
             );
-        }
 
         if (!empty($dataToExport)) {
             $headers[] = $renamedFields;

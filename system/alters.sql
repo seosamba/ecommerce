@@ -136,8 +136,14 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 24/10/2014
+-- 24/11/2014
 -- version: 2.3.1
+-- Rename titles for templates
+UPDATE `template_type` SET `title` = 'Checkout' WHERE `id` = 'typecheckout';
+UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
+
+-- 24/10/2014
+-- version: 2.3.2
 CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `discount_quantity` int(4) unsigned NOT NULL,
@@ -161,6 +167,6 @@ CREATE TABLE `shopping_quantity_discount_product` (
 
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.3.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.3.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

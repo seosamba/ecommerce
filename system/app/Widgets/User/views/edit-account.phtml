@@ -1,19 +1,19 @@
 <form name="user-edit-account" id="user-edit-account" action="<?php echo $this->websiteUrl; ?>plugin/shopping/run/editAccount/" method='post' enctype="multipart/form-data">
     <p><label><?php echo $this->translate('Current email');?>:</label>
-    <p><span class="user-current-email"><?php echo $this->currentEmail;?></span></p>
+        <span class="user-current-email"><?php echo $this->currentEmail;?></span></p>
     <input type="hidden" name="currentEmail" value="<?php echo $this->currentEmail;?>" />
-    <p><?php echo $this->userForm->getElement('newEmail')->renderLabel(); ?></p>
-    <p><?php echo $this->userForm->getElement('newEmail')->renderViewHelper(); ?></p>
-    <p><?php echo $this->userForm->getElement('newEmailConfirm')->renderLabel(); ?></p>
-    <p><?php echo $this->userForm->getElement('newEmailConfirm')->renderViewHelper(); ?></p>
-    <p><?php echo $this->userForm->getElement('currentPassword')->renderLabel(); ?></p>
-    <p><?php echo $this->userForm->getElement('currentPassword')->renderViewHelper(); ?></p>
-    <p><?php echo $this->userForm->getElement('newPassword')->renderLabel(); ?></p>
-    <p><?php echo $this->userForm->getElement('newPassword')->renderViewHelper(); ?></p>
-    <p><?php echo $this->userForm->getElement('newPasswordConfirm')->renderLabel(); ?></p>
-    <p><?php echo $this->userForm->getElement('newPasswordConfirm')->renderViewHelper(); ?></p>
-    <p><?php echo $this->userForm->getElement('saveUser')->renderViewHelper(); ?></p>
- </form>
+    <p><?php echo $this->userForm->getElement('newEmail')->renderLabel(); ?>
+        <?php echo $this->userForm->getElement('newEmail')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('newEmailConfirm')->renderLabel(); ?>
+        <?php echo $this->userForm->getElement('newEmailConfirm')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('currentPassword')->renderLabel(); ?>
+        <?php echo $this->userForm->getElement('currentPassword')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('newPassword')->renderLabel(); ?>
+        <?php echo $this->userForm->getElement('newPassword')->renderViewHelper(); ?></p>
+    <p><?php echo $this->userForm->getElement('newPasswordConfirm')->renderLabel(); ?>
+        <?php echo $this->userForm->getElement('newPasswordConfirm')->renderViewHelper(); ?></p>
+    <?php echo $this->userForm->getElement('saveUser')->renderViewHelper(); ?>
+</form>
 
 <script type="text/javascript">
     $(function() {

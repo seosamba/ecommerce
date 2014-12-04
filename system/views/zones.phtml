@@ -1,7 +1,13 @@
 <?php
-    $this->headTitle($this->translate('Manage zones'));
-    $this->headScript()->setAllowArbitraryAttributes(true)
-        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js'));
+$this->headScript()
+    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+    ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+        null,
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/zones.js')
+    );
+
+$this->headLink()
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
 <script id="zoneTemplate" type="text/x-jquery-tmpl">
@@ -41,7 +47,17 @@
 	</div>
 </script>
 
-<div id="manage-zones">
+<div id="manage-zones" class="seotoaster container">
+    <?php
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+//            'headerText'  => $this->translate('Shipping configuration'),
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
+        )
+    );
+    ?>
     <div id="zone">
         <ul class="header">
             <li class="add-new-zone">
@@ -53,26 +69,26 @@
         <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?> ]</a>
         <button id="save-btn" class="btn ticon-save" title="Hotkey: Ctrl+S"><?php echo $this->translate( 'Save' ); ?></button>
     </div>
-</div>
 
-<div class="ui-helper-hidden">
-    <div id="add-country-dialog" title="<?php echo $this->translate( 'Add country' ); ?>">
-        <ul id="country-list" class="list-bordered mt10px h200px" tabindex="0"></ul>
-        <div class="footer labeled icon right">
-            <input id="country-filter" type="text" placeholder="<?php echo $this->translate( 'Start typing country name here' ); ?>" size="30"/>
-            <span class="ticon-search"></span>
+    <div class="ui-helper-hidden">
+        <div id="add-country-dialog" title="<?php echo $this->translate( 'Add country' ); ?>">
+            <ul id="country-list" class="list-bordered mt10px h200px" tabindex="0"></ul>
+            <div class="footer labeled icon right">
+                <input id="country-filter" type="text" placeholder="<?php echo $this->translate( 'Start typing country name here' ); ?>" size="30"/>
+                <span class="ticon-search"></span>
+            </div>
+        </div>
+
+        <div id="add-state-dialog" class="form" title="<?php echo $this->translate( 'Add state' ); ?>">
+            <label class="grid_3 alpha mt15px"><?php echo $this->translate( 'Filter by country' ); ?>:</label>
+            <select id="state-filter" class="grid_9 alpha omega mt10px">
+                <option value="0" selected="selected"><?php echo $this->translate( 'all' ); ?></option>
+            </select>
+            <ul id="state-list" class="list-bordered mt10px grid_12 alpha omega"></ul>
         </div>
     </div>
-
-    <div id="add-state-dialog" class="form" title="<?php echo $this->translate( 'Add state' ); ?>">
-        <label class="grid_3 alpha mt15px"><?php echo $this->translate( 'Filter by country' ); ?>:</label>
-        <select id="state-filter" class="grid_9 alpha omega mt10px">
-            <option value="0" selected="selected"><?php echo $this->translate( 'all' ); ?></option>
-        </select>
-        <ul id="state-list" class="list-bordered mt10px grid_12 alpha omega"></ul>
-    </div>
+    <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 </div>
-<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
 $('#zone').tabs();
@@ -109,6 +125,6 @@ $(document).one('zones:loaded', function () {
         }
     });
     hideSpinner();
-})
+});
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

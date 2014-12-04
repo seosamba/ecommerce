@@ -159,7 +159,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		parent::__construct($options, $seotoasterData);
 
 		$this->_layout = new Zend_Layout();
-		$this->_layout->setLayoutPath(__DIR__ . '/system/views/');
+        $this->_layout->setLayoutPath(Zend_Layout::getMvcInstance()->getLayoutPath());
 
 		if ($viewScriptPath = Zend_Layout::getMvcInstance()->getView()->getScriptPaths()) {
 			$this->_view->setScriptPath($viewScriptPath);
@@ -287,8 +287,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$form->populate($config);
 		$this->_view->form = $form;
 		$this->_view->configTabs = Tools_Plugins_Tools::getEcommerceConfigTabs();
-		$this->_layout->content = $this->_view->render('config.phtml');
-		$this->_layout->sectionId = Tools_Misc::SECTION_STORE_CONFIG;
+        $this->_view->helpSection = Tools_Misc::SECTION_STORE_CONFIG;
+        $this->_layout->content = $this->_view->render('config.phtml');
 		echo $this->_layout->render();
 	}
 
@@ -355,8 +355,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
 		});
-		$this->_layout->content = $this->_view->render('shipping.phtml');
-		$this->_layout->sectionId = Tools_Misc::SECTION_STORE_SHIPPINGCONFIG;
+        $this->_view->helpSection = Tools_Misc::SECTION_STORE_SHIPPINGCONFIG;
+        $this->_layout->content = $this->_view->render('shipping.phtml');
 		echo $this->_layout->render();
 	}
 
@@ -470,8 +470,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		}, $zonesMapper->fetchAll());
 		$this->_view->states = Tools_Geo::getState();
 		$this->_view->countries = Tools_Geo::getCountries();
+        $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGEZONES;
         $this->_layout->content = $this->_view->render('zones.phtml');
-        $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
 		echo $this->_layout->render();
 	}
 
@@ -487,8 +487,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->zones = array_map(function ($zone) {
 			return $zone->toArray();
 		}, Models_Mapper_Zone::getInstance()->fetchAll());
-		$this->_layout->content = $this->_view->render('taxes.phtml');
-		$this->_layout->sectionId = Tools_Misc::SECTION_STORE_TAXES;
+        $this->_view->helpSection = Tools_Misc::SECTION_STORE_TAXES;
+        $this->_layout->content = $this->_view->render('taxes.phtml');
 		echo $this->_layout->render();
 	}
 
@@ -526,8 +526,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			$this->_view->websiteConfig = $this->_websiteConfig;
 
-			$this->_layout->content = $this->_view->render('product.phtml');
-			$this->_layout->sectionId = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
+            $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
+            $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
 	}
@@ -776,8 +776,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	public function brandlogosAction() {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
-			$this->_layout->content = $this->_view->render('brandlogos.phtml');
-			$this->_layout->sectionId = Tools_Misc::SECTION_STORE_BRANDLOGOS;
+            $this->_view->helpSection = Tools_Misc::SECTION_STORE_BRANDLOGOS;
+            $this->_layout->content = $this->_view->render('brandlogos.phtml');
 			echo $this->_layout->render();
 		}
 	}
@@ -927,7 +927,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				unset($tags);
 			}
 
-			$this->_layout->sectionId = Tools_Misc::SECTION_STORE_MERCHANDISING;
+            $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}
@@ -1215,7 +1215,7 @@ class Shopping extends Tools_Plugins_Abstract {
             );
             $this->_view->translator = $this->_translator;
             $this->_view->defaultImportsFileds = Tools_ExportImportOrders::getDefaultOrderExportConfig();
-            $this->_layout->sectionId = Tools_Misc::SECTION_STORE_IMPORTORDERS;
+            $this->_view->helpSection = Tools_Misc::SECTION_STORE_IMPORTORDERS;
             $this->_layout->content = $this->_view->render('orders-import.phtml');
             echo $this->_layout->render();
         }
@@ -1270,12 +1270,15 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         $ordersIds = filter_var($this->_request->getParam('orderIds'), FILTER_SANITIZE_STRING);
         $data = $this->_request->getParams();
-        $ordersIds = explode(',', $ordersIds);
-        $exportAllOrders = filter_var($this->_request->getParam('allOrders'), FILTER_SANITIZE_NUMBER_INT);
-        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)
-            && is_array($ordersIds)
-        ) {
-            Tools_ExportImportOrders::prepareOrdersDataForExport($data, $exportAllOrders, $ordersIds);
+        $ordersIds = ($data['allOrders'] == 1 || empty($ordersIds)) ? array() : explode(',', $ordersIds);
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            if (!empty($ordersIds)) {
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            } else {
+                parse_str($data['filters'], $res);
+                $data['filters'] = Tools_FilterOrders::filter($res);
+                Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
+            }
         }
     }
 
