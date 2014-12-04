@@ -136,7 +136,31 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 24/10/2014
+-- version: 2.3.1
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `discount_quantity` int(4) unsigned NOT NULL,
+  `discount_price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `apply_scope` enum('local', 'global') DEFAULT 'local',
+  `discount_amount` DECIMAL(10,4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `shopping_quantity_discount_product` (
+  `product_id` int(10) unsigned NOT NULL,
+  `quantity` int(4) unsigned NOT NULL,
+  `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `status` enum('enabled','disabled') COLLATE utf8_unicode_ci DEFAULT 'enabled',
+  `amount` decimal(10,4) DEFAULT NULL,
+  PRIMARY KEY (`product_id`,`quantity`),
+  CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.3.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.3.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

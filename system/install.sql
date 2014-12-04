@@ -765,4 +765,4 @@ CREATE TABLE `shopping_quantity_discount_product` (
   CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.3.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.3.2' WHERE `name` = 'shopping';
