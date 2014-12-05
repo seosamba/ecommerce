@@ -90,25 +90,45 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
         $quantityDiscountConfig = Store_Mapper_DiscountMapper::getInstance()->getDiscountDataConfig(
             $this->_product->getId(),
             false,
-            self::LOCAL_DISCOUNT_ENABLED
+            false,
+            true
         );
         $quantityDiscountData = array();
         $currentPrice = $this->_product->getCurrentPrice();
         if (empty($currentPrice)) {
             $currentPrice = $this->_product->getPrice();
         }
+
+        if ((bool)self::$_shoppingConfig['showPriceIncTax']) {
+            $productTax = Tools_Tax_Tax::calculateProductTax($this->_product);
+            $productPriceWithTax = $productTax + $currentPrice;
+        }
         if (!empty($quantityDiscountConfig)) {
             foreach ($quantityDiscountConfig as $configItem) {
-                $configItem['discount'] = $configItem['amount'];
-                $configItem['sign'] = $configItem['price_sign'];
-                $configItem['type'] = $configItem['price_type'];
+                if ($configItem['status'] === self::LOCAL_DISCOUNT_ENABLED) {
+                    $configItem['discount'] = $configItem['amount'];
+                    $configItem['sign'] = $configItem['price_sign'];
+                    $configItem['type'] = $configItem['price_type'];
 
-                $quantityDiscountData[$configItem['quantity']]['price'] = Tools_DiscountTools::applyDiscountData(
-                    $currentPrice,
-                    $configItem
-                );
-                $quantityDiscountData[$configItem['quantity']]['type'] = $configItem['price_type'];
-                $quantityDiscountData[$configItem['quantity']]['discount'] = $configItem['discount'];
+                    $quantityDiscountData[$configItem['quantity']]['price'] = Tools_DiscountTools::applyDiscountData(
+                        $currentPrice,
+                        $configItem
+                    );
+
+                    if ((bool)self::$_shoppingConfig['showPriceIncTax']) {
+                        $quantityDiscountPriceTax = Tools_Tax_Tax::calculateDiscountTax(
+                            $quantityDiscountData[$configItem['quantity']]['price'],
+                            $this->_product->getTaxClass()
+                        );
+
+                        $quantityDiscountData[$configItem['quantity']]['price'] = $quantityDiscountData[$configItem['quantity']]['price'] + $quantityDiscountPriceTax;
+                        $quantityDiscountData[$configItem['quantity']]['discount_price'] = $productPriceWithTax - $quantityDiscountData[$configItem['quantity']]['price'];
+                    }else{
+                        $quantityDiscountData[$configItem['quantity']]['discount_price'] = $configItem['discount'];
+                    }
+                    $quantityDiscountData[$configItem['quantity']]['type'] = $configItem['price_type'];
+                    $quantityDiscountData[$configItem['quantity']]['discount'] = $configItem['discount'];
+                }
             }
         }
         $this->_view->quantityDiscountPrices = $quantityDiscountData;

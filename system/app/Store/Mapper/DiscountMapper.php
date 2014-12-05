@@ -61,7 +61,7 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
      * @param int $productId
      * @return array
      */
-    public function getDiscountDataConfig($productId, $quantity = false, $status = false)
+    public function getDiscountDataConfig($productId, $quantity = false, $status = false, $globalWithStatus = false)
     {
         $whereLocal = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
         if ($status) {
@@ -76,10 +76,28 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
         )
             ->where($whereLocal);
         $localProductConfig = $this->getDbTable()->getAdapter()->fetchAssoc($selectLocal);
-        $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
-            'shopping_quantity_discount',
-            array('quantity' => 'discount_quantity', 'price_sign' => 'discount_price_sign', 'price_type' => 'discount_price_type', 'amount' => 'discount_amount')
-        );
+        if ($globalWithStatus) {
+            $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
+                'shopping_quantity_discount',
+                array(
+                    'quantity' => 'discount_quantity',
+                    'price_sign' => 'discount_price_sign',
+                    'price_type' => 'discount_price_type',
+                    'amount' => 'discount_amount',
+                    'status' => new Zend_Db_Expr('"enabled"')
+                )
+            );
+        } else {
+            $selectGlobal = $this->getDbTable()->getAdapter()->select()->from(
+                'shopping_quantity_discount',
+                array(
+                    'quantity' => 'discount_quantity',
+                    'price_sign' => 'discount_price_sign',
+                    'price_type' => 'discount_price_type',
+                    'amount' => 'discount_amount'
+                )
+            );
+        }
         if ($quantity) {
             $whereGlobal = $this->getDbTable()->getAdapter()->quoteInto('discount_quantity <= ?', $quantity);
             $selectGlobal->where($whereGlobal);
