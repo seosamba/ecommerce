@@ -49,6 +49,14 @@ define([
             if (status == '') {
                 status = 'GLOBAL DISCOUNT';
             }
+
+            if (status === 'disabled') {
+                status = 'Global discount disabled';
+            }
+
+            if (status === 'enabled') {
+                status = 'Product specific';
+            }
             var pId = quantityDiscount.get('productId'), quan = parseInt(quantityDiscount.get('quantity')), ps = quantityDiscount.get('priceSign'),
                 pt = quantityDiscount.get('priceType'), pa = quantityDiscount.get('amount');
             this.$el.fnAddData([
@@ -58,12 +66,17 @@ define([
                 '<a class="ticon-pencil icon14" data-role="edit" data-cid="' + pId + '" data-quantity="' + quan +
                 '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" href="javascript:;"></a>' +
                 ' <a class="ticon-remove error icon14" data-role="delete"  data-cid="' + pId + '" data-quantity="' + quan +
-                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '"  href="javascript:;"></a>'
+                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" data-status="' + quantityDiscount.get('status') + '" href="javascript:;"></a>'
             ]);
         },
         deleteQuantityDiscount: function (e) {
-            var self = this;
-            showConfirm('Are you sure?', function () {
+            var self = this,
+                messageStatus = 'Are you sure?';
+            if(!$(e.currentTarget).data('status')){
+                messageStatus = 'We won\'t be applying this global discount offer to this product';
+            }
+
+            showConfirm(messageStatus, function () {
                 showSpinner();
                 $.ajax({
                     url: $('#website_url').val() + 'api/store/productdiscounts/id/' +

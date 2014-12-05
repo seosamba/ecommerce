@@ -1,13 +1,13 @@
 <?php if (!empty($this->quantityDiscountPrices)): ?>
     <?php foreach ($this->quantityDiscountPrices as $quantity => $discountInfo): ?>
-        <?php $discountAmount = $this->currency->toCurrency($discountInfo['discount']);?>
+        <?php $discountAmount = $this->currency->toCurrency($discountInfo['discount_price']);?>
         <?php if($discountInfo['type'] === Widgets_Quantitydiscount_Quantitydiscount::PRICE_TYPE_PERCENT):?>
             <?php $discountAmount = number_format($discountInfo['discount'], 2) . ' %';?>
         <?php endif;?>
 
         <?php echo $this->translate('Buy') . ' ' . $quantity . ' ' . $this->translate(
             'for'
-        ) . ' ' . $discountInfo['price'] . ' ' . $this->translate(
+        ) . ' ' . $this->currency->toCurrency($discountInfo['price']) . ' ' . $this->translate(
             'each and save'
         ) . ' ' . $discountAmount; ?>
     <?php endforeach; ?>
