@@ -39,10 +39,7 @@ $this->headLink()
     </div>
 </script>
 <?php
-$this->placeholder('headerContent')->captureStart();
-    echo $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null) );
-    echo $this->formLabel('price-inc-tax', ' '.$this->translate('Show product price with tax included.'), array('class' => 'pointer'));
-$this->placeholder('headerContent')->captureEnd();
+$taxesStatus  = '<label>' . $this->formCheckbox('price-inc-tax', null, ($this->priceIncTax ? array('checked' => (bool)$this->priceIncTax) : null)) . '&nbsp;' . $this->translate('Show product price with tax included.') . '</label>';
 ?>
 
 <div id="manage-taxes" class="seotoaster container">
@@ -50,7 +47,7 @@ $this->placeholder('headerContent')->captureEnd();
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
         array(
-            'headerText'  => $this->translate('Manage taxes'),
+            'innerHeaderHtml' => $taxesStatus,
             'helpSection' => $this->helpSection,
             'hashMap'     => Tools_Misc::$_helpHashMap
         )
