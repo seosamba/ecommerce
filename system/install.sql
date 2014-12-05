@@ -750,7 +750,7 @@ CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
   `discount_price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
   `discount_price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `apply_scope` enum('local', 'global') DEFAULT 'local',
-  `discount_amount` DECIMAL(10,4) DEFAULT NULL,
+  `discount_amount` DECIMAL(10,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -760,7 +760,7 @@ CREATE TABLE `shopping_quantity_discount_product` (
   `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
   `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` enum('enabled','disabled') COLLATE utf8_unicode_ci DEFAULT 'enabled',
-  `amount` decimal(10,4) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`product_id`,`quantity`),
   CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
