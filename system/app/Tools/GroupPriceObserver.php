@@ -38,7 +38,7 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
         }
         $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
         $currentUser = $sessionHelper->getCurrentUser()->getId();
-        if(isset($currentUser)){
+        if(isset($currentUser) && is_array($allCustomersGroups)){
             if(array_key_exists($currentUser, $allCustomersGroups)){
                 $groupId = $allCustomersGroups[$currentUser]['group_id'];
                 if(isset($allProductsGroups[$groupId])){
