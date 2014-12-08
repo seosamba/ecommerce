@@ -95,19 +95,16 @@ define([
             })
         },
         editQuantityDiscount: function (e) {
-
-                var status = status;
-                if (status === 'disabled') {
-                    $('#disc-status').prop('checked', true);
-                } else {
-                    $('#disc-status').prop('checked', false);
-                }
-                $('#quantity').val($(e.currentTarget).data('quantity'));
-                $('#discount-quantity-price-type').val($(e.currentTarget).data('type')).prop('selected', true);
-                $('#discount-quantity-sign').val($(e.currentTarget).data('sign')).prop('selected', true);
-                $('#amount').val($(e.currentTarget).data('amount')).focus();
-            console.log($(e.currentTarget));
-
+            var status = status;
+            if (status === 'disabled') {
+                $('#disc-status').prop('checked', true);
+            } else {
+                $('#disc-status').prop('checked', false);
+            }
+            $('#quantity').val($(e.currentTarget).data('quantity'));
+            $('#discount-quantity-price-type').val($(e.currentTarget).data('type')).prop('selected', true);
+            $('#discount-quantity-sign').val($(e.currentTarget).data('sign')).prop('selected', true);
+            $('#amount').val($(e.currentTarget).data('amount')).focus();
         }
     });
 
