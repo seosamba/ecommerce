@@ -28,7 +28,7 @@ class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
                 }
                 if (!empty($discountConfig)) {
                     return array(
-                        'name' => 'quantitydiscount',
+                        'name' => 'q-ty discount',
                         'discount' => $discountConfig['amount'],
                         'type' => $discountConfig['price_type'],
                         'sign' => $discountConfig['price_sign']
@@ -36,7 +36,7 @@ class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
                 }
             }
         }
-        return array('name' => 'quantitydiscount', 'discount' => 0, 'type' => '', 'sign' => '');
+        return array('name' => 'q-ty discount', 'discount' => 0, 'type' => '', 'sign' => '');
 
     }
 

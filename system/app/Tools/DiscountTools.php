@@ -27,13 +27,17 @@ class Tools_DiscountTools
      */
     public static function calculateDiscountPrice($originalPrice, $discounts, $excludeDiscount = false)
     {
+        $processedDiscounts = array();
         foreach ($discounts as $discountData) {
             if (($excludeDiscount && $discountData['name'] === $excludeDiscount) || empty($discountData['type'])) {
                 continue;
             }
+            $previousPrice = $originalPrice;
             $originalPrice = self::applyDiscountData($originalPrice, $discountData);
+            $discountData['unitSave'] = self::getUnitDiscount($originalPrice, $previousPrice);
+            $processedDiscounts[] = $discountData;
         }
-        return $originalPrice;
+        return array('price' => $originalPrice, 'discounts' => $processedDiscounts);
     }
 
     /**
@@ -133,12 +137,17 @@ class Tools_DiscountTools
                 }
             }
         }
-        $originalDiscountedPrice = self::calculateDiscountPrice(
+        $originalDiscounted = self::calculateDiscountPrice(
             $cartItem['originalPrice'],
             $cartItem['productDiscounts']
         );
 
-        $cartItem['price'] = $originalDiscountedPrice;
+        $cartItem['price'] = $originalDiscounted['price'];
+        $cartItem['productDiscounts'] = $originalDiscounted['discounts'];
         return $cartItem;
+    }
+
+    public static function getUnitDiscount($price, $originPrice) {
+        return floatval($originPrice) - $price;
     }
 }

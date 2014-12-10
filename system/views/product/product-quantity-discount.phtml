@@ -10,23 +10,21 @@
                 'placeholder' => $this->translate('Enter quantity')
             )
         ); ?>
-    </div>
-
-    <div class="grid_1 alpha omega mt0px">
         <?php echo $this->formSelect(
             'priceSign',
             null,
             array(
                 'id' => 'discount-quantity-sign',
+                'hidden' => 'hidden'
             ),
             array(
-                'plus' => '+',
+                //'plus' => '+',
                 'minus' => '-'
             )
         ); ?>
 
     </div>
-    <div class="grid_2 mt0px">
+    <div class="grid_2 mt0px labeled icon left">
         <?php echo $this->formText(
             'amount',
             null,
@@ -35,6 +33,7 @@
                 'placeholder' => $this->translate('Enter value')
             )
         ); ?>
+        <i class="ticon-minus"></i>
     </div>
     <div class="grid_1 alpha omega mt0px">
         <?php echo $this->formSelect(

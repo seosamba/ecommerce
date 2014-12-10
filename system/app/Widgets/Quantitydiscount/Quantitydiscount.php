@@ -114,6 +114,7 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
                         $currentPrice,
                         $configItem
                     );
+                    $configItem['unitSave'] = $currentPrice - $quantityDiscountData[$configItem['quantity']]['price'];
 
                     if ((bool)self::$_shoppingConfig['showPriceIncTax']) {
                         $quantityDiscountPriceTax = Tools_Tax_Tax::calculateDiscountTax(
@@ -128,6 +129,7 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
                     }
                     $quantityDiscountData[$configItem['quantity']]['type'] = $configItem['price_type'];
                     $quantityDiscountData[$configItem['quantity']]['discount'] = $configItem['discount'];
+                    $quantityDiscountData[$configItem['quantity']]['unitSave'] = $configItem['unitSave'];
                 }
             }
         }
