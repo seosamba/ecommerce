@@ -49,24 +49,28 @@ define([
             if (status == '') {
                 status = 'GLOBAL DISCOUNT';
             }
-
             if (status === 'disabled') {
-                status = 'Global discount disabled';
+                status = 'Disabled discount';
             }
 
             if (status === 'enabled') {
-                status = 'Product specific';
+                status = 'Product specific discount';
             }
             var pId = quantityDiscount.get('productId'), quan = parseInt(quantityDiscount.get('quantity')), ps = quantityDiscount.get('priceSign'),
                 pt = quantityDiscount.get('priceType'), pa = quantityDiscount.get('amount');
+            if (status == 'GLOBAL DISCOUNT') {
+                var editLink = '<span class="ticon-pencil icon14"></span>'
+            } else {
+                var editLink = '<a class="ticon-pencil icon14" data-role="edit" data-cid="' + pId + '" data-quantity="' + quan + '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" href="javascript:;"></a>'
+            }
+            console.log(editLink);
+            console.log( quantityDiscount.get('status'));
             this.$el.fnAddData([
                 '<span class="discount-quantity">' + quantityDiscount.get('quantity') + '</span>',
                 '<span>' + priceSign + ' ' + quantityDiscount.get('amount') + ' ' + priceType + '</span>',
                 '<span>' + status + '</span>',
-                '<a class="ticon-pencil icon14" data-role="edit" data-cid="' + pId + '" data-quantity="' + quan +
-                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" href="javascript:;"></a>' +
-                ' <a class="ticon-remove error icon14" data-role="delete"  data-cid="' + pId + '" data-quantity="' + quan +
-                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" data-status="' + quantityDiscount.get('status') + '" href="javascript:;"></a>'
+                editLink + ' <a class="ticon-remove error icon14" data-role="delete"  data-cid="' + pId + '" data-quantity="' + quan +
+                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" data-status="' + status + '" href="javascript:;"></a>'
             ]);
         },
         deleteQuantityDiscount: function (e) {
@@ -97,10 +101,11 @@ define([
         editQuantityDiscount: function (e) {
             var status = status;
             if (status === 'disabled') {
-                $('#disc-status').prop('checked', true);
-            } else {
                 $('#disc-status').prop('checked', false);
+            } else {
+                $('#disc-status').prop('checked', true);
             }
+            console.log($('#disc-status').prop('checked'));
             $('#quantity').val($(e.currentTarget).data('quantity'));
             $('#discount-quantity-price-type').val($(e.currentTarget).data('type')).prop('selected', true);
             $('#discount-quantity-sign').val($(e.currentTarget).data('sign')).prop('selected', true);

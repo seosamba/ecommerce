@@ -96,8 +96,10 @@ class Api_Store_Productdiscounts extends Api_Service_Abstract {
             $this->_error($translator->translate('Price value must be numeric'));
         }
 
-        if(empty($data['status'])){
+        if(!empty($data['status'])){
             $data['status'] = 'enabled';
+        } else {
+            $data['status'] = 'disabled';
         }
 
         $model = new Store_Model_DiscountProduct($data);

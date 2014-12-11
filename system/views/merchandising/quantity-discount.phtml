@@ -49,7 +49,7 @@
         ); ?>
 
     </div>
-    <label class="grid_2 mt5px pointer" for="discountGlobal">
+    <label class="grid_3 mt5px pointer" for="discountGlobal">
         <?php echo $this->formCheckbox(
             'applyScope',
             null,
@@ -57,7 +57,7 @@
                 'id' => 'discount-quantity-global'
             )
         ); ?>
-        <?php echo $this->translate('Apply global'); ?>
+        <?php echo $this->translate('Apply to current catalogue'); ?>
     </label>
 
     <button class="btn grid_4 omega mt0px ticon-plus" type="submit"><?php echo $this->translate(
