@@ -23,6 +23,14 @@ $this->headScript()->setAllowArbitraryAttributes(true)
 </div>
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage(); ?>"/>
 <div id="manage-pickup-locations">
+    <?php
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+//            'headerText'  => $this->translate('Manage zones')
+        )
+    );
+    ?>
     <ul class="header">
         <?php foreach ($this->pickupLocationsCategories as $category): ?>
             <li><a data-category-id="<?php echo $category['id']; ?>"
@@ -40,126 +48,141 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     <?php if (empty($this->pickupLocationsCategories)): ?>
         <?php $hidden = 'hidden'; ?>
     <?php endif; ?>
-    <div class="content">
-        <div id="pickup-location-config" class="<?php echo $hidden; ?>">
-            <label class="category-label grid_3 mt10px"><?php echo $this->translate('Change category name'); ?></label>
-            <input class="change-category-label grid_3 mt5px" name="change-category-label"/>
-            <div class="grid_2 mt10px"><span class="imported-category"></span></div>
+    <div id="pickup-location-config" class="content <?php echo $hidden; ?>">
+        <label class="category-label grid_3 mt10px"><?php echo $this->translate('Change category name'); ?></label>
+        <input class="change-category-label grid_3 mt5px" name="change-category-label"/>
+        <div class="grid_2 mt10px"><span class="imported-category"></span></div>
 
-            <div class="uploader-category-logo grid_4 text-right">
-                <div id="progressbar" class="hidden grid_4 prefix_5 mt10px">
-                    <span class="label"><b class="value">0</b></span>
-                </div>
-                <?php if (isset($this->pickupLocationsCategories[0]['img']) && $this->pickupLocationsCategories[0]['img'] !== null): ?>
-                    <img
-                        src="'<?php echo $this->websiteUrl; ?>media/<?php echo Shopping::PICKUP_LOGOS_FOLDER . '/small/' . $this->pickupLocationsCategories[0]['img'] ?>'"
-                        width="50"/>
-                <?php else: ?>
-                    <img src="'<?php echo $this->websiteUrl; ?>system/images/noimage.png'" width="50"/>
-                <?php endif; ?>
+        <div class="uploader-category-logo grid_4 text-right">
+            <div id="progressbar" class="hidden grid_4 prefix_5 mt10px">
+                <span class="label"><b class="value">0</b></span>
             </div>
-            <form id="edit-pickup-location" class="grid_12 background mt20px" method="POST">
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Name'); ?></label>
+            <?php if (isset($this->pickupLocationsCategories[0]['img']) && $this->pickupLocationsCategories[0]['img'] !== null): ?>
+                <img
+                    src="'<?php echo $this->websiteUrl; ?>media/<?php echo Shopping::PICKUP_LOGOS_FOLDER . '/small/' . $this->pickupLocationsCategories[0]['img'] ?>'"
+                    width="50"/>
+            <?php else: ?>
+                <img src="'<?php echo $this->websiteUrl; ?>system/images/noimage.png'" width="50"/>
+            <?php endif; ?>
+        </div>
+        <form id="edit-pickup-location" class="grid_12 background mt10px mb15px" method="POST">
+            <fieldset class="column_4 full-width">
+                <p>
+                    <label><?php echo $this->translate('Name'); ?></label>
                     <input type="text" name="location-name" class="location-name"/>
                 </p>
 
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Address 1'); ?></label>
+                <p class="mt0px">
+                    <label><?php echo $this->translate('Address 1'); ?></label>
                     <input type="text" name="address1" class="location-address1"/>
                 </p>
 
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Address 2'); ?></label>
+                <p class="mt0px">
+                    <label><?php echo $this->translate('Address 2'); ?></label>
                     <input type="text" name="address2" class="location-address2"/>
                 </p>
 
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('City'); ?></label>
+                <p class="mt0px">
+                    <label><?php echo $this->translate('City'); ?></label>
                     <input type="text" name="city" class="location-city"/>
                 </p>
 
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Zip'); ?></label>
+                <p>
+                    <label><?php echo $this->translate('Zip'); ?></label>
                     <input type="text" name="zip" class="location-zip"/>
                 </p>
 
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Country'); ?></label>
+                <p>
+                    <label><?php echo $this->translate('Country'); ?></label>
                     <select name="country" class="location-country">
                         <?php foreach ($this->countries as $country): ?>
                             <option value="<?php echo $country['name']; ?>"><?php echo $country['name']; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </p>
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Phone'); ?></label>
+                <p>
+                    <label><?php echo $this->translate('Phone'); ?></label>
                     <input type="text" name="phone" class="location-phone"/>
                 </p>
 
-                <p class="grid_3 mt10px"><label><?php echo $this->translate('Weight'); ?></label>
+                <p>
+                    <label><?php echo $this->translate('Weight'); ?></label>
                     <input type="text" name="weight" class="location-weight"/>
                 </p>
+            </fieldset>
 
-                <p class="grid_3 mt15px text-center fl-left" id="working_hours">
-                    <a class="working-hours-dialog" href="javascript:;"><?php echo $this->translate(
-                            'Working hours'
-                        ); ?></a>
-                </p>
-                <input type="hidden" name="id" id="location-edit-id"/>
-                <button class="grid_3 btn omega ticon-plus" type="submit"/>
-                <?php echo $this->translate('Create or Update'); ?>
-                </button>
-            </form>
+            <p class="grid_3 mt15px text-center" id="working_hours">
+                <a class="working-hours-dialog" href="javascript:;">[ <?php
+                    echo $this->translate(
+                        'Working hours'
+                    );
+                ?> ]</a>
+            </p>
+            <input type="hidden" name="id" id="location-edit-id"/>
+            <button class="btn omega ticon-plus" type="submit"/><?php echo $this->translate('Create or Update'); ?></button>
+        </form>
 
-            <div class="working-hours-list grid_12 alpha omega hide"
-                 title="<?php echo $this->translate('Working hours'); ?>">
-                <p class="grid_6 mt20px"><label><?php echo $this->translate('Sunday'); ?></label>
-                    <input type="text" name="working-hours-sunday"/>
-                </p>
+        <div class="working-hours-list pt10px hide"
+             title="<?php echo $this->translate('Working hours'); ?>">
+            <p class="grid_6">
+                <label><?php echo $this->translate('Sunday'); ?></label>
+                <input type="text" name="working-hours-sunday"/>
+            </p>
 
-                <p class="grid_6"><label><?php echo $this->translate('Monday'); ?></label>
-                    <input type="text" name="working-hours-monday"/>
-                </p>
+            <p class="grid_6">
+                <label><?php echo $this->translate('Monday'); ?></label>
+                <input type="text" name="working-hours-monday"/>
+            </p>
 
-                <p class="grid_6"><label><?php echo $this->translate('Tuesday'); ?></label>
-                    <input type="text" name="working-hours-tuesday"/>
-                </p>
+            <p class="grid_6">
+                <label><?php echo $this->translate('Tuesday'); ?></label>
+                <input type="text" name="working-hours-tuesday"/>
+            </p>
 
-                <p class="grid_6"><label><?php echo $this->translate('Wednesday'); ?></label>
-                    <input type="text" name="working-hours-wednesday"/>
-                </p>
+            <p class="grid_6">
+                <label><?php echo $this->translate('Wednesday'); ?></label>
+                <input type="text" name="working-hours-wednesday"/>
+            </p>
 
-                <p class="grid_6"><label><?php echo $this->translate('Thursday'); ?></label>
-                    <input type="text" name="working-hours-thursday"/>
-                </p>
+            <p class="grid_6">
+                <label><?php echo $this->translate('Thursday'); ?></label>
+                <input type="text" name="working-hours-thursday"/>
+            </p>
 
-                <p class="grid_6"><label><?php echo $this->translate('Friday'); ?></label>
-                    <input type="text" name="working-hours-friday"/>
-                </p>
+            <p class="grid_6">
+                <label><?php echo $this->translate('Friday'); ?></label>
+                <input type="text" name="working-hours-friday"/>
+            </p>
 
-                <p class="grid_6"><label><?php echo $this->translate('Saturday'); ?></label>
-                    <input type="text" name="working-hours-saturday"/>
-                </p>
-            </div>
-            <div class="content-footer grid_12">
-                <div class="grid_12 alpha omega location-table">
-                    <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
-                        <thead class="header-inner">
-                        <tr>
-                            <th><?php echo $this->translate('Name'); ?></th>
-                            <th><?php echo $this->translate('Address1'); ?></th>
-                            <th><?php echo $this->translate('Address2'); ?></th>
-                            <th><?php echo $this->translate('City'); ?></th>
-                            <th><?php echo $this->translate('Zip'); ?></th>
-                            <th><?php echo $this->translate('Country'); ?></th>
-                            <th><?php echo $this->translate('Phone'); ?></th>
-                            <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
-                        </tr>
-                        </thead>
-                        <tbody></tbody>
-                        <tfoot class="text-center">
-                        <tr><td colspan="8" class="location-paginator"></td></tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="grid_12"><a id="delete-pickup-location-category" class="delete-selected-category error"
-                   href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a></div>
-            </div>
+            <p class="grid_6">
+                <label><?php echo $this->translate('Saturday'); ?></label>
+                <input type="text" name="working-hours-saturday"/>
+            </p>
         </div>
+        <div class="grid_12 location-table">
+            <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
+                <thead class="header-inner">
+                <tr>
+                    <th><?php echo $this->translate('Name'); ?></th>
+                    <th><?php echo $this->translate('Address1'); ?></th>
+                    <th><?php echo $this->translate('Address2'); ?></th>
+                    <th><?php echo $this->translate('City'); ?></th>
+                    <th><?php echo $this->translate('Zip'); ?></th>
+                    <th><?php echo $this->translate('Country'); ?></th>
+                    <th><?php echo $this->translate('Phone'); ?></th>
+                    <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot class="text-center">
+                <tr><td colspan="8" class="location-paginator"></td></tr>
+                </tfoot>
+            </table>
+        </div>
+        <footer class="grid_12">
+            <a id="delete-pickup-location-category" class="delete-selected-category error"
+               href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a>
+        </footer>
     </div>
 </div>
 
@@ -168,14 +191,3 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     $('#manage-pickup-locations').tabs();
     <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>
-<style>
-    #pickup-locations-table{
-        word-break: normal;
-    }
-    .ui-dialog{
-        position: absolute;
-    }
-    .ui-button:not(.icon){
-        text-overflow: inherit;
-    }
-<style>

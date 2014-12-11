@@ -1,36 +1,54 @@
 <?php
-    $this->headTitle($this->translate('Merchandising'));
-    //$this->placeholder('headerContent')->set('Merchandising');
+$this->headScript()
+    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js')
+    ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
+        null,
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/merchandising/config')
+    );
 
-    $this->jQuery()->addJavascriptFile($this->websiteUrl . 'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
+$this->headLink()
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
-<div id="merchandising" class="with-content-footer">
-    <ul class="header">
-        <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
-	    <?php if (isset($this->plugins) && !empty($this->plugins)):?>
-            <?php foreach ($this->plugins as $plugin) :?>
-			    <?php
-	            $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
-	            $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
-	            ?>
-	    <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
-            <?php endforeach; ?>
-        <?php endif; ?>
-        <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
-	</ul>
-	<div id="coupons">
-		<?php echo $this->partial('merchandising/coupon.phtml'); ?>
-	</div>
-    <div id="group-pricing">
-        <?php echo $this->partial('merchandising/grouping.phtml'); ?>
-    </div>
-	<div class="message info grid_12">
-        <ul class="list-count-sign column_2 full-width">
-            <li class="m0px text-overflow"><?php echo $this->translate('Set parameters for cart wide promotions from this screen.'); ?></li>
-            <li class="m0px text-overflow"><?php echo $this->translate('Set item specific promotions in the "add/edit product" screen.'); ?></li>
+
+<?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->currency)); ?>
+<div id="merchandising" class="seotoaster container">
+<?php
+    echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
+        )
+    );
+?>
+    <div class="with-content-footer">
+        <ul class="header">
+            <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
+            <?php if (isset($this->plugins) && !empty($this->plugins)):?>
+                <?php foreach ($this->plugins as $plugin) :?>
+                    <?php
+                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
+                    ?>
+            <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
         </ul>
-	</div>
+        <div id="coupons">
+            <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+        </div>
+        <div id="group-pricing">
+            <?php echo $this->partial('merchandising/grouping.phtml'); ?>
+        </div>
+        <div class="message info grid_12">
+            <ul class="list-count-sign column_2 full-width">
+                <li class="m0px text-overflow"><?php echo $this->translate('Set parameters for cart wide promotions from this screen.'); ?></li>
+                <li class="m0px text-overflow"><?php echo $this->translate('Set item specific promotions in the "add/edit product" screen.'); ?></li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -42,7 +60,3 @@
         });
     });
 </script>
-
-<script src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/libs/require.min.js" data-main="<?php echo $this->websiteUrl; ?>plugins/shopping/web/js/modules/merchandising/config"></script>
-
-<?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->currency)); ?>
