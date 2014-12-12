@@ -39,14 +39,17 @@ define([
             this.quantityDiscounts.each(this.renderQuantityDiscount, this);
         },
         renderQuantityDiscount: function(quantityDiscount){
-            var discountPriceType = $('.discount-currency').val();
+            var discountPriceType = $('.discount-currency').val(), discType = 'Exceptions OK';
+            if(quantityDiscount.get('applyScope') === 'global'){
+                discType = 'All products';
+            }
             if(quantityDiscount.get('discountPriceType') === 'percent'){
                 discountPriceType = '%';
             }
             this.$el.fnAddData([
                 '<span class="discount-quantity">'+quantityDiscount.get('discountQuantity')+'</span>',
                 '<span>- '+quantityDiscount.get('discountAmount')+' '+discountPriceType+'</span>',
-                '<span>'+quantityDiscount.get('applyScope')+'</span>',
+                '<span>'+discType+'</span>',
                 '<a class="ticon-remove error icon14 block centered" data-role="delete" data-cid="'+quantityDiscount.get('id')+'" href="javascript:;"></a>'
             ]);
         },

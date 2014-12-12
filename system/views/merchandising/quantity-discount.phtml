@@ -1,7 +1,7 @@
 <?php $currency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency'); ?>
 <input type="hidden" name="quantity-discount-currency" class="discount-currency" value="<?php echo $currency ?>">
 <form id="quantity-discount-form" class="grid_12 alpha omega background">
-    <div class="grid_2 alpha">
+    <div class="grid_1 alpha omega">
         <?php echo $this->formText(
             'discountQuantity',
             null,
@@ -49,7 +49,7 @@
         ); ?>
 
     </div>
-    <label class="grid_3 mt5px pointer" for="discountGlobal">
+    <label class="grid_6 mt5px pointer omega" for="discountGlobal">
         <?php echo $this->formCheckbox(
             'applyScope',
             null,
@@ -57,10 +57,10 @@
                 'id' => 'discount-quantity-global'
             )
         ); ?>
-        <?php echo $this->translate('Apply to current catalogue'); ?>
+        <?php echo $this->translate('Overwrite product specific discount when quantity matches'); ?>
     </label>
 
-    <button class="btn grid_3 omega mt0px ticon-plus" type="submit"><?php echo $this->translate(
+    <button class="btn grid_2 omega mt0px ticon-plus" type="submit"><?php echo $this->translate(
             'Create discount'
         ); ?></button>
 
