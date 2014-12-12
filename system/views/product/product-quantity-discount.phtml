@@ -10,19 +10,6 @@
                 'placeholder' => $this->translate('Enter quantity')
             )
         ); ?>
-        <?php echo $this->formSelect(
-            'priceSign',
-            null,
-            array(
-                'id' => 'discount-quantity-sign',
-                'hidden' => 'hidden'
-            ),
-            array(
-                //'plus' => '+',
-                'minus' => '-'
-            )
-        ); ?>
-
     </div>
     <div class="grid_2 mt0px labeled icon left">
         <?php echo $this->formText(
@@ -49,19 +36,6 @@
         ); ?>
 
     </div>
-    <div class="grid_1 omega m5px" >
-        <label class="pointer switcher" for="disc-status">
-            <?php echo $this->formCheckbox(
-                'status',
-                null,
-                array(
-                    'id' => 'disc-status',
-                    'class' => 'switcher',
-                    'checked' => 'checked'
-                )
-            ); ?>
-        </label>
-    </div>
     <input type="hidden" id="productId" name="productId" value=""/>
     <button class="btn grid_4 omega mt0px ticon-plus" type="submit"><?php echo $this->translate(
             'Create or update discount'
@@ -75,7 +49,7 @@
         <tr>
             <th><?php echo $this->translate('Quantity'); ?></th>
             <th><?php echo $this->translate('Default price modifier'); ?></th>
-            <th><?php echo $this->translate('Type & status'); ?></th>
+            <th><?php echo $this->translate('Type'); ?></th>
             <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
         </tr>
         </thead>

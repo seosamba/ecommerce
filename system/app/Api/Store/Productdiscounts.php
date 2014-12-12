@@ -46,14 +46,16 @@ class Api_Store_Productdiscounts extends Api_Service_Abstract {
         if ($id && empty($quantity)) {
             $discountMapper = Store_Mapper_DiscountMapper::getInstance();
             $data = $discountMapper->getDiscountDataConfig($id);
-            foreach ($data as &$discount) {
+            foreach ($data as $dt => &$discount) {
                 $discount['id'] = null;
                 $discount['productId'] = $id;
                 $discount['priceSign'] = $discount['price_sign'];
                 $discount['priceType'] = $discount['price_type'];
-                if(empty($discount['status']))
-                    $discount['status'] = '';
+                if(empty($discount['status'])) $discount['status'] = '';
                 unset($discount['price_type'], $discount['price_sign'], $discount['product_id']);
+                if($discount['status'] === 'disabled') {
+                    unset($data[$dt]);
+                }
             }
             return  array_merge(array(), $data);
 
@@ -96,11 +98,8 @@ class Api_Store_Productdiscounts extends Api_Service_Abstract {
             $this->_error($translator->translate('Price value must be numeric'));
         }
 
-        if(!empty($data['status'])){
-            $data['status'] = 'enabled';
-        } else {
-            $data['status'] = 'disabled';
-        }
+        $data['status'] = 'enabled';
+        $data['priceSign'] = 'minus';
 
         $model = new Store_Model_DiscountProduct($data);
         if (is_array($data)) {

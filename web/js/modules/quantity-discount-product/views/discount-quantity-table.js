@@ -8,8 +8,7 @@ define([
     var DiscountQuantityTableView = Backbone.View.extend({
         el: $('#quantity-discount-table'),
         events: {
-            'click a[data-role=delete]': 'deleteQuantityDiscount',
-            'click a[data-role=edit]': 'editQuantityDiscount'
+            'click a[data-role=delete]': 'deleteQuantityDiscount'
         },
         templates: {},
         initialize: function (options) {
@@ -38,13 +37,9 @@ define([
             this.quantityDiscounts.each(this.renderQuantityDiscount, this);
         },
         renderQuantityDiscount: function (quantityDiscount) {
-            var priceType = $('.discount-currency').val(), status = quantityDiscount.get('status'),
-                priceSign = '-';
+            var priceType = $('.discount-currency').val(), status = quantityDiscount.get('status');
             if (quantityDiscount.get('priceType') === 'percent') {
                 priceType = '%';
-            }
-            if (quantityDiscount.get('priceSign') === 'plus') {
-                priceSign = '+';
             }
             if (status == '') {
                 status = 'GLOBAL DISCOUNT';
@@ -56,21 +51,16 @@ define([
             if (status === 'enabled') {
                 status = 'Product specific discount';
             }
-            var pId = quantityDiscount.get('productId'), quan = parseInt(quantityDiscount.get('quantity')), ps = quantityDiscount.get('priceSign'),
+            var pId = quantityDiscount.get('productId'), quan = parseInt(quantityDiscount.get('quantity')),
                 pt = quantityDiscount.get('priceType'), pa = quantityDiscount.get('amount');
-            if (status == 'GLOBAL DISCOUNT') {
-                var editLink = '<span class="ticon-pencil icon14"></span>'
-            } else {
-                var editLink = '<a class="ticon-pencil icon14" data-role="edit" data-cid="' + pId + '" data-quantity="' + quan + '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" href="javascript:;"></a>'
-            }
-            console.log(editLink);
-            console.log( quantityDiscount.get('status'));
+          /*  if (status == 'GLOBAL DISCOUNT') {
+            }*/
             this.$el.fnAddData([
                 '<span class="discount-quantity">' + quantityDiscount.get('quantity') + '</span>',
-                '<span>' + priceSign + ' ' + quantityDiscount.get('amount') + ' ' + priceType + '</span>',
+                '<span>- ' + quantityDiscount.get('amount') + ' ' + priceType + '</span>',
                 '<span>' + status + '</span>',
-                editLink + ' <a class="ticon-remove error icon14" data-role="delete"  data-cid="' + pId + '" data-quantity="' + quan +
-                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="' + ps + '" data-status="' + status + '" href="javascript:;"></a>'
+                '<a class="ticon-remove error icon14 block centered" data-role="delete"  data-cid="' + pId + '" data-quantity="' + quan +
+                '" data-amount="' + pa + '" data-type="' + pt + '" data-sign="minus" data-status="' + status + '" href="javascript:;"></a>'
             ]);
         },
         deleteQuantityDiscount: function (e) {
@@ -87,7 +77,7 @@ define([
                     $(e.currentTarget).data('cid') +
                     '/quantity/' + $(e.currentTarget).data('quantity') +
                     '/amount/' + $(e.currentTarget).data('amount') +
-                    '/priceSign/' + $(e.currentTarget).data('sign') +
+                    '/priceSign/minus' +
                     '/priceType/' + $(e.currentTarget).data('type'),
                     type: 'DELETE',
                     dataType: 'json'
@@ -97,19 +87,6 @@ define([
                 })
 
             })
-        },
-        editQuantityDiscount: function (e) {
-            var status = status;
-            if (status === 'disabled') {
-                $('#disc-status').prop('checked', false);
-            } else {
-                $('#disc-status').prop('checked', true);
-            }
-            console.log($('#disc-status').prop('checked'));
-            $('#quantity').val($(e.currentTarget).data('quantity'));
-            $('#discount-quantity-price-type').val($(e.currentTarget).data('type')).prop('selected', true);
-            $('#discount-quantity-sign').val($(e.currentTarget).data('sign')).prop('selected', true);
-            $('#amount').val($(e.currentTarget).data('amount')).focus();
         }
     });
 
