@@ -1056,16 +1056,16 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     public static function importWebsiteData() {
         $result = array(
-            'shopping_product' => '',
-            'shopping_brands' => '',
-            'shopping_product_option' => '',
-            'shopping_product_option_selection' => '',
-            'shopping_product_set_settings' => '',
-            'shopping_tags' => '',
-            'shopping_product_has_option' => '',
-            'shopping_product_has_part' => '',
-            'shopping_product_has_related' => '',
-            'shopping_product_has_tag' => '',
+            'shopping_product' => array(),
+            'shopping_brands' => array(),
+            'shopping_product_option' => array(),
+            'shopping_product_option_selection' => array(),
+            'shopping_product_set_settings' => array(),
+            'shopping_tags' => array(),
+            'shopping_product_has_option' => array(),
+            'shopping_product_has_part' => array(),
+            'shopping_product_has_related' => array(),
+            'shopping_product_has_tag' => array(),
             'page_option'   => array(
                 array(
                     'id'           => self::OPTION_CHECKOUT,
