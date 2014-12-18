@@ -303,7 +303,8 @@ class Tools_Misc
             'state' => '',
             'zip' => '',
             'phone' => '',
-            'mobile' => ''
+            'mobile' => '',
+            'mobilecountrycode' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);

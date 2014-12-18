@@ -15,7 +15,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		$this->setLegend('Enter your shipping address')
 			->setAttribs(array(
 				'id'     => 'checkout-user-address',
-				'class'  => array('toaster-checkout', 'address-form'),
+				'class'  => 'toaster-checkout address-form',
 				'method' => Zend_Form::METHOD_POST
 			));
 
@@ -60,11 +60,20 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		)));
                
         $this->getElement('notes')->addFilter('StripTags');
-                
+
+        $this->addElement(new Zend_Form_Element_Select(array(
+            'name'         => 'mobilecountrycode',
+            'label'        => null,
+            'multiOptions' => Tools_System_Tools::getCountryPhoneCodesList(),
+            'value'        => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'),
+            'style'        => 'width: 41.667%;'
+        )));
+
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'mobile',
-			'label'    => 'Mobile',
-            'value'    => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
+			'label'    => null,
+            'value'    => '',
+            'style'    => 'width: 58.333%;'
 		)));
 
 		$emailValidator = new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL);
@@ -136,6 +145,9 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 		$this->resetRequiredFields(array(
 			'lastname', 'email', 'zip', 'shippingToc'
 		));
+
+        $this->getElement('mobilecountrycode')->removeDecorator('HtmlTag');
+        $this->getElement('mobile')->removeDecorator('HtmlTag');
 	}
 
 	/**

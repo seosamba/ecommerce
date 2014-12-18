@@ -7,6 +7,19 @@
  */
 class Forms_Signup extends Zend_Form {
 
+    protected $_mobilecountrycode = null;
+
+    public function setMobilecountrycode($_mobilecountryphonecode)
+    {
+        $this->_mobilecountrycode = $_mobilecountryphonecode;
+        $this->getElement('mobilecountrycode')->setValue($this->_mobilecountrycode);
+    }
+
+    public function getCurrentTheme()
+    {
+        return $this->_mobilecountrycode;
+    }
+
     public function init() {
 
         parent::init();
@@ -14,7 +27,7 @@ class Forms_Signup extends Zend_Form {
         $this->setLegend('Sign up')
             ->setAttribs(array(
             'id'     => 'checkout-signup',
-            'class'  => array('toaster-checkout', 'signup-form'),
+            'class'  => 'toaster-checkout signup-form',
             'method' => Zend_Form::METHOD_POST
         ));
 
@@ -42,10 +55,19 @@ class Forms_Signup extends Zend_Form {
 	        'class'      => array('required')
         )));
 
+        $this->addElement(new Zend_Form_Element_Select(array(
+                'name'         => 'mobilecountrycode',
+                'label'        => null,
+                'multiOptions' => Tools_System_Tools::getCountryPhoneCodesList(),
+                'value'        => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'),
+                'style'        => 'width: 41.667%;'
+        )));
+
         $this->addElement(new Zend_Form_Element_Text(array(
-             'name'       => 'mobile',
-             'label'      => 'Mobile',
-             'value'      => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
+                'name'     => 'mobile',
+                'label'    => null,
+                'style'    => 'width: 58.333%;',
+                'value'    => ''
         )));
 
         $this->addElement('hidden', 'step', array(
@@ -74,6 +96,8 @@ class Forms_Signup extends Zend_Form {
         ));
 
         $this->getElement('signup')->removeDecorator('Label');
+        $this->getElement('mobilecountrycode')->removeDecorator('HtmlTag');
+        $this->getElement('mobile')->removeDecorator('HtmlTag');
 
     }
 

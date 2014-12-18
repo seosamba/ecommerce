@@ -142,7 +142,12 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
 UPDATE `template_type` SET `title` = 'Checkout' WHERE `id` = 'typecheckout';
 UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 
+-- 10.12.2014
+-- version 2.3.2
+-- Add column to store mobile phone country code
+ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NULL DEFAULT NULL COMMENT 'Contains mobile phone country code';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.3.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.3.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
