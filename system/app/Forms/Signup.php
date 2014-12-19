@@ -74,6 +74,8 @@ class Forms_Signup extends Zend_Form {
         ));
 
         $this->getElement('signup')->removeDecorator('Label');
+        $this->getElement('signup')->removeDecorator('HtmlTag');
+        $this->getElement('step')->removeDecorator('HtmlTag');
 
     }
 

@@ -79,7 +79,7 @@ class Forms_Checkout_Shipping extends Forms_Address_Abstract {
 		$this->setElementDecorators(array(
 			'ViewHelper',
 			'Label',
-			array('HtmlTag', array('tag' => 'div'))
+			array('HtmlTag', array('tag' => 'p'))
 		));
 
 		$this->addElement(new Zend_Form_Element_Button(array(
