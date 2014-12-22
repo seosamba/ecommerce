@@ -43,6 +43,23 @@ $this->headLink()
                 <?php echo $elem->renderViewHelper();?>
 			</div>
 			<?php endforeach; ?>
+            <?php if ($subform->getId() === 'display'): ?>
+                <?php $links = Tools_Misc::getPostPurchaseAndLandingPageLinks(); ?>
+                <?php if (!empty($links)): ?>
+                    <?php $pagesArray = array(
+                        Tools_Misc::OPTION_THANKYOU => $this->translate('Your post purchase page'),
+                        Tools_Misc::OPTION_STORE_CLIENT_LOGIN => $this->translate('Your client area page')
+                    )
+                    ?>
+                    <?php foreach ($links as $linkOptionName => $link): ?>
+                        <?php if (array_key_exists($linkOptionName, $pagesArray)): ?>
+                            <div class="grid_12"><a href="<?php echo $this->websiteUrl . $link['url']; ?>"
+                                                    target="_blank"><?php echo $pagesArray[$linkOptionName]; ?></a>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            <?php endif; ?>
 		</fieldset>
 	<?php endforeach; ?>
 	</form>

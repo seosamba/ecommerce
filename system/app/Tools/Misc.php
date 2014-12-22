@@ -39,6 +39,15 @@ class Tools_Misc
 
     const EXCHANGE_ADDITIONAL_PARAMS = '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
 
+    /**
+     * Option for the client page
+     */
+    const OPTION_STORE_CLIENT_LOGIN = 'option_storeclientlogin';
+    /**
+     * Option for the page options system
+     */
+    const OPTION_THANKYOU = 'option_storethankyou';
+
 
     /*
      * Changes for name inc. Tax 
@@ -511,5 +520,23 @@ class Tools_Misc
         }
 
         return $entityParser->parse($templateContent);
+    }
+
+    /**
+     *  Return links for 'thank you'  and 'client area' pages
+     *
+     * @return array
+     */
+    public static function getPostPurchaseAndLandingPageLinks()
+    {
+        $pageOptionsDbRable = new Application_Model_DbTable_PageOption();
+        $select = $pageOptionsDbRable->getAdapter()->select()->from(
+            array('po' => 'page_option'),
+            array('pho.option_id', 'p.url')
+        )
+            ->joinLeft(array('pho' => 'page_has_option'), 'po.id = pho.option_id', array())
+            ->joinLeft(array('p' => 'page'), 'p.id = pho.page_id', array())
+            ->where('pho.option_id IN (?)', array(Tools_Misc::OPTION_THANKYOU, Tools_Misc::OPTION_STORE_CLIENT_LOGIN));
+        return $pageOptionsDbRable->getAdapter()->fetchAssoc($select);
     }
 }
