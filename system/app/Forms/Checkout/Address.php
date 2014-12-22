@@ -146,6 +146,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 			'lastname', 'email', 'zip', 'shippingToc'
 		));
 
+        $this->getElement('step')->removeDecorator('HtmlTag');
         $this->getElement('mobilecountrycode')->removeDecorator('HtmlTag');
         $this->getElement('mobile')->removeDecorator('HtmlTag');
 	}
