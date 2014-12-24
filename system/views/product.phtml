@@ -432,7 +432,7 @@ $this->headLink()
 </div>
 
 <script>
-	(function () {
+	$(function () {
 		$('#manage-product,#description-box, #preview-box').tabs({
             beforeLoad: function(event, ui){
                 //showSpinner('#merchandising');
@@ -441,11 +441,7 @@ $this->headLink()
 		$(".ui-tabs-nav, .ui-tabs-nav > *")
 				.removeClass("ui-corner-all")
 				.addClass("ui-corner-top");
-	})(window);
-</script>
 
-<script type="text/javascript">
-	$(function () {
 		$(document).one('loaded.product', function () {
 			<?php if ($this->product): ?>
 			app.model.set(<?php echo json_encode($this->product->toArray()) ;?>);
