@@ -91,7 +91,7 @@
 			<br/>
 			<span><?php echo $this->shoppingConfig['country'];?></span>
 			<br/>
-			<img src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig, 640, 300); ?>" alt="">
+			<img class="pickup-location-map" src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig, 640, 300); ?>" alt="">
             <?php elseif($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
                 <span><?php echo $shippingAddress['phone'];?></span>
                 </div>
@@ -106,7 +106,7 @@
                     <span><?php echo $countries[$shippingAddress['country']];?></span>
                     <br/>
                    <a href="<?php echo 'https://maps.google.com/?q='.$shippingAddress['address1'].'+'.$shippingAddress['city'].'+'.$shippingAddress['state'];?>" target="_blank">
-                     <img src="<?php echo Tools_Geo::generateStaticGmaps($shippingAddress, 640, 300); ?>" alt="">
+                     <img class="pickup-location-map" src="<?php echo Tools_Geo::generateStaticGmaps($shippingAddress, 640, 300); ?>" alt="">
                    </a>
             <?php else : ?>
 				<span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
@@ -144,13 +144,13 @@
 			<?php if (!isset($this->renamedTableRows)): ?>
 				<?php if (isset($this->additionalTableRows)): ?>
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
-						<th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+						<th class="product-unit-additional-row"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			<?php else: ?>
 				<?php if (isset($this->renamedTableRows)): ?>
 					<?php foreach ($this->renamedTableRows as $tableRow): ?>
-						<th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+						<th class="product-unit-additional-row"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			<?php endif; ?>
@@ -179,25 +179,24 @@
 					<span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
 						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
-							<br/>
 							<?php
 							if (is_array($optData)) {
-								$optionStr = $optionTitle . ': ' . $optData['title'];
+								$optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
 								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
 									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
 										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
 									} else {
 										$optPriceMod = $optData['priceValue'];
 									}
-									$optionStr .= '<span>(&nbsp;' . $optData['priceSign'] . $this->currency($optPriceMod) .'&nbsp;)</span>';
+									$optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
 								}
 								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-									$optionStr .= '<span>(&nbsp;' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . '&nbsp;)</span>' ;
+									$optionStr .= '<span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>' ;
 								}
 							} else {
 								$optionStr = $optionTitle . ': ' . $optData;
 							} ?>
-							<span class="post-purchase-report-product-options"><?php echo $optionStr; ?></span>
+							<div class="options"><?php echo $optionStr; ?></div>
 						<?php endforeach; ?>
 					<?php endif;?>
 				</td>
@@ -279,7 +278,7 @@
 
 <?php else: ?>
 	<div style="color:#444444; font-family:arial">
-	<div style="float:left; width:48%; margin:0 1%;">
+	<div style="float:left; width:48%; margin:0 3% 0 0;">
 			<span style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Billing Address');?>
 				:</span>
 
@@ -346,7 +345,7 @@
 		</p>
 	</div>
 
-	<div style="float:left; width:48%; margin:0 1%;">
+	<div style="float:left; width:48%;">
 		<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP): ?>
 			<span class="title"
 			      style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Pickup information');?>
@@ -429,19 +428,19 @@
 			<?php if (!isset($this->renamedTableRows)): ?>
 				<?php if (isset($this->additionalTableRows)): ?>
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
-						<th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+						<th align="center" style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			<?php else: ?>
 				<?php if (isset($this->renamedTableRows)): ?>
 					<?php foreach ($this->renamedTableRows as $tableRow): ?>
-						<th style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+						<th align="center" style="padding:5px;"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			<?php endif; ?>
-			<th style="padding:5px;"><?php echo $this->translate('Price'); ?></th>
-			<th style="padding:5px;"><?php echo $this->translate('Qty'); ?></th>
-			<th style="padding:5px;"><?php echo $this->translate('Total'); ?></th>
+			<th align="center" style="padding:5px;"><?php echo $this->translate('Price'); ?></th>
+			<th align="center" style="padding:5px;"><?php echo $this->translate('Qty'); ?></th>
+			<th align="center" style="padding:5px;"><?php echo $this->translate('Total'); ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -467,7 +466,6 @@
 						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
 						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
-							<br/>
 							<?php
 							if (is_array($optData)) {
 								$optionStr = $optionTitle . ': ' . $optData['title'];
@@ -477,15 +475,15 @@
 									} else {
 										$optPriceMod = $optData['priceValue'];
 									}
-									$optionStr .= '<span>(&nbsp;' . $optData['priceSign'] . $this->currency($optPriceMod) .'&nbsp;)</span>';
+									$optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
 								}
 								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-									$optionStr .= '<span>(&nbsp;' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . '&nbsp;)</span>' ;
+									$optionStr .= ' <span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>';
 								}
 							} else {
 								$optionStr = $optionTitle . ': ' . $optData;
 							} ?>
-							<span class="post-purchase-report-product-options"><?php echo $optionStr; ?></span>
+							<div class="options"><?php echo $optionStr; ?></div>
 						<?php endforeach; ?>
 					<?php endif;?>
 				</td>
