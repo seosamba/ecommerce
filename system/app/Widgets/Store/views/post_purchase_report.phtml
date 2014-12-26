@@ -188,7 +188,11 @@
 									} else {
 										$optPriceMod = $optData['priceValue'];
 									}
-									$optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                    if ($optData['priceType'] === 'percent') {
+									    $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                    } else {
+                                        $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                    }
 								}
 								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
 									$optionStr .= '<span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>' ;
@@ -424,7 +428,7 @@
 	<table width="100%" style="margin-bottom:15px; border:1px solid #dddddd;">
 		<thead>
 		<tr style="background:#ddd;">
-			<th colspan="2" style="padding:5px;"><?php echo $this->translate('Product'); ?></th>
+			<th align="left" colspan="2" style="padding:5px;"><?php echo $this->translate('Product'); ?></th>
 			<?php if (!isset($this->renamedTableRows)): ?>
 				<?php if (isset($this->additionalTableRows)): ?>
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
@@ -446,7 +450,7 @@
 		<tbody>
 		<?php foreach ($this->cartContent as $product) : ?>
 			<tr>
-				<td valign="middle">
+				<td align="left" valign="middle">
 					<?php if (isset($product['photo']) && $product['photo'] != ''): ?>
 						<a class="page-teaser-image"
 						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
@@ -462,7 +466,7 @@
 						     alt="<?php echo $product['name']; ?>"/>
 					<?php endif;?>
 				</td>
-				<td valign="middle">
+				<td align="left" valign="middle">
 						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
 						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
@@ -475,7 +479,11 @@
 									} else {
 										$optPriceMod = $optData['priceValue'];
 									}
-									$optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                    if ($optData['priceType'] === 'percent') {
+									    $optionStr .= ' <span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                    } else {
+                                        $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                    }
 								}
 								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
 									$optionStr .= ' <span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>';
