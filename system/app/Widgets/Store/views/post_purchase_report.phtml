@@ -522,12 +522,12 @@
 		</tbody>
 	</table>
 
-	<div style="float:right; width:30%; margin-bottom:15px; margin-right:2%;">
+	<div style="float:right; min-width:30%; margin-bottom:15px; margin-right:2%; white-space: nowrap;">
 		<span style="font-weight:bold;font-size:15px;color:#222222"><?php echo $this->translate('Summary');?>:</span>
 
-		<p style="padding:10px 0 5px; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
-				<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Sub-Total');?>
-					:</span>
+		<p style="padding:10px 0 5px; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
+				<span style="float:left;"><?php echo $this->translate('Sub-Total');?>
+					: </span>
 			<?php if ($this->showPriceIncTax == 1): ?>
 				<span><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getSubTotalTax());?></span>
 			<?php else: ?>
@@ -535,9 +535,9 @@
 			<?php endif;?>
 		</p>
         <?php if ($this->cart->getDiscount() > 0) : ?>
-            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
-					<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Discount');?>
-                        :</span>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
+					<span style="float:left;"><?php echo $this->translate('Discount');?>
+                        : </span>
                 <?php if ($this->showPriceIncTax == 1): ?>
                     <span><?php echo $this->currency($this->cart->getDiscount() + $this->cart->getDiscountTax());?></span>
                 <?php else:?>
@@ -545,31 +545,31 @@
                 <?php endif;?>
             </p>
         <?php endif; ?>
-        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
-            <span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Shipping');?>:</span>
+        <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
+            <span style="float:left;"><?php echo $this->translate('Shipping');?>: </span>
             <?php if ($this->showPriceIncTax == 1): ?>
                 <span><?php echo $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
             <?php else:?>
                 <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
             <?php endif;?>
         </p>
-		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right;">
+		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
 			<?php if (Tools_Misc::getTaxName() != ''): ?>
 				<?php $taxName = Tools_Misc::getTaxName(); ?>
 			<?php else: ?>
 				<?php $taxName = 'Tax'; ?>
 			<?php endif;?>
 			<?php if ($this->showPriceIncTax == 1): ?>
-				<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Inc. ' . $taxName);?>
-					:</span>
+				<span style="float:left;"><?php echo $this->translate('Inc. ' . $taxName);?>
+					: </span>
 			<?php else: ?>
-				<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total ' . $taxName);?>
-					:</span>
+				<span style="float:left;"><?php echo $this->translate('Total ' . $taxName);?>
+					: </span>
 			<?php endif;?>
 			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
 		</p>
-		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right;">
-			<span style="float:left; width:40%; text-align:left;"><?php echo $this->translate('Total');?>:</span>
+		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
+			<span style="float:left;"><?php echo $this->translate('Total');?>: </span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
 		</p>
 	</div>
