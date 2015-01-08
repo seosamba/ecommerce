@@ -162,7 +162,7 @@ $(function(){
         }
     });
 	$('#filter-state').on('addressChain:updated', function(){
-		$(this).prepend('<option value="0"></option>').trigger('liszt:updated');
+		$(this).prepend('<option value="0"></option>').trigger('chosen:updated');
 	})
 	$('#extra-filters').addressChain({
 		countrySelector: $('#filter-country'),
