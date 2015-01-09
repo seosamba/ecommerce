@@ -139,6 +139,7 @@ define(['backbone',
             if(typeof e !== 'undefined'){
                 e.preventDefault();
             }
+            this.orders.ordersChecked = [];
             this.orders.currentPage = 0;
             this.orders.pager();
         },
