@@ -139,6 +139,7 @@ define(['backbone',
             if(typeof e !== 'undefined'){
                 e.preventDefault();
             }
+            this.orders.ordersChecked = [];
             this.orders.currentPage = 0;
             this.orders.pager();
         },
@@ -146,7 +147,7 @@ define(['backbone',
             e.preventDefault();
             var $form = $(e.currentTarget).closest('form');
             $form.find('input:text').val('').end()
-                 .find('select.filter').val('0').trigger('liszt:updated');
+                 .find('select.filter').val('0').trigger('chosen:updated');
             this.applyFilter();
         },
         navigate: function(e){
