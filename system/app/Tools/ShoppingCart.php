@@ -344,8 +344,9 @@ class Tools_ShoppingCart {
 						$product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
 						$product->setPrice($cartItem['price']);
 					}
-
-                    $cartItem = Tools_DiscountTools::applyDiscountRules($cartItem);
+                    if ($cartItem['freebies'] != 1) {
+                        $cartItem = Tools_DiscountTools::applyDiscountRules($cartItem);
+                    }
                     $product->setPrice($cartItem['price']);
 
 					$cartItem['tax'] = Tools_Tax_Tax::calculateProductTax($product, isset($destinationAddress) ? $destinationAddress : null);
