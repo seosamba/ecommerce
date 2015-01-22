@@ -214,16 +214,20 @@
                 <td class="product-unit-price">
                 <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
+                <?php elseif ($this->showPriceIncTax == 1):?>
+                    <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
                 <?php else:?>
-				    <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
+                    <?php echo $this->currency(is_null($product['price'])?0:$product['price']); ?>
                 <?php endif;?>
                 </td>
 				<td class="product-qty"><?php echo $product['qty']; ?></td>
                 <td class="product-total">
                 <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
+                <?php elseif ($this->showPriceIncTax == 1):?>
+                    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
                 <?php else:?>
-				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+				    <?php echo $this->currency($product['price'] * $product['qty']); ?>
                 <?php endif;?>
                 </td>
 			</tr>
@@ -505,16 +509,20 @@
                 <td valign="middle" align="center">
                 <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
+                <?php elseif ($this->showPriceIncTax == 1):?>
+                    <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
                 <?php else:?>
-                    <?php echo $this->currency($product['tax_price']); ?>
+                    <?php echo $this->currency(is_null($product['price'])?0:$product['price']); ?>
                 <?php endif;?>
                 </td>
 				<td valign="middle" align="center"><?php echo $product['qty']; ?></td>
                 <td valign="middle" align="center">
                 <?php if($product['freebies'] == 1):?>
                     <?php echo $this->translate('free'); ?>
-                <?php else:?>
-				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                <?php elseif ($this->showPriceIncTax == 1):?>
+                    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+               <?php else:?>
+				    <?php echo $this->currency($product['price'] * $product['qty']); ?>
                 <?php endif;?>
                 </td>
 			</tr>
