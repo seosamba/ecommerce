@@ -576,7 +576,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $optionStr .= '<span>(&nbsp;' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'] . '&nbsp;)</span>';
                     }
                 } else {
-                    $optionStr = $optionTitle . ': ' . $optData;
+                    $optData = trim($optData);
+                    if (!empty($optData)) {
+                        $optionStr = $optionTitle . ': ' . $optData;
+                    } else {
+                        $optionStr = '';
+                    }
                 }
                 $optionResult .= '<span class="post-purchase-report-product-options">' . $optionStr . '</span>';
             }
