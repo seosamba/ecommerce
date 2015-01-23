@@ -561,7 +561,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $optionResult = '';
             foreach ($productOptions as $optionTitle => $optData) {
                 if (is_array($optData)) {
-                    $optionStr = $optionTitle . ': ' . $optData['title'];
+                    $optData = trim($optData['title']);
+                    if (!empty($optData)) {
+                        $optionStr = $optionTitle . ': ' . $optData['title'];
+                    } else {
+                        $optionStr = '';
+                    }
                     if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
                         if ((bool)$this->_cartContent[$sid]['taxRate'] && (bool)$this->_shoppingConfig['showPriceIncTax'] === true) {
                             $optPriceMod = $optData['priceValue'] * (100 + $this->_cartContent[$sid]['taxRate']) / 100;
