@@ -10,6 +10,28 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 		'AU' => 'Postcode'
 	);
 
+    protected $_mobilecountrycode = null;
+
+    protected $_mobile = null;
+
+    public function setMobilecountrycode($_mobilecountrycode)
+    {
+        $this->_mobilecountrycode = $_mobilecountrycode;
+        $this->getElement('mobilecountrycode')->setValue($this->_mobilecountrycode);
+    }
+
+    public function getMobilecountrycode()
+    {
+        return $this->_mobilecountrycode;
+    }
+
+    public function setMobile($_mobile)
+    {
+        $countryPhoneCode = Zend_Locale::getTranslation($this->_mobilecountrycode, 'phoneToTerritory');
+        $this->_mobile = preg_replace('/^(\+' . $countryPhoneCode . ')(\d+)/', '$2', $_mobile); //{
+        $this->getElement('mobile')->setValue($this->_mobile);
+    }
+
 	public function init() {
 		$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -72,7 +94,8 @@ abstract class Forms_Address_Abstract extends Zend_Form {
 		$this->addElement(new Zend_Form_Element_Text(array(
 			'name'     => 'phone',
 			'label'    => 'Phone',
-            'value'    => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
+            'value'    => '',
+            'placeholder' => '+'.Zend_Locale::getTranslation(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'), 'phoneToTerritory')
 		)));
 
 //		$this->addElement(new Zend_Form_Element_Hash(array(

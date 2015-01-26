@@ -3,12 +3,12 @@
             <?php foreach ($this->stats as $status => $value) : ?>
                 <?php if($status != Models_Model_CartSession::CART_STATUS_NEW):?>
                     <?php if($status == 'all'):?>
-                        <li class="<?php echo $status;?> active" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
+                        <li class="<?php echo $status;?> active" data-status="all" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
                     <?php else:?>
                         <?php if($status == 'quote_sent'):?>
-                            <li class="<?php echo $this->translate('Open Quotes');?>" data-sort="<?php echo $this->translate('Open Quotes');?>"><?php echo $this->translate('Open Quotes');?></li>
+                            <li class="quote_sent" data-status="quote_sent" data-sort="<?php echo $this->translate('Open Quotes');?>"><?php echo $this->translate('Open Quotes');?></li>
                         <?php else:?>
-                            <li class="<?php echo $this->translate('cs_'.$status);?>" data-sort="<?php echo $this->translate('cs_'.$status);?>"><?php echo $this->translate('cs_'.$status);?></li>
+                            <li class="<?php echo $status;?>" data-status="<?php echo $status;?>" data-sort="<?php echo $this->translate('cs_'.$status);?>"><?php echo $this->translate('cs_'.$status);?></li>
                         <?php endif;?>
                     <?php endif;?>
                 <?php endif;?>
@@ -110,9 +110,10 @@
                 }
             });
             $('ul.user-stats').on('click', 'li', function(e){
-                var filter = $(this).data('sort');
+                var filter = $(this).data('sort'),
+                    active = $(this).data('status');
                 $('.user-stats li').removeClass('active');
-                $('.user-stats .'+filter+'').addClass('active');
+                $('.user-stats .'+active+'').addClass('active');
                 if (filter === 'all'){
                     filter = '';
                 }

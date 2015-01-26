@@ -22,7 +22,7 @@
 
 	<!-- Filtering -->
 	<div id="filters" class="grid_4 alpha omega">
-		<select id="tags" class="pselect chzn-select" name="product-tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
+		<select id="tags" class="pselect chosen-select" name="product-tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
 	</div>
     <label id="conditional" class="tooltip grid_1 alpha" title="<?php echo $this->translate('AND conditional');?>">
         <input type="checkbox" id="strict-tags">
@@ -236,7 +236,7 @@
 								}
                             break;
                         }
-                        $('.pselect').trigger("liszt:updated");
+                        $('.pselect').trigger("chosen:updated");
                     } else if(typeof filter != 'undefined' && filter) {
 	                    $('#product-products').empty();
                     }
