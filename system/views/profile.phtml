@@ -311,7 +311,6 @@
 			success: function(response) {
 				showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
 				if (!response.error && response.hasOwnProperty('responseText')){
-                    console.log(response);
                     $(statusTd).text(response.responseText.status).data('currentStatus', response.responseText.status);
 				}
 			}
