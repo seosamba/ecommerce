@@ -65,6 +65,8 @@
  * {$postpurchase:cartitem:total[:clean]} -> total price with tax
  * {$postpurchase:cartitem:options} -> <span class="post-purchase-report-product-options">some options info</span>
  * {$postpurchase:cartitem:producturl} -> product url
+ *
+ * If you want to use it with action email system add param 'email' for magic space {postpurchasecartcontent:email}
  */
 
 class MagicSpaces_Postpurchasecartcontent_Postpurchasecartcontent extends Tools_MagicSpaces_Abstract
@@ -76,13 +78,18 @@ class MagicSpaces_Postpurchasecartcontent_Postpurchasecartcontent extends Tools_
         if ($registry->isRegistered('postPurchaseCart')) {
             $content = '';
             $tmpPageContent = $this->_content;
-            $this->_content = $this->_findPageTemplateContent();
+            $cartSession = $registry->get('postPurchaseCart');
+            if (!in_array('email', $this->_params)) {
+                $this->_content = $this->_findPageTemplateContent();
+            } else {
+                $session = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+                $session->storeCartSessionConversionKey = $cartSession->getId();
+            }
             $spaceContent = $this->_parse();
             $this->_content = $tmpPageContent;
             if (!$spaceContent) {
                 $spaceContent = $this->_parse();
             }
-            $cartSession = $registry->get('postPurchaseCart');
             if ($cartSession instanceof Models_Model_CartSession) {
                 $cartContent = $cartSession->getCartContent();
                 if (!empty($cartContent)) {

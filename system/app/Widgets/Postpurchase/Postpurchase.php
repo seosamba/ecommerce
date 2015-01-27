@@ -134,20 +134,23 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if (!isset($this->_options[0]) || empty($this->_cart)) {
             return '';
         }
+        $widgetName = '{$postpurchase:' . implode(':', $this->_options) . '}';
 
         //Analyze single cart item
         if (in_array('cartitem', $this->_options, true)) {
             unset($this->_options[array_search('cartitem', $this->_options, true)]);
             $sid = array_shift($this->_options);
-            if (isset($this->_cartContent[$sid])) {
+            if (isset($this->_cartContent[$sid]) && is_numeric($sid)) {
                 $option = strtolower(array_shift($this->_options));
                 $rendererName = '_renderCartItem' . ucfirst($option);
                 if (method_exists($this, $rendererName)) {
                     return $this->$rendererName($sid);
                 }
+            } else {
+                return $widgetName;
             }
-        }elseif(in_array('config', $this->_options, true)) {
-            if(isset($this->_shoppingConfig[$this->_options[1]])){
+        } elseif (in_array('config', $this->_options, true)) {
+            if (isset($this->_shoppingConfig[$this->_options[1]])) {
                 return $this->_shoppingConfig[$this->_options[1]];
             }
             return '';
