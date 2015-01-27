@@ -63,7 +63,7 @@
  * {$postpurchase:cartitem:qty} -> product quantity
  * {$postpurchase:cartitem:cartId} -> cart id
  * {$postpurchase:cartitem:total[:clean]} -> total price with tax
- * {$postpurchase:cartitem:options} -> <span class="post-purchase-report-product-options">some options info</span>
+ * {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
  * {$postpurchase:cartitem:producturl} -> product url
  *
  * If you want to use it with action email system add param 'email' for magic space {postpurchasecartcontent:email}

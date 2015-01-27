@@ -19,6 +19,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     const CLEAN_OPTIONS_PRICE = 'cleanOptionPrice';
 
     /**
+     * Add html wrapper if this option used into email template
+     */
+    const EMAIL_FORMAT = 'email';
+
+    /**
      * Show price without price
      */
     const WITHOUT_TAX = 'withouttax';
@@ -600,7 +605,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $optionStr = '';
                     }
                 }
-                $optionResult .= '<span class="options">' . $optionStr . '</span>';
+                $optionResult .= '<div class="options">' . $optionStr . '</div>';
             }
             return $optionResult;
         }
