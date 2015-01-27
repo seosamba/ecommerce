@@ -14,6 +14,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     const CLEAN_CART_PARAM = 'clean';
 
     /**
+     * Remove price value from options
+     */
+    const CLEAN_OPTIONS_PRICE = 'cleanOptionPrice';
+
+    /**
      * Show price without price
      */
     const WITHOUT_TAX = 'withouttax';
@@ -564,9 +569,9 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $optionResult = '';
             foreach ($productOptions as $optionTitle => $optData) {
                 if (is_array($optData)) {
-                    $optData = trim($optData['title']);
-                    if (!empty($optData)) {
-                        $optionStr = $optionTitle . ': ' . $optData['title'];
+                    $optDataTitle = trim($optData['title']);
+                    if (!empty($optDataTitle)) {
+                        $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
                     } else {
                         $optionStr = '';
                     }
@@ -576,12 +581,16 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         } else {
                             $optPriceMod = $optData['priceValue'];
                         }
-                        $optionStr .= '<span>(&nbsp;' . $optData['priceSign'] . $this->_view->currency(
-                            $optPriceMod
-                        ) . '&nbsp;)</span>';
+                        if (!in_array(self::CLEAN_OPTIONS_PRICE, $this->_options)) {
+                            if ($optData['priceType'] === 'percent') {
+                                $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                            } else {
+                                $optionStr .= '<span>(' . $optData['priceSign'] . $this->_view->currency($optPriceMod) .')</span>';
+                            }
+                        }
                     }
                     if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-                        $optionStr .= '<span>(&nbsp;' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'] . '&nbsp;)</span>';
+                        $optionStr .= '<span>(' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'] . ')</span>';
                     }
                 } else {
                     $optData = trim($optData);
@@ -591,7 +600,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $optionStr = '';
                     }
                 }
-                $optionResult .= '<span class="post-purchase-report-product-options">' . $optionStr . '</span>';
+                $optionResult .= '<span class="options">' . $optionStr . '</span>';
             }
             return $optionResult;
         }
