@@ -30,7 +30,7 @@ define([
 			'click #add-new-option-btn': 'newOption',
             'change #option-library': 'addOption',
 			'click #submit': 'saveProduct',
-			'change #product-image-folder': 'imageChange',
+			'click #product-image-folder': 'imageChange',
 			'click .box': 'setProductImage',
 			'change :input[data-reflection]': 'setProperty',
 			'change #product-enabled': 'toggleEnabled',

@@ -14,6 +14,16 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     const CLEAN_CART_PARAM = 'clean';
 
     /**
+     * Remove price value from options
+     */
+    const CLEAN_OPTIONS_PRICE = 'cleanOptionPrice';
+
+    /**
+     * Add html wrapper if this option used into email template
+     */
+    const EMAIL_FORMAT = 'email';
+
+    /**
      * Show price without price
      */
     const WITHOUT_TAX = 'withouttax';
@@ -134,20 +144,23 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if (!isset($this->_options[0]) || empty($this->_cart)) {
             return '';
         }
+        $widgetName = '{$postpurchase:' . implode(':', $this->_options) . '}';
 
         //Analyze single cart item
         if (in_array('cartitem', $this->_options, true)) {
             unset($this->_options[array_search('cartitem', $this->_options, true)]);
             $sid = array_shift($this->_options);
-            if (isset($this->_cartContent[$sid])) {
+            if (isset($this->_cartContent[$sid]) && is_numeric($sid)) {
                 $option = strtolower(array_shift($this->_options));
                 $rendererName = '_renderCartItem' . ucfirst($option);
                 if (method_exists($this, $rendererName)) {
                     return $this->$rendererName($sid);
                 }
+            } else {
+                return $widgetName;
             }
-        }elseif(in_array('config', $this->_options, true)) {
-            if(isset($this->_shoppingConfig[$this->_options[1]])){
+        } elseif (in_array('config', $this->_options, true)) {
+            if (isset($this->_shoppingConfig[$this->_options[1]])) {
                 return $this->_shoppingConfig[$this->_options[1]];
             }
             return '';
@@ -561,24 +574,38 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $optionResult = '';
             foreach ($productOptions as $optionTitle => $optData) {
                 if (is_array($optData)) {
-                    $optionStr = $optionTitle . ': ' . $optData['title'];
+                    $optDataTitle = trim($optData['title']);
+                    if (!empty($optDataTitle)) {
+                        $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
+                    } else {
+                        $optionStr = '';
+                    }
                     if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
                         if ((bool)$this->_cartContent[$sid]['taxRate'] && (bool)$this->_shoppingConfig['showPriceIncTax'] === true) {
                             $optPriceMod = $optData['priceValue'] * (100 + $this->_cartContent[$sid]['taxRate']) / 100;
                         } else {
                             $optPriceMod = $optData['priceValue'];
                         }
-                        $optionStr .= '<span>(&nbsp;' . $optData['priceSign'] . $this->_view->currency(
-                            $optPriceMod
-                        ) . '&nbsp;)</span>';
+                        if (!in_array(self::CLEAN_OPTIONS_PRICE, $this->_options)) {
+                            if ($optData['priceType'] === 'percent') {
+                                $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                            } else {
+                                $optionStr .= '<span>(' . $optData['priceSign'] . $this->_view->currency($optPriceMod) .')</span>';
+                            }
+                        }
                     }
                     if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-                        $optionStr .= '<span>(&nbsp;' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'] . '&nbsp;)</span>';
+                        $optionStr .= '<span>(' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'] . ')</span>';
                     }
                 } else {
-                    $optionStr = $optionTitle . ': ' . $optData;
+                    $optData = trim($optData);
+                    if (!empty($optData)) {
+                        $optionStr = $optionTitle . ': ' . $optData;
+                    } else {
+                        $optionStr = '';
+                    }
                 }
-                $optionResult .= '<span class="post-purchase-report-product-options">' . $optionStr . '</span>';
+                $optionResult .= '<div class="options">' . $optionStr . '</div>';
             }
             return $optionResult;
         }
