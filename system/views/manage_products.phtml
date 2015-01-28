@@ -3,6 +3,7 @@
 <?php
     $this->headScript()
             ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+            ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/accounting.min.js')
 			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-products/config'));
 
 	$this->headLink()

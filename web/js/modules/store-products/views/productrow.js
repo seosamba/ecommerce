@@ -14,7 +14,6 @@ define([
             this.model.on('change', this.render, this);
         },
         render: function(){
-            console.log('render');
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         },
