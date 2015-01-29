@@ -14,6 +14,7 @@ define([
             this.model.on('change', this.render, this);
         },
         render: function(){
+            this.model.set('currency', $('input[name=system-currency]').val());
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         },
