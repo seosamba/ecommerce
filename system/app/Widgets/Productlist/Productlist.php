@@ -306,7 +306,29 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      * @return array|null
      */
     private function _loadProducts($enabled = true) {
-		$enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
+        $allowedColumns = array(
+            'id' => 'id',
+            'parent_id' => 'parent_id',
+            'page_id' => 'page_id',
+            'enabled' => 'enabled',
+            'sku' => 'sku',
+            'name' => 'name',
+            'mpn' => 'mpn',
+            'weight' => 'weight',
+            'brand_id' => 'brand',
+            'photo' => 'photo',
+            'short_description' => 'short_description',
+            'full_description' => 'full_description',
+            'price' => 'price',
+            'tax_class' => 'tax_class',
+            'created_at' => 'date',
+            'updated_at' => 'updated_at',
+            'base_price' => 'base_price',
+            'inventory' => 'inventory',
+            'free_shipping' => 'free_shipping'
+        );
+
+        $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 
 
 		if (empty($this->_options)) {
@@ -326,6 +348,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         // fetching filters from query string
         $urlFilter = Filtering_Tools::normalizeFilterQuery();
+        $orderValue = array_diff($filters['order'],$allowedColumns);
+        if(!empty($orderValue)){
+            $wrongValue = implode(",", $orderValue);
+            throw new Exceptions_SeotoasterWidgetException('You entered an invalid sorting parameter : '.$wrongValue.'. You can sort by the following fields : name, price, brand, date.');
+        }
 
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
