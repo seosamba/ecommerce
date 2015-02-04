@@ -1,6 +1,9 @@
 <?php
 /**
+ *  MAGICSPACE: productset
+ * {productset} ... {/productset} - creating set of products
  *
+ * Class MagicSpaces_Productset_Productset
  */
 class MagicSpaces_Productset_Productset extends Tools_MagicSpaces_Abstract {
 

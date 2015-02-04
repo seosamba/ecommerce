@@ -1,4 +1,10 @@
 <?php
+/**
+ *  MAGICSPACE: freebies
+ * {freebies} ... {/freebies} - Freebies magicspace is processing all products inside magic space and makes them as free.
+ *
+ * Class MagicSpaces_Freebies_Freebies
+ */
 class MagicSpaces_Freebies_Freebies extends Tools_MagicSpaces_Abstract {
 
     protected $_view = null;
