@@ -71,8 +71,8 @@ Plugin widgets.
     {$postpurchase:totalTax[:clean]} -> total tax
     {$postpurchase:total[:clean]} ->  cart total
     {$postpurchase:referer} -> referer link
-    {$postpurchase:createdAt} -> purchase created date in d-M-Y format
-    {$postpurchase:updatedAt} -> purchase updated date in d-M-Y format
+    {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
+    {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
     {$postpurchase:shippingTax[:clean]} -> shipping tax
