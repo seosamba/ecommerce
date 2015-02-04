@@ -63,7 +63,7 @@ Plugin widgets.
     You can use 'withoutax' param if want to receive result without tax (even if display with tax enabled)
     {$postpurchase:ipAddress} -> ip address
     {$postpurchase:userId} -> system user id
-    {$postpurchase:status} -> status of purchace
+    {$postpurchase:status} -> status of purchase
     {$postpurchase:gateway} -> payment gateway name
     {$postpurchase:shippingPrice[:clean[:withouttax]]} -> shipping price (with tax if display with tax enabled)
     {$postpurchase:shippingService} -> shipping service name
