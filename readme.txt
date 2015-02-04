@@ -45,6 +45,7 @@ Plugin widgets.
     gotocart - prevent automatically redirect to the cart
 
 5. Customer widgets:
+    {$customer:name} - Adding a custom field for a storing additional customer information
 
 6. User widgets: This type of widgets you can use at the page with page option (Store client landing page)
     {$user:name} - user full name
