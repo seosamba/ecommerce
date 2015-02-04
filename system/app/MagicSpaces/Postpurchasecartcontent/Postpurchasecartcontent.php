@@ -9,16 +9,16 @@
  * {$postpurchase:userId} -> system user id
  * {$postpurchase:status} -> status of purchase
  * {$postpurchase:gateway} -> payment gateway name
- * {$postpurchase:shippingPrice[:clean[:withouttax]]} -> shipping price (with tax if display with tax enabled)
+ * {$postpurchase:shippingPrice[:clean[:withouttax]]} -> shipping price (with tax if tax enabled)
  * {$postpurchase:shippingService} -> shipping service name
- * {$postpurchase:subTotal[:clean[:withouttax]]} -> subtotal price (with tax if display with tax enabled)
+ * {$postpurchase:subTotal[:clean[:withouttax]]} -> subtotal price (with tax if tax enabled)
  * {$postpurchase:totalTax[:clean]} -> total tax
  * {$postpurchase:total[:clean]} ->  cart total
  * {$postpurchase:referer} -> referer link
  * {$postpurchase:createdAt} -> purchase created date in d-M-Y format
  * {$postpurchase:updatedAt} -> purchase updated date in d-M-Y format
  * {$postpurchase:notes} -> customer notes
- * {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if display with tax enabled)
+ * {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
  * {$postpurchase:shippingTax[:clean]} -> shipping tax
  * {$postpurchase:discountTax[:clean]} -> discount tax
  * {$postpurchase:subTotalTax[:clean]} -> subtotal tax
