@@ -1,4 +1,10 @@
 <?php
+/**
+ *  MAGICSPACE: productset
+ * {related} ... {/related} - assigning related products to the product
+ *
+ * Class MagicSpaces_Related_Related
+ */
 class MagicSpaces_Related_Related extends Tools_MagicSpaces_Abstract {
 
     protected $_view = null;
