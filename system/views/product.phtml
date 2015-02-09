@@ -174,7 +174,9 @@ $this->headLink()
 		<span class="image background"><img src="<%= photoUrl %>"/></span>
 		<span class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></span>
 		<span class="price">
-			<%= parseFloat(product.price).toFixed(2) + '&nbsp;' + currency %>
+            <% pricePreview = parseFloat(product.price) %>
+            <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
+			<%= pricePreview.toFixed(2) + '&nbsp;' + currency %>
 		</span>
 		<span class="info"><?php echo $this->translate('Click preview to get to product landing page');?></span>
 	</a>
