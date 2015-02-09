@@ -11,7 +11,7 @@ define([
     var AppView = Backbone.View.extend({
         el: $('#clients'),
         events: {
-            'click #export-users': function(){ $('#export-users-form').submit(); },
+            'click #export-users': 'exportUsers',
             'click #clients-previous': 'goPreviousPage',
             'click #clients-next': 'goNextPage',
             'click th.sortable': 'sort',
@@ -36,6 +36,13 @@ define([
                 var view = new CustomerRowView({model: customer});
                 view.render().$el.appendTo('#customer-list');
             });
+        },
+        exportUsers: function(){
+            if ($('#customer-list tr').length > 1) {
+                $('#export-users-form').submit();
+            } else {
+                showMessage(_.isUndefined(i18n['There are no users for export'])?'There are no users for export':i18n['There are no users for export'], true);
+            }
         },
         goPreviousPage: function() {
             this.customers.previous();
