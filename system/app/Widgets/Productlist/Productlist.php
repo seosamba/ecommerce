@@ -348,24 +348,24 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         // fetching filters from query string
         $urlFilter = Filtering_Tools::normalizeFilterQuery();
-        $orderValue = array_diff($filters['order'],$allowedColumns);
-        if(!empty($orderValue)){
-            $wrongValue = implode(",", $orderValue);
-            throw new Exceptions_SeotoasterWidgetException('You entered an invalid sorting parameter : '.$wrongValue.'. You can sort by the following fields : name, price, brand, date.');
-        }
-
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
-			$filters['order'] = array_map(function ($field) {
-				switch (trim($field)) {
-                    case 'brand':
-                        return $field = 'b.name'; break;
-                    case 'date':
-                        return $field = 'p.created_at DESC'; break;
-                    default:
-                        return $field =  'p.' . $field;
+            $filters['order'] = array_map(function ($field) use ($allowedColumns) {
+                if(in_array($field, $allowedColumns)) {
+                    switch (trim($field)) {
+                        case 'brand':
+                            return $field = 'b.name'; break;
+                        case 'date':
+                            return $field = 'p.created_at DESC'; break;
+                        default:
+                            return $field =  'p.' . $field;
+                    }
                 }
-			}, $filters['order']);
+            }, $filters['order']);
+            $filters['order'] = array_filter($filters['order']);
+            if (empty($filters['order'])) {
+                $filters['order'] = null;
+            }
 		}
 
         if (!empty($urlFilter['category'])) {
