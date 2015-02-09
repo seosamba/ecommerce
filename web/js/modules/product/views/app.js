@@ -315,7 +315,10 @@ define([
             } else {
                 this.$('#product-pageTemplate').val('-1');
 			}
-
+            if(this.model.isNew()){
+                this.$('#product-price').val('');
+                this.$('#product-weight').val('');
+            }
             if (!this.model.isNew()){
                 $('#quick-preview').html(this.quickPreviewTmpl({
                     product: this.model.toJSON(),
