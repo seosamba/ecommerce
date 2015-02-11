@@ -29,6 +29,8 @@ class Tools_Misc
 
     const SECTION_STORE_IMPORTORDERS = 'ordersimportconfig';
 
+    const SECTION_STORE_MANAGELOCATION = 'pickupLocation';
+
     const CS_ALIAS_PENDING = 'new_quote';
 
     const CS_ALIAS_PROCESSING = 'quote_sent';
@@ -69,7 +71,8 @@ class Tools_Misc
         self::SECTION_STORE_ADDEDITPRODUCT => 'ecommerce-cms.html',
         self::SECTION_STORE_BRANDLOGOS => 'e-commerce-product-brands.html',
         self::SECTION_STORE_MERCHANDISING => 'ecommerce-marketing.html',
-        self::SECTION_STORE_IMPORTORDERS => 'import-orders.html'
+        self::SECTION_STORE_IMPORTORDERS => 'import-orders.html',
+        self::SECTION_STORE_MANAGELOCATION => 'multi-locations-ecommerce.html'
     );
 
     /**
