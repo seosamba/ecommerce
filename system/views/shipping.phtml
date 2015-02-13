@@ -66,7 +66,12 @@ $this->headLink()
                 <li><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup'); ?></a></li>
                 <li><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping'); ?></a></li>
             <?php foreach($this->shippingPlugins as $plugin): ?>
-                <li><a data-plugin="<?php echo $plugin->getName(); ?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute'); ?>"><?php echo $plugin->getName(); ?></a></li>
+                <li><a data-plugin="<?php echo $plugin->getName(); ?>" href="<?php echo $this->url( array(
+                        'run' => 'config',
+                        'name' => strtolower( $plugin->getName() )
+                    ),
+                        'pluginroute' ); ?>"><?php echo defined( $pluginName = ucfirst( $plugin->getName() ) . '::PLUGIN_ALIAS' ) ? constant( $pluginName ) : $plugin->getName(); ?></a>
+                </li>
             <?php endforeach; ?>
                 <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
             </ul>
