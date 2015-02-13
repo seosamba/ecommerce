@@ -113,22 +113,7 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
 UPDATE `template_type` SET `title` = 'Checkout' WHERE `id` = 'typecheckout';
 UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NULL DEFAULT NULL COMMENT 'Contains mobile phone country code';
-INSERT INTO `plugin` (`name`, `status`, `tags`, `version`) VALUES ('toastauth', 1, '', '2.2.0');
 INSERT INTO `plugin` (`name`, `status`, `tags`, `version`) VALUES ('delivery', 1, '', '2.2.0');
-DROP TABLE IF EXISTS `plugin_toastauth_settings`;
-CREATE TABLE `plugin_toastauth_settings` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `settings` text COLLATE utf8_unicode_ci NOT NULL,
-  `status` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-INSERT INTO `plugin_toastauth_settings` (`id`, `name`, `settings`, `status`) VALUES
-  (null,        'facebook',     'a:6:{s:9:\"client_id\";s:0:\"\";s:13:\"client_secret\";s:0:\"\";s:12:\"redirect_uri\";s:0:\"\";s:5:\"scope\";s:5:\"email\";s:8:\"auth_url\";s:37:\"https://www.facebook.com/dialog/oauth\";s:9:\"token_url\";s:45:\"https://graph.facebook.com/oauth/access_token\";}',        0),
-  (null,        'google',       'a:8:{s:9:\"client_id\";s:0:\"\";s:13:\"client_secret\";s:0:\"\";s:12:\"redirect_uri\";s:0:\"\";s:5:\"scope\";s:5:\"email\";s:8:\"auth_url\";s:41:\"https://accounts.google.com/o/oauth2/auth\";s:9:\"token_url\";s:42:\"https://accounts.google.com/o/oauth2/token\";s:10:\"grant_type\";s:18:\"authorization_code\";s:13:\"response_type\";s:4:\"code\";}',   0),
-  (null,        'linkedin',     'a:8:{s:13:\"response_type\";s:4:\"code\";s:9:\"client_id\";s:0:\"\";s:13:\"client_secret\";s:0:\"\";s:5:\"scope\";s:29:\"r_basicprofile r_emailaddress\";s:12:\"redirect_uri\";s:60:\"http://auth.com/plugin/toastauth/run/login/provider/linkedin\";s:10:\"grant_type\";s:18:\"authorization_code\";s:9:\"token_url\";s:47:\"https://www.linkedin.com/uas/oauth2/accessToken\";s:8:\"auth_url\";s:49:\"https://www.linkedin.com/uas/oauth2/authorization\";}',        0);
-
 
 UPDATE `plugin` SET `version`='2.4.0' WHERE `name`='shopping';
 UPDATE `shopping_config` SET `value`='2.4.0' WHERE `name`='version';
