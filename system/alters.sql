@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `shopping_quantity_discount_product` (
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
   `product_id` int(10) unsigned NOT NULL,
   `quantity` int(4) unsigned NOT NULL,
   `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
