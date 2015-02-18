@@ -137,8 +137,14 @@ class Tools_DiscountTools
                 }
             }
         }
+
+        $productPrice = $cartItem['originalPrice'];
+        if (!empty($cartItem['options'])) {
+            $productPrice = self::calculateItemWithOptionsPrice($cartItem['originalPrice'], $cartItem['options']);
+        }
+
         $originalDiscounted = self::calculateDiscountPrice(
-            $cartItem['originalPrice'],
+            $productPrice,
             $cartItem['productDiscounts']
         );
 
@@ -147,7 +153,23 @@ class Tools_DiscountTools
         return $cartItem;
     }
 
-    public static function getUnitDiscount($price, $originPrice) {
+    public static function calculateItemWithOptionsPrice($originalPrice, $modifiers)
+    {
+        $price = $originalPrice;
+        if (!empty($modifiers)) {
+            foreach ($modifiers as $modifier) {
+                if (!is_array($modifier) || empty($modifier)) {
+                    continue;
+                }
+                $addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+                $price = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
+            }
+        }
+        return $price;
+    }
+
+    public static function getUnitDiscount($price, $originPrice)
+    {
         return floatval($originPrice) - $price;
     }
 }
