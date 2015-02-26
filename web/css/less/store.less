@@ -22,8 +22,8 @@
 
     .header{
         &.nav-links{
-//            .inline-block(top);
-//            padding-left : 5px;
+            //            .inline-block(top);
+            //            padding-left : 5px;
 
             a{
                 .inline-block(top);
@@ -131,7 +131,6 @@
         .product-tags{
 
             .tag-widget{
-                font-size : @font-size-small;
 
                 &:hover, &.tag-current{
                 }
@@ -181,7 +180,8 @@
             &::-webkit-input-placeholder{
                 font-size : 20px;
                 position  : relative;
-                top       : -4px; }
+                top       : -4px;
+            }
         }
         // Safari and Chrome
         & when (@moz = true){
@@ -189,18 +189,21 @@
             &:-moz-placeholder{
                 font-size : 20px;
                 position  : relative;
-                top       : -4px; }
+                top       : -4px;
+            }
             // Firefox 19+
             &::-moz-placeholder{
                 font-size : 20px;
                 position  : relative;
-                top       : -4px; }
+                top       : -4px;
+            }
         }
         & when (@ie = true){
             &:-ms-input-placeholder{
                 font-size : 20px;
                 position  : relative;
-                top       : -4px; }
+                top       : -4px;
+            }
         }
     }
 }
