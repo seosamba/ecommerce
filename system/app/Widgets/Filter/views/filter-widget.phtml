@@ -24,7 +24,7 @@
         <?php if (!isset($filter['values'])) : ?>
             <?php echo $this->partial('_range-slider.phtml', $filter); ?>
         <?php else : ?>
-            <ul>
+            <ul class="filter_attr_<?php echo filter_var(str_replace(' ', '_',$filter['label']), FILTER_SANITIZE_STRING); ?>">
                 <?php
                 $others = array();
                 ksort($filter['values']);
