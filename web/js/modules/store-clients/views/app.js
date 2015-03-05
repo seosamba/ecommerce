@@ -151,7 +151,8 @@ define([
                 url: $('#website_url').val()+'api/store/customers/',
                 data: {
                     groupId:groupId,
-                    userId:userId
+                    userId:userId,
+                    secureToken: $('.clientsSecureToken').val()
                 },
                 type: 'POST',
                 dataType: 'json',

@@ -8,6 +8,8 @@
  */
 class Api_Store_Groupsprice extends Api_Service_Abstract {
 
+    const GROUPS_PRICE_SECURE_TOKEN = 'GroupsPriceToken';
+
 	/**
 	 * @var array Access Control List
 	 */
@@ -97,6 +99,13 @@ class Api_Store_Groupsprice extends Api_Service_Abstract {
 		if (empty($data)) {
 			$this->_error();
 		}
+
+        $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::GROUPS_PRICE_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        unset($data[Tools_System_Tools::CSRF_SECURE_TOKEN]);
 
         if(!is_numeric($data['priceValue'])){
             return false;

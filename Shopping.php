@@ -119,6 +119,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CACHE_PREFIX = 'store_';
 
+    const SHOPPING_SECURE_TOKEN = 'ShoppingToken';
+
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -275,7 +277,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		$form = new Forms_Config();
 		if ($this->_request->isPost()) {
-			if ($form->isValid($this->_requestedParams)) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
 					$this->_configMapper->save($subFormValues);
 				}
