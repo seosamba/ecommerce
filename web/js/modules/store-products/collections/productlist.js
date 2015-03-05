@@ -26,16 +26,12 @@ define([
             'fbrand': function() { return $('select[name="filter-brand"]').val() || []; }
         },
         parse: function (response, xhr) {
-            console.log(response);
             var resultsCount = _.has(response, 'count') ? response.count : _.size(response.data);
             var totalCount = response.totalCount;
             if (!isNaN(totalCount)){
                 this.totalPages = Math.floor(totalCount/this.perPage);
                 this.totalRecords = totalCount;
             }
-//            if (resultsCount < this.perPage){
-//                this.totalPages = this.currentPage;
-//            }
             return response.data;
         },
         getFilter: function(){

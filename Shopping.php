@@ -658,6 +658,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
+			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
 			return $this->_view->render('manage_products.phtml');
 		}
 	}
@@ -1179,6 +1180,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $pickupLocationCategory->fetchAll()
         );
         $this->_view->countries = Tools_Geo::getCountries();
+        $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGELOCATION;
         $this->_layout->content = $this->_view->render('pickup-location.phtml');
         $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
         echo $this->_layout->render();

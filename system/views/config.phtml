@@ -1,10 +1,6 @@
 <?php
 $this->headScript()
-    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js')
-    ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
-        null,
-        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/merchandising/config')
-    );
+    ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/jquery/jquery.select-chain.js');
 
 $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
@@ -59,6 +55,11 @@ $this->headLink()
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
+                <div class="grid_12">
+                    <a href="<?php echo $this->websiteUrl; ?>sitemapproducts.xml" target="_blank">
+                        <?php echo $this->translate('Your Google products XML feed'); ?>
+                    </a>
+                </div>
             <?php endif; ?>
 		</fieldset>
 	<?php endforeach; ?>

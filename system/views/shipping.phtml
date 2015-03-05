@@ -66,7 +66,12 @@ $this->headLink()
                 <li><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup'); ?></a></li>
                 <li><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping'); ?></a></li>
             <?php foreach($this->shippingPlugins as $plugin): ?>
-                <li><a data-plugin="<?php echo $plugin->getName(); ?>" href="<?php echo $this->url(array('run' => 'config', 'name' => strtolower($plugin->getName())), 'pluginroute'); ?>"><?php echo $plugin->getName(); ?></a></li>
+                <li><a data-plugin="<?php echo $plugin->getName(); ?>" href="<?php echo $this->url( array(
+                        'run' => 'config',
+                        'name' => strtolower( $plugin->getName() )
+                    ),
+                        'pluginroute' ); ?>"><?php echo defined( $pluginName = ucfirst( $plugin->getName() ) . '::PLUGIN_ALIAS' ) ? constant( $pluginName ) : $plugin->getName(); ?></a>
+                </li>
             <?php endforeach; ?>
                 <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
             </ul>
@@ -98,7 +103,7 @@ $this->headLink()
                     <fieldset class="config-fields-pickup-config mt10px background hidden">
                         <legend class="background large p5px"><?php echo $this->translate('Shipping pickup configuration'); ?></legend>
                         <label>
-                            <?php echo $this->pickupForm->getElement('searchEnabled')->setAttrib('class', 'grid_6 alpha omega fl-right')->renderViewHelper(); ?>
+                            <?php echo $this->pickupForm->getElement('searchEnabled')->renderViewHelper(); ?>
                             <?php echo $this->translate('Display location search on checkout');?>
                         </label>
                         <p class="grid_6 alpha labeled icon right">

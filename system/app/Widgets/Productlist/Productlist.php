@@ -306,7 +306,29 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      * @return array|null
      */
     private function _loadProducts($enabled = true) {
-		$enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
+        $allowedColumns = array(
+            'id' => 'id',
+            'parent_id' => 'parent_id',
+            'page_id' => 'page_id',
+            'enabled' => 'enabled',
+            'sku' => 'sku',
+            'name' => 'name',
+            'mpn' => 'mpn',
+            'weight' => 'weight',
+            'brand_id' => 'brand',
+            'photo' => 'photo',
+            'short_description' => 'short_description',
+            'full_description' => 'full_description',
+            'price' => 'price',
+            'tax_class' => 'tax_class',
+            'created_at' => 'date',
+            'updated_at' => 'updated_at',
+            'base_price' => 'base_price',
+            'inventory' => 'inventory',
+            'free_shipping' => 'free_shipping'
+        );
+
+        $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
 
 
 		if (empty($this->_options)) {
@@ -326,19 +348,24 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         // fetching filters from query string
         $urlFilter = Filtering_Tools::normalizeFilterQuery();
-
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
-			$filters['order'] = array_map(function ($field) {
-				switch (trim($field)) {
-                    case 'brand':
-                        return $field = 'b.name'; break;
-                    case 'date':
-                        return $field = 'p.created_at DESC'; break;
-                    default:
-                        return $field =  'p.' . $field;
+            $filters['order'] = array_map(function ($field) use ($allowedColumns) {
+                if(in_array($field, $allowedColumns)) {
+                    switch (trim($field)) {
+                        case 'brand':
+                            return $field = 'b.name'; break;
+                        case 'date':
+                            return $field = 'p.created_at DESC'; break;
+                        default:
+                            return $field =  'p.' . $field;
+                    }
                 }
-			}, $filters['order']);
+            }, $filters['order']);
+            $filters['order'] = array_filter($filters['order']);
+            if (empty($filters['order'])) {
+                $filters['order'] = null;
+            }
 		}
 
         if (!empty($urlFilter['category'])) {

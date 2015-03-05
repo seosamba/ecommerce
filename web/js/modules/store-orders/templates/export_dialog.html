@@ -3,7 +3,7 @@
     <form id="export-orders-form" action="<%= $('#website_url').val()+'plugin/shopping/run/exportOrders/'+filter %>" method="post">
         <% _.each(defaultConfig, function(exportConf, name){%>
             <p class="grid_2 order-field-row" style="margin-top: 10px;">
-                <label class="pointer"><%= exportConf.label_name %>
+                <label class="pointer text-overflow" title="<%= exportConf.label_name %>">
                     <input type="checkbox" value="1" name="<%= name %>-checked"
                         <% if(_.isNull(exportConfig)) {%>
                                 checked="checked"
@@ -11,6 +11,7 @@
                                 checked="checked"
                         <% } %>
                     />
+                    <%= exportConf.label_name %>
                 </label>
                 <% if(_.isNull(exportConfig)) {%>
                     <input type="text" name="<%= name %>" value="<%= name %>"/>

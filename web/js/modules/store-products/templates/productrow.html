@@ -12,7 +12,7 @@
     <td><%= _.isUndefined(i18n['yes']) ? 'yes':i18n['yes'] %></td>
 <% } %>
 <td class="editable" data-prop="weight"><%= weight %></td>
-<td class="editable" data-prop="price"><%= price %></td>
+<td class="editable" data-prop="price"><%=accounting.formatMoney(price , currency) %></td>
 <td class="textcentered">
 <% if (this.model.has('stats')) {%>
     <% if (stats.length) {%>

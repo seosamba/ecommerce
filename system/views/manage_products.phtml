@@ -3,6 +3,7 @@
 <?php
     $this->headScript()
             ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+            ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/accounting.min.js')
 			->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-products/config'));
 
 	$this->headLink()
@@ -10,6 +11,7 @@
 ?>
 <div id="store-products" class="toaster-widget store-widget">
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
+    <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
         <div class="grid_9 omega">

@@ -27,7 +27,8 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
         array(
-//            'headerText'  => $this->translate('Manage zones')
+            'helpSection' => $this->helpSection,
+            'hashMap'     => Tools_Misc::$_helpHashMap
         )
     );
     ?>
