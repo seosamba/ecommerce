@@ -10,8 +10,6 @@
 class Api_Store_Taxes extends Api_Service_Abstract {
 
 
-    const TAXES_SECURE_TOKEN = 'TaxesToken';
-
 	/**
 	 * @var array Access Control List
 	 */
@@ -68,7 +66,7 @@ class Api_Store_Taxes extends Api_Service_Abstract {
 	public function postAction() {
 		$rules = $this->_request->getParam('rules', null);
         $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
-        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::TAXES_SECURE_TOKEN);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, Shopping::SHOPPING_SECURE_TOKEN);
         if (!$valid) {
             exit;
         }

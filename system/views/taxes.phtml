@@ -71,7 +71,7 @@ $taxesStatus  = '<label>' . $this->formCheckbox('price-inc-tax', null, ($this->p
         <button id="new-rule-btn" class="btn ticon-plus success"><?php echo $this->translate('Add new');?></button>
         <button id="save-btn" class="btn ticon-save"><?php echo $this->translate('Save and close');?></button>
     </div>
-    <input type="hidden" class="secure-token-tax" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Taxes::TAXES_SECURE_TOKEN);?>">
+    <input type="hidden" class="secure-token-tax" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>">
 
 </div>
 

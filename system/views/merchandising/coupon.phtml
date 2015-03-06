@@ -63,7 +63,7 @@
 	</div>
 
 	<div class="grid_6 alpha omega" id="coupon-action"></div>
-    <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Coupons::COUPON_SECURE_TOKEN);?>">
+    <input class="secure-token-discount-rate" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>">
 	<button class="btn grid_2 omega mt2-25em ticon-plus" type="submit"/><?php echo $this->translate('Create'); ?></button>
 </form>
 

@@ -8,8 +8,6 @@
  */
 class Api_Store_Coupons extends Api_Service_Abstract {
 
-	const COUPON_SECURE_TOKEN = 'CouponToken';
-
     /**
 	 * @var array Access Control List
 	 */
@@ -51,7 +49,7 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 		}
 
         $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
-        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::COUPON_SECURE_TOKEN);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, Shopping::SHOPPING_SECURE_TOKEN);
         if (!$valid) {
             exit;
         }

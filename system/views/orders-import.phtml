@@ -103,6 +103,7 @@ $this->headLink()
                     uploader.settings.multipart_params.importOrdersFields = importOrdersFields;
                     uploader.settings.multipart_params.realOrdersFields = realOrderFields;
                     uploader.settings.multipart_params.currentTemplateName = currentTemplateName;
+                    uploader.settings.multipart_params.secureToken = '<?php echo $this->secureToken;?>';
                     var defaultOrderStatus = $('#order-status :selected').val();
                     if(parseInt(defaultOrderStatus) === 0){
                         showMessage('<?php echo $this->translate('Please choose default order status');?>', true, '5000');

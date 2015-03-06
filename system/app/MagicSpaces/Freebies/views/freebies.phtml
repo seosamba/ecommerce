@@ -18,6 +18,7 @@
     </label>
     </div>
     <div class="product-freebies-content"><?php echo $this->content; ?></div>
+    <input type="hidden" class="secure-token-freebies" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>">
 </div>
 
 <style type="text/css">
@@ -68,7 +69,8 @@
         $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/setFreebies/', {
             productId  : '<?php echo $this->currentProductId; ?>',
             priceValue : priceValue,
-            quantity   : quantity
+            quantity   : quantity,
+            secureToken: $('.secure-token-freebies').val()
         });
     }
 </script>
