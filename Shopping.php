@@ -119,6 +119,8 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const CACHE_PREFIX = 'store_';
 
+    const SHOPPING_SECURE_TOKEN = 'ShoppingToken';
+
 	/**
 	 * @var Zend_Controller_Action_Helper_Json json helper for sending well-formated json response
 	 */
@@ -275,7 +277,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		$form = new Forms_Config();
 		if ($this->_request->isPost()) {
-			if ($form->isValid($this->_requestedParams)) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
 					$this->_configMapper->save($subFormValues);
 				}
@@ -418,7 +425,12 @@ class Shopping extends Tools_Plugins_Abstract {
 	protected function setConfigAction() {
 		$status = false;
 		if ($this->_request->isPost()) {
-			$configMapper = Models_Mapper_ShoppingConfig::getInstance();
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            $configMapper = Models_Mapper_ShoppingConfig::getInstance();
 			$configParams = $this->_request->getParam('config');
 			if ($configParams && is_array($configParams) && !empty ($configParams)) {
 				$status = $configMapper->save($configParams);
@@ -440,31 +452,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	/**
-	 * Method renders zones screen and handling zone saving
+	 * Method renders zones screen
 	 * @return html|json
-	 * @todo better response
 	 */
 	protected function zonesAction() {
 		$zonesMapper = Models_Mapper_Zone::getInstance();
-		if ($this->_request->isPost()) {
-			$toRemove = $this->_request->getParam('toRemove');
-			if (is_array($toRemove) && !empty ($toRemove)) {
-				$deleted = $zonesMapper->delete($toRemove);
-			}
-			$zones = $this->_request->getParam('zones');
-			if (is_array($zones) && !empty ($zones)) {
-				$result = array();
-				foreach ($zones as $id => $zone) {
-					$zone = $zonesMapper->createModel($zone);
-					$result[$id] = $zonesMapper->save($zone);
-				}
-			}
-			$this->_jsonHelper->direct(array(
-				'done'    => true,
-				'id'      => $result,
-				'deleted' => isset($deleted) ? $deleted : null
-			));
-		}
 		$this->_view->zones = array_map(function ($zone) {
 			return $zone->toArray();
 		}, $zonesMapper->fetchAll());
@@ -699,12 +691,6 @@ class Shopping extends Tools_Plugins_Abstract {
 				'delivered' => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
 				}))
-                //'customer_charged' => sizeof(array_filter($orders, function ($order) {
-                    //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() === self::GATEWAY_QUOTE);
-                //})),
-                //'customer_not_charged' => sizeof(array_filter($orders, function ($order) {
-                    //return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === self::GATEWAY_QUOTE);
-                //}))
 			);
 			$this->_view->orders = $orders;
 		}
@@ -1045,6 +1031,11 @@ class Shopping extends Tools_Plugins_Abstract {
         if ($this->_request->isPost() && $this->_sessionHelper->getCurrentUser()->getRoleId() != Tools_Security_Acl::ROLE_GUEST) {
             $data = $this->_request->getParams();
             $form = new Forms_User();
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
             if ($form->isValid($data)) {
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $userData = $userMapper->find($this->_sessionHelper->getCurrentUser()->getId());
@@ -1094,6 +1085,11 @@ class Shopping extends Tools_Plugins_Abstract {
 
     public function setFreebiesAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
             $productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
             $priceValue = filter_var($this->_request->getParam('priceValue'), FILTER_SANITIZE_NUMBER_FLOAT);
             $quantity = filter_var($this->_request->getParam('quantity'), FILTER_SANITIZE_NUMBER_INT);
@@ -1106,6 +1102,11 @@ class Shopping extends Tools_Plugins_Abstract {
     public function editUserProfileAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $data = $this->_request->getParams();
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
             if(isset($data['profileElement']) && isset($data['profileValue']) && isset($data['userId'])){
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $user = $userMapper->find($data['userId']);
@@ -1141,6 +1142,11 @@ class Shopping extends Tools_Plugins_Abstract {
 
     public function saveDiscountTaxRateAction(){
         if(Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
             $couponDiscountTaxRate = filter_var($this->_request->getParam('discountTaxValue'), FILTER_SANITIZE_NUMBER_INT);
             $shoppingConfigParams = $this->_configMapper->getConfigParams();
             $shoppingConfigParams['couponDiscountTaxRate'] = $couponDiscountTaxRate;
@@ -1191,7 +1197,7 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     public function deletePickupLocationAction()
     {
-        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
             $locationId = filter_var($this->_request->getParam('locationId'), FILTER_SANITIZE_NUMBER_INT);
             if ($locationId) {
                 Store_Mapper_PickupLocationConfigMapper::getInstance()->deleteConfig($locationId);
@@ -1227,6 +1233,11 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             ini_set("max_execution_time", 300);
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
             $uploader = new Zend_File_Transfer_Adapter_Http();
             $ordersCsv = $uploader->getFileInfo();
             $importOrdersFields = $this->_request->getParam('importOrdersFields');

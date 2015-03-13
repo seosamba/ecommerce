@@ -65,7 +65,7 @@ define([
             $.ajax({
                 url: $('#website_url').val()+'api/store/pickuplocationcategories',
                 type: 'POST',
-                data:{name:name},
+                data:{name:name, secureToken:$('.secure-token-pickup-cat').val()},
                 dataType: 'json',
                 success: function(id) {
                     self.$el.find('.ui-tabs-nav .add-new-pickup-location').before('<li><a data-category-id="'+id+'" href="#pickup-category-'+id+'">'+name+'</a></li>');

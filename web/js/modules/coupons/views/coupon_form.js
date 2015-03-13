@@ -107,7 +107,8 @@ define([
                 url: $('#website_url').val()+'plugin/shopping/run/saveDiscountTaxRate/',
                 type: 'POST',
                 data: {
-                    discountTaxValue:discountTaxValue
+                    discountTaxValue:discountTaxValue,
+                    secureToken: $('.secure-token-discount-rate').val()
                 },
                 dataType: 'json',
                 success: function(response) {

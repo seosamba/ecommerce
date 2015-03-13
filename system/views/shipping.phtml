@@ -58,6 +58,7 @@ $this->headLink()
                 <option value="3" <?php echo (isset($this->shoppingConfig[Shopping::SHIPPING_TAX_RATE]) && $this->shoppingConfig[Shopping::SHIPPING_TAX_RATE] === '3') ? 'selected' : '';?>><?php echo $this->translate('Tax Rate 2');?></option>
             </select>
         </div>
+        <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
     </form>
     <div id="shipping-config" class="grid_12 mt15px">
         <div id="shippers" class="ui-tabs-vertical clearfix">
@@ -321,15 +322,19 @@ $(function(){
         var locationRow = $(this).closest('.pickup-location-conf-row'),
             locationId = locationRow.data('pickup-location-row');
 
-        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function(){
-            $.post($('#website_url').val()+'plugin/shopping/run/deletePickupLocation/', {locationId:locationId}, function(response){
-                if($('.pickup-config-form').find('.pickup-location-conf-row').length > 1){
+        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+            $.ajax({
+               url: $('#website_url').val()+'plugin/shopping/run/deletePickupLocation/locationId/'+locationId,
+               type: 'DELETE',
+               dataType: 'json'
+            }).done(function(response) {
+                if ($('.pickup-config-form').find('.pickup-location-conf-row').length > 1) {
                     locationRow.remove();
-                }else{
+                } else{
                     locationRow.find('input').val(0);
                 }
-            }, 'json');
-       });
+            });
+        });
     });
 
     var previousCategory = '';

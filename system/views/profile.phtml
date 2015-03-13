@@ -20,6 +20,7 @@
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                     <input class="edit-client-email edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
                     <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
                 <?php endif;?>
             </h4>
 			<p class="client-info"><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
@@ -335,7 +336,8 @@
             data: {
                 profileElement:clientEditParam,
                 profileValue:editedValue,
-                userId:$('#userId').val()
+                userId:$('#userId').val(),
+                secureToken:$('.secure-token-user').val()
             }
         }).done(function(response) {
             if(response.error == 1){

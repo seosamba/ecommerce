@@ -45,7 +45,7 @@ define([
                 return false;
             }
             var self = this;
-            $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON()}, function(response){
+            $.post(this.rulesCollection.url, {rules: this.rulesCollection.toJSON(), secureToken:$('.secure-token-tax').val()}, function(response){
                 self.$el.closest('.seotoaster').find('.closebutton .close').trigger('click');
                 hideSpinner();
                 showMessage('Saved');
@@ -57,7 +57,7 @@ define([
             this.rulesCollection.add();
         },
         changeTaxConfig: function(e){
-            $.post($('#website_url').val() + '/plugin/shopping/run/setConfig', {config: {showPriceIncTax: e.target.checked ? 1 : 0}}) ;
+            $.post($('#website_url').val() + '/plugin/shopping/run/setConfig', {config: {showPriceIncTax: e.target.checked ? 1 : 0}, secureToken: $('.secure-token-tax').val()});
         }
     })
 	

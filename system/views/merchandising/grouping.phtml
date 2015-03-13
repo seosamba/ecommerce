@@ -29,6 +29,7 @@
     </div>
 
     <button class="btn grid_4 omega mt0px ticon-plus" type="submit"><?php echo $this->translate( 'Create or update group' ); ?></button>
+    <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Groups::GROUPS_SECURE_TOKEN);?>">
 
 </form>
 

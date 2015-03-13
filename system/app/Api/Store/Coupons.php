@@ -8,7 +8,7 @@
  */
 class Api_Store_Coupons extends Api_Service_Abstract {
 
-	/**
+    /**
 	 * @var array Access Control List
 	 */
 	protected $_accessList = array(
@@ -47,6 +47,13 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 		if (empty($data)) {
 			$this->_error();
 		}
+
+        $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, Shopping::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        unset($data[Tools_System_Tools::CSRF_SECURE_TOKEN]);
         $translator = Zend_Registry::get('Zend_Translate');
 		if (!isset($data['code']) || empty($data['code'])) {
 			$this->_error($translator->translate('Missing mandatory code parameter'));

@@ -78,8 +78,10 @@ define([
         saveRowGroup: function(e){
             var data = $(e.target).parent('.group-price-row').find('input, select').serialize();
             var productId = $('#group-products-id').val();
+            var secureToken = $('.secure-token-group-price').val();
             var priceSymbol = $('#group-products-price-symbol').val();
             data += '&productId='+productId+'';
+            data += '&secureToken='+secureToken+'';
             $.ajax({
                 url: $('#website_url').val()+'api/store/groupsprice/',
                 data: data,

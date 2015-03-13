@@ -426,6 +426,7 @@ $this->headLink()
             <button class="btn ticon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
         </div>
     </div>
+    <input class="secure-token-tax" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
 </div>
 
 <script>
