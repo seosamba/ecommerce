@@ -62,7 +62,13 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
             ) : new Zend_Currency();
         }
         $this->_view->currency = $this->_currency;
-        $this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
+        if (is_numeric($this->_options[0])) {
+            $this->_product = $this->_productMapper->find($this->_options[0]);
+            $this->_type = $this->_options[1];
+        } else {
+            $this->_product = $this->_productMapper->findByPageId($this->_toasterOptions['id']);
+            $this->_type = array_shift($this->_options);
+        }
         if (!$this->_product instanceof Models_Model_Product) {
             if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL) || is_null($this->_type)) {
                 return '<b>Product does not exist or wrong options provided</b>';
@@ -71,7 +77,6 @@ class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
         }
 
         $this->_view->product = $this->_product;
-        $this->_type = array_shift($this->_options);
 
         $methodName = '_render' . ucfirst(strtolower($this->_type));
         if (method_exists($this, $methodName)) {
