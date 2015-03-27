@@ -199,24 +199,37 @@ define(['backbone',
         changeStatus: function(event){
             var self        = this,
                 el          = $(event.currentTarget),
-                id          = parseInt(el.closest('div').data('order-id'));
+                id          = parseInt(el.closest('div').data('order-id')),
+                confirmMessage = _.isUndefined(i18n['Are you sure you want to change status for this order?'])?'Are you sure you want to change status for this order?':i18n['Are you sure you want to change status for this order?'],
+                status = el.data('status');
 
             var model = this.orders.get(id);
 
-            $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                data: {status: el.data('status')},
-                type: 'POST',
-                dataType: 'json',
-                beforeSend: function(){
-                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                },
-                success: function(response) {
-                    showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
-                    if (!response.error && response.hasOwnProperty('responseText')){
-                        model.set('status', response.responseText.status);
-                    }
+            if (status === 'refunded') {
+                confirmMessage = _.isUndefined(i18n['Are you sure you want to refund this payment?'])?'Are you sure you want to refund this payment?':i18n['Are you sure you want to refund this payment?'];
+            }
+
+            smoke.confirm(confirmMessage, function(e) {
+                if (e){
+                    $.ajax({
+                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                        data: {status: status},
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function(){
+                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                        },
+                        success: function(response) {
+                            showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
+                            if (!response.error && response.hasOwnProperty('responseText')){
+                                model.set('status', response.responseText.status);
+                            }
+                        }
+                    });
                 }
+            }, {
+                ok: _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'],
+                cancel: _.isUndefined(i18n['No'])?'No':i18n['No']
             });
         },
         changeTracking: function(event){
