@@ -334,6 +334,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		$price = !$noCurrency ? $this->_currency->toCurrency($price): $price;
 
+        if ($noCurrency) {
+            $price = number_format(round($price, 2), 2, '.', '');
+        }
+
         if($lifeReload){
 	        $lifeReloadClass = implode(' ', $lifeReloadClass);
             return '<span class="price-lifereload-'.$this->_product->getId().' '.$lifeReloadClass.'">'.$price.'</span>';
