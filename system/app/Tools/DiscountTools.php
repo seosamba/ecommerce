@@ -45,12 +45,16 @@ class Tools_DiscountTools
      *
      * @param $price
      * @param ex: array('type', 'sign', 'discount') $discountData
-     * @param bool if true subtraction will be analyzed like addition and in reverse $reverse
+     * @param bool $reverse if true subtraction will be analyzed like addition and in reverse
+     * @param bool $ignoreUnits ignore discount units
      * @return mixed
      */
-    public static function applyDiscountData($price, $discountData, $reverse = false)
+    public static function applyDiscountData($price, $discountData, $reverse = false, $ignoreUnits = false)
     {
         $priceModificationValue = 0;
+        if ($discountData['type'] === 'unit' && $ignoreUnits === true) {
+            return $price;
+        }
         if ($discountData['type'] === 'percent') {
             $priceModificationValue = $price * $discountData['discount'] / 100;
         }

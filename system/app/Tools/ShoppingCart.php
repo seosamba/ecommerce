@@ -283,7 +283,7 @@ class Tools_ShoppingCart {
 		if (!empty($modifiers)) {
 			foreach ($modifiers as $modifier) {
 				if ($taxRate) {
-					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue']);
+					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue'] + round(($taxRate * ($originalPrice / 100) * $modifier['priceValue']) / 100, 2));
 				} else {
 					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
 				}
