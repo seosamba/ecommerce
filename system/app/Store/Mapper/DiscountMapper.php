@@ -14,8 +14,9 @@ class Store_Mapper_DiscountMapper extends Application_Model_Mappers_Abstract
 
     /**
      * Save discount model to DB
-     * @param $model Store_Model_Discount
-     * @return Store_Model_Discount
+     * @param Store_Model_Discount $model
+     * @return int
+     * @throws Exceptions_SeotoasterException
      */
     public function save($model)
     {

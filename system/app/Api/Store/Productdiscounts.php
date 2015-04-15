@@ -4,7 +4,7 @@
  * @author  Vitaly Vyrodov <gtopbox@gmail.com>
  *
  * @package Store
- * @since   2.3.2
+ * @since   2.4.0
  */
 class Api_Store_Productdiscounts extends Api_Service_Abstract {
     /**

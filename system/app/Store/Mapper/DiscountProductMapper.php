@@ -48,7 +48,7 @@ class Store_Mapper_DiscountProductMapper extends Application_Model_Mappers_Abstr
     /**
      * Delete discount
      * @param int $id
-     * @param int quantity
+     * @param int $quantity product quantity
      * @return bool Result of operation
      */
     public function delete($id, $quantity)

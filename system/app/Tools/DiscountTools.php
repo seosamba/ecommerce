@@ -82,8 +82,8 @@ class Tools_DiscountTools
     /**
      * Adding new discount rule or updating existing rule if exists
      *
-     * @param array Existing discounts $discounts
-     * @param array ex: array('name', 'type', 'sign', 'discount') new discount $newDiscount
+     * @param array $discounts Existing discounts
+     * @param array $newDiscount ex: array('name', 'type', 'sign', 'discount') new discount
      * @return mixed
      */
     public static function addAdditionalDiscountRule($discounts, $newDiscount)
@@ -124,7 +124,7 @@ class Tools_DiscountTools
     /**
      * Analyze current active discounts and apply it to cart item
      *
-     * @param array Single cart item $cartItem
+     * @param array $cartItem Single cart item
      * @return array
      */
     public static function applyDiscountRules($cartItem)
@@ -157,6 +157,13 @@ class Tools_DiscountTools
         return $cartItem;
     }
 
+    /**
+     * Apply options with discounts to original price
+     *
+     * @param float $originalPrice original product price
+     * @param array $modifiers ex: array('priceType', 'priceSign', 'priceValue') product options data
+     * @return mixed
+     */
     public static function calculateItemWithOptionsPrice($originalPrice, $modifiers)
     {
         $price = $originalPrice;
@@ -172,6 +179,13 @@ class Tools_DiscountTools
         return $price;
     }
 
+    /**
+     * Get unit discount
+     *
+     * @param float $price
+     * @param float $originPrice original price
+     * @return float
+     */
     public static function getUnitDiscount($price, $originPrice)
     {
         return floatval($originPrice) - $price;

@@ -17,9 +17,10 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
 	}
 
 
-	/**
-	 * @param $object Models_Model_Product
-	 */
+    /**
+     * @param Models_Model_Product $object
+     * @return Models_Model_Product
+     */
 	public function notify($object) {
         if (null === ($allCustomersGroups = $this->_cache->load('customers_groups', 'store_'))){
             $dbTable = new Models_DbTable_CustomerInfo();
@@ -89,9 +90,9 @@ class Tools_GroupPriceObserver implements Interfaces_Observer {
 
     /**
      * @param $object Models_Model_Product
-     * @param $priceValue
-     * @param string (percent, unit) $priceType
-     * @param string (minus, plus) $priceSign
+     * @param bool $priceValue price
+     * @param bool $priceType price type
+     * @param bool $priceSign price sign
      * @return Models_Model_Product
      */
     private function _addDiscounts($object, $priceValue = false, $priceType = false, $priceSign = false)

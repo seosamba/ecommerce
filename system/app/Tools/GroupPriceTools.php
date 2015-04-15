@@ -6,6 +6,10 @@
 class Tools_GroupPriceTools extends Tools_DiscountRulesTools {
 
 
+    /**
+     * @param array $cartItem cart item
+     * @return array
+     */
 	public static function prepareDiscountRule($cartItem){
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
         $cacheTags  = array();

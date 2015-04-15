@@ -5,8 +5,17 @@
 class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
 {
 
+    /**
+     * flag for local discount
+     */
     const LOCAL_DISCOUNT_ENABLED = 'enabled';
 
+    /**
+     * Process discount rule
+     *
+     * @param array $cartItem cart item
+     * @return array
+     */
     public static function prepareDiscountRule($cartItem)
     {
 
