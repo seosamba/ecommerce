@@ -57,8 +57,6 @@ class Tools_ShoppingCart {
 
 	protected $_discount = 0;
 
-    protected $_productDiscounts = array();
-
     private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -887,17 +885,6 @@ class Tools_ShoppingCart {
 
     public function getDiscountTaxRate() {
         return $this->_discountTaxRate;
-    }
-
-    public function setProductDiscounts($productDiscounts)
-    {
-        $this->_productDiscounts = $productDiscounts;
-        return $this;
-    }
-
-    public function getProductDiscounts()
-    {
-        return $this->_productDiscounts;
     }
 
 }
