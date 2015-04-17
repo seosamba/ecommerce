@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- 15/04/2015
--- version: 2.4.1
+-- version: 2.4.0
 -- update version
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
