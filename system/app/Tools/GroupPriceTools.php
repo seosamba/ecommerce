@@ -44,12 +44,28 @@ class Tools_GroupPriceTools extends Tools_DiscountRulesTools {
                             $priceSign  = $allProductsWithGroups[$groupProductKey]['priceSign'];
                             $priceType  = $allProductsWithGroups[$groupProductKey]['priceType'];
                         }
-                        return array('name' => 'groupprice', 'discount' => $priceValue, 'type' => $priceType, 'sign' => $priceSign);
+
+                        return array(
+                            'name' => 'groupprice',
+                            'discount' => $priceValue,
+                            'type' => $priceType,
+                            'sign' => $priceSign,
+                            'checkout_label' => 'groupprice',
+                            'display_on_checkout' => false
+                        );
                     }
                 }
             }
         }
-        return array('name' => 'groupprice', 'discount' => 0, 'type' => '', 'sign' => '');
+
+        return array(
+            'name' => 'groupprice',
+            'discount' => 0,
+            'type' => '',
+            'sign' => '',
+            'checkout_label' => 'groupprice',
+            'display_on_checkout' => false
+        );
 
 	}
 

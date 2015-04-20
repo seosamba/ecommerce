@@ -83,7 +83,7 @@ class Tools_DiscountTools
      * Adding new discount rule or updating existing rule if exists
      *
      * @param array $discounts Existing discounts
-     * @param array $newDiscount ex: array('name', 'type', 'sign', 'discount') new discount
+     * @param array $newDiscount ex: array('name', 'type', 'sign', 'discount', 'checkout_label', 'display_on_checkout') new discount
      * @return mixed
      */
     public static function addAdditionalDiscountRule($discounts, $newDiscount)
@@ -96,6 +96,8 @@ class Tools_DiscountTools
                     $discounts[$key]['discount'] = $newDiscount['discount'];
                     $discounts[$key]['type'] = $newDiscount['type'];
                     $discounts[$key]['sign'] = $newDiscount['sign'];
+                    $discounts[$key]['checkout_label'] = $newDiscount['checkout_label'];
+                    $discounts[$key]['display_on_checkout'] = $newDiscount['display_on_checkout'];
                     $inDiscount = true;
                     break;
                 }
@@ -106,6 +108,7 @@ class Tools_DiscountTools
         } else {
             array_push($discounts, $newDiscount);
         }
+
         return $discounts;
     }
 
