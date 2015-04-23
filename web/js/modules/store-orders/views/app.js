@@ -21,7 +21,8 @@ define(['backbone',
             'click td.shipping-service .setTracking': 'changeTracking',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
-            'change input[name="check-order[]"]': 'toggleOrder'
+            'change input[name="check-order[]"]': 'toggleOrder',
+            'change #filter-order-type': 'toggleRecurring'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -42,7 +43,9 @@ define(['backbone',
                         'date-to': $('input[name=filter-to-date]', '#store-orders form.filters').val(),
                         'amount-from': $('input[name=filter-from-amount]', '#store-orders form.filters').val(),
                         'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val(),
-                        'user': $('input[name=user-name]', '#store-orders form.filters').val()
+                        'user': $('input[name=user-name]', '#store-orders form.filters').val(),
+                        'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
+                        'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val()
                     };
                 }
             });
@@ -272,6 +275,14 @@ define(['backbone',
                 ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
                 cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
             });
+        },
+        toggleRecurring : function(e){
+            var currentType = $(e.currentTarget).val();
+            if (currentType === 'recurring_id') {
+                $('.recurring-filters').removeClass('hidden');
+            } else {
+                $('.recurring-filters').addClass('hidden');
+            }
         }
     });
 

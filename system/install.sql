@@ -742,4 +742,21 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.3.2' WHERE `name` = 'shopping';
+CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart id',
+  `subscription_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Subscription id',
+  `ipn_tracking_id` VARCHAR (255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Ipn number',
+  `gateway_type` VARCHAR (100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Payment gateway name',
+  `payment_period` VARCHAR (30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frequency of recurring payment',
+  `recurring_times` SMALLINT unsigned NOT NULL COMMENT 'Amount of payments',
+  `subscription_date` TIMESTAMP NOT NULL COMMENT 'Subscription date',
+  `payment_cycle_amount` decimal(10,4) DEFAULT NULL COMMENT 'Amount for each recurring cycle',
+  `total_amount_paid` decimal(10,4) DEFAULT NULL COMMENT 'Amount paid',
+  `last_payment_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00' COMMENT 'Last payment date',
+  `recurring_status` ENUM('new', 'active', 'pending', 'expired', 'suspended', 'canceled') DEFAULT 'new' NOT NULL COMMENT 'Recurring payment status',
+  `custom_type` VARCHAR (50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional information for payment',
+  PRIMARY KEY(`cart_id`),
+  CONSTRAINT `shopping_recurring_payment_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+UPDATE `plugin` SET `version` = '2.4.2' WHERE `name` = 'shopping';

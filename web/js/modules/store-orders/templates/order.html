@@ -56,4 +56,12 @@
     </a>
 </td>
 <% } %>
-  <td><%= _.isNull(real_order_id) ? _.isUndefined(i18n['Yes']) ? 'Yes':i18n['Yes']: _.isUndefined(i18n['No']) ? 'No':i18n['No']%></td>
+  <td><% if(!_.isNull(real_order_id)) { %>
+        <%= _.isUndefined(i18n['Imported']) ? 'Imported':i18n['Imported'] %>
+      <% } else if(!_.isNull(recurring_id)) { %>
+        <%= _.isUndefined(i18n['Recurring']) ? 'Recurring':i18n['Recurring'] %>
+      <% } else { %>
+        <%= _.isUndefined(i18n['Regular']) ? 'Regular':i18n['Regular'] %>
+      <% } %>
+  </td>
+

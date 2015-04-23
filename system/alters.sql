@@ -147,11 +147,28 @@ UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 -- Add column to store mobile phone country code
 ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NULL DEFAULT NULL COMMENT 'Contains mobile phone country code';
 
--- 04/02/2015
--- version: 2.3.3
+-- 20/04/2015
+-- version: 2.4.1
 -- update version
+CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart id',
+  `subscription_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Subscription id',
+  `ipn_tracking_id` VARCHAR (255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Ipn number',
+  `gateway_type` VARCHAR (100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Payment gateway name',
+  `payment_period` VARCHAR (30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frequency of recurring payment',
+  `recurring_times` SMALLINT unsigned NOT NULL COMMENT 'Amount of payments',
+  `subscription_date` TIMESTAMP NOT NULL COMMENT 'Subscription date',
+  `payment_cycle_amount` decimal(10,4) DEFAULT NULL COMMENT 'Amount for each recurring cycle',
+  `total_amount_paid` decimal(10,4) DEFAULT NULL COMMENT 'Amount paid',
+  `last_payment_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00' COMMENT 'Last payment date',
+  `recurring_status` ENUM('new', 'active', 'pending', 'expired', 'suspended', 'canceled') DEFAULT 'new' NOT NULL COMMENT 'Recurring payment status',
+  `custom_type` VARCHAR (50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional information for payment',
+  PRIMARY KEY(`cart_id`),
+  CONSTRAINT `shopping_recurring_payment_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
