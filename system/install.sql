@@ -742,4 +742,4 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.3.2' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.4.0' WHERE `name` = 'shopping';
