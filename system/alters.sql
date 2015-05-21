@@ -151,7 +151,11 @@ ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NUL
 -- version: 2.3.3
 -- update version
 
+-- 21/05/2015
+-- version: 2.4.0
+-- update version
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
