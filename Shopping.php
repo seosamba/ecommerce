@@ -1317,4 +1317,190 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    /**
+     * Update recurring payment(subscription) status
+     */
+    public function updateSubscriptionAction()
+    {
+        $user = $this->_sessionHelper->getCurrentUser();
+        $roleId = $user->getRoleId();
+        $currentUserId = $user->getId();
+        if (Tools_Security_Acl::ROLE_GUEST !== $roleId && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            $cartId = filter_var($this->_request->getParam('cartId'), FILTER_SANITIZE_NUMBER_INT);
+            $changeSubscription = filter_var($this->_request->getParam('changeSubscription'), FILTER_SANITIZE_STRING);
+            $nextBillingDate = filter_var($this->_request->getParam('nextBillingDate'), FILTER_SANITIZE_STRING);
+            if ($nextBillingDate) {
+                $changeSubscription = 'update';
+            }
+            $cart = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            $cartUserId = intval($cart->getUserId());
+            $recurringPaymentParams = $this->_request->getParams();
+            $allowedUserStatuses = array(
+                Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT,
+                Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT,
+                Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT,
+                'update'
+            );
+            if ($cart instanceof Models_Model_CartSession && ($cartUserId === $currentUserId || Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT))) {
+                if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && !in_array($changeSubscription,
+                        $allowedUserStatuses)
+                ) {
+                    $this->_responseHelper->fail($this->_translator->translate('Recurring status not allowed'));
+                }
+                $result = Tools_RecurringPaymentTools::updateSubscription($cartId, $changeSubscription,
+                    $recurringPaymentParams);
+                $responseMessage = $this->_translator->translate($result['message']);
+                if ($result['error']) {
+                    $this->_responseHelper->fail($responseMessage);
+                } else {
+                    $this->_responseHelper->success($responseMessage);
+                }
+            } else {
+                $this->_responseHelper->fail($this->_translator->translate('Cart id not provided'));
+            }
+
+        }
+        $this->_responseHelper->fail('');
+    }
+
+    /**
+     * Change recurring payment type
+     */
+    public function changeRecurringTypeAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            $recurringPaymentType = filter_var($this->_request->getParam('recurringPaymentType'),
+                FILTER_SANITIZE_STRING);
+            $paymentType = false;
+            if (in_array($recurringPaymentType, Api_Store_Recurringtypes::$recurringAcceptType)) {
+                $paymentType = $recurringPaymentType;
+            }
+            $shoppingCart = Tools_ShoppingCart::getInstance();
+            $customer = $shoppingCart->getCustomer();
+            $shoppingCart->setRecurringPaymentType($paymentType);
+            $shoppingCart->save()->saveCartSession($customer);
+        }
+
+    }
+
+    /**
+     * Update recurring data
+     *
+     * @throws Exceptions_SeotoasterPluginException
+     * @throws Zend_Db_Table_Exception
+     */
+
+    public function updateRecurringDataAction()
+    {
+        $user = $this->_sessionHelper->getCurrentUser();
+        $roleId = $user->getRoleId();
+        $currentUserId = $user->getId();
+        $acceptedForChangeData = array('shipping', 'payment_cycle');
+        if (Tools_Security_Acl::ROLE_GUEST !== $roleId && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            $cartId = filter_var($this->_request->getParam('cartId'), FILTER_SANITIZE_NUMBER_INT);
+            $changeType = filter_var($this->_request->getParam('changeType'), FILTER_SANITIZE_STRING);
+            $cartMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $cart = $cartMapper->find($cartId);
+            $cartUserId = intval($cart->getUserId());
+            if (!in_array($changeType, $acceptedForChangeData)) {
+                $this->_responseHelper->fail($this->_translator->translate('Data type not accepted'));
+            }
+            if ($cart instanceof Models_Model_CartSession && ($cartUserId === $currentUserId || Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT))
+            ) {
+                switch ($changeType) {
+                    case 'shipping':
+                        $this->_updateRecurringShipping($cart, $currentUserId);
+                        break;
+                    case 'payment_cycle':
+                        $this->_updateRecurringCycle($cart);
+                        break;
+                    default:
+                        $this->_responseHelper->fail($this->_translator->translate('Data type not accepted'));
+                }
+            } else {
+                $this->_responseHelper->fail($this->_translator->translate('Cart id not provided'));
+            }
+        }
+    }
+
+    /**
+     * Update recurring cycle
+     *
+     * @param Models_Model_CartSession $cart cart object
+     */
+    private function _updateRecurringCycle($cart)
+    {
+        $params = $this->_request->getParams();
+        $activeRecurringPaymentTypes = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringTypes();
+
+        if (array_key_exists(strtolower('recurring-payment-' . $params['paymentCycle']),
+            $activeRecurringPaymentTypes)) {
+            $result = Tools_RecurringPaymentTools::updateSubscription($cart->getId(), '', $params);
+            $responseMessage = $this->_translator->translate($result['message']);
+            if ($result['error']) {
+                $this->_responseHelper->fail($responseMessage);
+            } else {
+                $this->_responseHelper->success($responseMessage);
+            }
+        }
+        $this->_responseHelper->fail($this->_translator->translate('You can\'t change this payment cycle'));
+    }
+
+
+    /**
+     * Update recurring shipping data
+     *
+     * @param Models_Model_CartSession $cart cart object
+     * @param int $currentUserId current user Id
+     * @throws Exceptions_SeotoasterPluginException
+     * @throws Zend_Db_Table_Exception
+     */
+    private function _updateRecurringShipping($cart, $currentUserId)
+    {
+        $shippingAddressId = $cart->getShippingAddressId();
+        $firstName = filter_var($this->_request->getParam('firstName'), FILTER_SANITIZE_STRING);
+        $lastName = filter_var($this->_request->getParam('lastName'), FILTER_SANITIZE_STRING);
+        $address1 = filter_var($this->_request->getParam('address1'), FILTER_SANITIZE_STRING);
+        $address2 = filter_var($this->_request->getParam('address2'), FILTER_SANITIZE_STRING);
+        $zip = filter_var($this->_request->getParam('zip'), FILTER_SANITIZE_STRING);
+        $shippingAddress = Models_Mapper_CustomerMapper::getInstance()->getUserAddressByUserId($currentUserId,
+            $shippingAddressId);
+        $address = $shippingAddress[$shippingAddressId];
+        $address['firstname'] = $firstName;
+        $address['lastname'] = $lastName;
+        $address['address1'] = $address1;
+        $address['address2'] = $address2;
+        $address['address_type'] = Models_Model_Customer::ADDRESS_TYPE_SHIPPING;
+        $address['zip'] = $zip;
+        $address = Tools_Misc::clenupAddress($address);
+        $address['id'] = Tools_Misc::getAddressUniqKey($address);
+        $address['user_id'] = $currentUserId;
+        $addressTable = new Models_DbTable_CustomerAddress();
+        if (null === ($row = $addressTable->find($address['id'])->current())) {
+            $cartMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $row = $addressTable->createRow();
+            $row->setFromArray($address);
+            $newShippingAddress = $row->save();
+            $cart->setShippingAddressId($newShippingAddress);
+            $cartMapper->save($cart);
+        }
+        $this->_responseHelper->success($this->_translator->translate('Shipping address updated'));
+    }
+
+
 }

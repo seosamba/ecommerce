@@ -57,6 +57,8 @@ class Tools_ShoppingCart {
 
 	protected $_discount = 0;
 
+    protected $_recurringPaymentType = '';
+
 	private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -899,4 +901,27 @@ class Tools_ShoppingCart {
     public function getDiscountTaxRate() {
         return $this->_discountTaxRate;
     }
+
+    /**
+     * @return string
+     */
+    public function getRecurringPaymentType()
+    {
+        return $this->_recurringPaymentType;
+    }
+
+    /**
+     * @param string $recurringPaymentType
+     * @return string
+     */
+    public function setRecurringPaymentType($recurringPaymentType)
+    {
+        $this->_recurringPaymentType = $recurringPaymentType;
+
+        return $this;
+    }
+
+
+
+
 }

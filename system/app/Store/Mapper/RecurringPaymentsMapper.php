@@ -38,7 +38,12 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
             'total_amount_paid' => $model->getTotalAmountPaid(),
             'last_payment_date' => $model->getLastPaymentDate(),
             'recurring_status' => $model->getRecurringStatus(),
-            'custom_type' => $model->getCustomType()
+            'custom_type' => $model->getCustomType(),
+            'accept_changing_next_billing_date' => $model->getAcceptChangingNextBillingDate(),
+            'accept_changing_shipping_address' => $model->getAcceptChangingShippingAddress(),
+            'free_transaction_cycle' => $model->getFreeTransactionCycle(),
+            'next_payment_date' => $model->getNextPaymentDate(),
+            'transactions_quantity' => $model->getTransactionsQuantity()
         );
 
         $recurringPaymentExists = $this->getByCartId($data['cart_id']);
@@ -59,6 +64,26 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
     }
 
     /**
+     * Save and attach regular payment to recurring
+     *
+     * @param int $recurringCartId recurring cart (parent cart id)
+     * @param int $originalCartId regular payment cart id
+     */
+    public function saveRelatedRecurring($recurringCartId, $originalCartId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('recurring_cart_id = ?', $recurringCartId);
+        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('cart_id = ?', $originalCartId);
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from('shopping_cart_session_has_recurring')->where($where);
+        $relatedRecurringExist = $this->getDbTable()->getAdapter()->fetchAll($select);
+        if (empty($relatedRecurringExist)) {
+            $data = array('recurring_cart_id' => $recurringCartId, 'cart_id' => $originalCartId);
+            $this->getDbTable()->getAdapter()->insert('shopping_cart_session_has_recurring', $data);
+        }
+
+    }
+
+    /**
      * Get recurring payments by cart id
      *
      * @param int $cartId cart id
@@ -70,5 +95,40 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
 
         return $this->fetchAll($where);
     }
+
+    /**
+     * Get whole information about order by user id
+     *
+     * @param int $userId user id
+     * @return array
+     */
+    public function getRecurringOrdersDataByUserId($userId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('sct.user_id = ?', $userId);
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('scp' => 'shopping_recurring_payment'))
+            ->join(array('sct' => 'shopping_cart_session'), 'scp.cart_id=sct.id')
+            ->join(array('scshr' => 'shopping_cart_session_has_recurring'), 'sct.id=scshr.recurring_cart_id', array('dependentOrders' => new Zend_Db_Expr('GROUP_CONCAT(scshr.cart_id)')))
+            ->where($where)
+            ->group('scshr.recurring_cart_id');
+
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
+
+    /**
+     * Get existing recurring types from general shopping config
+     *
+     * @param string $status recurring payment status
+     * @return array
+     */
+    public function getRecurringTypes($status = Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('name IN (?)',
+            Api_Store_Recurringtypes::$recurringAcceptType);
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('value = ?', $status);
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('sc' => 'shopping_config'), array('name', 'value'))->where($where);
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
+
+
 
 }

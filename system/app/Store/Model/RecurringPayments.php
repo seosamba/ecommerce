@@ -16,7 +16,7 @@ class Store_Model_RecurringPayments extends Application_Model_Models_Abstract
 
     const SUSPENDED_RECURRING_PAYMENT = 'suspended';
 
-    const CANCELLED_RECURRING_PAYMENT = 'canceled';
+    const CANCELED_RECURRING_PAYMENT = 'canceled';
 
     protected $_cartId;
 
@@ -41,6 +41,16 @@ class Store_Model_RecurringPayments extends Application_Model_Models_Abstract
     protected $_recurringStatus;
 
     protected $_customType;
+
+    protected $_acceptChangingNextBillingDate;
+
+    protected $_acceptChangingShippingAddress;
+
+    protected $_nextPaymentDate;
+
+    protected $_freeTransactionCycle;
+
+    protected $_transactionsQuantity;
 
     /**
      * @return mixed
@@ -266,6 +276,101 @@ class Store_Model_RecurringPayments extends Application_Model_Models_Abstract
     public function setCustomType($customType)
     {
         $this->_customType = $customType;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAcceptChangingNextBillingDate()
+    {
+        return $this->_acceptChangingNextBillingDate;
+    }
+
+    /**
+     * @param mixed $acceptChangingNextBillingDate
+     * @return mixed
+     */
+    public function setAcceptChangingNextBillingDate($acceptChangingNextBillingDate)
+    {
+        $this->_acceptChangingNextBillingDate = $acceptChangingNextBillingDate;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAcceptChangingShippingAddress()
+    {
+        return $this->_acceptChangingShippingAddress;
+    }
+
+    /**
+     * @param mixed $acceptChangingShippingAddress
+     * @return mixed
+     */
+    public function setAcceptChangingShippingAddress($acceptChangingShippingAddress)
+    {
+        $this->_acceptChangingShippingAddress = $acceptChangingShippingAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNextPaymentDate()
+    {
+        return $this->_nextPaymentDate;
+    }
+
+    /**
+     * @param mixed $nextPaymentDate
+     * @return mixed
+     */
+    public function setNextPaymentDate($nextPaymentDate)
+    {
+        $this->_nextPaymentDate = $nextPaymentDate;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFreeTransactionCycle()
+    {
+        return $this->_freeTransactionCycle;
+    }
+
+    /**
+     * @param mixed $freeTransactionCycle
+     * @return mixed
+     */
+    public function setFreeTransactionCycle($freeTransactionCycle)
+    {
+        $this->_freeTransactionCycle = $freeTransactionCycle;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTransactionsQuantity()
+    {
+        return $this->_transactionsQuantity;
+    }
+
+    /**
+     * @param mixed $transactionsQuantity
+     * @return mixed
+     */
+    public function setTransactionsQuantity($transactionsQuantity)
+    {
+        $this->_transactionsQuantity = $transactionsQuantity;
 
         return $this;
     }
