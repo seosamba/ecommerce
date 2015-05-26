@@ -25,7 +25,7 @@
                 e.preventDefault();
                 var recurringPaymentType = $(this).val(),
                     secureToken = $('.secureTokenRecurring').val();
-                $.post($('#website_url').val() + 'plugin/shopping/run/changeRecurringType/', {'recurringPaymentType': recurringPaymentType}, function (response) {
+                $.post($('#website_url').val() + 'plugin/shopping/run/changeRecurringType/', {'recurringPaymentType': recurringPaymentType, secureToken:secureToken}, function (response) {
 
                 }, 'json');
             });
