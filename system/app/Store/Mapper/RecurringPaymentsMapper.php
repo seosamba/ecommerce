@@ -97,6 +97,18 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
     }
 
     /**
+     * Get active recurring payments by date
+     *
+     * @return array|null
+     */
+    public function getRecurentsByDate($date, $statuses = array())
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('next_payment_date = ?', $date);
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('recurring_status IN (?)', $statuses);
+        return $this->fetchAll($where);
+    }
+
+    /**
      * Get whole information about order by user id
      *
      * @param int $userId user id

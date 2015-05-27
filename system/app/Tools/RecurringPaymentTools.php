@@ -22,7 +22,10 @@ class Tools_RecurringPaymentTools
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $paymentInfo = $recurringPaymentMapper->find($cartId);
         if ($paymentInfo instanceof Store_Model_RecurringPayments) {
-            $paymentInfo->setRecurringStatus($status);
+                $paymentInfo->setRecurringStatus($status);
+            $nextPaymentDate = date('Y-m-d', strtotime($paymentInfo->getNextPaymentDate() . $paymentInfo->getPaymentPeriod()));
+            $paymentInfo->setLastPaymentDate(date('Y-m-d'));
+            $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setGatewayType($gatewayName);
             if ($recurringAmount) {
                 $paymentInfo->setTotalAmountPaid($paymentInfo->getTotalAmountPaid() + $recurringAmount);
@@ -54,11 +57,9 @@ class Tools_RecurringPaymentTools
         $subscriptionId,
         $ipnTrackingId,
         $paymentPeriod,
-        $subscriptionDate,
         $paymentCycleAmount,
         $gatewayName,
         $totalAmountPaid = 0,
-        $lastPaymentDate = '0000-00-00 00:00:00',
         $customType = '',
         $recurringStatus = Store_Model_RecurringPayments::NEW_RECURRING_PAYMENT
     ) {
@@ -66,6 +67,9 @@ class Tools_RecurringPaymentTools
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
         $dependentCart = $cartSessionMapper->find($dependentCartId);
+        $recurrentPeriod = str_replace('recurring-payment-', '+1 ', $paymentPeriod);
+        $currentDate = date('Y-m-d');
+        $nextPaymentDate = date('Y-m-d', strtotime($recurrentPeriod));
         if ($dependentCart instanceof Models_Model_CartSession) {
             $dependentCart->setId(null);
             $recurringCart = $cartSessionMapper->save($dependentCart);
@@ -77,12 +81,13 @@ class Tools_RecurringPaymentTools
             $paymentInfo->setIpnTrackingId($ipnTrackingId);
             $paymentInfo->setRecurringStatus($recurringStatus);
             $paymentInfo->setGatewayType($gatewayName);
-            $paymentInfo->setPaymentPeriod(strtoupper($paymentPeriod));
+            $paymentInfo->setPaymentPeriod(strtoupper($recurrentPeriod));
             $paymentInfo->setRecurringTimes($recurringTimes);
             $paymentInfo->setTotalAmountPaid($totalAmountPaid);
-            $paymentInfo->setSubscriptionDate($subscriptionDate);
+            $paymentInfo->setSubscriptionDate($currentDate);
             $paymentInfo->setPaymentCycleAmount($paymentCycleAmount);
-            $paymentInfo->setLastPaymentDate($lastPaymentDate);
+            $paymentInfo->setLastPaymentDate($currentDate);
+            $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setCustomType($customType);
             $recurringPaymentMapper->save($paymentInfo);
         }
