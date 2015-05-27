@@ -1373,7 +1373,7 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     public function changeRecurringTypeAction()
     {
-        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+        if ($this->_request->isPost()) {
             $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
             $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
             if (!$valid) {
