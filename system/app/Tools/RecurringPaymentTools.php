@@ -15,9 +15,10 @@ class Tools_RecurringPaymentTools
      * @param string $status new status
      * @param string $gatewayName payment gateway name
      * @param mixed $recurringAmount amount to add to final total
+     * @param int $dependentCartId dependent cart id
      *
      */
-    public static function updateRecurringPaymentInfo($cartId, $status, $gatewayName, $recurringAmount = false)
+    public static function updateRecurringPaymentInfo($cartId, $status, $gatewayName, $recurringAmount = false, $dependentCartId)
     {
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $paymentInfo = $recurringPaymentMapper->find($cartId);
@@ -30,6 +31,7 @@ class Tools_RecurringPaymentTools
             if ($recurringAmount) {
                 $paymentInfo->setTotalAmountPaid($paymentInfo->getTotalAmountPaid() + $recurringAmount);
             }
+            $recurringPaymentMapper->saveRelatedRecurring($cartId, $dependentCartId);
             $recurringPaymentMapper->save($paymentInfo);
         }
     }
@@ -42,10 +44,8 @@ class Tools_RecurringPaymentTools
      * @param string $subscriptionId subscription id
      * @param string $ipnTrackingId ipn tracking id
      * @param string $paymentPeriod Frequency of recurring payment in format (+1 day, +1 month, +1 year etc...)
-     * @param string $subscriptionDate subscription date
      * @param float $paymentCycleAmount amount for each recurring payment
      * @param mixed $totalAmountPaid amount that was paid
-     * @param string $lastPaymentDate last payment date
      * @param string $recurringStatus recurring payment status
      * @param string $customType Additional information for payment
      * @param string $gatewayName payment gateway name
