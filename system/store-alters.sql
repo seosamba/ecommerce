@@ -172,5 +172,7 @@ CREATE TABLE IF NOT EXISTS `plugin_paypal_transactions` (
   COLLATE utf8_unicode_ci;
 INSERT INTO `plugin` (`name`, `status`, `tags`, `version`) VALUES ('paypal', 1, '', '2.2.3');
 
-UPDATE `plugin` SET `version`='2.4.1' WHERE `name`='shopping';
-UPDATE `shopping_config` SET `value`='2.4.1' WHERE `name`='version';
+ALTER TABLE `shopping_product_has_freebies` ADD FOREIGN KEY(`freebies_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+UPDATE `plugin` SET `version`='2.4.2' WHERE `name`='shopping';
+UPDATE `shopping_config` SET `value`='2.4.2' WHERE `name`='version';
