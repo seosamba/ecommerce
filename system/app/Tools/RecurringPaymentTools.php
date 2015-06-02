@@ -69,6 +69,7 @@ class Tools_RecurringPaymentTools
         $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
         $dependentCart = $cartSessionMapper->find($dependentCartId);
         $recurrentPeriod = str_replace('recurring-payment-', '+1 ', $paymentPeriod);
+        $freeTransactionCycle = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('recurringPaymentFreePeriod');
         $currentDate = date('Y-m-d');
         $nextPaymentDate = date('Y-m-d', strtotime($recurrentPeriod));
         if ($dependentCart instanceof Models_Model_CartSession) {
@@ -91,6 +92,7 @@ class Tools_RecurringPaymentTools
             $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setCustomType($customType);
             $paymentInfo->setTransactionsQuantity(1);
+            $paymentInfo->setFreeTransactionCycle($freeTransactionCycle);
             $recurringPaymentMapper->save($paymentInfo);
         }
     }
