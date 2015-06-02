@@ -39,7 +39,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'shipping_tax'          => $model->getShippingTax(),
             'discount_tax'          => $model->getDiscountTax(),
             'sub_total_tax'         => $model->getSubTotalTax(),
-            'discount_tax_rate'     => $model->getDiscountTaxRate()
+            'discount_tax_rate'     => $model->getDiscountTaxRate(),
+            'free_cart'             => $model->getFreeCart()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

@@ -28,6 +28,7 @@ class Tools_RecurringPaymentTools
             $paymentInfo->setLastPaymentDate(date('Y-m-d'));
             $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setGatewayType($gatewayName);
+            $paymentInfo->setTransactionsQuantity($paymentInfo->getTransactionsQuantity() + 1);
             if ($recurringAmount) {
                 $paymentInfo->setTotalAmountPaid($paymentInfo->getTotalAmountPaid() + $recurringAmount);
             }
@@ -89,6 +90,7 @@ class Tools_RecurringPaymentTools
             $paymentInfo->setLastPaymentDate($currentDate);
             $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setCustomType($customType);
+            $paymentInfo->setTransactionsQuantity(1);
             $recurringPaymentMapper->save($paymentInfo);
         }
     }
