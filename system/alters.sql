@@ -160,8 +160,8 @@ CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
   `subscription_date` TIMESTAMP NOT NULL COMMENT 'Subscription date',
   `payment_cycle_amount` decimal(10,4) DEFAULT NULL COMMENT 'Amount for each recurring cycle',
   `total_amount_paid` decimal(10,4) DEFAULT NULL COMMENT 'Amount paid',
-  `last_payment_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00' COMMENT 'Last payment date',
-  `next_payment_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00' COMMENT 'Next payment date',
+  `last_payment_date` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Last payment date',
+  `next_payment_date` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Next payment date',
   `recurring_status` ENUM('new', 'active', 'pending', 'expired', 'suspended', 'canceled') DEFAULT 'new' NOT NULL COMMENT 'Recurring payment status',
   `accept_changing_next_billing_date` ENUM('0', '1') DEFAULT '0' COMMENT 'Flag for change next payment date',
   `accept_changing_shipping_address` ENUM('0', '1') DEFAULT '0' COMMENT 'Flag for change shipping address',
@@ -179,6 +179,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_has_recurring` (
   CONSTRAINT `shopping_cart_session_has_recurring_ibfk_2` FOREIGN KEY (`recurring_cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `shopping_cart_session_has_recurring_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_cart_session` ADD `free_cart` enum('0','1') COLLATE 'utf8_unicode_ci' NULL DEFAULT '0';
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.4.2' WHERE `name`='shopping';
