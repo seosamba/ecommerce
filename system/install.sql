@@ -635,7 +635,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product_has_freebies` (
   `product_id` int(10) unsigned NOT NULL,
   `freebies_id` int(10) unsigned NOT NULL,
   `freebies_quantity` int(4) unsigned NOT NULL,
-  PRIMARY KEY (`product_id`,`freebies_id`)
+  PRIMARY KEY (`product_id`,`freebies_id`),
+  FOREIGN KEY(`freebies_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_filtering_attributes` (
