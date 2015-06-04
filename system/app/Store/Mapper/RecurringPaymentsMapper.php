@@ -141,6 +141,17 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
+    /**
+     * Update recurring payment status
+     *
+     * @param int $recurringCartId recurring cart (parent cart id)
+     * @param string $status
+     */
+    public function updateRecurringStatus($cartId, $status)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart_id = ?', $cartId);
+        $this->getDbTable()->update(array('recurring_status' => $status), $where);
+    }
 
 
 }

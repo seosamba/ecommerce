@@ -1358,6 +1358,8 @@ class Shopping extends Tools_Plugins_Abstract {
                 if ($result['error']) {
                     $this->_responseHelper->fail($responseMessage);
                 } else {
+                    $recurrentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
+                    $recurrentMapper->updateRecurringStatus($cartId, $changeSubscription);
                     $this->_responseHelper->success($responseMessage);
                 }
             } else {
