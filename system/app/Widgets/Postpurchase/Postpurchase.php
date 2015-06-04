@@ -625,8 +625,8 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     /**
      * Return proper address element
      *
-     * @param $addressType
-     *
+     * @param string $addressType (billing, shipping)
+     * @return string
      */
     private function _prepareAddress($addressType)
     {
