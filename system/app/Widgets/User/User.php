@@ -102,9 +102,7 @@ class Widgets_User_User extends Widgets_User_Base {
             return $this->_recurringOrdersGrid($userId, $addresses);
 
         }
-        $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(
-            array('user_id = ?' => $userId)
-        );
+        $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchNoRecurrent($userId);
         $this->_view->stats = array(
             'all'     => sizeof($orders),
             'completed' => sizeof(array_filter($orders, function ($order) {

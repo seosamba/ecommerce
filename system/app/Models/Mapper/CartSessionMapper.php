@@ -168,6 +168,22 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
 
+	public function fetchNoRecurrent($userId){
+		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+				->from(array('cart' => 'shopping_cart_session'))
+				->joinLeft(array('recurrent' => 'shopping_recurring_payment'), 'recurrent.cart_id = cart.id', array())
+				->where('recurrent.cart_id IS NULL AND user_id = ?', $userId);
+        //$w = $select->assemble();
+        $entries = array();
+        $resultSet = $this->getDbTable()->fetchAll($select);
+        if(sizeof($resultSet)){
+            foreach ($resultSet as $row) {
+                $entries[] = $this->_toModel($row);
+            }
+        }
+		return $entries;
+	}
+
 	protected function _restoreOptionsForCartSession($mapping){
 		if (!is_array($mapping) || empty($mapping)) {
 			throw new Exceptions_SeotoasterException('Wrong parameters passed');
