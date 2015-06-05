@@ -181,14 +181,6 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_has_recurring` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `shopping_cart_session` ADD `free_cart` enum('0','1') COLLATE 'utf8_unicode_ci' NULL DEFAULT '0';
-
--- 21/05/2015
--- version: 2.4.0
--- update version
-
--- 01/06/2015
--- version: 2.4.1
--- Fix missed foreign key for shopping_product_has_freebies table
 ALTER TABLE `shopping_product_has_freebies` ADD FOREIGN KEY(`freebies_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- These alters are always the latest and updated version of the database
