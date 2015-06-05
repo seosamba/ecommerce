@@ -52,7 +52,7 @@
                         <?php endif; ?>
                     </td>
                     <td><?php echo $this->currency(floatval($order['payment_cycle_amount'])); ?></td>
-                    <td class="user-order-current-status"><?php echo ($order['last_payment_date'] === '0000-00-00 00:00:00') ? '' : date("Y-m-d H:i:s",
+                    <td class="user-order-current-status"><?php echo ($order['last_payment_date'] === '0000-00-00') ? '' : date("Y-m-d",
                             strtotime($order['last_payment_date'])); ?></td>
                     <td class="user-order-next-billing-date">
                         <?php $paymentPeriod = strtolower($order['payment_period']); ?>
@@ -60,14 +60,11 @@
                             Api_Store_Recurringtypes::$recurringAcceptType)): ?>
                             <?php $paymentPeriod = '1 ' . $paymentPeriod; ?>
                         <?php endif; ?>
-                        <?php $nextPaymentDate = ($order['last_payment_date'] === '0000-00-00 00:00:00') ? date("Y-m-d H:i:s",
-                            strtotime('now +' . $paymentPeriod)) : date("Y-m-d H:i:s",
-                            strtotime($order['last_payment_date'] . ' +' . $paymentPeriod)) ?>
                         <?php if ($order['accept_changing_next_billing_date'] && $order['recurring_status'] === Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT): ?>
                             <input type="text" class="user-order-next-billing-date-change"
-                                   name="user-order-next-billing-date-change" value="<?php echo $nextPaymentDate; ?>"/>
+                                   name="user-order-next-billing-date-change" value="<?php echo $order['next_payment_date']; ?>"/>
                         <?php else: ?>
-                            <?php echo $nextPaymentDate; ?>
+                            <?php echo $order['next_payment_date']; ?>
                         <?php endif; ?>
                     </td>
                     <td class="user-orders-shipping-data">

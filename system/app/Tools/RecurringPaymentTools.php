@@ -50,6 +50,8 @@ class Tools_RecurringPaymentTools
      * @param string $recurringStatus recurring payment status
      * @param string $customType Additional information for payment
      * @param string $gatewayName payment gateway name
+     * @param int $acceptChangingNextBillingDate allow to admin update the next billing date
+     * @param int $acceptChangingShippingAddress allow to admin update the shipping address
      *
      */
     public static function createRecurringPaymentInfo(
@@ -62,7 +64,9 @@ class Tools_RecurringPaymentTools
         $gatewayName,
         $totalAmountPaid = 0,
         $customType = '',
-        $recurringStatus = Store_Model_RecurringPayments::NEW_RECURRING_PAYMENT
+        $recurringStatus = Store_Model_RecurringPayments::NEW_RECURRING_PAYMENT,
+        $acceptChangingNextBillingDate = 0,
+        $acceptChangingShippingAddress = 0
     ) {
 
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
@@ -93,6 +97,8 @@ class Tools_RecurringPaymentTools
             $paymentInfo->setCustomType($customType);
             $paymentInfo->setTransactionsQuantity(1);
             $paymentInfo->setFreeTransactionCycle($freeTransactionCycle);
+            $paymentInfo->setAcceptChangingNextBillingDate($acceptChangingNextBillingDate);
+            $paymentInfo->setAcceptChangingShippingAddress($acceptChangingShippingAddress);
             $recurringPaymentMapper->save($paymentInfo);
         }
     }

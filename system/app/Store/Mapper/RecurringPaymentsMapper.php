@@ -144,13 +144,25 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
     /**
      * Update recurring payment status
      *
-     * @param int $recurringCartId recurring cart (parent cart id)
+     * @param int $cartId recurring cart (parent cart id)
      * @param string $status
      */
     public function updateRecurringStatus($cartId, $status)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('cart_id = ?', $cartId);
         $this->getDbTable()->update(array('recurring_status' => $status), $where);
+    }
+
+    /**
+     * Update next recurring payment date
+     *
+     * @param int $cartId recurring cart (parent cart id)
+     * @param string $date
+     */
+    public function updateRecurringDate($cartId, $date)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart_id = ?', $cartId);
+        $this->getDbTable()->update(array('next_payment_date' => $date), $where);
     }
 
 

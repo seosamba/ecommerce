@@ -1358,9 +1358,12 @@ class Shopping extends Tools_Plugins_Abstract {
                 if ($result['error']) {
                     $this->_responseHelper->fail($responseMessage);
                 } else {
+                    $recurrentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
                     if ($changeSubscription !== 'update') {
-                        $recurrentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
                         $recurrentMapper->updateRecurringStatus($cartId, $changeSubscription);
+                    } else {
+                        $date = date('Y-m-d', strtotime($nextBillingDate));
+                        $recurrentMapper->updateRecurringDate($cartId, $date);
                     }
                     $this->_responseHelper->success($responseMessage);
                 }
