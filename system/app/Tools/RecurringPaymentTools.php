@@ -18,13 +18,19 @@ class Tools_RecurringPaymentTools
      * @param int $dependentCartId dependent cart id
      *
      */
-    public static function updateRecurringPaymentInfo($cartId, $status, $gatewayName, $recurringAmount = false, $dependentCartId)
-    {
+    public static function updateRecurringPaymentInfo(
+        $cartId,
+        $status,
+        $gatewayName,
+        $recurringAmount = false,
+        $dependentCartId
+    ) {
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $paymentInfo = $recurringPaymentMapper->find($cartId);
         if ($paymentInfo instanceof Store_Model_RecurringPayments) {
-                $paymentInfo->setRecurringStatus($status);
-            $nextPaymentDate = date('Y-m-d', strtotime($paymentInfo->getNextPaymentDate() . $paymentInfo->getPaymentPeriod()));
+            $paymentInfo->setRecurringStatus($status);
+            $nextPaymentDate = date('Y-m-d',
+                strtotime($paymentInfo->getNextPaymentDate() . $paymentInfo->getPaymentPeriod()));
             $paymentInfo->setLastPaymentDate(date('Y-m-d'));
             $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setGatewayType($gatewayName);
@@ -72,7 +78,11 @@ class Tools_RecurringPaymentTools
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
         $dependentCart = $cartSessionMapper->find($dependentCartId);
-        $recurrentPeriod = str_replace('recurring-payment-', '+1 ', $paymentPeriod);
+        if ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER) {
+            $recurrentPeriod = '+3 month';
+        } else {
+            $recurrentPeriod = str_replace('recurring-payment-', '+1', $paymentPeriod);
+        }
         $freeTransactionCycle = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('recurringPaymentFreePeriod');
         $currentDate = date('Y-m-d');
         $nextPaymentDate = date('Y-m-d', strtotime($recurrentPeriod));
@@ -144,6 +154,7 @@ class Tools_RecurringPaymentTools
                 return array('error' => true, 'message' => 'Recurring method does\'t exists');
             }
         }
+
         return array('error' => true, 'message' => 'Wrong params');
     }
 }

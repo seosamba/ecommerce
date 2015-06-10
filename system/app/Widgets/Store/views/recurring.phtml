@@ -1,12 +1,10 @@
 <?php if (!empty($this->activeRecurringPaymentTypes)): ?>
     <div id="cart-store-recurring">
-        <h3 class="checkout-widget-title">
-            <?php echo $this->translate('Recurring payment type'); ?>
-        </h3>
         <?php $recurringTypeLabels = array(
             'recurring-payment-day' => 'Pay each day',
             'recurring-payment-week' => 'Pay each week',
             'recurring-payment-month' => 'Pay each month',
+            'recurring-payment-quarter' => 'Pay each quarter',
             'recurring-payment-year' => 'Pay each year'
         ); ?>
         <select name="cart-recurring-payment-period-type" class="cart-recurring-payment-period-type">

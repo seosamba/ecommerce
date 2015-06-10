@@ -31,6 +31,11 @@ class Api_Store_Recurringtypes extends Api_Service_Abstract
     const RECURRING_PAYMENT_TYPE_MONTH = 'recurring-payment-month';
 
     /**
+     * Recurring payment type quarter (each 3 month payment period)
+     */
+    const RECURRING_PAYMENT_TYPE_QUARTER = 'recurring-payment-quarter';
+
+    /**
      * Recurring payment type year (each year payment period)
      */
     const RECURRING_PAYMENT_TYPE_YEAR = 'recurring-payment-year';
@@ -52,6 +57,7 @@ class Api_Store_Recurringtypes extends Api_Service_Abstract
         'day' => self::RECURRING_PAYMENT_TYPE_DAY,
         'week' => self::RECURRING_PAYMENT_TYPE_WEEK,
         'month' => self::RECURRING_PAYMENT_TYPE_MONTH,
+        'quarter' =>  self::RECURRING_PAYMENT_TYPE_QUARTER,
         'year' => self::RECURRING_PAYMENT_TYPE_YEAR
     );
 

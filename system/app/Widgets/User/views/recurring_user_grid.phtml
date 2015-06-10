@@ -5,19 +5,15 @@
         <thead>
         <tr class="user-orders-title-table">
             <th><?php echo $this->translate('Order date'); ?></th>
-            <th><?php echo $this->translate('Details'); ?></th>
-            <th><?php echo $this->translate('Payed recurring orders'); ?></th>
+            <th><?php echo $this->translate('Recurring order details'); ?></th>
+            <th><?php echo $this->translate('Related paid child orders'); ?></th>
             <th><?php echo $this->translate('Payment period cycle'); ?></th>
-            <th><?php echo $this->translate('Payment amount'); ?></th>
+            <th><?php echo $this->translate('Recurring Payment amount'); ?></th>
             <th><?php echo $this->translate('Last billing date'); ?></th>
             <th><?php echo $this->translate('Next billing date'); ?></th>
             <th><?php echo $this->translate('Shipping'); ?></th>
             <th><?php echo $this->translate('Shipping address'); ?></th>
-            <th><?php echo $this->translate('Tracking ID'); ?></th>
             <th class="user-recurring-status-th"><?php echo $this->translate('Status'); ?></th>
-            <?php if (isset($this->invoicePlugin)): ?>
-                <th><?php echo $this->translate('Invoice'); ?></th>
-            <?php endif; ?>
         </tr>
         </thead>
         <tbody>
@@ -39,12 +35,16 @@
                         <?php endforeach; ?>
                     </td>
                     <td class="user-order-current-status">
-                        <?php if (array_key_exists(strtolower('recurring-payment-' . $order['payment_period']),
+                        <?php $changePaymentPeriod =  trim(str_replace('+1', '', strtolower($order['payment_period'])));?>
+                        <?php if($changePaymentPeriod === '+3 month') :?>
+                            <?php $changePaymentPeriod = 'quarter';?>
+                        <?php endif;?>
+                        <?php if (array_key_exists(strtolower('recurring-payment-' . $changePaymentPeriod),
                             $this->activeRecurringPaymentTypes)): ?>
                             <select class="change-recurring-payment-period" name="change-recurring-payment-period">
                                 <?php foreach (Api_Store_Recurringtypes::$recurringAcceptType as $recurringType => $recurringTypeFullName): ?>
                                     <option
-                                        value="<?php echo strtoupper($recurringType); ?>" <?php echo (strtolower($order['payment_period']) === $recurringType) ? 'selected' : ''; ?>> <?php echo 'Every ' . $this->translate($recurringType); ?></option>
+                                        value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo 'Every ' . $this->translate($recurringType); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         <?php else: ?>
@@ -121,18 +121,6 @@
                             <?php endif; ?>
                         <?php endif; ?>
                     </td>
-                    <td>
-                        <?php if (in_array($order['status'],
-                                $this->shippingEnabledStatuses) && !empty($order['shipping_tracking_id'])
-                        ): ?>
-                            <p class="textcentered">
-                                <a target="_blank" class="tracking-link"
-                                   href="<?php echo $order['shipping_tracking_id']; ?>"><?php echo $this->translate('Track your parcel') ?></a>
-                            </p>
-                        <?php else: ?>
-                            <p> - </p>
-                        <?php endif; ?>
-                    </td>
                     <td class="user-order-current-status">
                         <select class="change-recurring-status" name="change-recurring-status">
                             <option
@@ -143,18 +131,7 @@
                                 value="<?php echo Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT; ?>" <?php echo ($order['recurring_status'] === Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT) ? 'selected' : ''; ?>><?php echo $this->translate(Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT); ?></option>
                         </select>
                     </td>
-                    <?php if (isset($this->invoicePlugin)): ?>
-                        <td>
-                            <?php if (in_array($order['status'], $this->shippingEnabledStatuses)): ?>
-                                <a target="_blank"
-                                   href="<?php echo $this->websiteUrl; ?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order['cart_id']; ?>/dwn/0/">
-                                    <img src="<?php echo $this->websiteUrl; ?>system/images/widgets/search.png"
-                                         alt="<?php echo $this->translate('View invoice'); ?>"
-                                         title="<?php echo $this->translate('View invoice'); ?>"/>
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                    <?php endif; ?>
+
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
