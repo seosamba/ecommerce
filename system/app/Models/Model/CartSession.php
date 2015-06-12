@@ -95,6 +95,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_freeCart = 0;
 
+    protected $_recurringId = null;
+
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -325,5 +327,24 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function getFreeCart() {
         return $this->_freeCart;
     }
+
+    /**
+     * @return null
+     */
+    public function getRecurringId()
+    {
+        return $this->_recurringId;
+    }
+
+    /**
+     * @param null $recurringId
+     * @return null
+     */
+    public function setRecurringId($recurringId)
+    {
+        $this->_recurringId = $recurringId;
+        return $this;
+    }
+
 
 }

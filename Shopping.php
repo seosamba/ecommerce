@@ -672,7 +672,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
 		if ($customer) {
 			$this->_view->customer = $customer;
-			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(array('user_id = ?' => $customer->getId()));
+			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
 			$this->_view->stats = array(
 				'total'     => sizeof($orders),
 				'new'       => sizeof(array_filter($orders, function ($order) {
@@ -680,7 +680,7 @@ class Shopping extends Tools_Plugins_Abstract {
 					})
 				),
 				'completed' => sizeof(array_filter($orders, function ($order) {
-					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
+					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED && !$order->getRecurringId();
 				})),
 				'pending'   => sizeof(array_filter($orders, function ($order) {
 					return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PENDING && $order->getGateway() !== Shopping::GATEWAY_QUOTE);
@@ -690,7 +690,13 @@ class Shopping extends Tools_Plugins_Abstract {
 				})),
 				'delivered' => sizeof(array_filter($orders, function ($order) {
 					return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
-				}))
+				})),
+                'recurring_orders' => sizeof(array_filter($orders, function ($order) {
+                    $recurringId = $order->getRecurringId();
+                    if (!empty($recurringId)) {
+                        return $recurringId;
+                    }
+                }))
 			);
 			$this->_view->orders = $orders;
 		}

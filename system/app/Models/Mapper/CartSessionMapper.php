@@ -168,12 +168,23 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
 
-	public function fetchNoRecurrent($userId){
-		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+    /**
+     * Fetch orders  by user id including recurring payments data
+     *
+     * @param int $userId user Id
+     * @param bool $withoutRecurring without recurring orders
+     * @return array
+     *
+     */
+	public function fetchOrders($userId, $withoutRecurring = false){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart.user_id = ?', $userId);
+        if ($withoutRecurring) {
+            $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('recurrent.cart_id IS NULL AND user_id = ?', $userId);
+        }
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
 				->from(array('cart' => 'shopping_cart_session'))
-				->joinLeft(array('recurrent' => 'shopping_recurring_payment'), 'recurrent.cart_id = cart.id', array())
-				->where('recurrent.cart_id IS NULL AND user_id = ?', $userId);
-        //$w = $select->assemble();
+				->joinLeft(array('recurrent' => 'shopping_recurring_payment'), 'recurrent.cart_id = cart.id', array('recurring_id' => 'recurrent.cart_id'))
+                ->where($where);
         $entries = array();
         $resultSet = $this->getDbTable()->fetchAll($select);
         if(sizeof($resultSet)){
