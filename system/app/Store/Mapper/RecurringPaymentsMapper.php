@@ -99,6 +99,8 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
     /**
      * Get active recurring payments by date
      *
+     * @param string $date
+     * @param array $statuses
      * @return array|null
      */
     public function getRecurentsByDate($date, $statuses = array())
@@ -165,5 +167,20 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
         $this->getDbTable()->update(array('next_payment_date' => $date), $where);
     }
 
+    /**
+     * Return order info if it's created from parent recurring order
+     *
+     * @param int $cartId
+     *
+     * @return array
+     */
+    public function checkRecurringOrder($cartId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart_id = ?', $cartId);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_cart_session_has_recurring')
+            ->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
 
 }
