@@ -68,9 +68,6 @@
                         <?php endif; ?>
                     </td>
                     <td class="user-orders-shipping-data">
-                        <?php if (!empty($order['shipping_price'])): ?>
-                            <p><?php echo $this->currency(floatval($order['shipping_price'])); ?></p>
-                        <?php endif; ?>
                         <?php if (!empty($order['shipping_type'])): ?>
                             <p><?php echo $order['shipping_service'] . ' - ' . $order['shipping_type']; ?></p>
                         <?php else: ?>
