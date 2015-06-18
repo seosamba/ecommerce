@@ -11,7 +11,6 @@
             <th><?php echo $this->translate('Recurring Payment amount'); ?></th>
             <th><?php echo $this->translate('Last billing date'); ?></th>
             <th><?php echo $this->translate('Next billing date'); ?></th>
-            <th><?php echo $this->translate('Shipping'); ?></th>
             <th><?php echo $this->translate('Shipping address'); ?></th>
             <th class="user-recurring-status-th"><?php echo $this->translate('Status'); ?></th>
         </tr>
@@ -65,13 +64,6 @@
                                    name="user-order-next-billing-date-change" value="<?php echo $order['next_payment_date']; ?>"/>
                         <?php else: ?>
                             <?php echo $order['next_payment_date']; ?>
-                        <?php endif; ?>
-                    </td>
-                    <td class="user-orders-shipping-data">
-                        <?php if (!empty($order['shipping_type'])): ?>
-                            <p><?php echo $order['shipping_service'] . ' - ' . $order['shipping_type']; ?></p>
-                        <?php else: ?>
-                            <p><?php echo $order['shipping_service']; ?></p>
                         <?php endif; ?>
                     </td>
                     <td>
