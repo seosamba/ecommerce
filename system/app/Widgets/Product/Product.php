@@ -401,7 +401,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		    if (isset($this->_options[0]) && strtolower($this->_options[0]) === 'json' ){
 			    return json_encode($tags);
 		    } else {
-	            $this->_view->tags = $tags;
+                $this->_view->nolinks = (!empty($this->_options[0]) && $this->_options[0]) ? true : false;
+                $this->_view->tags = $tags;
 	            return $this->_view->render('tags.phtml');
 	        }
 	    }
