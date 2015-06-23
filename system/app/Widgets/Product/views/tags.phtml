@@ -1,13 +1,9 @@
 <?php if (!empty($this->tags)): ?>
-    <?php foreach ($this->tags as $num => $tag): ?>
-        <?php if ($this->nolinks): ?>
-            <?php echo ($num !== 0) ? ', ' . htmlentities($tag['name']) : htmlentities($tag['name']);?>
-        <?php else : ?>
+<?php foreach ($this->tags as $tag): ?>
             <?php if (isset($tag['url'])): ?>
                 <a href="<?php echo $this->websiteUrl.$tag['name'].'.html';?>" title="<?php echo htmlentities($tag['name']);?>"><?php echo htmlentities($tag['name']);?></a>
             <?php else: ?>
                 <span><?php echo htmlentities($tag['name']);?></span>
             <?php endif; ?>
-        <?php endif; ?>
     <?php endforeach; ?>
 <?php endif; ?>

@@ -390,7 +390,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
 	    $tags = $this->_product->getTags();
 	    if (!empty($tags)){
-	        $pageHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('page');
+            if (!empty($this->_options[0]) && $this->_options[0] === 'nolinks') {
+                $tagsData = '';
+                foreach ($tags as $num => $tag) {
+                    $tagsData .= ($num !== 0) ? ', ' . trim($tag['name']) : trim($tag['name']);
+                }
+                return htmlentities($tagsData);
+            }
+            $pageHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('page');
 	        $pagesList = $pageMapper->getDbTable()->getAdapter()->fetchCol($pageMapper->getDbTable()->select()->from($pageMapper->getDbTable()->info('name'), 'url')->where("system = '0'"));
             foreach ($tags as &$tag) {
 	            $url = $pageHelper->filterUrl($tag['name']);
@@ -401,7 +408,6 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		    if (isset($this->_options[0]) && strtolower($this->_options[0]) === 'json' ){
 			    return json_encode($tags);
 		    } else {
-                $this->_view->nolinks = (!empty($this->_options[0]) && $this->_options[0]) ? true : false;
                 $this->_view->tags = $tags;
 	            return $this->_view->render('tags.phtml');
 	        }
