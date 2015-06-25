@@ -42,8 +42,11 @@
                             $this->activeRecurringPaymentTypes)): ?>
                             <select class="change-recurring-payment-period" name="change-recurring-payment-period">
                                 <?php foreach (Api_Store_Recurringtypes::$recurringAcceptType as $recurringType => $recurringTypeFullName): ?>
+                                    <?php if (array_key_exists(strtolower('recurring-payment-' . $recurringType),
+                                        $this->activeRecurringPaymentTypes)): ?>
                                     <option
                                         value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo 'Every ' . $this->translate($recurringType); ?></option>
+                                    <?php endif;?>
                                 <?php endforeach; ?>
                             </select>
                         <?php else: ?>
