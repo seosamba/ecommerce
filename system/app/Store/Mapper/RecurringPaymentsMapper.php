@@ -123,6 +123,7 @@ class Store_Mapper_RecurringPaymentsMapper extends Application_Model_Mappers_Abs
             ->join(array('sct' => 'shopping_cart_session'), 'scp.cart_id=sct.id')
             ->join(array('scshr' => 'shopping_cart_session_has_recurring'), 'sct.id=scshr.recurring_cart_id', array('dependentOrders' => new Zend_Db_Expr('GROUP_CONCAT(scshr.cart_id)')))
             ->where($where)
+            ->order('scp.recurring_status')
             ->group('scshr.recurring_cart_id');
 
         return $this->getDbTable()->getAdapter()->fetchAll($select);

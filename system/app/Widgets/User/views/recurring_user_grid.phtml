@@ -5,8 +5,8 @@
         <thead>
         <tr class="user-orders-title-table">
             <th><?php echo $this->translate('Order date'); ?></th>
-            <th><?php echo $this->translate('Recurring order details'); ?></th>
-            <th><?php echo $this->translate('Related paid child orders'); ?></th>
+<!--            <th>--><?php //echo $this->translate('Recurring order details'); ?><!--</th>-->
+            <th><?php echo $this->translate('Your autoship invoices'); ?></th>
             <th><?php echo $this->translate('Payment period cycle'); ?></th>
             <th><?php echo $this->translate('Recurring Payment amount'); ?></th>
             <th><?php echo $this->translate('Last billing date'); ?></th>
@@ -22,9 +22,9 @@
             <?php foreach ($this->orders as $order): ?>
                 <tr data-role="cart" data-id="<?php echo $order['cart_id']; ?>">
                     <td><?php echo date("d-M-Y", strtotime($order['created_at'])); ?></td>
-                    <td><a href="javascript:;" class="tpopup" data-pheight="560"
-                           data-url="<?php echo $this->websiteUrl; ?>plugin/shopping/run/order/id/<?php echo $order['cart_id']; ?>">
-                            # <?php echo $order['cart_id']; ?></a></td>
+<!--                    <td><a href="javascript:;" class="tpopup" data-pheight="560"-->
+<!--                           data-url="--><?php //echo $this->websiteUrl; ?><!--plugin/shopping/run/order/id/--><?php //echo $order['cart_id']; ?><!--">-->
+<!--                            # --><?php //echo $order['cart_id']; ?><!--</a></td>-->
                     <td>
                         <?php $dependentOrders = explode(',', $order['dependentOrders']); ?>
                         <?php foreach ($dependentOrders as $dependentOrderId): ?>
