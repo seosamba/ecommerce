@@ -214,7 +214,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
-                '$product:url'                        => $product->getPage() ? $product->getPage()->getUrl() : null,
+                '$product:url'                        => $product->getPage() ? $this->_websiteHelper->getUrl() . $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),
                 '$product:mpn'                        => $product->getMpn(),
