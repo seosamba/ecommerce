@@ -37,6 +37,8 @@
                         <?php $changePaymentPeriod =  trim(str_replace('+1', '', strtolower($order['payment_period'])));?>
                         <?php if($changePaymentPeriod === '+3 month') :?>
                             <?php $changePaymentPeriod = 'quarter';?>
+                        <?php elseif($changePaymentPeriod === '+6 month'):?>
+                            <?php $changePaymentPeriod = 'semester';?>
                         <?php endif;?>
                         <?php if (array_key_exists(strtolower('recurring-payment-' . $changePaymentPeriod),
                             $this->activeRecurringPaymentTypes)): ?>

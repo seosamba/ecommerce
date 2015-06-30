@@ -15,8 +15,12 @@
                       data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_MONTH; ?>"/><?php echo $this->translate('Month'); ?>
         </label>
         <label><input type="checkbox" class="recurring-payment-type"
-                      name="recurring-payment-month" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
-                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER; ?>"/><?php echo $this->translate('Quarterly/Semester'); ?>
+                      name="recurring-payment-quarter" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER; ?>"/><?php echo $this->translate('Quarter'); ?>
+        </label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-semester" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER; ?>"/><?php echo $this->translate('Semester'); ?>
         </label>
         <label><input type="checkbox" class="recurring-payment-type"
                       name="recurring-payment-year" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_YEAR]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_YEAR] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>

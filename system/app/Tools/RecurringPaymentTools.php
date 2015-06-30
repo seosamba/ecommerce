@@ -80,6 +80,8 @@ class Tools_RecurringPaymentTools
         $dependentCart = $cartSessionMapper->find($dependentCartId);
         if ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER) {
             $recurrentPeriod = '+3 month';
+        } elseif($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER) {
+            $recurrentPeriod = '+6 month';
         } else {
             $recurrentPeriod = str_replace('recurring-payment-', '+1 ', $paymentPeriod);
         }
