@@ -79,6 +79,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 */
 	private $_products        = array();
 
+	/**
+	 * Set website url
+	 *
+	 * @var string
+	 */
+	protected $_websiteUrl;
+
     /**
      * Show which logic should be used when selecting products by tags AND or OR (default)
      */
@@ -119,7 +126,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         }
         $this->_view->limit = $this->_limit;
         $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
-		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
+		$this->_websiteUrl = $this->_websiteHelper->getUrl();
+        $this->_view->websiteUrl = $this->_websiteUrl;
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
         $this->_strictTagsCount = in_array(self::OPTION_STRICT_TAGS_COUNT, $this->_options);
 
@@ -214,7 +222,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
-                '$product:url'                        => $product->getPage() ? $this->_websiteHelper->getUrl() . $product->getPage()->getUrl() : null,
+                '$product:url'                        => $product->getPage() ? $this->_websiteUrl . $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),
                 '$product:mpn'                        => $product->getMpn(),
