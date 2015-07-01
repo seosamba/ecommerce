@@ -25,6 +25,7 @@ $this->headLink()
     <div class="with-content-footer">
         <ul class="header">
             <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
+            <li><a href="#recurring-payments"><?php echo $this->translate('Recurring payments');?></a></li>
             <?php if (isset($this->plugins) && !empty($this->plugins)):?>
                 <?php foreach ($this->plugins as $plugin) :?>
                     <?php
@@ -41,6 +42,9 @@ $this->headLink()
         </div>
         <div id="group-pricing">
             <?php echo $this->partial('merchandising/grouping.phtml'); ?>
+        </div>
+        <div id="recurring-payments">
+            <?php echo $this->partial('merchandising/recurring.phtml'); ?>
         </div>
         <div class="message info grid_12">
             <ul class="list-count-sign column_2 full-width">

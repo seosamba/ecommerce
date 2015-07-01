@@ -66,7 +66,34 @@ $this->headLink()
                         Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY)
                     )); ?>
 	            </div>
-				<div class="grid_12 alpha omega mt20px">
+                <div class="grid_2 alpha mt20px hidden recurring-filters">
+                    <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
+                    <?php echo $this->formSelect('filter-recurring-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), array(
+                        '',
+                        'new' => $this->translate('New'),
+                        'active' => $this->translate('Active'),
+                        'pending' => $this->translate('Pending'),
+                        'expired' => $this->translate('Expired'),
+                        'suspended' => $this->translate('Suspended'),
+                        'canceled' => $this->translate('Canceled')
+                    )); ?>
+                </div>
+                <div class="grid_1 alpha mt20px">
+                    <label class="text-bold"><?php echo $this->translate('By order type');?></label>
+                    <?php echo $this->formSelect('filter-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), array(
+                        '',
+                        'cart_imported_id' => $this->translate('Imported'),
+                        'recurring_id' => $this->translate('Recurring'),
+                        'real_order_id' => $this->translate('Regular')
+                    )); ?>
+                </div>
+				<div class="grid_8 alpha omega mt20px">
 					<label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
 					<?php
                     $countryList = Tools_Geo::getCountries(true);
@@ -102,7 +129,7 @@ $this->headLink()
                 <?php if(isset($this->invoicePlugin)):?>
                     <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
-                <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('System order');?></th>
+                <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('Order type');?></th>
 			</tr>
 		</thead>
 		<tbody id="orders-list">

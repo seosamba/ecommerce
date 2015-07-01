@@ -59,6 +59,9 @@ table#orders-table td.shipping-data p { margin:0; }
 #profile .profile-header ul.stats li.delivered {
 	background-color: #32cd32;
 }
+#profile .profile-header ul.stats li.recurring_orders {
+    background-color: #32cd32;
+}
 
 /* Profile address */
 #profile #profile-address-list>div {

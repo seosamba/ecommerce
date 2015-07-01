@@ -298,6 +298,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Sub Total + Total Tax + Shipping',
   `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
   `discount` decimal(10,2) DEFAULT NULL COMMENT 'Order discount',
+  `free_cart` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -742,5 +743,35 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location_cart` (
   `lng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`cart_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart id',
+  `subscription_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Subscription id',
+  `ipn_tracking_id` VARCHAR (255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Ipn number',
+  `gateway_type` VARCHAR (100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Payment gateway name',
+  `payment_period` VARCHAR (30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frequency of recurring payment',
+  `recurring_times` SMALLINT unsigned NOT NULL COMMENT 'Amount of payments',
+  `subscription_date` TIMESTAMP NOT NULL COMMENT 'Subscription date',
+  `payment_cycle_amount` decimal(10,4) DEFAULT NULL COMMENT 'Amount for each recurring cycle',
+  `total_amount_paid` decimal(10,4) DEFAULT NULL COMMENT 'Amount paid',
+  `last_payment_date` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Last payment date',
+  `next_payment_date` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Next payment date',
+  `recurring_status` ENUM('new', 'active', 'pending', 'expired', 'suspended', 'canceled') DEFAULT 'new' NOT NULL COMMENT 'Recurring payment status',
+  `accept_changing_next_billing_date` ENUM('0', '1') DEFAULT '0' COMMENT 'Flag for change next payment date',
+  `accept_changing_shipping_address` ENUM('0', '1') DEFAULT '0' COMMENT 'Flag for change shipping address',
+  `free_transaction_cycle` TINYINT unsigned  DEFAULT NULL COMMENT 'Free transaction cycle quantity',
+  `transactions_quantity` SMALLINT unsigned DEFAULT NULL COMMENT 'Transaction total quantity',
+  `custom_type` VARCHAR (50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional information for payment',
+  PRIMARY KEY(`cart_id`),
+  CONSTRAINT `shopping_recurring_payment_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_has_recurring` (
+  `recurring_cart_id` int(10) unsigned NOT NULL COMMENT 'recurrent payment id',
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'dependent cart id to recurring payment',
+  PRIMARY KEY(`recurring_cart_id`, `cart_id`),
+  CONSTRAINT `shopping_cart_session_has_recurring_ibfk_2` FOREIGN KEY (`recurring_cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `shopping_cart_session_has_recurring_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `version` = '2.4.2' WHERE `name` = 'shopping';

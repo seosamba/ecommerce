@@ -82,9 +82,15 @@ class Widgets_User_User extends Widgets_User_Base {
         return $this->_view->render('edit-account.phtml');
     }
 
+    /**
+     * render user orders grid
+     *
+     * @return string
+     */
     protected function _renderGrid() {
         $customerObject = $this->_getCustomer();
-        $addresses = $customerObject->getAddresses();
+        $userId = $customerObject->getId();
+        $addresses = Models_Mapper_CustomerMapper::getInstance()->getUserAddressByUserId($userId);
         $enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
         if ($enabledInvoicePlugin != null) {
             if ($enabledInvoicePlugin->getStatus() == 'enabled') {
@@ -92,9 +98,11 @@ class Widgets_User_User extends Widgets_User_Base {
             }
         }
         $this->_view->customer = $customerObject;
-        $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchAll(
-            array('user_id = ?' => $customerObject->getId())
-        );
+        if (isset($this->_options['0']) && $this->_options['0'] === 'recurring') {
+            return $this->_recurringOrdersGrid($userId, $addresses);
+
+        }
+        $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($userId, true);
         $this->_view->stats = array(
             'all'     => sizeof($orders),
             'completed' => sizeof(array_filter($orders, function ($order) {
@@ -115,4 +123,48 @@ class Widgets_User_User extends Widgets_User_Base {
         return $this->_view->render('grid.phtml');
 
     }
+
+    /**
+     * Recurring user orders grid
+     *
+     * @param int $userId user id
+     * @param array $addresses all current user addresses
+     * @return string
+     */
+    protected function _recurringOrdersGrid($userId, $addresses)
+    {
+        $orders = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringOrdersDataByUserId($userId);
+        $this->_view->stats = array(
+            'all' => sizeof($orders),
+            'new' => sizeof(array_filter($orders, function ($order) {
+                return $order['recurring_status'] === Store_Model_RecurringPayments::NEW_RECURRING_PAYMENT;
+            })),
+            'active' => sizeof(array_filter($orders, function ($order) {
+                return $order['recurring_status'] === Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT;
+            })),
+            'pending' => sizeof(array_filter($orders, function ($order) {
+                return $order['recurring_status'] === Store_Model_RecurringPayments::PENDING_RECURRING_PAYMENT;
+            })),
+            'expired' => sizeof(array_filter($orders, function ($order) {
+                return $order['recurring_status'] === Store_Model_RecurringPayments::EXPIRED_RECURRING_PAYMENT;
+            })),
+            'suspended' => sizeof(array_filter($orders, function ($order) {
+                return $order['recurring_status'] === Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT;
+            })),
+            'canceled' => sizeof(array_filter($orders, function ($order) {
+                return $order['recurring_status'] === Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT;
+            }))
+        );
+        $this->_view->activeRecurringPaymentTypes = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringTypes();
+        $this->_view->orders = $orders;
+        $this->_view->addresses = $addresses;
+        $this->_view->shippingEnabledStatuses = array(
+            Models_Model_CartSession::CART_STATUS_COMPLETED,
+            Models_Model_CartSession::CART_STATUS_SHIPPED,
+            Models_Model_CartSession::CART_STATUS_DELIVERED
+        );
+
+        return $this->_view->render('recurring_user_grid.phtml');
+    }
+
 }

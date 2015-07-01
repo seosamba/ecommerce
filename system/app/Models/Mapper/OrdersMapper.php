@@ -60,6 +60,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				))
                 ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
                     array('real_order_id'=>'imp.real_order_id'))
+                ->joinLeft(array('shrp'=>'shopping_recurring_payment'), 'shrp.cart_id=order.id',
+                    array('recurring_id'=>'shrp.cart_id'))
 				->group('order.id');
 
 		if ($where){
@@ -276,6 +278,22 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         break;
                     case 'exclude_empty_address':
                         $select->where('s_adr.firstname IS NOT NULL');
+                        break;
+                    case 'filter-order-type':
+                        if ($val === 'recurring_id') {
+                            $select->where('shrp.cart_id IS NOT NULL');
+                        }
+                        if ($val === 'real_order_id') {
+                            $select->where('shrp.cart_id IS NULL');
+                            $select->where('imp.real_order_id IS NULL');
+                        }
+                        if ($val === 'cart_imported_id') {
+                            $select->where('imp.real_order_id IS NOT NULL');
+                        }
+                        break;
+                    case 'filter-recurring-order-type':
+                        $val = filter_var($val, FILTER_SANITIZE_STRING);
+                        $select->where('shrp.recurring_status = ?', $val);
                         break;
 					case 'status':
 						$val = filter_var($val, FILTER_SANITIZE_STRING);

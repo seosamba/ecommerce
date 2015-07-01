@@ -1,0 +1,40 @@
+<?php if (!empty($this->activeRecurringPaymentTypes)): ?>
+    <div id="cart-store-recurring">
+        <?php $recurringTypeLabels = array(
+            'recurring-payment-day' => 'Pay each day',
+            'recurring-payment-week' => 'Pay each week',
+            'recurring-payment-month' => 'Pay each month',
+            'recurring-payment-quarter' => 'Pay each quarter',
+            'recurring-payment-semester' => 'Pay each semester',
+            'recurring-payment-year' => 'Pay each year'
+        ); ?>
+        <select name="cart-recurring-payment-period-type" class="cart-recurring-payment-period-type">
+            <option value="0">
+                <?php if(isset($this->customSelectLabel)) :?>
+                    <?php echo $this->customSelectLabel ?></option>
+                <?php else:?>
+                    <?php echo $this->translate('Select recurring subscription type'); ?></option>
+                <?php endif;?>
+            <?php foreach ($this->activeRecurringPaymentTypes as $recurringType): ?>
+                <option
+                    value="<?php echo $recurringType['name']; ?>" <?php echo ($this->currentRecurringPaymentType === $recurringType['name']) ? 'selected' : ''; ?>>
+                    <?php echo $this->translate('Receive this order every '.str_replace('Pay each', '', $recurringTypeLabels[$recurringType['name']])); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input type="hidden" class="secureTokenRecurring" name="secureToken"
+               value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('.cart-recurring-payment-period-type').on('change', function (e) {
+                e.preventDefault();
+                var recurringPaymentType = $(this).val(),
+                    secureToken = $('.secureTokenRecurring').val();
+                $.post($('#website_url').val() + 'plugin/shopping/run/changeRecurringType/', {'recurringPaymentType': recurringPaymentType, secureToken:secureToken}, function (response) {
+
+                }, 'json');
+            });
+        });
+    </script>
+<?php endif; ?>

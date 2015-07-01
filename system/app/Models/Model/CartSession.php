@@ -92,7 +92,11 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_subTotalTax = 0;
 
     protected $_discountTaxRate = 0;
-    
+
+    protected $_freeCart = 0;
+
+    protected $_recurringId = null;
+
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -314,5 +318,33 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function getDiscountTaxRate() {
         return $this->_discountTaxRate;
     }
+
+    public function setFreeCart($freeCart) {
+        $this->_freeCart = $freeCart;
+        return $this;
+    }
+
+    public function getFreeCart() {
+        return $this->_freeCart;
+    }
+
+    /**
+     * @return null
+     */
+    public function getRecurringId()
+    {
+        return $this->_recurringId;
+    }
+
+    /**
+     * @param null $recurringId
+     * @return null
+     */
+    public function setRecurringId($recurringId)
+    {
+        $this->_recurringId = $recurringId;
+        return $this;
+    }
+
 
 }

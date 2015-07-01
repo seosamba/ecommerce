@@ -228,4 +228,18 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 		return $this->_view->render('coupon.phtml');
 	}
+
+    protected function _makeOptionRecurring() {
+        $shoppingCart = Tools_ShoppingCart::getInstance();
+        if (!$shoppingCart->getCustomerId()){
+            return null;
+        }
+        if (isset($this->_options[1])) {
+            $this->_view->customSelectLabel = $this->_options[1];
+        }
+
+        $this->_view->currentRecurringPaymentType = $shoppingCart->getRecurringPaymentType();
+        $this->_view->activeRecurringPaymentTypes = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringTypes();
+        return $this->_view->render('recurring.phtml');
+    }
 }
