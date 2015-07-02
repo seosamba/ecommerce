@@ -881,6 +881,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
 				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
 			)));
+            if (class_exists('Tools_AppsServiceWatchdog')) {
+                $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+            }
 			$cartSession->notifyObservers();
 		}
 
