@@ -45,7 +45,8 @@ define(['backbone',
                         'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val(),
                         'user': $('input[name=user-name]', '#store-orders form.filters').val(),
                         'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
-                        'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val()
+                        'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
+                        'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val()
                     };
                 }
             });

@@ -12,11 +12,12 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 
 	protected $_dbTable = 'Store_DbTable_Coupon';
 
-	/**
-	 * Save coupon model to DB
-	 * @param $model Store_Model_Coupon
-	 * @return Store_Model_Coupon
-	 */
+    /**
+     * Save coupon model to DB
+     * @param $model Store_Model_Coupon
+     * @return Store_Model_Coupon
+     * @throws Exceptions_SeotoasterException
+     */
 	public function save($model) {
 		if (!$model instanceof $this->_model){
 			$model = new $this->_model($model);
@@ -286,4 +287,35 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 
 		return true;
 	}
+
+    /**
+     * Store coupon sales history
+     *
+     * @param Tools_ShoppingCart $cart
+     * @return bool
+     */
+    public function saveCouponSales(Tools_ShoppingCart $cart)
+    {
+        $dbTable = new Zend_Db_Table('shopping_coupon_sales');
+        $coupons = $cart->getCoupons();
+
+        $dbTable->delete(array('cart_id' => $cart->getCartId()));
+        foreach ($coupons as $coupon) {
+            try {
+                $dbTable->insert(array('coupon_code' => $coupon->getCode(), 'cart_id' => $cart->getCartId()));
+            } catch (Exception $e) {
+                Tools_System_Tools::debugMode() && error_log($e->getMessage());
+            }
+
+        }
+
+        return true;
+    }
+
+    public function getCouponCodes()
+    {
+        $dbTable = new Zend_Db_Table('shopping_coupon_sales');
+        $select = $dbTable->getAdapter()->select()->from('shopping_coupon_sales', array('coupon_code', 'coupon_code'))->group('coupon_code');
+        return $dbTable->getAdapter()->fetchPairs($select);
+    }
 }

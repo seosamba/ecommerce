@@ -149,7 +149,7 @@ ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NUL
 
 -- 20/04/2015
 -- version: 2.4.1
--- update version
+-- add recurring payments
 CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
   `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart id',
   `subscription_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Subscription id',
@@ -183,7 +183,18 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_has_recurring` (
 ALTER TABLE `shopping_cart_session` ADD `free_cart` enum('0','1') COLLATE 'utf8_unicode_ci' NULL DEFAULT '0';
 ALTER TABLE `shopping_product_has_freebies` ADD FOREIGN KEY(`freebies_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
+-- 02/07/2015
+-- version: 2.4.2
+-- Add coupon sales history
+CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
+  `coupon_code` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Coupon code',
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart Id',
+  PRIMARY KEY (`coupon_code`,`cart_id`),
+  KEY `cart_id` (`cart_id`),
+  CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

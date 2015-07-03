@@ -62,6 +62,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                     array('real_order_id'=>'imp.real_order_id'))
                 ->joinLeft(array('shrp'=>'shopping_recurring_payment'), 'shrp.cart_id=order.id',
                     array('recurring_id'=>'shrp.cart_id'))
+                ->joinLeft(array('shcoupon'=>'shopping_coupon_sales'), 'shcoupon.cart_id=order.id',
+                    array('coupon_code'=>'shcoupon.coupon_code'))
 				->group('order.id');
 
 		if ($where){
@@ -294,6 +296,12 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                     case 'filter-recurring-order-type':
                         $val = filter_var($val, FILTER_SANITIZE_STRING);
                         $select->where('shrp.recurring_status = ?', $val);
+                        break;
+                    case 'filter-by-coupon':
+                        $val = trim(filter_var($val, FILTER_SANITIZE_STRING));
+                        if (!empty($val)) {
+                            $select->where('shcoupon.coupon_code = ?', $val);
+                        }
                         break;
 					case 'status':
 						$val = filter_var($val, FILTER_SANITIZE_STRING);
