@@ -299,7 +299,7 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
         $dbTable = new Zend_Db_Table('shopping_coupon_sales');
         $coupons = $cart->getCoupons();
 
-        $dbTable->delete(array('cart_id' => $cart->getCartId()));
+        $dbTable->delete(array('cart_id = ?' => $cart->getCartId()));
         foreach ($coupons as $coupon) {
             try {
                 $dbTable->insert(array('coupon_code' => $coupon->getCode(), 'cart_id' => $cart->getCartId()));
