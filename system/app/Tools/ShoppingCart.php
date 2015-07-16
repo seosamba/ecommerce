@@ -712,7 +712,7 @@ class Tools_ShoppingCart {
 					case Models_Model_Option::TYPE_TEXT:
 						$modifiers[$defaultOption['title']] = array(
 							'option_id'   => $defaultOption['id'],
-							'title'       => $options[$defaultOption['id']],
+							'title'       => $defaultOption['title'],
 							'priceSign'   => null,
 							'priceType'   => null,
 							'priceValue'  => null,
