@@ -999,6 +999,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			return array('pages' => $pages);
 		}
 
+        $pageOption = array(self::OPTION_CHECKOUT, self::OPTION_STORE_SHIPPING_TERMS, self::OPTION_THANKYOU);
+        $templates = array(Application_Model_Models_Template::TYPE_PRODUCT, Application_Model_Models_Template::TYPE_LISTING, Application_Model_Models_Template::TYPE_CHECKOUT);
+
 		$productsSql = "SELECT * FROM `shopping_product` WHERE `page_id` IN (" . implode(',', array_map(function ($page) {
 			return $page['id'];
 		}, $pages)) . ");";
@@ -1011,9 +1014,11 @@ class Shopping extends Tools_Plugins_Abstract {
 
         $result = array('pages'  => $pages,
                         'media'  => empty($productImages) ? null : array_map(function ($img) {
-                                    list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
-                                    return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
-                                }, $productImages)
+                                        list($folder, $file) = explode(DIRECTORY_SEPARATOR, $img);
+                                        return implode(DIRECTORY_SEPARATOR, array('media', $folder, 'original', $file));
+                                    }, $productImages),
+                        'page_option' => $pageOption,
+                        'template_type' => $templates
         );
 
         if(!empty($productsIds)) {
@@ -1023,18 +1028,87 @@ class Shopping extends Tools_Plugins_Abstract {
                     'shopping_brands'                   => "SELECT * FROM `shopping_brands`;",
                     'shopping_product_option'           => "SELECT * FROM `shopping_product_option`;",
                     'shopping_product_option_selection' => "SELECT * FROM `shopping_product_option_selection`;",
-                    'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ")",
+                    'shopping_product_set_settings'     => "SELECT * FROM `shopping_product_set_settings` WHERE productId IN (" . $productsIds . ");",
                     'shopping_tags'                     => "SELECT * FROM `shopping_tags`;",
-                    'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ")",
-                    'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ")",
-                    'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ")",
-                    'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ")"
+                    'shopping_product_has_option'       => "SELECT * FROM `shopping_product_has_option` WHERE product_id IN (" . $productsIds . ");",
+                    'shopping_product_has_part'         => "SELECT * FROM `shopping_product_has_part` WHERE product_id IN (" . $productsIds . ");",
+                    'shopping_product_has_related'      => "SELECT * FROM `shopping_product_has_related` WHERE product_id IN (" . $productsIds . ");",
+                    'shopping_product_has_tag'          => "SELECT * FROM `shopping_product_has_tag` WHERE product_id IN (" . $productsIds . ");",
+                    'page'                              => "SELECT * FROM `page` WHERE id IN (?);",
+                    'page_has_option'                   => "SELECT * FROM `page_has_option` WHERE page_id IN (?);",
+                    'page_option'                       => "SELECT * FROM `page_option` WHERE id IN ('" . self::OPTION_CHECKOUT . "', '" . self::OPTION_STORE_SHIPPING_TERMS . "', '" . self::OPTION_THANKYOU . "', '" . self::OPTION_STORE_CLIENT_LOGIN . "');",
+                    'template_type'                     => "SELECT * FROM `template_type` WHERE id IN ('" . Application_Model_Models_Template::TYPE_PRODUCT . "', '" . Application_Model_Models_Template::TYPE_LISTING . "', '" . Application_Model_Models_Template::TYPE_CHECKOUT . "');"
                 )
             ));
         }
         // return prepared data to the toaster
         return $result;
 	}
+
+    /**
+     * Toaster themes system import hook
+     *
+     * @return array
+     */
+    public static function importWebsiteData() {
+        $result = array(
+            'shopping_product' => array(),
+            'shopping_brands' => array(),
+            'shopping_product_option' => array(),
+            'shopping_product_option_selection' => array(),
+            'shopping_product_set_settings' => array(),
+            'shopping_tags' => array(),
+            'shopping_product_has_option' => array(),
+            'shopping_product_has_part' => array(),
+            'shopping_product_has_related' => array(),
+            'shopping_product_has_tag' => array(),
+            'page_option'   => array(
+                array(
+                    'id'           => self::OPTION_CHECKOUT,
+                    'title'        => 'The cart checkout page',
+                    'context'      => 'Cart and checkout',
+                    'active'       => '1',
+                    'option_usage' => 'once'
+                ),
+                array(
+                    'id'           => self::OPTION_STORE_SHIPPING_TERMS,
+                    'title'        => 'Shipping terms and conditions',
+                    'context'      => 'Cart and checkout',
+                    'active'       => '1',
+                    'option_usage' => 'once'
+                ),
+                array(
+                    'id'           => self::OPTION_THANKYOU,
+                    'title'        => 'Post purchase "Thank you" page',
+                    'context'      => 'Cart and checkout',
+                    'active'       => '1',
+                    'option_usage' => 'once'
+                ),
+                array(
+                    'id'           => self::OPTION_STORE_CLIENT_LOGIN,
+                    'title'        => 'Store client landing page',
+                    'context'      => 'Cart and checkout',
+                    'active'       => '1',
+                    'option_usage' => 'once'
+                )
+            ),
+            'template_type' => array(
+                array(
+                    'id'    => Application_Model_Models_Template::TYPE_PRODUCT,
+                    'title' => 'Product page'
+                ),
+                array(
+                    'id'    => Application_Model_Models_Template::TYPE_LISTING,
+                    'title' => 'Product listing'
+                ),
+                array(
+                    'id'    => Application_Model_Models_Template::TYPE_CHECKOUT,
+                    'title' => 'Checkout page'
+                )
+            )
+        );
+        return $result;
+    }
 
     public function editAccountAction(){
         if ($this->_request->isPost() && $this->_sessionHelper->getCurrentUser()->getRoleId() != Tools_Security_Acl::ROLE_GUEST) {
