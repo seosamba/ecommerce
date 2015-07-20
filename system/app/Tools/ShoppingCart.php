@@ -655,7 +655,9 @@ class Tools_ShoppingCart {
 
 		//saving "one use per client" coupons to DB
 		if (sizeof($this->getCoupons())){
-			Store_Mapper_CouponMapper::getInstance()->saveCouponsToCart($this);
+            $shoppingCouponUsage = Store_Mapper_CouponMapper::getInstance();
+            $shoppingCouponUsage->saveCouponsToCart($this);
+            $shoppingCouponUsage->saveCouponSales($this);
 		}
 
 		return $this;

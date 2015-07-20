@@ -103,6 +103,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			$this->_view->shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            $this->_view->usedCoupons = Store_Mapper_CouponMapper::getInstance()->getCouponCodes();
             $shippingPlugins = Models_Mapper_ShippingConfigMapper::getInstance()->fetchAll();
             $shippingServices = array('');
             if(!empty($shippingPlugins)){

@@ -10,7 +10,8 @@ define([
         el: $('#coupon-table'),
         events: {
             'click a[data-role=delete]': 'deleteCoupon',
-            'mouseover a[data-role=loadProductPage]': 'loadProductPage'
+            'mouseover a[data-role=loadProductPage]': 'loadProductPage',
+            'click .coupon-code-dashboard': 'setCouponForDashboard'
         },
         templates: {},
         initialize: function(options){
@@ -47,7 +48,7 @@ define([
             this.$el.fnAddData([
                 coupon.get('id'),
                 (coupon.get('type') === 'freeshipping' ? 'free shipping' : coupon.get('type') ),
-                coupon.get('code'),
+                '<a class="coupon-code-dashboard" data-coupon-code-dashboard="'+coupon.get('code')+'" href="'+$('#website_url').val()+'dashboard/orders/" target="_blank">'+coupon.get('code')+'</a>',
                 coupon.get('startDate'),
                 coupon.get('endDate'),
                 coupon.get('allowCombination') === '1' ? 'yes' : 'no',
@@ -61,9 +62,7 @@ define([
         },
         deleteCoupon: function(e){
             var cid = $(e.currentTarget).data('cid');
-            console.log(cid);
             var model = this.coupons.get(cid);
-            console.log(model);
             if (model){
                 model.destroy();
             }
@@ -83,6 +82,10 @@ define([
                     }
                 });
             }
+        },
+        setCouponForDashboard: function(e){
+            var couponCode = $(e.currentTarget).data('coupon-code-dashboard');
+            localStorage.setItem('couponCode', couponCode);
         }
     });
 
