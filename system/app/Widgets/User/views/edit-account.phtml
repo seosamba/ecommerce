@@ -12,6 +12,7 @@
         <?php echo $this->userForm->getElement('newPassword')->renderViewHelper(); ?></p>
     <p><?php echo $this->userForm->getElement('newPasswordConfirm')->renderLabel(); ?>
         <?php echo $this->userForm->getElement('newPasswordConfirm')->renderViewHelper(); ?></p>
+    <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>">
     <?php echo $this->userForm->getElement('saveUser')->renderViewHelper(); ?>
 </form>
 

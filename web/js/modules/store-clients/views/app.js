@@ -5,8 +5,9 @@ define([
     '../../groups/collections/group',
     'text!../../groups/templates/groups_dialog.html',
     'text!../templates/email_service.html',
+    'text!../templates/crm_service.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
-    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, EmailServiceDialogTmpl, i18n){
+    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, EmailServiceDialogTmpl, CrmServiceDialogTmpl, i18n){
 
     var AppView = Backbone.View.extend({
         el: $('#clients'),
@@ -151,7 +152,8 @@ define([
                 url: $('#website_url').val()+'api/store/customers/',
                 data: {
                     groupId:groupId,
-                    userId:userId
+                    userId:userId,
+                    secureToken: $('.clientsSecureToken').val()
                 },
                 type: 'POST',
                 dataType: 'json',
@@ -263,7 +265,7 @@ define([
             });
 
             $.ajax({
-                url: $('#website_url').val()+'plugin/apps/run/getEnabledServicesDashboard/customers/'+customerIds,
+                url: $('#website_url').val()+'plugin/apps/run/getEnabledServicesDashboard/serviceType/email/customers/'+customerIds,
                 type: 'GET',
                 dataType: 'json'
 
@@ -357,6 +359,116 @@ define([
                         });
                         return false;
                     }
+
+            });
+        },
+        crmMarketing: function(e){
+            var checkedCustomers = this.customers.checked();
+            var customerIds = [];
+
+            if(checkedCustomers.length == 0){
+                return false;
+            }
+
+            $.each(checkedCustomers, function(index, value) {
+                customerIds.push(value.id);
+            });
+
+            $.ajax({
+                url: $('#website_url').val()+'plugin/apps/run/getEnabledServicesDashboard/serviceType/crm/customers/'+customerIds,
+                type: 'GET',
+                dataType: 'json'
+
+            }).done(function(response) {
+                if(response.error == 1){
+                    showMessage(_.isUndefined(i18n['No available services'])?'No available services':i18n['No available services']);
+                    return false;
+                }else{
+                    var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'],
+                        assignCrmService = {},
+                        customerIds = response.responseText.clients,
+                        customerIds = customerIds.split(',');
+
+
+                    var enabledServices = response.responseText.enabledServices;
+                    assignCrmService[applyButton] = function() {
+
+                        if($("#crm-services option:selected").val() == 'select'){
+                            showMessage(_.isUndefined(i18n['Please choose service'])?'Please choose service':i18n['Please choose service']);
+                            return false;
+                        }
+
+                        if($("input:checkbox[name=list]:checked").length == 0){
+                            showMessage(_.isUndefined(i18n['Please choose list'])?'Please choose list':i18n['Please choose list']);
+                            return false;
+                        }
+
+                        var lists = [];
+                        $("input:checkbox[name=list]:checked").each(function() {
+                            lists.push($(this).val());
+                        });
+
+                        $.ajax({
+                            url: $('#website_url').val()+'plugin/apps/run/sendServicesDashboard/customers/'+customerIds+'/service/'+$("#crm-services option:selected").val()+'/lists/'+lists,
+                            type: 'POST',
+                            dataType: 'json'
+                        }).done(function(response) {
+                            if(response.error == 0){
+                                showMessage(_.isUndefined(i18n['Emails added'])?'Emails added':i18n['Emails added']);
+                            }else{
+                                showMessage(_.isUndefined(i18n['Something went wrong'])?'Something went wrong':i18n['Something went wrong']);
+                            }
+                        })
+                    };
+
+                    var dialog = _.template(CrmServiceDialogTmpl, {
+                        enabledServices:enabledServices,
+                        customerIds:customerIds,
+                        i18n:i18n
+                    });
+
+                    $(dialog).dialog({
+                        width: 600,
+                        dialogClass: 'seotoaster',
+                        resizable:false,
+                        buttons: assignCrmService,
+                        open: function(event, ui) {
+                            $('#crm-services').on('change',  function(){
+                                if($("#crm-services option:selected").val() != 'select'){
+                                    $.ajax({
+                                        url: $('#website_url').val()+'plugin/apps/run/getService/serviceName/'+$("#crm-services option:selected").val(),
+                                        type: 'GET',
+                                        dataType: 'json'
+
+                                    }).done(function(response) {
+                                        if(response.error == 1){
+                                            showMessage(_.isUndefined(i18n['No available lists'])?'No available lists':i18n['No available lists']);
+                                            $('#subscribe-list').remove();
+                                            return false;
+                                        }else{
+                                            $('#subscribe-list').remove();
+                                            var subscribeList = '<div class="mt10px" id="subscribe-list">';
+                                            $.each(response.responseText.list, function(value, listName){
+                                                subscribeList += '<label class="fl-left mr30px pointer">'+listName+' <input type="checkbox" name="list" value="'+value+'"/></label>'
+                                            })
+                                            subscribeList += '</div>';
+                                            $('#crm-services').after(subscribeList);
+
+                                        }
+
+                                    });
+                                }else{
+                                    $('#subscribe-list').remove();
+                                }
+                            })
+
+                        },
+                        close: function(event, ui){
+                            $(this).dialog('close').remove();
+                        }
+                    });
+                    return false;
+                }
 
             });
         },

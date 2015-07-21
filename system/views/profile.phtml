@@ -20,6 +20,7 @@
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                     <input class="edit-client-email edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
                     <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
                 <?php endif;?>
             </h4>
 			<p class="client-info"><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
@@ -68,7 +69,6 @@
 	</div>
 
 	<div class="grid_7 profile-actions">
-		<!--		<input type="button" class="blue-btn" value="--><?php //echo $this->translate('Edit profile');?><!--" />-->
 		<p class="title textcentered ui-state-default">
 			<img style="width: 16px; vertical-align: text-bottom;" src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAA/UlEQVR42r2VvQ3CMBBGswEjMIJHyASeIUV6qChSISRKpLR0jEDBABmBkpIRIk8QPks+3ekkfkzOsfSUxIm+p/PFSYUxRTAqAsPPvN6BEUzpWJcSBcolWSnRpJGT3oolK3ooSWMuwtinzCtwNG8qisEpL4CVfMa2R7xkBzlvWpFYskHfny1KG3FUjV+bi1jCInnfqketkhAt8PN6xMt14+DMinSwWv8AtuAuQp+gVx/PJl/EAZoBnNTzHZ1n9+iN5Ah8Lt8q0pLx3332SXRWkgAaU1EMFM11oP4lOLdHG/Ev6YC3QIscvWn6rbKtiPdID3wZEXOJk8VEpVlU9AI9gR1AIgkvUwAAAABJRU5ErkJggg==">
 			<?php echo $this->translate('Orders summary');?>
@@ -116,17 +116,19 @@
 					<td><?php echo $this->currency(floatval($order->getShippingPrice()));?></td>
 					<td class="shipping-data">
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
-						<p>
-	                        <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
-							<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                            <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
-							<?php endif;?>
-						</p>
-                        <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
-                            <?php if($order->getShippingTrackingId() != ''):?>
-                                <p class="textcentered">
-                                <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
+                        <?php if(!$order->getRecurringId()):?>
+                            <p>
+                                <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+                                <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                                <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+                                <?php endif;?>
                             </p>
+                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
+                                <?php if($order->getShippingTrackingId() != ''):?>
+                                    <p class="textcentered">
+                                    <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
+                                </p>
+                                <?php endif;?>
                             <?php endif;?>
                         <?php endif;?>
 					</td>
@@ -141,20 +143,25 @@
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_CANCELED):?>
                         <?php $status = 'Lost opportunity';?>
                     <?php endif;?>
+                    <?php if($order->getRecurringId()):?>
+                        <?php $status = 'Recurring order';?>
+                    <?php endif;?>
 					<td class="current-status"><?php echo $this->translate($status);?></td>
 
 
 					<td class="text-center"><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"><?php echo $this->translate('view');?></a></td>
                     <?php if(isset($this->invoicePlugin)):?>
-                    <td class="text-center">
-                        <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
-                            <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
-                                <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
-                            </a>
-                            <a href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/1/">
-                                <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="<?php echo $this->translate('Download invoice');?>" title="<?php echo $this->translate('Download invoice');?>"/>
-                            </a>
-                        <?php endif;?>
+                        <td class="text-center">
+                            <?php if(!$order->getRecurringId()):?>
+                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
+                                    <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
+                                        <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
+                                    </a>
+                                    <a href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/1/">
+                                        <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="<?php echo $this->translate('Download invoice');?>" title="<?php echo $this->translate('Download invoice');?>"/>
+                                    </a>
+                                <?php endif;?>
+                            <?php endif;?>
                      </td>
                     <?php endif;?>
                 </tr>
@@ -162,7 +169,6 @@
 			<?php endif; ?>
 			</tbody>
 		</table>
-		<?php //var_dump($this->orders); ?>
 	</div>
 	<div id="profile-address-list" class="clearfix">
 	<?php $addressList = $this->customer->getAddresses(); ?>
@@ -219,6 +225,7 @@
 		$('ul.stats').on('click', 'li', function(e){
 			var filter = $(this).data('sort');
 			if (filter === 'total') filter = '';
+            if (filter === 'Recurring Orders') filter = 'Recurring order';
 			oTable.fnFilter(filter);
 		});
 	});
@@ -335,7 +342,8 @@
             data: {
                 profileElement:clientEditParam,
                 profileValue:editedValue,
-                userId:$('#userId').val()
+                userId:$('#userId').val(),
+                secureToken:$('.secure-token-user').val()
             }
         }).done(function(response) {
             if(response.error == 1){

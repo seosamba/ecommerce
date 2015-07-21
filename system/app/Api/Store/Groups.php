@@ -8,6 +8,9 @@
  */
 class Api_Store_Groups extends Api_Service_Abstract {
 
+
+    const GROUPS_SECURE_TOKEN = 'GroupsToken';
+
 	/**
 	 * @var array Access Control List
 	 */
@@ -70,6 +73,13 @@ class Api_Store_Groups extends Api_Service_Abstract {
 	public function postAction() {
 		$data = filter_var_array($this->getRequest()->getPost(), FILTER_SANITIZE_STRING);
         $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+
+        $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::GROUPS_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        unset($data[Tools_System_Tools::CSRF_SECURE_TOKEN]);
 
 		if (!isset($data['groupName']) && !isset($data['groupPriceValue'])) {
 			$this->_error();

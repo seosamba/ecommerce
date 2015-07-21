@@ -57,7 +57,10 @@ class Tools_ShoppingCart {
 
 	protected $_discount = 0;
 
-    private function __construct() {
+
+    protected $_recurringPaymentType = '';
+
+	private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -640,7 +643,9 @@ class Tools_ShoppingCart {
 
 		//saving "one use per client" coupons to DB
 		if (sizeof($this->getCoupons())){
-			Store_Mapper_CouponMapper::getInstance()->saveCouponsToCart($this);
+            $shoppingCouponUsage = Store_Mapper_CouponMapper::getInstance();
+            $shoppingCouponUsage->saveCouponsToCart($this);
+            $shoppingCouponUsage->saveCouponSales($this);
 		}
 
 		return $this;
@@ -697,7 +702,7 @@ class Tools_ShoppingCart {
 					case Models_Model_Option::TYPE_TEXT:
 						$modifiers[$defaultOption['title']] = array(
 							'option_id'   => $defaultOption['id'],
-							'title'       => $options[$defaultOption['id']],
+							'title'       => $defaultOption['title'],
 							'priceSign'   => null,
 							'priceType'   => null,
 							'priceValue'  => null,
@@ -887,4 +892,22 @@ class Tools_ShoppingCart {
         return $this->_discountTaxRate;
     }
 
+    /**
+     * @return string
+     */
+    public function getRecurringPaymentType()
+    {
+        return $this->_recurringPaymentType;
+    }
+
+    /**
+     * @param string $recurringPaymentType
+     * @return string
+     */
+    public function setRecurringPaymentType($recurringPaymentType)
+    {
+        $this->_recurringPaymentType = $recurringPaymentType;
+
+        return $this;
+    }
 }

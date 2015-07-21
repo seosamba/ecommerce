@@ -63,7 +63,8 @@ $this->headLink()
             <?php endif; ?>
 		</fieldset>
 	<?php endforeach; ?>
-	</form>
+        <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>">
+    </form>
 
 	<?php //echo $this->form; ?>
     <div class="footer grid_12">

@@ -27,6 +27,7 @@ class Filtering_Tools
     {
         if (is_null($queryString)) {
             $queryString = $_SERVER['QUERY_STRING'];
+            $queryString = urldecode($queryString);
         }
 
         $urlFilters = array();

@@ -8,6 +8,9 @@
  */
 class Api_Store_Customers extends Api_Service_Abstract {
 
+
+    const CUSTOMERS_SECURE_TOKEN = 'CustomersToken';
+
 	/**
 	 * @var array Access Control List
 	 */
@@ -97,6 +100,12 @@ class Api_Store_Customers extends Api_Service_Abstract {
 
         if(!isset($userId)){
             $this->_error();
+        }
+
+        $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::CUSTOMERS_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
         }
 
         if(isset($groupId)){

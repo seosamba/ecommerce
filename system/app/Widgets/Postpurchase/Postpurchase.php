@@ -622,11 +622,30 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $this->_cartContent[$sid]['productUrl'];
     }
 
+
+    /**
+     * Return text if this order is recurring payment
+     *
+     * @return string
+     */
+    private function _renderRecurring()
+    {
+        if (isset($this->_options[0])) {
+            $cartId = $this->_cart->getId();
+            $recurringPayment = Store_Mapper_RecurringPaymentsMapper::getInstance()->checkRecurringOrder($cartId);
+            if (!empty($recurringPayment)) {
+                return $this->_options[0];
+            }
+        }
+
+        return '';
+    }
+
     /**
      * Return proper address element
      *
-     * @param $addressType
-     *
+     * @param string $addressType (billing, shipping)
+     * @return string
      */
     private function _prepareAddress($addressType)
     {

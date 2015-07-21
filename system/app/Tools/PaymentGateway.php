@@ -28,4 +28,5 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
 
 		return $this;
 	}
+
 }

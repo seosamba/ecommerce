@@ -600,7 +600,7 @@ define([
 
         toggleSetPriceConfig: function(e) {
             var checked = ($(e.currentTarget).prop('checked')) ? 1 : 0;
-            $.post($('#website_url').val() + 'plugin/shopping/run/setConfig/', {config: {autocalculateSetPrice: checked}});
+            $.post($('#website_url').val() + 'plugin/shopping/run/setConfig/', {config: {autocalculateSetPrice: checked, secureToken: $('.secure-token-tax').val()}});
         },
 
         removeRelated: function(id){

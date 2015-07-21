@@ -147,8 +147,55 @@ UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 -- Add column to store mobile phone country code
 ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NULL DEFAULT NULL COMMENT 'Contains mobile phone country code';
 
--- 24/10/2014
--- version: 2.3.3
+-- 20/04/2015
+-- version: 2.4.1
+-- add recurring payments
+CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart id',
+  `subscription_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Subscription id',
+  `ipn_tracking_id` VARCHAR (255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Ipn number',
+  `gateway_type` VARCHAR (100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Payment gateway name',
+  `payment_period` VARCHAR (30) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Frequency of recurring payment',
+  `recurring_times` SMALLINT unsigned NOT NULL COMMENT 'Amount of payments',
+  `subscription_date` TIMESTAMP NOT NULL COMMENT 'Subscription date',
+  `payment_cycle_amount` decimal(10,4) DEFAULT NULL COMMENT 'Amount for each recurring cycle',
+  `total_amount_paid` decimal(10,4) DEFAULT NULL COMMENT 'Amount paid',
+  `last_payment_date` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Last payment date',
+  `next_payment_date` date NOT NULL DEFAULT '0000-00-00' COMMENT 'Next payment date',
+  `recurring_status` ENUM('new', 'active', 'pending', 'expired', 'suspended', 'canceled') DEFAULT 'new' NOT NULL COMMENT 'Recurring payment status',
+  `accept_changing_next_billing_date` ENUM('0', '1') DEFAULT '0' COMMENT 'Flag for change next payment date',
+  `accept_changing_shipping_address` ENUM('0', '1') DEFAULT '0' COMMENT 'Flag for change shipping address',
+  `free_transaction_cycle` TINYINT unsigned  DEFAULT NULL COMMENT 'Free transaction cycle quantity',
+  `transactions_quantity` SMALLINT unsigned DEFAULT NULL COMMENT 'Transaction total quantity',
+  `custom_type` VARCHAR (50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional information for payment',
+  PRIMARY KEY(`cart_id`),
+  CONSTRAINT `shopping_recurring_payment_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_has_recurring` (
+  `recurring_cart_id` int(10) unsigned NOT NULL COMMENT 'recurrent payment id',
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'dependent cart id to recurring payment',
+  PRIMARY KEY(`recurring_cart_id`, `cart_id`),
+  CONSTRAINT `shopping_cart_session_has_recurring_ibfk_2` FOREIGN KEY (`recurring_cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `shopping_cart_session_has_recurring_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_cart_session` ADD `free_cart` enum('0','1') COLLATE 'utf8_unicode_ci' NULL DEFAULT '0';
+ALTER TABLE `shopping_product_has_freebies` ADD FOREIGN KEY(`freebies_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- 02/07/2015
+-- version: 2.4.2
+-- Add coupon sales history
+CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
+  `coupon_code` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Coupon code',
+  `cart_id` int(10) unsigned NOT NULL COMMENT 'Cart Id',
+  PRIMARY KEY (`coupon_code`,`cart_id`),
+  KEY `cart_id` (`cart_id`),
+  CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 21/07/2015
+-- version: 2.4.3
 CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `discount_quantity` int(10) unsigned NOT NULL,
@@ -170,8 +217,8 @@ CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
   CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 15/04/2015
--- version: 2.4.0
+-- 21/07/2015
+-- version: 2.4.4
 -- update version
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -189,6 +236,6 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.5' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

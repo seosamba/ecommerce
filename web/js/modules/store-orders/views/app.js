@@ -21,7 +21,8 @@ define(['backbone',
             'click td.shipping-service .setTracking': 'changeTracking',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
-            'change input[name="check-order[]"]': 'toggleOrder'
+            'change input[name="check-order[]"]': 'toggleOrder',
+            'change #filter-order-type': 'toggleRecurring'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -42,7 +43,10 @@ define(['backbone',
                         'date-to': $('input[name=filter-to-date]', '#store-orders form.filters').val(),
                         'amount-from': $('input[name=filter-from-amount]', '#store-orders form.filters').val(),
                         'amount-to': $('input[name=filter-to-amount]', '#store-orders form.filters').val(),
-                        'user': $('input[name=user-name]', '#store-orders form.filters').val()
+                        'user': $('input[name=user-name]', '#store-orders form.filters').val(),
+                        'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
+                        'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
+                        'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val()
                     };
                 }
             });
@@ -199,24 +203,37 @@ define(['backbone',
         changeStatus: function(event){
             var self        = this,
                 el          = $(event.currentTarget),
-                id          = parseInt(el.closest('div').data('order-id'));
+                id          = parseInt(el.closest('div').data('order-id')),
+                confirmMessage = _.isUndefined(i18n['Are you sure you want to change status for this order?'])?'Are you sure you want to change status for this order?':i18n['Are you sure you want to change status for this order?'],
+                status = el.data('status');
 
             var model = this.orders.get(id);
 
-            $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                data: {status: el.data('status')},
-                type: 'POST',
-                dataType: 'json',
-                beforeSend: function(){
-                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                },
-                success: function(response) {
-                    showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
-                    if (!response.error && response.hasOwnProperty('responseText')){
-                        model.set('status', response.responseText.status);
-                    }
+            if (status === 'refunded') {
+                confirmMessage = _.isUndefined(i18n['Are you sure you want to refund this payment?'])?'Are you sure you want to refund this payment?':i18n['Are you sure you want to refund this payment?'];
+            }
+
+            smoke.confirm(confirmMessage, function(e) {
+                if (e){
+                    $.ajax({
+                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                        data: {status: status},
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function(){
+                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                        },
+                        success: function(response) {
+                            showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
+                            if (!response.error && response.hasOwnProperty('responseText')){
+                                model.set('status', response.responseText.status);
+                            }
+                        }
+                    });
                 }
+            }, {
+                ok: _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'],
+                cancel: _.isUndefined(i18n['No'])?'No':i18n['No']
             });
         },
         changeTracking: function(event){
@@ -259,6 +276,14 @@ define(['backbone',
                 ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
                 cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
             });
+        },
+        toggleRecurring : function(e){
+            var currentType = $(e.currentTarget).val();
+            if (currentType === 'recurring_id') {
+                $('.recurring-filters').removeClass('hidden');
+            } else {
+                $('.recurring-filters').addClass('hidden');
+            }
         }
     });
 

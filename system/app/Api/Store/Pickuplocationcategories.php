@@ -5,6 +5,8 @@
 class Api_Store_Pickuplocationcategories extends Api_Service_Abstract
 {
 
+    const PICKUPLOCATIONS_SECURE_TOKEN = 'PickupLocationsToken';
+
     /**
      * @var array Access Control List
      */
@@ -44,6 +46,11 @@ class Api_Store_Pickuplocationcategories extends Api_Service_Abstract
         $pickupLocationModel = new Store_Model_PickupLocationCategory();
         if (empty($data)) {
             $this->_error();
+        }
+        $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::PICKUPLOCATIONS_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
         }
         $pickupLocationModel->setName($data['name']);
         $result = $pickupLocationCategoryMapper->save($pickupLocationModel);

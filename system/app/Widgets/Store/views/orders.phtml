@@ -40,12 +40,16 @@ $this->headLink()
                     <input class="grid_6 alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>">
                     <input class="grid_6 omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>">
 				</div>
+                <div class="grid_1 omega">
+                    <label class="text-bold"><?php echo $this->translate('By coupon');?></label>
+                    <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>">
+                </div>
 				<div class="grid_4">
 					<label class="text-bold"><?php echo $this->translate('By date');?></label>
                     <input class="grid_6 alpha" type="text" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>">
                     <input class="grid_6 omega" type="text" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>">
 				</div>
-	            <div class="grid_4 omega">
+	            <div class="grid_3 alpha">
 		            <label class="text-bold"><?php echo $this->translate('By order status');?></label>
                     <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
 		             <?php echo $this->formSelect('filter-status', null, array(
@@ -66,7 +70,34 @@ $this->headLink()
                         Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY)
                     )); ?>
 	            </div>
-				<div class="grid_12 alpha omega mt20px">
+                <div class="grid_2 alpha mt20px hidden recurring-filters">
+                    <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
+                    <?php echo $this->formSelect('filter-recurring-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), array(
+                        '',
+                        'new' => $this->translate('New'),
+                        'active' => $this->translate('Active'),
+                        'pending' => $this->translate('Pending'),
+                        'expired' => $this->translate('Expired'),
+                        'suspended' => $this->translate('Suspended'),
+                        'canceled' => $this->translate('Canceled')
+                    )); ?>
+                </div>
+                <div class="grid_1 alpha mt20px">
+                    <label class="text-bold"><?php echo $this->translate('By order type');?></label>
+                    <?php echo $this->formSelect('filter-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), array(
+                        '',
+                        'cart_imported_id' => $this->translate('Imported'),
+                        'recurring_id' => $this->translate('Recurring'),
+                        'real_order_id' => $this->translate('Regular')
+                    )); ?>
+                </div>
+				<div class="grid_8 alpha omega mt20px">
 					<label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
 					<?php
                     $countryList = Tools_Geo::getCountries(true);
@@ -102,7 +133,7 @@ $this->headLink()
                 <?php if(isset($this->invoicePlugin)):?>
                     <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                 <?php endif;?>
-                <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('System order');?></th>
+                <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('Order type');?></th>
 			</tr>
 		</thead>
 		<tbody id="orders-list">
@@ -170,5 +201,21 @@ $(function(){
 		toogleStateVisibility: false,
 		url: $('#website_url').val()+'api/store/geo/type/state?pairs'
 	});
+
+    var filterDefaultCouponCode = localStorage.getItem('couponCode');
+    if (filterDefaultCouponCode) {
+        $('#filter-by-coupon-code').val(filterDefaultCouponCode);
+        localStorage.removeItem('couponCode');
+    }
+
+    var searchData = <?php echo json_encode(array_values($this->usedCoupons));?>;
+    $('#filter-by-coupon-code').autocomplete({
+        minLength: 2,
+        source: searchData,
+        messages: {
+            noResults: '',
+            results: function() {}
+        }
+    });
 });
 </script>

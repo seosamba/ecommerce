@@ -1,0 +1,72 @@
+<?php $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams(); ?>
+
+<div class="grid_12 alpha omega background">
+    <p class="grid_12"><label><?php echo $this->translate('Activate autoship frequencies'); ?>:</label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-day" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_DAY]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_DAY] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_DAY; ?>"/><?php echo $this->translate('Day'); ?>
+        </label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-week" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_WEEK]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_WEEK] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_WEEK; ?>"/><?php echo $this->translate('Week'); ?>
+        </label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-month" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_MONTH]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_MONTH] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_MONTH; ?>"/><?php echo $this->translate('Month'); ?>
+        </label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-quarter" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER; ?>"/><?php echo $this->translate('Quarter'); ?>
+        </label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-semester" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER; ?>"/><?php echo $this->translate('Semester'); ?>
+        </label>
+        <label><input type="checkbox" class="recurring-payment-type"
+                      name="recurring-payment-year" <?php echo (isset($shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_YEAR]) && $shoppingConfig[Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_YEAR] === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_STATUS_ENABLED) ? 'checked' : ''; ?>
+                      data-recurring-period="<?php echo Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_YEAR; ?>"/><?php echo $this->translate('Year'); ?>
+        </label>
+    </p>
+
+    <p class="grid_6">
+        <label class="grid_6 alpha"><?php echo $this->translate('A free order is offered every'); ?></label>
+        <input class="grid_2 alpha" maxlength="3" id="recurring-payment-free-period"
+               name="recurring-payment-free-period"
+               value="<?php echo isset($shoppingConfig['recurringPaymentFreePeriod']) ? $shoppingConfig['recurringPaymentFreePeriod'] : ''; ?>"/>
+        <?php echo $this->translate('orders'); ?>.
+    </p>
+</div>
+
+<input type="hidden" class="recurringSecureToken" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN; ?>"
+       value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Recurringtypes::RECURRING_TYPES_SECURE_TOKEN); ?>">
+
+<script type="text/javascript">
+    $(function () {
+        $('.recurring-payment-type').on('change', function () {
+            var recurringPeriodType = $(this).data('recurring-period'),
+                recurringTypeStatus = 'disabled',
+                secureToken = $('.recurringSecureToken').val();
+            if ($(this).is(':checked')) {
+                recurringTypeStatus = 'enabled';
+            }
+            $.post($('#website_url').val() + 'api/store/recurringtypes/', {
+                'recurringPeriodType': recurringPeriodType,
+                'recurringTypeStatus': recurringTypeStatus,
+                'secureToken': secureToken
+            }, function (response) {
+
+            }, 'json');
+        });
+
+        $('#recurring-payment-free-period').on('blur', function () {
+            var secureToken = $('.recurringSecureToken').val(),
+                recurringPaymentFreePeriod = $(this).val();
+            $.post($('#website_url').val() + 'api/store/recurringtypes/', {
+                'recurringPaymentFreePeriod': recurringPaymentFreePeriod,
+                'secureToken': secureToken
+            }, function (response) {
+
+            }, 'json');
+        });
+    });
+</script>

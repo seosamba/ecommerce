@@ -1,0 +1,228 @@
+<div id="user-recurring-grid">
+    <input type="hidden" class="secureToken" name="secureToken"
+           value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
+    <table id="user-recurring-orders-table" border="1" class="widget">
+        <thead>
+        <tr class="user-orders-title-table">
+            <th><?php echo $this->translate('Order date'); ?></th>
+<!--            <th>--><?php //echo $this->translate('Recurring order details'); ?><!--</th>-->
+            <th><?php echo $this->translate('Your autoship invoices'); ?></th>
+            <th><?php echo $this->translate('Payment period cycle'); ?></th>
+            <th><?php echo $this->translate('Recurring Payment amount'); ?></th>
+            <th><?php echo $this->translate('Last billing date'); ?></th>
+            <th><?php echo $this->translate('Next billing date'); ?></th>
+            <th><?php echo $this->translate('Shipping address'); ?></th>
+            <th class="user-recurring-status-th"><?php echo $this->translate('Status'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php if (!empty($this->orders)): ?>
+            <?php $countries = Tools_Geo::getCountries(true); ?>
+            <?php $states = Tools_Geo::getState(null, true); ?>
+            <?php foreach ($this->orders as $order): ?>
+                <tr data-role="cart" data-id="<?php echo $order['cart_id']; ?>">
+                    <td><?php echo date("d-M-Y", strtotime($order['created_at'])); ?></td>
+<!--                    <td><a href="javascript:;" class="tpopup" data-pheight="560"-->
+<!--                           data-url="--><?php //echo $this->websiteUrl; ?><!--plugin/shopping/run/order/id/--><?php //echo $order['cart_id']; ?><!--">-->
+<!--                            # --><?php //echo $order['cart_id']; ?><!--</a></td>-->
+                    <td>
+                        <?php $dependentOrders = explode(',', $order['dependentOrders']); ?>
+                        <?php foreach ($dependentOrders as $dependentOrderId): ?>
+                            <a href="javascript:;" class="tpopup" data-pheight="560"
+                               data-url="<?php echo $this->websiteUrl; ?>plugin/shopping/run/order/id/<?php echo $dependentOrderId; ?>">
+                                # <?php echo $dependentOrderId; ?></a>
+                        <?php endforeach; ?>
+                    </td>
+                    <td class="user-order-current-status">
+                        <?php $changePaymentPeriod =  trim(str_replace('+1', '', strtolower($order['payment_period'])));?>
+                        <?php if($changePaymentPeriod === '+3 month') :?>
+                            <?php $changePaymentPeriod = 'quarter';?>
+                        <?php elseif($changePaymentPeriod === '+6 month'):?>
+                            <?php $changePaymentPeriod = 'semester';?>
+                        <?php endif;?>
+                        <?php if (array_key_exists(strtolower('recurring-payment-' . $changePaymentPeriod),
+                            $this->activeRecurringPaymentTypes)): ?>
+                            <select class="change-recurring-payment-period" name="change-recurring-payment-period">
+                                <?php foreach (Api_Store_Recurringtypes::$recurringAcceptType as $recurringType => $recurringTypeFullName): ?>
+                                    <?php if (array_key_exists(strtolower('recurring-payment-' . $recurringType),
+                                        $this->activeRecurringPaymentTypes)): ?>
+                                    <option
+                                        value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo 'Every ' . $this->translate($recurringType); ?></option>
+                                    <?php endif;?>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php else: ?>
+                            <?php echo 'Every ' . $this->translate($order['payment_period']); ?>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo $this->currency(floatval($order['payment_cycle_amount'])); ?></td>
+                    <td class="user-order-current-status"><?php echo ($order['last_payment_date'] === '0000-00-00') ? '' : date("d-M-Y",
+                            strtotime($order['last_payment_date'])); ?></td>
+                    <td class="user-order-next-billing-date">
+                        <?php $paymentPeriod = strtolower($order['payment_period']); ?>
+                        <?php if (array_key_exists(strtolower($paymentPeriod),
+                            Api_Store_Recurringtypes::$recurringAcceptType)): ?>
+                            <?php $paymentPeriod = '1 ' . $paymentPeriod; ?>
+                        <?php endif; ?>
+                        <?php if ($order['accept_changing_next_billing_date'] && $order['recurring_status'] === Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT): ?>
+                            <input type="text" class="user-order-next-billing-date-change"
+                                   name="user-order-next-billing-date-change" value="<?php echo date("d-M-Y", strtotime($order['next_payment_date'])); ?>"/>
+                        <?php else: ?>
+                            <?php echo  date("d-M-Y", strtotime($order['next_payment_date'])); ?>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if (array_key_exists($order['shipping_address_id'], $this->addresses)): ?>
+                            <?php $shippingAddress = $this->addresses[$order['shipping_address_id']]; ?>
+                            <?php if (empty($order['accept_changing_shipping_address'])): ?>
+                                <p>
+                                    <span><?php echo $shippingAddress['firstname'] . ' ' . $shippingAddress['lastname']; ?></span>
+                                    <span
+                                        class="recurring-shipping-street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2']; ?></span>
+                                </p>
+                            <?php else: ?>
+                                <input class="recurring-shipping-firstname" type="text"
+                                       name="recurring-shipping-firstname"
+                                       value="<?php echo $shippingAddress['firstname']; ?>"/>
+                                <input class="recurring-shipping-lastname" type="text"
+                                       name="recurring-shipping-lastname"
+                                       value="<?php echo $shippingAddress['lastname']; ?>"/>
+                                <input class="recurring-shipping-address1" type="text"
+                                       name="recurring-shipping-address1"
+                                       value="<?php echo $shippingAddress['address1']; ?>"/>
+                                <input class="recurring-shipping-address2" type="text"
+                                       name="recurring-shipping-address2"
+                                       value="<?php echo $shippingAddress['address2']; ?>"/>
+                            <?php endif; ?>
+                            <p>
+                            <span
+                                class="recurring-shipping-locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : ''); ?></span>
+                            <span
+                                class="recurring-shipping-region"><?php echo isset($states[$shippingAddress['state']]) ? $states[$shippingAddress['state']] : ''; ?></span>
+                                <?php if (!empty($order['accept_changing_shipping_address'])): ?>
+                                    <input class="recurring-shipping-zip" type="text"
+                                           name="recurring-shipping-zip"
+                                           value="<?php echo $shippingAddress['zip']; ?>"/>
+                                <?php else: ?>
+                                    <span
+                                        class="recurring-shipping-postal-code"><?php echo $shippingAddress['zip']; ?></span>
+                                <?php endif; ?>
+                                <span><?php echo $countries[$shippingAddress['country']]; ?></span>
+                            </p>
+                            <?php if (!empty($order['accept_changing_shipping_address'])): ?>
+                                <input type="button" class="recurring-shipping-update" name="recurring-shipping-update"
+                                       value="<?php echo $this->translate('Update shipping address'); ?>">
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td class="user-order-current-status">
+                        <select class="change-recurring-status" name="change-recurring-status">
+                            <option
+                                value="<?php echo Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT; ?>" <?php echo ($order['recurring_status'] === Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT) ? 'selected' : ''; ?>><?php echo $this->translate(Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT); ?></option>
+                            <option
+                                value="<?php echo Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT; ?>" <?php echo ($order['recurring_status'] === Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT) ? 'selected' : ''; ?>><?php echo $this->translate(Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT); ?></option>
+                            <option
+                                value="<?php echo Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT; ?>" <?php echo ($order['recurring_status'] === Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT) ? 'selected' : ''; ?>><?php echo $this->translate(Store_Model_RecurringPayments::CANCELED_RECURRING_PAYMENT); ?></option>
+                        </select>
+                    </td>
+
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('.change-recurring-status').on('focus', function () {
+            previousRecurringValue = $(this).val();
+        }).on('change', function () {
+            var currentRecurringStatus = $(this).val(),
+                cartId = $(this).closest('tr').data('id'),
+                secureToken = $('.secureToken').val(),
+                self = $(this);
+            $.post('<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/updateSubscription/', {
+                'changeSubscription': currentRecurringStatus,
+                'cartId': cartId,
+                'secureToken': secureToken
+            }, function (response) {
+                if (response.error) {
+                    self.val(previousRecurringValue);
+                    showMessage(response.responseText, true);
+                } else {
+                    showMessage(response.responseText);
+                }
+            }, 'json');
+        });
+
+
+        $('.change-recurring-payment-period').on('focus', function () {
+            previousPaymentPeriodValue = $(this).val();
+        }).on('change', function () {
+            var cartId = $(this).closest('tr').data('id'),
+                secureToken = $('.secureToken').val(),
+                paymentCycle = $(this).val(),
+                self = $(this);
+            $.post('<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/updateRecurringData/', {
+                'cartId': cartId,
+                'secureToken': secureToken,
+                'changeType': 'payment_cycle',
+                'paymentCycle': paymentCycle
+            }, function (response) {
+                if (response.error) {
+                    self.val(previousPaymentPeriodValue);
+                    showMessage(response.responseText, true);
+                } else {
+                    showMessage(response.responseText);
+                }
+            }, 'json');
+
+        });
+
+        $('.recurring-shipping-update').on('click', function () {
+            var cartId = $(this).closest('tr').data('id'),
+                secureToken = $('.secureToken').val();
+            $.post('<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/updateRecurringData/', {
+                'firstName': $(this).closest('tr').find('.recurring-shipping-firstname').val(),
+                'lastName': $(this).closest('tr').find('.recurring-shipping-lastname').val(),
+                'address1': $(this).closest('tr').find('.recurring-shipping-address1').val(),
+                'address2': $(this).closest('tr').find('.recurring-shipping-address2').val(),
+                'zip': $(this).closest('tr').find('.recurring-shipping-zip').val(),
+                'changeType': 'shipping',
+                'cartId': cartId,
+                'secureToken': secureToken
+            }, function (response) {
+                if (response.error) {
+                    self.val(previousRecurringValue);
+                    showMessage(response.responseText, true);
+                } else {
+                    showMessage(response.responseText);
+                }
+            }, 'json');
+        });
+
+        $('.user-order-next-billing-date-change').datepicker({
+            dateFormat: 'd-M-yy',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "c-5:c+5",
+            minDate: 0,
+            onSelect: function () {
+                var nextBillingDate = $(this).val(),
+                    cartId = $(this).closest('tr').data('id'),
+                    secureToken = $('.secureToken').val();
+                $.post('<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/updateSubscription/', {
+                    'nextBillingDate': nextBillingDate,
+                    'cartId': cartId,
+                    'secureToken': secureToken
+                }, function (response) {
+                    if (response.error) {
+                        showMessage(response.responseText, true);
+                    } else {
+                        showMessage(response.responseText);
+                    }
+                }, 'json');
+            }
+        });
+    });
+</script>
