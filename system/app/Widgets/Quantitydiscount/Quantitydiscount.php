@@ -6,9 +6,19 @@
 class Widgets_Quantitydiscount_Quantitydiscount extends Widgets_Abstract
 {
 
+    /**
+     * type units
+     */
     const PRICE_TYPE_UNIT = 'unit';
 
+    /**
+     * type percent
+     */
     const PRICE_TYPE_PERCENT = 'percent';
+
+    /**
+     * local discount flag
+     */
 
     const LOCAL_DISCOUNT_ENABLED = 'enabled';
 

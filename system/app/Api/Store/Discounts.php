@@ -3,7 +3,7 @@
  * Discounts REST API controller
  *
  * Class Api_Store_Discounts
- * @since 2.3.1
+ * @since 2.4.0
  *
  */
 class Api_Store_Discounts extends Api_Service_Abstract {

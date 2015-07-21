@@ -45,12 +45,16 @@ class Tools_DiscountTools
      *
      * @param $price
      * @param ex: array('type', 'sign', 'discount') $discountData
-     * @param bool if true subtraction will be analyzed like addition and in reverse $reverse
+     * @param bool $reverse if true subtraction will be analyzed like addition and in reverse
+     * @param bool $ignoreUnits ignore discount units
      * @return mixed
      */
-    public static function applyDiscountData($price, $discountData, $reverse = false)
+    public static function applyDiscountData($price, $discountData, $reverse = false, $ignoreUnits = false)
     {
         $priceModificationValue = 0;
+        if ($discountData['type'] === 'unit' && $ignoreUnits === true) {
+            return $price;
+        }
         if ($discountData['type'] === 'percent') {
             $priceModificationValue = $price * $discountData['discount'] / 100;
         }
@@ -78,8 +82,8 @@ class Tools_DiscountTools
     /**
      * Adding new discount rule or updating existing rule if exists
      *
-     * @param array Existing discounts $discounts
-     * @param array ex: array('name', 'type', 'sign', 'discount') new discount $newDiscount
+     * @param array $discounts Existing discounts
+     * @param array $newDiscount ex: array('name', 'type', 'sign', 'discount', 'checkout_label', 'display_on_checkout') new discount
      * @return mixed
      */
     public static function addAdditionalDiscountRule($discounts, $newDiscount)
@@ -92,6 +96,8 @@ class Tools_DiscountTools
                     $discounts[$key]['discount'] = $newDiscount['discount'];
                     $discounts[$key]['type'] = $newDiscount['type'];
                     $discounts[$key]['sign'] = $newDiscount['sign'];
+                    $discounts[$key]['checkout_label'] = $newDiscount['checkout_label'];
+                    $discounts[$key]['display_on_checkout'] = $newDiscount['display_on_checkout'];
                     $inDiscount = true;
                     break;
                 }
@@ -102,6 +108,7 @@ class Tools_DiscountTools
         } else {
             array_push($discounts, $newDiscount);
         }
+
         return $discounts;
     }
 
@@ -120,7 +127,7 @@ class Tools_DiscountTools
     /**
      * Analyze current active discounts and apply it to cart item
      *
-     * @param array Single cart item $cartItem
+     * @param array $cartItem Single cart item
      * @return array
      */
     public static function applyDiscountRules($cartItem)
@@ -153,6 +160,13 @@ class Tools_DiscountTools
         return $cartItem;
     }
 
+    /**
+     * Apply options with discounts to original price
+     *
+     * @param float $originalPrice original product price
+     * @param array $modifiers ex: array('priceType', 'priceSign', 'priceValue') product options data
+     * @return mixed
+     */
     public static function calculateItemWithOptionsPrice($originalPrice, $modifiers)
     {
         $price = $originalPrice;
@@ -168,6 +182,13 @@ class Tools_DiscountTools
         return $price;
     }
 
+    /**
+     * Get unit discount
+     *
+     * @param float $price
+     * @param float $originPrice original price
+     * @return float
+     */
     public static function getUnitDiscount($price, $originPrice)
     {
         return floatval($originPrice) - $price;

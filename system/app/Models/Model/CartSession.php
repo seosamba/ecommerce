@@ -92,6 +92,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_subTotalTax = 0;
 
     protected $_discountTaxRate = 0;
+
+    protected $_discounts = array();
     
 
 	public function setCartContent($cartContent) {
@@ -313,6 +315,17 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     public function getDiscountTaxRate() {
         return $this->_discountTaxRate;
+    }
+
+    public function setDiscounts($discounts)
+    {
+        $this->_discounts = $discounts;
+        return $this;
+    }
+
+    public function getDiscounts()
+    {
+        return $this->_discounts;
     }
 
 }

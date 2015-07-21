@@ -57,8 +57,6 @@ class Tools_ShoppingCart {
 
 	protected $_discount = 0;
 
-    protected $_productDiscounts = array();
-
     private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -283,7 +281,7 @@ class Tools_ShoppingCart {
 		if (!empty($modifiers)) {
 			foreach ($modifiers as $modifier) {
 				if ($taxRate) {
-					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue']);
+					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue'] + round(($taxRate * ($originalPrice / 100) * $modifier['priceValue']) / 100, 2));
 				} else {
 					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
 				}
@@ -887,17 +885,6 @@ class Tools_ShoppingCart {
 
     public function getDiscountTaxRate() {
         return $this->_discountTaxRate;
-    }
-
-    public function setProductDiscounts($productDiscounts)
-    {
-        $this->_productDiscounts = $productDiscounts;
-        return $this;
-    }
-
-    public function getProductDiscounts()
-    {
-        return $this->_productDiscounts;
     }
 
 }

@@ -183,7 +183,13 @@
 							if (is_array($optData)) {
 								$optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
 								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
+                                    if (!empty($product['productDiscounts'])) {
+                                        foreach ($product['productDiscounts'] as $discountRule) {
+                                            $optData['priceValue'] = Tools_DiscountTools::applyDiscountData($optData['priceValue'],
+                                                $discountRule, false, true);
+                                        }
+                                    }
+                                    if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
 										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
 									} else {
 										$optPriceMod = $optData['priceValue'];
@@ -216,8 +222,36 @@
                     <?php echo $this->translate('free'); ?>
                 <?php elseif ($this->showPriceIncTax == 1):?>
                     <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
+                    <?php if(!empty($product['productDiscounts'])):?>
+                        <?php $finalDiscount = 0;?>
+                        <?php foreach($product['productDiscounts'] as $discountData):?>
+                        <?php $discountData['unitSave'] = round($discountData['unitSave'] + ($discountData['unitSave'] / 100) * $product['taxRate'],
+                            2); ?>
+                        <?php $discountData['discount'] = round($discountData['discount'] + ($discountData['discount'] / 100) * $product['taxRate'],
+                            2); ?>
+                        <?php if($discountData['type'] === 'percent'):?>
+                            <?php $discount = $this->currency($discountData['unitSave']); ?>
+                        <?php else:?>
+                            <?php $discount = $this->currency($discountData['discount']); ?>
+                        <?php endif;?>
+                        <?php $finalDiscount += $discount;?>
+                        <?php endforeach;?>
+                        <?php echo $this->translate('you save') . ' ' .  $finalDiscount . ' ' . $this->translate('per unit')?>
+                    <?php endif;?>
                 <?php else:?>
                     <?php echo $this->currency(is_null($product['price'])?0:$product['price']); ?>
+                     <?php if(!empty($product['productDiscounts'])):?>
+                        <?php $finalDiscount = 0;?>
+                        <?php foreach($product['productDiscounts'] as $discountData):?>
+                            <?php if($discountData['type'] === 'percent'):?>
+                                <?php $discount = $discountData['unitSave']; ?>
+                            <?php else:?>
+                                <?php $discount = $discountData['discount']; ?>
+                            <?php endif;?>
+                            <?php $finalDiscount += $discount;?>
+                        <?php endforeach;?>
+                        <?php echo $this->translate('you save') . ' ' .  $finalDiscount . ' ' . $this->translate('per unit')?>
+                     <?php endif;?>
                 <?php endif;?>
                 </td>
 				<td class="product-qty"><?php echo $product['qty']; ?></td>
@@ -478,7 +512,13 @@
 							if (is_array($optData)) {
 								$optionStr = $optionTitle . ': ' . $optData['title'];
 								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
+                                    if (!empty($product['productDiscounts'])) {
+                                        foreach ($product['productDiscounts'] as $discountRule) {
+                                            $optData['priceValue'] = Tools_DiscountTools::applyDiscountData($optData['priceValue'],
+                                                $discountRule, false, true);
+                                        }
+                                    }
+                                    if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
 										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
 									} else {
 										$optPriceMod = $optData['priceValue'];
@@ -511,8 +551,36 @@
                     <?php echo $this->translate('free'); ?>
                 <?php elseif ($this->showPriceIncTax == 1):?>
                     <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
+                    <?php if(!empty($product['productDiscounts'])):?>
+                        <?php $finalDiscount = 0;?>
+                        <?php foreach($product['productDiscounts'] as $discountData):?>
+                            <?php $discountData['unitSave'] = round($discountData['unitSave'] + ($discountData['unitSave'] / 100) * $product['taxRate'],
+                                2); ?>
+                            <?php $discountData['discount'] = round($discountData['discount'] + ($discountData['discount'] / 100) * $product['taxRate'],
+                                2); ?>
+                            <?php if($discountData['type'] === 'percent'):?>
+                                <?php $discount = $this->currency($discountData['unitSave']); ?>
+                            <?php else:?>
+                                <?php $discount = $this->currency($discountData['discount']); ?>
+                            <?php endif;?>
+                            <?php $finalDiscount += $discount;?>
+                        <?php endforeach;?>
+                        <?php echo $this->translate('you save') . ' ' .  $finalDiscount . ' ' . $this->translate('per unit')?>
+                    <?php endif;?>
                 <?php else:?>
                     <?php echo $this->currency(is_null($product['price'])?0:$product['price']); ?>
+                    <?php if(!empty($product['productDiscounts'])):?>
+                        <?php $finalDiscount = 0;?>
+                        <?php foreach($product['productDiscounts'] as $discountData):?>
+                            <?php if($discountData['type'] === 'percent'):?>
+                                <?php $discount = $discountData['unitSave']; ?>
+                            <?php else:?>
+                                <?php $discount = $discountData['discount']; ?>
+                            <?php endif;?>
+                            <?php $finalDiscount += $discount;?>
+                        <?php endforeach;?>
+                        <?php echo $this->translate('you save') . ' ' .  $finalDiscount . ' ' . $this->translate('per unit')?>
+                    <?php endif;?>
                 <?php endif;?>
                 </td>
 				<td valign="middle" align="center"><?php echo $product['qty']; ?></td>

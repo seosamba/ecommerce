@@ -148,6 +148,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
             
 			if ($cartSession instanceof Models_Model_CartSession){
 				$cartContent = $cartSession->getCartContent();
+                $shippingAddress = null;
+                if (null !== ($shippingAddressId = $cartSession->getShippingAddressId())){
+                    $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);
+                }
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
                 $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 				$this->_view->shoppingConfig = $shoppingConfig;
@@ -157,7 +161,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['mpn']      = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
-                        $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
+                        $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, $shippingAddress, true);
                     }
                 }
 

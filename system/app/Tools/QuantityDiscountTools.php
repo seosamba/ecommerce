@@ -5,8 +5,17 @@
 class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
 {
 
+    /**
+     * flag for local discount
+     */
     const LOCAL_DISCOUNT_ENABLED = 'enabled';
 
+    /**
+     * Process discount rule
+     *
+     * @param array $cartItem cart item
+     * @return array
+     */
     public static function prepareDiscountRule($cartItem)
     {
 
@@ -28,15 +37,25 @@ class Tools_QuantityDiscountTools extends Tools_DiscountRulesTools
                 }
                 if (!empty($discountConfig)) {
                     return array(
-                        'name' => 'q-ty discount',
+                        'name' => 'quantity_discount',
                         'discount' => $discountConfig['amount'],
                         'type' => $discountConfig['price_type'],
-                        'sign' => $discountConfig['price_sign']
+                        'sign' => $discountConfig['price_sign'],
+                        'checkout_label' => 'q-ty discount',
+                        'display_on_checkout' => true
                     );
                 }
             }
         }
-        return array('name' => 'q-ty discount', 'discount' => 0, 'type' => '', 'sign' => '');
+
+        return array(
+            'name' => 'quantity_discount',
+            'discount' => 0,
+            'type' => '',
+            'sign' => '',
+            'checkout_label' => 'q-ty discount',
+            'display_on_checkout' => true
+        );
 
     }
 
