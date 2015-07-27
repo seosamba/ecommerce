@@ -209,7 +209,7 @@
                     <tr>
                         <td colspan="<?php echo $colSpan + 7 ?>">
                             <?php echo $this->translate('Delivery comments');?>:
-                            <p class="order-notes text-normal"><?php echo $this->order->getNotes();?></p>
+                            <p class="order-notes text-normal"><?php echo nl2br($this->order->getNotes());?></p>
                         </td>
                     </tr>
                     <tr>
