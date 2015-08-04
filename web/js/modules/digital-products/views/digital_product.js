@@ -71,7 +71,7 @@ define([
             if (downloadLimit === '0') {
                 downloadLimit = '';
             }
-            if (endDate === '2038-01-19 00:00:00') {
+            if (endDate === '2038-01-01 00:00:00') {
                 endDate = ''
             } else {
                 endDate = $.datepicker.formatDate('dd-M-yy', new Date(endDate));

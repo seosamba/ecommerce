@@ -27,7 +27,7 @@ class Store_Model_DigitalProduct extends Application_Model_Models_Abstract
 
     protected $_startDate;
 
-    protected $_endDate = '2038-01-19';
+    protected $_endDate = '2038-01-01';
 
     protected $_downloadLimit = 0;
 
