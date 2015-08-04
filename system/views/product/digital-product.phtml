@@ -1,0 +1,28 @@
+<div class="uploader-digital-product-block grid_12 text-center mt10px">
+    <div id="progressbar" class="hidden grid_4 prefix_5 mt10px">
+        <span class="label"><b class="value">0</b></span>
+    </div>
+    <button id="uploader-digital-product"
+            class="uploader-digital-product btn"><?php echo $this->translate('Attach new file to your product'); ?></button>
+    <div id="progressbar-uploader-digital-product" class="progressbar" style="display:none">
+        <span class="label"><?php echo $this->translate('Uploading'); ?>&nbsp;<b class="value">0</b></span>
+    </div>
+    <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN; ?>" class="uploader-digital-product-token"
+           value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Digitalproducts::DIGITAL_PRODUCTS_SECURE_TOKEN); ?>">
+</div>
+<div id="digital-products-block" class="grid_12 alpha omega form mt20px">
+        <table id="digital-products-table" class="table-striped table-hover small mb10px">
+            <thead class="header-inner">
+            <tr>
+                <th><?php echo $this->translate('From date'); ?></th>
+                <th><?php echo $this->translate('Expiration date'); ?></th>
+                <th><?php echo $this->translate('Download limit'); ?></th>
+                <th><?php echo $this->translate('Display label'); ?></th>
+                <th><?php echo $this->translate('Action');?></th>
+            </thead>
+            <tbody></tbody>
+            <tfoot class="text-center">
+            <tr><td colspan="5" class="digital-product-paginator"></td></tr>
+            </tfoot>
+        </table>
+</div>

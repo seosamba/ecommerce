@@ -8,6 +8,10 @@ class Widgets_User_User extends Widgets_User_Base {
 
     const GATEWAY_QUOTE = 'Quote';
 
+    const GRID_TYPE_DIGITAL = 'digital';
+
+    const GRID_TYPE_RECURRING = 'recurring';
+
     /**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -98,10 +102,15 @@ class Widgets_User_User extends Widgets_User_Base {
             }
         }
         $this->_view->customer = $customerObject;
-        if (isset($this->_options['0']) && $this->_options['0'] === 'recurring') {
+        if (isset($this->_options['0']) && $this->_options['0'] === self::GRID_TYPE_RECURRING) {
             return $this->_recurringOrdersGrid($userId, $addresses);
 
         }
+
+        if (!empty($this->_options['0']) && $this->_options['0'] === self::GRID_TYPE_DIGITAL) {
+            return $this->_digitalProductsGrid($userId);
+        }
+
         $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($userId, true);
         $this->_view->stats = array(
             'all'     => sizeof($orders),
@@ -165,6 +174,19 @@ class Widgets_User_User extends Widgets_User_Base {
         );
 
         return $this->_view->render('recurring_user_grid.phtml');
+    }
+
+    /**
+     * Render digital products grid
+     *
+     * @param int $userId user id
+     * @return string
+     */
+    protected function _digitalProductsGrid($userId)
+    {
+        $digitalProducts = Store_Mapper_DigitalProductMapper::getInstance()->findDigitalProductsByUserId($userId);
+        $this->_view->digitalProducts = $digitalProducts;
+        return $this->_view->render('digital-products-grid.phtml');
     }
 
 }

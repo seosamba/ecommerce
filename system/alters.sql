@@ -194,7 +194,32 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 28/07/2015
+-- version: 2.4.3
+-- Add support for digital products
+ALTER TABLE `shopping_product` ADD COLUMN  `is_digital` ENUM('0','1') DEFAULT '0';
+
+CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
+   `id` INT(10) unsigned AUTO_INCREMENT,
+   `file_stored_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Stored file name',
+   `file_hash` CHAR(40) NOT NULL COMMENT 'Hash for download link',
+   `original_file_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Original file name',
+   `display_file_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Display file name',
+   `product_id` INT(10) unsigned NOT NULL COMMENT 'Product id',
+   `uploaded_at` TIMESTAMP NOT NULL COMMENT 'Upload date',
+   `start_date` TIMESTAMP NOT NULL COMMENT 'Start sales date',
+   `end_date` TIMESTAMP NOT NULL COMMENT 'End sales date',
+   `download_limit` SMALLINT unsigned NOT NULL DEFAULT '0' COMMENT 'File download limit',
+   `product_type` ENUM('downloadable','viewable') NOT NULL DEFAULT 'downloadable' COMMENT 'Digital product distribution type',
+   `ip_address` VARCHAR(40) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   UNIQUE(`file_hash`),
+   CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_cart_session_content` ADD COLUMN `is_digital` ENUM('0','1') DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

@@ -176,6 +176,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `base_price` DECIMAL(10,2) NULL DEFAULT NULL,
   `inventory` VARCHAR(50) NULL DEFAULT NULL COLLATE utf8_unicode_ci,
   `free_shipping` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `is_digital` ENUM('0','1') DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -316,6 +317,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_content` (
   `tax` decimal(10,4) DEFAULT NULL COMMENT 'Tax Price',
   `tax_price` decimal(10,4) DEFAULT NULL COMMENT 'Price + Tax',
   `freebies` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `is_digital` ENUM('0','1') DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `cart_id` (`cart_id`,`product_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -782,4 +784,22 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.4.3' WHERE `name` = 'shopping';
+CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
+   `id` INT(10) unsigned AUTO_INCREMENT,
+   `file_stored_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Stored file name',
+   `file_hash` CHAR(40) NOT NULL COMMENT 'Hash for download link',
+   `original_file_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Original file name',
+   `display_file_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Display file name',
+   `product_id` INT(10) unsigned NOT NULL COMMENT 'Product id',
+   `uploaded_at` TIMESTAMP NOT NULL COMMENT 'Upload date',
+   `start_date` TIMESTAMP NOT NULL COMMENT 'Start sales date',
+   `end_date` TIMESTAMP NOT NULL COMMENT 'End sales date',
+   `download_limit` SMALLINT unsigned NOT NULL DEFAULT '0' COMMENT 'File download limit',
+   `product_type` ENUM('downloadable','viewable') NOT NULL DEFAULT 'downloadable' COMMENT 'Digital product distribution type',
+   `ip_address` VARCHAR(40) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   UNIQUE(`file_hash`),
+   CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+UPDATE `plugin` SET `version` = '2.4.4' WHERE `name` = 'shopping';

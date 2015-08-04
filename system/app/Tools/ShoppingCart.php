@@ -236,7 +236,8 @@ class Tools_ShoppingCart {
                 'freeShipping'     => $item->getFreeShipping(),
                 'freebies'         => $item->getFreebies(),
                 'groupPriceEnabled' => $item->getGroupPriceEnabled(),
-                'originalPrice'     => $item->getPrice()
+                'originalPrice'    => $item->getPrice(),
+                'isDigital'        => $item->getIsDigital()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;

@@ -1518,5 +1518,26 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->success($this->_translator->translate('Shipping address updated'));
     }
 
+    /**
+     * Check if this digital product was sold
+     */
+    public function checkDigitalProductUsageAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $productId = filter_var($this->_request->getParam('productId', false), FILTER_SANITIZE_NUMBER_INT);
+            if ($productId) {
+
+                $productSold = Store_Mapper_DigitalProductMapper::getInstance()->checkDigitalProductInCart($productId);
+                $sold = false;
+                if (!empty($productSold)) {
+                    $sold = true;
+                }
+                $this->_responseHelper->success(array('productSold' => $sold));
+            }
+            $this->_responseHelper->fail('Product id missed');
+        }
+        $this->_responseHelper->fail('not authorized');
+    }
+
 
 }
