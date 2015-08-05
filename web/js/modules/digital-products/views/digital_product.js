@@ -68,7 +68,7 @@ define([
         renderDigitalProduct: function (digitalProduct) {
             var endDate = digitalProduct.get('end_date'),
                 downloadLimit = digitalProduct.get('download_limit');
-            if (downloadLimit === '0') {
+            if (downloadLimit === '65000') {
                 downloadLimit = '';
             }
             if (endDate === '2038-01-01 00:00:00') {

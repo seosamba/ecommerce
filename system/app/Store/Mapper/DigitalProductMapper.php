@@ -164,10 +164,8 @@ class Store_Mapper_DigitalProductMapper extends Application_Model_Mappers_Abstra
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('scs.status IN (?)', self::$_acceptedStatuses);
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.file_hash = ?', $fileHash);
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('u.id = ?', $userId);
-        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.start_date <= ?',
-                date(Tools_System_Tools::DATE_MYSQL));
-        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.end_date >= ?',
-                date(Tools_System_Tools::DATE_MYSQL));
+        $where .= ' AND ' . new Zend_Db_Expr('spdg.start_date <= scs.created_at');
+        $where .= ' AND ' . new Zend_Db_Expr('spdg.end_date >= scs.created_at');
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.download_limit > ?', 0);
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.product_type = ?', $productType);
         $select = $this->getDbTable()->getAdapter()->select()->from(array('scs' => 'shopping_cart_session'), array())
@@ -193,18 +191,15 @@ class Store_Mapper_DigitalProductMapper extends Application_Model_Mappers_Abstra
         $where = $this->getDbTable()->getAdapter()->quoteInto('u.id = ?', $userId);
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('shcc.is_digital = ?', '1');
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('scs.status IN (?)', self::$_acceptedStatuses);
-        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.start_date <= ?',
-                date(Tools_System_Tools::DATE_MYSQL));
-        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.end_date >= ?',
-                date(Tools_System_Tools::DATE_MYSQL));
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('spdg.download_limit > ?', 0);
+        $where .= ' AND ' . new Zend_Db_Expr('spdg.start_date <= scs.created_at');
+        $where .= ' AND ' . new Zend_Db_Expr('spdg.end_date >= scs.created_at');
         $select = $this->getDbTable()->getAdapter()->select()->from(array('scs' => 'shopping_cart_session'),
             array('orderDate' => 'scs.created_at', 'cartId' => 'scs.id'))
             ->joinLeft(array('shcc' => 'shopping_cart_session_content'), 'scs.id=shcc.cart_id', array())
             ->joinLeft(array('spdg' => 'shopping_product_digital_goods'), 'shcc.product_id=spdg.product_id')
             ->joinLeft(array('u' => 'user'), 'u.id=scs.user_id', array())
             ->where($where)->group('spdg.file_hash');
-
         return $this->getDbTable()->getAdapter()->fetchAll($select);
     }
 

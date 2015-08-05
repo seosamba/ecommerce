@@ -54,7 +54,7 @@ class Api_Store_Digitalproductsdownload extends Api_Service_Abstract
                 DIRECTORY_SEPARATOR . 'web' . DIRECTORY_SEPARATOR . Api_Store_Digitalproducts::FILES_FOLDER
                 . DIRECTORY_SEPARATOR . $fileStoredName;
 
-            if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && Api_Store_Digitalproducts::DEFAULT_DOWNLOAD_LIMIT !== $digitalProduct['download_limit']) {
                 $digitalProductsMapper->decreaseDownloadLimit($digitalProduct['id']);
             }
 

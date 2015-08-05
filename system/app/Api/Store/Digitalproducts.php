@@ -8,6 +8,8 @@ class Api_Store_Digitalproducts extends Api_Service_Abstract
 
     const DIGITAL_PRODUCTS_SECURE_TOKEN = 'DigitalProductToken';
 
+    const DEFAULT_DOWNLOAD_LIMIT = '65000';
+
     /**
      * General files folder
      */
@@ -172,6 +174,7 @@ class Api_Store_Digitalproducts extends Api_Service_Abstract
                 $digitalProductModel->setUploadedAt(date(Tools_System_Tools::DATE_MYSQL));
                 $digitalProductModel->setStartDate(date(Tools_System_Tools::DATE_MYSQL));
                 $digitalProductModel->setDisplayFileName($fileName);
+                $digitalProductModel->setDownloadLimit(self::DEFAULT_DOWNLOAD_LIMIT);
                 $digitalProductMapper->save($digitalProductModel);
 
                 return array('error' => 0, 'message' => $translator->translate('File uploaded'));
@@ -203,7 +206,11 @@ class Api_Store_Digitalproducts extends Api_Service_Abstract
             $digitalProductModel->setEndDate(date(Tools_System_Tools::DATE_MYSQL, strtotime($srcData['end_date'])));
             $downloadLimit = filter_var($srcData['download_limit'], FILTER_SANITIZE_NUMBER_INT);
             $displayFileName = filter_var($srcData['display_file_name'], FILTER_SANITIZE_STRING);
-            $digitalProductModel->setDownloadLimit($downloadLimit);
+            if ($downloadLimit) {
+                $digitalProductModel->setDownloadLimit($downloadLimit);
+            } else {
+                $digitalProductModel->setDownloadLimit(self::DEFAULT_DOWNLOAD_LIMIT);
+            }
             $digitalProductModel->setDisplayFileName($displayFileName);
             $digitalProductMapper->save($digitalProductModel);
 
