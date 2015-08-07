@@ -531,15 +531,26 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $this->_cart->getId();
     }
 
+    /**
+     * Return cart item total for single cart item
+     *
+     * @param string $sid unique cart item key
+     * @return int
+     */
     protected function _renderCartItemTotal($sid)
     {
-        $priceWithTax = (is_null($this->_cartContent[$sid]['tax_price'])) ? 0 : $this->_cartContent[$sid]['tax_price'];
+        if (in_array(self::WITHOUT_TAX, $this->_options)) {
+            $price = $this->_cartContent[$sid]['price'];
+        } else {
+            $price = (is_null($this->_cartContent[$sid]['tax_price'])) ? 0 : $this->_cartContent[$sid]['tax_price'];
+        }
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            return $priceWithTax * $this->_cartContent[$sid]['qty'];
+            return $price * $this->_cartContent[$sid]['qty'];
         } elseif (intval($this->_cartContent[$sid]['freebies']) === 1) {
             return $this->_translator->translate('free');
         }
-        return $this->_view->currency($priceWithTax * $this->_cartContent[$sid]['qty']);
+
+        return $this->_view->currency($price * $this->_cartContent[$sid]['qty']);
     }
 
     /**
