@@ -194,7 +194,13 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 06/08/2015
+-- version: 2.4.3
+-- Add product type id
+INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
+UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_product`);
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
