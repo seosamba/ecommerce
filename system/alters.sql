@@ -198,6 +198,7 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
 -- version: 2.4.3
 -- Add product type id
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
+UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_product`);
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.4.4' WHERE `name`='shopping';
