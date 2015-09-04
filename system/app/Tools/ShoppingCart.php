@@ -712,9 +712,13 @@ class Tools_ShoppingCart {
 						break;
 					case Models_Model_Option::TYPE_DATE:
 					case Models_Model_Option::TYPE_TEXT:
+						$textValue = '';
+						if (!empty($options[$defaultOption['id']])) {
+							$textValue = $options[$defaultOption['id']];
+						}
 						$modifiers[$defaultOption['title']] = array(
 							'option_id'   => $defaultOption['id'],
-							'title'       => $defaultOption['title'],
+							'title'       => $textValue,
 							'priceSign'   => null,
 							'priceType'   => null,
 							'priceValue'  => null,
