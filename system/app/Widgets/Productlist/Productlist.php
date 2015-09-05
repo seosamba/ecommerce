@@ -193,7 +193,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$cacheTags = array();
 		// here we go - proccessing the list
-		array_walk($products, function ($product) use (&$renderedContent, $data, &$cacheTags) {
+        $websiteUrl = $this->_websiteUrl;
+		array_walk($products, function ($product) use (&$renderedContent, $data, &$cacheTags, $websiteUrl) {
 			array_push($cacheTags, 'prodid_' . $product->getId());
 			if (strpos($data['templateContent'], '$store:addtocart') !== false) {
 				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
@@ -222,7 +223,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
-                '$product:url'                        => $product->getPage() ? $this->_websiteUrl . $product->getPage()->getUrl() : null,
+                '$product:url'                        => $product->getPage() ? $websiteUrl . $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),
                 '$product:mpn'                        => $product->getMpn(),
