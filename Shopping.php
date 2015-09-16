@@ -967,17 +967,19 @@ class Shopping extends Tools_Plugins_Abstract {
                     if (Tools_CouponTools::processCoupons($shoppingCart->getCoupons(),
                         Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)
                     ) {
+                        $msg = array('msg' => $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.'));
+                    }
+
+                    if (!empty($msg)) {
                         $coupons = $shoppingCart->getCoupons();
                         $appliedCoupons = array();
                         foreach ($coupons as $coupon) {
                             $appliedCoupons[] = $coupon->getCode();
                         }
-
-                        $msg = array(
-                            'msg' => $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.'),
-                            'couponCodes' => implode(',', $appliedCoupons)
-                        );
+                        $msg['couponCodes'] = implode(',', $appliedCoupons);
                     }
+
+
 				} else {
 					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
 				}
