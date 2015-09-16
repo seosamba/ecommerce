@@ -220,15 +220,27 @@ class Widgets_Store_Store extends Widgets_Abstract {
         
     }
 
-	protected function _makeOptionCoupon() {
-		if (!Tools_ShoppingCart::getInstance()->getCustomerId()){
-			return null;
-		}
+    protected function _makeOptionCoupon()
+    {
+        $shoppingCart = Tools_ShoppingCart::getInstance();
 
-		$this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();
+        if (!$shoppingCart->getCustomerId()) {
+            return null;
+        }
 
-		return $this->_view->render('coupon.phtml');
-	}
+        $currentAppliedCoupons = $shoppingCart->getCoupons();
+        $appliedCoupons = array();
+        if (!empty($currentAppliedCoupons)) {
+            foreach ($currentAppliedCoupons as $coupon) {
+                $appliedCoupons[] = $coupon->getCode();
+            }
+        }
+        $this->_view->currentAppliedCoupons = $appliedCoupons;
+
+        $this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();
+
+        return $this->_view->render('coupon.phtml');
+    }
 
     protected function _makeOptionRecurring() {
         $shoppingCart = Tools_ShoppingCart::getInstance();

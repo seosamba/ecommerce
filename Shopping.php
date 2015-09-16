@@ -956,21 +956,36 @@ class Shopping extends Tools_Plugins_Abstract {
 						}
 					}
 
-					$discount = Tools_ShoppingCart::getInstance()->getDiscount();
-					if ($discount) {
-						$msg[] = 'Congratulations, you save ' . $this->_view->currency($discount) . ' on this order. Proceed to checkout now.';
-					}
-					//processing freeshipping coupons
-					if (Tools_CouponTools::processCoupons(Tools_ShoppingCart::getInstance()->getCoupons(), Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)) {
-						$msg[] = $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.');
-					}
+                    $shoppingCart = Tools_ShoppingCart::getInstance();
+
+                    $discount = $shoppingCart->getDiscount();
+                    if ($discount) {
+                        $msg = array('msg' => 'Congratulations, you save ' . $this->_view->currency($discount) . ' on this order. Proceed to checkout now.');
+                    }
+
+                    //processing freeshipping coupons
+                    if (Tools_CouponTools::processCoupons($shoppingCart->getCoupons(),
+                        Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)
+                    ) {
+                        $coupons = $shoppingCart->getCoupons();
+                        $appliedCoupons = array();
+                        foreach ($coupons as $coupon) {
+                            $appliedCoupons[] = $coupon->getCode();
+                        }
+
+                        $msg = array(
+                            'msg' => $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.'),
+                            'couponCodes' => implode(',', $appliedCoupons)
+                        );
+                    }
 				} else {
 					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
 				}
+                $this->_responseHelper->success($msg);
 			}
-
-			$this->_responseHelper->success($msg);
 		}
+
+        $this->_responseHelper->fail($this->_translator->translate('Failed'));
 	}
 
 	/**
