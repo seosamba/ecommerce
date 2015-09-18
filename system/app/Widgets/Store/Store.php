@@ -235,6 +235,21 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 $appliedCoupons[] = $coupon->getCode();
             }
         }
+
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
+        if (isset($this->_options[1])) {
+            $sessionHelper->customCouponMessageApply = $this->_options[1];
+        } elseif(isset($sessionHelper->customCouponMessageApply)){
+            unset($sessionHelper->customCouponMessageApply);
+        }
+
+        if (isset($this->_options[2]) && $this->_options[2] === 'success') {
+            $sessionHelper->forceCouponSuccessStatus = true;
+            $this->_view->forceCouponSuccessStatus = true;
+        } elseif(isset($sessionHelper->forceCouponSuccessStatus)) {
+            unset($sessionHelper->forceCouponSuccessStatus);
+        }
+
         $this->_view->currentAppliedCoupons = $appliedCoupons;
 
         $this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();

@@ -45,6 +45,9 @@ $(function(){
                                 $("<p></p>", { "class": "store-coupon-notify" }).html(msg)
                                     .on('click', function(){ $(this).remove(); })
                                     .appendTo($msgContainer);
+                                <?php if(isset($this->forceCouponSuccessStatus)):?>
+                                    showMessage(msg, false, 5000);
+                                <?php endif;?>
                             }
                             if (key === 'couponCodes') {
                                 var couponsInfoEl = $(self).find('.current-applied-coupons');
