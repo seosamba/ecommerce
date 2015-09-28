@@ -603,4 +603,5 @@
         'Your post purchase page' => 'Votre page de confirmation d\'achat',
         'Your client area page' => 'Votre page compte client',
         'Your Google products XML feed' => 'Flux xml de vos produits Google'
+        'All others' => 'Autres'
 );?>
