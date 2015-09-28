@@ -602,6 +602,6 @@
         'search quote by title, by creator, by client email & name' => 'rechercher devis par titre, par le créateur, par nom or email du client',
         'Your post purchase page' => 'Votre page de confirmation d\'achat',
         'Your client area page' => 'Votre page compte client',
-        'Your Google products XML feed' => 'Flux xml de vos produits Google'
+        'Your Google products XML feed' => 'Flux xml de vos produits Google',
         'All others' => 'Autres'
 );?>
