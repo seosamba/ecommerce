@@ -605,5 +605,8 @@
         'Your Google products XML feed' => 'Flux xml de vos produits Google',
         'All others' => 'Autres',
         'Reset filters' => 'Réinitialiser',
-        'Apply filters' => 'Appliquer'
+        'Apply filters' => 'Appliquer',
+        'Brands'=>'Marque',
+        'Category' => 'Categorie'
+
 );?>
