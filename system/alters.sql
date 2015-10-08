@@ -148,6 +148,9 @@ UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NULL DEFAULT NULL COMMENT 'Contains mobile phone country code';
 
 -- 20/04/2015
+-- version: 2.4.0
+
+-- 20/04/2015
 -- version: 2.4.1
 -- add recurring payments
 CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
