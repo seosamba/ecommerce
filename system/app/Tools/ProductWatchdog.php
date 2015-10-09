@@ -90,7 +90,8 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
             ->setSystem(0)
             ->setDraft((bool)$this->_object->getEnabled() ? '0' : '1')
             ->setMemLanding(0)
-            ->setNews(0);
+            ->setNews(0)
+            ->setPageType(Shopping::PRODUCT_PAGE_TYPE);
 
         if ($pageMapper->save($page)) {
             $this->_object->setPage($page);

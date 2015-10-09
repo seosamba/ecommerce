@@ -8,6 +8,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	const PRODUCT_CATEGORY_NAME = 'Product Pages';
 	const PRODUCT_CATEGORY_URL = 'product-pages.html';
 	const PRODUCT_DEFAULT_LIMIT = 30;
+	const PRODUCT_PAGE_TYPE = 2;
 
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
@@ -955,21 +956,44 @@ class Shopping extends Tools_Plugins_Abstract {
 						}
 					}
 
-					$discount = Tools_ShoppingCart::getInstance()->getDiscount();
-					if ($discount) {
-						$msg[] = 'Congratulations, you save ' . $this->_view->currency($discount) . ' on this order. Proceed to checkout now.';
-					}
-					//processing freeshipping coupons
-					if (Tools_CouponTools::processCoupons(Tools_ShoppingCart::getInstance()->getCoupons(), Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)) {
-						$msg[] = $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.');
-					}
+                    $shoppingCart = Tools_ShoppingCart::getInstance();
+
+                    $discount = $shoppingCart->getDiscount();
+                    if ($discount) {
+                        $msg = array('msg' => 'Congratulations, you save ' . $this->_view->currency($discount) . ' on this order. Proceed to checkout now.');
+                    }
+
+                    //processing freeshipping coupons
+                    if (Tools_CouponTools::processCoupons($shoppingCart->getCoupons(),
+                        Store_Model_Coupon::COUPON_TYPE_FREESHIPPING)
+                    ) {
+                        $msg = array('msg' => $this->_translator->translate('Congratulations, your order is now available for free shipping. Please proceed to checkout.'));
+                    }elseif(!isset($this->_sessionHelper->forceCouponSuccessStatus) && !$discount) {
+                        $this->_responseHelper->fail($this->_translator->translate('Coupon not available for that order amount'));
+                    }
+
+                    if (isset($this->_sessionHelper->customCouponMessageApply)) {
+                        $msg['msg'] = $this->_sessionHelper->customCouponMessageApply;
+                    }
+
+                    $coupons = $shoppingCart->getCoupons();
+                    if (!empty($coupons)) {
+                        $appliedCoupons = array();
+                        foreach ($coupons as $coupon) {
+                            $appliedCoupons[] = $coupon->getCode();
+                        }
+                        $msg['couponCodes'] = implode(',', $appliedCoupons);
+                    }
+
+                    $this->_responseHelper->success($msg);
 				} else {
 					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
 				}
-			}
 
-			$this->_responseHelper->success($msg);
+			}
 		}
+
+        $this->_responseHelper->fail($this->_translator->translate('Failed'));
 	}
 
 	/**

@@ -782,6 +782,8 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
+
 INSERT INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_GroupPriceObserver');
 
 CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
@@ -820,5 +822,4 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
   CONSTRAINT `shopping_cart_session_discount_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.4.5' WHERE `name` = 'shopping';
-
+UPDATE `plugin` SET `version` = '2.4.6' WHERE `name` = 'shopping';

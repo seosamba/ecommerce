@@ -224,15 +224,42 @@ class Widgets_Store_Store extends Widgets_Abstract {
         
     }
 
-	protected function _makeOptionCoupon() {
-		if (!Tools_ShoppingCart::getInstance()->getCustomerId()){
-			return null;
-		}
+    protected function _makeOptionCoupon()
+    {
+        $shoppingCart = Tools_ShoppingCart::getInstance();
 
-		$this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();
+        if (!$shoppingCart->getCustomerId()) {
+            return null;
+        }
 
-		return $this->_view->render('coupon.phtml');
-	}
+        $currentAppliedCoupons = $shoppingCart->getCoupons();
+        $appliedCoupons = array();
+        if (!empty($currentAppliedCoupons)) {
+            foreach ($currentAppliedCoupons as $coupon) {
+                $appliedCoupons[] = $coupon->getCode();
+            }
+        }
+
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
+        if (isset($this->_options[1])) {
+            $sessionHelper->customCouponMessageApply = $this->_options[1];
+        } elseif(isset($sessionHelper->customCouponMessageApply)){
+            unset($sessionHelper->customCouponMessageApply);
+        }
+
+        if (isset($this->_options[2]) && $this->_options[2] === 'success') {
+            $sessionHelper->forceCouponSuccessStatus = true;
+            $this->_view->forceCouponSuccessStatus = true;
+        } elseif(isset($sessionHelper->forceCouponSuccessStatus)) {
+            unset($sessionHelper->forceCouponSuccessStatus);
+        }
+
+        $this->_view->currentAppliedCoupons = $appliedCoupons;
+
+        $this->_view->returnUrl = Tools_Misc::getCheckoutPage()->getUrl();
+
+        return $this->_view->render('coupon.phtml');
+    }
 
     protected function _makeOptionRecurring() {
         $shoppingCart = Tools_ShoppingCart::getInstance();

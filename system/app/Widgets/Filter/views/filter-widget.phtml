@@ -19,7 +19,7 @@
         </li>
     <?php endif; ?>
     <?php foreach ($this->filters as $filter) : ?>
-        <li>
+        <li class="filter-<?php echo filter_var($filter['label'], FILTER_SANITIZE_STRING); ?>">
             <p class="filter-header"><?php echo $filter['label']; ?></p>
         <?php if (!isset($filter['values'])) : ?>
             <?php echo $this->partial('_range-slider.phtml', $filter); ?>

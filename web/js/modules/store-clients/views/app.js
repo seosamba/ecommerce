@@ -414,9 +414,9 @@ define([
                             dataType: 'json'
                         }).done(function(response) {
                             if(response.error == 0){
-                                showMessage(_.isUndefined(i18n['Emails added'])?'Emails added':i18n['Emails added']);
+                                showMessage(_.isUndefined(i18n['Added'])?'Added':i18n['Added']);
                             }else{
-                                showMessage(_.isUndefined(i18n['Something went wrong'])?'Something went wrong':i18n['Something went wrong']);
+                                showMessage(_.isUndefined(i18n[response.responseText])?response.responseText:i18n[response.responseText], false, 5000);
                             }
                         })
                     };
@@ -436,7 +436,7 @@ define([
                             $('#crm-services').on('change',  function(){
                                 if($("#crm-services option:selected").val() != 'select'){
                                     $.ajax({
-                                        url: $('#website_url').val()+'plugin/apps/run/getService/serviceName/'+$("#crm-services option:selected").val(),
+                                        url: $('#website_url').val()+'plugin/apps/run/getServiceDashboard/serviceName/'+$("#crm-services option:selected").val(),
                                         type: 'GET',
                                         dataType: 'json'
 
