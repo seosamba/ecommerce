@@ -1543,4 +1543,114 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
 
+    /**
+     * Refund order (full or partial order refund)
+     */
+    public function refundPaymentAction()
+    {
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $refundAmount = filter_var($this->_request->getParam('refundAmount'), FILTER_SANITIZE_STRING);
+        $refundNotes = filter_var($this->_request->getParam('refundInfo'), FILTER_SANITIZE_STRING);
+        $paymentGateway = strtolower(filter_var($this->_request->getParam('paymentGateway')));
+        $refundUsingPaymentGateway = (bool)$this->_request->getParam('refundUsingPaymentGateway', false);
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $taxRule = filter_var($this->_request->getParam('refundTax', false), FILTER_SANITIZE_NUMBER_INT);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && $orderId) {
+            $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus !== Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can refund only orders with status completed'));
+                }
+                $total = $orderModel->getTotal();
+                if (empty($refundAmount)) {
+                    $refundAmount = $total;
+                }
+                $refundResultMessage = '';
+                $finalTax = 0;
+                if ($taxRule) {
+                    $finalTax = Tools_Tax_Tax::calculateDiscountTax($refundAmount, $taxRule);
+                }
+                if ($total >= $refundAmount) {
+                    $data = array(
+                        'refund_notes' => $refundNotes,
+                        'refund_amount' => $refundAmount,
+                        'status' => Models_Model_CartSession::CART_STATUS_REFUNDED,
+                        'total_tax' => $orderModel->getTotalTax() + $finalTax,
+                        'sub_total' => $orderModel->getSubTotal() - $refundAmount - $finalTax,
+                        'total' => $total - $refundAmount
+                    );
+                    if ($refundUsingPaymentGateway) {
+                        $paymentGatewayInfo = Application_Model_Mappers_PluginMapper::getInstance()->findByName($paymentGateway);
+                        if ($paymentGatewayInfo instanceof Application_Model_Models_Plugin) {
+                            $pluginGatewayStatus = $paymentGatewayInfo->getStatus();
+                            if ($pluginGatewayStatus === Application_Model_Models_Plugin::ENABLED) {
+                                $paymentPluginClassName = ucfirst($paymentGateway);
+                                if (class_exists($paymentPluginClassName) && method_exists($paymentPluginClassName,
+                                        'refund')
+                                ) {
+                                    $reflection = new ReflectionMethod($paymentPluginClassName, 'refund');
+                                    if (!$reflection->isPublic()) {
+                                        $this->_responseHelper->fail($this->_translator->translate('Can\'t access payment gateway refund method'));
+                                    }
+                                    $pageData = array('websiteUrl' => $this->_websiteHelper->getUrl());
+                                    try {
+                                        $plugin = Tools_Factory_PluginFactory::createPlugin($paymentGateway, array(),
+                                            $pageData);
+                                        $result = $plugin->refund($orderId, $refundAmount, $refundNotes);
+                                        if (!isset($result['error'])) {
+                                            $this->_responseHelper->fail($this->_translator->translate('Unexpected error happened. Please contact support'));
+                                        } elseif (!empty($result['error']) && $result['error'] === 1) {
+                                            if (!empty($result['errorMessage'])) {
+                                                $this->_responseHelper->fail($this->_translator->translate($result['errorMessage']));
+                                            } else {
+                                                $this->_responseHelper->fail($this->_translator->translate('Payment gateway error happened'));
+                                            }
+                                        } elseif ($result['error'] === 0 && !empty($result['refundMessage'])) {
+                                            $refundResultMessage = $result['refundMessage'];
+                                        }
+                                    } catch (Exception $e) {
+                                        $this->_responseHelper->fail($e->getMessage());
+                                    }
+                                } else {
+                                    $this->_responseHelper->fail($this->_translator->translate('Payment gateway doesn\'t have refund functionality'));
+                                }
+                            } else {
+                                $this->_responseHelper->fail($this->_translator->translate('Payment plugin disabled'));
+                            }
+
+                        } else {
+                            $this->_responseHelper->fail($this->_translator->translate('Payment plugin doesn\'t exists'));
+                        }
+                    }
+
+                    Models_Mapper_OrdersMapper::getInstance()->updateOrderInfo($orderId, $data);
+
+                    $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+                    $orderModel->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_REFUND,
+                        'refundNotes' => $refundNotes,
+                        'refundAmount' => $refundAmount
+                    )));
+                    $orderModel->notifyObservers();
+
+                    $data['total'] = round($data['total'], 2);
+
+                    $this->_responseHelper->success(array('message' => $this->_translator->translate('Order refunded' . ' ' . $refundResultMessage), 'total' => $data['total']));
+                }
+                $this->_responseHelper->fail($this->_translator->translate('Sorry, you can\'t refund more than the order\'s original amount.'));
+            }
+
+            $this->_responseHelper->fail($this->_translator->translate('Order doesn\'t exists'));
+
+
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Order id missing'));
+    }
+
+
 }

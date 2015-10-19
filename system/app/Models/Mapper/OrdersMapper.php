@@ -56,7 +56,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 					'billing_address2' => 'address2'
 				))
 				->joinLeft(array('u' => 'user'), 'u.id = order.user_id', array(
-					'full_name', 'email'
+					'full_name', 'email', 'originalTotal' => new Zend_Db_Expr('SUM(order.total+order.refund_amount)')
 				))
                 ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
                     array('real_order_id'=>'imp.real_order_id'))
@@ -311,5 +311,23 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 		}
 		return $select;
 	}
+
+
+    /**
+     * Update order data
+     *
+     * @param int $orderId order id
+     * @param array $data array of order params ex: array('total' => '200', 'notes' => 'some info')
+     * @return int
+     * @throws Zend_Db_Adapter_Exception
+     */
+    public function updateOrderInfo($orderId, array $data = array())
+    {
+        if (!empty($data) && $orderId) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $orderId);
+            return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
+        }
+        return false;
+    }
 
 }

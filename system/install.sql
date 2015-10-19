@@ -299,6 +299,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
   `discount` decimal(10,2) DEFAULT NULL COMMENT 'Order discount',
   `free_cart` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
+  `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -784,4 +786,4 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
-UPDATE `plugin` SET `version` = '2.4.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.4.5' WHERE `name` = 'shopping';
