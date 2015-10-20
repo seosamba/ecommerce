@@ -252,12 +252,6 @@
                 <?php endif;?>
             </div>
         <?php endif; ?>
-        <?php if ($this->cart->getRefundAmount() > 0) : ?>
-            <div class="post-purchase-row cart-refund">
-                <span><?php echo $this->translate('Refund');?>:</span>
-                <span><?php echo $this->cart->getRefundAmount() === null ? $this->currency(0) : $this->currency($this->cart->getRefundAmount());?></span>
-            </div>
-        <?php endif; ?>
         <div class="post-purchase-row cart-shipping">
             <span><?php echo $this->translate('Shipping');?>:</span>
             <?php if ($this->showPriceIncTax == 1): ?>
@@ -279,6 +273,12 @@
 			<?php endif;?>
 			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
 		</div>
+        <?php if ($this->cart->getRefundAmount() > 0) : ?>
+            <div class="post-purchase-row cart-refund">
+                <span><?php echo $this->translate('Refund');?>:</span>
+                <span><?php echo $this->cart->getRefundAmount() === null ? $this->currency(0) : $this->currency($this->cart->getRefundAmount());?></span>
+            </div>
+        <?php endif; ?>
 		<div class="post-purchase-row cart-total">
 			<span><?php echo $this->translate('Total');?>:</span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
