@@ -28,7 +28,7 @@ define([
             if (recurringId === null) {
                 if (event.type === "mouseleave") {
                     var status = this.model.get('status');
-                    var translatedGateway = this.model.get('gateway')
+                    var translatedGateway = this.model.get('gateway');
                     var translatedStatus = 'cs_' + status;
 
                     if (translatedGateway == 'Quote' && status == 'pending') {
@@ -60,12 +60,12 @@ define([
                     'completed': '<button class="change-status btn small green-gradient" data-status="completed" >' + paidPaymentTranslation + '</button>',
                     'canceled': '<button class="change-status btn small red-gradient" data-status="canceled" >' + cancelOrderTranslation + '</button>',
                     'delivered': '<button class="change-status btn small orange-gradient" data-status="delivered" >' + deliveredTranslation + '</button>'
-                }
+                };
 
                 var html = '';
                 switch (this.model.get('status')) {
                     case 'completed':
-                        html += buttons['refunded']
+                        html += buttons['refunded'];
                         break;
                     case 'pending':
                         html += buttons['completed'];

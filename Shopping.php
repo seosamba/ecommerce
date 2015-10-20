@@ -1576,14 +1576,28 @@ class Shopping extends Tools_Plugins_Abstract {
                     $finalTax = Tools_Tax_Tax::calculateDiscountTax($refundAmount, $taxRule);
                 }
                 if ($total >= $refundAmount) {
+                    if ($orderModel->getTotalTax() <= 0) {
+                        $totalTax = $finalTax;
+                    } else {
+                        $totalTax = $orderModel->getTotalTax() - $finalTax;
+                    }
                     $data = array(
                         'refund_notes' => $refundNotes,
                         'refund_amount' => $refundAmount,
                         'status' => Models_Model_CartSession::CART_STATUS_REFUNDED,
-                        'total_tax' => $orderModel->getTotalTax() + $finalTax,
+                        'total_tax' => $totalTax,
                         'sub_total' => $orderModel->getSubTotal() - $refundAmount - $finalTax,
                         'total' => $total - $refundAmount
                     );
+                    if ($data['total'] <= 0) {
+                        $data['total'] = 0;
+                    }
+                    if ($data['total_tax'] <= 0) {
+                        $data['total_tax'] = 0;
+                    }
+                    if ($data['total'] === 0) {
+                        $data['sub_total'] = 0;
+                    }
                     if ($refundUsingPaymentGateway) {
                         $paymentGatewayInfo = Application_Model_Mappers_PluginMapper::getInstance()->findByName($paymentGateway);
                         if ($paymentGatewayInfo instanceof Application_Model_Models_Plugin) {
