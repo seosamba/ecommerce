@@ -264,6 +264,12 @@
                         <?php endif;?>
                         <td><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>
+                    <?php if ($this->order->getRefundAmount() > 0): ?>
+                        <tr>
+                            <td class="text-right"><?php echo $this->translate('Refund');?>:</td>
+                            <td><?php echo $this->currency($this->order->getRefundAmount());?></td>
+                        </tr>
+                    <?php endif; ?>
                     <tr>
                         <td class="text-right"><?php echo $this->translate('Grand Total');?>:</td>
                         <td><?php echo $this->currency($this->order->getTotal());?></td>

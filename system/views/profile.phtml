@@ -215,14 +215,12 @@
 			aoColumnDefs: [
 				{bSortable: false, aTargets: [-1]}
 			],
-			oLanguage: {
-		      sEmptyTable: "<?php echo $this->translate('You do not have any orders'); ?>"
-		    },
             "oLanguage": {
-                "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>"
+                "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>",
+                "sEmptyTable": "<?php echo $this->translate('You do not have any orders'); ?>"
             }
 		});
-		$('ul.stats').on('click', 'li', function(e){
+		$('ul.stats').on('click', 'li', function(){
 			var filter = $(this).data('sort');
 			if (filter === 'total') filter = '';
             if (filter === 'Recurring Orders') filter = 'Recurring order';
@@ -261,8 +259,7 @@
 	});
 
 	$('#orders-table').on('mouseenter', 'td.current-status', function(){
-		var self    = this,
-			id      = parseInt($(this).closest('tr').data('id')),
+		var id      = parseInt($(this).closest('tr').data('id')),
 			currentStatus = $(this).text();
 
 		$(this).data('currentStatus', $(this).text());
@@ -272,12 +269,12 @@
 			'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
 			'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
 			'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
-		}
+		};
 
-		var html = ''
+		var html = '';
 		switch (currentStatus){
 			case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
-				html += buttons['refunded']
+				html += buttons['refunded'];
 				break;
 			case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
 				html += buttons['completed'];

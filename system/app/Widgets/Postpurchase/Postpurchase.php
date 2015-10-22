@@ -406,6 +406,26 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     }
 
+    protected function _renderRefundamount()
+    {
+        if($this->_cart->getRefundAmount() === null) {
+            return '';
+        }
+
+        if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+            return $this->_cart->getRefundAmount();
+        }
+        return $this->_view->currency($this->_cart->getRefundAmount());
+    }
+
+    protected function _renderRefundNotes()
+    {
+        if($this->_cart->getRefundNotes() === null) {
+            return '';
+        }
+        return $this->_cart->getRefundNotes();
+    }
+
     /**
      * Return cart id
      *
