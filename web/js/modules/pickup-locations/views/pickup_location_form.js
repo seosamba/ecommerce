@@ -52,7 +52,7 @@ define([
                         showMessage('Updated', false);
                     }
                     $('#edit-pickup-location').attr('method', 'POST');
-                    $('#edit-pickup-location').find('input').val('');
+                    $('#edit-pickup-location').find('input[name!="secureToken"]').val('');
                 },
                 error: function(response){
                     hideSpinner();
