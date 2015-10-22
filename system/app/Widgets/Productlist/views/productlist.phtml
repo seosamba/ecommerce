@@ -17,7 +17,8 @@
 			    template: '<?php echo $this->productTemplate; ?>',
 			    nextpage: nextpage,
                 limit: '<?php echo $this->limit; ?>'
-		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>);
+		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
+                <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>);
 
 		showSpinner();
 
