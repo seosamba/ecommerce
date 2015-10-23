@@ -409,6 +409,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$this->_view->filters = $filters;
 
+        $attributes = array();
+
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
             if (!empty($urlFilter['price'])) {
@@ -420,6 +422,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $idsWhere = '';
             if (!empty($urlFilter)) {
                 $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
+                $attributes['attributes'] = $urlFilter;
                 if (empty($productIds)) {
                     return null;
                 }
@@ -429,6 +432,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             //if no filters passed in the product list we will check if it is a PL of product ids
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
 		}
+
+        $this->_view->filterAttributes = $attributes;
 
         if (!empty($idsWhere)) {
             $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
