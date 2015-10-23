@@ -10,13 +10,13 @@
 			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
 		</div>
 		<div class="grid_8 profile-main-info vcard">
-			<h2 class="client-fullname client-info"><span><?php echo $this->customer->getFullName();?></span>
+			<h2 class="client-fullname client-info"><span class="inline-data"><?php echo $this->customer->getFullName();?></span>
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                     <input class="edit-client-fullname edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname" />
                     <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 <?php endif;?>
             </h2>
-         	<h4 class="client-email client-info"><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span><?php echo $this->customer->getEmail();?></span></a>
+         	<h4 class="client-email client-info"><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data"><?php echo $this->customer->getEmail();?></span></a>
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                     <input class="edit-client-email edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
                     <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
@@ -38,6 +38,16 @@
 				}
 				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
 				?></p>
+            <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                <h4 class="client-info client-notes grid_12">
+                    <label class="grid_8 ml0px" for="client-notes"><?php echo $this->translate('Account notes');?>:</label>
+
+                        <img data-client-param="client-notes" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+
+                    <span class="grid_8 mt5px ml0px inline-data"><?php echo $this->customer->getNotes();?></span>
+                    <textarea id="client-notes" class="edit-client-profile edit-client-notes" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
+                </h4>
+            <?php endif;?>
             <input type="hidden" name="userId" id="userId" value="<?php echo $this->customer->getId();?>"/>
 			<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
 				<div class="adr">
@@ -348,7 +358,7 @@
             }else{
                 $('[data-client-param="client-'+clientEditParam+'"]').show();
                 $('.edit-client-'+clientEditParam).hide();
-                $('.client-'+clientEditParam+' span').text(editedValue).show();
+                $('.client-'+clientEditParam).find('.inline-data').text(editedValue).show();
                 smoke.signal('<?php echo $this->translate('Saved');?>');
             }
         });

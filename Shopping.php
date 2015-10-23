@@ -1135,36 +1135,47 @@ class Shopping extends Tools_Plugins_Abstract {
     public function editUserProfileAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $data = $this->_request->getParams();
+
             $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
             $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
             if (!$valid) {
                 exit;
             }
-            if(isset($data['profileElement']) && isset($data['profileValue']) && isset($data['userId'])){
+
+            if(!empty($data['profileElement']) && isset($data['profileValue']) && !empty($data['userId'])){
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);
                 if($user instanceof Application_Model_Models_User){
-                    if($data['profileElement'] == 'email'){
-                        $validator = new Zend_Validate_EmailAddress();
-                        if ($validator->isValid($data['profileValue'])) {
-                            $user->setEmail($data['profileValue']);
-                        }else{
-                            $this->_responseHelper->fail($this->_translator->translate('Email not valid'));
-                        }
-                        $validator = new Zend_Validate_Db_RecordExists(
-                            array(
-                                'table' => 'user',
-                                'field' => 'email'
-                            )
-                        );
-                        if ($validator->isValid($data['profileValue'])) {
-                            $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
-                        }
+                    switch($data['profileElement']) {
+                        case 'email':
+                            $validator = new Zend_Validate_EmailAddress();
+                            if ($validator->isValid($data['profileValue'])) {
+                                $user->setEmail($data['profileValue']);
+                            }else{
+                                $this->_responseHelper->fail($this->_translator->translate('Email not valid'));
+                            }
+                            $validator = new Zend_Validate_Db_RecordExists(
+                                array(
+                                    'table' => 'user',
+                                    'field' => 'email'
+                                )
+                            );
+                            if ($validator->isValid($data['profileValue'])) {
+                                $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                            }
+                        break;
+                        case 'fullname':
+                            $user->setFullName($data['profileValue']);
+                        break;
+                        case 'notes':
+                            $user->setNotes($data['profileValue']);
+                        break;
+                        default:
+                            $this->_responseHelper->fail($this->_translator->translate('Element doesn\'t exists'));
+
                     }
-                    if($data['profileElement'] == 'fullname' && $data['profileElement'] != ''){
-                        $user->setFullName($data['profileValue']);
-                    }
+
                     $userMapper->save($user);
                     $this->_responseHelper->success('');
                 }
