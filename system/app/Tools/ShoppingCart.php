@@ -376,7 +376,7 @@ class Tools_ShoppingCart {
             if(!empty($discountCoupons)){
                 $summary['discount'] = 0;
                 foreach ($discountCoupons as $coupon) {
-                    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
+                    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon, $summary);
                 }
                 $summary['discountTaxRate'] = isset($this->_shoppingConfig['couponDiscountTaxRate']) ? $this->_shoppingConfig['couponDiscountTaxRate'] : 0;
             }
