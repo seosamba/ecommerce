@@ -63,6 +63,7 @@ $this->headLink()
     <div id="shipping-config" class="grid_12 mt15px">
         <div id="shippers" class="ui-tabs-vertical clearfix">
             <ul class="grid_4 alpha omega list-bordered scroll m0px">
+                <li><a href="#shippingzones" data-plugin="shippingzones"><?php echo $this->translate('General Shipping Zones Configuration'); ?></a></li>
                 <li><a href="#markup" data-plugin="markup"><?php echo $this->translate('Markup'); ?></a></li>
                 <li><a href="#pickup" data-plugin="pickup"><?php echo $this->translate('Pickup'); ?></a></li>
                 <li><a href="#freeshipping" data-plugin="freeshipping"><?php echo $this->translate('Free shipping'); ?></a></li>
@@ -77,6 +78,29 @@ $this->headLink()
                 <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
             </ul>
             <div id="pane-container" class="grid_8 omega">
+            <div id="shippingzones">
+                <form class="grid_12" name="restrict-shipping-form" id="restrict-shipping-form" action="<?php echo $this->url(array('run' => 'bundledshipper'));?>" method="post" enctype="application/x-www-form-urlencoded">
+                    <?php echo $this->shippingRestriction->getElement('shipper')->renderViewHelper(); ?>
+                    <div class="grid_12">
+                        <label><?php echo $this->translate('Out of the shipping zone | Error message');?>:</label>
+                        <?php echo $this->shippingRestriction->getElement('restrictionMessage')->renderViewHelper(); ?>
+                    </div>
+                    <label class="grid_12 mt10px"><?php echo $this->translate('Restrict to buyers located in');?>:</label>
+                    <?php echo $this->shippingRestriction->getElement('restrictDestination')->renderViewHelper(); ?>
+
+                    <?php
+                    $hidden = 'hidden';
+                    if (!empty($this->shippingRestrictionConfig['config']['restrictDestination'])
+                    && $this->shippingRestrictionConfig['config']['restrictDestination'] === Forms_Shipping_ShippingRestriction::DESTINATION_ZONE
+                    ) {
+                    $hidden = '';
+                    }?>
+                    <div class="<?php echo $hidden;?> grid_12" id="restricted-shipping-zones">
+                        <label><?php echo $this->translate('Restrict buyers by zone');?>:</label>
+                        <?php echo $this->shippingRestriction->getElement('restrictZones')->renderViewHelper(); ?>
+                    </div>
+                </form>
+            </div>
             <div id="markup">
                 <?php $this->markupForm->setAction($this->url(array('run' => 'bundledshipper'))); ?>
                 <form action="<?php echo $this->markupForm->getAction(); ?>" method="post" enctype="application/x-www-form-urlencoded">
@@ -215,6 +239,14 @@ $(function(){
         panelTemplate : '<div class="clearfix"></div>',
         beforeLoad    : function(event, ui){
             showSpinner('#pane-container');
+        }
+    });
+
+    $('.restrict-destination').on('change', function(){
+        if ($(this).val() === '<?php echo Forms_Shipping_ShippingRestriction::DESTINATION_ZONE;?>') {
+            $('#restricted-shipping-zones').removeClass('hidden');
+        } else {
+            $('#restricted-shipping-zones').addClass('hidden');
         }
     });
 
