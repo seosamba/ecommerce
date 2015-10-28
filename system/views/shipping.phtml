@@ -81,11 +81,13 @@ $this->headLink()
             <div id="shippingzones">
                 <form class="grid_12" name="restrict-shipping-form" id="restrict-shipping-form" action="<?php echo $this->url(array('run' => 'bundledshipper'));?>" method="post" enctype="application/x-www-form-urlencoded">
                     <?php echo $this->shippingRestriction->getElement('shipper')->renderViewHelper(); ?>
+                    <fieldset class="background">
+                        <legend class="background large p5px"><?php echo $this->translate('General Shipping Zones Configuration');?></legend>
                     <div class="grid_12">
-                        <label><?php echo $this->translate('Out of the shipping zone | Error message');?>:</label>
+                        <label class="text-bold"><?php echo $this->translate('Out of the shipping zone | Error message');?>:</label>
                         <?php echo $this->shippingRestriction->getElement('restrictionMessage')->renderViewHelper(); ?>
                     </div>
-                    <label class="grid_12 mt10px"><?php echo $this->translate('Restrict to buyers located in');?>:</label>
+                    <label class="grid_12 mt10px text-bold"><?php echo $this->translate('Restrict to buyers located in');?>:</label>
                     <?php echo $this->shippingRestriction->getElement('restrictDestination')->renderViewHelper(); ?>
 
                     <?php
@@ -96,9 +98,10 @@ $this->headLink()
                     $hidden = '';
                     }?>
                     <div class="<?php echo $hidden;?> grid_12" id="restricted-shipping-zones">
-                        <label><?php echo $this->translate('Restrict buyers by zone');?>:</label>
+                        <label class="text-bold"><?php echo $this->translate('Restrict buyers by zone');?>:</label>
                         <?php echo $this->shippingRestriction->getElement('restrictZones')->renderViewHelper(); ?>
                     </div>
+                    </fieldset>
                 </form>
             </div>
             <div id="markup">
