@@ -114,8 +114,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const ORDER_IMPORT_CONFIG = 'order_import_config';
 
+    /**
+     * shipping restriction key
+     */
+    const SHIPPING_RESTRICTION_ZONES = 'shippingzones';
 
-	/**
+    /**
 	 * Cache prefix for use in shopping system
 	 */
 	const CACHE_PREFIX = 'store_';
@@ -319,7 +323,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (isset($markupConfig['config']) && !empty($markupConfig['config'])) {
 			$markupForm->populate($markupConfig['config']);
 		}
-        $orderConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::ORDER_CONFIG);
+        $orderConfig =  $shippingConfigMapper->find(self::ORDER_CONFIG);
         $orderConfigForm = new Forms_Shipping_OrderConfig();
         if(isset($orderConfig['config'])){
             $orderConfigForm->populate($orderConfig['config']);
@@ -329,6 +333,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])) {
 			$freeShippingForm->populate($freeShippingConfig['config']);
 		}
+
+        $shippingRestriction = new Forms_Shipping_ShippingRestriction();
+        $shippingRestrictionConfig = $shippingConfigMapper->find(self::SHIPPING_RESTRICTION_ZONES);
+        if (!empty($shippingRestrictionConfig['config'])) {
+            $shippingRestriction->populate($shippingRestrictionConfig['config']);
+            $this->_view->shippingRestrictionConfig = $shippingRestrictionConfig;
+        }
 
         $pickupShippingForm = new Forms_Shipping_PickupShipping();
         $pickupShippingConfig = $shippingConfigMapper->find(self::SHIPPING_PICKUP);
@@ -350,6 +361,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->freeForm = $freeShippingForm;
 		$this->_view->markupForm = $markupForm;
         $this->_view->pickupForm = $pickupShippingForm;
+        $this->_view->shippingRestriction = $shippingRestriction;
         $pickupLocationMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
         $this->_view->pickupLocationConfigZones = $pickupLocationMapper->getLocationZones();
         $this->_view->locationZonesInfo = $pickupLocationMapper->getLocationZonesInfo(self::QUANTITY_PICKUP_LOCATION_ON_SCREEN);
@@ -783,7 +795,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			self::SHIPPING_FREESHIPPING,
 			self::SHIPPING_PICKUP,
 			self::SHIPPING_MARKUP,
-            self::ORDER_CONFIG
+            self::ORDER_CONFIG,
+            self::SHIPPING_RESTRICTION_ZONES
 		);
 
 		if (!in_array($name, $bundledShippers)) {
@@ -803,6 +816,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					break;
                 case self::ORDER_CONFIG:
                     $form = new Forms_Shipping_OrderConfig();
+                    break;
+                case self::SHIPPING_RESTRICTION_ZONES:
+                    $form = new Forms_Shipping_ShippingRestriction();
                     break;
 				default:
 					break;
@@ -834,6 +850,18 @@ class Shopping extends Tools_Plugins_Abstract {
                                     $pickupLocationsConfigMapper->save($pickupLocationsConfigModel);
                                 }
                             }
+                        }
+                    } elseif($name === self::SHIPPING_RESTRICTION_ZONES){
+                        $data = $this->_request->getParams();
+                        $config = array(
+                            'name' => $name,
+                            'config' => array(
+                                'restrictDestination' => $data['restrictDestination'],
+                                'restrictionMessage' => $data['restrictionMessage']
+                            )
+                        );
+                        if ($data['restrictDestination'] === Forms_Shipping_ShippingRestriction::DESTINATION_ZONE) {
+                            $config['config']['restrictZones'] = $data['restrictZones'];
                         }
                     } else {
                         $config = array(
