@@ -1,0 +1,28 @@
+<div class="clearfix" style="width: 100%"
+     title="<%= _.isUndefined(i18n['Refund order']) ? 'Refund order':i18n['Refund order'] %> #<%= orderId %>">
+    <h3 class="text-center"><%= _.isUndefined(i18n['Enter amount to refund below']) ? 'Enter amount to refund below':i18n['Enter amount to refund below'] %></h3>
+
+    <form class="mt20px" id="refund-order-screen-form" action=""
+          method="post">
+        <p class="grid_12">
+            <label class="fl-left text-center pointer grid_5 mt10px"><%= _.isUndefined(i18n['How much do you want to refund']) ? 'How much do you want to refund':i18n['How much do you want to refund'] %> ?
+            </label>
+            <input type="text" name="partialRefundAmount" class="partial-refund-amount grid_2" value="<%= total %>" />
+            <label class="grid_2 mt10px"><%= _.isUndefined(i18n['Tax rate']) ? 'Tax rate':i18n['Tax rate'] %>:</label>
+            <select name="refund-tax" class="grid_3 refund-tax">
+                <option value="0"><%= _.isUndefined(i18n['Non taxable']) ? 'Non taxable':i18n['Non taxable'] %></option>
+                <option value="1" selected="selected"><%= _.isUndefined(i18n['Default']) ? 'Default':i18n['Default'] %></option>
+                <option value="2"><%= _.isUndefined(i18n['Alternative']) ? 'Alternative':i18n['Alternative'] %></option>
+                <option value="3"><%= _.isUndefined(i18n['Alternative']) ? 'Alternative':i18n['Alternative'] %> 2</option>
+            </select>
+            <label class="grid_9 fl-left mt20px pointer"><%= _.isUndefined(i18n['Process refund now through payment processor']) ? 'Process refund now through payment processor':i18n['Process refund now through payment processor'] %>
+                (< <%= gateway %> >) <input type="checkbox" class="use-refund-payment-gateway" name="gatewayRefund" value="1"/>
+            </label>
+            <label class="grid_12 fl-left mt20px pointer"><%= _.isUndefined(i18n['Add a refund message (will show on client\'s credit card receipt)']) ? 'Add a refund message (will show on client\'s credit card receipt)': i18n['Add a refund message (will show on client\'s credit card receipt)']  %>:
+                <textarea class="refund-info grid_12 mt10px"></textarea>
+            </label>
+        </p>
+        <input type="hidden" id="refund-order-id" value="<%= orderId %>" />
+    </form>
+</div>
+

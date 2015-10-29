@@ -299,6 +299,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
   `discount` decimal(10,2) DEFAULT NULL COMMENT 'Order discount',
   `free_cart` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
+  `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -822,4 +824,4 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
   CONSTRAINT `shopping_cart_session_discount_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.4.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.4.7' WHERE `name` = 'shopping';

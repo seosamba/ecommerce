@@ -203,8 +203,20 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_product`);
 
--- 21/07/2015
+-- 15/10/2015
 -- version: 2.4.4
+-- Add order refund information
+ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info';
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_refund'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_refund' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+-- 21/07/2015
+-- version: 2.4.5
 CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `discount_quantity` int(10) unsigned NOT NULL,
@@ -227,7 +239,7 @@ CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- 21/07/2015
--- version: 2.4.5
+-- version: 2.4.6
 -- update version
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -247,5 +259,5 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
 INSERT INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_GroupPriceObserver');
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

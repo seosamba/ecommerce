@@ -311,6 +311,12 @@
 			<?php endif;?>
 			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
 		</div>
+        <?php if ($this->cart->getRefundAmount() > 0) : ?>
+            <div class="post-purchase-row cart-refund">
+                <span><?php echo $this->translate('Refund');?>:</span>
+                <span><?php echo $this->cart->getRefundAmount() === null ? $this->currency(0) : $this->currency($this->cart->getRefundAmount());?></span>
+            </div>
+        <?php endif; ?>
 		<div class="post-purchase-row cart-total">
 			<span><?php echo $this->translate('Total');?>:</span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
@@ -644,6 +650,13 @@
 			<?php endif;?>
 			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
 		</p>
+        <?php if ($this->cart->getRefundAmount() > 0) : ?>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
+					<span style="float:left;"><?php echo $this->translate('Refund');?>
+                        : </span>
+                <span><?php echo $this->currency($this->cart->getRefundAmount());?></span>
+            </p>
+        <?php endif; ?>
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
 			<span style="float:left;"><?php echo $this->translate('Total');?>: </span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>

@@ -11,6 +11,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const TRIGGER_SHIPPING_TRACKING_NUMBER = 'store_trackingnumber';
 
+    const TRIGGER_REFUND = 'store_refund';
+
 	const RECIPIENT_SALESPERSON = 'sales person';
 
 	const RECIPIENT_CUSTOMER    = 'customer';
@@ -41,6 +43,13 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 	private $_websiteHelper;
 
 	private $_storeConfig;
+
+    /**
+     * Customer model
+     *
+     * @var null
+     */
+    private $_customer = null;
 
 	/**
 	 * @var Instance of watched object
@@ -279,83 +288,131 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		return $this->_send();
 	}
 
-	private function _sendTrackingnumberMail(){
-		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
-        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
-        $adminBccArray = array();
-        $customerBccArray = array();
-		$systemConfig = $this->_configHelper->getConfig();
-        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
-        switch ($this->_options['recipient']) {
-			case Tools_Security_Acl::ROLE_ADMIN:
-                $this->_mailer->setMailToLabel('Admin')
-						->setMailTo($adminEmail);
-                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
-                $adminUsers = $userMapper->fetchAll($where);;
-                if(!empty($adminUsers)){
-                    foreach($adminUsers as $admin){
-                        array_push($adminBccArray, $admin->getEmail());
-                    }
-                    if(!empty($adminBccArray)){
-                        $this->_mailer->setMailBcc($adminBccArray);
-                    }
-                }
-				break;
-            case self::RECIPIENT_SALESPERSON:
-				$this->_mailer->setMailToLabel('Sales person')
-						->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
-                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
-                $salesPersons = $userMapper->fetchAll($where);
-                if(!empty($salesPersons)){
-                    foreach($salesPersons as $salesPerson){
-                        array_push($customerBccArray, $salesPerson->getEmail());
-                    }
-                    if(!empty($customerBccArray)){
-                        $this->_mailer->setMailBcc($customerBccArray);
-                    }
-                }
-				break;
-			case self::RECIPIENT_CUSTOMER:
-				if ($customer && $customer->getEmail()){
-					$this->_mailer->setMailToLabel($customer->getFullName())->setMailTo($customer->getEmail());
-				} else {
-					return false;
-				}
-				break;
-			default:
-				error_log('Unsupported recipient '.$this->_options['recipient'].' given');
-				return false;
-				break;
-		}
-
-		if (false === ($body = $this->_preparseEmailTemplate())) {
-			return false;
-		}
-
-		$this->_entityParser
-			->objectToDictionary($this->_object, 'order')
-			->objectToDictionary($customer);
-        $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
-        $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
-        if(isset($withBillingAddress)){
-            $this->_entityParser->addToDictionary(array('order:billingaddress'=> $withBillingAddress));
+    /**
+     * Send email for when tracking number assigned or changed
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendTrackingnumberMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser
+            ->objectToDictionary($this->_object, 'order')
+            ->objectToDictionary($this->_customer);
+        $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
+            self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
+            self::SHIPPING_TYPE);
+        if (isset($withBillingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:billingaddress' => $withBillingAddress));
         }
-        if(isset($withShippingAddress)){
-            $this->_entityParser->addToDictionary(array('order:shippingaddress'=> $withShippingAddress));
+        if (isset($withShippingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
         }
-        $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
-		return $this->_send();
-	}
+        $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
-    private function _sendNewuseraccountMail(){
-        $systemConfig = $this->_configHelper->getConfig();
+        return $this->_send();
+    }
+
+    /**
+     * Send email when user change account info
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendNewuseraccountMail()
+    {
         $this->_mailer->setMailToLabel($this->_object->getFullName())
             ->setMailTo($this->_object->getEmail());
         $this->_entityParser
             ->objectToDictionary($this->_object);
+
         return $this->_send();
     }
-    
+
+    /**
+     * Send email for refund order
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendRefundMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser->addToDictionary(
+            array(
+                'refund:message' => $this->_options['refundAmount'],
+                'refund:notes' => $this->_options['refundNotes']
+            )
+        );
+
+        return $this->_send();
+    }
+
+    /**
+     *
+     * Prepare admin, salesperson, customers emails
+     *
+     * @return bool
+     */
+    private function _prepareEmailToSend()
+    {
+        $this->_customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
+        $customerBccArray = array();
+        $systemConfig = $this->_configHelper->getConfig();
+        $adminEmail = isset($systemConfig['adminEmail']) ? $systemConfig['adminEmail'] : 'admin@localhost';
+        switch ($this->_options['recipient']) {
+            case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+                    ->setMailTo($adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?",
+                    Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);;
+                if (!empty($adminUsers)) {
+                    foreach ($adminUsers as $admin) {
+                        array_push($adminBccArray, $admin->getEmail());
+                    }
+                    if (!empty($adminBccArray)) {
+                        $this->_mailer->setMailBcc($adminBccArray);
+                    }
+                }
+                break;
+            case self::RECIPIENT_SALESPERSON:
+                $this->_mailer->setMailToLabel('Sales person')
+                    ->setMailTo(!empty($this->_storeConfig['email']) ? $this->_storeConfig['email'] : $adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if (!empty($salesPersons)) {
+                    foreach ($salesPersons as $salesPerson) {
+                        array_push($customerBccArray, $salesPerson->getEmail());
+                    }
+                    if (!empty($customerBccArray)) {
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
+                break;
+            case self::RECIPIENT_CUSTOMER:
+                if ($this->_customer && $this->_customer->getEmail()) {
+                    $this->_mailer->setMailToLabel($this->_customer->getFullName())->setMailTo($this->_customer->getEmail());
+                } else {
+                    return false;
+                }
+                break;
+            default:
+                error_log('Unsupported recipient ' . $this->_options['recipient'] . ' given');
+
+                return false;
+                break;
+        }
+
+        if (false === ($body = $this->_preparseEmailTemplate())) {
+            return false;
+        }
+    }
+
     private function _prepareAdddress($address, $addressId, $type){
        foreach($address->getAddresses() as $addressData){
            if($addressData['id'] == $addressId){

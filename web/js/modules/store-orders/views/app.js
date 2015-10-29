@@ -3,10 +3,11 @@ define(['backbone',
     './order',
     'text!../templates/paginator.html',
     'text!../templates/export_dialog.html',
+    'text!../templates/refund_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, i18n
+        PaginatorTmpl, ExportTemplate, RefundTemplate, i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -211,30 +212,91 @@ define(['backbone',
 
             if (status === 'refunded') {
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to refund this payment?'])?'Are you sure you want to refund this payment?':i18n['Are you sure you want to refund this payment?'];
-            }
 
-            smoke.confirm(confirmMessage, function(e) {
-                if (e){
-                    $.ajax({
-                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                        data: {status: status},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                        },
-                        success: function(response) {
-                            showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
-                            if (!response.error && response.hasOwnProperty('responseText')){
-                                model.set('status', response.responseText.status);
-                            }
-                        }
+                var refundButton  = _.isUndefined(i18n['Refund']) ? 'Refund':i18n['Refund'],
+                    assignRefundButtons = {},
+                    dialog = _.template(RefundTemplate, {
+                        i18n:i18n,
+                        orderId: id,
+                        gateway: model.get('gateway'),
+                        total: model.get('total')
                     });
-                }
-            }, {
-                ok: _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'],
-                cancel: _.isUndefined(i18n['No'])?'No':i18n['No']
-            });
+
+                assignRefundButtons[refundButton] = function() {
+                    $('.ui-dialog').css('zIndex',"101");
+                    smoke.confirm(confirmMessage, function (e) {
+                        if (e) {
+                            $.ajax({
+                                url: $('#website_url').val() + 'plugin/shopping/run/refundPayment/orderId/',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    'orderId': $('#refund-order-id').val(),
+                                    'refundAmount': $('.partial-refund-amount').val(),
+                                    'refundInfo': $('.refund-info').val(),
+                                    'secureToken': $('.orders-secure-token').val(),
+                                    'paymentGateway': model.get('gateway'),
+                                    'refundUsingPaymentGateway': $('input.use-refund-payment-gateway').is(':checked') ? 1 : 0,
+                                    'refundTax': $('.refund-tax').val()
+                                },
+                                success: function (response) {
+                                    if (response.error === 1) {
+                                        showMessage(response.responseText, true, 5000);
+                                    } else {
+                                        showMessage(response.responseText.message, false, 5000);
+                                        model.set('status', status);
+                                        model.set('total', response.responseText.total);
+                                    }
+                                }
+                            });
+
+                        }
+
+                    }, {
+                        ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                        cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                    });
+
+                };
+
+                $(dialog).dialog({
+                    dialogClass: 'seotoaster',
+                    width: '35%',
+                    height: '450',
+                    buttons: assignRefundButtons,
+                    resizable: false,
+                    open: function (event, ui) {
+
+                    },
+                    close: function (event, ui) {
+                        $(this).dialog('destroy');
+                    }
+                });
+
+            } else {
+                smoke.confirm(confirmMessage, function (e) {
+                    if (e) {
+                        $.ajax({
+                            url: $('#website_url').val() + 'plugin/shopping/run/order?id=' + id,
+                            data: {status: status},
+                            type: 'POST',
+                            dataType: 'json',
+                            beforeSend: function () {
+                                el.closest('td').html('<img src="' + $('#website_url').val() + 'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                            },
+                            success: function (response) {
+                                showMessage(_.isUndefined(i18n['Saved']) ? 'Saved' : i18n['Saved'], response.hasOwnProperty('error') && response.error);
+                                if (!response.error && response.hasOwnProperty('responseText')) {
+                                    model.set('status', response.responseText.status);
+                                }
+                            }
+                        });
+                    }
+                }, {
+                    ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                    cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                });
+            }
         },
         changeTracking: function(event){
             var self    = this,

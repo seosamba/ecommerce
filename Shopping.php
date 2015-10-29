@@ -114,8 +114,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const ORDER_IMPORT_CONFIG = 'order_import_config';
 
+    /**
+     * shipping restriction key
+     */
+    const SHIPPING_RESTRICTION_ZONES = 'shippingzones';
 
-	/**
+    /**
 	 * Cache prefix for use in shopping system
 	 */
 	const CACHE_PREFIX = 'store_';
@@ -319,7 +323,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (isset($markupConfig['config']) && !empty($markupConfig['config'])) {
 			$markupForm->populate($markupConfig['config']);
 		}
-        $orderConfig = Models_Mapper_ShippingConfigMapper::getInstance()->find(self::ORDER_CONFIG);
+        $orderConfig =  $shippingConfigMapper->find(self::ORDER_CONFIG);
         $orderConfigForm = new Forms_Shipping_OrderConfig();
         if(isset($orderConfig['config'])){
             $orderConfigForm->populate($orderConfig['config']);
@@ -329,6 +333,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (isset($freeShippingConfig['config']) && !empty($freeShippingConfig['config'])) {
 			$freeShippingForm->populate($freeShippingConfig['config']);
 		}
+
+        $shippingRestriction = new Forms_Shipping_ShippingRestriction();
+        $shippingRestrictionConfig = $shippingConfigMapper->find(self::SHIPPING_RESTRICTION_ZONES);
+        if (!empty($shippingRestrictionConfig['config'])) {
+            $shippingRestriction->populate($shippingRestrictionConfig['config']);
+            $this->_view->shippingRestrictionConfig = $shippingRestrictionConfig;
+        }
 
         $pickupShippingForm = new Forms_Shipping_PickupShipping();
         $pickupShippingConfig = $shippingConfigMapper->find(self::SHIPPING_PICKUP);
@@ -350,6 +361,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->freeForm = $freeShippingForm;
 		$this->_view->markupForm = $markupForm;
         $this->_view->pickupForm = $pickupShippingForm;
+        $this->_view->shippingRestriction = $shippingRestriction;
         $pickupLocationMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
         $this->_view->pickupLocationConfigZones = $pickupLocationMapper->getLocationZones();
         $this->_view->locationZonesInfo = $pickupLocationMapper->getLocationZonesInfo(self::QUANTITY_PICKUP_LOCATION_ON_SCREEN);
@@ -565,9 +577,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$order = $this->_request->getParam('order');
 		$tags = $this->_request->getParam('tags');
 		$brands = $this->_request->getParam('brands');
+        $attributes = $this->_request->getParam('attributes');
 
 		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands);
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
@@ -782,7 +795,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			self::SHIPPING_FREESHIPPING,
 			self::SHIPPING_PICKUP,
 			self::SHIPPING_MARKUP,
-            self::ORDER_CONFIG
+            self::ORDER_CONFIG,
+            self::SHIPPING_RESTRICTION_ZONES
 		);
 
 		if (!in_array($name, $bundledShippers)) {
@@ -802,6 +816,9 @@ class Shopping extends Tools_Plugins_Abstract {
 					break;
                 case self::ORDER_CONFIG:
                     $form = new Forms_Shipping_OrderConfig();
+                    break;
+                case self::SHIPPING_RESTRICTION_ZONES:
+                    $form = new Forms_Shipping_ShippingRestriction();
                     break;
 				default:
 					break;
@@ -833,6 +850,18 @@ class Shopping extends Tools_Plugins_Abstract {
                                     $pickupLocationsConfigMapper->save($pickupLocationsConfigModel);
                                 }
                             }
+                        }
+                    } elseif($name === self::SHIPPING_RESTRICTION_ZONES){
+                        $data = $this->_request->getParams();
+                        $config = array(
+                            'name' => $name,
+                            'config' => array(
+                                'restrictDestination' => $data['restrictDestination'],
+                                'restrictionMessage' => $data['restrictionMessage']
+                            )
+                        );
+                        if ($data['restrictDestination'] === Forms_Shipping_ShippingRestriction::DESTINATION_ZONE) {
+                            $config['config']['restrictZones'] = $data['restrictZones'];
                         }
                     } else {
                         $config = array(
@@ -1135,36 +1164,47 @@ class Shopping extends Tools_Plugins_Abstract {
     public function editUserProfileAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $data = $this->_request->getParams();
+
             $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
             $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
             if (!$valid) {
                 exit;
             }
-            if(isset($data['profileElement']) && isset($data['profileValue']) && isset($data['userId'])){
+
+            if(!empty($data['profileElement']) && isset($data['profileValue']) && !empty($data['userId'])){
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);
                 if($user instanceof Application_Model_Models_User){
-                    if($data['profileElement'] == 'email'){
-                        $validator = new Zend_Validate_EmailAddress();
-                        if ($validator->isValid($data['profileValue'])) {
-                            $user->setEmail($data['profileValue']);
-                        }else{
-                            $this->_responseHelper->fail($this->_translator->translate('Email not valid'));
-                        }
-                        $validator = new Zend_Validate_Db_RecordExists(
-                            array(
-                                'table' => 'user',
-                                'field' => 'email'
-                            )
-                        );
-                        if ($validator->isValid($data['profileValue'])) {
-                            $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
-                        }
+                    switch($data['profileElement']) {
+                        case 'email':
+                            $validator = new Zend_Validate_EmailAddress();
+                            if ($validator->isValid($data['profileValue'])) {
+                                $user->setEmail($data['profileValue']);
+                            }else{
+                                $this->_responseHelper->fail($this->_translator->translate('Email not valid'));
+                            }
+                            $validator = new Zend_Validate_Db_RecordExists(
+                                array(
+                                    'table' => 'user',
+                                    'field' => 'email'
+                                )
+                            );
+                            if ($validator->isValid($data['profileValue'])) {
+                                $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                            }
+                        break;
+                        case 'fullname':
+                            $user->setFullName($data['profileValue']);
+                        break;
+                        case 'notes':
+                            $user->setNotes($data['profileValue']);
+                        break;
+                        default:
+                            $this->_responseHelper->fail($this->_translator->translate('Element doesn\'t exists'));
+
                     }
-                    if($data['profileElement'] == 'fullname' && $data['profileElement'] != ''){
-                        $user->setFullName($data['profileValue']);
-                    }
+
                     $userMapper->save($user);
                     $this->_responseHelper->success('');
                 }
@@ -1540,6 +1580,130 @@ class Shopping extends Tools_Plugins_Abstract {
             $cartMapper->save($cart);
         }
         $this->_responseHelper->success($this->_translator->translate('Shipping address updated'));
+    }
+
+
+    /**
+     * Refund order (full or partial order refund)
+     */
+    public function refundPaymentAction()
+    {
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $refundAmount = filter_var($this->_request->getParam('refundAmount'), FILTER_SANITIZE_STRING);
+        $refundNotes = filter_var($this->_request->getParam('refundInfo'), FILTER_SANITIZE_STRING);
+        $paymentGateway = strtolower(filter_var($this->_request->getParam('paymentGateway')));
+        $refundUsingPaymentGateway = (bool)$this->_request->getParam('refundUsingPaymentGateway', false);
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $taxRule = filter_var($this->_request->getParam('refundTax', false), FILTER_SANITIZE_NUMBER_INT);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && $orderId) {
+            $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus !== Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can refund only orders with status completed'));
+                }
+                $total = $orderModel->getTotal();
+                if (empty($refundAmount)) {
+                    $refundAmount = $total;
+                }
+                $refundResultMessage = '';
+                $finalTax = 0;
+                if ($taxRule) {
+                    $finalTax = Tools_Tax_Tax::calculateDiscountTax($refundAmount, $taxRule);
+                }
+                if ($total >= $refundAmount) {
+                    if ($orderModel->getTotalTax() <= 0) {
+                        $totalTax = $finalTax;
+                    } else {
+                        $totalTax = $orderModel->getTotalTax() - $finalTax;
+                    }
+                    $data = array(
+                        'refund_notes' => $refundNotes,
+                        'refund_amount' => $refundAmount,
+                        'status' => Models_Model_CartSession::CART_STATUS_REFUNDED,
+                        'total_tax' => $totalTax,
+                        'sub_total' => $orderModel->getSubTotal() - $refundAmount - $finalTax,
+                        'total' => $total - $refundAmount
+                    );
+                    if ($data['total'] <= 0) {
+                        $data['total'] = 0;
+                    }
+                    if ($data['total_tax'] <= 0) {
+                        $data['total_tax'] = 0;
+                    }
+                    if ($data['total'] === 0) {
+                        $data['sub_total'] = 0;
+                    }
+                    if ($refundUsingPaymentGateway) {
+                        $paymentGatewayInfo = Application_Model_Mappers_PluginMapper::getInstance()->findByName($paymentGateway);
+                        if ($paymentGatewayInfo instanceof Application_Model_Models_Plugin) {
+                            $pluginGatewayStatus = $paymentGatewayInfo->getStatus();
+                            if ($pluginGatewayStatus === Application_Model_Models_Plugin::ENABLED) {
+                                $paymentPluginClassName = ucfirst($paymentGateway);
+                                if (class_exists($paymentPluginClassName) && method_exists($paymentPluginClassName,
+                                        'refund')
+                                ) {
+                                    $reflection = new ReflectionMethod($paymentPluginClassName, 'refund');
+                                    if (!$reflection->isPublic()) {
+                                        $this->_responseHelper->fail($this->_translator->translate('Can\'t access payment gateway refund method'));
+                                    }
+                                    $pageData = array('websiteUrl' => $this->_websiteHelper->getUrl());
+                                    try {
+                                        $plugin = Tools_Factory_PluginFactory::createPlugin($paymentGateway, array(),
+                                            $pageData);
+                                        $result = $plugin->refund($orderId, $refundAmount, $refundNotes);
+                                        if (!isset($result['error'])) {
+                                            $this->_responseHelper->fail($this->_translator->translate('Unexpected error happened. Please contact support'));
+                                        } elseif (!empty($result['error']) && $result['error'] === 1) {
+                                            if (!empty($result['errorMessage'])) {
+                                                $this->_responseHelper->fail($this->_translator->translate($result['errorMessage']));
+                                            } else {
+                                                $this->_responseHelper->fail($this->_translator->translate('Payment gateway error happened'));
+                                            }
+                                        } elseif ($result['error'] === 0 && !empty($result['refundMessage'])) {
+                                            $refundResultMessage = $result['refundMessage'];
+                                        }
+                                    } catch (Exception $e) {
+                                        $this->_responseHelper->fail($e->getMessage());
+                                    }
+                                } else {
+                                    $this->_responseHelper->fail($this->_translator->translate('Payment gateway doesn\'t have refund functionality'));
+                                }
+                            } else {
+                                $this->_responseHelper->fail($this->_translator->translate('Payment plugin disabled'));
+                            }
+
+                        } else {
+                            $this->_responseHelper->fail($this->_translator->translate('Payment plugin doesn\'t exists'));
+                        }
+                    }
+
+                    Models_Mapper_OrdersMapper::getInstance()->updateOrderInfo($orderId, $data);
+
+                    $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+                    $orderModel->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_REFUND,
+                        'refundNotes' => $refundNotes,
+                        'refundAmount' => $refundAmount
+                    )));
+                    $orderModel->notifyObservers();
+
+                    $data['total'] = round($data['total'], 2);
+
+                    $this->_responseHelper->success(array('message' => $this->_translator->translate('Order refunded' . ' ' . $refundResultMessage), 'total' => $data['total']));
+                }
+                $this->_responseHelper->fail($this->_translator->translate('Sorry, you can\'t refund more than the order\'s original amount.'));
+            }
+
+            $this->_responseHelper->fail($this->_translator->translate('Order doesn\'t exists'));
+
+
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Order id missing'));
     }
 
 

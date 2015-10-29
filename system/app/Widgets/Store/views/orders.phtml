@@ -160,6 +160,7 @@ $this->headLink()
             <?php endif;?>
 		</tfoot>
 	</table>
+    <input type="hidden" name="orders-secure-token" class="orders-secure-token" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>" />
     <?php if(isset($this->invoicePlugin)):?>
         <input type="hidden" value="enabled" name="invoiceEnable" id="invoiceEnable"/>
     <?php endif;?>
