@@ -16,6 +16,9 @@ $this->headLink()
         )
     );
 ?>
+    <div class="tabs-nav-wrap">
+    <span class="arrow w5 omega left ticon-arrow-left3"></span>
+    <span class="arrow w5 right ticon-arrow-right3"></span>
     <ul class="header">
 	    <?php $subForms = $this->form->getSubForms(); ?>
         <?php foreach ($subForms as $subform): ?>
@@ -27,7 +30,7 @@ $this->headLink()
             <?php endforeach; ?>
         <?php endif; ?>
 	</ul>
-
+    </div>
 	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
 	<?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">

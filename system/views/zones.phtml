@@ -59,11 +59,15 @@ $this->headLink()
     );
     ?>
     <div id="zone">
+        <div class="tabs-nav-wrap">
+        <span class="arrow left ticon-arrow-left3"></span>
+        <span class="arrow right ticon-arrow-right3"></span>
         <ul class="header">
             <li class="add-new-zone">
                 <a id="new-zone-btn" class="ui-tabs-anchor ticon-plus icon16" title="Hotkey: Ctrl+N"></a>
             </li>
         </ul>
+        </div>
     </div>
     <div class="footer grid_12">
         <a id="delete-zone" class="delete-selected error" href="javascript:;">[ <?php echo $this->translate( 'Delete this zone' ); ?> ]</a>
@@ -88,6 +92,7 @@ $this->headLink()
         </div>
     </div>
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
+
 </div>
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
