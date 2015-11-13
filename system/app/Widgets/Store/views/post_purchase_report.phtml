@@ -325,15 +325,13 @@
 	</div>
 
 <?php else: ?>
-    <table width="100%" border="0" style="border:none;">
+    <table width="100%" border="0" style="border:none; margin-bottom:15px;">
         <thead>
         <tr>
-            <th width="50%">
-                <span
-                    style="font-weight:bold; font-size:15px; color:#222222"><?php echo $this->translate('Billing Address'); ?>
-                    :</span>
+            <th width="50%" align="left">
+                <span style="font-weight:bold; color:#222222"><?php echo $this->translate('Billing Address'); ?>:</span>
             </th>
-            <th width="50%">
+            <th width="50%" align="left">
                 <?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP): ?>
                     <span class="title"
                           style="font-weight:bold; font-size:15px; color:#222222"><?php echo $this->translate('Pickup information'); ?>
@@ -349,7 +347,7 @@
         <tbody>
         <tr>
             <td>
-                <div style="color:#444444; font-family: arial; font-size:14px;">
+                <div style="color:#444444; font-family: arial;">
                     <?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
                         <?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
                         <span><?php echo $billingAddress['firstname']; ?></span>
@@ -426,7 +424,7 @@
                 </div>
             </td>
             <td>
-                <div style="color:#444444; font-family: arial; font-size:14px;">
+                <div style="color:#444444; font-family: arial;">
                     <?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
                         <?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId); ?>
 
@@ -602,8 +600,7 @@
         <thead>
         <tr>
             <th width="70%">&nbsp;</th>
-            <th width="30%"><span
-                    style="font-weight:bold;font-size:15px;color:#222222"><?php echo $this->translate('Summary'); ?>
+            <th width="30%"><span style="font-weight:bold;color:#222222;"><?php echo $this->translate('Summary'); ?>
                     :</span></th>
         </tr>
         </thead>
@@ -613,7 +610,7 @@
             <td>
                 <table width="100%" border="0" style="border:none;" cellpadding="3">
                     <tbody>
-                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial; font-size:14px;">
+                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
                         <td align="left"><?php echo $this->translate('Sub-Total'); ?> :</td>
                         <td align="right"><?php if ($this->showPriceIncTax == 1): ?>
                                 <?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getSubTotalTax()); ?>
@@ -622,7 +619,7 @@
                             <?php endif; ?></td>
                     </tr>
                     <?php if ($this->cart->getDiscount() > 0) : ?>
-                        <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial; font-size:14px;">
+                        <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
                             <td align="left"><?php echo $this->translate('Discount'); ?> :</td>
                             <td align="right"><?php if ($this->showPriceIncTax == 1): ?>
                                     <?php echo $this->currency($this->cart->getDiscount() + $this->cart->getDiscountTax()); ?>
@@ -631,7 +628,7 @@
                                 <?php endif; ?></td>
                         </tr>
                     <?php endif; ?>
-                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial; font-size:14px;">
+                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
                         <td align="left"><?php echo $this->translate('Shipping'); ?> :</td>
                         <td align="right"><?php if ($this->showPriceIncTax == 1): ?>
                                 <?php echo $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax()); ?>
@@ -639,7 +636,7 @@
                                 <?php echo $this->currency($this->cart->getShippingPrice()); ?>
                             <?php endif; ?></td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial; font-size:14px;">
+                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
                         <td align="left"><?php if (Tools_Misc::getTaxName() != ''): ?>
                                 <?php $taxName = Tools_Misc::getTaxName(); ?>
                             <?php else: ?>
@@ -653,12 +650,12 @@
                         <td align="right"><?php echo $this->currency($this->cart->getTotalTax()); ?></td>
                     </tr>
                     <?php if ($this->cart->getRefundAmount() > 0) : ?>
-                        <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial; font-size:14px;">
+                        <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
                             <td align="left"><?php echo $this->translate('Refund'); ?> :</td>
                             <td align="right"><?php echo $this->currency($this->cart->getRefundAmount()); ?></td>
                         </tr>
                     <?php endif; ?>
-                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial; font-size:14px;">
+                    <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
                         <td align="left"><?php echo $this->translate('Total'); ?> :</td>
                         <td align="right"><?php echo $this->currency($this->cart->getTotal()); ?></td>
                     </tr>
