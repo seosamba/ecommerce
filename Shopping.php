@@ -664,6 +664,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
+            $products = Models_Mapper_ProductMapper::getInstance();
+            $query = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('inventory'));
+            $customerInventory = $products->getDbTable()->getAdapter()->fetchCol($query);
+            sort($customerInventory, SORT_NUMERIC);
+            $this->_view->inventory = $customerInventory;
 			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
 			return $this->_view->render('manage_products.phtml');
 		}

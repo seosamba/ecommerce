@@ -15,23 +15,30 @@
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
         <div class="grid_9 omega">
-            <div class="grid_6 alpha mb20px">
+            <div class="grid_4 alpha mb20px">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
                     <?php foreach($this->brands as $brand):?>
                         <option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_6 omega mb20px">
+            <div class="grid_4 omega mb20px">
                 <select class="pfilter" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
                     <?php foreach($this->tags as $tag):?>
                         <option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
+            <div class="grid_4 omega mb20px">
+                <select class="pfilter" multiple name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
+                    <?php foreach($this->inventory as $qty):?>
+                        <option value="<?php echo $qty;?>"><?php echo $qty;?></option>
+                    <?php endforeach;?>
+                </select>
+            </div>
         </div>
     </div>
-	<table class="products-table widget">
+	<table class="products-table widget omega" width="100%">
 		<thead>
 			<tr>
 				<th><input type="checkbox" name="check-all" title="<?php echo $this->translate('Select all');?>"></th>
@@ -42,10 +49,8 @@
                 <th><?php echo $this->translate('Free shipping');?></th>
 				<th><?php echo $this->translate('Weight');?></th>
 				<th><?php echo $this->translate('Price');?></th>
-				<th><?php echo $this->translate('Sales count');?></th>
-			</tr>
-			<tr>
-
+                <th><?php echo $this->translate('Inventory');?></th>
+                <th><?php echo $this->translate('Sales count');?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -57,7 +62,7 @@
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="9">
+				<td colspan="10">
                     <div class="grid_3 alpha">
                         <?php echo $this->translate('with selected');?>:&nbsp;
                         <select name="product-mass-action" id="">

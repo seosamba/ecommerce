@@ -151,6 +151,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $search = null,
         $tags = null,
         $brands = null,
+        $inventory = null,
         $strictTagsCount = false,
         $organicSearch = false,
         $attributes = array()
@@ -199,6 +200,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             if ($strictTagsCount) {
                 $select->having('COUNT(*) = ?', sizeof($tags));
             }
+        }
+
+        if(!empty($inventory)) {
+            if (!is_array($inventory)) {
+                $inventory = (array)$inventory;
+            }
+            $select->where('p.inventory in (?)', $inventory);
         }
 
         if ((bool)$search) {
