@@ -202,11 +202,16 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             }
         }
 
-        if(!empty($inventory)) {
-            if (!is_array($inventory)) {
-                $inventory = (array)$inventory;
+        if(is_array($inventory)) {
+            if(in_array('infinity', $inventory)){
+                $select->where('p.inventory IS NULL', $inventory);
+                unset($inventory[0]);
+
             }
-            $select->where('p.inventory in (?)', $inventory);
+            if (!empty($inventory)) {
+                $select->where('p.inventory  = ?', $inventory);
+            }
+
         }
 
         if ((bool)$search) {

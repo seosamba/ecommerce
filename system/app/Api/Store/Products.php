@@ -105,12 +105,10 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
             $filter['inventory']  = array_filter(filter_var_array((array)$this->_request->getParam('fqty'), FILTER_SANITIZE_STRING));
-
-            $organicSearch = filter_var($this->_request->getParam('os', 0), FILTER_SANITIZE_NUMBER_INT);
-            if ($key && $organicSearch) {
-                $key = explode(' ', $key);
-//                $filter['brands'] = $key;
+            if(in_array(html_entity_decode('&infin;'), $filter['inventory'])){
+                $filter['inventory'][array_search(html_entity_decode('&infin;'), $filter['inventory'])] = 'infinity';
             }
+            $organicSearch = filter_var($this->_request->getParam('os', 0), FILTER_SANITIZE_NUMBER_INT);
 
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
@@ -124,7 +122,6 @@ class Api_Store_Products extends Api_Service_Abstract {
                     (is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null,
                     $strictTagsCount,
                     $organicSearch
-                    //(is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null
                 );
 
 				$data = !is_null($products) ? array_map(function($prod){
@@ -150,7 +147,6 @@ class Api_Store_Products extends Api_Service_Abstract {
 				$this->_cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
 			}
 		}
-
 		return $data;
 	}
 

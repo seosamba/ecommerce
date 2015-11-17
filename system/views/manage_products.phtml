@@ -30,7 +30,8 @@
                 </select>
             </div>
             <div class="grid_4 omega mb20px">
-                <select class="pfilter" multiple name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
+                <select class="pfilter" name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
+                    <option value="0"><?php echo $this->translate('Select all');?></option>
                     <?php foreach($this->inventory as $qty):?>
                         <option value="<?php echo $qty;?>"><?php echo $qty;?></option>
                     <?php endforeach;?>

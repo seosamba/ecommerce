@@ -667,6 +667,10 @@ class Shopping extends Tools_Plugins_Abstract {
             $products = Models_Mapper_ProductMapper::getInstance();
             $query = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('inventory'));
             $customerInventory = $products->getDbTable()->getAdapter()->fetchCol($query);
+            if(in_array(null, $customerInventory)){
+               $arrNull = array_search(null, $customerInventory);
+                $customerInventory[$arrNull] = '&infin;';
+            }
             sort($customerInventory, SORT_NUMERIC);
             $this->_view->inventory = $customerInventory;
 			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
