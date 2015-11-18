@@ -39,6 +39,16 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     const ADDRESS_COUNTRY = 'country';
 
     /**
+     * shipping or billing address element phone
+     */
+    const ADDRESS_PHONE = 'phone';
+
+    /**
+     * shipping or billing address element mobile
+     */
+    const ADDRESS_MOBILE = 'mobile';
+
+    /**
      * shipping address
      */
     const ADDRESS_TYPE_SHIPPING = 'shipping';
@@ -703,6 +713,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         return $state['state'];
                     }
                     return '';
+                }
+                if (self::ADDRESS_MOBILE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+                   return str_replace('+', '', $addressData[$addressKey]);
+                }
+                if (self::ADDRESS_PHONE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+                    return str_replace('+', '', $addressData[$addressKey]);
                 }
                 return $addressData[$addressKey];
             }
