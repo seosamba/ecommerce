@@ -258,6 +258,13 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
 
 INSERT INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_GroupPriceObserver');
 
+-- 02/11/2015
+-- version: 2.4.7
+-- change tax precision
+ALTER TABLE `shopping_tax` MODIFY `rate1` decimal(10,3) NOT NULL DEFAULT '0.00';
+ALTER TABLE `shopping_tax` MODIFY `rate2` decimal(10,3) NOT NULL DEFAULT '0.00';
+ALTER TABLE `shopping_tax` MODIFY `rate3` decimal(10,3) NOT NULL DEFAULT '0.00';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.7' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.4.8' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
