@@ -214,41 +214,41 @@
                     </tr>
                     <tr>
                         <td colspan="<?php echo $colSpan + 5 ?>" rowspan="7"></td>
-                        <td class="text-right"><?php echo $this->translate('Subtotal');?>:</td>
+                        <td><?php echo $this->translate('Subtotal');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
+                            <td class="text-right"><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
                         <?php else:?>
-                            <td><?php echo $this->currency($this->order->getSubTotal());?></td>
+                            <td class="text-right"><?php echo $this->currency($this->order->getSubTotal());?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getDiscount() > 0): ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Discount');?>:</td>
+                            <td><?php echo $this->translate('Discount');?>:</td>
                             <?php if ($this->showPriceIncTax == 1): ?>
-                                <td><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
+                                <td class="text-right"><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
                             <?php else: ?>
-                                <td><?php echo $this->currency($this->order->getDiscount());?></td>
+                                <td class="text-right"><?php echo $this->currency($this->order->getDiscount());?></td>
                             <?php endif;?>
                         </tr>
                     <?php endif; ?>
                     <tr>
-                        <td class="text-right"><?php echo $this->translate('Shipping');?>:</td>
+                        <td><?php echo $this->translate('Shipping');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
+                            <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
                         <?php else:?>
-                            <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
+                            <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getShippingService()) : ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Shipping service');?>:</td>
-                            <td><?php echo strtoupper($this->order->getShippingService()) ;?></td>
+                            <td><?php echo $this->translate('Shipping service');?>:</td>
+                            <td class="text-right"><?php echo strtoupper($this->order->getShippingService()) ;?></td>
                         </tr>
                     <?php endif; ?>
                     <?php if ($this->order->getShippingType()) : ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Shipping type');?>:</td>
-                            <td><?php echo $this->order->getShippingType();?></td>
+                            <td><?php echo $this->translate('Shipping type');?>:</td>
+                            <td class="text-right"><?php echo $this->order->getShippingType();?></td>
                         </tr>
                     <?php endif; ?>
                     <tr>
@@ -258,21 +258,21 @@
                             <?php $taxName = 'Tax'; ?>
                         <?php endif;?>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td class="text-right"><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
                         <?php else: ?>
-                            <td class="text-right"><?php echo $this->translate('Total ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Total ' . $taxName);?>:</td>
                         <?php endif;?>
-                        <td><?php echo $this->currency($this->order->getTotalTax());?></td>
+                        <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>
                     <?php if ($this->order->getRefundAmount() > 0): ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Refund');?>:</td>
-                            <td><?php echo $this->currency($this->order->getRefundAmount());?></td>
+                            <td><?php echo $this->translate('Refund');?>:</td>
+                            <td class="text-right"><?php echo $this->currency($this->order->getRefundAmount());?></td>
                         </tr>
                     <?php endif; ?>
                     <tr>
-                        <td class="text-right"><?php echo $this->translate('Grand Total');?>:</td>
-                        <td><?php echo $this->currency($this->order->getTotal());?></td>
+                        <td><?php echo $this->translate('Grand Total');?>:</td>
+                        <td class="text-right"><?php echo $this->currency($this->order->getTotal());?></td>
                     </tr>
                     </tfoot>
                 </table>
