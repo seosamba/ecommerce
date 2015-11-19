@@ -194,7 +194,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
             return $this->_cart->getTotal();
         }
-        return $this->_cart->getTotal();
+        return $this->_view->currency($this->_cart->getTotal());
     }
 
     /**
