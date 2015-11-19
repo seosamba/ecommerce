@@ -141,18 +141,22 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
             }
             Zend_Registry::set('postPurchaseCart', $this->_cart);
-            if (!Zend_Registry::isRegistered('postPurchasePickup')) {
+            if (!Zend_Registry::isRegistered('postPurchasePickup') && $this->_cart->getShippingService() === 'pickup') {
                 $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
                 $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($this->_cart->getId());
                 if (empty($pickupLocationData)) {
                     $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-                    $this->_pickupLocationData = array(
+                    $pickupLocationData = array(
                         'name' => $shoppingConfig['company'],
                         'address1' => $shoppingConfig['address1'],
                         'address2' => $shoppingConfig['address2'],
+                        'city' => $shoppingConfig['city'],
+                        'state' => $shoppingConfig['state'],
                         'phone' => $shoppingConfig['phone']
                     );
                 }
+                $pickupLocationData['map_link'] = 'https://maps.google.com/?q='.$pickupLocationData['address1'].'+'.$pickupLocationData['city'].'+'.$pickupLocationData['state'];
+                $pickupLocationData['map_src'] = Tools_Geo::generateStaticGmaps($pickupLocationData, 640, 300);
                 Zend_Registry::set('postPurchasePickup', $pickupLocationData);
             }
             unset($this->_session->storeCartSessionConversionKey);
@@ -692,6 +696,9 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderPickup()
     {
+        if (!Zend_Registry::isRegistered('postPurchasePickup')) {
+            return '';
+        }
         $pickupLocationData = Zend_Registry::get('postPurchasePickup');
         if (!empty($this->_options[0]) && array_key_exists($this->_options[0], $pickupLocationData)) {
             $param = $this->_options[0];
@@ -707,7 +714,6 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                 return $pickupLocationData[$param];
             }
         }
-        return '';
     }
 
     /**
