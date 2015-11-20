@@ -141,7 +141,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
             }
             Zend_Registry::set('postPurchaseCart', $this->_cart);
-            if (!Zend_Registry::isRegistered('postPurchasePickup') && $this->_cart->getShippingService() === 'pickup') {
+            if (!Zend_Registry::isRegistered('postPurchasePickup') && $this->_cart instanceof Models_Model_CartSession && $this->_cart->getShippingService() === 'pickup') {
                 $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
                 $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($this->_cart->getId());
                 if (empty($pickupLocationData)) {
