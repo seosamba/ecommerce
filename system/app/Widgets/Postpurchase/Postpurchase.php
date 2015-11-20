@@ -141,6 +141,26 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
             }
             Zend_Registry::set('postPurchaseCart', $this->_cart);
+            if (!Zend_Registry::isRegistered('postPurchasePickup') && $this->_cart instanceof Models_Model_CartSession && $this->_cart->getShippingService() === 'pickup') {
+                $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                $pickupLocationData = $pickupLocationConfigMapper->getCartPickupLocationByCartId($this->_cart->getId());
+                if (empty($pickupLocationData)) {
+                    $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+                    $pickupLocationData = array(
+                        'name' => $shoppingConfig['company'],
+                        'address1' => $shoppingConfig['address1'],
+                        'address2' => $shoppingConfig['address2'],
+                        'country' => $shoppingConfig['country'],
+                        'city' => $shoppingConfig['city'],
+                        'state' => $shoppingConfig['state'],
+                        'zip' => $shoppingConfig['zip'],
+                        'phone' => $shoppingConfig['phone']
+                    );
+                }
+                $pickupLocationData['map_link'] = 'https://maps.google.com/?q='.$pickupLocationData['address1'].'+'.$pickupLocationData['city'].'+'.$pickupLocationData['state'];
+                $pickupLocationData['map_src'] = Tools_Geo::generateStaticGmaps($pickupLocationData, 640, 300);
+                Zend_Registry::set('postPurchasePickup', $pickupLocationData);
+            }
             unset($this->_session->storeCartSessionConversionKey);
         }
         if ($this->_cart instanceof Models_Model_CartSession) {
@@ -672,6 +692,65 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * Return pickup location address element
+     *
+     * Can be used any keys from $pickupLocationData.
+     * All widgets should be in {postpurchasepickup} magicspace.
+     * Widgets exaples:
+     * {$postpurchase:pickup:address1} - Display address
+     * {$postpurchase:pickup:address1[:label:Working hours]} - Display address with custom label
+     * {$postpurchase:pickup:working_hours[:sunday]} - Display working hours for Sunday
+     * {$postpurchase:pickup:country[:clean]} - Display shortcode of country
+     *
+     * @return string
+     */
+    protected function _renderPickup()
+    {
+        if (!Zend_Registry::isRegistered('postPurchasePickup')) {
+            return '';
+        }
+        $pickupLocationData = Zend_Registry::get('postPurchasePickup');
+        $labelExists = array_search('label', $this->_options);
+        if ($labelExists && $this->_options[$labelExists + 1]) {
+            $label = $this->_translator->translate(filter_var($this->_options[$labelExists + 1],
+                FILTER_SANITIZE_STRING));
+        }
+        if (!empty($this->_options[0]) && array_key_exists($this->_options[0], $pickupLocationData)) {
+            $param = $this->_options[0];
+            if (array_key_exists($param, $pickupLocationData)) {
+                $result = false;
+                if ($param === self::ADDRESS_STATE) {
+                    $result = $this->getState($pickupLocationData[$param]);
+                }
+                if ($param === self::ADDRESS_COUNTRY) {
+                    if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+                        $result = $pickupLocationData[$param];
+                    } else {
+                        $countries = Tools_Geo::getCountries(true);
+                        $result = $countries[$pickupLocationData[$param]];
+                    }
+                }
+                if ($param === 'working_hours') {
+                    $wh = unserialize($pickupLocationData[$param]);
+                    if (!empty($this->_options[1]) && array_key_exists($this->_options[1], $wh)) {
+                        $result = $wh[$this->_options[1]];
+                    } else {
+                        $wh = array_filter($wh);
+                        $result = implode(', ', array_map(function ($v, $k) {
+                            return ucfirst($k) . ': ' . $v;
+                        }, $wh, array_keys($wh)));
+                    }
+                }
+                if ($result !== false) {
+                    return (!empty($label) && !empty($result)) ? $label . ' ' . $result : $result;
+                } else {
+                    return (!empty($label) && !empty($pickupLocationData[$param])) ? $label . ' ' . $pickupLocationData[$param] : $pickupLocationData[$param];
+                }
+            }
+        }
+    }
+
+    /**
      * Return proper address element
      *
      * @param string $addressType (billing, shipping)
@@ -697,11 +776,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
                 }
                 if (self::ADDRESS_STATE === $addressKey) {
-                    $state = Tools_Geo::getStateById($addressData[$addressKey]);
-                    if (!empty($state['state'])) {
-                        return $state['state'];
-                    }
-                    return '';
+                    return $this->getState($addressData[$addressKey]);
                 }
                 if (self::ADDRESS_MOBILE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
                    return str_replace('+', '', $addressData[$addressKey]);
@@ -711,6 +786,18 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                 }
                 return $addressData[$addressKey];
             }
+        }
+        return '';
+    }
+
+    /**
+     * @param $stateId
+     * @return string
+     */
+    protected function getState($stateId) {
+        $state = Tools_Geo::getStateById($stateId);
+        if (!empty($state['state'])) {
+            return $state['state'];
         }
         return '';
     }
