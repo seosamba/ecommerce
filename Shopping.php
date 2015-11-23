@@ -973,7 +973,10 @@ class Shopping extends Tools_Plugins_Abstract {
 				$coupons = Store_Mapper_CouponMapper::getInstance()->findByCode($code);
 
 				$msg = array();
-
+                $defaultErrorMessage = $this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.');
+                if (isset($this->_sessionHelper->customCouponErrorMessage)) {
+                    $defaultErrorMessage = $this->_sessionHelper->customCouponErrorMessage;
+                }
 				if (!empty($coupons)) {
 					$status = Tools_CouponTools::applyCoupons($coupons);
 					if (!empty($status)) {
@@ -981,7 +984,7 @@ class Shopping extends Tools_Plugins_Abstract {
 							return $status !== true;
 						}));
 						if ($hasErrors) {
-							$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
+                            $this->_responseHelper->fail($defaultErrorMessage);
 						}
 					}
 
@@ -1016,7 +1019,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $this->_responseHelper->success($msg);
 				} else {
-					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
+					$this->_responseHelper->fail($defaultErrorMessage);
 				}
 
 			}

@@ -241,6 +241,15 @@ class Widgets_Store_Store extends Widgets_Abstract {
         }
 
         $sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
+
+        $customCouponError = preg_grep('/coupon-error=*/', $this->_options);
+        if (!empty($customCouponError)) {
+            $customErrorKey = key($customCouponError);
+            $customErrorMessage = str_replace('coupon-error=', '', current(preg_grep('/coupon-error=*/', $this->_options)));
+            $sessionHelper->customCouponErrorMessage = $customErrorMessage;
+            unset($this->_options[$customErrorKey]);
+        }
+
         if (isset($this->_options[1])) {
             $sessionHelper->customCouponMessageApply = $this->_options[1];
         } elseif(isset($sessionHelper->customCouponMessageApply)){
