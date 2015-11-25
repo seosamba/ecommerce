@@ -1,6 +1,13 @@
 <?php
-$min = floor(floatval($this->min));
-$max = ceil(floatval($this->max));
+if(isset($this->priceTax) && !empty($this->priceTax)){
+    $percentMin = ($this->priceTax / 100) * $this->min;
+    $percentMax = ($this->priceTax / 100) * $this->max;
+    $min = floor($this->min + $percentMin);
+    $max = ceil($this->max + $percentMax);
+}else{
+    $min = floor(floatval($this->min));
+    $max = ceil(floatval($this->max));
+}
 ?>
 <p>
     <?php echo $this->translate('From'); ?>

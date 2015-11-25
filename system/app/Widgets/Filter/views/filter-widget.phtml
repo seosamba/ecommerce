@@ -13,6 +13,9 @@
     <?php endif; ?>
     <?php if ($this->priceRange) : ?>
         <?php $this->priceRange['useCurrency'] = true; ?>
+        <?php if ($this->priceTax) : ?>
+            <?php $this->priceRange['priceTax'] = $this->priceTax; ?>
+        <?php endif; ?>
         <li>
             <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
             <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
