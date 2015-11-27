@@ -260,6 +260,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $itemDefaultOptionsArray
                 );
 
+                $price = round($price, 2);
+
                 if ($data['priceFilter']['min'] > $price || $data['priceFilter']['max'] < $price) {
                     return false;
                 }
