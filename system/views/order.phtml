@@ -185,7 +185,7 @@
                                             <?php
                                             if (is_array($optData)) {
                                                 $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
-                                                if (!empty($optData['priceValue'])) {
+                                                if (!empty($optData['priceValue']) && intval($optData['priceValue'])) {
                                                     if ((bool)$item['taxRate'] && $this->showPriceIncTax == 1){
                                                         $optPriceMod = $optData['priceValue'] * (100 + $item['taxRate'])/100;
                                                     } else {
@@ -197,7 +197,7 @@
                                                         $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
                                                     }
                                                 }
-                                                if (!empty($optData['weightValue'])) {
+                                                if (!empty($optData['weightValue']) && intval($optData['weightValue'])) {
                                                     $optionStr .= '<span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>' ;
                                                 }
                                             } else {
