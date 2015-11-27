@@ -178,7 +178,35 @@
                                              src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
                                              alt="<?php echo $product->getName(); ?>"/>
                                     <?php endif;?>
-                                    <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?></td>
+                                    <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?>
+                                    <?php if (!empty($item['options'])): ?>
+                                        <?php $item['taxRate'] = Tools_Tax_Tax::calculateProductTax($product, null, true);?>
+                                        <?php foreach ($item['options'] as $optionTitle => $optData): ?>
+                                            <?php
+                                            if (is_array($optData)) {
+                                                $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
+                                                if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+                                                    if ((bool)$item['taxRate'] && $this->showPriceIncTax == 1){
+                                                        $optPriceMod = $optData['priceValue'] * (100 + $item['taxRate'])/100;
+                                                    } else {
+                                                        $optPriceMod = $optData['priceValue'];
+                                                    }
+                                                    if ($optData['priceType'] === 'percent') {
+                                                        $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                                    } else {
+                                                        $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                                    }
+                                                }
+                                                if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+                                                    $optionStr .= '<span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>' ;
+                                                }
+                                            } else {
+                                                $optionStr = $optionTitle . ': ' . $optData;
+                                            } ?>
+                                            <div class="options"><?php echo $optionStr; ?></div>
+                                        <?php endforeach; ?>
+                                <?php endif;?>
+                                </td>
                                 <td class="text-center"><?php echo $product->getMpn();?></td>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                                     <td class="text-center"><?php echo $this->currency($item['original_price']);?></td>
