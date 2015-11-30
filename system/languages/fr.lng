@@ -607,6 +607,8 @@
         'Reset filters' => 'Réinitialiser',
         'Apply filters' => 'Appliquer',
         'Brands'=>'Marque',
-        'Category' => 'Categorie'
+        'Category' => 'Categorie',
+        "Log out from your admin account in order to view final navigation layer." => "Déconnectez-vous du panneau d'administration pour afficher le menu de navigation dans sa version finalisée.",
+        'Save ' => 'Sauvegarder'
 
 );?>

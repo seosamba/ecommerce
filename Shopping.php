@@ -777,6 +777,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
+            $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
 			$this->_layout->content = $this->_view->render('order.phtml');
 			echo $this->_layout->render();
 		}
