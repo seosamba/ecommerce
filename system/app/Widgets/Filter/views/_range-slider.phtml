@@ -2,7 +2,7 @@
 if(isset($this->priceTax) && !empty($this->priceTax)){
     $percentMin = ($this->min / 100) * $this->priceTax;
     $percentMax = ($this->max / 100) * $this->priceTax;
-    $min = round($this->min + $percentMin);
+    $min = floor($this->min + $percentMin);
     $max = round($this->max + $percentMax);
 }else{
     $min = floor(floatval($this->min));
