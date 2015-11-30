@@ -142,6 +142,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->pageId = $this->_toasterOptions['id'];
 		$this->_view->plContent = $content;
 		$this->_view->productTemplate = $this->_productTemplate->getName();
+
+        if(!empty($this->_priceFilter)){
+            if(in_array('tax', $this->_options)) {
+                $tax = $this->getTax();
+                if(!empty($tax)) {
+                    $tax = (int)$tax;
+                    $percentMax = $this->_priceFilter['max'] / "1.$tax";
+                    $percentMin = $this->_priceFilter['min'] / "1.$tax";
+                    $this->_priceFilter['max'] = $percentMax;
+                    $this->_priceFilter['min'] = $percentMin;
+                }
+            }
+
+
+            $this->_view->price = $this->_priceFilter;
+        }
+
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
@@ -188,6 +205,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 
         if (!empty($this->_priceFilter)) {
+            if(!empty($this->_priceFilter['tax'])){
+                $tax = $this->_priceFilter['tax'];
+                $this->_priceFilter['min'] = $this->_priceFilter['min'] * "1.$tax";
+                $this->_priceFilter['max'] = $this->_priceFilter['max'] * "1.$tax";
+            }
             $data['priceFilter'] = $this->_priceFilter;
         }
 
@@ -412,11 +434,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->filters = $filters;
 
         $attributes = array();
+        $priceFilter = array();
 
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
             if (!empty($urlFilter['price'])) {
-                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to']);
+                if(in_array('tax', $this->_options)) {
+
+                    $tax = $this->getTax();
+                    if(!empty($tax)) {
+                        $tax = (int)$tax;
+                        $percentMax = $urlFilter['price']['to'] / "1.$tax";
+                        $percentMin = $urlFilter['price']['from'] / "1.$tax";
+                        $urlFilter['price']['to'] = ceil($percentMax);
+                        $urlFilter['price']['from'] = floor($percentMin);
+                    }
+                }
+                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to'], 'tax' => $tax);
                 unset($urlFilter['price']);
             }
             // removing all
@@ -440,11 +474,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (!empty($idsWhere)) {
             $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
         }
+        if(isset($this->_priceFilter) && ($this->_priceFilter !== null)){
+            $priceFilter = $this->_priceFilter;
+        }
 
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,
-			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount);
+			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount,false,array(),(!empty($priceFilter) && (isset($priceFilter)) ? $priceFilter : array()));
 	}
 
 	/**
@@ -510,6 +547,17 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_cleanListOnly = $cleanListOnly;
 		return $this;
 	}
+
+    public function getTax(){
+        $filterTaxRate = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+        if(($filterTaxRate !== null) && (!empty($filterTaxRate))) {
+            $tax = $filterTaxRate[0]['rate1'];
+            return $tax;
+        }else {
+            $tax = '';
+            return $tax;
+        }
+    }
 
 
 }

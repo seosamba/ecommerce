@@ -578,9 +578,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$tags = $this->_request->getParam('tags');
 		$brands = $this->_request->getParam('brands');
         $attributes = $this->_request->getParam('attributes');
+        $price = $this->_request->getParam('price');
 
 		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes);
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
