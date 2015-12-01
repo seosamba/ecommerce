@@ -37,6 +37,11 @@
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
                         <span class="phone"><?php echo $billingAddress['phone'];?></span>
+                        <?php if ($this->order->getGateway()) : ?>
+                            <br/>
+                            <span><?php echo $this->translate('Payment Method');?>
+                                : <?php echo $this->order->getGateway() ;?></span>
+                        <?php endif; ?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>
                     <?php endif;?>
