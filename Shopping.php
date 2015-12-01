@@ -741,7 +741,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				throw new Exceptions_SeotoasterPluginException('Order not found');
 			}
 
-			if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
+			if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
 				if ((int)$order->getUserId() !== (int)$customer->getId()) {
 					throw new Exceptions_SeotoasterPluginException('Not allowed action');
 				}
