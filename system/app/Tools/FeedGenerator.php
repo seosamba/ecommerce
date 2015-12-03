@@ -114,6 +114,10 @@ class Tools_FeedGenerator {
 
 			if ($product->getDefaultOptions()){
 				foreach ($this->_parseProductOptions($product->getDefaultOptions()) as $name => $value) {
+					//Exclude names that starts from number because - not valid xml tag name
+					if(is_numeric($name[0])) {
+						continue;
+					}
 					$item->appendChild($feed->createElement('c:'.$name, $value));
 					unset($name, $value);
 				}
