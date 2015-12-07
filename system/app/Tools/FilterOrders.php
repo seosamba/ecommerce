@@ -21,22 +21,24 @@ class Tools_FilterOrders {
         if (isset($filter['date-to']) && !empty($filter['date-to'])) {
             $filter['date-to'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-to']));
         }
+
         $filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
-        if(isset($filter['status']) && ($filter['status'] == Models_Model_CartSession::CART_STATUS_PENDING || $filter['status'] == Models_Model_CartSession::CART_STATUS_PROCESSING || $filter['status'] == Models_Model_CartSession::CART_STATUS_CANCELED)){
-            $filter['exclude_gateway'] = self::GATEWAY_QUOTE;
+        if (!empty($filter['status'])) {
+            $statuses = (array)$filter['status'];
+            $aliases = array(
+                Models_Model_CartSession::CART_STATUS_PENDING => Tools_Misc::CS_ALIAS_PENDING,
+                Models_Model_CartSession::CART_STATUS_PROCESSING => Tools_Misc::CS_ALIAS_PENDING,
+                Models_Model_CartSession::CART_STATUS_CANCELED => Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY
+            );
+            foreach ($statuses as $k => $v) {
+                if (array_key_exists($v, $aliases)) {
+                    $filter['status'][$k] = $aliases[$v];
+                    $filter['exclude_gateway'] = self::GATEWAY_QUOTE;
+                    $filter['gateway'] = self::GATEWAY_QUOTE;
+                }
+            }
         }
-        if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_PENDING){
-            $filter['status']  = Models_Model_CartSession::CART_STATUS_PENDING;
-            $filter['gateway'] = self::GATEWAY_QUOTE;
-        }
-        if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_PROCESSING){
-            $filter['status']  = Models_Model_CartSession::CART_STATUS_PROCESSING;
-            $filter['gateway'] = self::GATEWAY_QUOTE;
-        }
-        if(isset($filter['status']) && $filter['status'] == Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY){
-            $filter['status']  = Models_Model_CartSession::CART_STATUS_CANCELED;
-            $filter['gateway'] = self::GATEWAY_QUOTE;
-        }
+
         $filter['exclude_empty_address'] = '';
 
         return $filter;

@@ -304,8 +304,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         }
                         break;
 					case 'status':
-						$val = filter_var($val, FILTER_SANITIZE_STRING);
-						$select->where('order.status = ?', $val);
+						$val = filter_var_array($val, FILTER_SANITIZE_STRING);
+						$select->where('order.status IN (?)', $val);
 				}
 			}
 		}
