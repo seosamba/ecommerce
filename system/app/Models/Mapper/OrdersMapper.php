@@ -219,7 +219,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 			return $select;
 		}
 		foreach ($where as $key => $val){
-			if (is_int($key)) {
+ 			if (is_int($key)) {
 				$select->where($val);
 			} else {
 				$key = strtolower($key);

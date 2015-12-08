@@ -23,17 +23,19 @@ class Tools_FilterOrders {
         }
 
         $filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));
+        if(isset($filter['status']) && ($filter['status'] == Models_Model_CartSession::CART_STATUS_PENDING || $filter['status'] == Models_Model_CartSession::CART_STATUS_PROCESSING || $filter['status'] == Models_Model_CartSession::CART_STATUS_CANCELED)){
+            $filter['exclude_gateway'] = self::GATEWAY_QUOTE;
+        }
         if (!empty($filter['status'])) {
             $statuses = (array)$filter['status'];
             $aliases = array(
-                Models_Model_CartSession::CART_STATUS_PENDING => Tools_Misc::CS_ALIAS_PENDING,
-                Models_Model_CartSession::CART_STATUS_PROCESSING => Tools_Misc::CS_ALIAS_PENDING,
-                Models_Model_CartSession::CART_STATUS_CANCELED => Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY
+                Tools_Misc::CS_ALIAS_PENDING => Models_Model_CartSession::CART_STATUS_PENDING,
+                Tools_Misc::CS_ALIAS_PROCESSING => Models_Model_CartSession::CART_STATUS_PROCESSING,
+                Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => Models_Model_CartSession::CART_STATUS_CANCELED
             );
             foreach ($statuses as $k => $v) {
                 if (array_key_exists($v, $aliases)) {
                     $filter['status'][$k] = $aliases[$v];
-                    $filter['exclude_gateway'] = self::GATEWAY_QUOTE;
                     $filter['gateway'] = self::GATEWAY_QUOTE;
                 }
             }
