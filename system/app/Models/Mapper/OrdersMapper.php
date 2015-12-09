@@ -305,7 +305,19 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         break;
 					case 'status':
 						$val = filter_var_array($val, FILTER_SANITIZE_STRING);
-						$select->where('order.status IN (?)', $val);
+						if (!empty($val)) {
+							$filterWhere = '(';
+							foreach ($val as $status) {
+								$filterWhere .= '(order.status = \'' . $status['name'] . '\'';
+								if ($status[Tools_FilterOrders::GATEWAY_QUOTE]) {
+									$filterWhere .= 'AND order.gateway <> \'' . Tools_FilterOrders::GATEWAY_QUOTE . '\'';
+								}
+								$filterWhere .= ') OR ';
+
+							}
+							$filterWhere = trim($filterWhere, ' OR ') . ')';
+							$select->where($filterWhere);
+						}
 				}
 			}
 		}
