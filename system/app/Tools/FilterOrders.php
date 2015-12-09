@@ -36,9 +36,9 @@ class Tools_FilterOrders {
                 $statuses[$k][self::GATEWAY_QUOTE] = false;
                 if (array_key_exists($v, $aliases)) {
                     $statuses[$k]['name'] = $aliases[$v];
+                    $statuses[$k][self::GATEWAY_QUOTE] = true;
                 }
                 if (in_array($v, $aliases)) {
-                    $statuses[$k][self::GATEWAY_QUOTE] = true;
                 }
             }
             $filter['status'] = $statuses;

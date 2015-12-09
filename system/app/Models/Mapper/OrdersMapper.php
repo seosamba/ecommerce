@@ -308,14 +308,16 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 						if (!empty($val)) {
 							$filterWhere = '(';
 							foreach ($val as $status) {
-								$filterWhere .= '(order.status = \'' . $status['name'] . '\'';
+								$filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.status = ?', $status['name']);
 								if ($status[Tools_FilterOrders::GATEWAY_QUOTE]) {
-									$filterWhere .= 'AND order.gateway <> \'' . Tools_FilterOrders::GATEWAY_QUOTE . '\'';
+									$filterWhere .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('order.gateway = ?', Tools_FilterOrders::GATEWAY_QUOTE);
+								} else {
+									$filterWhere .= ' AND (' .$this->getDbTable()->getAdapter()->quoteInto('order.gateway <> ?', Tools_FilterOrders::GATEWAY_QUOTE);
+									$filterWhere .= ' OR order.gateway IS NULL)';
 								}
-								$filterWhere .= ') OR ';
-
+								$filterWhere .= ') OR (';
 							}
-							$filterWhere = trim($filterWhere, ' OR ') . ')';
+							$filterWhere = rtrim($filterWhere, ' OR (');
 							$select->where($filterWhere);
 						}
 				}
