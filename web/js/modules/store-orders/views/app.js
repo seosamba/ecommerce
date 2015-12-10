@@ -36,7 +36,7 @@ define(['backbone',
                 'filter': function() {
                     return {
                         'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),
-                        'status': $('select[name=filter-status]', '#store-orders form.filters').val(),
+                        'status': $('#filter-status', '#store-orders form.filters').val(),
                         'country': $('select[name=filter-country]', '#store-orders form.filters').val(),
                         'state': $('select[name=filter-state]', '#store-orders form.filters').val(),
                         'carrier': $('select[name=filter-carrier]', '#store-orders form.filters').val(),

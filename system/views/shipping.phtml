@@ -38,7 +38,7 @@ $this->headLink()
                 'config[' . Shopping::SHIPPING_SUCCESS_MESSAGE . ']',
                 isset($this->shoppingConfig[Shopping::SHIPPING_SUCCESS_MESSAGE]) ? $this->shoppingConfig[Shopping::SHIPPING_SUCCESS_MESSAGE] : null,
                 array(
-                    'placeholder' => $this->translate('Success message at the checkout page'),
+                    'placeholder' => $this->translate('Free shipping success message'),
                     'class'       => 'grid_4 alpha'
                 )); ?>
             <?php echo $this->formText(
