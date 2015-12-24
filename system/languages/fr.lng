@@ -610,8 +610,8 @@
         'Category' => 'Categorie',
         "Log out from your admin account in order to view final navigation layer." => "Déconnectez-vous du panneau d'administration pour afficher le menu de navigation dans sa version finalisée.",
         'Save ' => 'Sauvegarder',
-        "Congratulations, you save" => "Félicictations, vous avez épargné",
-        "on this order. Proceed to checkout now." => "sur cette commande. Veuillez procéder au règlement.",
-        "Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout." => "Désolé, le coupon-numéro que vous avez entré est invalide ou ne peut pas être combiné avec d'autres codes que vous avez saisis. Retournez à la page précédente pour changer le code ou procédez au règlement."
+        "Congratulations, you save" => "Félicitations, vous avez économisé",
+        "on this order. Proceed to checkout now." => "sur cette commande! Merci de procéder au règlement de votre commande.",
+        "Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout." => "Désolé, le code de réduction que vous avez entré est invalide ou ne peut être combiné avec d'autres codes que vous avez saisis. Veuillez retourner à la page précédente pour changer le code, ou continuez pour procéder au règlement de votre commande."
 
 );?>
