@@ -609,6 +609,9 @@
         'Brands'=>'Marque',
         'Category' => 'Categorie',
         "Log out from your admin account in order to view final navigation layer." => "Déconnectez-vous du panneau d'administration pour afficher le menu de navigation dans sa version finalisée.",
-        'Save ' => 'Sauvegarder'
+        'Save ' => 'Sauvegarder',
+        "Congratulations, you save" => "Félicictations, vous avez épargné",
+        "on this order. Proceed to checkout now." => "sur cette commande. Veuillez procéder au règlement.",
+        "Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout." => "Désolé, le coupon-numéro que vous avez entré est invalide ou ne peut pas être combiné avec d'autres codes que vous avez saisis. Retournez à la page précédente pour changer le code ou procédez au règlement."
 
 );?>

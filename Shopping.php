@@ -974,7 +974,8 @@ class Shopping extends Tools_Plugins_Abstract {
 				$coupons = Store_Mapper_CouponMapper::getInstance()->findByCode($code);
 
 				$msg = array();
-                $defaultErrorMessage = $this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.');
+
+                $defaultErrorMessage = $this->_translator->translate("Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout.");
                 if (isset($this->_sessionHelper->customCouponErrorMessage)) {
                     $defaultErrorMessage = $this->_sessionHelper->customCouponErrorMessage;
                 }
@@ -993,7 +994,9 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $discount = $shoppingCart->getDiscount();
                     if ($discount) {
-                        $msg = array('msg' => 'Congratulations, you save ' . $this->_view->currency($discount) . ' on this order. Proceed to checkout now.');
+                        $msgPartOne = $this->_translator->translate('Congratulations, you save');
+                        $msgPartTwo = $this->_translator->translate('on this order. Proceed to checkout now.');
+                        $msg = array('msg' => "$msgPartOne " . $this->_view->currency($discount) . " $msgPartTwo");
                     }
 
                     //processing freeshipping coupons
