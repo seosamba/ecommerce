@@ -1610,7 +1610,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
             if ($orderModel instanceof Models_Model_CartSession) {
                 $orderStatus = $orderModel->getStatus();
-                if ($orderStatus !== Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                if ($orderStatus !== Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus !== Models_Model_CartSession::CART_STATUS_SHIPPED && $orderStatus !== Models_Model_CartSession::CART_STATUS_DELIVERED) {
                     $this->_responseHelper->fail($this->_translator->translate('You can refund only orders with status completed'));
                 }
                 $total = $orderModel->getTotal();
