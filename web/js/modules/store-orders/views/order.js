@@ -75,6 +75,9 @@ define([
                         html += buttons['delivered'];
                         html += buttons['refunded'];
                         break;
+                    case 'delivered':
+                        html += buttons['refunded'];
+                        break;
                     default:
                         return false;
                         break;
