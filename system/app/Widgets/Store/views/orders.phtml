@@ -53,17 +53,17 @@ $this->headLink()
 		            <label class="text-bold"><?php echo $this->translate('By order status');?></label>
                     <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
                     <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED); ?>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?>
-                             <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?>
-                             <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?>
-                             <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED); ?></option>
+                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?></option>
+                             <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?></option>
+                             <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?></option>
+                             <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?></option>
                     </select>
 	            </div>
                 <div class="grid_2 alpha mt20px hidden recurring-filters">

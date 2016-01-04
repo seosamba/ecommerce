@@ -202,7 +202,7 @@
         'Where is my order?'=>'Où est ma commande?',
         'Delete this address'=>'Supprimer cette adresse',
         'You don t have any saved addresses'=>'Vous n&rsquo;avez pas d&rsquo;adresses enregistrées',
-        'You do not have any orders'=>'Vous n&rsquo;avez pas d&rsquo;ordres',
+        'You do not have any orders'=>'Vous n&rsquo;avez pas de commandes',
         'Insert tracking code for this order'=>'Insérez le code de suivi de cette commande',
         'First'=>'Première',
         'Last'=>'Dernier',
@@ -609,6 +609,9 @@
         'Brands'=>'Marque',
         'Category' => 'Categorie',
         "Log out from your admin account in order to view final navigation layer." => "Déconnectez-vous du panneau d'administration pour afficher le menu de navigation dans sa version finalisée.",
-        'Save ' => 'Sauvegarder'
+        'Save ' => 'Sauvegarder',
+        "Congratulations, you save" => "Félicitations, vous avez économisé",
+        "on this order. Proceed to checkout now." => "sur cette commande! Merci de procéder au règlement de votre commande.",
+        "Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout." => "Désolé, le code de réduction que vous avez entré est invalide ou ne peut être combiné avec d'autres codes que vous avez saisis. Veuillez retourner à la page précédente pour changer le code, ou continuez pour procéder au règlement de votre commande."
 
 );?>
