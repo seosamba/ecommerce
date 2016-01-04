@@ -246,6 +246,7 @@ define(['backbone',
                                         showMessage(response.responseText.message, false, 5000);
                                         model.set('status', status);
                                         model.set('total', response.responseText.total);
+                                        $('.ui-dialog-titlebar-close').trigger('click');
                                     }
                                 }
                             });
