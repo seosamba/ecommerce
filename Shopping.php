@@ -1671,8 +1671,6 @@ class Shopping extends Tools_Plugins_Abstract {
                                             } else {
                                                 $this->_responseHelper->fail($this->_translator->translate('Payment gateway error happened'));
                                             }
-                                        } elseif ($result['error'] === 0 && !empty($result['refundMessage'])) {
-                                            $refundResultMessage = $result['refundMessage'];
                                         }
                                     } catch (Exception $e) {
                                         $this->_responseHelper->fail($e->getMessage());
@@ -1687,6 +1685,12 @@ class Shopping extends Tools_Plugins_Abstract {
                         } else {
                             $this->_responseHelper->fail($this->_translator->translate('Payment plugin doesn\'t exists'));
                         }
+                        $currency = Zend_Registry::get('Zend_Currency');
+                        $refundSuccessMessage = $this->_translator->translate('You\'ve successfully refunded');
+                        $refundSuccessMessage .= ' ' . $currency->toCurrency($refundAmount);
+                        $refundSuccessMessage .= ' '. $this->_translator->translate('to your client’s credit card');
+                    } else {
+                        $refundSuccessMessage = $this->_translator->translate('You\'ve added a note. No amount refunded to credit card by this system');
                     }
 
                     Models_Mapper_OrdersMapper::getInstance()->updateOrderInfo($orderId, $data);
@@ -1701,7 +1705,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $data['total'] = round($data['total'], 2);
 
-                    $this->_responseHelper->success(array('message' => $this->_translator->translate('Order refunded' . ' ' . $refundResultMessage), 'total' => $data['total']));
+                    $this->_responseHelper->success(array('message' => $refundSuccessMessage, 'total' => $data['total']));
                 }
                 $this->_responseHelper->fail($this->_translator->translate('Sorry, you can\'t refund more than the order\'s original amount.'));
             }
