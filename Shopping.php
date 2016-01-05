@@ -994,6 +994,9 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $discount = $shoppingCart->getDiscount();
                     if ($discount) {
+                        if($this->_configMapper->getConfigParam('showPriceIncTax')){
+                            $discount += $shoppingCart->getDiscountTax();
+                        }
                         $msgPartOne = $this->_translator->translate('Congratulations, you save');
                         $msgPartTwo = $this->_translator->translate('on this order. Proceed to checkout now.');
                         $msg = array('msg' => "$msgPartOne " . $this->_view->currency($discount) . " $msgPartTwo");
