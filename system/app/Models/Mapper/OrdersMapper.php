@@ -219,7 +219,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 			return $select;
 		}
 		foreach ($where as $key => $val){
-			if (is_int($key)) {
+ 			if (is_int($key)) {
 				$select->where($val);
 			} else {
 				$key = strtolower($key);
@@ -304,8 +304,22 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         }
                         break;
 					case 'status':
-						$val = filter_var($val, FILTER_SANITIZE_STRING);
-						$select->where('order.status = ?', $val);
+						$val = filter_var_array($val, FILTER_SANITIZE_STRING);
+						if (!empty($val)) {
+							$filterWhere = '(';
+							foreach ($val as $status) {
+								$filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.status = ?', $status['name']);
+								if ($status[Tools_FilterOrders::GATEWAY_QUOTE]) {
+									$filterWhere .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('order.gateway = ?', Tools_FilterOrders::GATEWAY_QUOTE);
+								} else {
+									$filterWhere .= ' AND (' .$this->getDbTable()->getAdapter()->quoteInto('order.gateway <> ?', Tools_FilterOrders::GATEWAY_QUOTE);
+									$filterWhere .= ' OR order.gateway IS NULL)';
+								}
+								$filterWhere .= ') OR (';
+							}
+							$filterWhere = rtrim($filterWhere, ' OR (');
+							$select->where($filterWhere);
+						}
 				}
 			}
 		}
