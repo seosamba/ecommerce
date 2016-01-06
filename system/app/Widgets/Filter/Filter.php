@@ -104,9 +104,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
             }
-            if(preg_match('/(tax)$/u', $option)){
+            if($option == 'tax'){
                 $priceTax = Filtering_Mappers_Filter::getInstance()->getTaxRate();
-                if($priceTax !== null){
+                if(!empty($priceTax)){
                    $priceTax = $priceTax[0]['rate1'];
                 }
             }

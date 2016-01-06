@@ -148,8 +148,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $tax = $this->getTax();
                 if(!empty($tax)) {
                     $tax = (int)$tax;
-                    $percentMax = $this->_priceFilter['max'] / "1.$tax";
-                    $percentMin = $this->_priceFilter['min'] / "1.$tax";
+                    $taxValue = $tax / 100 + 1;
+
+                    $percentMax = $this->_priceFilter['max'] / $taxValue;
+                    $percentMin = $this->_priceFilter['min'] / $taxValue;
                     $this->_priceFilter['max'] = $percentMax;
                     $this->_priceFilter['min'] = $percentMin;
                 }
@@ -206,9 +208,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (!empty($this->_priceFilter)) {
             if(!empty($this->_priceFilter['tax'])){
-                $tax = $this->_priceFilter['tax'];
-                $this->_priceFilter['min'] = $this->_priceFilter['min'] * "1.$tax";
-                $this->_priceFilter['max'] = $this->_priceFilter['max'] * "1.$tax";
+                $tax = (int)$this->_priceFilter['tax'];
+                $taxValue = $tax / 100 + 1;
+
+                $this->_priceFilter['min'] = $this->_priceFilter['min'] * $taxValue;
+                $this->_priceFilter['max'] = $this->_priceFilter['max'] * $taxValue;
             }
             $data['priceFilter'] = $this->_priceFilter;
         }
@@ -444,8 +448,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $tax = $this->getTax();
                     if(!empty($tax)) {
                         $tax = (int)$tax;
-                        $percentMax = $urlFilter['price']['to'] / "1.$tax";
-                        $percentMin = $urlFilter['price']['from'] / "1.$tax";
+                        $taxValue = $tax / 100 + 1;
+                        $percentMax = $urlFilter['price']['to'] / $taxValue;
+                        $percentMin = $urlFilter['price']['from'] / $taxValue;
                         $urlFilter['price']['to'] = ceil($percentMax);
                         $urlFilter['price']['from'] = floor($percentMin);
                     }
@@ -550,13 +555,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
     public function getTax(){
         $filterTaxRate = Filtering_Mappers_Filter::getInstance()->getTaxRate();
-        if(($filterTaxRate !== null) && (!empty($filterTaxRate))) {
+        if(!empty($filterTaxRate)) {
             $tax = $filterTaxRate[0]['rate1'];
-            return $tax;
-        }else {
-            $tax = '';
-            return $tax;
         }
+        return $tax;
     }
 
 
