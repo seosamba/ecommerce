@@ -188,7 +188,12 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
 
         if(!empty($price)){
-            $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
+           $min = filter_var($price['min'], FILTER_SANITIZE_NUMBER_INT);
+           $max = filter_var($price['max'], FILTER_SANITIZE_NUMBER_INT);
+
+           if(!empty($min) && !empty($max)) {
+               $select->where("p.price BETWEEN " . $min . " AND " . $max);
+           }
         }
 
         if (!empty($tags)) {
