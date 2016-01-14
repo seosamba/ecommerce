@@ -26,7 +26,7 @@ if(isset($this->priceTax) && !empty($this->priceTax)){
     <?php if (!empty($this->to)) { ?> data-to="<?php echo $this->to; ?>" <?php } ?>
     ></div>
 <?php
-if (isset($this->from) && isset($this->to)) {
+if (!empty($this->from) && !empty($this->to)) {
     $filterRange = $this->from . '-' . $this->to;
 } else {
     $filterRange = '';
