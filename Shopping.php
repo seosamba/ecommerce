@@ -742,7 +742,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
-				if ((int)$order->getUserId() !== (int)$customer->getId()) {
+				$orderUserId = $order->getUserId();
+				if (empty($orderUserId) || (int) $orderUserId !== (int)$customer->getId()) {
 					throw new Exceptions_SeotoasterPluginException('Not allowed action');
 				}
 			}
