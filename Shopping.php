@@ -1720,5 +1720,91 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail($this->_translator->translate('Order id missing'));
     }
 
+    public function editUserProfileAddressAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            if(!empty($data['profileField']) && isset($data['profileValue']) && !empty($data['userId'])){
+                $countries = Zend_Locale::getTranslationList('territory', null, 2);
+
+                $data['profileValue'] = trim($data['profileValue']);
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $customer = $customerMapper->find($data['userId']);
+                $addr = $customer->getAddresses();
+
+                foreach($addr as $key => $value){
+                    if($value['id'] == $data['clientToken']){
+
+                        if($data['addressType'] == 'shipping'){
+                            if($data['profileField'] == 'address'){
+                                $addr[$key]['address1'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'address2'){
+                                $addr[$key]['address2'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'locality'){
+                                $addr[$key]['city'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'postal-code'){
+                                $addr[$key]['zip'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'country'){
+                                $currentCountry = array_search($data['profileValue'], $countries);
+                                if($currentCountry === false){
+                                    exit;
+                                }
+                                $addr[$key]['country'] = $currentCountry;
+                            }
+                            if($data['profileField'] == 'mobile'){
+                                $addr[$key]['mobile'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'phone'){
+                                $addr[$key]['phone'] = $data['profileValue'];
+                            }
+                        }
+
+                        if($data['addressType'] == 'billing'){
+                            if($data['profileField'] == 'address'){
+                                $addr[$key]['address1'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'address2'){
+                                $addr[$key]['address2'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'locality'){
+                                $addr[$key]['city'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'postal-code'){
+                                $addr[$key]['zip'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'country'){
+                                $currentCountry = array_search($data['profileValue'], $countries);
+                                if($currentCountry === false){
+                                    exit;
+                                }
+                                $addr[$key]['country'] = $currentCountry;
+                            }
+                            if($data['profileField'] == 'mobile'){
+                                $addr[$key]['mobile'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'phone'){
+                                $addr[$key]['phone'] = $data['profileValue'];
+                            }
+                        }
+                    }
+                }
+
+                $customer->setAddresses($addr);
+                $customerMapper->save($customer);
+
+                $this->_responseHelper->success('');
+            }
+            $this->_responseHelper->fail();
+        }
+    }
 
 }

@@ -184,25 +184,62 @@
 	<?php $addressList = $this->customer->getAddresses(); ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
-	<div>
+	<div><h3><?php echo $billingAddress['firstname'].' '.$billingAddress['lastname'].': '.$billingAddress['address_type'];?></h3>
 		<div class="adr">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
-			<span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
-			<br/>
-			<span class="locality"><?php
-				echo $billingAddress['city'].
-					($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
-				?></span>
-			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
-			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
-			<br />
+            <b class="address""><?php echo $this->translate('Address1');?>:</b>
+                <span class="client-address-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address1'];?></span>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <input class="edit-client-address-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="address" name="edit-client-address" />
+                        <img data-client-param="client-address-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <?php endif;?>
+                </span>
+            <br/>
+            <b class="address2"><?php echo $this->translate('Address2');?>:</b>
+                <span class="client-address2-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address2'];?></span>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <input class="edit-client-address2-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="address2" name="edit-client-address2" />
+                        <img data-client-param="client-address2-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <?php endif;?>
+                </span>
+            <br/>
+            <b class="locality"><?php echo $this->translate('City');?>:</b>
+                <span class="client-locality-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['city'];?></span>
+                    <input class="edit-client-locality-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="locality" name="edit-client-locality" />
+                    <img data-client-param="client-locality-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
+            <br/>
+            <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+
+            <b class="postal-code"><?php echo $this->translate('ZIP');?>:</b>
+            <span class="client-postal-code-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['zip'];?></span>
+                <input class="edit-client-postal-code-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="postal-code" name="edit-client-postal-code" />
+                <img data-client-param="client-postal-code-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+            </span>
+            <br />
             <?php if(isset($billingAddress['country'])):?>
-			    <span><?php echo $countryList[$billingAddress['country']];?></span>
+                <b class="country"><?php echo $this->translate('Country');?>:</b>
+                <span class="client-country-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $countryList[$billingAddress['country']];?></span>
+                    <input class="edit-client-country-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="country" name="edit-client-country" />
+                    <img data-client-param="client-country-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
             <?php endif;?>
+            <br />
             <?php if(isset($billingAddress['mobile'])):?>
-                <br />
-                <span class="mobile"><?php echo $billingAddress['mobile'];?></span>
+                <b class="mobile"><?php echo $this->translate('Mobile:');?></b>
+                <span class="client-mobile-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['mobile'];?></span>
+                    <input class="edit-client-mobile-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="mobile" name="edit-client-mobile" />
+                    <img data-client-param="client-mobile-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
+            <?php endif;?>
+            <br />
+            <?php if(isset($billingAddress['phone'])):?>
+                <b class="phone"><?php echo $this->translate('Phone:');?></b>
+                <span class="client-phone-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['phone'];?></span>
+                    <input class="edit-client-phone-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="phone" name="edit-client-phone" />
+                    <img data-client-param="client-phone-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
             <?php endif;?>
 		</div>
 	</div>
@@ -363,6 +400,40 @@
             }
         });
         return false;
+    });
+
+    $('.edit-client-profile-address').on('blur', function(){
+        var clientEditParam = $(this).data('client-param');
+        var editedValue = $(this).val();
+        var addrType = $(this).data('client-type');
+        var clientToken = $(this).data('client-token');
+        showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+            function (){
+                $.ajax({
+                    type: "POST",
+                    url: $('#website_url').val() + 'plugin/shopping/run/editUserProfileAddress/',
+                    dataType: "json",
+                    data: {
+                        profileField: clientEditParam,
+                        profileValue: editedValue,
+                        userId: $('#userId').val(),
+                        secureToken: $('.secure-token-user').val(),
+                        addressType: addrType,
+                        clientToken: clientToken
+                    }
+                }).done(function (response) {
+                    if (response.error == 1) {
+                        smoke.alert(response.responseText, {'classname': 'errors'});
+                    } else {
+                        $('[data-client-param="client-' + clientEditParam + '-' + clientToken+'"]').show();
+                        $('.edit-client-' + clientEditParam + '-' + clientToken).hide();
+                        $('.client-' + clientEditParam + '-' + clientToken).find('.inline-data').text(editedValue).show();
+                        smoke.signal('<?php echo $this->translate('Saved');?>');
+                    }
+                });
+            }, function () {
+                return false;
+            });
     });
 
 	<?php endif;?>
