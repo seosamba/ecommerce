@@ -163,7 +163,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->group('p.id');
 
         if (!is_null($order)) {
-			if(($key = array_search('p.sku', $order)) !== false) {
+			if(is_array($order) && ($key = array_search('p.sku', $order)) !== false) {
 				unset($order[$key]);
 				$select->order('ABS(p.sku)');
 			}
