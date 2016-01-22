@@ -684,6 +684,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
+        $customerOrders = Models_Mapper_CustomerMapper::getInstance()->getUserAddressOrdersByUserId($id);
+        if($customerOrders) {
+            $this->_view->customerOrders = $customerOrders;
+        }
 		if ($customer) {
 			$this->_view->customer = $customer;
 			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
@@ -1731,6 +1735,8 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             if(!empty($data['profileField']) && isset($data['profileValue']) && !empty($data['userId'])){
                 $countries = Zend_Locale::getTranslationList('territory', null, 2);
+                $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                $customerTable = new Models_DbTable_CustomerAddress();
 
                 $data['profileValue'] = trim($data['profileValue']);
                 $customerMapper = Models_Mapper_CustomerMapper::getInstance();
@@ -1766,6 +1772,19 @@ class Shopping extends Tools_Plugins_Abstract {
                             if($data['profileField'] == 'phone'){
                                 $addr[$key]['phone'] = $data['profileValue'];
                             }
+                            if($data['profileField'] == 'region'){
+                                $currentState = Tools_Geo::getStateByCode($data['profileValue']);
+                                if($currentState === false){
+                                    exit;
+                                }
+                                $addr[$key]['state'] = $currentState['id'];
+                            }
+                            $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
+                            $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
+                            if(!empty($currentCartSession) && (isset($customerToken))) {
+                                $newToken['shipping_address_id'] = $customerToken;
+                                $cartSessionMapper->updateAddress($data['clientToken'], $data['addressType'], $newToken);
+                            }
                         }
 
                         if($data['addressType'] == 'billing'){
@@ -1794,14 +1813,31 @@ class Shopping extends Tools_Plugins_Abstract {
                             if($data['profileField'] == 'phone'){
                                 $addr[$key]['phone'] = $data['profileValue'];
                             }
+                            if($data['profileField'] == 'region'){
+                                $currentState = Tools_Geo::getStateByCode($data['profileValue']);
+                                if($currentState === false){
+                                    exit;
+                                }
+                                $addr[$key]['state'] = $currentState['id'];
+                            }
+                            $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
+                            $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
+                            if(!empty($currentCartSession) && isset($customerToken)) {
+                                $newToken['billing_address_id'] = $customerToken;
+                                $cartSessionMapper->updateAddress($data['clientToken'], $data['addressType'], $newToken);
+                            }
                         }
                     }
                 }
-
-                $customer->setAddresses($addr);
-                $customerMapper->save($customer);
-
-                $this->_responseHelper->success('');
+                if(isset($data['clientToken'])) {
+                    $select = $customerTable->getAdapter()->select()->from('shopping_customer_address')->where('id =?', $customerToken);
+                    $lastData =  $customerTable->getAdapter()->fetchAssoc($select);
+                    if(!empty($lastData)){
+                        $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
+                        $customerTable->delete($where);
+                    }
+                }
+                $this->_responseHelper->success(array('newToken'=> $customerToken, 'oldToken'=> $data['clientOldToken']));
             }
             $this->_responseHelper->fail();
         }

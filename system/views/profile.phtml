@@ -181,192 +181,214 @@
 		</table>
 	</div>
 	<div id="profile-address-list" class="clearfix">
-	<?php $addressList = $this->customer->getAddresses(); ?>
+    <?php $addressList = $this->customerOrders; ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
-	<div><h3><?php echo $billingAddress['firstname'].' '.$billingAddress['lastname'].': '.$billingAddress['address_type'];?></h3>
+            <?php
+            $arrOrderId = array();
+            $orderUrls = '';
+            if(!is_null($billingAddress['shippingId'])){
+                $arrOrderId = explode(',',$billingAddress['shippingId']);
+            }
+            if(!is_null($billingAddress['billingId'])){
+                $arrOrderId = explode(',',$billingAddress['billingId']);
+            }
+            if(!empty($arrOrderId)) {
+                foreach ($arrOrderId as $value) {
+                    $dataUrl = $this->websiteUrl . 'plugin/shopping/run/order/id/' . $value;
+                    $href = "<a href='javascript:;' class='tpopup' data-pheight='560' data-url='$dataUrl'>$value</a>";
+                    $orderUrls .= ' ' . $href;
+                }
+            }
+            ?>
+
+        <div><h3><?php echo $this->translate('Type');?>: <?php echo $billingAddress['address_type'];?> <?php echo $this->translate('Order');?> № <?php echo $orderUrls; ?></h3>
 		<div class="adr">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
             <b class="address""><?php echo $this->translate('Address1');?>:</b>
-                <span class="client-address-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address1'];?></span>
+                <span class="client-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address1'];?></span>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                        <input class="edit-client-address-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="address" name="edit-client-address" />
-                        <img data-client-param="client-address-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <input class="edit-profile edit-client-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="address" name="edit-client-address" />
+                        <img data-client-param="client-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                     <?php endif;?>
                 </span>
             <br/>
             <b class="address2"><?php echo $this->translate('Address2');?>:</b>
-                <span class="client-address2-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address2'];?></span>
+                <span class="client-address2-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address2'];?></span>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                        <input class="edit-client-address2-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="address2" name="edit-client-address2" />
-                        <img data-client-param="client-address2-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <input class="edit-profile edit-client-address2-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="address2" name="edit-client-address2" />
+                        <img data-client-param="client-address2-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                     <?php endif;?>
                 </span>
             <br/>
             <b class="locality"><?php echo $this->translate('City');?>:</b>
-                <span class="client-locality-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['city'];?></span>
-                    <input class="edit-client-locality-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="locality" name="edit-client-locality" />
-                    <img data-client-param="client-locality-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                <span class="client-locality-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['city'];?></span>
+                    <input class="edit-profile edit-client-locality-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="locality" name="edit-client-locality" />
+                    <img data-client-param="client-locality-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
             <br/>
-            <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
-
+            <b class="region"><?php echo $this->translate('State');?>:</b>
+            <span class="client-region-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><?php $state = Tools_Geo::getStateById($billingAddress['state']);?><span class="inline-data"><?php echo $state['state'];?></span>
+                <input class="edit-profile edit-client-region-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="region" name="edit-client-region" />
+                <img data-client-param="client-region-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+            </span>
+            <br/>
             <b class="postal-code"><?php echo $this->translate('ZIP');?>:</b>
-            <span class="client-postal-code-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['zip'];?></span>
-                <input class="edit-client-postal-code-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="postal-code" name="edit-client-postal-code" />
-                <img data-client-param="client-postal-code-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+            <span class="client-postal-code-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['zip'];?></span>
+                <input class="edit-profile edit-client-postal-code-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="postal-code" name="edit-client-postal-code" />
+                <img data-client-param="client-postal-code-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
             </span>
             <br />
             <?php if(isset($billingAddress['country'])):?>
                 <b class="country"><?php echo $this->translate('Country');?>:</b>
-                <span class="client-country-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $countryList[$billingAddress['country']];?></span>
-                    <input class="edit-client-country-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="country" name="edit-client-country" />
-                    <img data-client-param="client-country-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                <span class="client-country-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $countryList[$billingAddress['country']];?></span>
+                    <input class="edit-profile edit-client-country-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="country" name="edit-client-country" />
+                    <img data-client-param="client-country-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
             <?php endif;?>
             <br />
             <?php if(isset($billingAddress['mobile'])):?>
                 <b class="mobile"><?php echo $this->translate('Mobile:');?></b>
-                <span class="client-mobile-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['mobile'];?></span>
-                    <input class="edit-client-mobile-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="mobile" name="edit-client-mobile" />
-                    <img data-client-param="client-mobile-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                <span class="client-mobile-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['mobile'];?></span>
+                    <input class="edit-profile edit-client-mobile-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="mobile" name="edit-client-mobile" />
+                    <img data-client-param="client-mobile-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
             <?php endif;?>
             <br />
             <?php if(isset($billingAddress['phone'])):?>
                 <b class="phone"><?php echo $this->translate('Phone:');?></b>
-                <span class="client-phone-<?php echo $billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['phone'];?></span>
-                    <input class="edit-client-phone-<?php echo $billingAddress['id'];?> edit-client-profile-address" style="display:none;" type="text" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="phone" name="edit-client-phone" />
-                    <img data-client-param="client-phone-<?php echo $billingAddress['id'];?>" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                <span class="client-phone-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['phone'];?></span>
+                    <input class="edit-profile edit-profile edit-client-phone-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="phone" name="edit-client-phone" />
+                    <img data-client-param="client-phone-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
             <?php endif;?>
-		</div>
-	</div>
-	<?php endforeach; ?>
-	<?php else : ?>
-	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
-	<?php endif;?>
-	</div>
+        </div>
+        </div>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <p><?php echo $this->translate("You don't have any saved addresses");?></p>
+    <?php endif;?>
+    </div>
 </div>
 <script>
-	$('#profile-content').tabs();
-	$('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
-	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
-	$(function(){
-		var oTable = $('#orders-table').dataTable({
-			bPaginate: false,
-			bLengthChange: false,
-			sDom: 't',
-			aaSorting: [[ 1, "desc" ]],
-			aoColumnDefs: [
-				{bSortable: false, aTargets: [-1]}
-			],
+    $('#profile-content').tabs();
+    $('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
+    $('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
+    $(function(){
+        var oTable = $('#orders-table').dataTable({
+            bPaginate: false,
+            bLengthChange: false,
+            sDom: 't',
+            aaSorting: [[ 1, "desc" ]],
+            aoColumnDefs: [
+                {bSortable: false, aTargets: [-1]}
+            ],
             "oLanguage": {
                 "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>",
                 "sEmptyTable": "<?php echo $this->translate('You do not have any orders'); ?>"
             }
-		});
-		$('ul.stats').on('click', 'li', function(){
-			var filter = $(this).data('sort');
-			if (filter === 'total') filter = '';
+        });
+        $('ul.stats').on('click', 'li', function(){
+            var filter = $(this).data('sort');
+            if (filter === 'total') filter = '';
             if (filter === 'Recurring Orders') filter = 'Recurring order';
-			oTable.fnFilter(filter);
-		});
-	});
+            oTable.fnFilter(filter);
+        });
+    });
 
-	<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
 
-	$('a.tracking-dialog').on('click', function(e){
-		e.preventDefault();
-		var self = this,
-			id = parseInt($(this).closest('tr').data('id'));
-		smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
-			if (value === false) {
-				return value;
-			}
-			value = $.trim(value);
-			if ($(self).data('shippingTrackingId') !== value) {
-				$.ajax({
-					url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-					data: {shippingTrackingId: value},
-					type: 'POST',
-					dataType: 'json',
-					success: function(response) {
-						showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
-						if (response.hasOwnProperty('responseText')){
-							$(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
-							$(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
-							$(self).closest('tr').find('td.current-status').text(response.responseText.status);
-						}
-					}
-				});
-			}
-		});
-	});
+    $('a.tracking-dialog').on('click', function(e){
+        e.preventDefault();
+        var self = this,
+            id = parseInt($(this).closest('tr').data('id'));
+        smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
+            if (value === false) {
+                return value;
+            }
+            value = $.trim(value);
+            if ($(self).data('shippingTrackingId') !== value) {
+                $.ajax({
+                    url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                    data: {shippingTrackingId: value},
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+                        if (response.hasOwnProperty('responseText')){
+                            $(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
+                            $(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
+                            $(self).closest('tr').find('td.current-status').text(response.responseText.status);
+                        }
+                    }
+                });
+            }
+        });
+    });
 
-	$('#orders-table').on('mouseenter', 'td.current-status', function(){
-		var id      = parseInt($(this).closest('tr').data('id')),
-			currentStatus = $(this).text();
+    $('#orders-table').on('mouseenter', 'td.current-status', function(){
+        var id      = parseInt($(this).closest('tr').data('id')),
+            currentStatus = $(this).text();
 
-		$(this).data('currentStatus', $(this).text());
+        $(this).data('currentStatus', $(this).text());
 
-		var buttons = {
-			'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
-			'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
-			'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
-			'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
-		};
+        var buttons = {
+            'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+            'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+            'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+            'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+        };
 
-		var html = '';
-		switch (currentStatus){
-			case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
-				html += buttons['refunded'];
-				break;
-			case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
-				html += buttons['completed'];
+        var html = '';
+        switch (currentStatus){
+            case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
+                html += buttons['refunded'];
+                break;
+            case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
+                html += buttons['completed'];
                 html += buttons['canceled'];
                 break;
-			case '<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>':
-				html += buttons['delivered'];
-				html += buttons['refunded'];
-				break;
-		}
+            case '<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>':
+                html += buttons['delivered'];
+                html += buttons['refunded'];
+                break;
+        }
 
-		if (html.length){
-			var popup = $('<div></div>')
-					.css({"white-space": "nowrap"})
-					.html(html);
-			$(this).html(popup);
-		}
+        if (html.length){
+            var popup = $('<div></div>')
+                .css({"white-space": "nowrap"})
+                .html(html);
+            $(this).html(popup);
+        }
 
 
-	});
-	$('#orders-table').on('mouseleave', 'td.current-status', function(){
-		var oldStatus = $(this).data('currentStatus');
-		if (oldStatus) $(this).text(oldStatus);
-	});
+    });
+    $('#orders-table').on('mouseleave', 'td.current-status', function(){
+        var oldStatus = $(this).data('currentStatus');
+        if (oldStatus) $(this).text(oldStatus);
+    });
 
-	$('#orders-table').on('click', 'td.current-status .change-status', function(){
-		var statusTd    = $(this).closest('td'),
-			id      = parseInt($(this).closest('tr').data('id')),
-			currentStatus = $(this).data('status');
+    $('#orders-table').on('click', 'td.current-status .change-status', function(){
+        var statusTd    = $(this).closest('td'),
+            id      = parseInt($(this).closest('tr').data('id')),
+            currentStatus = $(this).data('status');
 
-		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+        statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
 
-		$.ajax({
-			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-			data: {status: currentStatus},
-			type: 'POST',
-			dataType: 'json',
-			success: function(response) {
-				showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
-				if (!response.error && response.hasOwnProperty('responseText')){
+        $.ajax({
+            url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+            data: {status: currentStatus},
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+                if (!response.error && response.hasOwnProperty('responseText')){
                     $(statusTd).text(response.responseText.status).data('currentStatus', response.responseText.status);
-				}
-			}
-		});
-	});
+                }
+            }
+        });
+    });
 
     $('.edit-inline-profile').on('click', function(){
         $(this).hide();
@@ -402,11 +424,12 @@
         return false;
     });
 
-    $('.edit-client-profile-address').on('blur', function(){
+    $('.edit-profile').on('blur', function(){
         var clientEditParam = $(this).data('client-param');
         var editedValue = $(this).val();
         var addrType = $(this).data('client-type');
         var clientToken = $(this).data('client-token');
+        var oldToken = $(this).data('old-token');
         showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
             function (){
                 $.ajax({
@@ -419,23 +442,34 @@
                         userId: $('#userId').val(),
                         secureToken: $('.secure-token-user').val(),
                         addressType: addrType,
-                        clientToken: clientToken
+                        clientToken: clientToken,
+                        clientOldToken: oldToken
                     }
                 }).done(function (response) {
                     if (response.error == 1) {
-                        smoke.alert(response.responseText, {'classname': 'errors'});
+                        smoke.signal(response.responseText, {'classname': 'errors'});
                     } else {
-                        $('[data-client-param="client-' + clientEditParam + '-' + clientToken+'"]').show();
-                        $('.edit-client-' + clientEditParam + '-' + clientToken).hide();
-                        $('.client-' + clientEditParam + '-' + clientToken).find('.inline-data').text(editedValue).show();
+                        var addressId = response.responseText.newToken;
+                        var oldToken = response.responseText.oldToken;
+                        console.log('new');
+                        console.log(addressId);
+                        console.log('old');
+                        console.log(oldToken);
+
+                        $('.edit-client-profile-address-'+ addrType + '-' + oldToken).data('clientToken', addressId).attr('data-client-token',addressId);
+                        $('[data-client-param="client-' + clientEditParam + '-' + addrType + '-'+ oldToken+'"]').show();
+                        $('.edit-client-' + clientEditParam + '-' + addrType + '-'+ oldToken).hide();
+                        $('.client-' + clientEditParam + '-' + addrType + '-'+ oldToken).find('.inline-data').text(editedValue).show();
                         smoke.signal('<?php echo $this->translate('Saved');?>');
                     }
                 });
             }, function () {
-                return false;
+                $('.edit-'+oldToken).css({"display":"inline"});
+                $('.edit-client-' + clientEditParam + '-' + addrType + '-'+ oldToken).css({"display":"none"});
+                $('.inline-data').css({"display":"inline"});
             });
     });
 
-	<?php endif;?>
-	
+    <?php endif;?>
+
 </script>
