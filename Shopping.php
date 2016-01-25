@@ -1788,6 +1788,10 @@ class Shopping extends Tools_Plugins_Abstract {
                             if($data['profileField'] == 'company'){
                                 $addr[$key]['company'] = $data['profileValue'];
                             }
+                            unset($addr[$key]['id'], $addr[$key]['user_id'], $addr[$key]['address_type']);
+                            $addr[$key]['notes'] = '';
+                            $addr[$key]['mobilecountrycode'] = $addr[$key]['country'];
+
                             $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
                             $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
                             if(!empty($currentCartSession) && (isset($customerToken))) {
@@ -1838,6 +1842,10 @@ class Shopping extends Tools_Plugins_Abstract {
                             if($data['profileField'] == 'company'){
                                 $addr[$key]['company'] = $data['profileValue'];
                             }
+                            unset($addr[$key]['id'], $addr[$key]['user_id'], $addr[$key]['address_type']);
+                            $addr[$key]['notes'] = '';
+                            $addr[$key]['mobilecountrycode'] = $addr[$key]['country'];
+
                             $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
                             $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
                             if(!empty($currentCartSession) && isset($customerToken)) {
