@@ -17,6 +17,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_CUSTOMER    = 'customer';
 
+	const RECIPIENT_ADMIN    = 'admin';
+
     const TRIGGER_CUSTOMERCHANGEATTR = 't_userchangeattr';
 
     const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
@@ -177,7 +179,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				return false;
 				break;
 		}
-        
+
         $this->_entityParser
 				->objectToDictionary($this->_object);
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
