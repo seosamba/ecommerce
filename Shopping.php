@@ -1788,11 +1788,11 @@ class Shopping extends Tools_Plugins_Abstract {
                             if($data['profileField'] == 'company'){
                                 $addr[$key]['company'] = $data['profileValue'];
                             }
-                            unset($addr[$key]['id'], $addr[$key]['user_id'], $addr[$key]['address_type']);
-                            $addr[$key]['notes'] = '';
                             $addr[$key]['mobilecountrycode'] = $addr[$key]['country'];
+                            $addressValues = $this->_normalizeMobilePhoneNumber($addr[$key]);
+                            $addressVal = Tools_Misc::clenupAddress($addressValues);
 
-                            $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
+                            $customerToken = $customerMapper->addAddress($customer, $addressVal, $data['addressType']);
                             $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
                             if(!empty($currentCartSession) && (isset($customerToken))) {
                                 $newToken['shipping_address_id'] = $customerToken;
@@ -1842,11 +1842,9 @@ class Shopping extends Tools_Plugins_Abstract {
                             if($data['profileField'] == 'company'){
                                 $addr[$key]['company'] = $data['profileValue'];
                             }
-                            unset($addr[$key]['id'], $addr[$key]['user_id'], $addr[$key]['address_type']);
-                            $addr[$key]['notes'] = '';
-                            $addr[$key]['mobilecountrycode'] = $addr[$key]['country'];
+                            $addressValues = Tools_Misc::clenupAddress($addr[$key]);
 
-                            $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
+                            $customerToken = $customerMapper->addAddress($customer, $addressValues, $data['addressType']);
                             $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
                             if(!empty($currentCartSession) && isset($customerToken)) {
                                 $newToken['billing_address_id'] = $customerToken;
@@ -1867,6 +1865,17 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             $this->_responseHelper->fail();
         }
+    }
+
+    private function _normalizeMobilePhoneNumber($arr) {
+        if(isset($arr['mobile']) && !empty($arr['mobile'])) {
+            $countryPhoneCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
+            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryPhoneCode);
+            if ($mobileNumber !== false) {
+                $arr['mobile'] = $mobileNumber;
+            }
+        }
+        return $arr;
     }
 
 }
