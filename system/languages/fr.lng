@@ -617,6 +617,9 @@
         'cs_new_quote'  => 'nouveau devis',
         'cs_quote_sent' => 'devis envoyé',
         'cs_recurring_orders' => 'commandes récurrentes',
-        "Are you sure you would like to change the profile data?" => "Etes-vous sûr de vouloir changer les données du profil?"
+        "Are you sure you would like to change the profile data?" => "Etes-vous sûr de vouloir changer les données du profil?",
+        "First name" => "Prénom",
+        "Last name" => "Nom",
+        "Company" => "Société"
 
 );?>

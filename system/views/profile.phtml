@@ -206,6 +206,24 @@
 		<div class="adr">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
+            <b class="firstName"><?php echo $this->translate('First name');?>:</b>
+                <span class="client-firstName-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['firstname'];?></span>
+                    <input class="edit-profile edit-client-firstName-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="firstName" name="edit-client-firstName" />
+                    <img data-client-param="client-firstName-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
+            <br/>
+            <b class="lastName"><?php echo $this->translate('Last name');?>:</b>
+                <span class="client-lastName-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['lastname'];?></span>
+                    <input class="edit-profile edit-client-lastName-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="lastName" name="edit-client-lastName" />
+                    <img data-client-param="client-lastName-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
+            <br/>
+            <b class="company"><?php echo $this->translate('Company');?>:</b>
+                <span class="client-company-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['company'];?></span>
+                    <input class="edit-profile edit-client-company-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="company" name="edit-client-company" />
+                    <img data-client-param="client-company-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
+            <br/>
             <b class="address""><?php echo $this->translate('Address1');?>:</b>
                 <span class="client-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['address1'];?></span>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
@@ -240,29 +258,23 @@
                 <img data-client-param="client-postal-code-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
             </span>
             <br />
-            <?php if(isset($billingAddress['country'])):?>
                 <b class="country"><?php echo $this->translate('Country');?>:</b>
                 <span class="client-country-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $countryList[$billingAddress['country']];?></span>
                     <input class="edit-profile edit-client-country-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="country" name="edit-client-country" />
                     <img data-client-param="client-country-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
-            <?php endif;?>
             <br />
-            <?php if(isset($billingAddress['mobile'])):?>
                 <b class="mobile"><?php echo $this->translate('Mobile:');?></b>
                 <span class="client-mobile-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['mobile'];?></span>
                     <input class="edit-profile edit-client-mobile-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="mobile" name="edit-client-mobile" />
                     <img data-client-param="client-mobile-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
-            <?php endif;?>
             <br />
-            <?php if(isset($billingAddress['phone'])):?>
                 <b class="phone"><?php echo $this->translate('Phone:');?></b>
                 <span class="client-phone-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> client-info"><span class="inline-data"><?php echo $billingAddress['phone'];?></span>
                     <input class="edit-profile edit-profile edit-client-phone-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?> edit-client-profile-address-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" style="display:none;" type="text" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>" data-client-param="phone" name="edit-client-phone" />
                     <img data-client-param="client-phone-<?php echo $billingAddress['address_type'].'-'.$billingAddress['id'];?>" class="edit-inline-profile edit-<?php echo $billingAddress['id'];?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                 </span>
-            <?php endif;?>
         </div>
         </div>
         <?php endforeach; ?>

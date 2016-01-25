@@ -1779,6 +1779,15 @@ class Shopping extends Tools_Plugins_Abstract {
                                 }
                                 $addr[$key]['state'] = $currentState['id'];
                             }
+                            if($data['profileField'] == 'firstName'){
+                                $addr[$key]['firstname'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'lastName'){
+                                $addr[$key]['lastname'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'company'){
+                                $addr[$key]['company'] = $data['profileValue'];
+                            }
                             $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
                             $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
                             if(!empty($currentCartSession) && (isset($customerToken))) {
@@ -1819,6 +1828,15 @@ class Shopping extends Tools_Plugins_Abstract {
                                     exit;
                                 }
                                 $addr[$key]['state'] = $currentState['id'];
+                            }
+                            if($data['profileField'] == 'firstName'){
+                                $addr[$key]['firstname'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'lastName'){
+                                $addr[$key]['lastname'] = $data['profileValue'];
+                            }
+                            if($data['profileField'] == 'company'){
+                                $addr[$key]['company'] = $data['profileValue'];
                             }
                             $customerToken = $customerMapper->addAddress($customer, $addr[$key], $data['addressType']);
                             $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
