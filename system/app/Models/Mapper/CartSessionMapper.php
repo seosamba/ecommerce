@@ -248,16 +248,11 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		return $result;
 	}
 
-    public function updateAddress($oldTokenId, $type, $data = array()){
-        if ((!empty($oldTokenId)) && (!empty($type)) && (!empty($data))) {
-            $data['updated_at'] = date(DATE_ATOM);
-            if($type == 'shipping') {
-                $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $oldTokenId);
-            }
+    public function updateAddress($oldTokenId, $type = 'shipping', $data = array()){
+            $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $oldTokenId);
             if($type == 'billing') {
                 $where = $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $oldTokenId);
             }
             return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
-        }
     }
 }

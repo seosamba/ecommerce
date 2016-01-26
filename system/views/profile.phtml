@@ -181,7 +181,7 @@
 		</table>
 	</div>
 	<div id="profile-address-list" class="clearfix">
-    <?php $addressList = $this->customerOrders; ?>
+    <?php $addressList = $this->customerAddress; ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
             <?php
@@ -195,7 +195,7 @@
                 $country = '';
             }
             $arrOrderId = array();
-            $orderUrls = '';
+            $href = '';
             if(!is_null($billingAddress['shippingId'])){
                 $arrOrderId = explode(',',$billingAddress['shippingId']);
             }
@@ -205,13 +205,12 @@
             if(!empty($arrOrderId)) {
                 foreach ($arrOrderId as $value) {
                     $dataUrl = $this->websiteUrl . 'plugin/shopping/run/order/id/' . $value;
-                    $href = "<a href='javascript:;' class='tpopup' data-pheight='560' data-url='$dataUrl'>$value</a>";
-                    $orderUrls .= ' ' . $href;
+                    $href .= ' ' . "<a href='javascript:;' class='tpopup' data-pheight='560' data-url='$dataUrl'>$value</a>";
                 }
             }
             ?>
         <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)): ?>
-        <div><h3><?php echo $this->translate('Type');?>: <?php echo $billingAddress['address_type'];?> <?php echo $this->translate('Order');?> № <?php echo $orderUrls; ?></h3>
+        <div><h3><?php echo $this->translate('Type');?>: <?php echo $billingAddress['address_type'];?> <?php echo $this->translate('Order');?> № <?php echo $href; ?></h3>
 		<div class="addr" id="<?php echo $billingAddress['id'];?>" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
@@ -491,13 +490,14 @@
                         $('.edit-' + oldToken).css({"display":"inline"});
                         $('.edit-client-' + clientEditParam + '-' + addrType + '-' + oldToken).css({"display":"none"});
                         $('.inline-data').css({"display":"inline"});
+                        showMessage(response.responseText.respText, false && 5000);
                     } else {
                         var addressId = response.responseText.newToken;
                         $('#'+oldToken).data('clientToken', addressId).attr('data-client-token',addressId);
                         $('[data-client-param="client-' + clientEditParam + '-' + addrType + '-'+ oldToken+'"]').show();
                         $('.edit-client-' + clientEditParam + '-' + addrType + '-'+ oldToken).hide();
                         $('.client-' + clientEditParam + '-' + addrType + '-'+ oldToken).find('.inline-data').text(editedValue).show();
-                        showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+                        showMessage('<?php echo $this->translate('Saved');?>', false && 5000);
                     }
                 });
             }, function () {
