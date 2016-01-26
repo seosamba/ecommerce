@@ -1853,10 +1853,10 @@ class Shopping extends Tools_Plugins_Abstract {
                         }
                     }
                 }
+
                 if(isset($data['clientToken'])) {
-                    $select = $customerTable->getAdapter()->select()->from('shopping_customer_address')->where('id =?', $customerToken);
-                    $lastData =  $customerTable->getAdapter()->fetchAssoc($select);
-                    if(!empty($lastData)){
+                    $lastData =  $customerMapper->getUserAddressByUserId($customer->getId(),$customerToken);
+                    if(!empty($lastData) && ($data['clientToken'] !== $customerToken)){
                         $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
                         $customerTable->delete($where);
                     }
