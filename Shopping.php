@@ -1185,7 +1185,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 exit;
             }
 
-            if(!empty($data['profileElement']) && isset($data['profileValue']) && !empty($data['userId'])){
+            if(!empty($data['profileElement']) && !empty($data['userId'])){
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);
@@ -1733,135 +1733,68 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
-            if(!empty($data['profileField']) && isset($data['profileValue']) && !empty($data['userId'])){
+            if(!empty($data['profileField']) && !empty($data['userId'])){
+                $customerToken = '';
                 $countries = Zend_Locale::getTranslationList('territory', null, 2);
                 $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
                 $customerTable = new Models_DbTable_CustomerAddress();
 
                 $data['profileValue'] = trim($data['profileValue']);
                 $customerMapper = Models_Mapper_CustomerMapper::getInstance();
-                $customer = $customerMapper->find($data['userId']);
-                $addr = $customer->getAddresses();
-
-                foreach($addr as $key => $value){
-                    if($value['id'] == $data['clientToken']){
-
-                        if($data['addressType'] == 'shipping'){
-                            if($data['profileField'] == 'address'){
-                                $addr[$key]['address1'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'address2'){
-                                $addr[$key]['address2'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'locality'){
-                                $addr[$key]['city'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'postal-code'){
-                                $addr[$key]['zip'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'country'){
+                $currentCustomer = $customerMapper->find($data['userId']);
+                $customer = $customerMapper->getUserAddressByUserId($data['userId'], $data['clientToken']);
+                if(!empty($customer)) {
+                    foreach ($customer as $value) {
+                        if($data['profileField'] === 'country' || $data['profileField'] === 'state') {
+                            if ($data['profileField'] === 'country') {
                                 $currentCountry = array_search($data['profileValue'], $countries);
-                                if($currentCountry === false){
-                                    exit;
+                                if ($currentCountry === false) {
+                                    $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken']));
                                 }
-                                $addr[$key]['country'] = $currentCountry;
+                                $value[$data['profileField']] = $currentCountry;
                             }
-                            if($data['profileField'] == 'mobile'){
-                                $addr[$key]['mobile'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'phone'){
-                                $addr[$key]['phone'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'region'){
+                            if ($data['profileField'] === 'state') {
                                 $currentState = Tools_Geo::getStateByCode($data['profileValue']);
-                                if($currentState === false){
-                                    exit;
+                                if ($currentState === null) {
+                                    $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken']));
                                 }
-                                $addr[$key]['state'] = $currentState['id'];
+                                $value[$data['profileField']] = $currentState['id'];
                             }
-                            if($data['profileField'] == 'firstName'){
-                                $addr[$key]['firstname'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'lastName'){
-                                $addr[$key]['lastname'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'company'){
-                                $addr[$key]['company'] = $data['profileValue'];
-                            }
-                            $addr[$key]['mobilecountrycode'] = $addr[$key]['country'];
-                            $addressValues = $this->_normalizeMobilePhoneNumber($addr[$key]);
-                            $addressVal = Tools_Misc::clenupAddress($addressValues);
+                            $addressValues = $value;
 
-                            $customerToken = $customerMapper->addAddress($customer, $addressVal, $data['addressType']);
-                            $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
-                            if(!empty($currentCartSession) && (isset($customerToken))) {
+                        }else{
+                            $value[$data['profileField']] = $data['profileValue'];
+
+                            if($value['address_type'] === 'shipping'){
+                                $value['mobilecountrycode'] = $value['country'];
+                                $address = $this->_normalizeMobilePhoneNumber($value);
+                                $addressValues = Tools_Misc::clenupAddress($address);
+                            }else{
+                                $addressValues = Tools_Misc::clenupAddress($value);
+                            }
+
+                        }
+                        $customerToken = $customerMapper->addAddress($currentCustomer, $addressValues, $data['addressType']);
+                        $currentCartSession = $cartSessionMapper->fetchOrders($currentCustomer->getId());
+
+                        if(!empty($currentCartSession) && (isset($customerToken))) {
+                            if($value['address_type'] === 'shipping') {
                                 $newToken['shipping_address_id'] = $customerToken;
-                                $cartSessionMapper->updateAddress($data['clientToken'], $data['addressType'], $newToken);
-                            }
-                        }
-
-                        if($data['addressType'] == 'billing'){
-                            if($data['profileField'] == 'address'){
-                                $addr[$key]['address1'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'address2'){
-                                $addr[$key]['address2'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'locality'){
-                                $addr[$key]['city'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'postal-code'){
-                                $addr[$key]['zip'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'country'){
-                                $currentCountry = array_search($data['profileValue'], $countries);
-                                if($currentCountry === false){
-                                    exit;
-                                }
-                                $addr[$key]['country'] = $currentCountry;
-                            }
-                            if($data['profileField'] == 'mobile'){
-                                $addr[$key]['mobile'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'phone'){
-                                $addr[$key]['phone'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'region'){
-                                $currentState = Tools_Geo::getStateByCode($data['profileValue']);
-                                if($currentState === false){
-                                    exit;
-                                }
-                                $addr[$key]['state'] = $currentState['id'];
-                            }
-                            if($data['profileField'] == 'firstName'){
-                                $addr[$key]['firstname'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'lastName'){
-                                $addr[$key]['lastname'] = $data['profileValue'];
-                            }
-                            if($data['profileField'] == 'company'){
-                                $addr[$key]['company'] = $data['profileValue'];
-                            }
-                            $addressValues = Tools_Misc::clenupAddress($addr[$key]);
-
-                            $customerToken = $customerMapper->addAddress($customer, $addressValues, $data['addressType']);
-                            $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
-                            if(!empty($currentCartSession) && isset($customerToken)) {
+                            }else{
                                 $newToken['billing_address_id'] = $customerToken;
-                                $cartSessionMapper->updateAddress($data['clientToken'], $data['addressType'], $newToken);
                             }
-                        }
-                    }
-                }
+                            $cartSessionMapper->updateAddress($data['clientToken'], $data['addressType'], $newToken);
 
-                if(isset($data['clientToken'])) {
-                    $lastData =  $customerMapper->getUserAddressByUserId($customer->getId(),$customerToken);
-                    if(!empty($lastData) && ($data['clientToken'] !== $customerToken)){
-                        $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
-                        $customerTable->delete($where);
+                        }
+                            $lastData =  $customerMapper->getUserAddressByUserId($currentCustomer->getId(),$customerToken);
+                            if(!empty($lastData) && ($data['clientToken'] !== $customerToken)){
+                                $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
+                                $customerTable->delete($where);
+                            }
+
                     }
+                    $this->_responseHelper->success(array('newToken'=> $customerToken, 'oldToken'=> $data['clientOldToken']));
                 }
-                $this->_responseHelper->success(array('newToken'=> $customerToken, 'oldToken'=> $data['clientOldToken']));
             }
             $this->_responseHelper->fail();
         }

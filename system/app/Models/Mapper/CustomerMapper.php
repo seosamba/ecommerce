@@ -227,7 +227,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
-    public function getUserAddressOrdersByUserId($userId, $addressId = false)
+    public function getUserAddressOrdersByUserId($userId)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('c_adr.user_id = ?', $userId);
 
