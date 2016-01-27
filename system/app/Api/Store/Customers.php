@@ -173,17 +173,11 @@ class Api_Store_Customers extends Api_Service_Abstract {
             $users = $userMapper->fetchAll($where);
             if(!empty($users)){
                 foreach($users as $user){
-                    $resetToken = new Application_Model_Models_PasswordRecoveryToken(array(
-                        'saltString' => $user->getEmail(),
-                        'expiredAt'  => date(Tools_System_Tools::DATE_MYSQL, strtotime('+1 day', time())),
-                        'userId'     => $user->getId()
-                    ));
-                    $resetToken->registerObserver(new Tools_Mail_Watchdog(array(
-                        'trigger' => Tools_Mail_SystemMailWatchdog::TRIGGER_PASSWORDRESET
-                    )));
-                    Application_Model_Mappers_PasswordRecoveryMapper::getInstance()->save($resetToken);
-
-                }
+                    $resetToken = Tools_System_Tools::saveResetToken($user->getEmail(),$user->getId(), '+1 day');
+					$resetToken->registerObserver(new Tools_Mail_Watchdog(array(
+						'trigger' => Tools_Mail_SystemMailWatchdog::TRIGGER_PASSWORDRESET
+					)));
+				}
             }
         }
 

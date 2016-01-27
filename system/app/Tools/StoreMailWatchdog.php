@@ -17,6 +17,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const RECIPIENT_CUSTOMER    = 'customer';
 
+    const RECIPIENT_ADMIN    = 'admin';
+
     const TRIGGER_CUSTOMERCHANGEATTR = 't_userchangeattr';
 
     const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
@@ -171,6 +173,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 			case self::RECIPIENT_CUSTOMER:
 				$this->_mailer->setMailToLabel($this->_object->getFullName())
 						->setMailTo($this->_object->getEmail());
+                //create link for password generation and send e-mail to the user
+                $resetToken = Tools_System_Tools::saveResetToken( $this->_object->getEmail(), $this->_object->getId(), '+1 week');
 				break;
 			default:
 				error_log('Unsupported recipient '.$this->_options['recipient'].' given');
@@ -178,8 +182,13 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				break;
 		}
         
-        $this->_entityParser
-				->objectToDictionary($this->_object);
+        $this->_entityParser->objectToDictionary($this->_object);
+        if ($resetToken instanceof Application_Model_Models_PasswordRecoveryToken) {
+            $this->_entityParser->addToDictionary( array(
+                'customer:passwordLink' => '<a href="' . $resetToken->getResetUrl() . '/new/customer">link</a>',
+                'customer:passwordLinkRaw'  => $resetToken->getResetUrl()
+            ));
+        }
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
         $this->_entityParser->addToDictionary(array('website:url'=>$this->_websiteHelper->getUrl()));
         $this->_addAddressToDictionary($this->_object);

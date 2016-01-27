@@ -742,7 +742,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
-				if ((int)$order->getUserId() !== (int)$customer->getId()) {
+				$orderUserId = $order->getUserId();
+				if (empty($orderUserId) || (int) $orderUserId !== (int)$customer->getId()) {
 					throw new Exceptions_SeotoasterPluginException('Not allowed action');
 				}
 			}
@@ -994,6 +995,9 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $discount = $shoppingCart->getDiscount();
                     if ($discount) {
+                        if($this->_configMapper->getConfigParam('showPriceIncTax')){
+                            $discount += $shoppingCart->getDiscountTax();
+                        }
                         $msgPartOne = $this->_translator->translate('Congratulations, you save');
                         $msgPartTwo = $this->_translator->translate('on this order. Proceed to checkout now.');
                         $msg = array('msg' => "$msgPartOne " . $this->_view->currency($discount) . " $msgPartTwo");

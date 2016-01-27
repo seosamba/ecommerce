@@ -8,6 +8,17 @@ class Tools_InventoryObserver implements Interfaces_Observer {
 	const UPDATE_SUBTRACT = -1;
 	const UPDATE_ADD = 1;
 
+    /**
+     * plugin based inventory check stock method
+     */
+    const INVENTORY_IN_STOCK_METHOD = 'inStock';
+
+    /**
+     * plugin base inventory update method
+     *
+     */
+    const INVENTORY_UPDATE_STOCK = 'updateStock';
+
 	private $_oldStatus;
 
 	/**
@@ -48,7 +59,7 @@ class Tools_InventoryObserver implements Interfaces_Observer {
 	}
 
 	/**
-	 * @param int $direction Increase/descrease stock quantity
+	 * @param int $direction Increase/decrease stock quantity
 	 * @return bool
 	 */
 	private function _updateInventory($direction = self::UPDATE_SUBTRACT){
@@ -59,13 +70,21 @@ class Tools_InventoryObserver implements Interfaces_Observer {
 			case self::UPDATE_ADD:
 				$sqlExpr = 'inventory + ?';
 				break;
-			defaut:
+			default:
 				return false;
-				break;
+                break;
 		}
 		$this->_dbTable->getAdapter()->beginTransaction();
 		foreach ($this->_object->getCartContent() as $cartItem){
-			$inventory = $this->_dbTable->getAdapter()->quoteInto($sqlExpr, intval($cartItem['qty']));
+            if (!empty($cartItem['options'])) {
+                $options = array();
+                foreach ($cartItem['options'] as  $optionData) {
+                    $options[$optionData['option_id']] = $optionData['id'];
+                }
+                Tools_Misc::applyInventory($cartItem['product_id'], $options, $cartItem['qty'], Tools_InventoryObserver::INVENTORY_UPDATE_STOCK);
+            }
+
+            $inventory = $this->_dbTable->getAdapter()->quoteInto($sqlExpr, intval($cartItem['qty']));
 			$where = $this->_dbTable->getAdapter()->quoteInto('id = ? AND inventory IS NOT NULL', $cartItem['product_id']);
 			$this->_dbTable->update(array('inventory' => new Zend_Db_Expr($inventory)), $where);
 		}

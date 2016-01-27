@@ -29,6 +29,9 @@ $this->headLink()
                 <?php foreach ($this->plugins as $plugin) :?>
                     <?php
                     $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    if ($pluginClass->hasConstant('WITHOUT_TAB')) {
+                        continue;
+                    }
                     $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
                     ?>
             <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
