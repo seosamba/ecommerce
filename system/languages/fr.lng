@@ -612,6 +612,22 @@
         'Save ' => 'Sauvegarder',
         "Congratulations, you save" => "Félicitations, vous avez économisé",
         "on this order. Proceed to checkout now." => "sur cette commande! Merci de procéder au règlement de votre commande.",
-        "Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout." => "Désolé, le code de réduction que vous avez entré est invalide ou ne peut être combiné avec d'autres codes que vous avez saisis. Veuillez retourner à la page précédente pour changer le code, ou continuez pour procéder au règlement de votre commande."
+        "Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout." => "Désolé, le code de réduction que vous avez entré est invalide ou ne peut être combiné avec d'autres codes que vous avez saisis. Veuillez retourner à la page précédente pour changer le code, ou continuez pour procéder au règlement de votre commande.",
+        "Track your parcel" => "Suivez votre colis",
+        'cs_new_quote'  => 'nouveau devis',
+        'cs_quote_sent' => 'devis envoyé',
+        'cs_recurring_orders' => 'commandes récurrentes',
+        "Are you sure you would like to change the profile data?" => "Etes-vous sûr de vouloir changer les données du profil?",
+        "firstname" => "Prénom",
+        "lastname" => "Nom",
+        "company" => "Société",
+        'address1'=>'Adresse 1',
+        'address2'=>'Adresse 2',
+        'country'=>'Pays',
+        'city'=>'Ville',
+        'state'=>'Etat',
+        'zip'=>'Code postal',
+        'phone'=>'Téléphone',
+        'mobile'=>'Mobile'
 
 );?>
