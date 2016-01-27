@@ -1185,7 +1185,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 exit;
             }
 
-            if(!empty($data['profileElement']) && !empty($data['userId'])){
+            if(isset($data['profileElement']) && isset($data['profileValue']) && isset($data['userId'])){
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);

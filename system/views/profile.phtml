@@ -490,14 +490,14 @@
                         $('.edit-' + oldToken).css({"display":"inline"});
                         $('.edit-client-' + clientEditParam + '-' + addrType + '-' + oldToken).css({"display":"none"});
                         $('.inline-data').css({"display":"inline"});
-                        showMessage(response.responseText.respText, false && 5000);
+                        showMessage(response.responseText.respText, true, 5000);
                     } else {
                         var addressId = response.responseText.newToken;
                         $('#'+oldToken).data('clientToken', addressId).attr('data-client-token',addressId);
                         $('[data-client-param="client-' + clientEditParam + '-' + addrType + '-'+ oldToken+'"]').show();
                         $('.edit-client-' + clientEditParam + '-' + addrType + '-'+ oldToken).hide();
                         $('.client-' + clientEditParam + '-' + addrType + '-'+ oldToken).find('.inline-data').text(editedValue).show();
-                        showMessage('<?php echo $this->translate('Saved');?>', false && 5000);
+                        showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
                     }
                 });
             }, function () {
