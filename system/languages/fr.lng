@@ -618,8 +618,16 @@
         'cs_quote_sent' => 'devis envoyé',
         'cs_recurring_orders' => 'commandes récurrentes',
         "Are you sure you would like to change the profile data?" => "Etes-vous sûr de vouloir changer les données du profil?",
-        "First name" => "Prénom",
-        "Last name" => "Nom",
-        "Company" => "Société"
+        "firstname" => "Prénom",
+        "lastname" => "Nom",
+        "company" => "Société",
+        'address1'=>'Adresse 1',
+        'address2'=>'Adresse 2',
+        'country'=>'Pays',
+        'city'=>'Ville',
+        'state'=>'Etat',
+        'zip'=>'Code postal',
+        'phone'=>'Téléphone',
+        'mobile'=>'Mobile'
 
 );?>
