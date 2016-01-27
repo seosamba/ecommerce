@@ -226,4 +226,33 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
             ->where($where);
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
+
+    public function getUserAddressOrdersByUserId($userId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('c_adr.user_id = ?', $userId);
+
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('c_adr' =>'shopping_customer_address'), array(
+                'c_adr.id',
+                'c_adr.user_id',
+                'c_adr.address_type',
+                'c_adr.firstname',
+                'c_adr.lastname',
+                'c_adr.company',
+                'c_adr.email',
+                'c_adr.address1',
+                'c_adr.address2',
+                'c_adr.country',
+                'c_adr.city',
+                'c_adr.state',
+                'c_adr.zip',
+                'c_adr.phone',
+                'c_adr.mobile',
+            ))
+            ->joinLeft(array('s_cart' => 'shopping_cart_session'), 's_cart.shipping_address_id = c_adr.id', array('shippingId' => '(GROUP_CONCAT(s_cart.id))'))
+            ->joinLeft(array('b_cart' => 'shopping_cart_session'), 'b_cart.billing_address_id = c_adr.id', array('billingId' => '(GROUP_CONCAT(b_cart.id))'))
+            ->where($where)->group('c_adr.id');
+
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
 }
