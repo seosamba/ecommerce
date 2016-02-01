@@ -342,10 +342,10 @@ define(['backbone',
             });
         },
         sendInvoice: function(event){
-            var tdElement = '',
-                tdContent = '',
-                el      = $(event.currentTarget),
-                id      = parseInt(el.closest('tr').find('td.order-id').text());
+            var el = $(event.currentTarget),
+                id = parseInt(el.closest('tr').find('td.order-id').text()),
+                tdElement  = el.closest('td'),
+                tdContent =  tdElement.html();
             $.ajax({
                 url: $('#website_url').val()+'plugin/invoicetopdf/run/sendInvoiceToUser/',
                 data: {
@@ -355,8 +355,6 @@ define(['backbone',
                 type: 'POST',
                 dataType: 'json',
                 beforeSend: function(){
-                    tdElement = el.closest('td')
-                    tdContent = tdElement.html();
                     tdElement.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                 },
                 success: function(response) {
