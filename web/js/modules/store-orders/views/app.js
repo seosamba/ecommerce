@@ -358,8 +358,12 @@ define(['backbone',
                     tdElement.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
                 },
                 success: function(response) {
-                    if (response.hasOwnProperty('error') && !response.error){
-                        showMessage(_.isUndefined(i18n['Invoice has been sent'])?'Invoice has been sent':i18n['Invoice has been sent']);
+                    if (response.hasOwnProperty('error')) {
+                        if (!response.error) {
+                            showMessage(_.isUndefined(i18n['Invoice has been sent']) ? 'Invoice has been sent' : i18n['Invoice has been sent']);
+                        } else {
+                            showMessage(response.responseText, false, 5000);
+                        }
                     }
                     tdElement.html(tdContent);
                 }
