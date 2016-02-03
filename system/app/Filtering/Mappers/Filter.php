@@ -8,6 +8,8 @@ class Filtering_Mappers_Filter
 {
     const TABLE_NAME = 'shopping_filtering_widget_settings';
 
+    const TAX_TABLE = 'shopping_tax';
+
     /**
      * @var Filtering_Mappers_Filter
      */
@@ -16,6 +18,7 @@ class Filtering_Mappers_Filter
     private function __construct()
     {
         $this->_dbTable = new Zend_Db_Table(self::TABLE_NAME);
+        $this->_dbTaxTable = new Zend_Db_Table(self::TAX_TABLE);
     }
 
     private function __clone()
@@ -61,5 +64,13 @@ class Filtering_Mappers_Filter
         }
 
         return array();
+    }
+
+    public function getTaxRate(){
+        $where = $this->_dbTaxTable->getAdapter()->quoteInto("isDefault = ?", '1');
+        $select = $this->_dbTaxTable->select($where);
+        $result = $this->_dbTaxTable->fetchAll($select);
+        return $result->toArray();
+
     }
 }
