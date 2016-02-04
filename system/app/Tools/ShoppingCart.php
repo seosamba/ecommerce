@@ -362,10 +362,9 @@ class Tools_ShoppingCart {
                                 'taxClass' => $cartItem['taxClass']
                             ));
                             $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
-                            if ($cartItem['originalPrice'] != '0') {
-                                $product->setPrice($changedPrice);
-                                $cartItem['price'] = $changedPrice;
-                            }
+                            $product->setPrice($changedPrice);
+                            $cartItem['price'] = $changedPrice;
+
                         }
                     }
 
