@@ -20,6 +20,7 @@ define(['backbone',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
             'click td.shipping-service .setTracking': 'changeTracking',
+            'click .sendInvoice': 'sendInvoice',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
             'change input[name="check-order[]"]': 'toggleOrder',
@@ -338,6 +339,34 @@ define(['backbone',
             }, {value: model.get('shipping_tracking_id'),
                 ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
                 cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
+            });
+        },
+        sendInvoice: function(event){
+            var el = $(event.currentTarget),
+                id = parseInt(el.closest('tr').find('td.order-id').text()),
+                tdElement  = el.closest('td'),
+                tdContent =  tdElement.html();
+            $.ajax({
+                url: $('#website_url').val()+'plugin/invoicetopdf/run/sendInvoiceToUser/',
+                data: {
+                    'cartId': id,
+                    'dwn': 0
+                },
+                type: 'POST',
+                dataType: 'json',
+                beforeSend: function(){
+                    tdElement.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                },
+                success: function(response) {
+                    if (response.hasOwnProperty('error')) {
+                        if (!response.error) {
+                            showMessage(_.isUndefined(i18n['Invoice has been sent']) ? 'Invoice has been sent' : i18n['Invoice has been sent']);
+                        } else {
+                            showMessage(response.responseText, false, 5000);
+                        }
+                    }
+                    tdElement.html(tdContent);
+                }
             });
         },
         toggleRecurring : function(e){
