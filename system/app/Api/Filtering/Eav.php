@@ -12,10 +12,26 @@ class Api_Filtering_Eav extends Api_Service_Abstract
      */
     private $_eavMapper;
 
+    /**
+     * Translator
+     *
+     * @var Zend_Translate
+     */
+    protected $_translator = null;
+
+    /**
+     * Toaster response helper
+     *
+     * @var Helpers_Action_Response
+     */
+    protected $_responseHelper = null;
+
     public function init()
     {
         parent::init();
         $this->_eavMapper = Filtering_Mappers_Eav::getInstance();
+        $this->_translator = Zend_Registry::get('Zend_Translate');
+        $this->_responseHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('response');
     }
 
     /**
@@ -62,6 +78,20 @@ class Api_Filtering_Eav extends Api_Service_Abstract
             $this->_error();
         }
 
+        if(isset($data['checked'])){
+            if (!empty($data['tagId'])) {
+                $tagId = filter_var($data['tagId'], FILTER_SANITIZE_NUMBER_INT);
+            }
+            $productId =  filter_var($data['product_id'], FILTER_SANITIZE_NUMBER_INT);
+            $attributeId = filter_var($data['attribute_id'], FILTER_SANITIZE_NUMBER_INT);
+            $attributeName = filter_var($data['attributeVal'], FILTER_SANITIZE_STRING);
+
+            if (!empty($tagId)) {
+                $this->_assignUpdateFilterToTags($productId, $tagId, $attributeId, $attributeName, $data['checked']);
+            }
+            return $this->_responseHelper->success(array('message'=>$this->_translator->translate('Configuration updated')));
+        }
+
         if (!empty($data['tags']) && is_array($data['tags'])) {
             $tags = filter_var_array($data['tags'], FILTER_SANITIZE_NUMBER_INT);
         }
@@ -79,6 +109,35 @@ class Api_Filtering_Eav extends Api_Service_Abstract
         return $container;
     }
 
+    private function _assignUpdateFilterToTags($productId, $tagId, $attributeId , $attributeName,$checked = true)
+    {
+        if (empty($tagId)) {
+            return false;
+        }
+        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+        $mapper = Filtering_Mappers_Eav::getInstance();
+        $currentData =  $mapper->getAttributesTagsProduct($productId, $tagId, $attributeId);
+
+        if(!empty($currentData) && in_array('0',$currentData)){
+            $dbTable = new Zend_Db_Table('shopping_filtering_tags_has_attributes');
+            $dbTable->delete(array('attribute_id = ?' => $attributeId, 'tag_id = ?' => $tagId, 'product_id = ?' => '0'));
+        }
+
+        $mapper->saveEavContainer($productId, $attributeId, $attributeName);
+
+        if($checked === true) {
+            $sql = "INSERT IGNORE INTO shopping_filtering_tags_has_attributes (attribute_id, tag_id, product_id) VALUES (:attribute_id, :tag_id, :product_id)";
+            $dbAdapter->query($sql,
+                array('attribute_id' => $attributeId, 'tag_id' => $tagId, 'product_id' => $productId));
+
+            return true;
+        }
+        $dbTable = new Zend_Db_Table('shopping_filtering_tags_has_attributes');
+        $dbTable->delete(array('attribute_id = ?' => $attributeId, 'tag_id = ?' => $tagId, 'product_id = ?' => $productId));
+
+        return true;
+    }
+
     /**
      * The delete action handles DELETE requests and receives an 'id'
      * parameter; it should update the server resource state of the resource
@@ -86,7 +145,15 @@ class Api_Filtering_Eav extends Api_Service_Abstract
      */
     public function deleteAction()
     {
-        // TODO: Implement deleteAction() method.
+        $data = json_decode($this->_request->getRawBody(), true);
+        if (empty($data['attributeId']) && empty($data['productId'])) {
+            $this->_error();
+        }
+        $dbTable = new Zend_Db_Table('shopping_filtering_values');
+        $dbTable->delete(array('attribute_id = ?' => $data['attributeId'], 'product_id = ?' => $data['productId']));
+
+        return $this->_responseHelper->success(array('message'=>$this->_translator->translate('This attribute is deleted')));
+
     }
 
     private function _assignFilterToTags($eavContainer, $tags)
@@ -95,9 +162,13 @@ class Api_Filtering_Eav extends Api_Service_Abstract
             return false;
         }
         $dbAdapter = Zend_Db_Table::getDefaultAdapter();
-        $sql = "INSERT IGNORE INTO shopping_filtering_tags_has_attributes (attribute_id, tag_id) VALUES (:attribute_id, :tag_id)";
+
+        $dbTable = new Zend_Db_Table('shopping_filtering_tags_has_attributes');
+
+        $sql = "INSERT IGNORE INTO shopping_filtering_tags_has_attributes (attribute_id, tag_id, product_id) VALUES (:attribute_id, :tag_id, :product_id)";
         foreach ($tags as $tagId) {
-            $dbAdapter->query($sql, array('attribute_id' => $eavContainer['attribute_id'], 'tag_id' => $tagId));
+            $dbTable->delete(array('attribute_id = ?' => $eavContainer['attribute_id'], 'tag_id = ?' => $tagId, 'product_id = ?' => $eavContainer['product_id']));
+            $dbAdapter->query($sql, array('attribute_id' => $eavContainer['attribute_id'], 'tag_id' => $tagId, 'product_id' => $eavContainer['product_id']));
         }
         return true;
     }

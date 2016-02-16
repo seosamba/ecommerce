@@ -181,6 +181,41 @@ class Filtering_Mappers_Eav
         return $filters;
     }
 
+    public function getAttributesTags($productId = null)
+    {
+        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+        $select = $dbAdapter->select()
+            ->from(
+                array('attr' => $this->_attributesTable),
+                array('attr.name', 'attr.id AS attribute_id', 'tha.tag_id')
+            )
+            ->join(
+                array('tha' => $this->_tagsRelationTable),
+                'attr.id = tha.attribute_id', null
+            )
+            ->where('tha.product_id = ?', $productId);
+        return $dbAdapter->fetchAll($select);
+    }
+
+    public function getAttributesTagsProduct($productId, $tagId, $attributeId)
+    {
+        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+        $select = $dbAdapter->select()
+            ->from(
+                array('attrValues' => $this->_valuesTable),
+                array('tha.product_id')
+            )
+            ->join(
+                array('tha' => $this->_tagsRelationTable),
+                'attrValues.attribute_id = tha.attribute_id', null
+            )
+            ->where('attrValues.product_id = ?', "$productId")
+            ->where('tha.tag_id = ?', "$tagId")
+            ->where('tha.attribute_id = ?', "$attributeId");
+
+        return $dbAdapter->fetchCol($select);
+    }
+
     /**
      * Returns array of range product filters relevant to specified tags
      * @param array $tags    List of tags

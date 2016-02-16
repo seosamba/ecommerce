@@ -83,10 +83,30 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         if (!$product instanceof Models_Model_Product) {
             throw new Exceptions_SeotoasterWidgetException('This is not a product page');
         }
+        $arrTags = array();
+        $tags = $product->getTags();
+        foreach($tags as $tag){
+            $arrTags[$tag['name']] =  $tag['id'];
+        }
+
+        $attributesTags = $mapper->getAttributesTags($product->getId());
+        $filterData = $mapper->getAttributes($product->getId());
+
+        foreach($filterData as $key => $value){
+            foreach($attributesTags as $val){
+                if($value['attribute_id'] == $val['attribute_id']){
+                    $filterData[$key]['checked_Tags'][] = $val['tag_id'];
+                }
+            }
+        }
+        $this->_view->currentFilters = $filterData;
+
+        foreach ($filterData as $key => $filters) {
+            $this->_view->currentFilters[$key]['tags'] = $arrTags;
+        }
 
         $this->_view->productId = $product->getId();
         $this->_view->tags = $product->getTags();
-        $this->_view->currentFilters = $mapper->getAttributes($product->getId());
 
 
         return $this->_view->render('builder.phtml');

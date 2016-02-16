@@ -15,7 +15,8 @@ if (_.isUndefined(TFilter)) {
         tags: [],
         events: {
             'change .filtering-attribute-widget input': 'saveAttributeValue',
-            'keyup [name=new-attribute]': 'attachAttribute'
+            'keyup [name=new-attribute]': 'attachAttribute',
+            'click .filed-upgrade-select input': 'changeAttributeStatus'
         },
         initialize: function () {
             this.productId = this.$el.data('productid');
@@ -24,11 +25,12 @@ if (_.isUndefined(TFilter)) {
             this.$tabs.tabs();
             this.$tabs.on('tabsactivate', _.bind(this.initTagsBlock, this));
             this.data = this.$el.data();
-
             var self = this;
             this.$el.find('input.typeahead').autocomplete({
                 source: _.bind(this.autocomplete, this),
                 select: function (event, ui) {
+                    $('.filtering-attribute-widget').show();
+                    $('.add-new-config').hide();
                     self.renderAttribute(ui.item).find('input:text').focus();
                     $(this).val('').blur();
                     return false;
@@ -43,6 +45,39 @@ if (_.isUndefined(TFilter)) {
         },
         getTags: function () {
             return this.tags;
+        },
+        changeAttributeStatus: function(e){
+            var checkBoxEl = $(e.currentTarget).closest('.filed-upgrade-select').find('.checkbox'),
+                attributeEl = $(e.currentTarget).closest('.filtering-attribute-widget'),
+                tagId = checkBoxEl.val(),
+                attributeId = attributeEl.attr('data-attributeId'),
+                attributeValue = attributeEl.attr('data-attributeValue'),
+                productId = this.productId,
+                checked = '';
+
+            if(checkBoxEl.is(":checked")){
+                checked = true;
+            }else{
+                checked = false;
+            }
+           var data = {
+                product_id: productId,
+                attribute_id: attributeId,
+                tagId: tagId,
+                attributeVal: attributeValue,
+                checked: checked
+            };
+
+            $.ajax({
+                url: $('#website_url').val() + 'api/filtering/eav/',
+                type: 'PUT',
+                data: JSON.stringify(data),
+                success: function (model) {
+                    showMessage(model.responseText.message, false, 2000);
+                }
+
+            });
+
         },
         attachAttribute: function (e) {
             e.preventDefault();
@@ -119,6 +154,7 @@ if (_.isUndefined(TFilter)) {
             if ($exists.size()) {
                 return $exists.closest('p.filtering-attribute-widget');
             }
+
             // caching list element
             if (_.isUndefined(this.list)) {
                 this.list = this.$el.find('.product-filters-list');
@@ -127,30 +163,55 @@ if (_.isUndefined(TFilter)) {
             if (_.has(attr, 'tags')) {
                 tags = attr.tags;
             }
+            var html = '';
+            _.each( attr.tags, function (k ,v) {
+                if($.inArray(k, attr.checked_Tags) !== -1) {
+                    html += '<label class="filed-upgrade-select"><input class="checkbox" type="checkbox" checked name="tags[]" value="' + k + '" />' +
+                    _.escape(v) + '</label>';
+                }else{
+                    html += '<label class="filed-upgrade-select"><input class="checkbox" type="checkbox" name="tags[]" value="' + k + '" />' +
+                    _.escape(v) + '</label>';
+                }
+            });
+            var ticon = '';
+            var ticonRemove = '';
 
-            return $('<p>', {'class': 'filtering-attribute-widget'})
-                .append($('<label>').html(attr.label))
+            if(attr.product_id){
+                ticon = 'ticon-cog';
+                ticonRemove = 'ticon-remove-sign';
+            }
+
+            return $('<p>', {'class': 'filtering-attribute-widget', 'data-attributeId': attr.attribute_id, 'data-attributeValue': attr.value, 'data-productId': attr.product_id})
+                .append($('<label>').html(attr.label+' ').append($('<span>', {'class': ticonRemove, 'style': 'color:#FF6347;'})))
                 .append(
                     $('<input>', {type: 'text', name: attr.name, value: _.unescape(attr.value)})
                         .data({aid: attr.attribute_id, tags: tags})
                 )
+                .append($('<span>', {'class': ticon, 'style':'color:#228B22;'}).html(''))
+                .append($('<div>', {'class': 'updateConfigBlock', 'style':"display:none;"}).append(html))
                 .appendTo(this.list);
         },
         saveAttributeValue: function (e) {
             var $input = $(e.currentTarget),
-                data = {
+                dataValue = {
                     product_id: this.productId,
                     attribute_id: $input.data('aid'),
                     tags: $input.data('tags'),
                     value: $input.val()
                 };
+            if(dataValue.value === ''){
+                return;
+            }
 
             $.ajax({
                 url: $('#website_url').val() + 'api/filtering/eav/',
                 type: 'PUT',
-                data: JSON.stringify(data),
+                data: JSON.stringify(dataValue),
                 success: function (model) {
                     $input.val(_.unescape(model.value));
+                    document.location.reload(true);
+
+
                 }
             });
         },

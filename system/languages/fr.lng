@@ -628,6 +628,8 @@
         'state'=>'Etat',
         'zip'=>'Code postal',
         'phone'=>'Téléphone',
-        'mobile'=>'Mobile'
+        'mobile'=>'Mobile',
+        'This attribute is deleted' => "L'attribut a été supprimé",
+        'You are about to remove the attribute for this product! Are you sure?' => "Etes-vous sûr de vouloir supprimer l\'attribut d\'un produit?"
 
 );?>

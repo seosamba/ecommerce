@@ -658,7 +658,7 @@ CREATE TABLE IF NOT EXISTS  `shopping_filtering_widget_settings` (
 CREATE TABLE IF NOT EXISTS  `shopping_filtering_tags_has_attributes` (
   `tag_id` int(10) unsigned NOT NULL,
   `attribute_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`tag_id`,`attribute_id`),
+  `product_id` int(10) unsigned NOT NULL,
   KEY `attribute_id` (`attribute_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

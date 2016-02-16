@@ -4,14 +4,16 @@
     <div class="product-filters-list">
     </div>
     <header><?php echo $this->translate('Attach attribute to this product'); ?>:</header>
-    <div class="tag-list">
+    <div class="add-new">
+    <span class="ticon-plus3" style="color: #228B22;"></span>
+    <div class="tag-list" style="display: none;">
         <p><?php echo $this->translate('Applies to tags'); ?>:</p>
         <div class="apply-to-tags">
         <?php
         if (!empty($this->tags)) {
             foreach($this->tags as $tag) { ?>
-                <label><input type="checkbox" name="tags[]" value="<?php echo $tag['id']; ?>"
-                              checked />&nbsp;<?php echo $tag['name']; ?></label>
+                <label id="<?php echo $tag['id']; ?>"><input type="checkbox" name="tags[]" value="<?php echo $tag['id']; ?>"
+                            />&nbsp;<?php echo $tag['name']; ?></label>
         <?php
             }
         } else {
@@ -20,6 +22,7 @@
         ?>
         </div>
         <div><input type="text" class="typeahead" name="new-attribute" placeholder="Give a name to filter" /></div>
+    </div>
     </div>
 </div>
 
@@ -60,4 +63,58 @@
         app.loadAttributes(<?php echo json_encode($this->currentFilters); ?>);
         <?php endif; ?>
     });
+
+    $(document).on("click", ".ticon-cog", function () {
+        var self = this;
+        var $wrapper = $(self).closest('.filtering-attribute-widget').find('.updateConfigBlock');
+
+        if ($wrapper.hasClass("show-config")) {
+            $wrapper.removeClass( "show-config" );
+            $wrapper.hide();
+        } else{
+            $wrapper.addClass( "show-config" );
+            $wrapper.show();
+        }
+    });
+
+    $(document).on("click", ".ticon-plus3", function () {
+        var selfdata = this;
+        var $addnew = $(selfdata).closest('.add-new').find('.tag-list');
+        if($addnew.hasClass("hidden")){
+            $addnew.removeClass("hidden");
+            $addnew.removeClass( "add-new-config" );
+            $(this).closest('.filtering-attribute-widget').find('span').addClass( "ticon-remove-sign" );
+        }
+
+        if ($addnew.hasClass("add-new-config")) {
+            $addnew.removeClass( "add-new-config" );
+            $addnew.hide();
+        } else{
+            $addnew.addClass( "add-new-config" );
+            $addnew.show();
+        }
+    });
+
+    $(document).on("click", ".ticon-remove-sign", function () {
+        var selfdeleted = this,
+        $deleted = $(selfdeleted).closest('.filtering-attribute-widget'),
+        $deletedData = {
+            attributeId: $deleted.data('attributeid'),
+            productId: $deleted.data('productid')
+        };
+        showConfirm('<?php echo $this->translate("You are about to remove the attribute for this product! Are you sure?"); ?>',
+            function () {
+                $.ajax({
+                    url: '<?php echo $this->websiteUrl?>api/filtering/eav/',
+                    dataType: 'json',
+                    data: JSON.stringify($deletedData),
+                    type: 'DELETE'
+                }).done(function (response) {
+                    showMessage(response.responseText.message, false, 3000);
+                    $deleted = $(selfdeleted).closest('.filtering-attribute-widget');
+                    $deleted.hide();
+                });
+            });
+    });
+
 </script>
