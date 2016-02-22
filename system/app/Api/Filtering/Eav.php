@@ -99,7 +99,7 @@ class Api_Filtering_Eav extends Api_Service_Abstract
         $container = $this->_eavMapper->saveEavContainer(
             intval($data['product_id']),
             intval($data['attribute_id']),
-            strip_tags($data['value'])
+            strip_tags(htmlspecialchars($data['value']))
         );
 
         if (!empty($tags)) {
