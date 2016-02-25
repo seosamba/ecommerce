@@ -12,6 +12,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
+    /**
+     * Shopping URL db table
+     */
+    const SHOPPING_URL_TABLE = 'shopping_shipping_url';
 	/**
 	 * New system role 'customer'
 	 *
@@ -140,6 +144,16 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @var Models_Mapper_ShoppingConfig
 	 */
 	private $_configMapper = null;
+    /**
+     * @var Models_Mapper_ShippingUrl
+     */
+    private $_shippingUrlMapper = null;
+
+    private $_shoppingUrlField = array(
+        'name' => '`name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL UNIQUE',
+        'code' => '`code` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL',
+        'url'  => '`url` TEXT COLLATE utf8_unicode_ci'
+    );
 
 	/**
 	 * @var array List of actions that should be secured
@@ -176,6 +190,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig = Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $this->_shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
 	}
 
 	/**
@@ -244,6 +259,15 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	public function run($requestedParams = array()) {
+        $shoppingShippingUrlDbTable = new Models_DbTable_ShoppingShippingUrl();
+        $createTableSql = "CREATE TABLE IF NOT EXISTS " . self::SHOPPING_URL_TABLE . " (";
+        $createTableSql .= $this->_shoppingUrlField['name'] . ',';
+        $createTableSql .= $this->_shoppingUrlField['code'] . ',';
+        $createTableSql .= $this->_shoppingUrlField['url'] . ' ';
+        $createTableSql .= ") ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;";
+        $stmt = $shoppingShippingUrlDbTable->getAdapter()->prepare($createTableSql);
+        $stmt->execute();
+
 		$dispatchersResult = parent::run($requestedParams);
 		if ($dispatchersResult) {
 			return $this->_getOption($dispatchersResult);
@@ -324,6 +348,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$markupForm->populate($markupConfig['config']);
 		}
         $orderConfig =  $shippingConfigMapper->find(self::ORDER_CONFIG);
+        $trackingUrlForm = new Forms_Shipping_TrackingUrl();
+
         $orderConfigForm = new Forms_Shipping_OrderConfig();
         if(isset($orderConfig['config'])){
             $orderConfigForm->populate($orderConfig['config']);
@@ -371,6 +397,9 @@ class Shopping extends Tools_Plugins_Abstract {
         }
         $this->_view->pickupLocationConf = $pickupLocationConfig;
         $this->_view->orderConfigForm = $orderConfigForm;
+
+        $this->_view->trackingUrlForm = $trackingUrlForm;
+
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -451,6 +480,59 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
+
+    protected function fetchNamesAction(){
+        $trackingData = $this->_shippingUrlMapper->fetchNames();
+
+        $arrData = array($this->_translator->translate('Custom Shipper'));
+        foreach($trackingData as $key => $value){
+            $arrData[$value] = $value;
+        }
+        return  $this->_responseHelper->success(array('data' => $arrData));
+    }
+
+
+    protected function setDataAction() {
+        $data = json_decode($this->_request->getRawBody(), true);
+
+        $data = array_map("trim", $data);
+        if (empty($data['name']) || empty($data['code'])) {
+          return  $this->_responseHelper->fail('Required parameters is missing');
+        }
+
+        $status = $this->_shippingUrlMapper->save($data);
+        if(!$status){
+            $msg = $this->_translator->translate('Updated');
+            return  $this->_responseHelper->success(array('msg' => $this->_translator->translate($msg), 'optionName' => $data['name']));
+        }
+        $this->_responseHelper->success(array('msg' => $this->_translator->translate('Saved'), 'optionName' => $status));
+    }
+
+    protected function getDataAction() {
+        $data = json_decode($this->_request->getRawBody(), true);
+        if (empty($data['name'])) {
+            exit;
+        }
+        $data = array_map("trim", $data);
+        $currentData = $this->_shippingUrlMapper->findByName($data['name']);
+       if($currentData){
+           $this->_responseHelper->success(array('name'=> $currentData['name'], 'code'=> $currentData['code'], 'url'=> $currentData['url']));
+       }
+
+    }
+
+    protected function deleteDataAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
+            $name = filter_var(trim($this->_request->getParam('selectName')), FILTER_SANITIZE_STRING);
+            if ($name) {
+               $status = $this->_shippingUrlMapper->delete($name);
+               if(!empty($status)){
+                   $this->_responseHelper->success(array('msg' => $this->_translator->translate('Deleted'), 'optionName' => $name));
+               }
+            }
+        }
+    }
+
 
 	public function setSettingsAction() {
 		$status = false;
@@ -754,16 +836,27 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if ($this->_request->isPost()) {
-				$order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
+                $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
 
-				$params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+                $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
 
-				if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']) {
-					$order->registerObserver(new Tools_Mail_Watchdog(array(
-						'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
-					)));
-					$params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
-				}
+                    if((isset($params['name'])) && (!empty($params['name']))){
+                        if(empty($params['shippingTrackingId'])) {
+                            $currentData = $this->_shippingUrlMapper->findByName($params['name']);
+                            $currentData['name'] = '<b>'. $currentData['name']. '</b>';
+                            foreach ($currentData as $value) {
+                                $params['shippingTrackingId'] .= $value. ' ';
+                            }
+                        }
+                    }
+
+                    if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']) {
+                        unset($params['name']);
+                        $order->registerObserver(new Tools_Mail_Watchdog(array(
+                            'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
+                        )));
+                        $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                    }
 
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);

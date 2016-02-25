@@ -9,7 +9,7 @@ $this->headScript()
 $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
-<div class="seotoaster container">
+<div class="seotoaster container" xmlns="http://www.w3.org/1999/html">
     <?php
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -76,6 +76,7 @@ $this->headLink()
                 </li>
             <?php endforeach; ?>
                 <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
+                <li><a href="#trackingUrl" data-plugin="trackingUrl"><?php echo $this->translate('Shipping url per carrier'); ?></a></li>
             </ul>
             <div id="pane-container" class="grid_8 omega">
             <div id="shippingzones">
@@ -222,6 +223,34 @@ $this->headLink()
                         </fieldset>
                     </form>
             </div>
+            <div id="trackingUrl">
+                <div>
+                    <fieldset class="background">
+                        <legend class="background large p5px"><?php echo $this->translate('Shipping url per carrier'); ?></legend>
+                        <div class="labeled" style="text-align: center; line-height: 30px;">
+                            <button class="remove-pickup-location-shipping-url link fl-right btn icon inverse-error ticon-close" title="<?php echo $this->translate('Remove');?>"></button>
+                            <button class="btn success grid_5 alpha fl-left ticon-plus" for="cartamount"><?php echo $this->translate($this->trackingUrlForm->getElement('addNew')->getLabel()); ?></button>
+                            <span>OR</span>
+                            <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_6 omega fl-right')->renderViewHelper(); ?>
+                        </div>
+                        <div class="add-new" style="display: none;">
+                            <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Name');?>
+                                <input type="text" id="name" name="name" />
+                            </span>
+                            <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Code');?>
+                                <input type="text" id="code" name="code" />
+                            </span>
+                            <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Service url');?>
+                                <input type="text" id="url" name="url" />
+                            </span>
+                        </div>
+                        <div>
+                            <button class="btn grid_4 omega fl-right save-data" style="margin-top: 10px;"/><?php echo $this->translate('Save');?></button>
+                        </div>
+
+                    </fieldset>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -233,6 +262,143 @@ $this->headLink()
 
 <script>
 $(function(){
+    $(document).on("click", ".ticon-plus", function () {
+        var selfdata = this,
+            addnew = $(selfdata).closest('.background').find('.add-new'),
+            selectValue = $('#shipping-url option:selected').val();
+
+        if(selectValue !== '0'){
+            $("#shipping-url :contains('Select')").attr("selected", "selected");
+        }
+
+        $('#name').val('');
+        $('#code').val('');
+        $('#url').val('');
+
+        if (addnew.hasClass("add-new-config")) {
+            addnew.removeClass( "add-new-config" );
+            addnew.hide();
+        } else{
+            addnew.addClass( "add-new-config" );
+            addnew.show();
+        }
+    });
+
+    $(document).on("change", "#name", function () {
+        var textValue = $('#name').val(),
+            selectData = {
+                name: textValue
+            };
+
+        $.ajax({
+            url: '<?php echo $this->websiteUrl?>plugin/shopping/run/getData',
+            dataType: 'json',
+            data: JSON.stringify(selectData),
+            type: 'POST'
+        }).done(function (response) {
+            $('#name').val(response.responseText.name);
+            $('#code').val(response.responseText.code);
+            $('#url').val(response.responseText.url);
+        });
+
+    });
+
+    $(document).on("click", "#shipping-url", function () {
+        var selectValue = $('#shipping-url option:selected').val(),
+            selfdata = this,
+            addnew = $(selfdata).closest('.background').find('.add-new');
+
+        if (addnew.hasClass("add-new-config") && selectValue === '0') {
+            addnew.removeClass( "add-new-config" );
+            addnew.hide();
+        } else{
+            var selectData = {
+                name: selectValue
+            };
+
+            $.ajax({
+                url: '<?php echo $this->websiteUrl?>plugin/shopping/run/getData',
+                dataType: 'json',
+                data: JSON.stringify(selectData),
+                type: 'POST'
+            }).done(function (response) {
+                $('#name').val(response.responseText.name);
+                $('#code').val(response.responseText.code);
+                $('#url').val(response.responseText.url);
+
+                addnew.addClass( "add-new-config" );
+                addnew.show();
+            });
+        }
+    });
+
+    $(document).on("click", ".save-data", function () {
+      var name =  $('#name').val(),
+          code = $('#code').val(),
+          url = $('#url').val(),
+          selfdata = this,
+          addnew = $(selfdata).closest('.background').find('.add-new'),
+          selectValue = $('#shipping-url option:selected').val();
+        if(name == '' || code == ''){
+            showMessage('field not been empty');
+        }else {
+            var data = {
+                name: name,
+                code: code,
+                url: url
+            };
+                $.ajax({
+                    url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setData',
+                    dataType: 'json',
+                    data: JSON.stringify(data),
+                    type: 'POST'
+                }).done(function (response) {
+                    var optVal = response.responseText.optionName,
+                        optionValues = '';
+                    $("#shipping-url option[value='"+optVal+"']").each(function() {
+                        optionValues = optVal ;
+                    });
+                    if(optionValues == ''){
+                        $("#shipping-url").append('<option value="'+optVal+'">'+optVal+'</option>');
+                    }
+                    showMessage(response.responseText.msg, false, 2000);
+                });
+
+            if(addnew.hasClass("add-new-config")){
+                addnew.removeClass( "add-new-config" );
+                addnew.hide();
+            }
+            if(selectValue !== '0'){
+                $("#shipping-url :contains('Select')").attr("selected", "selected");
+            }
+        }
+
+    });
+
+    $(document).on('click', '.remove-pickup-location-shipping-url', function(e){
+        e.preventDefault();
+          var selectName = $('#shipping-url option:selected').val(),
+              selfdata = this,
+              row = $(selfdata).closest('.background').find('.add-new');
+        if(selectName === '0'){
+            return;
+        }
+        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+            row.removeClass( "add-new-config" );
+            row.hide();
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/deleteData/selectName/'+selectName,
+                type: 'DELETE',
+                dataType: 'json'
+            }).done(function(response) {
+                var optionName = response.responseText.optionName;
+                $("#shipping-url option[value="+optionName+"]").remove();
+                $("#shipping-url :contains('Select')").attr("selected", "selected");
+                showMessage(response.responseText.msg, false, 2000);
+            });
+        });
+    });
+
     $('form#general-config :input').on('change', function(){
         $.post($('#website_url').val()+'plugin/shopping/run/setConfig', $(this).closest('form').serialize());
     });
