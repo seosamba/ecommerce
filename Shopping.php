@@ -151,7 +151,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
     private $_shoppingUrlField = array(
         'name' => '`name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL UNIQUE',
-        'code' => '`code` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL',
         'url'  => '`url` TEXT COLLATE utf8_unicode_ci'
     );
 
@@ -262,7 +261,6 @@ class Shopping extends Tools_Plugins_Abstract {
         $shoppingShippingUrlDbTable = new Models_DbTable_ShoppingShippingUrl();
         $createTableSql = "CREATE TABLE IF NOT EXISTS " . self::SHOPPING_URL_TABLE . " (";
         $createTableSql .= $this->_shoppingUrlField['name'] . ',';
-        $createTableSql .= $this->_shoppingUrlField['code'] . ',';
         $createTableSql .= $this->_shoppingUrlField['url'] . ' ';
         $createTableSql .= ") ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;";
         $stmt = $shoppingShippingUrlDbTable->getAdapter()->prepare($createTableSql);
@@ -496,7 +494,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $data = json_decode($this->_request->getRawBody(), true);
 
         $data = array_map("trim", $data);
-        if (empty($data['name']) || empty($data['code'])) {
+        if (empty($data['name'])) {
           return  $this->_responseHelper->fail('Required parameters is missing');
         }
 
@@ -516,7 +514,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $data = array_map("trim", $data);
         $currentData = $this->_shippingUrlMapper->findByName($data['name']);
        if($currentData){
-           $this->_responseHelper->success(array('name'=> $currentData['name'], 'code'=> $currentData['code'], 'url'=> $currentData['url']));
+           $this->_responseHelper->success(array('name'=> $currentData['name'], 'url'=> $currentData['url']));
        }
 
     }
@@ -843,21 +841,20 @@ class Shopping extends Tools_Plugins_Abstract {
                     if((isset($params['name'])) && (!empty($params['name']))){
                             $currentData = $this->_shippingUrlMapper->findByName($params['name']);
                             $currentData['name'] = '<b>'. $currentData['name']. '</b>';
+                            $currentData['url'] = '<a href="'.$currentData['url'].$params['shippingTrackingId'].'">'.$params['shippingTrackingId'].'</a>';
                             $param = '';
                             foreach ($currentData as $value) {
                                 $param .= $value . ' ';
                             }
                         if(empty($params['shippingTrackingId'])){
-                            if(empty($currentData['url'])) {
-                                $param = trim($param);
-                            }else{
-                                $param = trim($param) . $currentData['code'];
-                            }
+                            return;
                         }
-                        $params['shippingTrackingId'] = trim($param).$params['shippingTrackingId'];
+                        $params['shippingTrackingId'] = trim($param);
                     }
-
-                    if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']) {
+                    if (isset($params['shippingTrackingId'])) {
+                        if(empty($params['name'])){
+                            $params['shippingTrackingId'] = '<a href="'.$params['shippingTrackingId'].'">'.$params['shippingTrackingId'].'</a>';
+                        }
                         unset($params['name']);
                         $order->registerObserver(new Tools_Mail_Watchdog(array(
                             'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER

@@ -330,8 +330,8 @@ define(['backbone',
                         });
                         $('.save-data').on('click', function(){
                             var  name =  $('#marketing-services').val(),
-                                text =  $('#shippingTrackingId').val()
-                            var data = {
+                                 text =  $('#shippingTrackingId').val(),
+                                 data = {
                                 name: name,
                                 shippingTrackingId: text
                             };

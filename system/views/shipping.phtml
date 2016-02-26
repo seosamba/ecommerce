@@ -237,10 +237,7 @@ $this->headLink()
                             <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Name');?>
                                 <input type="text" id="name" name="name" />
                             </span>
-                            <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Code');?>
-                                <input type="text" id="code" name="code" />
-                            </span>
-                            <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Service url');?>
+                            <span class="grid_8 omega" style="text-align: center"><?php echo $this->translate('Service url');?>
                                 <input type="text" id="url" name="url" />
                             </span>
                         </div>
@@ -272,7 +269,6 @@ $(function(){
         }
 
         $('#name').val('');
-        $('#code').val('');
         $('#url').val('');
 
         if (addnew.hasClass("add-new-config")) {
@@ -297,7 +293,6 @@ $(function(){
             type: 'POST'
         }).done(function (response) {
             $('#name').val(response.responseText.name);
-            $('#code').val(response.responseText.code);
             $('#url').val(response.responseText.url);
         });
 
@@ -323,7 +318,6 @@ $(function(){
                 type: 'POST'
             }).done(function (response) {
                 $('#name').val(response.responseText.name);
-                $('#code').val(response.responseText.code);
                 $('#url').val(response.responseText.url);
 
                 addnew.addClass( "add-new-config" );
@@ -334,17 +328,15 @@ $(function(){
 
     $(document).on("click", ".save-data", function () {
       var name =  $('#name').val(),
-          code = $('#code').val(),
           url = $('#url').val(),
           selfdata = this,
           addnew = $(selfdata).closest('.background').find('.add-new'),
           selectValue = $('#shipping-url option:selected').val();
-        if(name == '' || code == ''){
+        if(name == ''){
             showMessage('field not been empty');
         }else {
             var data = {
                 name: name,
-                code: code,
                 url: url
             };
                 $.ajax({
