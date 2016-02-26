@@ -841,13 +841,20 @@ class Shopping extends Tools_Plugins_Abstract {
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
 
                     if((isset($params['name'])) && (!empty($params['name']))){
-                        if(empty($params['shippingTrackingId'])) {
                             $currentData = $this->_shippingUrlMapper->findByName($params['name']);
                             $currentData['name'] = '<b>'. $currentData['name']. '</b>';
+                            $param = '';
                             foreach ($currentData as $value) {
-                                $params['shippingTrackingId'] .= $value. ' ';
+                                $param .= $value . ' ';
+                            }
+                        if(empty($params['shippingTrackingId'])){
+                            if(empty($currentData['url'])) {
+                                $param = trim($param);
+                            }else{
+                                $param = trim($param) . $currentData['code'];
                             }
                         }
+                        $params['shippingTrackingId'] = trim($param).$params['shippingTrackingId'];
                     }
 
                     if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']) {
