@@ -837,27 +837,33 @@ class Shopping extends Tools_Plugins_Abstract {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
 
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+                $selectedName = '';
+                $url = '';
+                $paramData = $params['shippingTrackingId'];
 
                     if((isset($params['name'])) && (!empty($params['name']))){
-                            $currentData = $this->_shippingUrlMapper->findByName($params['name']);
-                            $currentData['name'] = '<b>'. $currentData['name']. '</b>';
-                            $currentData['url'] = '<a href="'.$currentData['url'].$params['shippingTrackingId'].'">'.$params['shippingTrackingId'].'</a>';
+                        $currentData = $this->_shippingUrlMapper->findByName($params['name']);
+
+                        $selectedName = $params['name'];
+                        $url = $currentData['url'];
+                        $currentData['url'] = $currentData['url'].$params['shippingTrackingId'];
+                        unset($currentData['name']);
                             $param = '';
                             foreach ($currentData as $value) {
                                 $param .= $value . ' ';
                             }
-                        if(empty($params['shippingTrackingId'])){
+                        if(empty($params['shippingTrackingId']) || strpos($params['shippingTrackingId'], '://')){
                             return;
                         }
                         $params['shippingTrackingId'] = trim($param);
                     }
                     if (isset($params['shippingTrackingId'])) {
-                        if(empty($params['name'])){
-                            $params['shippingTrackingId'] = '<a href="'.$params['shippingTrackingId'].'">'.$params['shippingTrackingId'].'</a>';
-                        }
                         unset($params['name']);
                         $order->registerObserver(new Tools_Mail_Watchdog(array(
-                            'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
+                            'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
+                            'name' => $selectedName,
+                            'code' => $paramData,
+                            'url' =>  $url
                         )));
                         $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
                     }
