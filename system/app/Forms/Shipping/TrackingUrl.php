@@ -6,7 +6,7 @@ class Forms_Shipping_TrackingUrl extends Zend_Form {
         $trackingUrlDataMapper =   Models_Mapper_ShoppingShippingUrlMapper::getInstance();
         $trackingData = $trackingUrlDataMapper->fetchNames();
 
-        $arrData = array('Select');
+        $arrData = array('Select to edit');
         foreach($trackingData as $key => $value){
             $arrData[$value] = $value;
         }
