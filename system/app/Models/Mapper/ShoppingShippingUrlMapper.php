@@ -46,6 +46,26 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
       return $result->toArray();
     }
 
+    public function findDefaultStatus() {
+        $select = $this->getDbTable()->select();
+        $select->where('default_status = "1"');
+        $result = $this->getDbTable()->fetchRow($select);
+        if(is_null($result)){
+            return false;
+        }
+        return $result->toArray();
+    }
+
+    public function clearDefaultStatus() {
+        $result = array();
+        $defaultStatus = $this->findDefaultStatus();
+        if(!is_null($defaultStatus)){
+            $data = array('default_status' => '0');
+            $result = $this->getDbTable()->update($data);
+        }
+        return $result;
+    }
+
     public function delete($name) {
         $result = array();
         $rowset = $this->getDbTable()->find($name);

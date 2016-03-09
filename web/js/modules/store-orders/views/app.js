@@ -317,6 +317,7 @@ define(['backbone',
                 console.log(response);
                 var dialog = _.template(TrackingCodeTemplate, {
                     data:response.responseText.data,
+                    defaultSelection: response.responseText.defaultSelection,
                     orderId: id,
                     i18n:i18n
                 });

@@ -151,7 +151,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     private $_shoppingUrlField = array(
         'name' => '`name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL UNIQUE',
-        'url'  => '`url` TEXT COLLATE utf8_unicode_ci'
+        'url'  => '`url` TEXT COLLATE utf8_unicode_ci',
+        'default_status' => "`default_status` ENUM('0', '1') DEFAULT '0'",
     );
 
 	/**
@@ -481,12 +482,16 @@ class Shopping extends Tools_Plugins_Abstract {
 
     protected function fetchNamesAction(){
         $trackingData = $this->_shippingUrlMapper->fetchNames();
-
+        $defaultSelection = $this->_shippingUrlMapper->findDefaultStatus();
         $arrData = array($this->_translator->translate('Custom Shipper'));
+        $arrDataDefault = $arrData;
+        if($defaultSelection) {
+            $arrDataDefault = array($defaultSelection['name'] => $defaultSelection['default_status']);
+        }
         foreach($trackingData as $key => $value){
             $arrData[$value] = $value;
         }
-        return  $this->_responseHelper->success(array('data' => $arrData));
+        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
     }
 
 
@@ -839,6 +844,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
                 $selectedName = '';
                 $url = '';
+                $defaultStatus = '';
                 $paramData = $params['shippingTrackingId'];
 
                     if((isset($params['name'])) && (!empty($params['name']))){
@@ -846,16 +852,30 @@ class Shopping extends Tools_Plugins_Abstract {
 
                         $selectedName = $params['name'];
                         $url = $currentData['url'];
-                        $currentData['url'] = $currentData['url'].$params['shippingTrackingId'];
-                        unset($currentData['name']);
+                        $defaultStatus = $currentData['default_status'];
+
+                        if(empty($defaultStatus)) {
+                            $presentStatus = $this->_shippingUrlMapper->findDefaultStatus();
+                            if (($selectedName != $presentStatus['name']) && ($presentStatus !== false)) {
+                                $presentStatus['default_status'] = $defaultStatus;
+                                $this->_shippingUrlMapper->save($presentStatus);
+                            }
+                            $currentData['default_status'] = '1';
+                            $currentData['url'] = $url;
+                            $this->_shippingUrlMapper->save($currentData);
+                        }
+
+                        unset($currentData['name'], $currentData['default_status']);
                             $param = '';
                             foreach ($currentData as $value) {
                                 $param .= $value . ' ';
                             }
                         if(empty($params['shippingTrackingId']) || strpos($params['shippingTrackingId'], '://')){
                             return;
+                        }else {
+                            $paramValue = $params['shippingTrackingId'];
+                            $params['shippingTrackingId'] = trim($param).trim($paramValue);
                         }
-                        $params['shippingTrackingId'] = trim($param);
                     }
                     if (isset($params['shippingTrackingId'])) {
                         unset($params['name']);
@@ -866,8 +886,10 @@ class Shopping extends Tools_Plugins_Abstract {
                             'url' =>  $url
                         )));
                         $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                        if(empty($selectedName)){
+                            $this->_shippingUrlMapper->clearDefaultStatus();
+                        }
                     }
-
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
