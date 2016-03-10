@@ -3,11 +3,12 @@ define(['backbone',
     './order',
     'text!../templates/paginator.html',
     'text!../templates/export_dialog.html',
+    'text!../templates/tracking_code.html',
     'text!../templates/refund_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, RefundTemplate, i18n
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -19,7 +20,8 @@ define(['backbone',
             'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
-            'click td.shipping-service .setTracking': 'changeTracking',
+            //'click td.shipping-service .setTracking': 'changeTracking',
+            'click td.shipping-service .setTracking': 'changeTrackigCode',
             'click .sendInvoice': 'sendInvoice',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
@@ -299,6 +301,72 @@ define(['backbone',
                     cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
                 });
             }
+        },
+        changeTrackigCode: function(e){
+            var self    = this,
+                el      = $(e.currentTarget),
+                id      = parseInt(el.closest('tr').find('td.order-id').text());
+            var model = this.orders.get(id);
+
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/fetchNames',
+                type: 'GET',
+                dataType: 'json'
+
+            }).done(function(response) {
+                console.log(response);
+                var dialog = _.template(TrackingCodeTemplate, {
+                    data:response.responseText.data,
+                    defaultSelection: response.responseText.defaultSelection,
+                    orderId: id,
+                    i18n:i18n
+                });
+
+                $(dialog).dialog({
+                    width: 600,
+                    dialogClass: 'seotoaster',
+                    resizable:false,
+                    open: function(event, ui) {
+                        $('.setTracking').on('click',  function(){
+                        });
+                        $('.save-data').on('click', function(){
+                            var  name =  $('#marketing-services').val(),
+                                 text =  $('#shippingTrackingId').val(),
+                                 data = {
+                                name: name,
+                                shippingTrackingId: text
+                            };
+
+                            $.ajax({
+                                url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                                data: data,
+                                type: 'POST',
+                                dataType: 'json',
+                                beforeSend: function(){
+                                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                                },
+                                success: function(response) {
+                                    if (response.hasOwnProperty('error') && !response.error){
+                                        showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
+                                    }
+                                    if (response.hasOwnProperty('responseText')){
+                                        model.set({
+                                            'status': response.responseText.status,
+                                            'shipping_tracking_id': response.responseText.shippingTrackingId
+                                        });
+                                    }
+                                }
+                            });
+                        });
+
+                    },
+                    close: function(event, ui){
+                        $(this).dialog('close').remove();
+                    }
+                });
+
+
+            });
         },
         changeTracking: function(event){
             var self    = this,

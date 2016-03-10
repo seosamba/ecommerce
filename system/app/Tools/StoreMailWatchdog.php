@@ -319,6 +319,12 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         if (isset($withShippingAddress)) {
             $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
         }
+        if(!empty($this->_options['name'])){
+            $this->_entityParser->addToDictionary(array('order:shippingtrackingurl' =>  $this->_options['url']));
+            $this->_entityParser->addToDictionary(array('order:shippingtrackingid' =>  $this->_options['code']));
+        }else{
+            $this->_entityParser->addToDictionary(array('order:shippingtrackingurl' =>  ''));
+        }
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
         return $this->_send();
