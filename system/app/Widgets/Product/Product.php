@@ -332,11 +332,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        $lifeReload = false;    // life reload is not allowed
         }
 
-		$price = !$noCurrency ? $this->_currency->toCurrency($price): $price;
-
-        if ($noCurrency) {
-            $price = number_format(round($price, 2), 2, '.', '');
-        }
+		if(!$noCurrency) {
+			$price = $this->_currency->toCurrency($price);
+		} else {
+			$price = number_format(round($price, 2), 2, '.', '');
+		}
 
         if($lifeReload){
 	        $lifeReloadClass = implode(' ', $lifeReloadClass);
