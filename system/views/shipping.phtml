@@ -232,7 +232,7 @@ $this->headLink()
                             <span>OR</span>
                             <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_6 omega fl-right')->renderViewHelper(); ?>
                         </div>
-                        <div class="add-new" style="display: none;">
+                        <div class="add-new row-close" style="display: none;">
                             <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Name');?>
                                 <input type="text" id="name" name="name" />
                             </span>
@@ -263,20 +263,24 @@ $(function(){
         var selfdata = this,
             addnew = $(selfdata).closest('.background').find('.add-new'),
             selectValue = $('#shipping-url option:selected').val();
-
-        if(selectValue !== '0'){
-            $("#shipping-url :contains('Select to edit')").attr("selected", "selected");
+        if(selectValue != '0'){
+            $("#shipping-url :contains('Select to edit')").attr("selected", true);
         }
-
         $('#name').val('');
         $('#url').val('');
-
-        if (addnew.hasClass("add-new-config")) {
-            addnew.removeClass( "add-new-config" );
-            addnew.hide();
-        } else{
-            addnew.addClass( "add-new-config" );
+        if(addnew.hasClass("row-open")){
+            addnew.addClass("add-new-config");
+            addnew.removeClass( "row-open").addClass( "row-close");
+            $("#shipping-url :contains('Select to edit')").attr("selected", false);
             addnew.show();
+        }else{
+            if (addnew.hasClass("add-new-config")) {
+                addnew.removeClass("add-new-config");
+                addnew.hide();
+            } else {
+                addnew.addClass("add-new-config");
+                addnew.show();
+            }
         }
     });
 
@@ -298,13 +302,13 @@ $(function(){
 
     });
 
-    $(document).on("click", "#shipping-url", function () {
+    $(document).on("change", "#shipping-url", function () {
         var selectValue = $('#shipping-url option:selected').val(),
             selfdata = this,
             addnew = $(selfdata).closest('.background').find('.add-new');
 
-        if (addnew.hasClass("add-new-config") && selectValue === '0') {
-            addnew.removeClass( "add-new-config" );
+        if (addnew.hasClass("add-new-config") && selectValue == '0') {
+            addnew.removeClass( "add-new-config" ).removeClass( "row-open").addClass( "row-close");
             addnew.hide();
         } else{
             var selectData = {
@@ -321,6 +325,7 @@ $(function(){
                 $('#url').val(response.responseText.url);
 
                 addnew.addClass( "add-new-config" );
+                addnew.removeClass( "row-close" ).addClass("row-open");
                 addnew.show();
             });
         }
@@ -347,6 +352,7 @@ $(function(){
                 }).done(function (response) {
                     var optVal = response.responseText.optionName,
                         optionValues = '';
+
                     $("#shipping-url option[value='"+optVal+"']").each(function() {
                         optionValues = optVal ;
                     });
