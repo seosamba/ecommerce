@@ -9,7 +9,7 @@ $this->headScript()
 $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
-<div class="seotoaster container" xmlns="http://www.w3.org/1999/html">
+<div class="seotoaster container">
     <?php
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -232,7 +232,7 @@ $this->headLink()
                             <span>OR</span>
                             <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_6 omega fl-right')->renderViewHelper(); ?>
                         </div>
-                        <div class="add-new row-close" style="display: none;">
+                        <div class="add-new row-close" data-current="" style="display: none;">
                             <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Name');?>
                                 <input type="text" id="name" name="name" />
                             </span>
@@ -266,8 +266,10 @@ $(function(){
         if(selectValue != '0'){
             $("#shipping-url :contains('Select to edit')").attr("selected", true);
         }
+
         $('#name').val('');
         $('#url').val('');
+        addnew.attr('data-current','');
         if(addnew.hasClass("row-open")){
             addnew.addClass("add-new-config");
             addnew.removeClass( "row-open").addClass( "row-close");
@@ -284,24 +286,6 @@ $(function(){
         }
     });
 
-    $(document).on("change", "#name", function () {
-        var textValue = $('#name').val(),
-            selectData = {
-                name: textValue
-            };
-
-        $.ajax({
-            url: '<?php echo $this->websiteUrl?>plugin/shopping/run/getData',
-            dataType: 'json',
-            data: JSON.stringify(selectData),
-            type: 'POST'
-        }).done(function (response) {
-            $('#name').val(response.responseText.name);
-            $('#url').val(response.responseText.url);
-        });
-
-    });
-
     $(document).on("change", "#shipping-url", function () {
         var selectValue = $('#shipping-url option:selected').val(),
             selfdata = this,
@@ -309,6 +293,7 @@ $(function(){
 
         if (addnew.hasClass("add-new-config") && selectValue == '0') {
             addnew.removeClass( "add-new-config" ).removeClass( "row-open").addClass( "row-close");
+            addnew.attr('data-current','');
             addnew.hide();
         } else{
             var selectData = {
@@ -326,6 +311,7 @@ $(function(){
 
                 addnew.addClass( "add-new-config" );
                 addnew.removeClass( "row-close" ).addClass("row-open");
+                addnew.attr('data-current', response.responseText.current);
                 addnew.show();
             });
         }
@@ -336,13 +322,15 @@ $(function(){
           url = $('#url').val(),
           selfdata = this,
           addnew = $(selfdata).closest('.background').find('.add-new'),
-          selectValue = $('#shipping-url option:selected').val();
+          selectValue = $('#shipping-url option:selected').val(),
+          current = addnew.data('current');
         if(name == ''){
             showMessage('field not been empty');
         }else {
             var data = {
                 name: name,
-                url: url
+                url: url,
+                currentId: current
             };
                 $.ajax({
                     url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setData',
@@ -353,6 +341,7 @@ $(function(){
                     var optVal = response.responseText.optionName,
                         optionValues = '';
 
+                    addnew.removeData('current','');
                     $("#shipping-url option[value='"+optVal+"']").each(function() {
                         optionValues = optVal ;
                     });

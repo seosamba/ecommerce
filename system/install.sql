@@ -784,6 +784,14 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
+  `id` int(10) unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_status` ENUM('0', '1') DEFAULT '0',
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
 UPDATE `plugin` SET `version` = '2.4.5' WHERE `name` = 'shopping';

@@ -149,12 +149,6 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     private $_shippingUrlMapper = null;
 
-    private $_shoppingUrlField = array(
-        'name' => '`name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL UNIQUE',
-        'url'  => '`url` TEXT COLLATE utf8_unicode_ci',
-        'default_status' => "`default_status` ENUM('0', '1') DEFAULT '0'",
-    );
-
 	/**
 	 * @var array List of actions that should be secured
 	 */
@@ -259,14 +253,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	}
 
 	public function run($requestedParams = array()) {
-        $shoppingShippingUrlDbTable = new Models_DbTable_ShoppingShippingUrl();
-        $createTableSql = "CREATE TABLE IF NOT EXISTS " . self::SHOPPING_URL_TABLE . " (";
-        $createTableSql .= $this->_shoppingUrlField['name'] . ',';
-        $createTableSql .= $this->_shoppingUrlField['url'] . ' ';
-        $createTableSql .= ") ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;";
-        $stmt = $shoppingShippingUrlDbTable->getAdapter()->prepare($createTableSql);
-        $stmt->execute();
-
 		$dispatchersResult = parent::run($requestedParams);
 		if ($dispatchersResult) {
 			return $this->_getOption($dispatchersResult);
@@ -488,8 +474,10 @@ class Shopping extends Tools_Plugins_Abstract {
         if($defaultSelection) {
             $arrDataDefault = array($defaultSelection['name'] => $defaultSelection['default_status']);
         }
-        foreach($trackingData as $key => $value){
-            $arrData[$value] = $value;
+        if(!empty($trackingData)) {
+            foreach ($trackingData as $key => $value) {
+                $arrData[$value] = $value;
+            }
         }
         return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
     }
@@ -497,18 +485,25 @@ class Shopping extends Tools_Plugins_Abstract {
 
     protected function setDataAction() {
         $data = json_decode($this->_request->getRawBody(), true);
-
         $data = array_map("trim", $data);
+
         if (empty($data['name'])) {
           return  $this->_responseHelper->fail('Required parameters is missing');
         }
+        $shippingUrlModel = new Models_Model_ShippingUrl();
+        $shippingUrlModel->setId($data['currentId']);
+        $shippingUrlModel->setName($data['name']);
+        $shippingUrlModel->setUrl($data['url']);
+        $shippingUrlModel->setDefaultStatus(0);
+        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
 
-        $status = $this->_shippingUrlMapper->save($data);
-        if(!$status){
+
+        $currentId = $shippingUrlMapper->save($shippingUrlModel);
+        if($currentId == $data['currentId']){
             $msg = $this->_translator->translate('Updated');
-            return  $this->_responseHelper->success(array('msg' => $this->_translator->translate($msg), 'optionName' => $data['name']));
+            return  $this->_responseHelper->success(array('msg' => $this->_translator->translate($msg), 'optionName' => $currentId));
         }
-        $this->_responseHelper->success(array('msg' => $this->_translator->translate('Saved'), 'optionName' => $status));
+        $this->_responseHelper->success(array('msg' => $this->_translator->translate('Saved'), 'optionName' => $data['name']));
     }
 
     protected function getDataAction() {
@@ -519,7 +514,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $data = array_map("trim", $data);
         $currentData = $this->_shippingUrlMapper->findByName($data['name']);
        if($currentData){
-           $this->_responseHelper->success(array('name'=> $currentData['name'], 'url'=> $currentData['url']));
+           $this->_responseHelper->success(array('name'=> $currentData['name'], 'url'=> $currentData['url'], 'current'=> $currentData['id']));
        }
 
     }
@@ -842,6 +837,8 @@ class Shopping extends Tools_Plugins_Abstract {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
 
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+                $shippingUrlModel = new Models_Model_ShippingUrl();
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                 $selectedName = '';
                 $url = '';
                 $defaultStatus = '';
@@ -857,15 +854,20 @@ class Shopping extends Tools_Plugins_Abstract {
                         if(empty($defaultStatus)) {
                             $presentStatus = $this->_shippingUrlMapper->findDefaultStatus();
                             if (($selectedName != $presentStatus['name']) && ($presentStatus !== false)) {
-                                $presentStatus['default_status'] = $defaultStatus;
-                                $this->_shippingUrlMapper->save($presentStatus);
+                                $shippingUrlModel->setId($presentStatus['id']);
+                                $shippingUrlModel->setName($presentStatus['name']);
+                                $shippingUrlModel->setUrl($presentStatus['url']);
+                                $shippingUrlModel->setDefaultStatus(0);
+                                $shippingUrlMapper->save($shippingUrlModel);
                             }
-                            $currentData['default_status'] = '1';
-                            $currentData['url'] = $url;
-                            $this->_shippingUrlMapper->save($currentData);
+                            $shippingUrlModel->setId($currentData['id']);
+                            $shippingUrlModel->setName($currentData['name']);
+                            $shippingUrlModel->setUrl($currentData['url']);
+                            $shippingUrlModel->setDefaultStatus(1);
+                            $shippingUrlMapper->save($shippingUrlModel);
                         }
 
-                        unset($currentData['name'], $currentData['default_status']);
+                        unset($currentData['name'], $currentData['default_status'],$currentData['id']);
                             $param = '';
                             foreach ($currentData as $value) {
                                 $param .= $value . ' ';

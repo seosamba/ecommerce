@@ -4,25 +4,28 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
     protected  function __construct(){
         $this->_dbTable = new Zend_Db_Table('shopping_shipping_url');
     }
+    protected $_model	= 'Models_Model_ShippingUrl';
 
-    public function save($shippingUrl){
-        $row = $this->getDbTable()->fetchRow(array('name = ?' => $shippingUrl['name']));
-        if (is_null($row)){
-            $row =  $this->getDbTable()->createRow($shippingUrl);
+    public function save($model){
+
+        if (!$model instanceof $this->_model){
+            $model = new $this->_model($model);
+        }
+
+        $data = array(
+            'id'                =>$model->getId(),
+            'name'              => $model->getName(),
+            'url'               => $model->geturl(),
+            'default_status'    => $model->getDefaultStatus()
+        );
+        $userInfo = $this->getDbTable()->find($model->getId());
+        if(!$userInfo->current()) {
+            unset($data['id']);
+           $id = $this->getDbTable()->insert($data);
+            return $id;
         } else {
-            $row->setFromArray($shippingUrl);
-        }
-        $result = $this->getDbTable()->find($shippingUrl['name']);
-        if ($result->count() == 1){
-            $row->save();
-            return false;
-        }
-        try {
-            return $row->save();
-        } catch (Zend_Exception $e){
-            error_log($e->getTraceAsString());
-            error_log($e->getMessage());
-            return false;
+            $this->getDbTable()->update($data, array('id = ?' => $model->getId()));
+            return $model->getId();
         }
     }
 

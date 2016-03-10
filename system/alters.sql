@@ -209,6 +209,15 @@ UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_p
 ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info';
 
+-- Add Carrier tracking url's
+CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
+  `id` int(10) unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_status` ENUM('0', '1') DEFAULT '0',
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
 SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_refund'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
 NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
