@@ -498,10 +498,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
 
 
-        $currentId = $shippingUrlMapper->save($shippingUrlModel);
-        if($currentId == $data['currentId']){
+        $lastName = $shippingUrlMapper->save($shippingUrlModel);
+        if(is_array($lastName)){
             $msg = $this->_translator->translate('Updated');
-            return  $this->_responseHelper->success(array('msg' => $this->_translator->translate($msg), 'optionName' => $currentId));
+            return  $this->_responseHelper->success(array('msg' => $this->_translator->translate($msg), 'optionUpdateName' => $lastName[0]['name'], 'optionName' => $data['name']));
         }
         $this->_responseHelper->success(array('msg' => $this->_translator->translate('Saved'), 'optionName' => $data['name']));
     }
@@ -521,12 +521,19 @@ class Shopping extends Tools_Plugins_Abstract {
 
     protected function deleteDataAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
-            $name = filter_var(trim($this->_request->getParam('selectName')), FILTER_SANITIZE_STRING);
+            $name = filter_var($this->_request->getParam('selectId'), FILTER_SANITIZE_NUMBER_INT);
             if ($name) {
-               $status = $this->_shippingUrlMapper->delete($name);
-               if(!empty($status)){
-                   $this->_responseHelper->success(array('msg' => $this->_translator->translate('Deleted'), 'optionName' => $name));
+               $name = (int) $name;
+               $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+               $current = $shippingUrlMapper->find($name);
+               if(!empty($current)) {
+                   $status = $shippingUrlMapper->delete($current);
                }
+               if(!empty($status)){
+                   $this->_responseHelper->success(array('msg' => $this->_translator->translate('Deleted'), 'optionName' => $current->getName()));
+               }
+            }else{
+                exit;
             }
         }
     }
@@ -835,7 +842,6 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			if ($this->_request->isPost()) {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
-
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
                 $shippingUrlModel = new Models_Model_ShippingUrl();
                 $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
@@ -845,14 +851,15 @@ class Shopping extends Tools_Plugins_Abstract {
                 $paramData = $params['shippingTrackingId'];
 
                     if((isset($params['name'])) && (!empty($params['name']))){
-                        $currentData = $this->_shippingUrlMapper->findByName($params['name']);
-
-                        $selectedName = $params['name'];
-                        $url = $currentData['url'];
-                        $defaultStatus = $currentData['default_status'];
+                        $currentData = $shippingUrlMapper->findByName($params['name']);
+                        if(!empty($currentData)) {
+                            $selectedName = $params['name'];
+                            $url = $currentData['url'];
+                            $defaultStatus = $currentData['default_status'];
+                        }
 
                         if(empty($defaultStatus)) {
-                            $presentStatus = $this->_shippingUrlMapper->findDefaultStatus();
+                            $presentStatus = $shippingUrlMapper->findDefaultStatus();
                             if (($selectedName != $presentStatus['name']) && ($presentStatus !== false)) {
                                 $shippingUrlModel->setId($presentStatus['id']);
                                 $shippingUrlModel->setName($presentStatus['name']);
@@ -889,7 +896,7 @@ class Shopping extends Tools_Plugins_Abstract {
                         )));
                         $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
                         if(empty($selectedName)){
-                            $this->_shippingUrlMapper->clearDefaultStatus();
+                            $shippingUrlMapper->clearDefaultStatus();
                         }
                     }
 				$order->setOptions($params);

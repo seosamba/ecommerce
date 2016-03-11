@@ -11,9 +11,8 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         if (!$model instanceof $this->_model){
             $model = new $this->_model($model);
         }
-
         $data = array(
-            'id'                =>$model->getId(),
+            'id'                => $model->getId(),
             'name'              => $model->getName(),
             'url'               => $model->geturl(),
             'default_status'    => $model->getDefaultStatus()
@@ -25,7 +24,7 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
             return $id;
         } else {
             $this->getDbTable()->update($data, array('id = ?' => $model->getId()));
-            return $model->getId();
+            return $userInfo->toArray();
         }
     }
 
@@ -69,12 +68,8 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         return $result;
     }
 
-    public function delete($name) {
-        $result = array();
-        $rowset = $this->getDbTable()->find($name);
-        foreach ($rowset as $row) {
-            $result[$row->name] = $row->delete();
-        }
+    public function delete(Models_Model_ShippingUrl $model) {
+        $result = $this->getDbTable()->delete($this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId()));
         return $result;
     }
 }

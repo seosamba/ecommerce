@@ -322,8 +322,7 @@ $(function(){
           url = $('#url').val(),
           selfdata = this,
           addnew = $(selfdata).closest('.background').find('.add-new'),
-          selectValue = $('#shipping-url option:selected').val(),
-          current = addnew.data('current');
+          current = addnew.attr('data-current');
         if(name == ''){
             showMessage('field not been empty');
         }else {
@@ -339,9 +338,13 @@ $(function(){
                     type: 'POST'
                 }).done(function (response) {
                     var optVal = response.responseText.optionName,
+                        optionUpdateName = response.responseText.optionUpdateName,
                         optionValues = '';
-
-                    addnew.removeData('current','');
+                    addnew.attr('data-current','');
+                    addnew.removeClass( "row-open" );
+                    if(optionUpdateName) {
+                        $("#shipping-url option[value='"+optionUpdateName+"']").remove();
+                    }
                     $("#shipping-url option[value='"+optVal+"']").each(function() {
                         optionValues = optVal ;
                     });
@@ -355,32 +358,33 @@ $(function(){
                 addnew.removeClass( "add-new-config" );
                 addnew.hide();
             }
-            if(selectValue !== '0'){
-                $("#shipping-url :contains('Select to edit')").attr("selected", "selected");
-            }
+            $("#shipping-url :contains('Select to edit')").attr("selected", false);
         }
 
     });
 
-    $(document).on('click', '.remove-pickup-location-shipping-url', function(e){
-        e.preventDefault();
+    $(document).on('click', '.remove-pickup-location-shipping-url', function(){
           var selectName = $('#shipping-url option:selected').val(),
               selfdata = this,
               row = $(selfdata).closest('.background').find('.add-new');
+
         if(selectName === '0'){
             return;
         }
         showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+            var selectId = row.attr('data-current');
             row.removeClass( "add-new-config" );
             row.hide();
             $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/deleteData/selectName/'+selectName,
+                url: $('#website_url').val()+'plugin/shopping/run/deleteData/selectId/'+selectId,
                 type: 'DELETE',
                 dataType: 'json'
             }).done(function(response) {
                 var optionName = response.responseText.optionName;
                 $("#shipping-url option[value="+optionName+"]").remove();
-                $("#shipping-url :contains('Select to edit')").attr("selected", "selected");
+                $("#shipping-url :contains('Select to edit')").attr("selected", false);
+                row.attr('data-current','');
+                row.removeClass( "row-open" );
                 showMessage(response.responseText.msg, false, 2000);
             });
         });
