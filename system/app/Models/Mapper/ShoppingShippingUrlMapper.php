@@ -1,10 +1,9 @@
 <?php
 class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_Abstract {
 
-    protected  function __construct(){
-        $this->_dbTable = new Zend_Db_Table('shopping_shipping_url');
-    }
     protected $_model	= 'Models_Model_ShippingUrl';
+
+    protected $_dbTable = 'Models_DbTable_ShoppingShippingUrl';
 
     public function save($model){
 
@@ -21,7 +20,7 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         if(!$userInfo->current()) {
             unset($data['id']);
            $id = $this->getDbTable()->insert($data);
-            return $id;
+            return $model->setId($id);
         } else {
             $this->getDbTable()->update($data, array('id = ?' => $model->getId()));
             return $userInfo->toArray();
@@ -46,6 +45,15 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         $select->where('name = ?', $name);
         $result = $this->getDbTable()->fetchRow($select);
       return $result->toArray();
+    }
+
+    public function findById($id) {
+        $current = $this->getDbTable()->find($id)->current();
+        if (!$current){
+            return null;
+        }
+        $currentData = new $this->_model($current->toArray());
+        return $currentData;
     }
 
     public function findDefaultStatus() {

@@ -242,7 +242,7 @@ $this->headLink()
                                 <button style="margin-top: 20px;" class="grid_1 omega remove-pickup-location-shipping-url link fl-right btn icon inverse-error ticon-close" title="<?php echo $this->translate('Remove');?>"></button>
                         </div>
                         <div>
-                            <button class="btn grid_4 omega fl-right save-data" style="margin-top: 10px;"/><?php echo $this->translate('Save');?></button>
+                            <button class="btn grid_4 omega fl-right save-data" style="margin-top: 10px;"><?php echo $this->translate('Save');?></button>
                         </div>
 
                     </fieldset>
@@ -297,7 +297,7 @@ $(function(){
             addnew.hide();
         } else{
             var selectData = {
-                name: selectValue
+                id: selectValue
             };
 
             $.ajax({
@@ -322,14 +322,16 @@ $(function(){
           url = $('#url').val(),
           selfdata = this,
           addnew = $(selfdata).closest('.background').find('.add-new'),
-          current = addnew.attr('data-current');
+          current = addnew.attr('data-current'),
+          secureToken = '<?php echo $this->secureToken?>';
         if(name == ''){
             showMessage('field not been empty');
         }else {
             var data = {
                 name: name,
                 url: url,
-                currentId: current
+                currentId: current,
+                secureToken: secureToken
             };
                 $.ajax({
                     url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setData',
@@ -338,18 +340,19 @@ $(function(){
                     type: 'POST'
                 }).done(function (response) {
                     var optVal = response.responseText.optionName,
-                        optionUpdateName = response.responseText.optionUpdateName,
+                        optionUpdateStatus = response.responseText.optionUpdateStatus,
+                        optionUpdateId = response.responseText.optionId,
                         optionValues = '';
                     addnew.attr('data-current','');
                     addnew.removeClass( "row-open" );
-                    if(optionUpdateName) {
-                        $("#shipping-url option[value='"+optionUpdateName+"']").remove();
+                    if(optionUpdateStatus) {
+                        $("#shipping-url option[value='"+optionUpdateId+"']").remove();
                     }
-                    $("#shipping-url option[value='"+optVal+"']").each(function() {
-                        optionValues = optVal ;
+                    $("#shipping-url option[value='"+optionUpdateId+"']").each(function() {
+                        optionValues = optionUpdateId ;
                     });
                     if(optionValues == ''){
-                        $("#shipping-url").append('<option value="'+optVal+'">'+optVal+'</option>');
+                        $("#shipping-url").append('<option value="'+optionUpdateId+'">'+optVal+'</option>');
                     }
                     showMessage(response.responseText.msg, false, 2000);
                 });
@@ -366,7 +369,8 @@ $(function(){
     $(document).on('click', '.remove-pickup-location-shipping-url', function(){
           var selectName = $('#shipping-url option:selected').val(),
               selfdata = this,
-              row = $(selfdata).closest('.background').find('.add-new');
+              row = $(selfdata).closest('.background').find('.add-new'),
+              secureToken = '<?php echo $this->secureToken?>';
 
         if(selectName === '0'){
             return;
@@ -376,12 +380,12 @@ $(function(){
             row.removeClass( "add-new-config" );
             row.hide();
             $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/deleteData/selectId/'+selectId,
+                url: $('#website_url').val()+'plugin/shopping/run/deleteData/selectId/'+selectId+'/secureToken/'+secureToken,
                 type: 'DELETE',
                 dataType: 'json'
             }).done(function(response) {
-                var optionName = response.responseText.optionName;
-                $("#shipping-url option[value="+optionName+"]").remove();
+                var optionId = response.responseText.optionId;
+                $("#shipping-url option[value="+optionId+"]").remove();
                 $("#shipping-url :contains('Select to edit')").attr("selected", false);
                 row.attr('data-current','');
                 row.removeClass( "row-open" );

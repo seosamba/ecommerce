@@ -12,10 +12,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
-    /**
-     * Shopping URL db table
-     */
-    const SHOPPING_URL_TABLE = 'shopping_shipping_url';
+
 	/**
 	 * New system role 'customer'
 	 *
@@ -144,10 +141,6 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @var Models_Mapper_ShoppingConfig
 	 */
 	private $_configMapper = null;
-    /**
-     * @var Models_Mapper_ShippingUrl
-     */
-    private $_shippingUrlMapper = null;
 
 	/**
 	 * @var array List of actions that should be secured
@@ -184,7 +177,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
 		$this->_websiteConfig = Zend_Registry::get('website');
 		$this->_configMapper = Models_Mapper_ShoppingConfig::getInstance();
-        $this->_shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
 	}
 
 	/**
@@ -466,9 +458,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
 
-    protected function fetchNamesAction(){
-        $trackingData = $this->_shippingUrlMapper->fetchNames();
-        $defaultSelection = $this->_shippingUrlMapper->findDefaultStatus();
+    public function fetchNamesAction(){
+        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+        $trackingData = $shippingUrlMapper->fetchNames();
+        $defaultSelection = $shippingUrlMapper->findDefaultStatus();
         $arrData = array($this->_translator->translate('Custom Shipper'));
         $arrDataDefault = $arrData;
         if($defaultSelection) {
@@ -483,54 +476,85 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
 
-    protected function setDataAction() {
-        $data = json_decode($this->_request->getRawBody(), true);
-        $data = array_map("trim", $data);
+    public function setDataAction() {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = json_decode($this->_request->getRawBody(), true);
+            $data = array_map("trim", $data);
 
-        if (empty($data['name'])) {
-          return  $this->_responseHelper->fail('Required parameters is missing');
+            $tokenToValidate = $data['secureToken'];
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+
+            if (empty($data['name'])) {
+                return $this->_responseHelper->fail('Required parameters is missing');
+            }
+            $shippingUrlModel = $shippingUrlMapper->findById($data['currentId']);
+            if (!$shippingUrlModel) {
+                $shippingUrlModel = new Models_Model_ShippingUrl();
+                $shippingUrlModel->setId($data['currentId']);
+                $shippingUrlModel->setName($data['name']);
+                $shippingUrlModel->setUrl($data['url']);
+                $shippingUrlModel->setDefaultStatus(0);
+            } else {
+                $shippingUrlModel->setName($data['name']);
+                $shippingUrlModel->setUrl($data['url']);
+                $shippingUrlModel->setDefaultStatus($shippingUrlModel->getDefaultStatus());
+            }
+
+            $lastName = $shippingUrlMapper->save($shippingUrlModel);
+            if (!$lastName instanceof Models_Model_ShippingUrl) {
+                $msg = $this->_translator->translate('Updated');
+
+                return $this->_responseHelper->success(array(
+                    'msg' => $this->_translator->translate($msg),
+                    'optionUpdateStatus' => true,
+                    'optionName' => $shippingUrlModel->getName(),
+                    'optionId' => $shippingUrlModel->getId()
+                ));
+            }
+            $this->_responseHelper->success(array(
+                'msg' => $this->_translator->translate('Saved'),
+                'optionName' => $lastName->getName(),
+                'optionId' => $lastName->getId()
+            ));
         }
-        $shippingUrlModel = new Models_Model_ShippingUrl();
-        $shippingUrlModel->setId($data['currentId']);
-        $shippingUrlModel->setName($data['name']);
-        $shippingUrlModel->setUrl($data['url']);
-        $shippingUrlModel->setDefaultStatus(0);
-        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-
-
-        $lastName = $shippingUrlMapper->save($shippingUrlModel);
-        if(is_array($lastName)){
-            $msg = $this->_translator->translate('Updated');
-            return  $this->_responseHelper->success(array('msg' => $this->_translator->translate($msg), 'optionUpdateName' => $lastName[0]['name'], 'optionName' => $data['name']));
-        }
-        $this->_responseHelper->success(array('msg' => $this->_translator->translate('Saved'), 'optionName' => $data['name']));
     }
 
-    protected function getDataAction() {
+    public function getDataAction() {
+        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
         $data = json_decode($this->_request->getRawBody(), true);
-        if (empty($data['name'])) {
+        if (empty($data['id'])) {
             exit;
         }
-        $data = array_map("trim", $data);
-        $currentData = $this->_shippingUrlMapper->findByName($data['name']);
+        $currentData = $shippingUrlMapper->findById($data['id']);
        if($currentData){
-           $this->_responseHelper->success(array('name'=> $currentData['name'], 'url'=> $currentData['url'], 'current'=> $currentData['id']));
+           $this->_responseHelper->success(array('name'=> $currentData->getName(), 'url'=> $currentData->getUrl(), 'current'=> $currentData->getId()));
        }
 
     }
 
-    protected function deleteDataAction(){
+    public function deleteDataAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
-            $name = filter_var($this->_request->getParam('selectId'), FILTER_SANITIZE_NUMBER_INT);
-            if ($name) {
-               $name = (int) $name;
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $id = filter_var($this->_request->getParam('selectId'), FILTER_SANITIZE_NUMBER_INT);
+            if ($id) {
+                $id = (int) $id;
                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-               $current = $shippingUrlMapper->find($name);
+               $current = $shippingUrlMapper->find($id);
                if(!empty($current)) {
                    $status = $shippingUrlMapper->delete($current);
                }
                if(!empty($status)){
-                   $this->_responseHelper->success(array('msg' => $this->_translator->translate('Deleted'), 'optionName' => $current->getName()));
+                   $this->_responseHelper->success(array('msg' => $this->_translator->translate('Deleted'), 'optionId' => $current->getId()));
                }
             }else{
                 exit;

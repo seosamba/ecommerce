@@ -4,11 +4,13 @@ class Forms_Shipping_TrackingUrl extends Zend_Form {
 
     public function init() {
         $trackingUrlDataMapper =   Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-        $trackingData = $trackingUrlDataMapper->fetchNames();
+        $trackingData = $trackingUrlDataMapper->fetchAll();
 
         $arrData = array('Select to edit');
-        foreach($trackingData as $key => $value){
-            $arrData[$value] = $value;
+        if(!empty($trackingData)) {
+            foreach ($trackingData as $dataValue) {
+                    $arrData[$dataValue['id']] = $dataValue['name'];
+            }
         }
 
         $this->addElement('hidden', 'shipper', array(
