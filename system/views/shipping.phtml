@@ -328,7 +328,7 @@ $(function(){
             showMessage('field not been empty');
         }else {
             var data = {
-                name: name,
+                trackingName: name,
                 url: url,
                 currentId: current,
                 secureToken: secureToken
@@ -336,7 +336,7 @@ $(function(){
                 $.ajax({
                     url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setData',
                     dataType: 'json',
-                    data: JSON.stringify(data),
+                    data: data,
                     type: 'POST'
                 }).done(function (response) {
                     var optVal = response.responseText.optionName,

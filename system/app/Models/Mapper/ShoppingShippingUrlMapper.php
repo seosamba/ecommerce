@@ -1,70 +1,84 @@
 <?php
-class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_Abstract {
 
-    protected $_model	= 'Models_Model_ShippingUrl';
+class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_Abstract
+{
+
+    protected $_model = 'Models_Model_ShippingUrl';
 
     protected $_dbTable = 'Models_DbTable_ShoppingShippingUrl';
 
-    public function save($model){
+    public function save($model)
+    {
 
-        if (!$model instanceof $this->_model){
+        if (!$model instanceof $this->_model) {
             $model = new $this->_model($model);
         }
         $data = array(
-            'id'                => $model->getId(),
-            'name'              => $model->getName(),
-            'url'               => $model->geturl(),
-            'default_status'    => $model->getDefaultStatus()
+            'id' => $model->getId(),
+            'name' => $model->getName(),
+            'url' => $model->geturl(),
+            'default_status' => $model->getDefaultStatus()
         );
         $userInfo = $this->getDbTable()->find($model->getId());
-        if(!$userInfo->current()) {
+        if (!$userInfo->current()) {
             unset($data['id']);
-           $id = $this->getDbTable()->insert($data);
+            $id = $this->getDbTable()->insert($data);
+
             return $model->setId($id);
-        } else {
-            $this->getDbTable()->update($data, array('id = ?' => $model->getId()));
-            return $userInfo->toArray();
         }
+        $this->getDbTable()->update($data, array('id = ?' => $model->getId()));
+
+        return $model;
+
     }
 
-    public function fetchAll($where = null) {
+    public function fetchAll($where = null)
+    {
         $results = $this->getDbTable()->fetchAll($where);
-        if (sizeof($results)){
+        if (sizeof($results)) {
             return $results->toArray();
         }
     }
 
-    public function findById($id) {
+    public function findById($id)
+    {
         $current = $this->getDbTable()->find($id)->current();
-        if (!$current){
+        if (!$current) {
             return null;
         }
         $currentData = new $this->_model($current->toArray());
+
         return $currentData;
     }
 
-    public function findDefaultStatus() {
+    public function findDefaultStatus()
+    {
         $select = $this->getDbTable()->select();
         $select->where('default_status = "1"');
         $result = $this->getDbTable()->fetchRow($select);
-        if(is_null($result)){
+        if (is_null($result)) {
             return false;
         }
+
         return $result->toArray();
     }
 
-    public function clearDefaultStatus() {
+    public function clearDefaultStatus()
+    {
         $result = array();
         $defaultStatus = $this->findDefaultStatus();
-        if(!is_null($defaultStatus)){
+        if (!is_null($defaultStatus)) {
             $data = array('default_status' => '0');
             $result = $this->getDbTable()->update($data);
         }
+
         return $result;
     }
 
-    public function delete(Models_Model_ShippingUrl $model) {
+    public function delete(Models_Model_ShippingUrl $model)
+    {
         $result = $this->getDbTable()->delete($this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId()));
+
         return $result;
     }
 }
