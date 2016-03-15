@@ -215,7 +215,8 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `default_status` ENUM('0', '1') DEFAULT '0',
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
