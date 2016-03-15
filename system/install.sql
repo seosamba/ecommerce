@@ -153,7 +153,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('weightUnit', 'kg'),
 ('zip', '94117'),
 ('noZeroPrice', '1'),
-('version', '2.5.0');
+('version', '2.5.1');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -795,4 +795,4 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
-UPDATE `plugin` SET `version` = '2.5.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.1' WHERE `name` = 'shopping';
