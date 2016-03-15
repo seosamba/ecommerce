@@ -52,6 +52,19 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         return $currentData;
     }
 
+    public function findByName($name)
+    {
+        $select = $this->getDbTable()->select();
+        $select->where('name = ?', $name);
+        $result = $this->getDbTable()->fetchRow($select);
+        if(is_null($result)){
+            return null;
+        }
+        $currentData = new $this->_model($result->toArray());
+
+        return $currentData;
+    }
+
     public function findDefaultStatus()
     {
         $select = $this->getDbTable()->select();

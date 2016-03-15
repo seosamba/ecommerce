@@ -458,7 +458,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
 
-    public function fetchNamesAction(){
+    public function fetchShippingUrlNamesAction(){
         $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
         $trackingData = $shippingUrlMapper->fetchAll();
         $defaultSelection = $shippingUrlMapper->findDefaultStatus();
@@ -477,7 +477,7 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
 
-    public function setDataAction()
+    public function setShippingUrlDataAction()
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $data = $this->_request->getParams();
@@ -503,8 +503,13 @@ class Shopping extends Tools_Plugins_Abstract {
                 $update = true;
                 $msg = $this->_translator->translate('Updated');
             } else {
+                $findCurrentName = $shippingUrlMapper->findByName($data['trackingName']);
+                if($findCurrentName instanceof Models_Model_ShippingUrl){
+                    $this->_responseHelper->fail(array('msg' => 'This name is already exists, please select proper name from the dropdown!'));
+                }
                 $shippingUrlModel = new Models_Model_ShippingUrl();
                 $shippingUrlModel->setDefaultStatus(0);
+
             }
             $shippingUrlModel->setName($data['trackingName']);
             $shippingUrlModel->setUrl($data['url']);
@@ -520,25 +525,32 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail('');
     }
 
-    public function getDataAction()
+    public function getShippingUrlDataAction()
     {
-        $data = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
-        if (!empty($data)) {
-            $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-            $currentData = $shippingUrlMapper->findById($data);
-            if ($currentData instanceof Models_Model_ShippingUrl) {
-                $this->_responseHelper->success(array(
-                    'name' => $currentData->getName(),
-                    'url' => $currentData->getUrl(),
-                    'current' => $currentData->getId()
-                ));
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+            $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($id)) {
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                $currentData = $shippingUrlMapper->findById($id);
+                if ($currentData instanceof Models_Model_ShippingUrl) {
+                    $this->_responseHelper->success(array(
+                        'name' => $currentData->getName(),
+                        'url' => $currentData->getUrl(),
+                        'current' => $currentData->getId()
+                    ));
+                }
             }
         }
         $this->_responseHelper->fail('');
 
     }
 
-    public function deleteDataAction()
+    public function deleteShippingUrlDataAction()
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
             $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);

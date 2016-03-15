@@ -262,9 +262,9 @@ $(function(){
     $(document).on("click", ".trackingUrl-plus", function () {
         var selfdata = this,
             addnew = $(selfdata).closest('.trackingUrl').find('.add-new'),
-            selectValue = $('#shipping-url option:selected').val();
+            selectValue = $('#shipping-url').val();
         if(selectValue != '0'){
-            $("#shipping-url :contains('Select to edit')").attr("selected", true);
+            $("#shipping-url").val(0).attr("selected", true);
         }
 
         $('#name').val('');
@@ -272,8 +272,7 @@ $(function(){
         addnew.attr('data-current','');
         if(addnew.hasClass("row-open")){
             addnew.addClass("add-new-config").removeClass( "row-open").addClass( "row-close");
-            $("#shipping-url :contains('Select to edit')").attr("selected", false);
-            addnew.show();
+            $("#shipping-url").val(0).attr("selected", false).show();
         }else{
             if (addnew.hasClass("add-new-config")) {
                 addnew.removeClass("add-new-config").hide();
@@ -284,26 +283,30 @@ $(function(){
     });
 
     $(document).on("change", "#shipping-url", function () {
-        var selectValue = $('#shipping-url option:selected').val(),
+        var selectValue = $('#shipping-url').val(),
             selfdata = this,
-            addnew = $(selfdata).closest('.trackingUrl').find('.add-new');
+            addnew = $(selfdata).closest('.trackingUrl').find('.add-new'),
+            secureToken = '<?php echo $this->secureToken?>';
 
-        if (addnew.hasClass("add-new-config") && selectValue == '0') {
+        if (selectValue == '0') {
             addnew.removeClass( "add-new-config" ).removeClass( "row-open").addClass( "row-close").attr('data-current','').hide();
         } else{
             var selectData = {
-                id: selectValue
+                id: selectValue,
+                secureToken: secureToken
             };
 
             $.ajax({
-                url: '<?php echo $this->websiteUrl?>plugin/shopping/run/getData',
+                url: '<?php echo $this->websiteUrl?>plugin/shopping/run/getShippingUrlData',
                 dataType: 'json',
                 data: selectData,
                 type: 'POST'
             }).done(function (response) {
+                if(response.error === 1){
+                    return false;
+                }
                 $('#name').val(response.responseText.name);
                 $('#url').val(response.responseText.url);
-
                 addnew.addClass( "add-new-config" ).removeClass( "row-close" ).addClass("row-open").attr('data-current', response.responseText.current).show();
             });
         }
@@ -327,11 +330,15 @@ $(function(){
                 secureToken: secureToken
             };
                 $.ajax({
-                    url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setData',
+                    url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setShippingUrlData',
                     dataType: 'json',
                     data: data,
                     type: 'POST'
                 }).done(function (response) {
+                    if(response.error === 1){
+                        showMessage(response.responseText.msg, true, 2000);
+                        return false;
+                    }
                     var optVal = response.responseText.optionName,
                         optionUpdateStatus = response.responseText.optionUpdateStatus,
                         optionUpdateId = response.responseText.optionId,
@@ -347,17 +354,17 @@ $(function(){
                         $("#shipping-url").append('<option value="'+optionUpdateId+'">'+optVal+'</option>');
                     }
                     showMessage(response.responseText.msg, false, 2000);
-                });
 
-            if(addnew.hasClass("add-new-config")){
-                addnew.removeClass( "add-new-config" ).hide();
-            }
-            $("#shipping-url :contains('Select to edit')").attr("selected", false);
+                    if(addnew.hasClass("add-new-config")){
+                        addnew.removeClass( "add-new-config" ).hide();
+                    }
+                    $("#shipping-url").val(0).attr("selected", false);
+                });
 
     });
 
     $(document).on('click', '.remove-pickup-location-shipping-url', function(){
-          var selectName = $('#shipping-url option:selected').val(),
+          var selectName = $('#shipping-url').val(),
               selfdata = this,
               row = $(selfdata).closest('.trackingUrl').find('.add-new'),
               secureToken = '<?php echo $this->secureToken?>';
@@ -370,13 +377,16 @@ $(function(){
             row.removeClass( "add-new-config" );
             row.hide();
             $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/deleteData/selectId/'+selectId+'/secureToken/'+secureToken,
+                url: $('#website_url').val()+'plugin/shopping/run/deleteShippingUrlData/selectId/'+selectId+'/secureToken/'+secureToken,
                 type: 'DELETE',
                 dataType: 'json'
             }).done(function(response) {
+                if(response.error === 1){
+                    return false;
+                }
                 var optionId = response.responseText.optionId;
                 $("#shipping-url option[value="+optionId+"]").remove();
-                $("#shipping-url :contains('Select to edit')").attr("selected", false);
+                $("#shipping-url").val(0).attr("selected", false);
                 row.attr('data-current','').removeClass( "row-open" );
                 showMessage(response.responseText.msg, false, 2000);
             });

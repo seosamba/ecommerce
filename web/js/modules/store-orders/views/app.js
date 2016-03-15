@@ -308,7 +308,7 @@ define(['backbone',
             var model = this.orders.get(id);
 
             $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/fetchNames',
+                url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames',
                 type: 'GET',
                 dataType: 'json'
 
