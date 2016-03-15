@@ -41,17 +41,6 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         return array();
     }
 
-    public function findById($id)
-    {
-        $current = $this->getDbTable()->find($id)->current();
-        if (!$current) {
-            return null;
-        }
-        $currentData = new $this->_model($current->toArray());
-
-        return $currentData;
-    }
-
     public function findByName($name)
     {
         $select = $this->getDbTable()->select();

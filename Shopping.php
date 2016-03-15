@@ -496,7 +496,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             $update = false;
             $msg = $this->_translator->translate('Saved');
-            $shippingUrlModel = $shippingUrlMapper->findById($data['currentId']);
+            $shippingUrlModel = $shippingUrlMapper->find($data['currentId']);
             if ($shippingUrlModel) {
                 $shippingUrlModel->setId($data['currentId']);
                 $shippingUrlModel->setDefaultStatus(0);
@@ -536,7 +536,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
             if (!empty($id)) {
                 $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-                $currentData = $shippingUrlMapper->findById($id);
+                $currentData = $shippingUrlMapper->find($id);
                 if ($currentData instanceof Models_Model_ShippingUrl) {
                     $this->_responseHelper->success(array(
                         'name' => $currentData->getName(),

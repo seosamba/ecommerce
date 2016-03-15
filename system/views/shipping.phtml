@@ -265,10 +265,10 @@ $(function(){
 
         $('#name').val('');
         $('#url').val('');
-        addnew.attr('data-current','');
+        addnew.data('current','');
         if(addnew.hasClass("row-open")){
             addnew.addClass("add-new-config").removeClass( "row-open").addClass( "row-close");
-            $("#shipping-url").val(0).attr("selected", false).show();
+            $("#shipping-url").val(0).prop("selected", false).show();
         }else{
             if (addnew.hasClass("add-new-config")) {
                 addnew.removeClass("add-new-config").hide();
@@ -285,7 +285,7 @@ $(function(){
             secureToken = '<?php echo $this->secureToken?>';
 
         if (selectValue == '0') {
-            addnew.removeClass( "add-new-config" ).removeClass( "row-open").addClass( "row-close").attr('data-current','').hide();
+            addnew.removeClass( "add-new-config" ).removeClass( "row-open").addClass( "row-close").data('current','').hide();
         } else{
             var selectData = {
                 id: selectValue,
@@ -303,7 +303,7 @@ $(function(){
                 }
                 $('#name').val(response.responseText.name);
                 $('#url').val(response.responseText.url);
-                addnew.addClass( "add-new-config" ).removeClass( "row-close" ).addClass("row-open").attr('data-current', response.responseText.current).show();
+                addnew.addClass( "add-new-config" ).removeClass( "row-close" ).addClass("row-open").data('current', response.responseText.current).show();
             });
         }
     });
@@ -313,7 +313,7 @@ $(function(){
           url = $('#url').val(),
           selfdata = this,
           addnew = $(selfdata).closest('.trackingUrl').find('.add-new'),
-          current = addnew.attr('data-current'),
+          current = addnew.data('current'),
           secureToken = '<?php echo $this->secureToken?>';
         if(name == '') {
             showMessage('field not been empty');
@@ -339,7 +339,7 @@ $(function(){
                         optionUpdateStatus = response.responseText.optionUpdateStatus,
                         optionUpdateId = response.responseText.optionId,
                         optionValues = '';
-                    addnew.attr('data-current','').removeClass( "row-open" );
+                    addnew.data('current','').removeClass( "row-open" );
                     if(optionUpdateStatus) {
                         $("#shipping-url option[value='"+optionUpdateId+"']").remove();
                     }
@@ -354,7 +354,7 @@ $(function(){
                     if(addnew.hasClass("add-new-config")){
                         addnew.removeClass( "add-new-config" ).hide();
                     }
-                    $("#shipping-url").val(0).attr("selected", false);
+                    $("#shipping-url").val(0).prop("selected", false);
                 });
 
     });
@@ -369,7 +369,7 @@ $(function(){
             return false;
         }
         showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
-            var selectId = row.attr('data-current');
+            var selectId = row.data('current');
             row.removeClass( "add-new-config" );
             row.hide();
             $.ajax({
@@ -382,8 +382,8 @@ $(function(){
                 }
                 var optionId = response.responseText.optionId;
                 $("#shipping-url option[value="+optionId+"]").remove();
-                $("#shipping-url").val(0).attr("selected", false);
-                row.attr('data-current','').removeClass( "row-open" );
+                $("#shipping-url").val(0).prop("selected", false);
+                row.data('current','').removeClass( "row-open" );
                 showMessage(response.responseText.msg, false, 2000);
             });
         });
