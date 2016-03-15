@@ -3,11 +3,12 @@ define(['backbone',
     './order',
     'text!../templates/paginator.html',
     'text!../templates/export_dialog.html',
+    'text!../templates/tracking_code.html',
     'text!../templates/refund_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, RefundTemplate, i18n
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -300,45 +301,68 @@ define(['backbone',
                 });
             }
         },
-        changeTracking: function(event){
+        changeTracking: function(e){
             var self    = this,
-                el      = $(event.currentTarget),
+                el      = $(e.currentTarget),
                 id      = parseInt(el.closest('tr').find('td.order-id').text());
             var model = this.orders.get(id);
 
-            if (!model) {
-                return false;
-            }
-            smoke.prompt(_.isUndefined(i18n['Insert tracking code for this order'])?'Insert tracking code for this order':i18n['Insert tracking code for this order'], function(value){
-                if (value === false) {
-                    return value;
-                }
-                value = $.trim(value);
-                if (model.get('shipping_tracking_id') !== value) {
-                    $.ajax({
-                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                        data: {shippingTrackingId: value},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                        },
-                        success: function(response) {
-                            if (response.hasOwnProperty('error') && !response.error){
-                                showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
-                            }
-                            if (response.hasOwnProperty('responseText')){
-                                model.set({
-                                    'status': response.responseText.status,
-                                    'shipping_tracking_id': response.responseText.shippingTrackingId
-                                });
-                            }
-                        }
-                    });
-                }
-            }, {value: model.get('shipping_tracking_id'),
-                ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
-                cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames',
+                type: 'GET',
+                dataType: 'json'
+
+            }).done(function(response) {
+                var dialog = _.template(TrackingCodeTemplate, {
+                    data:response.responseText.data,
+                    defaultSelection: response.responseText.defaultSelection,
+                    orderId: id,
+                    i18n:i18n
+                });
+
+                $(dialog).dialog({
+                    width: 600,
+                    dialogClass: 'seotoaster',
+                    resizable:false,
+                    open: function(event, ui) {
+                        $('.setTracking').on('click',  function(){
+                        });
+                        $('.save-data').on('click', function(){
+                            var  trackingUrlId =  $('#marketing-services').val(),
+                                text =  $('#shippingTrackingId').val(),
+                                data = {
+                                    trackingUrlId: trackingUrlId,
+                                    shippingTrackingId: text,
+                                    id:id
+                                };
+
+                            $.ajax({
+                                url: $('#website_url').val()+'plugin/shopping/run/order',
+                                data: data,
+                                type: 'POST',
+                                dataType: 'json',
+                                beforeSend: function(){
+                                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                                },
+                                success: function(response) {
+                                    if (response.hasOwnProperty('error') && !response.error){
+                                        showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
+                                    }
+                                    if (response.hasOwnProperty('responseText')){
+                                        model.set({
+                                            'status': response.responseText.status,
+                                            'shipping_tracking_id': response.responseText.shippingTrackingId
+                                        });
+                                    }
+                                }
+                            });
+                        });
+
+                    },
+                    close: function(event, ui){
+                        $(this).dialog('close').remove();
+                    }
+                });
             });
         },
         sendInvoice: function(event){
