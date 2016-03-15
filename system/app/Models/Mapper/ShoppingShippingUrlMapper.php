@@ -38,6 +38,7 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         if (sizeof($results)) {
             return $results->toArray();
         }
+        return array();
     }
 
     public function findById($id)
@@ -57,10 +58,11 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         $select->where('default_status = "1"');
         $result = $this->getDbTable()->fetchRow($select);
         if (is_null($result)) {
-            return false;
+            return null;
         }
+        $currentData = new $this->_model($result->toArray());
 
-        return $result->toArray();
+        return $currentData;
     }
 
     public function clearDefaultStatus()

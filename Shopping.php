@@ -464,8 +464,8 @@ class Shopping extends Tools_Plugins_Abstract {
         $defaultSelection = $shippingUrlMapper->findDefaultStatus();
         $arrData = array($this->_translator->translate('Custom Shipper'));
         $arrDataDefault = $arrData;
-        if($defaultSelection) {
-            $arrDataDefault = array($defaultSelection['name'] => $defaultSelection['default_status']);
+        if($defaultSelection instanceof Models_Model_ShippingUrl) {
+            $arrDataDefault = array($defaultSelection->getName() => $defaultSelection->getDefaultStatus());
         }
         if(!empty($trackingData)) {
             foreach ($trackingData as $dataValue) {
@@ -517,16 +517,16 @@ class Shopping extends Tools_Plugins_Abstract {
                 'optionId' => $shippingUrlModel->getId()
             ));
         }
+        $this->_responseHelper->fail('');
     }
 
     public function getDataAction()
     {
-
-        $data = json_decode($this->_request->getRawBody(), true);
-        if (!empty($data['id'])) {
+        $data = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+        if (!empty($data)) {
             $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-            $currentData = $shippingUrlMapper->findById($data['id']);
-            if ($currentData) {
+            $currentData = $shippingUrlMapper->findById($data);
+            if ($currentData instanceof Models_Model_ShippingUrl) {
                 $this->_responseHelper->success(array(
                     'name' => $currentData->getName(),
                     'url' => $currentData->getUrl(),
@@ -552,9 +552,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                 $current = $shippingUrlMapper->find($id);
                 if (!empty($current)) {
-                    $status = $shippingUrlMapper->delete($current);
-                }
-                if (!empty($status)) {
+                    $shippingUrlMapper->delete($current);
                     $this->_responseHelper->success(array(
                         'msg' => $this->_translator->translate('Deleted'),
                         'optionId' => $current->getId()
@@ -562,6 +560,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
         }
+        $this->_responseHelper->fail('');
     }
 
 
@@ -884,7 +883,7 @@ class Shopping extends Tools_Plugins_Abstract {
                             $shippingUrlMapper->save($currentData);
                         }
                     }
-                        unset($params['trackingUrlId']);
+                        unset($params['trackingUrlId'], $params['id']);
                         if($currentData instanceof Models_Model_ShippingUrl){
                             $params['shippingTrackingId'] = trim($currentData->getUrl()).trim($paramData);
                         }

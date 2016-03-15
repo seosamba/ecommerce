@@ -5,7 +5,7 @@ class Models_Model_ShippingUrl extends Application_Model_Models_Abstract {
 
     protected $_url;
 
-    protected $_default_status;
+    protected $_defaultStatus;
 
 
     public function getName() {
@@ -25,11 +25,11 @@ class Models_Model_ShippingUrl extends Application_Model_Models_Abstract {
     }
 
     public function getDefaultStatus() {
-        return $this->_default_status;
+        return $this->_defaultStatus;
     }
 
-    public function setDefaultStatus($_default_status) {
-        $this->_default_status = $_default_status;
+    public function setDefaultStatus($_defaultStatus) {
+        $this->_defaultStatus = $_defaultStatus;
     }
 
 }

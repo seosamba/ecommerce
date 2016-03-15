@@ -20,8 +20,7 @@ define(['backbone',
             'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
-            //'click td.shipping-service .setTracking': 'changeTracking',
-            'click td.shipping-service .setTracking': 'changeTrackigCode',
+            'click td.shipping-service .setTracking': 'changeTracking',
             'click .sendInvoice': 'sendInvoice',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
@@ -302,7 +301,7 @@ define(['backbone',
                 });
             }
         },
-        changeTrackigCode: function(e){
+        changeTracking: function(e){
             var self    = this,
                 el      = $(e.currentTarget),
                 id      = parseInt(el.closest('tr').find('td.order-id').text());
@@ -314,7 +313,6 @@ define(['backbone',
                 dataType: 'json'
 
             }).done(function(response) {
-                console.log(response);
                 var dialog = _.template(TrackingCodeTemplate, {
                     data:response.responseText.data,
                     defaultSelection: response.responseText.defaultSelection,
@@ -331,14 +329,15 @@ define(['backbone',
                         });
                         $('.save-data').on('click', function(){
                             var  trackingUrlId =  $('#marketing-services').val(),
-                                 text =  $('#shippingTrackingId').val(),
-                                 data = {
-                                trackingUrlId: trackingUrlId,
-                                shippingTrackingId: text
-                            };
+                                text =  $('#shippingTrackingId').val(),
+                                data = {
+                                    trackingUrlId: trackingUrlId,
+                                    shippingTrackingId: text,
+                                    id:id
+                                };
 
                             $.ajax({
-                                url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                                url: $('#website_url').val()+'plugin/shopping/run/order',
                                 data: data,
                                 type: 'POST',
                                 dataType: 'json',
@@ -364,49 +363,6 @@ define(['backbone',
                         $(this).dialog('close').remove();
                     }
                 });
-
-
-            });
-        },
-        changeTracking: function(event){
-            var self    = this,
-                el      = $(event.currentTarget),
-                id      = parseInt(el.closest('tr').find('td.order-id').text());
-            var model = this.orders.get(id);
-
-            if (!model) {
-                return false;
-            }
-            smoke.prompt(_.isUndefined(i18n['Insert tracking code for this order'])?'Insert tracking code for this order':i18n['Insert tracking code for this order'], function(value){
-                if (value === false) {
-                    return value;
-                }
-                value = $.trim(value);
-                if (model.get('shipping_tracking_id') !== value) {
-                    $.ajax({
-                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                        data: {shippingTrackingId: value},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                        },
-                        success: function(response) {
-                            if (response.hasOwnProperty('error') && !response.error){
-                                showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
-                            }
-                            if (response.hasOwnProperty('responseText')){
-                                model.set({
-                                    'status': response.responseText.status,
-                                    'shipping_tracking_id': response.responseText.shippingTrackingId
-                                });
-                            }
-                        }
-                    });
-                }
-            }, {value: model.get('shipping_tracking_id'),
-                ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
-                cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
             });
         },
         sendInvoice: function(event){
