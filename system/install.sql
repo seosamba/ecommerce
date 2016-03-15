@@ -786,4 +786,4 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
-UPDATE `plugin` SET `version` = '2.4.5' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.0' WHERE `name` = 'shopping';
