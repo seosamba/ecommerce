@@ -330,10 +330,10 @@ define(['backbone',
                         $('.setTracking').on('click',  function(){
                         });
                         $('.save-data').on('click', function(){
-                            var  name =  $('#marketing-services').val(),
+                            var  trackingUrlId =  $('#marketing-services').val(),
                                  text =  $('#shippingTrackingId').val(),
                                  data = {
-                                name: name,
+                                trackingUrlId: trackingUrlId,
                                 shippingTrackingId: text
                             };
 

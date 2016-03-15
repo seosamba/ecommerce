@@ -230,10 +230,10 @@ $this->headLink()
                         <div class="labeled" style="text-align: center; line-height: 30px;">
                             <button class="btn success grid_6 alpha fl-left ticon-plus" for="cartamount"><?php echo $this->translate($this->trackingUrlForm->getElement('addNew')->getLabel()); ?></button>
                             <span>OR</span>
-                            <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_6 omega fl-right')->renderViewHelper(); ?>
+                            <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_5 omega fl-right')->renderViewHelper(); ?>
                         </div>
                         <div class="add-new row-close" data-current="" style="display: none;">
-                            <span class="grid_4 omega" style="text-align: center"><?php echo $this->translate('Name');?>
+                            <span class="grid_4 alpha" style="text-align: center"><?php echo $this->translate('Name');?>
                                 <input type="text" id="name" name="name" />
                             </span>
                             <span class="grid_7 omega" style="text-align: center"><?php echo $this->translate('Service url');?>

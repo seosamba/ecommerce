@@ -34,19 +34,6 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         }
     }
 
-    public function fetchNames() {
-        $select = $this->getDbTable()->select();
-        $select->from($this->getDbTable(), array('name'))->order('name ASC');
-      return  $this->getDbTable()->getAdapter()->fetchCol($select);
-    }
-
-    public function findByName($name) {
-        $select = $this->getDbTable()->select();
-        $select->where('name = ?', $name);
-        $result = $this->getDbTable()->fetchRow($select);
-      return $result->toArray();
-    }
-
     public function findById($id) {
         $current = $this->getDbTable()->find($id)->current();
         if (!$current){

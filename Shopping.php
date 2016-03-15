@@ -460,7 +460,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
     public function fetchNamesAction(){
         $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-        $trackingData = $shippingUrlMapper->fetchNames();
+        $trackingData = $shippingUrlMapper->fetchAll();
         $defaultSelection = $shippingUrlMapper->findDefaultStatus();
         $arrData = array($this->_translator->translate('Custom Shipper'));
         $arrDataDefault = $arrData;
@@ -468,9 +468,10 @@ class Shopping extends Tools_Plugins_Abstract {
             $arrDataDefault = array($defaultSelection['name'] => $defaultSelection['default_status']);
         }
         if(!empty($trackingData)) {
-            foreach ($trackingData as $key => $value) {
-                $arrData[$value] = $value;
+            foreach ($trackingData as $dataValue) {
+                $arrData[$dataValue['id']] = $dataValue['name'];
             }
+
         }
         return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
     }
@@ -496,16 +497,14 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$shippingUrlModel) {
                 $shippingUrlModel = new Models_Model_ShippingUrl();
                 $shippingUrlModel->setId($data['currentId']);
-                $shippingUrlModel->setName($data['name']);
-                $shippingUrlModel->setUrl($data['url']);
                 $shippingUrlModel->setDefaultStatus(0);
             } else {
-                $shippingUrlModel->setName($data['name']);
-                $shippingUrlModel->setUrl($data['url']);
                 $shippingUrlModel->setDefaultStatus($shippingUrlModel->getDefaultStatus());
             }
-
+            $shippingUrlModel->setName($data['name']);
+            $shippingUrlModel->setUrl($data['url']);
             $lastName = $shippingUrlMapper->save($shippingUrlModel);
+
             if (!$lastName instanceof Models_Model_ShippingUrl) {
                 $msg = $this->_translator->translate('Updated');
 
@@ -525,15 +524,16 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
     public function getDataAction() {
-        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+
         $data = json_decode($this->_request->getRawBody(), true);
-        if (empty($data['id'])) {
-            exit;
+        if (!empty($data['id'])) {
+            $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+            $currentData = $shippingUrlMapper->findById($data['id']);
+            if($currentData){
+                $this->_responseHelper->success(array('name'=> $currentData->getName(), 'url'=> $currentData->getUrl(), 'current'=> $currentData->getId()));
+            }
         }
-        $currentData = $shippingUrlMapper->findById($data['id']);
-       if($currentData){
-           $this->_responseHelper->success(array('name'=> $currentData->getName(), 'url'=> $currentData->getUrl(), 'current'=> $currentData->getId()));
-       }
+        $this->_responseHelper->fail('');
 
     }
 
@@ -546,8 +546,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
 
             $id = filter_var($this->_request->getParam('selectId'), FILTER_SANITIZE_NUMBER_INT);
-            if ($id) {
-                $id = (int) $id;
+            if (!empty($id)) {
                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                $current = $shippingUrlMapper->find($id);
                if(!empty($current)) {
@@ -556,8 +555,6 @@ class Shopping extends Tools_Plugins_Abstract {
                if(!empty($status)){
                    $this->_responseHelper->success(array('msg' => $this->_translator->translate('Deleted'), 'optionId' => $current->getId()));
                }
-            }else{
-                exit;
             }
         }
     }
@@ -867,51 +864,25 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($this->_request->isPost()) {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
-                $shippingUrlModel = new Models_Model_ShippingUrl();
                 $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                 $selectedName = '';
                 $url = '';
-                $defaultStatus = '';
                 $paramData = $params['shippingTrackingId'];
-
-                    if((isset($params['name'])) && (!empty($params['name']))){
-                        $currentData = $shippingUrlMapper->findByName($params['name']);
+                $currentData = '';
+                $shippingUrlMapper->clearDefaultStatus();
+                    if(!empty($params['trackingUrlId'])){
+                        $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
                         if(!empty($currentData)) {
-                            $selectedName = $params['name'];
-                            $url = $currentData['url'];
-                            $defaultStatus = $currentData['default_status'];
-                        }
-
-                        if(empty($defaultStatus)) {
-                            $presentStatus = $shippingUrlMapper->findDefaultStatus();
-                            if (($selectedName != $presentStatus['name']) && ($presentStatus !== false)) {
-                                $shippingUrlModel->setId($presentStatus['id']);
-                                $shippingUrlModel->setName($presentStatus['name']);
-                                $shippingUrlModel->setUrl($presentStatus['url']);
-                                $shippingUrlModel->setDefaultStatus(0);
-                                $shippingUrlMapper->save($shippingUrlModel);
-                            }
-                            $shippingUrlModel->setId($currentData['id']);
-                            $shippingUrlModel->setName($currentData['name']);
-                            $shippingUrlModel->setUrl($currentData['url']);
-                            $shippingUrlModel->setDefaultStatus(1);
-                            $shippingUrlMapper->save($shippingUrlModel);
-                        }
-
-                        unset($currentData['name'], $currentData['default_status'],$currentData['id']);
-                            $param = '';
-                            foreach ($currentData as $value) {
-                                $param .= $value . ' ';
-                            }
-                        if(empty($params['shippingTrackingId']) || strpos($params['shippingTrackingId'], '://')){
-                            return;
-                        }else {
-                            $paramValue = $params['shippingTrackingId'];
-                            $params['shippingTrackingId'] = trim($param).trim($paramValue);
+                            $selectedName = $currentData->getName();
+                            $url = $currentData->getUrl();
+                            $currentData->setDefaultStatus(1);
+                            $shippingUrlMapper->save($currentData);
                         }
                     }
-                    if (isset($params['shippingTrackingId'])) {
-                        unset($params['name']);
+                        unset($params['trackingUrlId']);
+                        if($currentData instanceof Models_Model_ShippingUrl){
+                            $params['shippingTrackingId'] = trim($currentData->getUrl()).trim($paramData);
+                        }
                         $order->registerObserver(new Tools_Mail_Watchdog(array(
                             'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
                             'name' => $selectedName,
@@ -919,10 +890,6 @@ class Shopping extends Tools_Plugins_Abstract {
                             'url' =>  $url
                         )));
                         $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
-                        if(empty($selectedName)){
-                            $shippingUrlMapper->clearDefaultStatus();
-                        }
-                    }
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 

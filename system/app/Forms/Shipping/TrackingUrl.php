@@ -23,8 +23,7 @@ class Forms_Shipping_TrackingUrl extends Zend_Form {
         $this->addElement(new Zend_Form_Element_Select(array(
             'name'         => 'quantity',
             'id'          => 'shipping-url',
-            'multiOptions' => $arrData,
-            'style'        => 'width: 40%;'
+            'multiOptions' => $arrData
         )));
     }
 
