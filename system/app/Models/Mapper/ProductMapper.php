@@ -153,7 +153,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $brands = null,
         $strictTagsCount = false,
         $organicSearch = false,
-        $attributes = array()
+        $attributes = array(),
+        $price = array()
     ) {
         $entities = array();
 
@@ -188,6 +189,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             } else {
                 return null;
             }
+        }
+
+        if(!empty($price)){
+            $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
         }
 
         if (!empty($tags)) {

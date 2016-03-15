@@ -277,8 +277,8 @@ class Filtering_Mappers_Eav
                     'p' => 'shopping_product'
                 ),
                 array(
-                    'min' => 'FLOOR(MIN(p.price))',
-                    'max' => 'CEIL(MAX(p.price))'
+                    'min' => 'MIN(p.price)',
+                    'max' => 'MAX(p.price)'
                 )
             )
             ->from(array('t' => 'shopping_product_has_tag'), null)

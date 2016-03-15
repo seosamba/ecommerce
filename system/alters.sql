@@ -265,6 +265,19 @@ ALTER TABLE `shopping_tax` MODIFY `rate1` decimal(10,3) NOT NULL DEFAULT '0.00';
 ALTER TABLE `shopping_tax` MODIFY `rate2` decimal(10,3) NOT NULL DEFAULT '0.00';
 ALTER TABLE `shopping_tax` MODIFY `rate3` decimal(10,3) NOT NULL DEFAULT '0.00';
 
+-- 15/10/2015
+-- version: 2.5.0
+-- Add Carrier tracking url
+
+CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_status` ENUM('0', '1') DEFAULT '0',
+  UNIQUE KEY `name` (`name`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.8' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

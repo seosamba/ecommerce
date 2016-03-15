@@ -377,7 +377,7 @@ class Tools_Misc
      */
     public static function getConvertedPriceByCurrency($price, $currency)
     {
-        $amount = number_format($price, 2, ".", ",");
+        $amount = number_format($price, 2, ".", "");
         $translator = Zend_Registry::get('Zend_Translate');
         $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
         $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
@@ -402,7 +402,7 @@ class Tools_Misc
                         array(), Helpers_Action_Cache::CACHE_LONG);
             }
         }
-        return number_format($amount / $currRate, 2);
+        return number_format($amount / $currRate, 2, ".", "");
     }
 
 

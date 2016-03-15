@@ -177,6 +177,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
 					$resetToken->registerObserver(new Tools_Mail_Watchdog(array(
 						'trigger' => Tools_Mail_SystemMailWatchdog::TRIGGER_PASSWORDRESET
 					)));
+					$resetToken->notifyObservers();
 				}
             }
         }

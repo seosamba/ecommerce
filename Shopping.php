@@ -12,6 +12,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
+
 	/**
 	 * New system role 'customer'
 	 *
@@ -324,6 +325,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$markupForm->populate($markupConfig['config']);
 		}
         $orderConfig =  $shippingConfigMapper->find(self::ORDER_CONFIG);
+        $trackingUrlForm = new Forms_Shipping_TrackingUrl();
+
         $orderConfigForm = new Forms_Shipping_OrderConfig();
         if(isset($orderConfig['config'])){
             $orderConfigForm->populate($orderConfig['config']);
@@ -371,6 +374,9 @@ class Shopping extends Tools_Plugins_Abstract {
         }
         $this->_view->pickupLocationConf = $pickupLocationConfig;
         $this->_view->orderConfigForm = $orderConfigForm;
+
+        $this->_view->trackingUrlForm = $trackingUrlForm;
+
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -451,6 +457,124 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
+
+    public function fetchShippingUrlNamesAction(){
+        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+        $trackingData = $shippingUrlMapper->fetchAll();
+        $defaultSelection = $shippingUrlMapper->findDefaultStatus();
+        $arrData = array($this->_translator->translate('Custom Shipper'));
+        $arrDataDefault = $arrData;
+        if($defaultSelection instanceof Models_Model_ShippingUrl) {
+            $arrDataDefault = array($defaultSelection->getName() => $defaultSelection->getDefaultStatus());
+        }
+        if(!empty($trackingData)) {
+            foreach ($trackingData as $dataValue) {
+                $arrData[$dataValue['id']] = $dataValue['name'];
+            }
+
+        }
+        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
+    }
+
+
+    public function setShippingUrlDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+            $data = array_map("trim", $data);
+
+            $tokenToValidate = $data['secureToken'];
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+
+            if (empty($data['trackingName'])) {
+                return $this->_responseHelper->fail('Required parameters is missing');
+            }
+            $update = false;
+            $msg = $this->_translator->translate('Saved');
+            $shippingUrlModel = $shippingUrlMapper->find($data['currentId']);
+            if ($shippingUrlModel) {
+                $shippingUrlModel->setId($data['currentId']);
+                $shippingUrlModel->setDefaultStatus(0);
+                $update = true;
+                $msg = $this->_translator->translate('Updated');
+            } else {
+                $findCurrentName = $shippingUrlMapper->findByName($data['trackingName']);
+                if($findCurrentName instanceof Models_Model_ShippingUrl){
+                    $this->_responseHelper->fail(array('msg' => 'This name is already exists, please select proper name from the dropdown!'));
+                }
+                $shippingUrlModel = new Models_Model_ShippingUrl();
+                $shippingUrlModel->setDefaultStatus(0);
+
+            }
+            $shippingUrlModel->setName($data['trackingName']);
+            $shippingUrlModel->setUrl($data['url']);
+            $shippingUrlModel = $shippingUrlMapper->save($shippingUrlModel);
+
+            $this->_responseHelper->success(array(
+                'msg' => $this->_translator->translate($msg),
+                'optionUpdateStatus' => $update,
+                'optionName' => $shippingUrlModel->getName(),
+                'optionId' => $shippingUrlModel->getId()
+            ));
+        }
+        $this->_responseHelper->fail('');
+    }
+
+    public function getShippingUrlDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+            $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($id)) {
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                $currentData = $shippingUrlMapper->find($id);
+                if ($currentData instanceof Models_Model_ShippingUrl) {
+                    $this->_responseHelper->success(array(
+                        'name' => $currentData->getName(),
+                        'url' => $currentData->getUrl(),
+                        'current' => $currentData->getId()
+                    ));
+                }
+            }
+        }
+        $this->_responseHelper->fail('');
+
+    }
+
+    public function deleteShippingUrlDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $id = filter_var($this->_request->getParam('selectId'), FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($id)) {
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                $current = $shippingUrlMapper->find($id);
+                if (!empty($current)) {
+                    $shippingUrlMapper->delete($current);
+                    $this->_responseHelper->success(array(
+                        'msg' => $this->_translator->translate('Deleted'),
+                        'optionId' => $current->getId()
+                    ));
+                }
+            }
+        }
+        $this->_responseHelper->fail('');
+    }
+
 
 	public function setSettingsAction() {
 		$status = false;
@@ -578,9 +702,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$tags = $this->_request->getParam('tags');
 		$brands = $this->_request->getParam('brands');
         $attributes = $this->_request->getParam('attributes');
+        $price = $this->_request->getParam('price');
 
 		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes);
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
@@ -753,17 +878,34 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if ($this->_request->isPost()) {
-				$order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
-
-				$params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
-
-				if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']) {
-					$order->registerObserver(new Tools_Mail_Watchdog(array(
-						'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
-					)));
-					$params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
-				}
-
+                $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
+                $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                $selectedName = '';
+                $url = '';
+                $paramData = $params['shippingTrackingId'];
+                $currentData = '';
+                $shippingUrlMapper->clearDefaultStatus();
+                    if(!empty($params['trackingUrlId'])){
+                        $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
+                        if(!empty($currentData)) {
+                            $selectedName = $currentData->getName();
+                            $url = $currentData->getUrl();
+                            $currentData->setDefaultStatus(1);
+                            $shippingUrlMapper->save($currentData);
+                        }
+                    }
+                        unset($params['trackingUrlId'], $params['id']);
+                        if($currentData instanceof Models_Model_ShippingUrl){
+                            $params['shippingTrackingId'] = trim($currentData->getUrl()).trim($paramData);
+                        }
+                        $order->registerObserver(new Tools_Mail_Watchdog(array(
+                            'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
+                            'name' => $selectedName,
+                            'code' => $paramData,
+                            'url' =>  $url
+                        )));
+                        $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
