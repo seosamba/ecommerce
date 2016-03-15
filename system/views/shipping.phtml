@@ -261,11 +261,7 @@ $this->headLink()
 $(function(){
     $(document).on("click", ".trackingUrl-plus", function () {
         var selfdata = this,
-            addnew = $(selfdata).closest('.trackingUrl').find('.add-new'),
-            selectValue = $('#shipping-url').val();
-        if(selectValue != '0'){
-            $("#shipping-url").val(0).attr("selected", true);
-        }
+            addnew = $(selfdata).closest('.trackingUrl').find('.add-new');
 
         $('#name').val('');
         $('#url').val('');
