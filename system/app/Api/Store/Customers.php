@@ -55,6 +55,21 @@ class Api_Store_Customers extends Api_Service_Abstract {
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
 			$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
 
+            $roleId = filter_var($this->_request->getParam('roleId'), FILTER_SANITIZE_STRING);
+
+            $where = null;
+            if (!empty($id)) {
+                $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('id = ?', $id);
+            }
+            if (!empty($roleId)) {
+                if (!empty($where)) {
+                    $where .= ' AND '. $customerMapper->getDbTable()->getAdapter()->quoteInto('role_id = ?', $roleId);
+                } else {
+                    $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('role_id = ?', $roleId);
+                }
+            }
+
+
 			$currency = Zend_Registry::get('Zend_Currency');
 			$data = array_map(function($row) use ($currency){
 				$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
@@ -72,7 +87,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
                 }
 				return $row;
 			},
-			$customerMapper->listAll($id ? array('id = ?'=>$id) : null, $order, $limit, $offset, $search));
+			$customerMapper->listAll($where, $order, $limit, $offset, $search));
 		} else {
 			if ($id) {
 				$result = $customerMapper->find($id);

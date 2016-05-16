@@ -77,7 +77,7 @@
 			<?php endif;?>
 		</div>
 	</div>
-
+    <?php if(empty($this->supplier)):?>
 	<div class="grid_7 profile-actions">
 		<p class="title textcentered ui-state-default">
 			<img style="width: 16px; vertical-align: text-bottom;" src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAA/UlEQVR42r2VvQ3CMBBGswEjMIJHyASeIUV6qChSISRKpLR0jEDBABmBkpIRIk8QPks+3ekkfkzOsfSUxIm+p/PFSYUxRTAqAsPPvN6BEUzpWJcSBcolWSnRpJGT3oolK3ooSWMuwtinzCtwNG8qisEpL4CVfMa2R7xkBzlvWpFYskHfny1KG3FUjV+bi1jCInnfqketkhAt8PN6xMt14+DMinSwWv8AtuAuQp+gVx/PJl/EAZoBnNTzHZ1n9+iN5Ah8Lt8q0pLx3332SXRWkgAaU1EMFM11oP4lOLdHG/Ev6YC3QIscvWn6rbKtiPdID3wZEXOJk8VEpVlU9AI9gR1AIgkvUwAAAABJRU5ErkJggg==">
@@ -89,9 +89,10 @@
 			<?php endforeach; ?>
 		</ul>
 	</div>
+    <?php endif;?>
 </div>
 
-
+<?php if(empty($this->supplier)):?>
 <div id="profile-content" class="mt30px">
 	<ul class="profile-nav">
 		<li><a href="#profile-orders-list"><?php echo $this->translate('Orders');?></a></li>
@@ -264,6 +265,7 @@
     <?php endif;?>
     </div>
 </div>
+<?php endif;?>
 <script>
     $('#profile-content').tabs();
     $('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');

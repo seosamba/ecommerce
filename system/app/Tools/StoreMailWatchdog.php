@@ -19,9 +19,21 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
     const RECIPIENT_ADMIN    = 'admin';
 
+    const RECIPIENT_SUPPLIER = 'supplier';
+
     const TRIGGER_CUSTOMERCHANGEATTR = 't_userchangeattr';
 
     const TRIGGER_NEW_USER_ACCOUNT = 'store_newuseraccount';
+
+    /**
+     * Send email to supplier when order marked as completed
+     */
+    const TRIGGER_SUPPLIER_COMPLETED = 'store_suppliercompleted';
+
+    /**
+     * Send email to supplier when order marked as shipped
+     */
+    const TRIGGER_SUPPLIER_SHIPPED = 'store_suppliershipped';
 
     const SHIPPING_TYPE = 'shipping';
 
@@ -194,6 +206,44 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $this->_addAddressToDictionary($this->_object);
         return $this->_send();
 	}
+
+    private function _sendSuppliercompletedMail()
+    {
+        $this->_prepareSupplierMails();
+
+        return $this->_send();
+    }
+
+    private function _sendSuppliershippedMail()
+    {
+        $this->_prepareSupplierMails();
+
+        return $this->_send();
+    }
+
+    private function _prepareSupplierMails()
+    {
+        $productIds = $this->_options['productIds'];
+        $productPagesUrls = $this->_options['productPagesUrls'];
+        switch ($this->_options['recipient']) {
+            case self::RECIPIENT_SUPPLIER:
+                $this->_mailer->setMailToLabel($this->_object->getFullName())
+                    ->setMailTo($this->_object->getEmail());
+                break;
+            default:
+                error_log('Unsupported recipient ' . $this->_options['recipient'] . ' given');
+
+                return false;
+                break;
+        }
+        $productUrls = '';
+        foreach ($productIds as $prodId) {
+            $prodUrl = $this->_websiteHelper->getUrl() . $productPagesUrls[$prodId]['url'];
+            $productUrls .= '<a href="' . $prodUrl . '">' . $productPagesUrls[$prodId]['name'] . '</a>';
+        }
+        $this->_entityParser->addToDictionary(array('product:urls' => $productUrls));
+        $this->_entityParser->objectToDictionary($this->_object, 'customer');
+    }
 
 	private function _preparseEmailTemplate(){
 		$tmplName = $this->_options['template'];

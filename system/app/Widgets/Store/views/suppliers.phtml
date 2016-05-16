@@ -1,0 +1,92 @@
+<?php $this->headTitle($this->translate('Manage suppliers')); ?>
+
+<script id="tableRowTemplate" type="text/x-jquery-tmpl">
+    <td class="check-td"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
+    <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
+    <td class="email"><a href="mailto:${email}">${email}</a></td>
+    <td><input type="text" class="mobile-number" data-uid="${id}" data-attribute="mobile" value="${mobile_phone}" /></td>
+    <td class="company">
+        <?php if(!empty($this->allCompanies)):?>
+            <select class="companies-assignment" name="companies">
+                <option value="0"><?php echo $this->translate('select');?></option>
+                <?php foreach($this->allCompanies as $company): ?>
+                    <option {{if company_id == <?php echo $company->getId();?>}} selected="selected" {{/if}} value="<?php echo $company->getId();?>"><?php echo $company->getCompanyName();?></option>
+                <?php endforeach;?>
+            </select>
+        <?php else:?>
+            <span><?php echo $this->translate('There are no company yet');?></span>
+        <?php endif;?>
+    </td>
+    <td class="date text-center">${reg_date}</td>
+</script>
+
+<script id="supplierDetailsTemplate" type="text/x-jquery-tmpl">
+	<h2 class="fn">${fullName}</h2>
+	<h3><a href="mailto:${email}" class="email">${email}</a></h3>
+	<p>${roleId} since ${regDate}</p>
+</script>
+
+<input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
+<?php
+    $this->headScript()
+        ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+        ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-suppliers/config'));
+
+	$this->noLayout ? $this->headScript() : '';
+?>
+<?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
+<div id="suppliers" class="toaster-widget">
+    <div class="search-line mt20px mb20px clearfix">
+        <input type="text" id="suppliers-search" class="grid_6 alpha" name="suppliers-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
+    </div>
+    <table id="suppliers-table" class="widget table-hover">
+        <thead>
+            <tr class="title-table ws-nowrap">
+	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
+	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
+	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
+	            <th class="sortable" data-sortkey="mobile_phone"><?php echo $this->translate('Mobile number');?></th>
+                <th class="sortable" data-sortkey="company_name"><?php echo $this->translate('Company Name');?></th>
+	            <th class="sortable text-center" data-sortkey="reg_date"><?php echo $this->translate('Registered');?></th>
+            </tr>
+        </thead>
+        <tbody id="supplier-list">
+            <tr>
+	            <td colspan="6" class="text-center">
+                    <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+	            <td colspan="2">
+		            <?php echo $this->translate('with selected do');?>
+
+                    <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>
+                    <select id="mass-action">
+			            <option value="0"><?php echo $this->translate('nothing');?></option>
+                        <option value="assignPassword"><?php echo $this->translate('assign new password');?></option>
+                        <option value="assignCompany"><?php echo $this->translate('assign company');?></option>
+                        <?php if($enabledAppsPlugin instanceof Application_Model_Models_Plugin):?>
+                            <option value="emailMarketing"><?php echo $this->translate('add to email list');?></option>
+                            <option value="crmMarketing"><?php echo $this->translate('add to crm');?></option>
+                        <?php endif;?>
+			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
+		            </select>
+	            </td>
+                <td colspan="6" class="text-right">
+                    <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
+                    <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
+                </td>
+            </tr>
+        </tfoot>
+        <input class="clientsSecureToken" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Customers::CUSTOMERS_SECURE_TOKEN);?>" />
+    </table>
+
+	<div id="supplier-details">
+		<div class="toolbar mt10px mb30px">
+			<a href="javascript:;" class="link btn-text">[ &#8678; <?php echo $this->translate('back to suppliers list');?> ]</a>
+		</div>
+		<div id="profile"></div>
+	</div>
+</div>

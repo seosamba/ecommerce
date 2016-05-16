@@ -23,6 +23,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const ROLE_SALESPERSON = 'sales person';
 
+    /**
+     * System role 'supplier'
+     */
+    const ROLE_SUPPLIER = 'supplier';
+
 	/**
 	 * New system resource 'cart'
 	 *
@@ -217,6 +222,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!$acl->hasRole(self::ROLE_CUSTOMER)) {
 			$acl->addRole(new Zend_Acl_Role(self::ROLE_CUSTOMER), Tools_Security_Acl::ROLE_GUEST);
 		}
+        if (!$acl->hasRole(self::ROLE_SUPPLIER)) {
+            $acl->addRole(new Zend_Acl_Role(self::ROLE_SUPPLIER), Tools_Security_Acl::ROLE_GUEST);
+        }
 		if (!$acl->hasRole(self::ROLE_SALESPERSON)) {
 			$acl->addRole(new Zend_Acl_Role(self::ROLE_SALESPERSON), Tools_Security_Acl::ROLE_MEMBER);
 		}
@@ -230,6 +238,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			$acl->addResource(new Zend_Acl_Resource(self::RESOURCE_STORE_MANAGEMENT));
 		}
 		$acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
+		$acl->allow(self::ROLE_SUPPLIER, self::RESOURCE_CART);
 		$acl->deny(Tools_Security_Acl::ROLE_GUEST, self::RESOURCE_API);
 		$acl->deny(Tools_Security_Acl::ROLE_MEMBER, self::RESOURCE_API);
 		$acl->deny(self::ROLE_SALESPERSON);
@@ -815,7 +824,12 @@ class Shopping extends Tools_Plugins_Abstract {
         }
 		if ($customer) {
 			$this->_view->customer = $customer;
-			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
+            $userRole = filter_var($this->_request->getParam('userRole'), FILTER_SANITIZE_STRING);
+            if ($userRole === Shopping::ROLE_SUPPLIER) {
+                $this->_view->supplier = true;
+                $this->_responseHelper->success($this->_view->render('profile.phtml'));
+            }
+            $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
 			$this->_view->stats = array(
 				'total'     => sizeof($orders),
 				'new'       => sizeof(array_filter($orders, function ($order) {
@@ -879,6 +893,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			if ($this->_request->isPost()) {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
+                $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
                 $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                 $selectedName = '';

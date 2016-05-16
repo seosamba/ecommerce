@@ -173,6 +173,8 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 array('userattr' => 'user_attributes'),
                 $joinConditionCustomer,
                 array('customer_attr'=>'(GROUP_CONCAT(DISTINCT(userattr.attribute), \'||\', userattr.value))'))
+            ->joinLeft(array('scs' => 'shopping_company_suppliers'), 'scs.supplier_id=user.id', array())
+            ->joinLeft(array('sc' => 'shopping_companies'), 'scs.company_id=sc.id', array('company_name' => 'sc.company_name', 'company_id' => 'scs.company_id'))
             ->group('user.id');
 
 		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {
@@ -190,8 +192,9 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		}
 
 		if ($search) {
-			$select->orWhere('user.full_name LIKE ?', '%'.$search.'%')
-					->orWhere('user.email LIKE ?', '%'.$search.'%');
+            $searchCond = $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?', '%'. $search. '%');
+            $searchCond .= ' OR '. $userDbTable->getAdapter()->quoteInto('user.email LIKE ?', '%'. $search. '%');
+			$select->where($searchCond);
 		}
 
 		$select->limit($limit, $offset);
