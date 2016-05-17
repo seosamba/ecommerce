@@ -43,7 +43,7 @@
         <thead>
             <tr class="title-table ws-nowrap">
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
-	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
+	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Supplier Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
 	            <th class="sortable" data-sortkey="mobile_phone"><?php echo $this->translate('Mobile number');?></th>
                 <th class="sortable" data-sortkey="company_name"><?php echo $this->translate('Company Name');?></th>
@@ -66,7 +66,7 @@
                     <select id="mass-action">
 			            <option value="0"><?php echo $this->translate('nothing');?></option>
                         <option value="assignPassword"><?php echo $this->translate('assign new password');?></option>
-                        <option value="assignCompany"><?php echo $this->translate('assign company');?></option>
+                        <option value="assignCompany"><?php echo $this->translate('assign suppliers');?></option>
                         <?php if($enabledAppsPlugin instanceof Application_Model_Models_Plugin):?>
                             <option value="emailMarketing"><?php echo $this->translate('add to email list');?></option>
                             <option value="crmMarketing"><?php echo $this->translate('add to crm');?></option>
