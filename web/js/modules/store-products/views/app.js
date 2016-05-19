@@ -354,7 +354,7 @@ define([
                     data: {'companies': companies, productIds:productIds, removeOldCompanies: '1'},
                     dataType: 'json',
                     success: function(response){
-
+                        showMessage(_.isUndefined(i18n['Saved']) ? 'Saved':i18n['Saved'], false, 5000);
                     }
                 });
 

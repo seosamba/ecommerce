@@ -239,6 +239,7 @@ define([
                             showMessage(response.responseText, true, 5000);
                             return false;
                         } else {
+                            showMessage(_.isUndefined(i18n['Saved. To see the changes please reload the screen.']) ? 'Saved. To see the changes please reload the screen.':i18n['Saved. To see the changes please reload the screen.'], false, 5000);
                             $(this).dialog('close');
                         }
 
