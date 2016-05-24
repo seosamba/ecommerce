@@ -41,6 +41,8 @@ define([
             this.products = new ProductsCollection();
             this.products.on('reset', this.renderProducts, this);
             this.products.on('reset', this.loadStats, this);
+            this.products.on('reset', this.loadSuppliersCompanies, this);
+            this.products.on('reset', this.loadCompanies, this);
             this.products.pager();
             $.extend($.ui.dialog.prototype.options, {
                 modal: true,
@@ -410,6 +412,36 @@ define([
                     }
                 }
             })
+        },
+        loadSuppliersCompanies: function() {
+            var self = this;
+            $.ajax({
+                url: $('#website_url').val()+'api/store/companyproducts/',
+                data: {productIds: this.products.pluck('id').join(','), 'groupByCompany':true},
+                success: function(response){
+                    if (_.isArray(response)){
+                        var suppliersCompanies = _.groupBy(response, function(r){ return r.productId; });
+                        self.products.each(function(prod){
+                            prod.set('suppliersCompanies', _.isUndefined(suppliersCompanies[prod.get('id')]) ? [] : suppliersCompanies[prod.get('id')] );
+                        });
+                    }
+                }
+            });
+        },
+        loadCompanies: function(){
+            var self = this;
+            $.ajax({
+                url: $('#website_url').val()+'api/store/companies/',
+                data: {},
+                success: function(response){
+                    if (_.isArray(response)){
+                        var suppliersCompanies = _.groupBy(response, function(r){ return r.id; });
+                        self.products.each(function(prod){
+                            prod.set('companyInfo', suppliersCompanies);
+                        });
+                    }
+                }
+            });
         }
     });
 
