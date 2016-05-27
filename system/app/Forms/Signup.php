@@ -24,6 +24,8 @@ class Forms_Signup extends Zend_Form {
 
         parent::init();
 
+        $translator =  Zend_Registry::get('Zend_Translate');
+
         $this->setLegend('Sign up')
             ->setAttribs(array(
             'id'     => 'checkout-signup',
@@ -54,6 +56,8 @@ class Forms_Signup extends Zend_Form {
             'required'   => true,
 	        'class'      => array('required')
         )));
+
+        $this->getElement('email')->setErrorMessages(array("'%value%'".' '.$translator->translate('is not a valid email address')));
 
         $this->addElement(new Zend_Form_Element_Select(array(
                 'name'         => 'mobilecountrycode',
