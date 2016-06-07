@@ -409,18 +409,30 @@ class Shopping extends Tools_Plugins_Abstract {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
-				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
+				if (!empty($data['customerPassword'])) {
+                    $password = $data['customerPassword'];
+                } else {
+                    $password = md5(uniqid('customer_' . time()));
+                }
+                $customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
                         ->setMobilePhone($mobilePhone)
-						->setPassword(md5(uniqid('customer_' . time())));
+						->setPassword($password);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
 					$customer->setId($newCustomerId);
 					$session->storeIsNewCustomer = true;
-				}
+                    if (!empty($data['customerPassword'])) {
+                        $session->clientWithNewPassword = true;
+                    } elseif(isset($session->clientWithNewPassword)) {
+                        unset($session->clientWithNewPassword);
+                    }
+				} elseif(isset($session->clientWithNewPassword)) {
+                    unset($session->clientWithNewPassword);
+                }
 			} else {
 				return $existingCustomer;
 			}
@@ -1043,13 +1055,17 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
-				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
-				$userData = $userMapper->find($cartSession->getUserId());
-				$newCustomerPassword = uniqid('customer_' . time());
-				$userData->setPassword($newCustomerPassword);
-				$newCustomerId = $userMapper->save($userData);
+				if (!isset($this->_sessionHelper->clientWithNewPassword)) {
+                    $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                    $userData = $userMapper->find($cartSession->getUserId());
+                    $newCustomerPassword = uniqid('customer_' . time());
+                    $userData->setPassword($newCustomerPassword);
+                    $userMapper->save($userData);
+                }
 				$customer = Models_Mapper_CustomerMapper::getInstance()->find($cartSession->getUserId());
-				$customer->setPassword($newCustomerPassword);
+                if (!isset($this->_sessionHelper->clientWithNewPassword)) {
+                    $customer->setPassword($newCustomerPassword);
+                }
 				$customer->registerObserver(new Tools_Mail_Watchdog(array(
 					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
 				)));
