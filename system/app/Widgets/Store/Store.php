@@ -308,11 +308,9 @@ class Widgets_Store_Store extends Widgets_Abstract {
         if (!empty($cartContent)) {
             $step = '';
             if ($cart->_websiteHelper->getActionController()->getRequest()->has('step')) {
-                if (!empty($cartContent)) {
-                    $step = strtolower($request->getParam('step'));
-                    if ($request->getParam('stepBack')) {
-                        $step = 'address';
-                    }
+                $step = strtolower($request->getParam('step'));
+                if ($request->getParam('stepBack')) {
+                    $step = 'address';
                 }
             }
             $this->_view->currentUser = $currentUser;
