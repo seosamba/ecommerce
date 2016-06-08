@@ -12,11 +12,14 @@ define([
     '../../coupons/views/coupon_form',
     '../../coupons/views/coupons_table',
     '../../groups/views/group_price',
+    '../../quantity-discount-product/views/discount-quantity-form',
+    '../../quantity-discount-product/views/discount-quantity-table',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, i18n){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView,
+            QuantityDiscountFormView, QuantityDiscountTableView, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -82,6 +85,7 @@ define([
                     break;
                     case '#coupon-tab':
                     case '#group-pricing-tab':
+                    case '#quantity-discount-tab':
                         if (self.model.isNew()){
                             showMessage(_.isUndefined(i18n['Please save product information first'])?'Please save product information first':i18n['Please save product information first'], true);
                             return false;
@@ -101,6 +105,13 @@ define([
             this.couponForm.render();
 
             this.groupsPrice = new GroupsPriceView();
+
+            this.discountForm = new QuantityDiscountFormView();
+            this.discountTable = new QuantityDiscountTableView();
+
+            this.discountTable.$el.on('discount:deleted', _.bind(this.discountTable.render, this.discountTable));
+            this.discountTable.$el.on('discount:add', _.bind(this.discountTable.render, this.discountTable));
+            this.discountTable.$el.on('discount:edit', _.bind(this.discountForm.render, this.discountForm));
 
 		},
         initProducts: function(){
@@ -846,6 +857,10 @@ define([
             this.$el.find('#group-regular-price').html(' '+$('#group-products-price-symbol').val()+parseFloat(productPrice).toFixed(2));
             this.groupsPrice.groups.server_api.productId = productId;
             this.groupsPrice.render();
+            this.discountForm.$el.find('input#productId').val(productId);
+            this.discountForm.render();
+            this.discountTable.quantityDiscounts.server_api.productId = productId;
+            this.discountTable.render();
         }
 	});
 

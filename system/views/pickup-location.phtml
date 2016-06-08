@@ -34,8 +34,10 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     ?>
     <ul class="header">
         <?php foreach ($this->pickupLocationsCategories as $category): ?>
-            <li><a data-category-id="<?php echo $category['id']; ?>"
-                   href="#pickup-category-<?php echo $category['id']; ?>"><?php echo $category['name']; ?></a></li>
+            <li><a data-category-id="<?php echo $category['id']; ?>" class="pr0"
+               href="#pickup-category-<?php echo $category['id']; ?>"><?php echo $category['name']; ?></a>
+                <span data-pickup-id="<?php echo $category['id']; ?>" class="delete-pickup-location-category icon12 pointer error ticon-close"></span>
+            </li>
         <?php endforeach; ?>
         <li class="add-new-pickup-location">
             <a id="new-pickup-location-btn" class="ui-tabs-anchor ticon-plus fs16"></a>
@@ -182,8 +184,6 @@ $this->headScript()->setAllowArbitraryAttributes(true)
             </table>
         </div>
         <footer class="grid_12">
-            <a id="delete-pickup-location-category" class="delete-selected-category error"
-               href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a>
         </footer>
     </div>
 </div>

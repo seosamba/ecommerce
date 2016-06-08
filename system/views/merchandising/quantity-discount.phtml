@@ -1,0 +1,81 @@
+<?php $currency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency'); ?>
+<input type="hidden" name="quantity-discount-currency" class="discount-currency" value="<?php echo $currency ?>">
+<form id="quantity-discount-form" class="grid_12 alpha omega background">
+    <div class="grid_1 alpha omega">
+        <?php echo $this->formText(
+            'discountQuantity',
+            null,
+            array(
+                'class' => 'new-discount-quantity',
+                'placeholder' => $this->translate('Enter quantity')
+            )
+        ); ?>
+        <?php echo $this->formSelect(
+            'discountPriceSign',
+            null,
+            array(
+                'id' => 'discount-quantity-sign',
+                'hidden' => 'hidden'
+            ),
+            array(
+                //'plus' => '+',
+                'minus' => '-'
+            )
+        ); ?>
+
+    </div>
+    <div class="grid_2 mt0px labeled icon left">
+        <?php echo $this->formText(
+            'discountAmount',
+            null,
+            array(
+                'class' => 'new-discount-quantity-price-value',
+                'placeholder' => $this->translate('Enter value')
+            )
+        ); ?>
+        <i class="ticon-minus"></i>
+    </div>
+    <div class="grid_1 alpha omega mt0px">
+        <?php echo $this->formSelect(
+            'discountPriceType',
+            null,
+            array(
+                'id' => 'discount-quantity-price-type',
+            ),
+            array(
+                'percent' => '%',
+                'unit' => $currency
+            )
+        ); ?>
+
+    </div>
+    <label class="grid_6 mt5px pointer omega" for="discountGlobal">
+        <?php echo $this->formCheckbox(
+            'applyScope',
+            null,
+            array(
+                'id' => 'discount-quantity-global'
+            )
+        ); ?>
+        <?php echo $this->translate('Overwrite product specific discount when quantity matches'); ?>
+    </label>
+
+    <button class="btn grid_2 omega mt0px ticon-plus" type="submit"><?php echo $this->translate(
+            'Create discount'
+        ); ?></button>
+
+</form>
+
+<div class="grid_12 alpha omega mt15px">
+    <table id="quantity-discount-table" class="table-striped table-hover small mb10px">
+        <thead class="header-inner">
+        <tr>
+            <th><?php echo $this->translate('Quantity'); ?></th>
+            <th><?php echo $this->translate('Default price modifier'); ?></th>
+            <th><?php echo $this->translate('Apply scope'); ?></th>
+            <th class="w10 text-center"><?php echo $this->translate('Action'); ?></th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>

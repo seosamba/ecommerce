@@ -237,9 +237,9 @@ DROP TABLE IF EXISTS `shopping_tax`;
 CREATE TABLE IF NOT EXISTS `shopping_tax` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `zoneId` int(10) unsigned NOT NULL,
-  `rate1` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `rate2` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `rate3` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `rate1` decimal(10,3) NOT NULL DEFAULT '0.00',
+  `rate2` decimal(10,3) NOT NULL DEFAULT '0.00',
+  `rate3` decimal(10,3) NOT NULL DEFAULT '0.00',
   `isDefault` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `zoneId` (`zoneId`)
@@ -622,7 +622,7 @@ CREATE TABLE IF NOT EXISTS `shopping_group_price` (
 
 INSERT INTO `template_type` (`id`, `title`) VALUES
 ('typecheckout', 'Checkout'),
-('typeproduct', 'Product'),
+('typeproduct', 'Product page'),
 ('typelisting', 'Product listing');
 
 CREATE TABLE IF NOT EXISTS `shopping_product_freebies_settings` (
@@ -794,5 +794,43 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
+
+INSERT INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_GroupPriceObserver');
+
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `discount_quantity` int(10) unsigned NOT NULL,
+  `discount_price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `apply_scope` enum('local', 'global') DEFAULT 'local',
+  `discount_amount` DECIMAL(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `shopping_quantity_discount_product` (
+  `product_id` int(10) unsigned NOT NULL,
+  `quantity` int(10) unsigned NOT NULL,
+  `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `status` enum('enabled','disabled') COLLATE utf8_unicode_ci DEFAULT 'enabled',
+  `amount` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`product_id`,`quantity`),
+  CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cart_id` int(10) unsigned NOT NULL,
+  `product_id` int(10) unsigned NOT NULL,
+  `discount_type` VARCHAR(255) NOT NULL,
+  `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount` decimal(10,2) DEFAULT NULL,
+  `unit_save` decimal(10,2) DEFAULT NULL,
+  `order_discount` TINYINT unsigned DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE (`cart_id`, `product_id`, `discount_type`),
+  CONSTRAINT `shopping_cart_session_discount_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `version` = '2.5.1' WHERE `name` = 'shopping';

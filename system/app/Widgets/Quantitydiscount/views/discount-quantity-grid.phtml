@@ -1,0 +1,12 @@
+<?php if (!empty($this->quantityDiscountPrices)): ?>
+    <?php foreach ($this->quantityDiscountPrices as $quantity => $discountInfo): ?>
+        <?php $discountAmount = $this->currency->toCurrency($discountInfo['unitSave']);?>
+        <span>
+            <?php echo $this->translate('Buy') . ' ' . $quantity . ' ' . $this->translate(
+                'for'
+            ) . ' ' . $this->currency->toCurrency($discountInfo['price']) . ' ' . $this->translate(
+                'each and save'
+            ) . ' ' . $discountAmount; ?>
+        </span>
+    <?php endforeach; ?>
+<?php endif; ?>

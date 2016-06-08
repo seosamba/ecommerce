@@ -117,8 +117,10 @@ class Forms_Checkout_Pickup extends Zend_Form {
         $this->getElement('submitpickup')->removeDecorator('Label');
         $this->getElement('submitpickup')->removeDecorator('HtmlTag');
         $this->getElement('step')->removeDecorator('HtmlTag');
+
         $this->getElement('mobilecountrycode')->removeDecorator('HtmlTag');
         $this->getElement('mobile')->removeDecorator('HtmlTag');
+
 	}
 
 }

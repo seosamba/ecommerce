@@ -71,15 +71,21 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 	private function _processCartContent(Models_Model_CartSession $cartSession){
 		$cartSessionContentDbTable = new Models_DbTable_CartSessionContent();
+        $cartSessionDiscounts = new Models_DbTable_CartSessionDiscount();
 		$content = $cartSession->getCartContent();
 
         $cartSessionContentDbTable->getAdapter()->beginTransaction();
 		$cartSessionId = $cartSession->getId();
 
 		$cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSessionId));
+        $cartSessionDiscounts->delete(array('cart_id = ?' => $cartSessionId));
         if (!empty($content)) {
             foreach ($content as $item) {
 	            $productId = isset($item['product_id']) ? $item['product_id'] : $item['id'];
+
+                if (!empty($item['productDiscounts'])) {
+                    $this->_processDiscounts($item['productDiscounts'], $cartSessionId, $productId);
+                }
 
 	            $data = array(
 		            'cart_id' => $cartSessionId,
@@ -104,6 +110,31 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
         }
         $cartSessionContentDbTable->getAdapter()->commit();
 	}
+
+    /**
+     * Save discounts for each product in cart
+     *
+     * @param array $discounts
+     * @param int $cartId cart id
+     * @param int $productId product id
+     */
+    private function _processDiscounts(array $discounts, $cartId, $productId)
+    {
+        $cartSessionDiscounts = new Models_DbTable_CartSessionDiscount();
+        foreach ($discounts as $key => $discount) {
+            $data = array(
+                'cart_id' => $cartId,
+                'product_id' => $productId,
+                'discount_type' => $discount['name'],
+                'price_sign' => $discount['sign'],
+                'price_type' => $discount['type'],
+                'discount' => $discount['discount'],
+                'unit_save' => $discount['unitSave'],
+                'order_discount' => $key+1
+            );
+            $cartSessionDiscounts->insert($data);
+        }
+    }
 
 	/**
 	 * Search for cart session by id
@@ -145,12 +176,20 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		if (!empty($content)){
 			$cartId = $model->getId();
 
+            $discounts = $this->_restoreDiscountsForCartSession($cartId);
+
 			foreach ($content as &$item) {
 				if (!empty($item['options'])) {
 					parse_str($item['options'], $tmpOptions);
 					$options = $this->_restoreOptionsForCartSession($tmpOptions);
 					$item['options'] = empty($options) ? null : $options;
 				}
+                if (!empty($discounts) && array_key_exists($item['product_id'], $discounts)) {
+                    $item['productDiscounts'] = $discounts[$item['product_id']];
+                } else {
+                    $item['productDiscounts'] = array();
+                }
+
 			}
 
 			$model->setCartContent($content);
@@ -248,11 +287,52 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		return $result;
 	}
 
+
+    /**
+     * Prepare discounts for each product in cart
+     *
+     * @param int $cartId cart id
+     * @return array discounts data
+     */
+    protected function _restoreDiscountsForCartSession($cartId)
+    {
+        $discountData = array();
+        $cartDiscountTable = new Models_DbTable_CartSessionContent();
+        $where = $cartDiscountTable->getAdapter()->quoteInto('cart_id = ?', $cartId);
+        $select = $cartDiscountTable->select()->setIntegrityCheck(false)->from('shopping_cart_session_discount',
+            array(
+                'product_id',
+                'discount_type',
+                'price_sign',
+                'price_type',
+                'discount',
+                'unit_save',
+                'order_discount'
+            ))->where($where);
+        $result = $cartDiscountTable->fetchAll($select);
+        $cartDiscounts = $result->toArray();
+        if (!empty($cartDiscounts)) {
+            foreach ($cartDiscounts as $discount) {
+                $discountData[$discount['product_id']][$discount['order_discount'] - 1] = array(
+                    'type' => $discount['price_type'],
+                    'sign' => $discount['price_sign'],
+                    'discount' => $discount['discount'],
+                    'name' => $discount['discount_type'],
+                    'unitSave' => $discount['unit_save']
+                );
+            }
+
+        }
+
+        return $discountData;
+    }
+
     public function updateAddress($oldTokenId, $type = 'shipping', $data = array()){
             $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $oldTokenId);
             if($type == 'billing') {
                 $where = $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $oldTokenId);
             }
             return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
+
     }
 }

@@ -93,6 +93,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_discountTaxRate = 0;
 
+    protected $_discounts = array();
+    
     protected $_freeCart = 0;
 
     protected $_recurringId = null;
@@ -100,7 +102,6 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_refundAmount = '';
 
     protected $_refundNotes = '';
-
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -323,6 +324,17 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         return $this->_discountTaxRate;
     }
 
+    public function setDiscounts($discounts)
+    {
+        $this->_discounts = $discounts;
+        return $this;
+    }
+
+    public function getDiscounts()
+    {
+        return $this->_discounts;
+    }
+
     public function setFreeCart($freeCart) {
         $this->_freeCart = $freeCart;
         return $this;
@@ -387,6 +399,5 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
         return $this;
     }
-
 
 }

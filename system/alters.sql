@@ -209,13 +209,61 @@ UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_p
 ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info';
 
-
-
 INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
 SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_refund'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
 NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
 WHERE `enabled` = '1' AND `trigger_name` = 'store_refund' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+-- 21/07/2015
+-- version: 2.4.5
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `discount_quantity` int(10) unsigned NOT NULL,
+  `discount_price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount_price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `apply_scope` enum('local', 'global') DEFAULT 'local',
+  `discount_amount` DECIMAL(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_quantity_discount_product` (
+  `product_id` int(10) unsigned NOT NULL,
+  `quantity` int(10) unsigned NOT NULL,
+  `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `status` enum('enabled','disabled') COLLATE utf8_unicode_ci DEFAULT 'enabled',
+  `amount` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`product_id`,`quantity`),
+  CONSTRAINT `shopping_quantity_discount_product_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 21/07/2015
+-- version: 2.4.6
+-- update version
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cart_id` int(10) unsigned NOT NULL,
+  `product_id` int(10) unsigned NOT NULL,
+  `discount_type` VARCHAR(255) NOT NULL,
+  `price_sign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `price_type` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `discount` decimal(10,2) DEFAULT NULL,
+  `unit_save` decimal(10,2) DEFAULT NULL,
+  `order_discount` TINYINT unsigned DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE (`cart_id`, `product_id`, `discount_type`),
+  CONSTRAINT `shopping_cart_session_discount_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_GroupPriceObserver');
+
+-- 02/11/2015
+-- version: 2.4.7
+-- change tax precision
+ALTER TABLE `shopping_tax` MODIFY `rate1` decimal(10,3) NOT NULL DEFAULT '0.00';
+ALTER TABLE `shopping_tax` MODIFY `rate2` decimal(10,3) NOT NULL DEFAULT '0.00';
+ALTER TABLE `shopping_tax` MODIFY `rate3` decimal(10,3) NOT NULL DEFAULT '0.00';
 
 -- 15/10/2015
 -- version: 2.5.0
@@ -233,4 +281,3 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.5.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
-

@@ -4,7 +4,7 @@
         $values = empty($this->nocount) ? $this->values : array_flip($this->values);
     ?>
     <?php foreach ($values as $value => $count) : ?>
-        <li>
+        <li class="category_<?php echo filter_var(preg_replace("/[^A-Za-z0-9]/", '_', $value), FILTER_SANITIZE_STRING);?>">
             <label>
                 <input type="checkbox"
                        name="<?php echo $this->name; ?>"

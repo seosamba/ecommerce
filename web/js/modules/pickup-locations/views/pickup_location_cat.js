@@ -7,7 +7,7 @@ define([
         events: {
             'click .uploader-category-logo': 'triggerUpload',
             'blur .change-category-label': 'changeCategoryName',
-            'click #delete-pickup-location-category': 'deleteCategory',
+            'click .delete-pickup-location-category': 'deleteCategory',
             'click #new-pickup-location-btn': 'addCategory'
         },
         templates: {
@@ -68,25 +68,24 @@ define([
                 data:{name:name, secureToken:$('.secure-token-pickup-cat').val()},
                 dataType: 'json',
                 success: function(id) {
-                    self.$el.find('.ui-tabs-nav .add-new-pickup-location').before('<li><a data-category-id="'+id+'" href="#pickup-category-'+id+'">'+name+'</a></li>');
+                    self.$el.find('.ui-tabs-nav .add-new-pickup-location').before('<li><a class="pb0" data-category-id="'+id+'" href="#pickup-category-'+id+'">'+name+
+                    '</a><span id="'+id+'" class="delete-pickup-location-category icon12 pointer error ticon-close"></span></li>');
                     self.$el.find('.header').after('<div id="pickup-category-'+id+'"></div>');
                     self.$el.tabs('refresh');
+
                 }
             });
         },
-        deleteCategory: function(){
-            var currentCategoryId = $(".ui-state-active").find('a').data('category-id');
-            var index = $('#manage-pickup-locations').tabs('option', 'active');
-
+        deleteCategory: function(e){
+            var currentCategoryId = $(e.currentTarget).data('pickup-id'),
+                removeEl = $(e.currentTarget).parent('li');
             var self = this;
             var model = this.categories.get(currentCategoryId);
-            showConfirm('Are you sure?', function(){
+            showConfirm('Are you sure want delete '+ model.get('name')+ ' ?', function(){
                 if (model){
                     showSpinner();
                     model.destroy({success:function(){
-                        var tab = $('#manage-pickup-locations').find('.ui-tabs-nav li:eq('+index+')').remove();
-                        var panelId = tab.attr( "aria-controls" );
-                        $( "#" + panelId ).remove();
+                        removeEl.remove();
                         $('#manage-pickup-locations').tabs("refresh");
                         $('#edit-pickup-location').trigger('pickupLocation:created');
                         $('#edit-pickup-location').trigger('pickupLocation:deleted');

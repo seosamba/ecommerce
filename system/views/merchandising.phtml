@@ -10,7 +10,6 @@ $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
-
 <?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->currency)); ?>
 <div id="merchandising" class="seotoaster container">
 <?php
@@ -39,12 +38,16 @@ $this->headLink()
                 <?php endforeach; ?>
             <?php endif; ?>
             <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
+            <li><a href="#quantity-discount"><?php echo $this->translate('Quantity discount');?></a></li>
         </ul>
         <div id="coupons">
             <?php echo $this->partial('merchandising/coupon.phtml'); ?>
         </div>
         <div id="group-pricing">
             <?php echo $this->partial('merchandising/grouping.phtml'); ?>
+        </div>
+        <div id="quantity-discount">
+            <?php echo $this->partial('merchandising/quantity-discount.phtml'); ?>
         </div>
         <div id="recurring-payments">
             <?php echo $this->partial('merchandising/recurring.phtml'); ?>

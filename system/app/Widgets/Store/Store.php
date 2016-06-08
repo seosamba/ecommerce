@@ -13,6 +13,8 @@ class Widgets_Store_Store extends Widgets_Abstract {
 	 */
 	protected $_cacheable      = false;
 
+    protected $_sessionHelper = null;
+
 	private static $_zendRegistryKey = 'store-cart-plugin';
 
     protected function _load() {
@@ -46,6 +48,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$this->_view = new Zend_View();
 		$this->_view->websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
 		$this->_view->setScriptPath(realpath(__DIR__.DIRECTORY_SEPARATOR.'views'));
+        $this->_sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
 	}
 
 
@@ -149,6 +152,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
             
 			if ($cartSession instanceof Models_Model_CartSession){
 				$cartContent = $cartSession->getCartContent();
+                $shippingAddress = null;
+                if (null !== ($shippingAddressId = $cartSession->getShippingAddressId())){
+                    $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);
+                }
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
                 $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 				$this->_view->shoppingConfig = $shoppingConfig;
@@ -158,7 +165,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
                         $cartContent[$key]['mpn']      = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
-                        $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
+                        $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, $shippingAddress, true);
                     }
                 }
 
@@ -278,5 +285,60 @@ class Widgets_Store_Store extends Widgets_Abstract {
         $this->_view->currentRecurringPaymentType = $shoppingCart->getRecurringPaymentType();
         $this->_view->activeRecurringPaymentTypes = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringTypes();
         return $this->_view->render('recurring.phtml');
+    }
+
+    protected function _makeOptionCheckoutbreacrumb()
+    {
+        $stepLabels = array();
+        if (isset($this->_options[1])) {
+            $stepLabels = explode(',', $this->_options[1]);
+        }
+        $this->_view->steplabels = $stepLabels;
+        $currentUser = $this->_sessionHelper->getCurrentUser()->getRoleId();
+        $this->_getCheckoutPage();
+        $cart = Tools_ShoppingCart::getInstance();
+        $freeShipping = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_FREESHIPPING);
+        if (!empty($freeShipping['enabled']) && !empty($freeShipping['config'])) {
+            if ($freeShipping['config']['cartamount'] < $cart->getTotal()) {
+                $this->_view->freeShipping = true;
+            }
+        }
+        $request = $cart->_websiteHelper->getActionController()->getRequest();
+        $cartContent = $cart->getContent();
+        if (!empty($cartContent)) {
+            $step = '';
+            if ($cart->_websiteHelper->getActionController()->getRequest()->has('step')) {
+                $step = strtolower($request->getParam('step'));
+                if ($request->getParam('stepBack')) {
+                    $step = 'address';
+                }
+            }
+            $this->_view->currentUser = $currentUser;
+            $this->_view->step = $step;
+
+            return $this->_view->render('checkoutbreacrumb.phtml');
+        }
+
+        return '';
+
+    }
+
+    protected function _getCheckoutPage()
+    {
+        $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
+        if (null === ($checkoutPage = $cacheHelper->load(Shopping::CHECKOUT_PAGE_CACHE_ID, Shopping::CACHE_PREFIX))) {
+            $checkoutPage = Tools_Misc::getCheckoutPage();
+            if (!$checkoutPage instanceof Application_Model_Models_Page) {
+                if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
+                    throw new Exceptions_SeotoasterPluginException('Error rendering cart. Please select a checkout page');
+                }
+                throw new Exceptions_SeotoasterPluginException('<!-- Error rendering cart. Please select a checkout page -->');
+            }
+            $cacheHelper->save(Shopping::CHECKOUT_PAGE_CACHE_ID, $checkoutPage, 'store_', array(),
+                Helpers_Action_Cache::CACHE_SHORT);
+        }
+        $this->_view->checkoutPage = $checkoutPage;
+
+        return $checkoutPage;
     }
 }

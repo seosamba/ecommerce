@@ -239,6 +239,7 @@ $this->headLink()
                 <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
                 <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
                 <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
+                <li><a href="#quantity-discount-tab"><?php echo $this->translate('Quantity discount'); ?></a></li>
                 <li><a href="#group-pricing-tab"><?php echo $this->translate('Groups'); ?></a></li>
                 <?php foreach ($this->plugins as $plugin) : ?>
                     <?php
@@ -416,6 +417,10 @@ $this->headLink()
             <?php echo $this->partial('merchandising/coupon.phtml'); ?>
         </div>
 
+        <div id="quantity-discount-tab">
+                    <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for quantity dicount from this screen.'); ?></p>
+                    <?php echo $this->partial('product/product-quantity-discount.phtml'); ?>
+                </div>
         <div id="group-pricing-tab">
             <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
             <?php echo $this->partial('product/grouping-price.phtml'); ?>

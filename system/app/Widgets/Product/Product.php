@@ -15,6 +15,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 	const PRICE_MODE_CURRENCY   = 'currency';
 
+    const PRICE_MODE_ORIGINAL = 'original';
+
 	/**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -251,6 +253,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		$noCurrency = array_search(self::PRICE_MODE_NOCURRENCY, $this->_options);
 		$lifeReload = array_search(self::PRICE_MODE_LIFERELOAD, $this->_options);
         $currency   = array_search(self::PRICE_MODE_CURRENCY, $this->_options);
+        $original   = array_search(self::PRICE_MODE_ORIGINAL, $this->_options);
 
 		if ($noCurrency !== false){
 			unset($this->_options[$noCurrency]);
@@ -273,7 +276,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         
 		if (!empty($this->_options)){
             $pluginName = strtolower($this->_options[0]);
-			if ($pluginName === 'original'){
+			if ($pluginName === self::PRICE_MODE_ORIGINAL){
 				if (is_null($this->_product->getCurrentPrice())){
 					return null;
 				} else {
@@ -312,7 +315,17 @@ class Widgets_Product_Product extends Widgets_Abstract {
                 }
             }
         }
-      
+        if ($original === false) {
+            $discountedPrice = Tools_DiscountTools::applyDiscountRules(array(
+                'originalPrice' => $this->_product->getPrice(),
+                'id' => $this->_product->getId(),
+                'qty' => 1,
+                'options' => $this->_parseOptions($this->_product),
+                'productDiscounts' => $this->_product->getProductDiscounts()
+            ));
+            $this->_product->setCurrentPrice($discountedPrice['price']);
+            $itemDefaultOptionsArray = array();
+        }
         $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($this->_product, $itemDefaultOptionsArray);
         if($currency === true){
             if ($this->_cacheable) {
@@ -345,13 +358,44 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 		return $price;
 	}
-	
+
+    /**
+     * Prepare product options
+     *
+     * @param Models_Model_Product $item product model
+     * @return array
+     */
+    private function _parseOptions(Models_Model_Product $item)
+    {
+        $modifiers = array();
+        $defaultOptions = $item->getDefaultOptions();
+        foreach ($defaultOptions as $defaultOption) {
+            switch ($defaultOption['type']) {
+                case Models_Model_Option::TYPE_DROPDOWN:
+                case Models_Model_Option::TYPE_RADIO:
+                    $defaultSelections = $defaultOption['selection'];
+                    if (empty($defaultSelections)) {
+                        return array();
+                    }
+                    foreach ($defaultSelections as $defaultSelection) {
+                        if ($defaultSelection['isDefault']) {
+                            $modifiers[$defaultOption['title']] = $defaultSelection;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return $modifiers;
+    }
+
 	private function _renderBrand() {
 		return $this->_product->getBrand();
 	}
 	
 	private function _renderOptions() {
 		$this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
+        $this->_view->discountRules = $this->_product->getProductDiscounts();
 		return $this->_view->render('options.phtml');
 	}
 	

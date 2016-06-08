@@ -32,9 +32,9 @@ unset($cur, $format);
 <?php foreach ($this->product->getDefaultOptions() as $option): ?>
     <?php $uniqName = 'product-'.$this->product->getId().'-option-'.$option['id']; ?>
     <?php
+    $defaultId = null;
+    $options = array();
     if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN || $option['type'] === Models_Model_Option::TYPE_RADIO) {
-        $options = array();
-        $defaultId = null;
 	    $template = $option['type'] === Models_Model_Option::TYPE_RADIO ? ' <span>(%s%s)</span>' : ' (%s%s)';
         if (!empty($option['selection'])) {
             foreach ($option['selection'] as $item) {
@@ -42,16 +42,27 @@ unset($cur, $format);
                 if (floatval($item['priceValue']) != 0){
                     if ($item['priceType'] === 'unit'){
                         $price = floatval($item['priceValue']);
+                        if (!empty($this->discountRules)) {
+                            foreach ($this->discountRules as $discountRule) {
+                                $price = Tools_DiscountTools::applyDiscountData($price, $discountRule, false, true);
+                            }
+                        }
                         if ($this->taxRate && (bool)$showWithTax){
                             $price = $price + round(( $this->taxRate * $price) / 100, 2);
                         }
                         $item['priceValue'] = $this->currency($price);
                         $pricesData['original'][$item['id']] = $item['priceSign'] . $price;
-                        $pricesData['current'][$item['id']] = $item['priceSign'] . $price;
+                        $pricesData['current'][$item['id']] = $item['priceSign'] .  $price;
                         unset($price);
                     } else {
+                        $modifiedOptionPrice = round($originalPrice / 100 * $item['priceValue'], 2);
+                        if (!empty($this->discountRules)) {
+                            foreach ($this->discountRules as $discountRule) {
+                                $modifiedOptionPrice = round(Tools_DiscountTools::applyDiscountData($modifiedOptionPrice, $discountRule, false, true), 2);
+                            }
+                        }
                         $pricesData['original'][$item['id']] = $item['priceSign'] . round($originalPrice / 100 * $item['priceValue'], 2);
-                        $pricesData['current'][$item['id']] = $item['priceSign'] . round($currentPrice / 100 * $item['priceValue'], 2);
+                        $pricesData['current'][$item['id']] = $item['priceSign'] . $modifiedOptionPrice;
                         $item['priceValue'] = number_format($item['priceValue'], 2).'%';
                     }
                     $options[$item['id']] .= sprintf($template, $item['priceSign'], $item['priceValue']);
@@ -77,9 +88,6 @@ unset($cur, $format);
 				<input type="date" class="option-datepicker" name="<?php echo  $uniqName;?>" />
 		        <span class="ticon-calendar icon16" onclick="$('input[name=<?php echo  $uniqName;?>]').focus();"></span>
 		    </div>
-	    <?php if(!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PAGE_PROTECTED)): ?>
-            <link rel="stylesheet" href="<?php echo $this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css'; ?>">
-		    <?php endif; ?>
 	    <?php endif; ?>
     </div>
 <?php endforeach; ?>
