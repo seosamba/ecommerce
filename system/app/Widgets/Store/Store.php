@@ -287,9 +287,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
         return $this->_view->render('recurring.phtml');
     }
 
-    protected function _makeOptionCheckoutbreacrumb() {
+    protected function _makeOptionCheckoutbreacrumb()
+    {
         $stepLabels = array();
-        if(isset($this->_options[1])){
+        if (isset($this->_options[1])) {
             $stepLabels = explode(',', $this->_options[1]);
         }
         $this->_view->steplabels = $stepLabels;
@@ -297,27 +298,35 @@ class Widgets_Store_Store extends Widgets_Abstract {
         $this->_getCheckoutPage();
         $cart = Tools_ShoppingCart::getInstance();
         $freeShipping = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_FREESHIPPING);
-        if($freeShipping && (bool)$freeShipping['enabled'] && isset($freeShipping['config']) && !empty($freeShipping['config'])){
-            if($freeShipping['config']['cartamount'] < $cart->getTotal()){
+        if (!empty($freeShipping['enabled']) && !empty($freeShipping['config'])) {
+            if ($freeShipping['config']['cartamount'] < $cart->getTotal()) {
                 $this->_view->freeShipping = true;
             }
         }
         $request = $cart->_websiteHelper->getActionController()->getRequest();
         $cartContent = $cart->getContent();
-        $step = (empty($cartContent)) ? false : true;
-        if ($cart->_websiteHelper->getActionController()->getRequest()->has('step')) {
-            if(!empty($cartContent)) {
-                $step = strtolower($request->getParam('step'));
-                if($request->getParam('stepBack')){
-                    $step =  'address';
+        if (!empty($cartContent)) {
+            $step = '';
+            if ($cart->_websiteHelper->getActionController()->getRequest()->has('step')) {
+                if (!empty($cartContent)) {
+                    $step = strtolower($request->getParam('step'));
+                    if ($request->getParam('stepBack')) {
+                        $step = 'address';
+                    }
                 }
             }
+            $this->_view->currentUser = $currentUser;
+            $this->_view->step = $step;
+
+            return $this->_view->render('checkoutbreacrumb.phtml');
         }
-        $this->_view->currentUser = $currentUser;
-        $this->_view->step = $step;
-        return $this->_view->render('checkoutbreacrumb.phtml');
+
+        return null;
+
     }
-    protected function _getCheckoutPage() {
+
+    protected function _getCheckoutPage()
+    {
         $cacheHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('cache');
         if (null === ($checkoutPage = $cacheHelper->load(Shopping::CHECKOUT_PAGE_CACHE_ID, Shopping::CACHE_PREFIX))) {
             $checkoutPage = Tools_Misc::getCheckoutPage();
@@ -327,9 +336,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 }
                 throw new Exceptions_SeotoasterPluginException('<!-- Error rendering cart. Please select a checkout page -->');
             }
-            $cacheHelper->save(Shopping::CHECKOUT_PAGE_CACHE_ID, $checkoutPage, 'store_', array(), Helpers_Action_Cache::CACHE_SHORT);
+            $cacheHelper->save(Shopping::CHECKOUT_PAGE_CACHE_ID, $checkoutPage, 'store_', array(),
+                Helpers_Action_Cache::CACHE_SHORT);
         }
         $this->_view->checkoutPage = $checkoutPage;
+
         return $checkoutPage;
     }
 }

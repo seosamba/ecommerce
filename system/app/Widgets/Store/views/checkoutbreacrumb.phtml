@@ -1,44 +1,42 @@
 <ul class="pagination-breadcrumb">
     <?php
     $breadCrumb = '';
-    $startName           = $this->translate('Start');
-    $shippingAddrName    = $this->translate('Shipping address');
+    $startName = $this->translate('Start');
+    $shippingAddrName = $this->translate('Shipping address');
     $shippingCarrierName = $this->translate('Shipping carrier');
-    $paymentName         = $this->translate('Payment');
-    if(!empty($this->steplabels)){
+    $paymentName = $this->translate('Payment');
+    if (!empty($this->steplabels)) {
         $startName = isset($this->steplabels[0]) ? $this->steplabels[0] : $startName;
         $shippingAddrName = isset($this->steplabels[1]) ? $this->steplabels[1] : $shippingAddrName;
         $shippingCarrierName = isset($this->steplabels[2]) ? $this->steplabels[2] : $shippingCarrierName;
         $paymentName = isset($this->steplabels[3]) ? $this->steplabels[3] : $paymentName;
     }
-    $start = '<li><a href="'. $this->websiteUrl . $this->checkoutPage->getUrl().'">'. $startName .'</a></li>';
-    $startPlus = '<li><span>'. $shippingAddrName .'</span></li>';
-    $address = '<li><a href="'. $this->websiteUrl . $this->checkoutPage->getUrl().'?step='.Cart::STEP_SHIPPING_OPTIONS.'">'. $shippingAddrName .'</a></li>';
-    $addressPlus = '<li><span>'. $shippingCarrierName .'</span></li>';
-    $method = '<li><a href="'. $this->websiteUrl . $this->checkoutPage->getUrl().'?step='.Cart::STEP_SHIPPING_METHOD.'&stepBack=address">'. $shippingCarrierName .'</a></li>';
-    $methodPlus = '<li><span>'. $paymentName .'</span></li>';
+    $start = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '">' . $startName . '</a></li>';
+    $startPlus = '<li><span>' . $shippingAddrName . '</span></li>';
+    $address = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . Cart::STEP_SHIPPING_OPTIONS . '">' . $shippingAddrName . '</a></li>';
+    $addressPlus = '<li><span>' . $shippingCarrierName . '</span></li>';
+    $method = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . Cart::STEP_SHIPPING_METHOD . '&stepBack=address">' . $shippingCarrierName . '</a></li>';
+    $methodPlus = '<li><span>' . $paymentName . '</span></li>';
     ?>
 
-    <?php if($this->currentUser === Tools_Security_Acl::ROLE_GUEST):?>
-        <?php if($this->step):?>
-            <?php $breadCrumb = '<li><span class="current">'. $startName .'</span></li>';?>
-        <?php endif;?>
-        <?php if($this->step === 'signup' || $this->step === 'shipping'):?>
-            <?php $breadCrumb = $start.$startPlus;?>
-        <?php endif;?>
-    <?php else:?>
-        <?php if($this->step || $this->step === 'shipping'):?>
-            <?php $breadCrumb = $start.$startPlus;?>
-        <?php endif;?>
-    <?php endif;?>
-    <?php if($this->step === 'address'):?>
-        <?php $breadCrumb = $start.$address.$addressPlus;?>
-        <?php if($this->freeShipping):?>
-            <?php $breadCrumb = $start.$address.$methodPlus;?>
-        <?php endif;?>
-    <?php endif;?>
-    <?php if($this->step === 'method'):?>
-        <?php $breadCrumb = $start.$address.$method.$methodPlus;?>
-    <?php endif;?>
-    <?php echo $breadCrumb;?>
+    <?php if ($this->currentUser === Tools_Security_Acl::ROLE_GUEST): ?>
+        <?php $breadCrumb = '<li><span class="current">' . $startName . '</span></li>'; ?>
+        <?php if ($this->step === 'signup' || $this->step === 'shipping'): ?>
+            <?php $breadCrumb = $start . $startPlus; ?>
+        <?php endif; ?>
+    <?php else: ?>
+        <?php if ($this->step === 'shipping'): ?>
+            <?php $breadCrumb = $start . $startPlus; ?>
+        <?php endif; ?>
+    <?php endif; ?>
+    <?php if ($this->step === 'address'): ?>
+        <?php $breadCrumb = $start . $address . $addressPlus; ?>
+        <?php if ($this->freeShipping): ?>
+            <?php $breadCrumb = $start . $address . $methodPlus; ?>
+        <?php endif; ?>
+    <?php endif; ?>
+    <?php if ($this->step === 'method'): ?>
+        <?php $breadCrumb = $start . $address . $method . $methodPlus; ?>
+    <?php endif; ?>
+    <?php echo $breadCrumb; ?>
 </ul>
