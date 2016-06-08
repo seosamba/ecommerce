@@ -321,7 +321,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
             return $this->_view->render('checkoutbreacrumb.phtml');
         }
 
-        return null;
+        return '';
 
     }
 
