@@ -304,6 +304,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
             }
         }
         $request = $cart->_websiteHelper->getActionController()->getRequest();
+        $merchandisingStep = $this->_sessionHelper->merchandisingZoneTmpl;
+        if(!empty($merchandisingStep) && $request->getParam('step') == 'method'){
+            $this->_view->merchandising = true;
+        }
         $cartContent = $cart->getContent();
         if (!empty($cartContent)) {
             $step = '';
@@ -311,6 +315,12 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 $step = strtolower($request->getParam('step'));
                 if ($request->getParam('stepBack')) {
                     $step = 'address';
+                }
+                if ($request->getParam('stepBackMerchandising')) {
+                    $this->_view->merchandisingBack = true;
+                }
+                if($merchandisingStep && $this->_view->freeShipping){
+                    $this->_view->merchandising = true;
                 }
             }
             $this->_view->currentUser = $currentUser;
