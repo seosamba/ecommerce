@@ -83,6 +83,37 @@ class Forms_Signup extends Zend_Form {
             'decorators' => array('ViewHelper')
         )));
 
+        $this->addElement(
+            new Zend_Form_Element_Password(array(
+                'name' => 'customerPassword',
+                'id' => '',
+                'label' => 'Password',
+                'required' => true,
+                'validators' => array(
+                    new Zend_Validate_StringLength(array(
+                        'encoding' => 'UTF-8',
+                        'min' => 4
+                    )),
+                ),
+                'filters' => array('StringTrim')
+            ))
+        );
+
+        $this->getElement('customerPassword')->getValidator('stringLength')->setMessage('*** is less than 4 characters long');
+
+        $this->addElement(
+            new Zend_Form_Element_Password(array(
+                'name' => 'customerPassConfirmation',
+                'id' => '',
+                'label' => 'Confirm password',
+                'required' => true,
+                'validators' => array(
+                    'NotEmpty',
+                    array('identical', false, array('token' => 'customerPassword'))
+                ),
+            ))
+        );
+
         $this->setElementDecorators(array(
             'ViewHelper',
             'Errors',

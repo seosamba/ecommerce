@@ -76,13 +76,13 @@ class Tools_InventoryObserver implements Interfaces_Observer {
 		}
 		$this->_dbTable->getAdapter()->beginTransaction();
 		foreach ($this->_object->getCartContent() as $cartItem){
+            $options = array();
             if (!empty($cartItem['options'])) {
-                $options = array();
                 foreach ($cartItem['options'] as  $optionData) {
                     $options[$optionData['option_id']] = $optionData['id'];
                 }
-                Tools_Misc::applyInventory($cartItem['product_id'], $options, $cartItem['qty'], Tools_InventoryObserver::INVENTORY_UPDATE_STOCK);
             }
+            Tools_Misc::applyInventory($cartItem['product_id'], $options, $cartItem['qty'], Tools_InventoryObserver::INVENTORY_UPDATE_STOCK);
 
             $inventory = $this->_dbTable->getAdapter()->quoteInto($sqlExpr, intval($cartItem['qty']));
 			$where = $this->_dbTable->getAdapter()->quoteInto('id = ? AND inventory IS NOT NULL', $cartItem['product_id']);
