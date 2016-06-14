@@ -90,6 +90,7 @@ class Forms_Signup extends Zend_Form {
                 'label' => 'Password',
                 'required' => true,
                 'validators' => array(
+                    'NotEmpty',
                     new Zend_Validate_StringLength(array(
                         'encoding' => 'UTF-8',
                         'min' => 4
@@ -100,6 +101,8 @@ class Forms_Signup extends Zend_Form {
         );
 
         $this->getElement('customerPassword')->getValidator('stringLength')->setMessage('*** is less than 4 characters long');
+        $this->getElement('customerPassword')->getValidator('NotEmpty')->setMessage('Please enter a password');
+
 
         $this->addElement(
             new Zend_Form_Element_Password(array(
@@ -113,6 +116,9 @@ class Forms_Signup extends Zend_Form {
                 ),
             ))
         );
+
+        $this->getElement('customerPassConfirmation')->getValidator('NotEmpty')->setMessage('Please enter a password');
+        $this->getElement('customerPassConfirmation')->getValidator('identical')->setMessage('Please make sure that your passwords match');
 
         $this->setElementDecorators(array(
             'ViewHelper',
