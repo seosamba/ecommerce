@@ -1,18 +1,13 @@
 <ul class="pagination-breadcrumb">
     <?php
     $breadCrumb = '';
-    $startName = $this->translate('Start');
-    $shippingAddrName = $this->translate('Shipping address');
-    $shippingCarrierName = $this->translate('Shipping carrier');
-    $merchandisingName = $this->translate('Merchandising');
-    $paymentName = $this->translate('Payment');
-    if (!empty($this->steplabels)) {
-        $startName = isset($this->steplabels[0]) ? $this->steplabels[0] : $startName;
-        $shippingAddrName = isset($this->steplabels[1]) ? $this->steplabels[1] : $shippingAddrName;
-        $shippingCarrierName = isset($this->steplabels[2]) ? $this->steplabels[2] : $shippingCarrierName;
-        $merchandisingName = isset($this->steplabels[3]) ? $this->steplabels[3] : $merchandisingName;
-        $paymentName = isset($this->steplabels[4]) ? $this->steplabels[4] : $paymentName;
-    }
+
+    $startName = $this->steplabels[0];
+    $shippingAddrName = $this->steplabels[1];
+    $shippingCarrierName = $this->steplabels[2];
+    $merchandisingName = $this->steplabels[3];
+    $paymentName = $this->steplabels[4];
+
     $start = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '">' . $startName . '</a></li>';
     $startPlus = '<li><span>' . $shippingAddrName . '</span></li>';
     $address = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . Cart::STEP_SHIPPING_OPTIONS . '">' . $shippingAddrName . '</a></li>';
@@ -25,62 +20,105 @@
 
     $pathAAp = $address . $addressPlus;
     $pathASSp = $address . $shipping . $shippingPlus;
-    $pathASMc = $address . $shipping . $merchandisingCurrent;
+    $pathASMcMp = $address . $shipping . $merchandisingCurrent . $merchandisingPlus;
     $pathASMMp = $address . $shipping . $merchandising. $merchandisingPlus;
     $pathAMMp = $address . $merchandising . $merchandisingPlus;
-    $pathAMc = $address . $merchandisingCurrent;
+    $pathAMcMp = $address . $merchandisingCurrent . $merchandisingPlus;
     $pathAMp = $address . $merchandisingPlus;
     $pathASMp = $address . $shipping . $merchandisingPlus;
-    $pathAMMp = $address . $merchandising. $merchandisingPlus;
+    $pathSpApMcMp = $startPlus . $addressPlus . $merchandisingCurrent . $merchandisingPlus;
+    $pathSpMcMp = $startPlus . $merchandisingCurrent . $merchandisingPlus;
+    $pathSpApMp = $startPlus . $addressPlus . $merchandisingPlus;
+    $pathSpMp = $startPlus . $merchandisingPlus;
+    $pathMcMp = $merchandisingCurrent . $merchandisingPlus;
     ?>
     <?php
     if ($this->currentUser === Tools_Security_Acl::ROLE_GUEST){
-        $breadCrumb = '<li><span class="current">' . $startName . '</span></li>';
+        $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $startPlus . $addressPlus . $pathMcMp;
+        if(empty($this->merchandising)){
+            $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $pathSpApMp;
+        }
+        if($this->freeShipping){
+            $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $pathMcMp;
+            if(empty($this->merchandising)){
+                $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $pathSpMp;
+            }
+            if(!empty($this->merchandising)){
+                $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $pathSpMcMp;
+            }
+        }
         if ($this->step === 'signup' || $this->step === 'shipping'){
-            $breadCrumb = $start . $startPlus;
+            $breadCrumb = $start . $pathSpApMcMp;
+            if($this->freeShipping){
+                $breadCrumb =  $start . $pathSpMcMp;
+            }
+            if(empty($this->merchandising)){
+                $breadCrumb =  $start . $pathSpApMp;
+                if($this->freeShipping){
+                    $breadCrumb =  $start . $pathSpMp;
+                }
+            }
         }
         if($this->step === 'address'){
-            $breadCrumb = $start . $pathAAp;
+            $breadCrumb = $start . $pathAAp .$pathMcMp;
+            if(empty($this->merchandising)){
+                $breadCrumb =  $start . $pathAAp . $merchandisingPlus;
+            }
         }
         if($this->step === 'method'){
             $breadCrumb = $start . $pathASSp;
             if($this->merchandising){
-                $breadCrumb = $start . $pathASMc;
+                $breadCrumb = $start . $pathASMcMp;
             }
         }
         if($this->step === 'merchandising'){
             $breadCrumb = $start . $pathASMMp;
             if($this->merchandisingBack){
-                $breadCrumb = $start . $pathASMc;
+                $breadCrumb = $start . $pathASMcMp;
             }
             if($this->freeShipping && $this->merchandising){
                 $breadCrumb = $start . $pathAMMp;
                 if($this->merchandisingBack){
-                    $breadCrumb = $start . $pathAMc;
+                    $breadCrumb = $start . $pathAMcMp;
                 }
             }
         }
         if($this->step === 'address' && $this->freeShipping){
-            $breadCrumb = $start . $pathAMc;
+            $breadCrumb = $start . $pathAMcMp;
             if(empty($this->merchandising)){
                 $breadCrumb = $start . $pathAMp;
             }
         }
     }else{
         if (empty($this->step) || $this->step === 'shipping'){
-            $breadCrumb = $startPlus;
+            $breadCrumb = $pathSpApMcMp;
+            if($this->freeShipping){
+                $breadCrumb =  $pathSpMcMp;
+            }
+            if(empty($this->merchandising)){
+                $breadCrumb = $pathSpApMp;
+                if($this->freeShipping){
+                    $breadCrumb = $pathSpMp;
+                }
+            }
         }
         if ($this->step === 'address'){
-            $breadCrumb = $pathAAp;
+            $breadCrumb = $pathAAp . $pathMcMp;
             if($this->freeShipping){
                 $breadCrumb = $pathAMp;
             }
             if($this->freeShipping && $this->merchandising){
-                $breadCrumb = $pathAMc;
+                $breadCrumb = $pathAMcMp;
+            }
+            if(empty($this->merchandising)){
+                $breadCrumb =  $pathAAp .  $merchandisingPlus;
+                if($this->freeShipping){
+                    $breadCrumb = $pathAMp;
+                }
             }
         }
         if ($this->step === 'method'){
-            $breadCrumb = $pathASMc;
+            $breadCrumb = $pathASMcMp;
             if(empty($this->merchandising)){
                 $breadCrumb = $pathASMp;
             }
@@ -88,12 +126,12 @@
         if ($this->step === 'merchandising'){
             $breadCrumb = $pathASMMp;
             if($this->merchandisingBack){
-                $breadCrumb = $pathASMc;
+                $breadCrumb = $pathASMcMp;
             }
             if ($this->freeShipping && $this->merchandising){
                 $breadCrumb = $pathAMMp;
                 if($this->merchandisingBack){
-                    $breadCrumb = $pathAMc;
+                    $breadCrumb = $pathAMcMp;
                 }
             }
         }

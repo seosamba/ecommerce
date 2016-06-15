@@ -289,9 +289,21 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
     protected function _makeOptionCheckoutbreacrumb()
     {
+        $translator = Zend_Registry::get('Zend_Translate');
+        $defaultLabelsNames = array(
+            $translator->translate('Start'),
+            $translator->translate('Shipping address'),
+            $translator->translate('Shipping carrier'),
+            $translator->translate('Merchandising'),
+            $translator->translate('Payment')
+        );
+
         $stepLabels = array();
         if (isset($this->_options[1])) {
             $stepLabels = explode(',', $this->_options[1]);
+            if(count($stepLabels) < count($defaultLabelsNames)){
+                $stepLabels = $defaultLabelsNames;
+            }
         }
         $this->_view->steplabels = $stepLabels;
         $currentUser = $this->_sessionHelper->getCurrentUser()->getRoleId();
@@ -322,6 +334,9 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 if($merchandisingStep && $this->_view->freeShipping){
                     $this->_view->merchandising = true;
                 }
+            }
+            if(!empty($merchandisingStep)){
+                $this->_view->merchandising = true;
             }
             $this->_view->currentUser = $currentUser;
             $this->_view->step = $step;
