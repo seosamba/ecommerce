@@ -8,7 +8,6 @@
     $merchandisingName = $this->steplabels[3];
     $paymentName = $this->steplabels[4];
 
-    //$startName = '<li><span class="current">' . $startName . '</span></li>';
     $start = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '">' . $startName . '</a></li>';
     $startPlus = '<li><span>' . $shippingAddrName . '</span></li>';
     $address = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . Cart::STEP_SHIPPING_OPTIONS . '">' . $shippingAddrName . '</a></li>';
@@ -35,7 +34,7 @@
     ?>
     <?php
     if ($this->currentUser === Tools_Security_Acl::ROLE_GUEST){
-        $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $addressPlus . $pathMcMp;
+        $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $startPlus . $addressPlus . $pathMcMp;
         if(empty($this->merchandising)){
             $breadCrumb = '<li><span class="current">' . $startName . '</span></li>' . $pathSpApMp;
         }
