@@ -5,12 +5,7 @@
 <td><%= brand %></td>
 <td class="editable " data-prop="sku"><%= sku %></td>
 <td class="editable" data-prop="mpn"><%= mpn %></td>
-<% if (freeShipping == '0' || _.isNull(freeShipping)){%>
-    <td><%= _.isUndefined(i18n['no']) ? 'no':i18n['no'] %></td>
-<% } %>
-<% if (freeShipping == '1'){%>
-    <td><%= _.isUndefined(i18n['yes']) ? 'yes':i18n['yes'] %></td>
-<% } %>
+<td><%= (freeShipping == '1') ? i18n['yes'] : i18n['no'] %></td>
 <td class="editable" data-prop="weight"><%= weight %></td>
 <% if (_.isNull(inventory)){%>
 <td><%= _.isUndefined(i18n['null']) ? "&infin;":i18n['&infin;'] %></td>

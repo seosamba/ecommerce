@@ -15,23 +15,23 @@
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
         <div class="grid_9 omega">
-            <div class="grid_4 alpha mb20px">
+            <div class="grid_4 alpha ">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
                     <?php foreach($this->brands as $brand):?>
                         <option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_4 omega mb20px">
+            <div class="grid_4 alpha omega ">
                 <select class="pfilter" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
                     <?php foreach($this->tags as $tag):?>
                         <option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_4 omega mb20px">
+            <div class="grid_4 omega ">
                 <select class="pfilter" name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
-                    <option value="0"><?php echo $this->translate('Select all');?></option>
+                    <option value="select"><?php echo $this->translate('Select all');?></option>
                     <?php foreach($this->inventory as $qty):?>
                         <option value="<?php echo $qty;?>"><?php echo $qty;?></option>
                     <?php endforeach;?>
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-	<table class="products-table widget omega" width="100%">
+	<table class="products-table widget omega">
 		<thead>
 			<tr>
 				<th><input type="checkbox" name="check-all" title="<?php echo $this->translate('Select all');?>"></th>

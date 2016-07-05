@@ -104,7 +104,10 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
-            $filter['inventory']  = array_filter(filter_var_array((array)$this->_request->getParam('fqty'), FILTER_SANITIZE_STRING));
+			$filter['inventory']  = (array)$this->_request->getParam('fqty');
+
+			$filter['inventory'] = (!in_array('select', $filter['inventory'])) ? $filter['inventory'] : array();
+
             if(in_array(html_entity_decode('&infin;'), $filter['inventory'])){
                 $filter['inventory'][array_search(html_entity_decode('&infin;'), $filter['inventory'])] = 'infinity';
             }
@@ -114,7 +117,7 @@ class Api_Store_Products extends Api_Service_Abstract {
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
             $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) .implode(',', $filter['inventory']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
-			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
+			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null || empty($data['data'])) {
 
 				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, $order, $offset, $limit, (bool)$key?$key:null,
 					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
