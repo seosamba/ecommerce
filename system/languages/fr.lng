@@ -628,6 +628,9 @@
         'state'=>'Etat',
         'zip'=>'Code postal',
         'phone'=>'Téléphone',
-        'mobile'=>'Mobile'
+        'mobile'=>'Mobile',
+        'Deleted'=>'Supprimé',
+        'Are you sure want to delete?' => 'Etes-vous sûr de vouloir supprimer?',
+        'Custom Shipper' => 'Expéditeur Personnalisé'
 
 );?>

@@ -76,6 +76,7 @@ $this->headLink()
                 </li>
             <?php endforeach; ?>
                 <li><a href="#orderconfig" data-plugin="orderconfig"><?php echo $this->translate('Minimum order'); ?></a></li>
+                <li><a href="#trackingurl" data-plugin="trackingurl"><?php echo $this->translate("Carrier tracking url's"); ?></a></li>
             </ul>
             <div id="pane-container" class="grid_8 omega">
             <div id="shippingzones">
@@ -222,6 +223,31 @@ $this->headLink()
                         </fieldset>
                     </form>
             </div>
+            <div id="trackingurl">
+                <div>
+                    <fieldset class="background trackingUrl">
+                        <legend class="background large p5px"><?php echo $this->translate("Carrier tracking url's"); ?></legend>
+                        <div class="labeled" style="text-align: center; line-height: 30px;">
+                            <button class="btn success grid_6 alpha fl-left ticon-plus trackingUrl-plus" for="cartamount"><?php echo $this->translate($this->trackingUrlForm->getElement('addNew')->getLabel()); ?></button>
+                            <span>OR</span>
+                            <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_5 omega fl-right')->renderViewHelper(); ?>
+                        </div>
+                        <div class="add-new row-close" data-current="" style="display: none;">
+                            <span class="grid_4 alpha" style="text-align: center"><?php echo $this->translate('Name');?>
+                                <input type="text" id="name" name="name" />
+                            </span>
+                            <span class="grid_7 omega" style="text-align: center"><?php echo $this->translate('Service url');?>
+                                <input type="text" id="url" name="url" />
+                            </span>
+                                <button style="margin-top: 20px;" class="grid_1 omega remove-pickup-location-shipping-url link fl-right btn icon inverse-error ticon-close" title="<?php echo $this->translate('Remove');?>"></button>
+                        </div>
+                        <div>
+                            <button class="btn grid_4 omega fl-right save-data" style="margin-top: 10px;"><?php echo $this->translate('Save');?></button>
+                        </div>
+
+                    </fieldset>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -233,6 +259,136 @@ $this->headLink()
 
 <script>
 $(function(){
+    $(document).on("click", ".trackingUrl-plus", function () {
+        var selfdata = this,
+            addnew = $(selfdata).closest('.trackingUrl').find('.add-new');
+
+        $('#name').val('');
+        $('#url').val('');
+        addnew.data('current','');
+        if(addnew.hasClass("row-open")){
+            addnew.addClass("add-new-config").removeClass( "row-open").addClass( "row-close");
+            $("#shipping-url").val(0).prop("selected", false).show();
+        }else{
+            if (addnew.hasClass("add-new-config")) {
+                addnew.removeClass("add-new-config").hide();
+            } else {
+                addnew.addClass("add-new-config").show();
+            }
+        }
+    });
+
+    $(document).on("change", "#shipping-url", function () {
+        var selectValue = $('#shipping-url').val(),
+            selfdata = this,
+            addnew = $(selfdata).closest('.trackingUrl').find('.add-new'),
+            secureToken = '<?php echo $this->secureToken?>';
+
+        if (selectValue == '0') {
+            addnew.removeClass( "add-new-config" ).removeClass( "row-open").addClass( "row-close").data('current','').hide();
+        } else{
+            var selectData = {
+                id: selectValue,
+                secureToken: secureToken
+            };
+
+            $.ajax({
+                url: '<?php echo $this->websiteUrl?>plugin/shopping/run/getShippingUrlData',
+                dataType: 'json',
+                data: selectData,
+                type: 'POST'
+            }).done(function (response) {
+                if(response.error === 1){
+                    return false;
+                }
+                $('#name').val(response.responseText.name);
+                $('#url').val(response.responseText.url);
+                addnew.addClass( "add-new-config" ).removeClass( "row-close" ).addClass("row-open").data('current', response.responseText.current).show();
+            });
+        }
+    });
+
+    $(document).on("click", ".save-data", function () {
+      var name =  $('#name').val(),
+          url = $('#url').val(),
+          selfdata = this,
+          addnew = $(selfdata).closest('.trackingUrl').find('.add-new'),
+          current = addnew.data('current'),
+          secureToken = '<?php echo $this->secureToken?>';
+        if(name == '') {
+            showMessage('field not been empty');
+            return false;
+        }
+            var data = {
+                trackingName: name,
+                url: url,
+                currentId: current,
+                secureToken: secureToken
+            };
+                $.ajax({
+                    url: '<?php echo $this->websiteUrl?>plugin/shopping/run/setShippingUrlData',
+                    dataType: 'json',
+                    data: data,
+                    type: 'POST'
+                }).done(function (response) {
+                    if(response.error === 1){
+                        showMessage(response.responseText.msg, true, 2000);
+                        return false;
+                    }
+                    var optVal = response.responseText.optionName,
+                        optionUpdateStatus = response.responseText.optionUpdateStatus,
+                        optionUpdateId = response.responseText.optionId,
+                        optionValues = '';
+                    addnew.data('current','').removeClass( "row-open" );
+                    if(optionUpdateStatus) {
+                        $("#shipping-url option[value='"+optionUpdateId+"']").remove();
+                    }
+                    $("#shipping-url option[value='"+optionUpdateId+"']").each(function() {
+                        optionValues = optionUpdateId ;
+                    });
+                    if(optionValues == ''){
+                        $("#shipping-url").append('<option value="'+optionUpdateId+'">'+optVal+'</option>');
+                    }
+                    showMessage(response.responseText.msg, false, 2000);
+
+                    if(addnew.hasClass("add-new-config")){
+                        addnew.removeClass( "add-new-config" ).hide();
+                    }
+                    $("#shipping-url").val(0).prop("selected", false);
+                });
+
+    });
+
+    $(document).on('click', '.remove-pickup-location-shipping-url', function(){
+          var selectName = $('#shipping-url').val(),
+              selfdata = this,
+              row = $(selfdata).closest('.trackingUrl').find('.add-new'),
+              secureToken = '<?php echo $this->secureToken?>';
+
+        if(selectName === '0'){
+            return false;
+        }
+        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+            var selectId = row.data('current');
+            row.removeClass( "add-new-config" );
+            row.hide();
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/deleteShippingUrlData/selectId/'+selectId+'/secureToken/'+secureToken,
+                type: 'DELETE',
+                dataType: 'json'
+            }).done(function(response) {
+                if(response.error === 1){
+                    return false;
+                }
+                var optionId = response.responseText.optionId;
+                $("#shipping-url option[value="+optionId+"]").remove();
+                $("#shipping-url").val(0).prop("selected", false);
+                row.data('current','').removeClass( "row-open" );
+                showMessage(response.responseText.msg, false, 2000);
+            });
+        });
+    });
+
     $('form#general-config :input').on('change', function(){
         $.post($('#website_url').val()+'plugin/shopping/run/setConfig', $(this).closest('form').serialize());
     });

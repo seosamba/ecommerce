@@ -630,9 +630,10 @@ class Tools_ShoppingCart {
 					->setShippingAddressId($this->_shippingAddressKey)
 					->setBillingAddressId($this->_billingAddressKey);
 		}
-
-		if ($customer->getReferer()) {
-			$cartSession->setReferer($customer->getReferer());
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Session');
+		
+		if(!empty($sessionHelper->refererUrl)){
+			$cartSession->setReferer($sessionHelper->refererUrl);
 		}
 
         if (null !== ($shippingData = $this->getShippingData())) {

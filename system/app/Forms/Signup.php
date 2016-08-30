@@ -24,6 +24,8 @@ class Forms_Signup extends Zend_Form {
 
         parent::init();
 
+        $translator =  Zend_Registry::get('Zend_Translate');
+
         $this->setLegend('Sign up')
             ->setAttribs(array(
             'id'     => 'checkout-signup',
@@ -55,6 +57,8 @@ class Forms_Signup extends Zend_Form {
 	        'class'      => array('required')
         )));
 
+        $this->getElement('email')->setErrorMessages(array("'%value%'".' '.$translator->translate('is not a valid email address')));
+
         $this->addElement(new Zend_Form_Element_Select(array(
                 'name'         => 'mobilecountrycode',
                 'label'        => null,
@@ -82,6 +86,43 @@ class Forms_Signup extends Zend_Form {
             'label'  => 'Next',
             'decorators' => array('ViewHelper')
         )));
+
+        $this->addElement(
+            new Zend_Form_Element_Password(array(
+                'name' => 'customerPassword',
+                'id' => '',
+                'label' => 'Password',
+                'required' => true,
+                'validators' => array(
+                    'NotEmpty',
+                    new Zend_Validate_StringLength(array(
+                        'encoding' => 'UTF-8',
+                        'min' => 4
+                    )),
+                ),
+                'filters' => array('StringTrim')
+            ))
+        );
+
+        $this->getElement('customerPassword')->getValidator('stringLength')->setMessage('*** is less than 4 characters long');
+        $this->getElement('customerPassword')->getValidator('NotEmpty')->setMessage('Please enter a password');
+
+
+        $this->addElement(
+            new Zend_Form_Element_Password(array(
+                'name' => 'customerPassConfirmation',
+                'id' => '',
+                'label' => 'Confirm password',
+                'required' => true,
+                'validators' => array(
+                    'NotEmpty',
+                    array('identical', false, array('token' => 'customerPassword'))
+                ),
+            ))
+        );
+
+        $this->getElement('customerPassConfirmation')->getValidator('NotEmpty')->setMessage('Please enter a password');
+        $this->getElement('customerPassConfirmation')->getValidator('identical')->setMessage('Please make sure that your passwords match');
 
         $this->setElementDecorators(array(
             'ViewHelper',
