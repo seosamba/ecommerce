@@ -357,8 +357,14 @@ class Tools_ShoppingCart {
                         if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
                             $cartItem['groupPriceEnabled'] = 0;
                             $product->setGroupPriceEnabled(0);
-                            $product->setPrice($cartItem['originalPrice']);
-                            $cartItem['price'] = $cartItem['originalPrice'];
+                            $originalProduct = new Models_Model_Product(array(
+                                'price'    => $cartItem['originalPrice'],
+                                'taxClass' => $cartItem['taxClass']
+                            ));
+                            $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
+                            $product->setPrice($changedPrice);
+                            $cartItem['price'] = $changedPrice;
+
                         }
                     }
 
