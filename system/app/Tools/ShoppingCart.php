@@ -357,10 +357,12 @@ class Tools_ShoppingCart {
                         if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
                             $cartItem['groupPriceEnabled'] = 0;
                             $product->setGroupPriceEnabled(0);
-                            $originalProduct = new Models_Model_Product(array(
-                                'price'    => $cartItem['originalPrice'],
-                                'taxClass' => $cartItem['taxClass']
-                            ));
+                            $originalProduct =  Models_Mapper_ProductMapper::getInstance()->find($cartItem['id']);
+                            $originalProduct->setTaxClass($cartItem['taxClass']);
+//                            $originalProduct = new Models_Model_Product(array(
+//                                'price'    => $cartItem['originalPrice'],
+//                                'taxClass' => $cartItem['taxClass']
+//                            ));
                             $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
                             $product->setPrice($changedPrice);
                             $cartItem['price'] = $changedPrice;
