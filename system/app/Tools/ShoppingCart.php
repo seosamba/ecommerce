@@ -324,6 +324,7 @@ class Tools_ShoppingCart {
             $freebiesProductsInCart = array();
             $notFreebiesProductsInCart = array();
             $notFreebiesProductsInCartStorageKeys = array();
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
 			if (is_array($this->_content) && !empty($this->_content)) {
 				foreach ($this->_content as $storageKey => &$cartItem) {
 					if (isset($cartItem['sid'])) {
@@ -357,10 +358,8 @@ class Tools_ShoppingCart {
                         if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
                             $cartItem['groupPriceEnabled'] = 0;
                             $product->setGroupPriceEnabled(0);
-                            $originalProduct = new Models_Model_Product(array(
-                                'price'    => $cartItem['originalPrice'],
-                                'taxClass' => $cartItem['taxClass']
-                            ));
+                            $originalProduct = $productMapper->find($cartItem['id']);
+                            $originalProduct->setTaxClass($cartItem['taxClass']);
                             $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
                             $product->setPrice($changedPrice);
                             $cartItem['price'] = $changedPrice;
