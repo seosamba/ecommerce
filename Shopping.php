@@ -892,32 +892,34 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($this->_request->isPost()) {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
-                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-                $selectedName = '';
-                $url = '';
-                $paramData = $params['shippingTrackingId'];
-                $currentData = '';
-                $shippingUrlMapper->clearDefaultStatus();
-                    if(!empty($params['trackingUrlId'])){
+                if (isset($params['shippingTrackingId'])) {
+                    $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                    $selectedName = '';
+                    $url = '';
+                    $paramData = $params['shippingTrackingId'];
+                    $currentData = '';
+                    $shippingUrlMapper->clearDefaultStatus();
+                    if (!empty($params['trackingUrlId'])) {
                         $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
-                        if(!empty($currentData)) {
+                        if (!empty($currentData)) {
                             $selectedName = $currentData->getName();
                             $url = $currentData->getUrl();
                             $currentData->setDefaultStatus(1);
                             $shippingUrlMapper->save($currentData);
                         }
                     }
-                        unset($params['trackingUrlId'], $params['id']);
-                        if($currentData instanceof Models_Model_ShippingUrl){
-                            $params['shippingTrackingId'] = trim($currentData->getUrl()).trim($paramData);
-                        }
-                        $order->registerObserver(new Tools_Mail_Watchdog(array(
-                            'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
-                            'name' => $selectedName,
-                            'code' => $paramData,
-                            'url' =>  $url
-                        )));
-                        $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                    unset($params['trackingUrlId'], $params['id']);
+                    if ($currentData instanceof Models_Model_ShippingUrl) {
+                        $params['shippingTrackingId'] = trim($currentData->getUrl()) . trim($paramData);
+                    }
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
+                        'name' => $selectedName,
+                        'code' => $paramData,
+                        'url' => $url
+                    )));
+                    $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                }
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
