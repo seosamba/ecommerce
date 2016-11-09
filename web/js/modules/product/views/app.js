@@ -296,14 +296,14 @@ define([
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
-				this.$('#product-enabled').attr('checked', 'checked');
+                this.$('#product-enabled').prop('checked',true);
 			} else {
 				this.$('#product-enabled').removeAttr('checked');
 			}
 
             //toggle free-shipping flag
             if (parseInt(this.model.get('freeShipping'))){
-                this.$('#free-shipping').attr('checked', 'checked');
+                this.$('#free-shipping').prop('checked',true);
             } else {
                 this.$('#free-shipping').removeAttr('checked');
             }

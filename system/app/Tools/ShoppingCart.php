@@ -324,6 +324,7 @@ class Tools_ShoppingCart {
             $freebiesProductsInCart = array();
             $notFreebiesProductsInCart = array();
             $notFreebiesProductsInCartStorageKeys = array();
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
 			if (is_array($this->_content) && !empty($this->_content)) {
 				foreach ($this->_content as $storageKey => &$cartItem) {
 					if (isset($cartItem['sid'])) {
@@ -357,8 +358,12 @@ class Tools_ShoppingCart {
                         if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
                             $cartItem['groupPriceEnabled'] = 0;
                             $product->setGroupPriceEnabled(0);
-                            $product->setPrice($cartItem['originalPrice']);
-                            $cartItem['price'] = $cartItem['originalPrice'];
+                            $originalProduct = $productMapper->find($cartItem['id']);
+                            $originalProduct->setTaxClass($cartItem['taxClass']);
+                            $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
+                            $product->setPrice($changedPrice);
+                            $cartItem['price'] = $changedPrice;
+
                         }
                     }
 
@@ -624,9 +629,10 @@ class Tools_ShoppingCart {
 					->setShippingAddressId($this->_shippingAddressKey)
 					->setBillingAddressId($this->_billingAddressKey);
 		}
-
-		if ($customer->getReferer()) {
-			$cartSession->setReferer($customer->getReferer());
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Session');
+		
+		if(!empty($sessionHelper->refererUrl)){
+			$cartSession->setReferer($sessionHelper->refererUrl);
 		}
 
         if (null !== ($shippingData = $this->getShippingData())) {
