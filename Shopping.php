@@ -718,7 +718,38 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		$offset = intval($nextPage) * $limit;
 		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
-		if (!empty($products)) {
+        //-------------------------------------------------------------------------------------
+        $draglist_id = $this->_request->getParam('draglist_id');
+        $dragMapper = Models_Mapper_DraggableMapper::getInstance();
+        $search = $dragMapper->find($draglist_id);
+        if ($search) {
+            $search = $search->toArray();
+            $this->draglist['list_id'] = $search['list_id'];
+            $this->draglist['data'] = unserialize($search['data']);
+            $current_products_id = array();
+            for ($i = $offset; $i < ($offset + $limit); $i++) {
+                if (count($this->draglist['data']) > $offset&&isset($this->draglist['data'][$i])) {
+                    $current_products_id[] = $this->draglist['data'][$i];
+                }
+            }
+            if (!empty($current_products_id)) {
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                    $current_products_id));
+                $final = array();
+                for ($i = 0; $i < count($current_products_id); $i++) {
+                    foreach ($res as $product) {
+                        $prod_id = $product->getId();
+                        if ($current_products_id[$i] == $prod_id) {
+                            $final[$i] = $product;
+                        }
+                    }
+                }
+                $products = $final;
+            }
+        }
+        //-------------------------------------------------------------------------------------
+        if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
 			$content = $widget->setProducts($products)->setCleanListOnly(true)->render();
@@ -1971,6 +2002,34 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         return $arr;
+    }
+    public function saveDragListOrderAction()
+    {
+        $draglist = $this->_request->getParams(array('list_data', 'list_id'));
+        $mapper = Models_Mapper_DraggableMapper::getInstance();
+        $data = array(
+            'list_id' => $draglist['list_id'],
+            'data' => serialize($draglist['list_data']
+            )
+        );
+        $search = $mapper->find($draglist['list_id']);
+
+        if ($search) {
+            $draglistTable = new Models_DbTable_Draggable();
+            $where = $draglistTable->getAdapter()->quoteInto('list_id = ?', $data['list_id']);
+            $draglistTable->update(array('data' => serialize($draglist['list_data'])), $where);
+            echo json_encode(array('updated' => true));
+            die();
+        } else {
+
+            $draglistTable = new Models_DbTable_Draggable();
+
+            $draglistTable->insert($data);
+            echo json_encode(array('exists' => false));
+            die();
+        }
+        die('Something wrong');
+
     }
 
 }

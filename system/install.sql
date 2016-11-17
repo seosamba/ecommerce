@@ -796,3 +796,9 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
 UPDATE `plugin` SET `version` = '2.5.1' WHERE `name` = 'shopping';
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `list_id` char(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` varchar(500) COLLATE 'utf8_unicode_ci' NOT NULL
+) ENGINE='InnoDB' COLLATE 'utf8_unicode_ci';
+ALTER TABLE `shopping_draggable`
+ADD PRIMARY KEY `list_id` (`list_id`);

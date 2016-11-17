@@ -1,0 +1,46 @@
+<ul id="sortable-<?php echo $this->draglist_id; ?>" style="list-style: none;">
+    <?php foreach ($this->dragproducts as $product): ?>
+        <?php
+        $img = $product->getPhoto();
+        $img_arr = explode('/', $img);
+
+        ?>
+        <li>
+            <p class="product_id" style="display: none;"><?php echo $product->getId(); ?></p>
+            <img src="<?php echo $this->websiteUrl . 'media/' . $img_arr[0] . '/small/' . $img_arr[1]; ?>" alt="">
+            <p><?php echo $product->getName(); ?></p>
+        </li>
+    <?php endforeach; ?>
+</ul>
+<input id="website_url" type="hidden" value="<?php echo $this->websiteUrl; ?>">
+<input id="<?php echo $this->draglist_id; ?>" type="hidden" value="<?php echo $this->draglist_id; ?>">
+<button id="save_drag_pos-<?php echo $this->draglist_id; ?>">Save position</button>
+<script>
+    $(function () {
+        $("#sortable-<?php echo $this->draglist_id; ?>").sortable();
+        $("#sortable-<?php echo $this->draglist_id; ?>").disableSelection();
+    });
+    $('#save_drag_pos-<?php echo $this->draglist_id; ?>').click(function () {
+        var sort_order = [];
+        $('#sortable-<?php echo $this->draglist_id; ?> li p.product_id').each(function (index) {
+            sort_order.push($(this).text());
+        });
+        console.log(sort_order);
+
+        var action = $('#website_url').val() + 'plugin/shopping/run/saveDragListOrder';
+        var data = {'list_data': sort_order, 'list_id': $('#<?php echo $this->draglist_id; ?>').val()}
+        $.ajax({
+            url: action,
+            data: data,
+            type: 'post',
+            dataType: 'json',
+            error: function (e) {
+                console.log(e);
+            },
+            success: function (res) {
+                console.log(res);
+            }
+        });
+
+    });
+</script>

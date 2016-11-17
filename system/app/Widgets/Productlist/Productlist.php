@@ -113,6 +113,33 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
+        //-----------------------------------------------------------------------
+        $this->_sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $role = $this->_sessionHelper->getCurrentUser()->getRoleId();
+        if ($role != 'guest' && strlen($last) < 10) {
+            $last = 0;
+        } elseif ($role == 'guest' && strlen($last) < 10) {
+            $this->last = $last;
+        }
+        $front = Zend_Controller_Front::getInstance();
+        $this->_request = $front->getRequest();
+        $draglist_id = $this->_request->getParam('draglist_id');
+        /* $draglist_id = isset($this->_request->getParam('draglist_id')) ? $this->_request->getParam('draglist_id') : md5(implode(',',
+             $this->_options));*/
+        if (null === $draglist_id) {
+            $draglist_id = md5(implode(',', $this->_options));
+        }
+        if (array_search('draggable', $this->_options)) {
+            $dragMapper = Models_Mapper_DraggableMapper::getInstance();
+            $search = $dragMapper->find($draglist_id);
+            if ($search) {
+                $search = $search->toArray();
+                $this->draglist['list_id'] = $search['list_id'];
+                $this->draglist['data'] = unserialize($search['data']);
+            }
+
+        }
+        //-----------------------------------------------------------------------
 
         if (is_numeric($last)) {
             $last = abs(intval($last));
@@ -160,6 +187,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         }
 
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
+        //----------------------------------------------------------------------------------------------------
+
+        $this->_view->draglist_id = $draglist_id;
+        foreach ($this->_options as $option) {
+            if ($role != 'guest' && array_search('draggable', $this->_options)) {
+                return $this->_view->render('draggable.phtml');
+            }
+        }
+//----------------------------------------------------------------------------------------------------
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
 		} elseif (!intval($this->_options[0])) {
@@ -169,6 +205,22 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 		return $this->_view->render('productlist.phtml');
 	}
+
+    protected function _dragListNewOrder()
+    {
+        if (isset($this->draglist) && is_array($this->draglist['data']) && isset($this->dragproducts) && is_array($this->dragproducts)) {
+            $res = array();
+            for ($i = 0; $i < count($this->draglist['data']); $i++) {
+                foreach ($this->dragproducts as $product) {
+                    $prod_id = $product->getId();
+                    if ($this->draglist['data'][$i] == $prod_id) {
+                        $res[$i] = $product;
+                    }
+                }
+            }
+            return $res;
+        }
+    }
 
 	/**
 	 * The main list proccessing function
@@ -185,6 +237,38 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
+        //------------------------------------------------------------------------------------
+        if (isset($this->last) && is_numeric($this->last) && isset($this->draglist)) {
+            $neededIds = array();
+            for ($i = 0; $i < $this->last; $i++) {
+                $neededIds[] = $this->draglist['data'][$i];
+            }
+            if (!empty($neededIds)) {
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                    $neededIds));
+                $final = array();
+                for ($i = 0; $i < count($neededIds); $i++) {
+                    foreach ($res as $product) {
+                        $prod_id = $product->getId();
+                        if ($neededIds[$i] == $prod_id) {
+                            $final[$i] = $product;
+                        }
+                    }
+                }
+                $products = $final;
+            }
+
+        } else {
+            $this->_view->dragproducts = $products;
+            $this->dragproducts = $products;
+        }
+
+        if (is_array($res = $this->_dragListNewOrder()) && (count($res) > 0)) {
+            $products = $res;
+            $this->_view->dragproducts = $products;
+        }
+//--------------------------------------------------------------------------------------
 		$this->_view->totalCount = sizeof($products);
 		$wesiteData = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
