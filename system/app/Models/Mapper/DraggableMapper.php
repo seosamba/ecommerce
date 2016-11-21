@@ -12,15 +12,6 @@ class Models_Mapper_DraggableMapper extends Application_Model_Mappers_Abstract
     {
     }
 
-    public function find($id)
-    {
-        $result = $this->getDbTable()->find($id);
-        if (0 == count($result)) {
-            return;
-        }
-        $row = $result->current();
-        return $row;
-    }
 
 
 }

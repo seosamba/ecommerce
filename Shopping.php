@@ -719,28 +719,27 @@ class Shopping extends Tools_Plugins_Abstract {
 		$offset = intval($nextPage) * $limit;
 		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
         //-------------------------------------------------------------------------------------
-        $draglist_id = $this->_request->getParam('draglist_id');
+        $draglistId = $this->_request->getParam('draglist_id');
         $dragMapper = Models_Mapper_DraggableMapper::getInstance();
-        $search = $dragMapper->find($draglist_id);
-        if ($search) {
-            $search = $search->toArray();
-            $this->draglist['list_id'] = $search['list_id'];
-            $this->draglist['data'] = unserialize($search['data']);
-            $current_products_id = array();
+        $dragModel = $dragMapper->find($draglistId);
+        if ($dragModel) {
+            $this->draglist['list_id'] = $dragModel->getId();
+            $this->draglist['data'] = unserialize($dragModel->getData());
+            $currentProductsId = array();
             for ($i = $offset; $i < ($offset + $limit); $i++) {
-                if (count($this->draglist['data']) > $offset&&isset($this->draglist['data'][$i])) {
-                    $current_products_id[] = $this->draglist['data'][$i];
+                if (count($this->draglist['data']) > $offset && isset($this->draglist['data'][$i])) {
+                    $currentProductsId[] = $this->draglist['data'][$i];
                 }
             }
-            if (!empty($current_products_id)) {
+            if (!empty($currentProductsId)) {
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
                 $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
-                    $current_products_id));
+                    $currentProductsId));
                 $final = array();
-                for ($i = 0; $i < count($current_products_id); $i++) {
+                for ($i = 0; $i < count($currentProductsId); $i++) {
                     foreach ($res as $product) {
-                        $prod_id = $product->getId();
-                        if ($current_products_id[$i] == $prod_id) {
+                        $prodId = $product->getId();
+                        if ($currentProductsId[$i] == $prodId) {
                             $final[$i] = $product;
                         }
                     }
@@ -2016,7 +2015,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
         if ($search) {
             $draglistTable = new Models_DbTable_Draggable();
-            $where = $draglistTable->getAdapter()->quoteInto('list_id = ?', $data['list_id']);
+            $where = $draglistTable->getAdapter()->quoteInto('id = ?', $data['list_id']);
             $draglistTable->update(array('data' => serialize($draglist['list_data'])), $where);
             echo json_encode(array('updated' => true));
             die();

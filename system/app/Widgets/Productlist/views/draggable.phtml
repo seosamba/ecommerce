@@ -19,28 +19,31 @@
     $(function () {
         $("#sortable-<?php echo $this->draglist_id; ?>").sortable();
         $("#sortable-<?php echo $this->draglist_id; ?>").disableSelection();
-    });
-    $('#save_drag_pos-<?php echo $this->draglist_id; ?>').click(function () {
-        var sort_order = [];
-        $('#sortable-<?php echo $this->draglist_id; ?> li p.product_id').each(function (index) {
-            sort_order.push($(this).text());
-        });
-        console.log(sort_order);
 
-        var action = $('#website_url').val() + 'plugin/shopping/run/saveDragListOrder';
-        var data = {'list_data': sort_order, 'list_id': $('#<?php echo $this->draglist_id; ?>').val()}
-        $.ajax({
-            url: action,
-            data: data,
-            type: 'post',
-            dataType: 'json',
-            error: function (e) {
-                console.log(e);
-            },
-            success: function (res) {
-                console.log(res);
-            }
+        $('#save_drag_pos-<?php echo $this->draglist_id; ?>').on('click', function () {
+            var sort_order = [];
+            $('#sortable-<?php echo $this->draglist_id; ?> li p.product_id').each(function (index) {
+                sort_order.push($(this).text());
+            });
+            console.log(sort_order);
+
+            var action = $('#website_url').val() + 'plugin/shopping/run/saveDragListOrder';
+            var data = {'list_data': sort_order, 'list_id': $('#<?php echo $this->draglist_id; ?>').val()}
+            $.ajax({
+                url: action,
+                data: data,
+                type: 'post',
+                dataType: 'json',
+                error: function (e) {
+                    console.log(e);
+                },
+                success: function (res) {
+                    console.log(res);
+                }
+            });
+
         });
 
     });
+
 </script>

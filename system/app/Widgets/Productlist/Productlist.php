@@ -116,26 +116,24 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         //-----------------------------------------------------------------------
         $this->_sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
         $role = $this->_sessionHelper->getCurrentUser()->getRoleId();
-        if ($role != 'guest' && strlen($last) < 10) {
+        if ($role != Tools_Security_Acl::ROLE_GUEST && strlen($last) < 10) {
             $last = 0;
-        } elseif ($role == 'guest' && strlen($last) < 10) {
+        } elseif ($role == Tools_Security_Acl::ROLE_GUEST && strlen($last) < 10) {
             $this->last = $last;
         }
         $front = Zend_Controller_Front::getInstance();
         $this->_request = $front->getRequest();
-        $draglist_id = $this->_request->getParam('draglist_id');
-        /* $draglist_id = isset($this->_request->getParam('draglist_id')) ? $this->_request->getParam('draglist_id') : md5(implode(',',
-             $this->_options));*/
-        if (null === $draglist_id) {
-            $draglist_id = md5(implode(',', $this->_options));
+        $draglistId = $this->_request->getParam('draglist_id');
+
+        if (null === $draglistId) {
+            $draglistId = md5(implode(',', $this->_options));
         }
         if (array_search('draggable', $this->_options)) {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
-            $search = $dragMapper->find($draglist_id);
-            if ($search) {
-                $search = $search->toArray();
-                $this->draglist['list_id'] = $search['list_id'];
-                $this->draglist['data'] = unserialize($search['data']);
+            $dragModel = $dragMapper->find($draglistId);
+            if ($dragModel) {
+                $this->draglist['list_id'] = $dragModel->getId();
+                $this->draglist['data'] = unserialize($dragModel->getData());
             }
 
         }
@@ -189,11 +187,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
         //----------------------------------------------------------------------------------------------------
 
-        $this->_view->draglist_id = $draglist_id;
-        foreach ($this->_options as $option) {
-            if ($role != 'guest' && array_search('draggable', $this->_options)) {
-                return $this->_view->render('draggable.phtml');
-            }
+        $this->_view->draglist_id = $draglistId;
+        if ($role != Tools_Security_Acl::ROLE_GUEST && array_search('draggable', $this->_options)) {
+            return $this->_view->render('draggable.phtml');
         }
 //----------------------------------------------------------------------------------------------------
 		if (!isset($this->_options[0])) {
@@ -238,7 +234,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$products = $this->_loadProducts();
 		}
         //------------------------------------------------------------------------------------
-        if (isset($this->last) && is_numeric($this->last) && isset($this->draglist)) {
+        if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
             $neededIds = array();
             for ($i = 0; $i < $this->last; $i++) {
                 $neededIds[] = $this->draglist['data'][$i];
@@ -250,8 +246,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $final = array();
                 for ($i = 0; $i < count($neededIds); $i++) {
                     foreach ($res as $product) {
-                        $prod_id = $product->getId();
-                        if ($neededIds[$i] == $prod_id) {
+                        $prodId = $product->getId();
+                        if ($neededIds[$i] == $prodId) {
                             $final[$i] = $product;
                         }
                     }
