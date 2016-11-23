@@ -125,13 +125,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         $this->_request = $front->getRequest();
         $draglistId = $this->_request->getParam('draglist_id');
 
-        if (null === $draglistId) {
+        if (empty($draglistId)) {
             $draglistId = md5(implode(',', $this->_options));
         }
-        if (array_search('draggable', $this->_options)) {
+        if (array_search('draggable', $this->_options) !== false) {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($draglistId);
-            if ($dragModel) {
+            if ($dragModel instanceof Models_Model_Draggable) {
                 $this->draglist['list_id'] = $dragModel->getId();
                 $this->draglist['data'] = unserialize($dragModel->getData());
             }

@@ -702,52 +702,57 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
-		$content = '';
-		$nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
-        if (is_numeric($this->_request->getParam('limit'))) {
-            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
-        } else {
-            $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
-        }
-
-		$order = $this->_request->getParam('order');
-		$tags = $this->_request->getParam('tags');
-		$brands = $this->_request->getParam('brands');
-        $attributes = $this->_request->getParam('attributes');
-        $price = $this->_request->getParam('price');
-
-		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
-        //-------------------------------------------------------------------------------------
         $draglistId = $this->_request->getParam('draglist_id');
-        $dragMapper = Models_Mapper_DraggableMapper::getInstance();
-        $dragModel = $dragMapper->find($draglistId);
-        if ($dragModel) {
-            $this->draglist['list_id'] = $dragModel->getId();
-            $this->draglist['data'] = unserialize($dragModel->getData());
-            $currentProductsId = array();
-            for ($i = $offset; $i < ($offset + $limit); $i++) {
-                if (count($this->draglist['data']) > $offset && isset($this->draglist['data'][$i])) {
-                    $currentProductsId[] = $this->draglist['data'][$i];
-                }
+		$content = '';
+            $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+            if (is_numeric($this->_request->getParam('limit'))) {
+                $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+            } else {
+                $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
             }
-            if (!empty($currentProductsId)) {
-                $productMapper = Models_Mapper_ProductMapper::getInstance();
-                $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
-                    $currentProductsId));
-                $final = array();
-                for ($i = 0; $i < count($currentProductsId); $i++) {
-                    foreach ($res as $product) {
-                        $prodId = $product->getId();
-                        if ($currentProductsId[$i] == $prodId) {
-                            $final[$i] = $product;
-                        }
+            $order = $this->_request->getParam('order');
+            $tags = $this->_request->getParam('tags');
+            $brands = $this->_request->getParam('brands');
+            $attributes = $this->_request->getParam('attributes');
+            $price = $this->_request->getParam('price');
+
+            $offset = intval($nextPage) * $limit;
+        if (empty($draglistId)) {
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price);
+        } else {
+            //-------------------------------------------------------------------------------------
+
+            $dragMapper = Models_Mapper_DraggableMapper::getInstance();
+            $dragModel = $dragMapper->find($draglistId);
+            if ($dragModel instanceof Models_Model_Draggable) {
+                $draglist['list_id'] = $dragModel->getId();
+                $draglist['data'] = unserialize($dragModel->getData());
+                $currentProductsId = array();
+                for ($i = $offset; $i < ($offset + $limit); $i++) {
+                    if (count($draglist['data']) > $offset && isset($draglist['data'][$i])) {
+                        $currentProductsId[] = $draglist['data'][$i];
                     }
                 }
-                $products = $final;
+                if (!empty($currentProductsId)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+                    $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                        $currentProductsId));
+                    $final = array();
+                    for ($i = 0; $i < count($currentProductsId); $i++) {
+                        foreach ($res as $product) {
+                            $prodId = $product->getId();
+                            if ($currentProductsId[$i] == $prodId) {
+                                $final[$i] = $product;
+                            }
+                        }
+                    }
+                    $products = $final;
+                }
             }
+            //-------------------------------------------------------------------------------------
         }
-        //-------------------------------------------------------------------------------------
+
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
@@ -2004,31 +2009,27 @@ class Shopping extends Tools_Plugins_Abstract {
     }
     public function saveDragListOrderAction()
     {
-        $draglist = $this->_request->getParams(array('list_data', 'list_id'));
-        $mapper = Models_Mapper_DraggableMapper::getInstance();
-        $data = array(
-            'list_id' => $draglist['list_id'],
-            'data' => serialize($draglist['list_data']
-            )
-        );
-        $search = $mapper->find($draglist['list_id']);
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $draglist = $this->_request->getParams(array('list_data', 'list_id'));
+            $mapper = Models_Mapper_DraggableMapper::getInstance();
+            $data = array(
+                'id' => $draglist['list_id'],
+                'data' => serialize($draglist['list_data']
+                )
+            );
+            $model = $mapper->find($draglist['list_id']);
+            if ($model instanceof Models_Model_Draggable) {
+                $model->setData($data['data']);
+                $mapper->save($model);
+                $this->_responseHelper->success(array('updated' => true));
+            } else {
 
-        if ($search) {
-            $draglistTable = new Models_DbTable_Draggable();
-            $where = $draglistTable->getAdapter()->quoteInto('id = ?', $data['list_id']);
-            $draglistTable->update(array('data' => serialize($draglist['list_data'])), $where);
-            echo json_encode(array('updated' => true));
-            die();
-        } else {
-
-            $draglistTable = new Models_DbTable_Draggable();
-
-            $draglistTable->insert($data);
-            echo json_encode(array('exists' => false));
-            die();
+                $draglistTable = new Models_DbTable_Draggable();
+                $draglistTable->insert($data);
+                $this->_responseHelper->success(array('added' => true));
+            }
         }
-        die('Something wrong');
-
+        $this->_responseHelper->fail('');
     }
 
 }
