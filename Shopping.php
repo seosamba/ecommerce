@@ -2011,22 +2011,24 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $draglist = $this->_request->getParams(array('list_data', 'list_id'));
-            $mapper = Models_Mapper_DraggableMapper::getInstance();
-            $data = array(
-                'id' => $draglist['list_id'],
-                'data' => serialize($draglist['list_data']
-                )
-            );
-            $model = $mapper->find($draglist['list_id']);
-            if ($model instanceof Models_Model_Draggable) {
-                $model->setData($data['data']);
-                $mapper->save($model);
-                $this->_responseHelper->success(array('updated' => true));
-            } else {
+            if (!empty($draglist)) {
+                $mapper = Models_Mapper_DraggableMapper::getInstance();
+                $data = array(
+                    'id' => $draglist['list_id'],
+                    'data' => serialize($draglist['list_data']
+                    )
+                );
+                $model = $mapper->find($draglist['list_id']);
+                if ($model instanceof Models_Model_Draggable) {
+                    $model->setData($data['data']);
+                    $mapper->save($model);
+                    $this->_responseHelper->success(array('updated' => true));
+                } else {
 
-                $draglistTable = new Models_DbTable_Draggable();
-                $draglistTable->insert($data);
-                $this->_responseHelper->success(array('added' => true));
+                    $draglistTable = new Models_DbTable_Draggable();
+                    $draglistTable->insert($data);
+                    $this->_responseHelper->success(array('added' => true));
+                }
             }
         }
         $this->_responseHelper->fail('');
