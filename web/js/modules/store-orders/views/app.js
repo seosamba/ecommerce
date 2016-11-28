@@ -325,9 +325,8 @@ define(['backbone',
                     dialogClass: 'seotoaster',
                     resizable:false,
                     open: function(event, ui) {
-                        $('.setTracking').on('click',  function(){
-                        });
-                        $('.save-data').on('click', function(){
+                        $('.save-data').on('click', function(e){
+                            e.preventDefault();
                             var  trackingUrlId =  $('#marketing-services').val(),
                                 text =  $('#shippingTrackingId').val(),
                                 data = {
