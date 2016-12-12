@@ -30,6 +30,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
     const OPTION_FILTERABLE = 'filterable';
 
     /**
+     * Option to create custom product order in product list
+     */
+    const OPTION_DRAGGABLE = 'draggable';
+
+    /**
      * Option to apply "AND" logic for tags filtering
      */
     const OPTION_STRICT_TAGS_COUNT = 'and';
@@ -107,6 +112,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
         }
+        if (in_array(self::OPTION_DRAGGABLE, $this->_options) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $this->_cacheable = false;
+        }
 	}
 
 	public function _load() {
@@ -114,23 +122,26 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
         //-----------------------------------------------------------------------
-        $this->_sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
-        $role = $this->_sessionHelper->getCurrentUser()->getRoleId();
-        if ($role != Tools_Security_Acl::ROLE_GUEST && strlen($last) < 10) {
+
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) ) {
             $last = 0;
-        } elseif ($role == Tools_Security_Acl::ROLE_GUEST && strlen($last) < 10) {
+        } elseif (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options)) {
             $this->last = $last;
         }
         $front = Zend_Controller_Front::getInstance();
-        $this->_request = $front->getRequest();
-        $draglistId = $this->_request->getParam('draglist_id');
+        $request = $front->getRequest();
+        $dragListId = $request->getParam('draglist_id');
 
-        if (empty($draglistId)) {
-            $draglistId = md5(implode(',', $this->_options));
+        if (empty($dragListId)) {
+            $optionsForDragKey =  $this->_options;
+            if (is_numeric($last)) {
+                array_pop($optionsForDragKey);
+            }
+            $dragListId = md5(implode(',', $optionsForDragKey));
         }
-        if (array_search('draggable', $this->_options) !== false) {
+        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
-            $dragModel = $dragMapper->find($draglistId);
+            $dragModel = $dragMapper->find($dragListId);
             if ($dragModel instanceof Models_Model_Draggable) {
                 $this->draglist['list_id'] = $dragModel->getId();
                 $this->draglist['data'] = unserialize($dragModel->getData());
@@ -187,8 +198,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
         //----------------------------------------------------------------------------------------------------
 
-        $this->_view->draglist_id = $draglistId;
-        if ($role != Tools_Security_Acl::ROLE_GUEST && array_search('draggable', $this->_options)) {
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options)) {
+            $this->_view->dragListId = $dragListId;
             return $this->_view->render('draggable.phtml');
         }
 //----------------------------------------------------------------------------------------------------

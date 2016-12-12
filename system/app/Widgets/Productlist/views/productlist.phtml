@@ -5,7 +5,7 @@
     <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
 	<?php endif; ?>
 </div>
-	<span id="<?php echo $this->draglist_id; ?>" style="display: none;"></span>
+	<span id="<?php echo $this->dragListId; ?>" style="display: none;"></span>
 <?php if ($this->totalCount >= $this->limit): ?>
 <script>
 	$('#<?php echo $id; ?>').on('click', function(e){
@@ -21,7 +21,7 @@
 		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
                 <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
                 <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
-				<?php echo json_encode(array('draglist_id' => $this->draglist_id));?>);
+				<?php echo json_encode(array('draglist_id' => $this->dragListId));?>);
 
 		showSpinner();
 
