@@ -134,7 +134,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (empty($dragListId)) {
             $optionsForDragKey =  $this->_options;
-            if (is_numeric($last)) {
+            if (is_numeric($last) && $last !== 0) {
                 array_pop($optionsForDragKey);
             }
             $dragListId = md5(implode(',', $optionsForDragKey));
