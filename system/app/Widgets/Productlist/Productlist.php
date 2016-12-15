@@ -130,7 +130,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         }
         $front = Zend_Controller_Front::getInstance();
         $request = $front->getRequest();
-        $dragListId = $request->getParam('draglist_id');
+        $dragListId = filter_var($request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
 
         if (empty($dragListId)) {
             $optionsForDragKey =  $this->_options;
