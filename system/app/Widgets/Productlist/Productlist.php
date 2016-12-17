@@ -149,7 +149,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
 
         }
-        //-----------------------------------------------------------------------
 
         if (is_numeric($last)) {
             $last = abs(intval($last));
@@ -200,10 +199,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         //----------------------------------------------------------------------------------------------------
         $this->_view->dragListId = $dragListId;
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options)) {
-
             return $this->_view->render('draggable.phtml');
         }
-//----------------------------------------------------------------------------------------------------
+
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
 		} elseif (!intval($this->_options[0])) {
@@ -245,7 +243,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
-        //------------------------------------------------------------------------------------
+
         if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
             $neededIds = array();
             for ($i = 0; $i < $this->last; $i++) {
@@ -276,7 +274,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $products = $res;
             $this->_view->dragproducts = $products;
         }
-//--------------------------------------------------------------------------------------
+
 		$this->_view->totalCount = sizeof($products);
 		$wesiteData = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');

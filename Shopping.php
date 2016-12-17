@@ -702,7 +702,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
-        $dragListId = $this->_request->getParam('draglist_id');
+        $dragListId = filter_var($this->_request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
 		$content = '';
             $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
             if (is_numeric($this->_request->getParam('limit'))) {

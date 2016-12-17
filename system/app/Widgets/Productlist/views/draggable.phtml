@@ -5,8 +5,7 @@
         $imgArr = explode('/', $img);
 
         ?>
-        <li>
-            <p class="product_id" style="display: none;"><?php echo $product->getId(); ?></p>
+        <li class="sortable-product-list-row" data-sort-product-id="<?php echo $product->getId(); ?>">
             <?php if (!empty($imgArr[1])) :?>
                 <img src="<?php echo $this->websiteUrl . 'media/' . $imgArr[0] . '/small/' . $imgArr[1]; ?>" alt="">
             <?php else:?>
@@ -16,22 +15,19 @@
         </li>
     <?php endforeach; ?>
 </ul>
-<input id="website_url" type="hidden" value="<?php echo $this->websiteUrl; ?>">
-<input id="<?php echo $this->dragListId; ?>" type="hidden" value="<?php echo $this->dragListId; ?>">
-<button class="save_drag_pos btn" id="save_drag_pos-<?php echo $this->dragListId; ?>"><?php echo $this->translate('Save position');?></button>
+<button class="save_drag_pos btn" id="save_drag_pos-<?php echo $this->dragListId; ?>"><?php echo $this->translate('Save order');?></button>
 <script>
     $(function () {
-        $("#sortable-<?php echo $this->dragListId; ?>").sortable();
-        $("#sortable-<?php echo $this->dragListId; ?>").disableSelection();
+        $("#sortable-<?php echo $this->dragListId; ?>").sortable().disableSelection();
 
         $('#save_drag_pos-<?php echo $this->dragListId; ?>').on('click', function () {
             var sort_order = [];
-            $('#sortable-<?php echo $this->dragListId; ?> li p.product_id').each(function (index) {
-                sort_order.push($(this).text());
+            $('.sortable-product-list-row').each(function (index) {
+                sort_order.push($(this).data('sort-product-id'));
             });
 
-            var action = $('#website_url').val() + 'plugin/shopping/run/saveDragListOrder';
-            var data = {'list_data': sort_order, 'list_id': $('#<?php echo $this->dragListId; ?>').val()}
+            var action = '<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/saveDragListOrder';
+            var data = {'list_data': sort_order, 'list_id': '<?php echo $this->dragListId; ?>'}
             $.ajax({
                 url: action,
                 data: data,
@@ -39,9 +35,9 @@
                 dataType: 'json'
             }).done(function(response) {
                 if(response.error == 1){
-                    smoke.alert(response.responseText,{'classname':'errors'});
+                    showMessage(response.responseText, true, 5000);
                 }else{
-                    smoke.signal('<?php echo $this->translate('Saved');?>');
+                    showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
                 }
             });
 

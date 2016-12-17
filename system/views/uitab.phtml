@@ -7,7 +7,7 @@
                 <strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?>
             </h4>
         <?php else: ?>
-            <div id="template-selector" class="grid_6 alpha">
+            <div id="template-selector" class="grid_5 alpha">
                 <select id="templates" class="templates"
                         data-placeholder="<?php echo $this->translate('Select a product listing template...'); ?>">
                     <option value=""><?php echo $this->translate('Select a product listing template'); ?></option>
@@ -16,12 +16,12 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="grid_6 omega">
+            <div class="grid_4 omega">
                 <?php echo $this->formText('search', '',
                     array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
             </div>
-            <div class="grid_6">
-                <label for="draggable">Draggable</label><input type="checkbox" id="draggable" name="draggable"/>
+            <div class="grid_3 mt5px">
+                <label for="draggable"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Draggable');?></label>
             </div>
         <?php endif; ?>
     </div>
