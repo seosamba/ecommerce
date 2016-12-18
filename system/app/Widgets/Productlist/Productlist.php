@@ -121,26 +121,21 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
-        //-----------------------------------------------------------------------
 
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) ) {
             $last = 0;
         } elseif (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options)) {
             $this->last = $last;
         }
-        $front = Zend_Controller_Front::getInstance();
-        $request = $front->getRequest();
-        $dragListId = filter_var($request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
 
-        if (empty($dragListId)) {
+        $dragListId = null;
+        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
             $optionsForDragKey =  $this->_options;
             $withLimit = end($this->_options);
             if (is_numeric($withLimit)) {
                 array_pop($optionsForDragKey);
             }
             $dragListId = md5(implode(',', $optionsForDragKey));
-        }
-        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($dragListId);
             if ($dragModel instanceof Models_Model_Draggable) {
@@ -196,9 +191,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         }
 
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
-        //----------------------------------------------------------------------------------------------------
-        $this->_view->dragListId = $dragListId;
+
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options)) {
+            $this->_view->dragListId = $dragListId;
             return $this->_view->render('draggable.phtml');
         }
 
@@ -270,9 +265,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $this->dragproducts = $products;
         }
 
-        if (is_array($res = $this->_dragListNewOrder()) && (count($res) > 0)) {
-            $products = $res;
-            $this->_view->dragproducts = $products;
+        if (isset($this->draglist) && is_array($this->draglist['data']) && isset($this->dragproducts) && is_array($this->dragproducts)) {
+            $dragOrderResult = $this->_dragListNewOrder();
+            if (is_array($dragOrderResult) && (count($dragOrderResult) > 0)) {
+                $products = $dragOrderResult;
+                $this->_view->dragproducts = $products;
+            }
         }
 
 		$this->_view->totalCount = sizeof($products);
