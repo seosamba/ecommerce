@@ -142,7 +142,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $this->draglist['list_id'] = $dragModel->getId();
                 $this->draglist['data'] = unserialize($dragModel->getData());
             }
-
+            $this->_view->dragListId = $dragListId;
         }
 
         if (is_numeric($last)) {
@@ -192,8 +192,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 
+
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options)) {
-            $this->_view->dragListId = $dragListId;
             return $this->_view->render('draggable.phtml');
         }
 
