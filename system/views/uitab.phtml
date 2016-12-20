@@ -205,6 +205,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
 
             },
             loadStoreData: function (dataType, filter, force) {
+
                 showSpinner();
                 if (typeof  filter !== 'undefined') {
                     $('.ui-helper-hidden-accessible').hide();
@@ -227,6 +228,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     params.offset = utab.offset;
                     params.limit = utab.limit;
                 }
+                console.log(params);
 
                 $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
                     params,
@@ -274,6 +276,9 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     }
                     if ($('#brands').val()) {
                         data.fbrand = $('#brands').val();
+                    }
+                    if ($('#ordering').val()) {
+                        data.forder = $('#ordering').val();
                     }
                 }
                 data['stc'] = ($('#strict-tags').prop('checked') == false) ? 0 : 1;
