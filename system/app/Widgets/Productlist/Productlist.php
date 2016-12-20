@@ -121,14 +121,22 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
-
-        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) ) {
+        $isPreview = Zend_Controller_Front::getInstance()->getRequest()->getParam('preview');
+        if ($isPreview) {
+            $this->_view->isPreview = $isPreview;
+        }
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
             $last = 0;
-        } elseif (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options)) {
+        } elseif ((!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
+                    $this->_options))
+            || (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
+                    $this->_options) && $isPreview)
+        ) {
             $this->last = $last;
         }
 
         $dragListId = null;
+
         if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
             $optionsForDragKey =  $this->_options;
             $withLimit = end($this->_options);
@@ -193,7 +201,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 
 
-        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options)) {
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
             return $this->_view->render('draggable.phtml');
         }
 
