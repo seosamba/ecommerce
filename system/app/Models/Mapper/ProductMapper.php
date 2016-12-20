@@ -154,7 +154,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $inventory = null,
         $strictTagsCount = false,
         $organicSearch = false,
-        $attributes = array()
+        $attributes = array(),
+        $price = array()
     ) {
         $entities = array();
 
@@ -164,7 +165,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->group('p.id');
 
         if (!is_null($order)) {
-            $select->order($order);
+			if(is_array($order) && ($key = array_search('p.sku', $order)) !== false) {
+				unset($order[$key]);
+				$select->order('ABS(p.sku)');
+			}
+			$select->order($order);
         }
 
         if (!empty($where)) {
@@ -185,6 +190,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             } else {
                 return null;
             }
+        }
+
+        if(!empty($price)){
+            $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
         }
 
         if (!empty($tags)) {

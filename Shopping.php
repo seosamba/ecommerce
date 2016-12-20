@@ -12,6 +12,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
+
 	/**
 	 * New system role 'customer'
 	 *
@@ -324,6 +325,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$markupForm->populate($markupConfig['config']);
 		}
         $orderConfig =  $shippingConfigMapper->find(self::ORDER_CONFIG);
+        $trackingUrlForm = new Forms_Shipping_TrackingUrl();
+
         $orderConfigForm = new Forms_Shipping_OrderConfig();
         if(isset($orderConfig['config'])){
             $orderConfigForm->populate($orderConfig['config']);
@@ -371,6 +374,9 @@ class Shopping extends Tools_Plugins_Abstract {
         }
         $this->_view->pickupLocationConf = $pickupLocationConfig;
         $this->_view->orderConfigForm = $orderConfigForm;
+
+        $this->_view->trackingUrlForm = $trackingUrlForm;
+
 		$this->_view->shippingPlugins = array_filter(Tools_Plugins_Tools::getEnabledPlugins(), function ($plugin) {
 			$reflection = new Zend_Reflection_Class(ucfirst($plugin->getName()));
 			return $reflection->implementsInterface('Interfaces_Shipping');
@@ -403,18 +409,30 @@ class Shopping extends Tools_Plugins_Abstract {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
-				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
+				if (!empty($data['customerPassword'])) {
+                    $password = $data['customerPassword'];
+                } else {
+                    $password = md5(uniqid('customer_' . time()));
+                }
+                $customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
                         ->setMobilePhone($mobilePhone)
-						->setPassword(md5(uniqid('customer_' . time())));
+						->setPassword($password);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
 					$customer->setId($newCustomerId);
 					$session->storeIsNewCustomer = true;
-				}
+                    if (!empty($data['customerPassword'])) {
+                        $session->clientWithNewPassword = true;
+                    } elseif(isset($session->clientWithNewPassword)) {
+                        unset($session->clientWithNewPassword);
+                    }
+				} elseif(isset($session->clientWithNewPassword)) {
+                    unset($session->clientWithNewPassword);
+                }
 			} else {
 				return $existingCustomer;
 			}
@@ -451,6 +469,124 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 		$this->_jsonHelper->direct(array('done' => $status));
 	}
+
+    public function fetchShippingUrlNamesAction(){
+        $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+        $trackingData = $shippingUrlMapper->fetchAll();
+        $defaultSelection = $shippingUrlMapper->findDefaultStatus();
+        $arrData = array($this->_translator->translate('Custom Shipper'));
+        $arrDataDefault = $arrData;
+        if($defaultSelection instanceof Models_Model_ShippingUrl) {
+            $arrDataDefault = array($defaultSelection->getName() => $defaultSelection->getDefaultStatus());
+        }
+        if(!empty($trackingData)) {
+            foreach ($trackingData as $dataValue) {
+                $arrData[$dataValue['id']] = $dataValue['name'];
+            }
+
+        }
+        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
+    }
+
+
+    public function setShippingUrlDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+            $data = array_map("trim", $data);
+
+            $tokenToValidate = $data['secureToken'];
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+
+            if (empty($data['trackingName'])) {
+                return $this->_responseHelper->fail('Required parameters is missing');
+            }
+            $update = false;
+            $msg = $this->_translator->translate('Saved');
+            $shippingUrlModel = $shippingUrlMapper->find($data['currentId']);
+            if ($shippingUrlModel) {
+                $shippingUrlModel->setId($data['currentId']);
+                $shippingUrlModel->setDefaultStatus(0);
+                $update = true;
+                $msg = $this->_translator->translate('Updated');
+            } else {
+                $findCurrentName = $shippingUrlMapper->findByName($data['trackingName']);
+                if($findCurrentName instanceof Models_Model_ShippingUrl){
+                    $this->_responseHelper->fail(array('msg' => 'This name is already exists, please select proper name from the dropdown!'));
+                }
+                $shippingUrlModel = new Models_Model_ShippingUrl();
+                $shippingUrlModel->setDefaultStatus(0);
+
+            }
+            $shippingUrlModel->setName($data['trackingName']);
+            $shippingUrlModel->setUrl($data['url']);
+            $shippingUrlModel = $shippingUrlMapper->save($shippingUrlModel);
+
+            $this->_responseHelper->success(array(
+                'msg' => $this->_translator->translate($msg),
+                'optionUpdateStatus' => $update,
+                'optionName' => $shippingUrlModel->getName(),
+                'optionId' => $shippingUrlModel->getId()
+            ));
+        }
+        $this->_responseHelper->fail('');
+    }
+
+    public function getShippingUrlDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+            $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($id)) {
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                $currentData = $shippingUrlMapper->find($id);
+                if ($currentData instanceof Models_Model_ShippingUrl) {
+                    $this->_responseHelper->success(array(
+                        'name' => $currentData->getName(),
+                        'url' => $currentData->getUrl(),
+                        'current' => $currentData->getId()
+                    ));
+                }
+            }
+        }
+        $this->_responseHelper->fail('');
+
+    }
+
+    public function deleteShippingUrlDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isDelete()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $id = filter_var($this->_request->getParam('selectId'), FILTER_SANITIZE_NUMBER_INT);
+            if (!empty($id)) {
+                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                $current = $shippingUrlMapper->find($id);
+                if (!empty($current)) {
+                    $shippingUrlMapper->delete($current);
+                    $this->_responseHelper->success(array(
+                        'msg' => $this->_translator->translate('Deleted'),
+                        'optionId' => $current->getId()
+                    ));
+                }
+            }
+        }
+        $this->_responseHelper->fail('');
+    }
+
 
 	public function setSettingsAction() {
 		$status = false;
@@ -578,9 +714,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		$tags = $this->_request->getParam('tags');
 		$brands = $this->_request->getParam('brands');
         $attributes = $this->_request->getParam('attributes');
+        $price = $this->_request->getParam('price');
 
 		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes);
+		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
 		if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
@@ -693,6 +830,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
+        $customerAddress = Models_Mapper_CustomerMapper::getInstance()->getUserAddressOrdersByUserId($id);
+        if($customerAddress) {
+            $this->_view->customerAddress = $customerAddress;
+        }
 		if ($customer) {
 			$this->_view->customer = $customer;
 			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
@@ -750,24 +891,44 @@ class Shopping extends Tools_Plugins_Abstract {
 				throw new Exceptions_SeotoasterPluginException('Order not found');
 			}
 
-			if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_ADMINPANEL)) {
-				if ((int)$order->getUserId() !== (int)$customer->getId()) {
+			if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+				$orderUserId = $order->getUserId();
+				if (empty($orderUserId) || (int) $orderUserId !== (int)$customer->getId()) {
 					throw new Exceptions_SeotoasterPluginException('Not allowed action');
 				}
 			}
 
 			if ($this->_request->isPost()) {
-				$order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
-
-				$params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
-
-				if (isset($params['shippingTrackingId']) && $order->getShippingTrackingId() !== $params['shippingTrackingId']) {
-					$order->registerObserver(new Tools_Mail_Watchdog(array(
-						'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER
-					)));
-					$params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
-				}
-
+                $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
+                $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+                if (isset($params['shippingTrackingId'])) {
+                    $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                    $selectedName = '';
+                    $url = '';
+                    $paramData = $params['shippingTrackingId'];
+                    $currentData = '';
+                    $shippingUrlMapper->clearDefaultStatus();
+                    if (!empty($params['trackingUrlId'])) {
+                        $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
+                        if (!empty($currentData)) {
+                            $selectedName = $currentData->getName();
+                            $url = $currentData->getUrl();
+                            $currentData->setDefaultStatus(1);
+                            $shippingUrlMapper->save($currentData);
+                        }
+                    }
+                    unset($params['trackingUrlId'], $params['id']);
+                    if ($currentData instanceof Models_Model_ShippingUrl) {
+                        $params['shippingTrackingId'] = trim($currentData->getUrl()) . trim($paramData);
+                    }
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
+                        'name' => $selectedName,
+                        'code' => $paramData,
+                        'url' => $url
+                    )));
+                    $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                }
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
@@ -785,6 +946,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
+            $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
 			$this->_layout->content = $this->_view->render('order.phtml');
 			echo $this->_layout->render();
 		}
@@ -904,13 +1066,17 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
-				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
-				$userData = $userMapper->find($cartSession->getUserId());
-				$newCustomerPassword = uniqid('customer_' . time());
-				$userData->setPassword($newCustomerPassword);
-				$newCustomerId = $userMapper->save($userData);
+				if (!isset($this->_sessionHelper->clientWithNewPassword)) {
+                    $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                    $userData = $userMapper->find($cartSession->getUserId());
+                    $newCustomerPassword = uniqid('customer_' . time());
+                    $userData->setPassword($newCustomerPassword);
+                    $userMapper->save($userData);
+                }
 				$customer = Models_Mapper_CustomerMapper::getInstance()->find($cartSession->getUserId());
-				$customer->setPassword($newCustomerPassword);
+                if (!isset($this->_sessionHelper->clientWithNewPassword)) {
+                    $customer->setPassword($newCustomerPassword);
+                }
 				$customer->registerObserver(new Tools_Mail_Watchdog(array(
 					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
 				)));
@@ -983,6 +1149,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
 				$msg = array();
 
+                $defaultErrorMessage = $this->_translator->translate("Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you've already captured in. Go back to swap promo codes or proceed with shipping information to checkout.");
+                if (isset($this->_sessionHelper->customCouponErrorMessage)) {
+                    $defaultErrorMessage = $this->_sessionHelper->customCouponErrorMessage;
+                }
 				if (!empty($coupons)) {
 					$status = Tools_CouponTools::applyCoupons($coupons);
 					if (!empty($status)) {
@@ -990,7 +1160,7 @@ class Shopping extends Tools_Plugins_Abstract {
 							return $status !== true;
 						}));
 						if ($hasErrors) {
-							$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you\'ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
+                            $this->_responseHelper->fail($defaultErrorMessage);
 						}
 					}
 
@@ -998,7 +1168,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $discount = $shoppingCart->getDiscount();
                     if ($discount) {
-                        $msg = array('msg' => 'Congratulations, you save ' . $this->_view->currency($discount) . ' on this order. Proceed to checkout now.');
+                        if($this->_configMapper->getConfigParam('showPriceIncTax')){
+                            $discount += $shoppingCart->getDiscountTax();
+                        }
+                        $msgPartOne = $this->_translator->translate('Congratulations, you save');
+                        $msgPartTwo = $this->_translator->translate('on this order. Proceed to checkout now.');
+                        $msg = array('msg' => "$msgPartOne " . $this->_view->currency($discount) . " $msgPartTwo");
                     }
 
                     //processing freeshipping coupons
@@ -1025,7 +1200,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $this->_responseHelper->success($msg);
 				} else {
-					$this->_responseHelper->fail($this->_translator->translate('Sorry, some coupon codes you provided are invalid or cannot be combined with the ones you&rsquo;ve already captured in. Go back to swap promo codes or proceed with shipping information to checkout.'));
+					$this->_responseHelper->fail($defaultErrorMessage);
 				}
 
 			}
@@ -1179,7 +1354,6 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
-
             if(!empty($data['profileElement']) && isset($data['profileValue']) && !empty($data['userId'])){
                 $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                 $user = $userMapper->find($data['userId']);
@@ -1612,7 +1786,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
             if ($orderModel instanceof Models_Model_CartSession) {
                 $orderStatus = $orderModel->getStatus();
-                if ($orderStatus !== Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                if ($orderStatus !== Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus !== Models_Model_CartSession::CART_STATUS_SHIPPED && $orderStatus !== Models_Model_CartSession::CART_STATUS_DELIVERED) {
                     $this->_responseHelper->fail($this->_translator->translate('You can refund only orders with status completed'));
                 }
                 $total = $orderModel->getTotal();
@@ -1673,8 +1847,6 @@ class Shopping extends Tools_Plugins_Abstract {
                                             } else {
                                                 $this->_responseHelper->fail($this->_translator->translate('Payment gateway error happened'));
                                             }
-                                        } elseif ($result['error'] === 0 && !empty($result['refundMessage'])) {
-                                            $refundResultMessage = $result['refundMessage'];
                                         }
                                     } catch (Exception $e) {
                                         $this->_responseHelper->fail($e->getMessage());
@@ -1689,6 +1861,12 @@ class Shopping extends Tools_Plugins_Abstract {
                         } else {
                             $this->_responseHelper->fail($this->_translator->translate('Payment plugin doesn\'t exists'));
                         }
+                        $currency = Zend_Registry::get('Zend_Currency');
+                        $refundSuccessMessage = $this->_translator->translate('You\'ve successfully refunded');
+                        $refundSuccessMessage .= ' ' . $currency->toCurrency($refundAmount);
+                        $refundSuccessMessage .= ' '. $this->_translator->translate('to your client’s credit card');
+                    } else {
+                        $refundSuccessMessage = $this->_translator->translate('You\'ve added a note. No amount refunded to credit card by this system');
                     }
 
                     Models_Mapper_OrdersMapper::getInstance()->updateOrderInfo($orderId, $data);
@@ -1703,7 +1881,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $data['total'] = round($data['total'], 2);
 
-                    $this->_responseHelper->success(array('message' => $this->_translator->translate('Order refunded' . ' ' . $refundResultMessage), 'total' => $data['total']));
+                    $this->_responseHelper->success(array('message' => $refundSuccessMessage, 'total' => $data['total']));
                 }
                 $this->_responseHelper->fail($this->_translator->translate('Sorry, you can\'t refund more than the order\'s original amount.'));
             }
@@ -1715,5 +1893,93 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail($this->_translator->translate('Order id missing'));
     }
 
+    public function editUserProfileAddressAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+            if(!empty($data['profileField']) && !empty($data['userId'])){
+                $customerToken = '';
+                $countries = Zend_Locale::getTranslationList('territory', null, 2);
+                $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                $customerTable = new Models_DbTable_CustomerAddress();
+
+                $data['profileValue'] = trim($data['profileValue']);
+                if(empty($data['clientToken'])){
+                    $this->_responseHelper->fail();
+                }
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $currentCustomer = $customerMapper->find($data['userId']);
+                $customerAddress = $customerMapper->getUserAddressByUserId($data['userId'], $data['clientToken']);
+                if(!empty($customerAddress)) {
+                    foreach ($customerAddress as $value) {
+                        if($data['profileField'] === 'country' || $data['profileField'] === 'state') {
+                            if ($data['profileField'] === 'country') {
+                                $currentCountry = array_search($data['profileValue'], $countries);
+                                if ($currentCountry === false) {
+                                    $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken'], 'respText'=> $this->_translator->translate('Can\'t update Country')));
+                                }
+                                $value[$data['profileField']] = $currentCountry;
+                            }
+                            if ($data['profileField'] === 'state') {
+                                $currentState = Tools_Geo::getStateByCode($data['profileValue']);
+                                if ($currentState === null) {
+                                    $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken'], 'respText'=> $this->_translator->translate('Can\'t update State')));
+                                }
+                                $value[$data['profileField']] = $currentState['id'];
+                            }
+                            $addressValues = $value;
+
+                        }else{
+                            $value[$data['profileField']] = $data['profileValue'];
+
+                            if($value['address_type'] === 'shipping'){
+                                $value['mobilecountrycode'] = $value['country'];
+                                $value = $this->_normalizeMobilePhoneNumber($value);
+                            }
+                            $addressValues = Tools_Misc::clenupAddress($value);
+
+                        }
+                        $customerToken = $customerMapper->addAddress($currentCustomer, $addressValues, $data['addressType']);
+                        $currentCartSession = $cartSessionMapper->fetchOrders($currentCustomer->getId());
+
+                        if(!empty($currentCartSession) && (!empty($customerToken))) {
+                            if($value['address_type'] === 'shipping') {
+                                $newToken['shipping_address_id'] = $customerToken;
+                            }else{
+                                $newToken['billing_address_id'] = $customerToken;
+                            }
+                            $newToken['updated_at'] = date(DATE_ATOM);
+                            $cartSessionMapper->updateAddress($data['clientToken'], $data['addressType'], $newToken);
+
+                        }
+                            $lastData =  $customerMapper->getUserAddressByUserId($currentCustomer->getId(),$customerToken);
+                            if(!empty($lastData) && ($data['clientToken'] !== $customerToken)){
+                                $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
+                                $customerTable->delete($where);
+                            }
+
+                    }
+                    $this->_responseHelper->success(array('newToken'=> $customerToken, 'oldToken'=> $data['clientOldToken']));
+                }
+            }
+            $this->_responseHelper->fail();
+        }
+    }
+
+    private function _normalizeMobilePhoneNumber($arr) {
+        if(!empty($arr['mobile'])) {
+            $countryPhoneCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
+            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryPhoneCode);
+            if ($mobileNumber !== false) {
+                $arr['mobile'] = $mobileNumber;
+            }
+        }
+        return $arr;
+    }
 
 }

@@ -99,9 +99,16 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
 
         $options = array();
+        $priceTax = '';
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
+            }
+            if(preg_match('/(tax)$/u', $option)){
+                $priceTax = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+                if($priceTax !== null){
+                   $priceTax = $priceTax[0]['rate1'];
+                }
             }
         }
 
@@ -142,6 +149,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_filters = array_merge($rangeFilters, $listFilters);
         // fetch price range for filters
         $this->_priceRange = $eavMapper->getPriceRange($tagIds);
+        if(!isset($priceTax) || empty($priceTax)){
+            $this->_priceRange['min'] = floor($this->_priceRange['min']);
+            $this->_priceRange['max'] = ceil($this->_priceRange['max']);
+        }
         $this->_priceRange['name'] = 'price';
         $this->_priceRange['label'] = 'Price';
 
@@ -225,6 +236,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             'checked' => !empty($appliedFilters['brand']) ? $appliedFilters['brand'] : array()
         );
 
+        if(isset($priceTax) && !empty($priceTax)){
+            $this->_view->priceTax = $priceTax;
+        }
+
         // apply user values to price range filter
         if (!empty($appliedFilters['price'])) {
             $this->_priceRange = array_merge($this->_priceRange, $appliedFilters['price']);
@@ -233,6 +248,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         if (!isset($widgetSettings['price']) || !empty($widgetSettings['price'])) {
             $this->_view->priceRange = $this->_priceRange;
         }
+
 
         return $this->_view->render('filter-widget.phtml');
     }

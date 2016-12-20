@@ -170,6 +170,19 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		return $this->getDbTable()->fetchAll($select)->toArray();
 	}
 
+    public function findByClientId($clientId, $token){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $token);
+        $where .= ' OR '. $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $token);
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('user_id = ?', $clientId);
+        $select = $this->getDbTable()->getAdapter()->select()->from($this->getDbTable()->info('name'))->where($where);
+        $row = $this->getDbTable()->getAdapter()->fetchRow($select);
+        if(null == $row) {
+            return null;
+        }
+        return new $this->_model($row);
+
+    }
+
     /**
      * Fetch orders  by user id including recurring payments data
      *
@@ -234,4 +247,12 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 		return $result;
 	}
+
+    public function updateAddress($oldTokenId, $type = 'shipping', $data = array()){
+            $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $oldTokenId);
+            if($type == 'billing') {
+                $where = $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $oldTokenId);
+            }
+            return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
+    }
 }

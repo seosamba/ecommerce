@@ -181,155 +181,207 @@
 		</table>
 	</div>
 	<div id="profile-address-list" class="clearfix">
-	<?php $addressList = $this->customer->getAddresses(); ?>
+    <?php $addressList = $this->customerAddress; ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
-	<div>
-		<div class="adr">
+            <?php
+            $state =  Tools_Geo::getStateById($billingAddress['state']);
+            if(is_null($state)){
+                $state['state'] = '';
+            }
+            if(array_key_exists($billingAddress['country'], $countryList)){
+              $country = $countryList[$billingAddress['country']];
+            }else{
+                $country = '';
+            }
+            $arrOrderId = array();
+            $href = '';
+            if(!is_null($billingAddress['shippingId'])){
+                $arrOrderId = explode(',',$billingAddress['shippingId']);
+            }
+            if(!is_null($billingAddress['billingId'])){
+                $arrOrderId = explode(',',$billingAddress['billingId']);
+            }
+            if(!empty($arrOrderId)) {
+                foreach ($arrOrderId as $value) {
+                    $dataUrl = $this->websiteUrl . 'plugin/shopping/run/order/id/' . $value;
+                    $href .= ' ' . "<a href='javascript:;' class='tpopup' data-pheight='560' data-url='$dataUrl'>$value</a>";
+                }
+            }
+            ?>
+        <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)): ?>
+        <div><h3><?php echo $this->translate('Type');?>: <?php echo $billingAddress['address_type'];?> <?php echo $this->translate('Order');?> № <?php echo $href; ?></h3>
+		<div class="addr" id="<?php echo $billingAddress['id'];?>" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
-			<span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
-			<br/>
-			<span class="locality"><?php
-				echo $billingAddress['city'].
-					($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
-				?></span>
-			<span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
-			<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
-			<br />
-            <?php if(isset($billingAddress['country'])):?>
-			    <span><?php echo $countryList[$billingAddress['country']];?></span>
-            <?php endif;?>
-            <?php if(isset($billingAddress['mobile'])):?>
-                <br />
-                <span class="mobile"><?php echo $billingAddress['mobile'];?></span>
-            <?php endif;?>
-		</div>
-	</div>
-	<?php endforeach; ?>
-	<?php else : ?>
-	<p><?php echo $this->translate("You don't have any saved addresses");?></p>
-	<?php endif;?>
-	</div>
+            <?php
+            $billingAddressData = $billingAddress;
+            $id = $billingAddressData['id'];
+            $addressType = $billingAddressData['address_type'];
+            unset($billingAddressData['user_id'], $billingAddressData['shippingId'], $billingAddressData['billingId'], $billingAddressData['email'], $billingAddressData['id'], $billingAddressData['address_type']);
+            ?>
+            <?php foreach($billingAddressData as $key => $val):?>
+                <span class="text-bold"><?php echo $this->translate($key);?>:</span>
+                <?php if($key == 'state'):?>
+                    <span class="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> client-info"><span class="inline-data"><?php echo $state['state'];?></span>
+                <?php elseif($key == 'country'):?>
+                    <span class="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> client-info"><span class="inline-data"><?php echo $country;?></span>
+                <?php else:?>
+                <span class="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> client-info"><span class="inline-data"><?php echo $val;?></span>
+                <?php endif;?>
+                    <input class="edit-profile edit-client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> edit-client-profile-address-<?php echo $addressType.'-'.$id;?>" style="display:none;" type="text" data-client-param="<?php echo $key;?>" name="edit-client-<?php echo $key;?>" />
+                    <img data-client-param="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?>" class="edit-inline-profile edit-<?php echo $id;?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                </span>
+                <br/>
+            <?php endforeach;?>
+        </div>
+        </div>
+        <?php else:?>
+                    <div class="adr">
+                        <?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
+                        <?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
+                        <span class="street-address"><?php echo $billingAddress['address1'].' '. $billingAddress['address2'];?></span>
+                        <br/>
+			    <span class="locality"><?php
+                echo $billingAddress['city'].
+                    ($billingAddress['city']&&($billingAddress['state'] || $billingAddress['zip'])?',':'');
+                ?></span>
+                        <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+                        <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
+                        <br />
+                        <?php if(isset($billingAddress['country'])):?>
+                            <span><?php echo $countryList[$billingAddress['country']];?></span>
+                        <?php endif;?>
+                        <?php if(isset($billingAddress['mobile'])):?>
+                            <br />
+                            <span class="mobile"><?php echo $billingAddress['mobile'];?></span>
+                        <?php endif;?>
+                    </div>
+        <?php endif;?>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <p><?php echo $this->translate("You don't have any saved addresses");?></p>
+    <?php endif;?>
+    </div>
 </div>
 <script>
-	$('#profile-content').tabs();
-	$('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
-	$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
-	$(function(){
-		var oTable = $('#orders-table').dataTable({
-			bPaginate: false,
-			bLengthChange: false,
-			sDom: 't',
-			aaSorting: [[ 1, "desc" ]],
-			aoColumnDefs: [
-				{bSortable: false, aTargets: [-1]}
-			],
+    $('#profile-content').tabs();
+    $('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
+    $('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
+    $(function(){
+        var oTable = $('#orders-table').dataTable({
+            bPaginate: false,
+            bLengthChange: false,
+            sDom: 't',
+            aaSorting: [[ 1, "desc" ]],
+            aoColumnDefs: [
+                {bSortable: false, aTargets: [-1]}
+            ],
             "oLanguage": {
                 "sZeroRecords": "<?php echo $this->translate('You do not have any orders'); ?>",
                 "sEmptyTable": "<?php echo $this->translate('You do not have any orders'); ?>"
             }
-		});
-		$('ul.stats').on('click', 'li', function(){
-			var filter = $(this).data('sort');
-			if (filter === 'total') filter = '';
+        });
+        $('ul.stats').on('click', 'li', function(){
+            var filter = $(this).data('sort');
+            if (filter === 'total') filter = '';
             if (filter === 'Recurring Orders') filter = 'Recurring order';
-			oTable.fnFilter(filter);
-		});
-	});
+            oTable.fnFilter(filter);
+        });
+    });
 
-	<?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
 
-	$('a.tracking-dialog').on('click', function(e){
-		e.preventDefault();
-		var self = this,
-			id = parseInt($(this).closest('tr').data('id'));
-		smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
-			if (value === false) {
-				return value;
-			}
-			value = $.trim(value);
-			if ($(self).data('shippingTrackingId') !== value) {
-				$.ajax({
-					url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-					data: {shippingTrackingId: value},
-					type: 'POST',
-					dataType: 'json',
-					success: function(response) {
-						showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
-						if (response.hasOwnProperty('responseText')){
-							$(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
-							$(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
-							$(self).closest('tr').find('td.current-status').text(response.responseText.status);
-						}
-					}
-				});
-			}
-		});
-	});
+    $('a.tracking-dialog').on('click', function(e){
+        e.preventDefault();
+        var self = this,
+            id = parseInt($(this).closest('tr').data('id'));
+        smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
+            if (value === false) {
+                return value;
+            }
+            value = $.trim(value);
+            if ($(self).data('shippingTrackingId') !== value) {
+                $.ajax({
+                    url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+                    data: {shippingTrackingId: value},
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+                        if (response.hasOwnProperty('responseText')){
+                            $(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
+                            $(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
+                            $(self).closest('tr').find('td.current-status').text(response.responseText.status);
+                        }
+                    }
+                });
+            }
+        });
+    });
 
-	$('#orders-table').on('mouseenter', 'td.current-status', function(){
-		var id      = parseInt($(this).closest('tr').data('id')),
-			currentStatus = $(this).text();
+    $('#orders-table').on('mouseenter', 'td.current-status', function(){
+        var id      = parseInt($(this).closest('tr').data('id')),
+            currentStatus = $(this).text();
 
-		$(this).data('currentStatus', $(this).text());
+        $(this).data('currentStatus', $(this).text());
 
-		var buttons = {
-			'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
-			'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
-			'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
-			'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
-		};
+        var buttons = {
+            'refunded'  : '<button class="change-status btn small blue-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED;?>" >Refund payment</button>',
+            'completed' : '<button class="change-status btn small green-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED;?>" >Complete order</button>',
+            'canceled'  : '<button class="change-status btn small red-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED;?>" >Cancel order</button>',
+            'delivered' : '<button class="change-status btn small orange-gradient" data-status="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED;?>" >Delivered</button>'
+        };
 
-		var html = '';
-		switch (currentStatus){
-			case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
-				html += buttons['refunded'];
-				break;
-			case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
-				html += buttons['completed'];
+        var html = '';
+        switch (currentStatus){
+            case '<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED; ?>':
+                html += buttons['refunded'];
+                break;
+            case '<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>':
+                html += buttons['completed'];
                 html += buttons['canceled'];
                 break;
-			case '<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>':
-				html += buttons['delivered'];
-				html += buttons['refunded'];
-				break;
-		}
+            case '<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>':
+                html += buttons['delivered'];
+                html += buttons['refunded'];
+                break;
+        }
 
-		if (html.length){
-			var popup = $('<div></div>')
-					.css({"white-space": "nowrap"})
-					.html(html);
-			$(this).html(popup);
-		}
+        if (html.length){
+            var popup = $('<div></div>')
+                .css({"white-space": "nowrap"})
+                .html(html);
+            $(this).html(popup);
+        }
 
 
-	});
-	$('#orders-table').on('mouseleave', 'td.current-status', function(){
-		var oldStatus = $(this).data('currentStatus');
-		if (oldStatus) $(this).text(oldStatus);
-	});
+    });
+    $('#orders-table').on('mouseleave', 'td.current-status', function(){
+        var oldStatus = $(this).data('currentStatus');
+        if (oldStatus) $(this).text(oldStatus);
+    });
 
-	$('#orders-table').on('click', 'td.current-status .change-status', function(){
-		var statusTd    = $(this).closest('td'),
-			id      = parseInt($(this).closest('tr').data('id')),
-			currentStatus = $(this).data('status');
+    $('#orders-table').on('click', 'td.current-status .change-status', function(){
+        var statusTd    = $(this).closest('td'),
+            id      = parseInt($(this).closest('tr').data('id')),
+            currentStatus = $(this).data('status');
 
-		statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+        statusTd.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
 
-		$.ajax({
-			url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-			data: {status: currentStatus},
-			type: 'POST',
-			dataType: 'json',
-			success: function(response) {
-				showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
-				if (!response.error && response.hasOwnProperty('responseText')){
+        $.ajax({
+            url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
+            data: {status: currentStatus},
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
+                if (!response.error && response.hasOwnProperty('responseText')){
                     $(statusTd).text(response.responseText.status).data('currentStatus', response.responseText.status);
-				}
-			}
-		});
-	});
+                }
+            }
+        });
+    });
 
     $('.edit-inline-profile').on('click', function(){
         $(this).hide();
@@ -365,6 +417,51 @@
         return false;
     });
 
-	<?php endif;?>
-	
+    $('.edit-profile').on('blur', function(){
+        var clientEditParam = $(this).data('client-param'),
+            editedValue = $(this).val(),
+            addrRow = $(this).closest('.addr'),
+            addrType = addrRow.data('client-type'),
+            clientToken = addrRow.data('client-token'),
+            oldToken = addrRow.data('old-token');
+        showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+            function (){
+                $.ajax({
+                    type: "POST",
+                    url: $('#website_url').val() + 'plugin/shopping/run/editUserProfileAddress/',
+                    dataType: "json",
+                    data: {
+                        profileField: clientEditParam,
+                        profileValue: editedValue,
+                        userId: $('#userId').val(),
+                        secureToken: $('.secure-token-user').val(),
+                        addressType: addrType,
+                        clientToken: clientToken,
+                        clientOldToken: oldToken
+                    }
+                }).done(function (response) {
+                    var oldToken = response.responseText.oldToken;
+                    if (response.error == 1) {
+                        $('.edit-' + oldToken).css({"display":"inline"});
+                        $('.edit-client-' + clientEditParam + '-' + addrType + '-' + oldToken).css({"display":"none"});
+                        $('.inline-data').css({"display":"inline"});
+                        showMessage(response.responseText.respText, true, 5000);
+                    } else {
+                        var addressId = response.responseText.newToken;
+                        $('#'+oldToken).data('clientToken', addressId).attr('data-client-token',addressId);
+                        $('[data-client-param="client-' + clientEditParam + '-' + addrType + '-'+ oldToken+'"]').show();
+                        $('.edit-client-' + clientEditParam + '-' + addrType + '-'+ oldToken).hide();
+                        $('.client-' + clientEditParam + '-' + addrType + '-'+ oldToken).find('.inline-data').text(editedValue).show();
+                        showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
+                    }
+                });
+            }, function () {
+                $('.edit-' + oldToken).css({"display":"inline"});
+                $('.edit-client-' + clientEditParam + '-' + addrType + '-' + oldToken).css({"display":"none"});
+                $('.inline-data').css({"display":"inline"});
+            });
+    });
+
+    <?php endif;?>
+
 </script>

@@ -377,7 +377,7 @@ class Tools_Misc
      */
     public static function getConvertedPriceByCurrency($price, $currency)
     {
-        $amount = number_format($price, 2, ".", ",");
+        $amount = number_format($price, 2, ".", "");
         $translator = Zend_Registry::get('Zend_Translate');
         $shoppingCurrency = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');
         $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
@@ -402,7 +402,7 @@ class Tools_Misc
                         array(), Helpers_Action_Cache::CACHE_LONG);
             }
         }
-        return number_format($amount / $currRate, 2);
+        return number_format($amount / $currRate, 2, ".", "");
     }
 
 
@@ -542,4 +542,69 @@ class Tools_Misc
             ->where('pho.option_id IN (?)', array(Tools_Misc::OPTION_THANKYOU, Tools_Misc::OPTION_STORE_CLIENT_LOGIN));
         return $pageOptionsDbRable->getAdapter()->fetchAssoc($select);
     }
+
+    /**
+     * apply inventory actions (plugin based)
+     *
+     * @param int $productId product id
+     * @param array $options product options
+     * @param int $quantity quantity of products
+     * @param string $methodName public function name from inventory plugin
+     * @return array
+     */
+    public static function applyInventory($productId, $options, $quantity, $methodName)
+    {
+        $inventoryPluginsStatus = self::getInventoryPlugins($methodName);
+        if (!empty($inventoryPluginsStatus)) {
+            $pageData = array('websiteUrl' => Zend_Controller_Action_HelperBroker::getStaticHelper('website')->getUrl());
+            foreach ($inventoryPluginsStatus as $pluginName => $pluginStatus) {
+                if($pluginStatus === true) {
+                    try {
+                        $plugin = Tools_Factory_PluginFactory::createPlugin($pluginName, array(),
+                            $pageData);
+                        $result = $plugin->$methodName($productId, $options, $quantity);
+                        if ($result['error'] === true) {
+                            return $result;
+                        }
+                    } catch (Exception $e) {
+                        return array('error' => true, 'message' => $e->getMessage());
+                    }
+                }
+            }
+        }
+        return array('error' => false);
+    }
+
+    /**
+     * Get all plugins with tag inventory with specified method name
+     *
+     * @param string $methodName plugin public method name
+     *
+     * @return array
+     */
+    public static function getInventoryPlugins($methodName)
+    {
+        $inventoryPlugins = Tools_Plugins_Tools::getPluginsByTags(array('inventory'));
+        $inventoryPluginsStatus = array();
+        if (!empty($inventoryPlugins)) {
+            foreach ($inventoryPlugins as $inventoryPlugin) {
+                if ($inventoryPlugin->getStatus() === Application_Model_Models_Plugin::ENABLED) {
+                    $invPluginName = ucfirst($inventoryPlugin->getName());
+                    if (class_exists($invPluginName) && method_exists($invPluginName,
+                            $methodName)
+                    ) {
+                        $reflection = new ReflectionMethod($invPluginName, $methodName);
+                        if ($reflection->isPublic()) {
+                            $inventoryPluginsStatus[$invPluginName] = true;
+                        }
+                    } else {
+                        $inventoryPluginsStatus[$invPluginName] = false;
+                    }
+                }
+            }
+        }
+        return $inventoryPluginsStatus;
+    }
+
+
 }

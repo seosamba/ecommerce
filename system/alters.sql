@@ -209,14 +209,28 @@ UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_p
 ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info';
 
+
+
 INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
 SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_refund'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
 NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
 WHERE `enabled` = '1' AND `trigger_name` = 'store_refund' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+-- 15/10/2015
+-- version: 2.5.0
+-- Add Carrier tracking url
+
+CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_status` ENUM('0', '1') DEFAULT '0',
+  UNIQUE KEY `name` (`name`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.5' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

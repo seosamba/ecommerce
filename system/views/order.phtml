@@ -37,6 +37,11 @@
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
                         <span class="phone"><?php echo $billingAddress['phone'];?></span>
+                        <?php if ($this->order->getGateway()) : ?>
+                            <br/>
+                            <span><?php echo $this->translate('Payment Method');?>
+                                : <?php echo $this->order->getGateway() ;?></span>
+                        <?php endif; ?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>
                     <?php endif;?>
@@ -178,7 +183,35 @@
                                              src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
                                              alt="<?php echo $product->getName(); ?>"/>
                                     <?php endif;?>
-                                    <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?></td>
+                                    <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?>
+                                    <?php if (!empty($item['options'])): ?>
+                                        <?php $item['taxRate'] = Tools_Tax_Tax::calculateProductTax($product, null, true);?>
+                                        <?php foreach ($item['options'] as $optionTitle => $optData): ?>
+                                            <?php
+                                            if (is_array($optData)) {
+                                                $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
+                                                if (!empty($optData['priceValue']) && intval($optData['priceValue'])) {
+                                                    if ((bool)$item['taxRate'] && $this->showPriceIncTax == 1){
+                                                        $optPriceMod = $optData['priceValue'] * (100 + $item['taxRate'])/100;
+                                                    } else {
+                                                        $optPriceMod = $optData['priceValue'];
+                                                    }
+                                                    if ($optData['priceType'] === 'percent') {
+                                                        $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                                    } else {
+                                                        $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                                    }
+                                                }
+                                                if (!empty($optData['weightValue']) && intval($optData['weightValue'])) {
+                                                    $optionStr .= '<span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>' ;
+                                                }
+                                            } else {
+                                                $optionStr = $optionTitle . ': ' . $optData;
+                                            } ?>
+                                            <div class="options"><?php echo $optionStr; ?></div>
+                                        <?php endforeach; ?>
+                                <?php endif;?>
+                                </td>
                                 <td class="text-center"><?php echo $product->getMpn();?></td>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                                     <td class="text-center"><?php echo $this->currency($item['original_price']);?></td>
@@ -214,41 +247,41 @@
                     </tr>
                     <tr>
                         <td colspan="<?php echo $colSpan + 5 ?>" rowspan="7"></td>
-                        <td class="text-right"><?php echo $this->translate('Subtotal');?>:</td>
+                        <td><?php echo $this->translate('Subtotal');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
+                            <td class="text-right"><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
                         <?php else:?>
-                            <td><?php echo $this->currency($this->order->getSubTotal());?></td>
+                            <td class="text-right"><?php echo $this->currency($this->order->getSubTotal());?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getDiscount() > 0): ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Discount');?>:</td>
+                            <td><?php echo $this->translate('Discount');?>:</td>
                             <?php if ($this->showPriceIncTax == 1): ?>
-                                <td><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
+                                <td class="text-right"><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
                             <?php else: ?>
-                                <td><?php echo $this->currency($this->order->getDiscount());?></td>
+                                <td class="text-right"><?php echo $this->currency($this->order->getDiscount());?></td>
                             <?php endif;?>
                         </tr>
                     <?php endif; ?>
                     <tr>
-                        <td class="text-right"><?php echo $this->translate('Shipping');?>:</td>
+                        <td><?php echo $this->translate('Shipping');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
+                            <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
                         <?php else:?>
-                            <td><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
+                            <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getShippingService()) : ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Shipping service');?>:</td>
-                            <td><?php echo strtoupper($this->order->getShippingService()) ;?></td>
+                            <td><?php echo $this->translate('Shipping service');?>:</td>
+                            <td class="text-right"><?php echo strtoupper($this->order->getShippingService()) ;?></td>
                         </tr>
                     <?php endif; ?>
                     <?php if ($this->order->getShippingType()) : ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Shipping type');?>:</td>
-                            <td><?php echo $this->order->getShippingType();?></td>
+                            <td><?php echo $this->translate('Shipping type');?>:</td>
+                            <td class="text-right"><?php echo $this->order->getShippingType();?></td>
                         </tr>
                     <?php endif; ?>
                     <tr>
@@ -258,21 +291,21 @@
                             <?php $taxName = 'Tax'; ?>
                         <?php endif;?>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td class="text-right"><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
                         <?php else: ?>
-                            <td class="text-right"><?php echo $this->translate('Total ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Total ' . $taxName);?>:</td>
                         <?php endif;?>
-                        <td><?php echo $this->currency($this->order->getTotalTax());?></td>
+                        <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>
                     <?php if ($this->order->getRefundAmount() > 0): ?>
                         <tr>
-                            <td class="text-right"><?php echo $this->translate('Refund');?>:</td>
-                            <td><?php echo $this->currency($this->order->getRefundAmount());?></td>
+                            <td><?php echo $this->translate('Refund');?>:</td>
+                            <td class="text-right"><?php echo $this->currency($this->order->getRefundAmount());?></td>
                         </tr>
                     <?php endif; ?>
                     <tr>
-                        <td class="text-right"><?php echo $this->translate('Grand Total');?>:</td>
-                        <td><?php echo $this->currency($this->order->getTotal());?></td>
+                        <td><?php echo $this->translate('Grand Total');?>:</td>
+                        <td class="text-right"><?php echo $this->currency($this->order->getTotal());?></td>
                     </tr>
                     </tfoot>
                 </table>
