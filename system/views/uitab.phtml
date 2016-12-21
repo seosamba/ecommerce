@@ -20,9 +20,6 @@
                 <?php echo $this->formText('search', '',
                     array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
             </div>
-            <div class="grid_3 mt5px">
-                <label for="draggable"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Draggable');?></label>
-            </div>
         <?php endif; ?>
     </div>
 
@@ -52,6 +49,9 @@
         </select>
     </div>
     <div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
+    <div class="grid_3 mt5px">
+        <label for="draggable"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Draggable');?></label>
+    </div>
     <a href="javascript:;" id="btn-create"
        class="grid_12 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
