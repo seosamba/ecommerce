@@ -23,7 +23,7 @@
 
         $('#save_drag_pos-<?php echo $this->dragListId; ?>').on('click', function () {
             var sort_order = [];
-            $('.sortable-product-list-row').each(function (index) {
+            $('#sortable-<?php echo $this->dragListId; ?> .sortable-product-list-row').each(function (index) {
                 sort_order.push($(this).data('sort-product-id'));
             });
 

@@ -200,7 +200,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 
-
+        $this->_view->isAdmin = Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT);
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
             return $this->_view->render('draggable.phtml');
         }
