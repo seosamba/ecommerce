@@ -20,9 +20,6 @@
                 <?php echo $this->formText('search', '',
                     array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
             </div>
-            <div class="grid_3 mt5px">
-                <label for="draggable"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Draggable');?></label>
-            </div>
         <?php endif; ?>
     </div>
 
@@ -52,8 +49,11 @@
         </select>
     </div>
     <div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
+    <div class="grid_3 mt10px">
+        <label for="draggable" class="tooltip" title="<?php echo $this->translate('Once you’re back on list page, click items vignettes to drag & drop them into your desired order');?>"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Tweak sorting');?></label>
+    </div>
     <a href="javascript:;" id="btn-create"
-       class="grid_12 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
+       class="grid_9 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
 
 <?php
@@ -205,6 +205,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
 
             },
             loadStoreData: function (dataType, filter, force) {
+
                 showSpinner();
                 if (typeof  filter !== 'undefined') {
                     $('.ui-helper-hidden-accessible').hide();
@@ -274,6 +275,9 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     }
                     if ($('#brands').val()) {
                         data.fbrand = $('#brands').val();
+                    }
+                    if ($('#ordering').val()) {
+                        data.forder = $('#ordering').val();
                     }
                 }
                 data['stc'] = ($('#strict-tags').prop('checked') == false) ? 0 : 1;
