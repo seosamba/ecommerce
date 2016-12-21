@@ -1,21 +1,22 @@
 <?php $id = uniqid('pl-'); ?>
 <div class="product-list">
-	<?php if ($this->isPreview == true && $this->isAdmin):?>
-		<button id="backToOriginal-<?php echo $this->dragListId;?>" class="btn"><?php echo $this->translate('Back to original');?></button>
+	<?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+        <a class="btn backToOriginal"><?php echo $this->translate('Back to original');?></a>
 	<?php endif;?>
 	<?php echo $this->plContent; ?>
 	<?php if ($this->totalCount >= $this->limit): ?>
     <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
 	<?php endif; ?>
 </div>
-	<script>
-		$(function(){
-			var pathName = window.location.pathname;
-			$('#backToOriginal-<?php echo $this->dragListId;?>').on('click', function(){
-				window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>'+pathName;
-			});
-		});
-	</script>
+<script type="application/javascript">
+    $(function() {
+        $('.backToOriginal').on('click', function (e) {
+            e.preventDefault();
+            var pathName = window.location.pathname;
+            window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>' + pathName;
+        });
+    });
+</script>
 <?php if ($this->totalCount >= $this->limit): ?>
 <script>
 	$('#<?php echo $id; ?>').on('click', function(e){

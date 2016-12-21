@@ -121,8 +121,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
-        $isPreview = Zend_Controller_Front::getInstance()->getRequest()->getParam('preview');
-        if ($isPreview) {
+        $isPreview = filter_var(Zend_Controller_Front::getInstance()->getRequest()->getParam('prodListPreview'), FILTER_SANITIZE_STRING);
+        if (!empty($isPreview)) {
             $this->_view->isPreview = $isPreview;
         }
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
@@ -200,7 +200,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 
-        $this->_view->isAdmin = Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT);
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
             return $this->_view->render('draggable.phtml');
         }

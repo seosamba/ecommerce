@@ -107,10 +107,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$filter['order']     = array_filter(filter_var_array((array)$this->_request->getParam('forder'), FILTER_SANITIZE_STRING));
 
             if (empty($order) && !empty($filter['order'])) {
-                while (($i = array_search('draggable', $filter['order'])) !== false) {
-                    unset($filter['order'][$i]);
-                }
-                $order = $filter['order'];
+                $order = array_unique($filter['order']);
             }
 
             $organicSearch = filter_var($this->_request->getParam('os', 0), FILTER_SANITIZE_NUMBER_INT);

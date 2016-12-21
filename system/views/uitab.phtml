@@ -49,11 +49,11 @@
         </select>
     </div>
     <div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
-    <div class="grid_3 mt5px">
-        <label for="draggable"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Draggable');?></label>
+    <div class="grid_3 mt10px">
+        <label for="draggable" class="tooltip" title="<?php echo $this->translate('Once you’re back on list page, click items vignettes to drag & drop them into your desired order');?>"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Tweak sorting');?></label>
     </div>
     <a href="javascript:;" id="btn-create"
-       class="grid_12 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
+       class="grid_9 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
 
 <?php
@@ -228,7 +228,6 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     params.offset = utab.offset;
                     params.limit = utab.limit;
                 }
-                console.log(params);
 
                 $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
                     params,
