@@ -1,7 +1,7 @@
 <?php $id = uniqid('pl-'); ?>
 <div class="product-list">
 	<?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-        <a class="btn backToOriginal"><?php echo $this->translate('Back to original');?></a>
+        <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop');?></a>
 	<?php endif;?>
 	<?php echo $this->plContent; ?>
 	<?php if ($this->totalCount >= $this->limit): ?>
