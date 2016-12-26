@@ -6,6 +6,7 @@
 
         ?>
         <li class="sortable-product-list-row" data-sort-product-id="<?php echo $product->getId(); ?>">
+            <span><?php echo $product->getId(); ?></span>
             <?php if (!empty($imgArr[1])) :?>
                 <img src="<?php echo $this->websiteUrl . 'media/' . $imgArr[0] . '/small/' . $imgArr[1]; ?>" alt="">
             <?php else:?>
@@ -16,9 +17,13 @@
     <?php endforeach; ?>
 </ul>
 <button class="save_drag_pos btn" id="save_drag_pos-<?php echo $this->dragListId; ?>"><?php echo $this->translate('Save order');?></button>
-<a class="btn" href="<?php echo $this->websiteUrl;?>?prodListPreview=true"><?php echo $this->translate('Preview');?></a>
+<a class="btn prodListPreview"><?php echo $this->translate('Preview');?></a>
 <script>
     $(function () {
+        $('.prodListPreview').on('click', function(){
+            window.location.href = '<?php echo rtrim($this->websiteUrl,
+                    '/');?>' + window.location.pathname + '?prodListPreview=true';
+        });
         $("#sortable-<?php echo $this->dragListId; ?>").sortable().disableSelection();
 
         $('#save_drag_pos-<?php echo $this->dragListId; ?>').on('click', function () {
