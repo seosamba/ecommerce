@@ -246,14 +246,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$products = $this->_loadProducts();
 		}
         if (!empty($this->draglist) && !empty($products)) {
-            $productsForCompare = $products;
+            $productsToCompare = $products;
             if($this->_limit){
                 $currentLimit = $this->_limit;
                 unset($this->_limit);
-                $productsForCompare = $this->_loadProducts();
+                $productsToCompare = $this->_loadProducts();
                 $this->_limit = $currentLimit;
             }
-            $this->_compareProductsWithDraglist($productsForCompare);
+            $this->_compareProductsWithDraglist($productsToCompare);
         }
         if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
             $neededIds = array();
@@ -416,7 +416,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         }
         if (!empty($notInProducts)) {
             foreach ($notInProducts as $productId) {
-                while (($i = array_search($productId, $this->draglist['data'])) !== false) {
+                if (($i = array_search($productId, $this->draglist['data'])) !== false) {
                     unset($this->draglist['data'][$i]);
                 }
             }
