@@ -61,6 +61,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_originalPrice = 0;
 
+    protected $_limit = 0;
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -208,6 +210,14 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     public function setFreeShipping($_freeShipping) {
         $this->_freeShipping = $_freeShipping;
+    }
+
+    public function getLimit() {
+        return $this->_limit;
+    }
+
+    public function setLimit($_limit) {
+        $this->_limit = $_limit;
     }
 
 	public function toArray() {

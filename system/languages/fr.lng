@@ -631,6 +631,8 @@
         'mobile'=>'Mobile',
         'Deleted'=>'Supprimé',
         'Are you sure want to delete?' => 'Etes-vous sûr de vouloir supprimer?',
-        'Custom Shipper' => 'Expéditeur Personnalisé'
-
+        'Custom Shipper' => 'Expéditeur Personnalisé',
+        'Limit' => 'Limite',
+        'Products limit notify' => 'Notification de limite de produits',
+        'Inventory' => 'Inventaire'
 );?>

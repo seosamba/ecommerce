@@ -27,6 +27,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
     const BILLING_TYPE = 'billing';
 
+    const TRIGGER_PRODUCT_LIMIT = 'store_productlimit';
+
 	private $_options;
 
 	/**
@@ -225,6 +227,56 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 		return false;
 	}
+
+    /**
+     * Send email when product limit exceeded
+     *
+     * @return bool
+     */
+    private function _sendProductlimitMail()
+    {
+        $adminEmail = isset($systemConfig['adminEmail']) ? $systemConfig['adminEmail'] : 'admin@localhost';
+        $recipient = $this->_options['recipient'];
+        $options = $this->_options;
+
+        if ($options['cartStatus'] == Models_Model_CartSession::CART_STATUS_COMPLETED) {
+            switch ($recipient) {
+                case Tools_Security_Acl::ROLE_ADMIN:
+                    $this->_mailer->setMailToLabel('Admin')->setMailTo($adminEmail);
+                    break;
+                default:
+                    error_log('Unsupported recipient ' . $this->_options['recipient'] . ' given');
+
+                    return false;
+                    break;
+            }
+            $invitationData = array();
+
+            $productId = $options['cartContent']['product_id'];
+            $product = Models_Mapper_ProductMapper::getInstance()->find($productId);
+            if (!empty($product)) {
+                $productInventory = $product->getInventory();
+                $productLimit = $product->getLimit();
+                if (!empty($productLimit)) {
+                    if ($productLimit <= $productInventory) {
+                        $invitationData = array(
+                            'productlimit:name' => $product->getName(),
+                            'productlimit:qty' => $product->getInventory(),
+                            'productlimit:sku' => $product->getSku(),
+                            'productlimit:limit' => $product->getLimit()
+                        );
+                    }
+                }
+            }
+
+            if (!empty($invitationData)) {
+                $this->_entityParser->addToDictionary($invitationData);
+
+                return $this->_send();
+            }
+            return false;
+        }
+    }
 
 	private function _sendNeworderMail() {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());

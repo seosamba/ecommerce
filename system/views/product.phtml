@@ -345,14 +345,24 @@ $this->headLink()
                         </div>
                     <?php endif;?>
                     </div>
-                    <div class="grid_6 alpha labeled mt1-5em">
+                    <?php $grid = 'grid_6';?>
+                    <?php if(!empty($this->generalConfig['productLimit'])){
+                     $grid = 'grid_4';
+                    }?>
+                    <div class="<?php echo $grid;?> alpha labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
                         <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->generalConfig['currency']; ?></label>
                     </div>
-                    <div class="grid_6 omega labeled mt1-5em">
+                    <div class="<?php echo $grid;?> omega labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="&infin;">
                         <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                     </div>
+                    <?php if(!empty($this->generalConfig['productLimit'])):?>
+                    <div class="grid_4 omega labeled mt1-5em">
+                        <input class="grid_5 alpha omega fl-right" type="text" id="option-limit" data-reflection="limit" placeholder="0">
+                        <label class="grid_7 alpha omega" for="option-limit"><?php echo $this->translate('Limit'); ?></label>
+                    </div>
+                    <?php endif;?>
                     <div class="grid_12 alpha omega mt1-5em labeled">
                         <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
                             <option value="0"><?php echo $this->translate('Non taxable'); ?></option>

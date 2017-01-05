@@ -810,6 +810,9 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             sort($customerInventory, SORT_NUMERIC);
             $this->_view->inventory = $customerInventory;
+            $productLimitFlag = $this->_configMapper->getConfigParam('productLimit');
+            $this->_view->productLimitFlag = $productLimitFlag;
+
 			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
 			return $this->_view->render('manage_products.phtml');
 		}
@@ -1090,6 +1093,19 @@ class Shopping extends Tools_Plugins_Abstract {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
 			$cartSession->notifyObservers();
+
+            $productLimitFlag = $this->_configMapper->getConfigParam('productLimit');
+            if(!empty($productLimitFlag)){
+                foreach ($cartSession->getCartContent() as $content){
+                    $cartSession->removeObserver(new Tools_Mail_Watchdog);
+                    $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_PRODUCT_LIMIT,
+                        'cartStatus' => $cartSession->getStatus(),
+                        'cartContent' => $content
+                    )));
+                    $cartSession->notifyObservers();
+                }
+            }
 		}
 
 

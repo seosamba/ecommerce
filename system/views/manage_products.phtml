@@ -12,6 +12,7 @@
 <div id="store-products" class="toaster-widget store-widget">
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
     <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>
+    <input type="hidden" name="product-limit" value="<?php echo $this->productLimitFlag ;?>"/>
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
         <div class="grid_9 omega">
@@ -50,20 +51,31 @@
                 <th><?php echo $this->translate('Free shipping');?></th>
 				<th><?php echo $this->translate('Weight');?></th>
                 <th><?php echo $this->translate('Inventory');?></th>
+
+                <?php if(!empty($this->productLimitFlag)):?>
+                <th><?php echo $this->translate('Limit');?></th>
+                <?php endif;?>
+
 				<th><?php echo $this->translate('Price');?></th>
                 <th><?php echo $this->translate('Sales count');?></th>
 			</tr>
 		</thead>
+        <?php
+        $colspan = 10;
+        if(!empty($this->productLimitFlag)){
+            $colspan++;
+        }
+        ?>
 		<tbody>
 			<tr>
-				<td colspan="10" class="text-center">
+				<td colspan="<?php echo $colspan;?>" class="text-center">
 					<img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" alt="Loading..." />
 				</td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="10">
+				<td colspan="<?php echo $colspan;?>">
                     <div class="grid_3 alpha">
                         <?php echo $this->translate('with selected');?>:&nbsp;
                         <select name="product-mass-action" id="">

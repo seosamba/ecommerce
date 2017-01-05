@@ -230,7 +230,15 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 03/01/2017
+-- version: 2.5.1
+-- Add Product Limit
+
+ALTER TABLE `shopping_product` ADD COLUMN `limit` int(10) NULL DEFAULT '0' COMMENT='Limit for product';
+INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
+('1', 'store_productlimit', 'Tools_StoreMailWatchdog');
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

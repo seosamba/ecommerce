@@ -28,6 +28,11 @@ class Forms_BasicsSettings extends Zend_Form {
 			'label' => 'Force use HTTPS for checkout page',
             'class' => 'grid_6 alpha'
 		));
+
+        $this->addElement('checkbox', 'productLimit', array(
+            'label' => 'Products limit notify',
+            'class' => 'grid_6 alpha'
+        ));
 	}
 
 }

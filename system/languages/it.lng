@@ -1,0 +1,5 @@
+<?php return array(
+    'Limit' => 'Limite',
+    'Products limit notify' => 'Prodotti limitano notificare',
+    'Inventory' => 'Inventario'
+);?>

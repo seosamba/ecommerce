@@ -1,19 +1,22 @@
 <td><input type="checkbox" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> /></td>
-<td class="editable text-left" data-prop="name">
+<td class="text-left" data-prop="name">
     <a href="javascript:;" title="Click to open editor" class="tpopup" data-url="<%= $('#website_url').val() %>plugin/shopping/run/product/id/<%= id%>"><%= name %></a>
 </td>
 <td><%= brand %></td>
-<td class="editable " data-prop="sku"><%= sku %></td>
-<td class="editable" data-prop="mpn"><%= mpn %></td>
+<td data-prop="sku"><%= sku %></td>
+<td data-prop="mpn"><%= mpn %></td>
 <td><%= (freeShipping == '1') ? i18n['yes'] : i18n['no'] %></td>
-<td class="editable" data-prop="weight"><%= weight %></td>
+<td data-prop="weight"><%= weight %></td>
 <% if (_.isNull(inventory)){%>
 <td><%= _.isUndefined(i18n['null']) ? "&infin;":i18n['&infin;'] %></td>
 <% } %>
 <% if(inventory != null){%>
 <td><%= inventory %></td>
 <% }%>
-<td class="editable" data-prop="price"><%=accounting.formatMoney(price , currency) %></td>
+<% if(productLimit != 0){%>
+<td><%= limit %></td>
+<% }%>
+<td data-prop="price"><%=accounting.formatMoney(price , currency) %></td>
 <td class="textcentered">
 <% if (this.model.has('stats')) {%>
     <% if (stats.length) {%>

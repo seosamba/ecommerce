@@ -148,3 +148,14 @@ Magic spaces:
     somename - You should provide optional name if you want use several magicspaces on one page.
 
 
+    If you want receive e-mail with the products in which the limit is reached, please activate checkbox in admin panel "Products limit notify" (Store->Configuration->Basics).
+    After that configure Product limit notification.
+
+                                                        Email lexems
+========================================================================================================================
+                                        Product limit notification
+Product limit from action emails lexems (for admin)
+    {productlimit:name} - product name
+    {productlimit:sku} - product sku
+    {productlimit:qty} - product QTY(inventory)
+    {productlimit:limit} - product limit value

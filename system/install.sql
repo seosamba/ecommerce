@@ -176,6 +176,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `base_price` DECIMAL(10,2) NULL DEFAULT NULL,
   `inventory` VARCHAR(50) NULL DEFAULT NULL COLLATE utf8_unicode_ci,
   `free_shipping` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `limit` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -795,4 +796,4 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
-UPDATE `plugin` SET `version` = '2.5.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.2' WHERE `name` = 'shopping';
