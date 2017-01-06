@@ -81,6 +81,7 @@ Plugin widgets.
     {$postpurchase:subTotalTax[:clean]} -> subtotal tax
     {$postpurchase:id} -> cart id
     {$postpurchase:coupon} -> if coupon was used, show coupon name.
+    {$postpurchase:quotenote} -> show quote disclaimer.
 
     ######### Billing information #############
     {$postpurchase:billing:lastname} -> billing lastname
