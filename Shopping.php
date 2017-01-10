@@ -702,26 +702,65 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
+        $dragListId = filter_var($this->_request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
 		$content = '';
-		$nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
-        if (is_numeric($this->_request->getParam('limit'))) {
-            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+            $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+            if (is_numeric($this->_request->getParam('limit'))) {
+                $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+            } else {
+                $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+            }
+            $order = $this->_request->getParam('order');
+            $tags = $this->_request->getParam('tags');
+            $brands = $this->_request->getParam('brands');
+            $attributes = $this->_request->getParam('attributes');
+            $price = $this->_request->getParam('price');
+
+            $offset = intval($nextPage) * $limit;
+        if (empty($dragListId)) {
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price);
         } else {
-            $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+            $dragMapper = Models_Mapper_DraggableMapper::getInstance();
+            $dragModel = $dragMapper->find($dragListId);
+            if ($dragModel instanceof Models_Model_Draggable) {
+                $dragList['list_id'] = $dragModel->getId();
+                $dragList['data'] = unserialize($dragModel->getData());
+                $currentProductsId = array();
+                for ($i = $offset; $i < ($offset + $limit); $i++) {
+                    if (count($dragList['data']) > $offset && isset($dragList['data'][$i])) {
+                        $currentProductsId[] = $dragList['data'][$i];
+                    }
+                }
+                if (!empty($currentProductsId)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+                    $productsListData = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                        $currentProductsId));
+                    $productsListDataResult = array();
+                    for ($i = 0; $i < count($currentProductsId); $i++) {
+                        foreach ($productsListData as $product) {
+                            $prodId = $product->getId();
+                            if ($currentProductsId[$i] == $prodId) {
+                                $productsListDataResult[$i] = $product;
+                            }
+                        }
+                    }
+                    $products = $productsListDataResult;
+                }
+            }
         }
 
-		$order = $this->_request->getParam('order');
-		$tags = $this->_request->getParam('tags');
-		$brands = $this->_request->getParam('brands');
-        $attributes = $this->_request->getParam('attributes');
-        $price = $this->_request->getParam('price');
-
-		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
-		if (!empty($products)) {
+        if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
-			$content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+			if (!empty($productsListDataResult)) {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT)), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
+
+            } else {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            }
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
 			unset($widget);
 		}
 		if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
@@ -1996,6 +2035,23 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         return $arr;
+    }
+
+    public function saveDragListOrderAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $dragList = filter_var_array($this->_request->getParams(), FILTER_SANITIZE_STRING);
+            if (!empty($dragList['list_id'])) {
+                $mapper = Models_Mapper_DraggableMapper::getInstance();
+                $listId = $dragList['list_id'];
+                $model = new Models_Model_Draggable();
+                $model->setId($listId);
+                $model->setData(serialize($dragList['list_data']));
+                $mapper->save($model);
+                $this->_responseHelper->success($this->_translator->translate('Order has been updated'));
+            }
+        }
+        $this->_responseHelper->fail('');
     }
 
 }

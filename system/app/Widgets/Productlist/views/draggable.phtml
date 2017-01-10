@@ -1,0 +1,53 @@
+<ul id="sortable-<?php echo $this->dragListId; ?>" style="list-style: none;">
+    <?php foreach ($this->dragproducts as $product): ?>
+        <?php
+        $img = $product->getPhoto();
+        $imgArr = explode('/', $img);
+
+        ?>
+        <li class="sortable-product-list-row" data-sort-product-id="<?php echo $product->getId(); ?>">
+            <?php if (!empty($imgArr[1])) :?>
+                <img src="<?php echo $this->websiteUrl . 'media/' . $imgArr[0] . '/small/' . $imgArr[1]; ?>" alt="">
+            <?php else:?>
+                <img src="<?php echo $this->websiteUrl . 'system/images/no_image.png';?>" alt="">
+            <?php endif;?>
+            <p><?php echo $product->getName(); ?></p>
+        </li>
+    <?php endforeach; ?>
+</ul>
+<button class="save_drag_pos btn" id="save_drag_pos-<?php echo $this->dragListId; ?>"><?php echo $this->translate('Save order');?></button>
+<a class="btn prodListPreview"><?php echo $this->translate('Preview');?></a>
+<script>
+    $(function () {
+        $('.prodListPreview').on('click', function(){
+            window.location.href = '<?php echo rtrim($this->websiteUrl,
+                    '/');?>' + window.location.pathname + '?prodListPreview=true';
+        });
+        $("#sortable-<?php echo $this->dragListId; ?>").sortable().disableSelection();
+
+        $('#save_drag_pos-<?php echo $this->dragListId; ?>').on('click', function () {
+            var sort_order = [];
+            $('#sortable-<?php echo $this->dragListId; ?> .sortable-product-list-row').each(function (index) {
+                sort_order.push($(this).data('sort-product-id'));
+            });
+
+            var action = '<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/saveDragListOrder';
+            var data = {'list_data': sort_order, 'list_id': '<?php echo $this->dragListId; ?>'}
+            $.ajax({
+                url: action,
+                data: data,
+                type: 'post',
+                dataType: 'json'
+            }).done(function(response) {
+                if(response.error == 1){
+                    showMessage(response.responseText, true, 5000);
+                }else{
+                    showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
+                }
+            });
+
+        });
+
+    });
+
+</script>

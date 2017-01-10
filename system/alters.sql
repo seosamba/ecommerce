@@ -230,8 +230,18 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 03/01/2017
+-- 12/12/2016
 -- version: 2.5.1
+-- Add custom sort for product list
+
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 03/01/2017
+-- version: 2.5.2
 -- Add Product Limit
 
 ALTER TABLE `shopping_product` ADD COLUMN `limit` int(10) NULL DEFAULT '0' COMMENT='Limit for product';
@@ -239,6 +249,6 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_productlimit', 'Tools_StoreMailWatchdog');
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

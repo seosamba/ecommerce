@@ -687,6 +687,18 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $this->_cartContent[$sid]['productUrl'];
     }
 
+    /**
+     * Return Quote disclaimer
+     *
+     * @return mixed
+     */
+    protected function _renderQuoteNote(){
+        $cartId = $this->_cart->getId();
+        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($cartId);
+        if(!empty($quote)){
+            return $quote->getDisclaimer();
+        }
+    }
 
     /**
      * Return text if this order is recurring payment
