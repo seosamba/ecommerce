@@ -60,6 +60,8 @@ class Tools_ShoppingCart {
 
     protected $_recurringPaymentType = '';
 
+    protected $_disableProductDiscounts = false;
+
 	private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -326,7 +328,8 @@ class Tools_ShoppingCart {
             $freebiesProductsInCart = array();
             $notFreebiesProductsInCart = array();
             $notFreebiesProductsInCartStorageKeys = array();
-			if (is_array($this->_content) && !empty($this->_content)) {
+			$excludeProductDiscounts = $this->getDisableProductDiscounts();
+            if (is_array($this->_content) && !empty($this->_content)) {
 				foreach ($this->_content as $storageKey => &$cartItem) {
 					if (isset($cartItem['sid'])) {
 						if($cartItem['freebies'] == 1){
@@ -345,7 +348,7 @@ class Tools_ShoppingCart {
 						$product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
 						$product->setPrice($cartItem['price']);
 					}
-                    if ($cartItem['freebies'] != 1) {
+                    if ($cartItem['freebies'] != 1 && $excludeProductDiscounts === false) {
                         $cartItem = Tools_DiscountTools::applyDiscountRules($cartItem);
                     }
                     $product->setPrice($cartItem['price']);
@@ -914,4 +917,27 @@ class Tools_ShoppingCart {
 
         return $this;
     }
+
+    /**
+     * @return boolean
+     */
+    public function getDisableProductDiscounts()
+    {
+        return $this->_disableProductDiscounts;
+    }
+
+    /**
+     * @param boolean $disableProductDiscounts
+     * @return boolean
+     */
+    public function setDisableProductDiscounts($disableProductDiscounts)
+    {
+        $this->_disableProductDiscounts = $disableProductDiscounts;
+
+        return $this;
+    }
+
+
+
+
 }
