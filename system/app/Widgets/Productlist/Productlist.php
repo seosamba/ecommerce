@@ -245,7 +245,16 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
-
+        if (!empty($this->draglist) && !empty($products)) {
+            $productsToCompare = $products;
+            if($this->_limit){
+                $currentLimit = $this->_limit;
+                unset($this->_limit);
+                $productsToCompare = $this->_loadProducts();
+                $this->_limit = $currentLimit;
+            }
+            $this->_compareProductsWithDraglist($productsToCompare);
+        }
         if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
             $neededIds = array();
             for ($i = 0; $i < $this->last; $i++) {
@@ -392,6 +401,36 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		return implode('', $renderedContent);
 	}
 
+    protected function _compareProductsWithDraglist($products)
+    {
+        $productsIds = array();
+        foreach ($products as $productModel) {
+            $productsIds[] = $productModel->getId();
+        }
+        $notInDrag = array_diff($productsIds, $this->draglist['data']);
+        $notInProducts = array_diff($this->draglist['data'], $productsIds);
+        if (!empty($notInDrag)) {
+            foreach ($notInDrag as $productId) {
+                $this->draglist['data'][] = $productId;
+            }
+        }
+        if (!empty($notInProducts)) {
+            foreach ($notInProducts as $productId) {
+                if (($i = array_search($productId, $this->draglist['data'])) !== false) {
+                    unset($this->draglist['data'][$i]);
+                }
+            }
+        }
+        if (!empty($notInDrag) || !empty($notInProducts)) {
+            $this->draglist['data'] = array_values($this->draglist['data']);
+            $mapper = Models_Mapper_DraggableMapper::getInstance();
+            $model = new Models_Model_Draggable();
+            $model->setId($this->draglist['list_id']);
+            $model->setData(serialize($this->draglist['data']));
+            $mapper->save($model);
+        }
+
+    }
 
 	protected function _listSameTags() {
 		//get the product
