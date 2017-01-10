@@ -6,7 +6,6 @@
 
         ?>
         <li class="sortable-product-list-row" data-sort-product-id="<?php echo $product->getId(); ?>">
-            <span><?php echo $product->getId(); ?></span>
             <?php if (!empty($imgArr[1])) :?>
                 <img src="<?php echo $this->websiteUrl . 'media/' . $imgArr[0] . '/small/' . $imgArr[1]; ?>" alt="">
             <?php else:?>
