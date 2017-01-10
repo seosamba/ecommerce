@@ -230,7 +230,17 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 12/12/2016
+-- version: 2.5.1
+-- Add custom sort for product list
+
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
