@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `shopping_draggable` (
 -- version: 2.5.2
 -- Add Product Limit
 
-ALTER TABLE `shopping_product` ADD COLUMN `limit` int(10) NULL DEFAULT '0' COMMENT='Limit for product';
+ALTER TABLE `shopping_product` ADD COLUMN `limit` int(10) UNSIGNED NULL DEFAULT '0' COMMENT 'Limit for product';
 INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
 ('1', 'store_productlimit', 'Tools_StoreMailWatchdog');
 

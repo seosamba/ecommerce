@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `base_price` DECIMAL(10,2) NULL DEFAULT NULL,
   `inventory` VARCHAR(50) NULL DEFAULT NULL COLLATE utf8_unicode_ci,
   `free_shipping` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
-  `limit` int(10) unsigned DEFAULT '0',
+  `limit` int(10) UNSIGNED NULL DEFAULT '0' COMMENT 'Limit for product',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
