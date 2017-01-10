@@ -833,4 +833,10 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_discount` (
   CONSTRAINT `shopping_cart_session_discount_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.5.1' WHERE `name` = 'shopping';
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+UPDATE `plugin` SET `version` = '2.5.2' WHERE `name` = 'shopping';
