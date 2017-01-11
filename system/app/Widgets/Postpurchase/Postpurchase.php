@@ -334,17 +334,6 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $this->_translator->translate($shippingService);
     }
 
-    protected function _renderCoupon()
-    {
-        $couponName = '';
-        $cartId = $this->_cart->getId();
-        $coupon = Store_Mapper_CouponMapper::getInstance()->findByCartId($cartId);
-        if(!empty($coupon)){
-            $couponName = $coupon['coupon_code'];
-        }
-        return $this->_translator->translate($couponName);
-    }
-
     /**
      * @return string Coupon Name
      */
