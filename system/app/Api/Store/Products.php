@@ -105,13 +105,12 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
 			$filter['inventory']  = (array)$this->_request->getParam('fqty');
+            $filter['limit']  = (array)$this->_request->getParam('flimit');
 			$filter['order']     = array_filter(filter_var_array((array)$this->_request->getParam('forder'), FILTER_SANITIZE_STRING));
 
             if (empty($order) && !empty($filter['order'])) {
                 $order = array_unique($filter['order']);
             }
-
-			$filter['inventory'] = (!in_array('select', $filter['inventory'])) ? $filter['inventory'] : array();
 
             if(in_array(html_entity_decode('&infin;'), $filter['inventory'])){
                 $filter['inventory'][array_search(html_entity_decode('&infin;'), $filter['inventory'])] = 'infinity';
@@ -121,7 +120,7 @@ class Api_Store_Products extends Api_Service_Abstract {
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
-            $cacheKey = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . implode(',', $filter['order']). implode(',', $filter['inventory']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
+            $cacheKey = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . implode(',', $filter['order']). implode(',', $filter['inventory']). implode(',', $filter['limit']) . $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
 			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
 
 
@@ -129,6 +128,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 					(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
                     (is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null,
+                    (is_array($filter['limit']) && !empty($filter['limit'])) ? $filter['limit']: null,
                     $strictTagsCount,
                     $organicSearch
                 );

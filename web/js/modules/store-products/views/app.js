@@ -13,10 +13,12 @@ define([
     'text!../templates/toggle_dialog.html',
     'text!../templates/delete_dialog.html',
     'text!../templates/freeShipping_dialog.html',
+    'text!../templates/productLimit_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone, ProductsCollection, BrandsCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
-            PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl, FreeShippingDialogTmpl, i18n){
+            PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl, FreeShippingDialogTmpl,
+            ProductLimitTmpl ,i18n){
     var MainView = Backbone.View.extend({
         el: $('#store-products'),
         events: {
@@ -145,6 +147,35 @@ define([
                 dialogClass: 'seotoaster',
                 buttons: brandButtons
             });
+            return false;
+        },
+        productLimitAction: function(products){
+            var self = this;
+            var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
+            var limitButtons = {};
+
+            var dialog = _.template(ProductLimitTmpl, {
+                totalProducts: this.products.totalRecords,
+                i18n:i18n
+            });
+
+            limitButtons[applyButton] = function() {
+                var productLimit = parseInt($(this).find('input[name=newlimit]').val());
+                if(isNaN(productLimit)){
+                    $(this).dialog('destroy');
+                    showMessage('You entered not valid data.', 3000, false);
+                    return false;
+                }
+                self.products.batch('PUT', {'limit': productLimit}, $(this).find('input[name="applyToAll"]').attr('checked') );
+
+                $(this).dialog('destroy');
+            };
+
+            $(dialog).dialog({
+                dialogClass: 'seotoaster',
+                buttons: limitButtons
+            });
+
             return false;
         },
         tagAction: function(products){

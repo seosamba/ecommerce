@@ -257,6 +257,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             if (!empty($product)) {
                 $productInventory = $product->getInventory();
                 $productLimit = $product->getLimit();
+                $productGeneralLimit = $this->_storeConfig['productLimitInput'];
+                if(empty($productLimit) && !empty($productGeneralLimit)){
+                    $productLimit = $productGeneralLimit;
+                }
+
                 if (!empty($productLimit)) {
                     if ($productLimit <= $productInventory) {
                         $invitationData = array(

@@ -841,14 +841,14 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
             $products = Models_Mapper_ProductMapper::getInstance();
-            $query = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('inventory'));
-            $customerInventory = $products->getDbTable()->getAdapter()->fetchCol($query);
-            if(in_array(null, $customerInventory)){
-               $arrNull = array_search(null, $customerInventory);
-                $customerInventory[$arrNull] = '&infin;';
-            }
+            $queryInventory = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('inventory'));
+            $customerInventory = $products->getDbTable()->getAdapter()->fetchCol($queryInventory);
             sort($customerInventory, SORT_NUMERIC);
             $this->_view->inventory = $customerInventory;
+            $queryProductLimit = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('limit'));
+            $customerProductLimit = $products->getDbTable()->getAdapter()->fetchCol($queryProductLimit);
+            sort($customerProductLimit, SORT_NUMERIC);
+            $this->_view->productLimit = $customerProductLimit;
             $productLimitFlag = $this->_configMapper->getConfigParam('productLimit');
             $this->_view->productLimitFlag = $productLimitFlag;
 

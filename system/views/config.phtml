@@ -149,5 +149,18 @@ $this->headLink()
     $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
     });
+
+    if(!$('#productLimit').prop('checked')){
+      $('#productLimitInput').hide();
+    }
+
+    $(document).on('change', '#productLimit', function (e) {
+        if(!$('#productLimit').prop('checked')){
+            $('#productLimitInput').hide();
+        }else{
+            $('#productLimitInput').show();
+        }
+    });
+
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

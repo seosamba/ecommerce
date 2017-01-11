@@ -153,6 +153,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $tags = null,
         $brands = null,
         $inventory = null,
+        $productLimit = null,
         $strictTagsCount = false,
         $organicSearch = false,
         $attributes = array(),
@@ -219,9 +220,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
             }
             if (!empty($inventory)) {
-                $select->where('p.inventory  = ?', $inventory);
+                $select->where('p.inventory IN (?)', $inventory);
             }
 
+        }
+
+        if(is_array($productLimit) && !empty($productLimit)) {
+            $select->where('p.limit IN (?)', $productLimit);
         }
 
         if ((bool)$search) {

@@ -24,7 +24,8 @@ define([
             'count': true,
             'ftag': function() { return $('select[name="filter-tag"]').val() || []; },
             'fbrand': function() { return $('select[name="filter-brand"]').val() || []; },
-            'fqty': function() { return $('select[name="filter-inventory"]').val() || []; }
+            'fqty': function() { return $('select[name="filter-inventory"]').val() || []; },
+            'flimit': function() { return $('select[name="filter-limit"]').val() || []; }
         },
         parse: function (response, xhr) {
             var resultsCount = _.has(response, 'count') ? response.count : _.size(response.data);
@@ -38,7 +39,7 @@ define([
         getFilter: function(){
             var self = this,
                 params = {};
-            _.each(_.pick(this.server_api, 'ftag', 'fbrand','fqty', 'key'), function(value, key){
+            _.each(_.pick(this.server_api, 'ftag', 'fbrand','fqty', 'flimit', 'key'), function(value, key){
                 if( _.isFunction(value) ) {
                     value = _.bind(value, self);
                     value = value();

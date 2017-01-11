@@ -33,6 +33,12 @@ class Forms_BasicsSettings extends Zend_Form {
             'label' => 'Products limit notify',
             'class' => 'grid_6 alpha'
         ));
+
+        $this->addElement('text', 'productLimitInput', array(
+            'label' => '',
+            'class' => 'grid_6 alpha',
+            'validators' => array(new Zend_Validate_Int())
+        ));
 	}
 
 }

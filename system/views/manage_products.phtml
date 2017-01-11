@@ -30,14 +30,29 @@
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_4 omega ">
-                <select class="pfilter" name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
-                    <option value="select"><?php echo $this->translate('Select all');?></option>
+            <?php
+            $grid = 'grid_4';
+            if($this->productLimitFlag){
+                $grid = 'grid_2';
+            }
+            ?>
+            <div class="<?php echo $grid;?> omega ">
+                <select class="pfilter" multiple name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
                     <?php foreach($this->inventory as $qty):?>
+                        <?php $qty = (is_null($qty)) ? '&infin;' : $qty;?>
                         <option value="<?php echo $qty;?>"><?php echo $qty;?></option>
                     <?php endforeach;?>
                 </select>
             </div>
+            <?php if($this->productLimitFlag):?>
+                <div class="<?php echo $grid;?> omega ">
+                    <select class="pfilter" multiple name="filter-limit" data-placeholder="<?php echo $this->translate('Product by limit..');?>">
+                        <?php foreach($this->productLimit as $limit):?>
+                            <option value="<?php echo $limit;?>"><?php echo $limit;?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div>
+            <?php endif;?>
         </div>
     </div>
 	<table class="products-table widget omega">
@@ -87,6 +102,9 @@
                             <option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
                             <option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
                             <option value="toggle"><?php echo $this->translate('enable/disable');?></option>
+                            <?php if($this->productLimitFlag):?>
+                            <option value="productLimit"><?php echo $this->translate('assign product limit');?></option>
+                            <?php endif;?>
                         </select>
                     </div>
                     <div id="paginator" class="paginator text-right grid_9 omega mt10px"></div>
