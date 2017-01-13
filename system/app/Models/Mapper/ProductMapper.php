@@ -213,15 +213,17 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             }
         }
 
-        if(is_array($inventory)) {
+        if(is_array($inventory) && !empty($inventory)) {
             if(in_array('infinity', $inventory)){
-                $select->where('p.inventory IS NULL', $inventory);
+              $where =  $this->getDbTable()->getAdapter()->quoteInto('p.inventory IS NULL', $inventory);
                 unset($inventory[0]);
-
+                if (!empty($inventory)) {
+                    $where .= ' OR ' . $this->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $inventory);
+                }
+            }else{
+                $where = $this->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $inventory);
             }
-            if (!empty($inventory)) {
-                $select->where('p.inventory IN (?)', $inventory);
-            }
+            $select->where($where);
 
         }
 
@@ -608,6 +610,18 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->where('weight = 0 OR weight IS NULL');
         $result = $this->getDbTable()->getAdapter()->fetchAll($select);
         return $result[0]['count'];
+    }
+
+    public function getProductRows()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product', array(
+            'inventory' => new Zend_Db_Expr('GROUP_CONCAT(DISTINCT(inventory))'),
+            'limit' => new Zend_Db_Expr('GROUP_CONCAT(DISTINCT(`limit`))')
+        ));
+
+        $result = $this->getDbTable()->getAdapter()->fetchRow($select);
+
+        return $result;
     }
 
 }

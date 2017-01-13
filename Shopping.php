@@ -841,14 +841,20 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
             $products = Models_Mapper_ProductMapper::getInstance();
-            $queryInventory = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('inventory'));
-            $customerInventory = $products->getDbTable()->getAdapter()->fetchCol($queryInventory);
-            sort($customerInventory, SORT_NUMERIC);
-            $this->_view->inventory = $customerInventory;
-            $queryProductLimit = $products->getDbTable()->getAdapter()->select()->distinct()->from('shopping_product', array('limit'));
-            $customerProductLimit = $products->getDbTable()->getAdapter()->fetchCol($queryProductLimit);
-            sort($customerProductLimit, SORT_NUMERIC);
-            $this->_view->productLimit = $customerProductLimit;
+
+            $productsData = $products->getProductRows();
+
+            if(!empty($productsData['inventory'])){
+                $customerInventory =  explode(',' , $productsData['inventory']);
+                sort($customerInventory, SORT_NUMERIC);
+                $this->_view->inventory = $customerInventory;
+            }
+            if(!empty($productsData['limit'])){
+                $customerProductLimit = explode(',' , $productsData['limit']);
+                sort($customerProductLimit, SORT_NUMERIC);
+                $this->_view->productLimit = $customerProductLimit;
+            }
+
             $productLimitFlag = $this->_configMapper->getConfigParam('productLimit');
             $this->_view->productLimitFlag = $productLimitFlag;
 

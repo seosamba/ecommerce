@@ -38,8 +38,8 @@
             ?>
             <div class="<?php echo $grid;?> omega ">
                 <select class="pfilter" multiple name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by inventory..');?>">
+                    <option value="<?php echo '&infin;';?>"><?php echo '&infin;';?></option>
                     <?php foreach($this->inventory as $qty):?>
-                        <?php $qty = (is_null($qty)) ? '&infin;' : $qty;?>
                         <option value="<?php echo $qty;?>"><?php echo $qty;?></option>
                     <?php endforeach;?>
                 </select>
