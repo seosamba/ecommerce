@@ -104,9 +104,9 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
-			$filter['inventory']  = (array)$this->_request->getParam('fqty');
-            $filter['limit']  = (array)$this->_request->getParam('flimit');
-			$filter['order']     = array_filter(filter_var_array((array)$this->_request->getParam('forder'), FILTER_SANITIZE_STRING));
+			$filter['inventory']  = filter_var_array((array)$this->_request->getParam('fqty'), FILTER_SANITIZE_STRING);
+            $filter['limit']      = filter_var_array((array)$this->_request->getParam('flimit'), FILTER_SANITIZE_NUMBER_INT);
+			$filter['order']      = array_filter(filter_var_array((array)$this->_request->getParam('forder'), FILTER_SANITIZE_STRING));
 
             if (empty($order) && !empty($filter['order'])) {
                 $order = array_unique($filter['order']);
