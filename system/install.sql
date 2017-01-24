@@ -819,4 +819,11 @@ CREATE TABLE IF NOT EXISTS `shopping_company_products` (
   FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.5.2' WHERE `name` = 'shopping';
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+UPDATE `plugin` SET `version` = '2.5.3' WHERE `name` = 'shopping';
+

@@ -418,18 +418,30 @@ class Shopping extends Tools_Plugins_Abstract {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
-				$customer->setRoleId(Shopping::ROLE_CUSTOMER)
+				if (!empty($data['customerPassword'])) {
+                    $password = $data['customerPassword'];
+                } else {
+                    $password = md5(uniqid('customer_' . time()));
+                }
+                $customer->setRoleId(Shopping::ROLE_CUSTOMER)
 						->setEmail($data['email'])
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
                         ->setMobilePhone($mobilePhone)
-						->setPassword(md5(uniqid('customer_' . time())));
+						->setPassword($password);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
 					$customer->setId($newCustomerId);
 					$session->storeIsNewCustomer = true;
-				}
+                    if (!empty($data['customerPassword'])) {
+                        $session->clientWithNewPassword = true;
+                    } elseif(isset($session->clientWithNewPassword)) {
+                        unset($session->clientWithNewPassword);
+                    }
+				} elseif(isset($session->clientWithNewPassword)) {
+                    unset($session->clientWithNewPassword);
+                }
 			} else {
 				return $existingCustomer;
 			}
@@ -699,26 +711,65 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!$this->_request->isPost()) {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
+        $dragListId = filter_var($this->_request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
 		$content = '';
-		$nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
-        if (is_numeric($this->_request->getParam('limit'))) {
-            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+            $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+            if (is_numeric($this->_request->getParam('limit'))) {
+                $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+            } else {
+                $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+            }
+            $order = $this->_request->getParam('order');
+            $tags = $this->_request->getParam('tags');
+            $brands = $this->_request->getParam('brands');
+            $attributes = $this->_request->getParam('attributes');
+            $price = $this->_request->getParam('price');
+
+            $offset = intval($nextPage) * $limit;
+        if (empty($dragListId)) {
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price);
         } else {
-            $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+            $dragMapper = Models_Mapper_DraggableMapper::getInstance();
+            $dragModel = $dragMapper->find($dragListId);
+            if ($dragModel instanceof Models_Model_Draggable) {
+                $dragList['list_id'] = $dragModel->getId();
+                $dragList['data'] = unserialize($dragModel->getData());
+                $currentProductsId = array();
+                for ($i = $offset; $i < ($offset + $limit); $i++) {
+                    if (count($dragList['data']) > $offset && isset($dragList['data'][$i])) {
+                        $currentProductsId[] = $dragList['data'][$i];
+                    }
+                }
+                if (!empty($currentProductsId)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+                    $productsListData = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                        $currentProductsId));
+                    $productsListDataResult = array();
+                    for ($i = 0; $i < count($currentProductsId); $i++) {
+                        foreach ($productsListData as $product) {
+                            $prodId = $product->getId();
+                            if ($currentProductsId[$i] == $prodId) {
+                                $productsListDataResult[$i] = $product;
+                            }
+                        }
+                    }
+                    $products = $productsListDataResult;
+                }
+            }
         }
 
-		$order = $this->_request->getParam('order');
-		$tags = $this->_request->getParam('tags');
-		$brands = $this->_request->getParam('brands');
-        $attributes = $this->_request->getParam('attributes');
-        $price = $this->_request->getParam('price');
-
-		$offset = intval($nextPage) * $limit;
-		$products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price);
-		if (!empty($products)) {
+        if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			$widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
-			$content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+			if (!empty($productsListDataResult)) {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT)), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
+
+            } else {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            }
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
 			unset($widget);
 		}
 		if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
@@ -895,32 +946,34 @@ class Shopping extends Tools_Plugins_Abstract {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
-                $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
-                $selectedName = '';
-                $url = '';
-                $paramData = $params['shippingTrackingId'];
-                $currentData = '';
-                $shippingUrlMapper->clearDefaultStatus();
-                    if(!empty($params['trackingUrlId'])){
+                if (isset($params['shippingTrackingId'])) {
+                    $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
+                    $selectedName = '';
+                    $url = '';
+                    $paramData = $params['shippingTrackingId'];
+                    $currentData = '';
+                    $shippingUrlMapper->clearDefaultStatus();
+                    if (!empty($params['trackingUrlId'])) {
                         $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
-                        if(!empty($currentData)) {
+                        if (!empty($currentData)) {
                             $selectedName = $currentData->getName();
                             $url = $currentData->getUrl();
                             $currentData->setDefaultStatus(1);
                             $shippingUrlMapper->save($currentData);
                         }
                     }
-                        unset($params['trackingUrlId'], $params['id']);
-                        if($currentData instanceof Models_Model_ShippingUrl){
-                            $params['shippingTrackingId'] = trim($currentData->getUrl()).trim($paramData);
-                        }
-                        $order->registerObserver(new Tools_Mail_Watchdog(array(
-                            'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
-                            'name' => $selectedName,
-                            'code' => $paramData,
-                            'url' =>  $url
-                        )));
-                        $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                    unset($params['trackingUrlId'], $params['id']);
+                    if ($currentData instanceof Models_Model_ShippingUrl) {
+                        $params['shippingTrackingId'] = trim($currentData->getUrl()) . trim($paramData);
+                    }
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,
+                        'name' => $selectedName,
+                        'code' => $paramData,
+                        'url' => $url
+                    )));
+                    $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                }
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
@@ -1058,13 +1111,17 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_sessionHelper->storeCartSessionConversionKey = $cartId;
 			if ($this->_sessionHelper->storeIsNewCustomer) {
 				$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
-				$userMapper = Application_Model_Mappers_UserMapper::getInstance();
-				$userData = $userMapper->find($cartSession->getUserId());
-				$newCustomerPassword = uniqid('customer_' . time());
-				$userData->setPassword($newCustomerPassword);
-				$newCustomerId = $userMapper->save($userData);
+				if (!isset($this->_sessionHelper->clientWithNewPassword)) {
+                    $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                    $userData = $userMapper->find($cartSession->getUserId());
+                    $newCustomerPassword = uniqid('customer_' . time());
+                    $userData->setPassword($newCustomerPassword);
+                    $userMapper->save($userData);
+                }
 				$customer = Models_Mapper_CustomerMapper::getInstance()->find($cartSession->getUserId());
-				$customer->setPassword($newCustomerPassword);
+                if (!isset($this->_sessionHelper->clientWithNewPassword)) {
+                    $customer->setPassword($newCustomerPassword);
+                }
 				$customer->registerObserver(new Tools_Mail_Watchdog(array(
 					'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_CUSTOMER
 				)));
@@ -1968,6 +2025,23 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         return $arr;
+    }
+
+    public function saveDragListOrderAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $dragList = filter_var_array($this->_request->getParams(), FILTER_SANITIZE_STRING);
+            if (!empty($dragList['list_id'])) {
+                $mapper = Models_Mapper_DraggableMapper::getInstance();
+                $listId = $dragList['list_id'];
+                $model = new Models_Model_Draggable();
+                $model->setId($listId);
+                $model->setData(serialize($dragList['list_data']));
+                $mapper->save($model);
+                $this->_responseHelper->success($this->_translator->translate('Order has been updated'));
+            }
+        }
+        $this->_responseHelper->fail('');
     }
 
 }

@@ -1,99 +1,110 @@
 <?php echo $this->headLink()->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css'); ?>
 <div class="container form">
-	<!-- Product listing selector -->
+    <!-- Product listing selector -->
     <div class="grid_12 alpha omega">
-        <?php if(!isset($this->productTemplates) || empty($this->productTemplates)): ?>
-            <h4 class="message warning text-normal mb0px"><strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?></h4>
+        <?php if (!isset($this->productTemplates) || empty($this->productTemplates)): ?>
+            <h4 class="message warning text-normal mb0px">
+                <strong><?php echo $this->translate('Warning! '); ?></strong><?php echo $this->translate('You don\'t have any product listing template. You should create one.'); ?>
+            </h4>
         <?php else: ?>
-            <div id="template-selector" class="grid_6 alpha">
-				<select id="templates" class="templates" data-placeholder="<?php echo $this->translate('Select a product listing template...');?>">
+            <div id="template-selector" class="grid_5 alpha">
+                <select id="templates" class="templates"
+                        data-placeholder="<?php echo $this->translate('Select a product listing template...'); ?>">
                     <option value=""><?php echo $this->translate('Select a product listing template'); ?></option>
-                    <?php foreach($this->productTemplates as $template): ?>
+                    <?php foreach ($this->productTemplates as $template): ?>
                         <option value="<?php echo $template->getName(); ?>"><?php echo $template->getName(); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="grid_6 omega">
-                <?php echo $this->formText('search', '', array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
+            <div class="grid_4 omega">
+                <?php echo $this->formText('search', '',
+                    array('placeholder' => $this->translate('search by name, sku or tags'))); ?>
             </div>
         <?php endif; ?>
     </div>
 
 
-	<!-- Filtering -->
-	<div id="filters" class="grid_4 alpha omega">
-		<select id="tags" class="pselect chosen-select" name="product-tags" multiple data-placeholder="<?php echo $this->translate('Filter by tags...');?>"></select>
-	</div>
-    <label id="conditional" class="tooltip grid_1 alpha" title="<?php echo $this->translate('AND conditional');?>">
+    <!-- Filtering -->
+    <div id="filters" class="grid_4 alpha omega">
+        <select id="tags" class="pselect chosen-select" name="product-tags" multiple
+                data-placeholder="<?php echo $this->translate('Filter by tags...'); ?>"></select>
+    </div>
+    <label id="conditional" class="tooltip grid_1 alpha" title="<?php echo $this->translate('AND conditional'); ?>">
         <input type="checkbox" id="strict-tags">
     </label>
     <div class="grid_4 alpha">
-		<select class="pselect" name="product-brands" id="brands" multiple data-placeholder="<?php echo $this->translate('Filter by brands...');?>"></select>
-	</div>
+        <select class="pselect" name="product-brands" id="brands" multiple
+                data-placeholder="<?php echo $this->translate('Filter by brands...'); ?>"></select>
+    </div>
 
-	<!-- Ordering -->
-	<div id="order" class="grid_3 omega">
-		<select id="ordering" class="pselect" name="ordering" multiple data-placeholder="<?php echo $this->translate('Sort by...');?>">
-			<option value="name"><?php echo $this->translate('Name'); ?></option>
-			<option value="price"><?php echo $this->translate('Price'); ?></option>
-			<option value="brand"><?php echo $this->translate('Brand'); ?></option>
+    <!-- Ordering -->
+    <div id="order" class="grid_3 omega">
+        <select id="ordering" class="pselect" name="ordering" multiple
+                data-placeholder="<?php echo $this->translate('Sort by...'); ?>">
+            <option value="name"><?php echo $this->translate('Name'); ?></option>
+            <option value="price"><?php echo $this->translate('Price'); ?></option>
+            <option value="brand"><?php echo $this->translate('Brand'); ?></option>
             <option value="date"><?php echo $this->translate('Date'); ?></option>
             <option value="sku"><?php echo $this->translate('Sku'); ?></option>
-		</select>
-	</div>
-	<div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
-	<a href="javascript:;" id="btn-create" class="grid_12 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
+        </select>
+    </div>
+    <div id="product-products" class="grid_12 alpha omega column_6 full-width"></div>
+    <div class="grid_3 mt10px">
+        <label for="draggable" class="tooltip" title="<?php echo $this->translate('Once you’re back on list page, click items vignettes to drag & drop them into your desired order');?>"><input type="checkbox" id="draggable" name="draggable"/> <?php echo $this->translate('Tweak sorting');?></label>
+    </div>
+    <a href="javascript:;" id="btn-create"
+       class="grid_9 alpha omega mt5px btn success"><?php echo $this->translate('Create an automated product listing'); ?></a>
 </div>
 
 <?php
-    echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
-        ->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
-        ->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
+echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+    ->headScript()->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/lazyload/jquery.lazyload.min.js')
+    ->headScript()->appendFile($this->websiteUrl . 'system/js/external/waypoints/waypoints.min.js');
 ?>
 
 <script type="text/javascript" charset="utf-8">
-    $(function() {
+    $(function () {
         showTooltip('.tooltip', 'info', 'right');
-	    // uiTab object
-	    var uiTab = {
-		    step: parseInt('<?php echo Shopping::PRODUCT_DEFAULT_LIMIT; ?>'),
-		    offset: 0,
+        // uiTab object
+        var uiTab = {
+            step: parseInt('<?php echo Shopping::PRODUCT_DEFAULT_LIMIT; ?>'),
+            offset: 0,
             searchTerm: null,
-		    init: function() {
+            init: function () {
 
                 //init chosen plugin
                 $('.pselect').chosen();
 
-			    //init jqueryui button
-			    $('.ui-tabs-nav-item a').click(this.launch);
-			    $(document)
+                //init jqueryui button
+                $('.ui-tabs-nav-item a').click(this.launch);
+                $(document)
                     .on('click', '.currproduct', this.insertSingleProduct)
-			        .on('click', '#btn-create', this.insertList)
-                    .on('click', '#strict-tags', function() {
-                        if($('#tags').val() !== null) {
-                            uiTab.offset    = 0;
+                    .on('click', '#btn-create', this.insertList)
+                    .on('click', '#strict-tags', function () {
+                        if ($('#tags').val() !== null) {
+                            uiTab.offset = 0;
                             self.searchTerm = null;
                             $('#search').val('');
                             uiTab.loadStoreData('products', true);
                         }
                     });
 
-			    $('.pselect').chosen().change(function() {
-					uiTab.offset    = 0;
+                $('.pselect').chosen().change(function () {
+                    uiTab.offset = 0;
 
                     //cleaning the search params before filtering
                     self.searchTerm = null;
                     $('#search').val('');
 
                     uiTab.loadStoreData('products', true);
-			    });
+                });
 
                 var self = this;
-                $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
+                $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function (response) {
                     $('#search').autocomplete({
                         minLength: 2,
                         source: response,
-                        select: function(event, ui){
+                        select: function (event, ui) {
                             self.searchTerm = null;
                             self.loadStoreData('products', {
                                 key: ui.item.value
@@ -102,80 +113,84 @@
                     });
                 });
 
-                $(document).on('keypress', '#search', function(e) {
+                $(document).on('keypress', '#search', function (e) {
                     $('.ui-helper-hidden-accessible').show();
-                    if(e.keyCode == 13) {
+                    if (e.keyCode == 13) {
                         $('.ui-autocomplete').hide();
                         self.searchTerm = null;
                         self.loadStoreData('products', {key: $(e.currentTarget).val()}, true);
                     }
                 })
 
-    	    },
-		    launch: function() {
-			    var children = $(this).find('#products');
-			    if(children.length) {
+            },
+            launch: function () {
+                var children = $(this).find('#products');
+                if (children.length) {
                     //loading store data
-				    uiTab.loadStoreData('tags');
-				    uiTab.loadStoreData('brands');
-				    uiTab.loadStoreData('products')
-			    }
-		    },
-		    insertSingleProduct: function() {
-			    var template = $('#templates').val();
-                if(template == 0) {
+                    uiTab.loadStoreData('tags');
+                    uiTab.loadStoreData('brands');
+                    uiTab.loadStoreData('products')
+                }
+            },
+            insertSingleProduct: function () {
+                var template = $('#templates').val();
+                if (template == 0) {
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
-                tinymce.activeEditor.execCommand('mceInsertContent',false, '{$product:' + $(this).attr('id') + ((template) ? ':' + template : '') + '}');
-		    },
-		    insertList: function() {
-			    var shortCode = '{$productlist:';
-                if(!$('#templates').size() || !$('#templates').val()) {
+                tinymce.activeEditor.execCommand('mceInsertContent', false, '{$product:' + $(this).attr('id') + ((template) ? ':' + template : '') + '}');
+            },
+            insertList: function () {
+                var shortCode = '{$productlist:';
+                if (!$('#templates').size() || !$('#templates').val()) {
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
                 //listing template
                 shortCode += $('#templates').val();
+                var draggable = '';
+                if($('#draggable').is(":checked")){
+                    draggable = ':draggable';
+                }
 
-                if($('#search').size() && $('#search').val()) {
-                    var ids             = [];
+                if ($('#search').size() && $('#search').val()) {
+                    var ids = [];
                     var visibleProducts = $('a.currproduct');
-                    if(visibleProducts.length < uiTab.step) {
-                        $.each(visibleProducts, function(key, productContainer) {
+                    if (visibleProducts.length < uiTab.step) {
+                        $.each(visibleProducts, function (key, productContainer) {
                             ids.push($(productContainer).attr('id'));
                         });
                         shortCode += ':' + ids.join(',') + '}';
                         tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                     } else {
                         showSpinner();
-                        $.when($.getJSON($('#website_url').val() + 'api/store/products/offset/0/limit/1000000/', {key: $('#search').val()}, function(response) {
+                        $.when($.getJSON($('#website_url').val() + 'api/store/products/offset/0/limit/1000000/', {key: $('#search').val()}, function (response) {
                             //console.log(response);
                             hideSpinner();
-                            if(!response.length) {
+                            if (!response.length) {
                                 showMessage('There is nothing to put in the list. Search different criteria and try again', true);
                                 return false;
                             }
-                            $.each(response, function(key, product) {
+                            $.each(response, function (key, product) {
                                 ids.push(product.id);
                             });
-                        })).done(function() {
+                        })).done(function () {
                             shortCode += ':' + ids.join(',') + '}';
                             tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                         });
                     }
                 } else {
                     //tags filter
-                    if ($('#tags').val()){
+                    if ($('#tags').val()) {
                         shortCode += ':tagnames-';
                         var tagnames = [];
-                        $('#tags option:selected').each(function(){
+                        $('#tags option:selected').each(function () {
                             tagnames.push($(this).text());
                         });
                         shortCode += tagnames.join(',');
 
                         // and logic checkbox checked
-                        if($('#strict-tags').prop('checked')) {
+                        if ($('#strict-tags').prop('checked')) {
                             shortCode += ':and';
                         }
 
@@ -184,133 +199,137 @@
                     //brands filter
                     shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
                     //ordering
-                    shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + '}';
+                    shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + draggable + '}';
                     tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                 }
 
-		    },
-		    loadStoreData : function(dataType, filter, force) {
+            },
+            loadStoreData: function (dataType, filter, force) {
+
                 showSpinner();
-                if(typeof  filter !== 'undefined'){
+                if (typeof  filter !== 'undefined') {
                     $('.ui-helper-hidden-accessible').hide();
                 }
                 //if data type already loaded - return
-                if($('#' + dataType + ' option').length) {
+                if ($('#' + dataType + ' option').length) {
                     return false;
                 }
 
                 var utab = this;
-                if((!force || typeof(force) == 'undefined') && !utab.searchTerm) {
-		            params = uiTab.getParams(filter);
+                if ((!force || typeof(force) == 'undefined') && !utab.searchTerm) {
+                    params = uiTab.getParams(filter);
                 } else {
-                    if(!utab.searchTerm) {
+                    if (!utab.searchTerm) {
                         utab.searchTerm = filter;
-                        params          = filter;
+                        params = filter;
                     } else {
                         params = utab.searchTerm;
                     }
                     params.offset = utab.offset;
-                    params.limit  = utab.limit;
+                    params.limit = utab.limit;
                 }
 
                 $.getJSON('<?php echo $this->websiteUrl; ?>api/store/' + dataType,
-				    params,
-				function(response) {
-                    if(response.length) {
-                        switch(dataType) {
-                            case 'tags':
-                            case 'brands':
-	                        	uiTab.parseTagsAndBrands(response, dataType);
-                            break;
-                            case 'products':
-	                            uiTab.parseProducts(response, filter);
-								if(response.length >= uiTab.step) {
-		                            $('.productlisting:last-child').waypoint(function() {
-										$(this).waypoint('remove');
-			                            uiTab.offset += 30;
-										uiTab.loadStoreData('products', filter)
-									},
-									{
-										context: '#product-products',
-										offset : '95%'
-									});
-								}
-                            break;
+                    params,
+                    function (response) {
+                        if (response.length) {
+                            switch (dataType) {
+                                case 'tags':
+                                case 'brands':
+                                    uiTab.parseTagsAndBrands(response, dataType);
+                                    break;
+                                case 'products':
+                                    uiTab.parseProducts(response, filter);
+                                    if (response.length >= uiTab.step) {
+                                        $('.productlisting:last-child').waypoint(function () {
+                                                $(this).waypoint('remove');
+                                                uiTab.offset += 30;
+                                                uiTab.loadStoreData('products', filter)
+                                            },
+                                            {
+                                                context: '#product-products',
+                                                offset: '95%'
+                                            });
+                                    }
+                                    break;
+                            }
+                            $('.pselect').trigger("chosen:updated");
+                        } else if (typeof filter != 'undefined' && filter) {
+                            $('#product-products').empty();
                         }
-                        $('.pselect').trigger("chosen:updated");
-                    } else if(typeof filter != 'undefined' && filter) {
-	                    $('#product-products').empty();
-                    }
-					hideSpinner();
-                });
+                        hideSpinner();
+                    });
 
             },
-		    getParams: function(filter) {
-			    var data = {};
-			    if(typeof this.offset != 'undefined') {
-				    data.offset = this.offset;
-			    }
-			    if(typeof this.limit != 'undefined') {
+            getParams: function (filter) {
+                var data = {};
+                if (typeof this.offset != 'undefined') {
+                    data.offset = this.offset;
+                }
+                if (typeof this.limit != 'undefined') {
                     data.limit = this.limit;
                 }
-                if(typeof filter != 'undefined' && filter) {
-	                if ($('#tags').val()) {
+                if (typeof filter != 'undefined' && filter) {
+                    if ($('#tags').val()) {
                         data.ftag = $('#tags').val();
-	                }
-	                if ($('#brands').val()) {
+                    }
+                    if ($('#brands').val()) {
                         data.fbrand = $('#brands').val();
-	                }
+                    }
+                    if ($('#ordering').val()) {
+                        data.forder = $('#ordering').val();
+                    }
                 }
                 data['stc'] = ($('#strict-tags').prop('checked') == false) ? 0 : 1;
-			    return data;
-		    },
-		    parseTagsAndBrands: function(tagsBrandResponse, dataType) {
-               $.each(tagsBrandResponse, function() {
-                   $('#' + dataType).append(
-                       $('<option></option>').val((dataType == 'tags') ? this.id : this.name).text(this.name)
-                   );
-               });
-		    },
-		    parseProducts: function(productsResponse, filter) {
-			    var productsContainer = $('#product-products');
+                return data;
+            },
+            parseTagsAndBrands: function (tagsBrandResponse, dataType) {
+                $.each(tagsBrandResponse, function () {
+                    $('#' + dataType).append(
+                        $('<option></option>').val((dataType == 'tags') ? this.id : this.name).text(this.name)
+                    );
+                });
+            },
+            parseProducts: function (productsResponse, filter) {
+                var productsContainer = $('#product-products');
 //			    if((typeof filter != 'undefined' && filter) || !productsResponse.length) {
 //				    productsContainer.empty();
 //			    }
-			    //media servers
-			    var mediaServers = <?php echo Tools_Content_Tools::getMediaServers(true); ?>;
-			    var srcPart      = '<?php echo $this->websiteUrl;?>';
-			    var productItemsHtml = '';
-			    $.each(productsResponse, function() {
-				    var photoUrl = this.photo;
-				    if (!/^https?:\/\/.*/.test(photoUrl)){
-				        var srcPart = '<?php echo $this->websiteUrl;?>';
-			            <?php if($this->mediaServersAllowed): ?>
-                        srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random()*mediaServers.length)]  + '.<?php echo $this->domain; ?>');
-	                    <?php endif; ?>
+                //media servers
+                var mediaServers = <?php echo Tools_Content_Tools::getMediaServers(true); ?>;
+                var srcPart = '<?php echo $this->websiteUrl;?>';
+                var productItemsHtml = '';
+                $.each(productsResponse, function () {
+                    var photoUrl = this.photo;
+                    if (!/^https?:\/\/.*/.test(photoUrl)) {
+                        var srcPart = '<?php echo $this->websiteUrl;?>';
+                        <?php if($this->mediaServersAllowed): ?>
+                        srcPart = srcPart.replace('<?php echo $this->websiteData['url']; ?>', mediaServers[Math.floor(Math.random() * mediaServers.length)] + '.<?php echo $this->domain; ?>');
+                        <?php endif; ?>
                         photoUrl = srcPart + 'media/' + photoUrl.replace('/', '/product/');
                     }
                     productItemsHtml += '<div class="productlisting">' +
-                                            '<a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
-                                                '<span class="brand">' + this.brand + '</span>' +
-                                                '<span class="image"><img class="lazy" src="" data-original="' + photoUrl + '" alt="' + this.name + '"></span>' +
-                                                '<span class="name">' + this.name + '</span>' +
-                                                '<span class="sku">' + this.sku + '</span>' +
-                                            '</a>' +
-                                        '</div>';
+                        '<a href="javascript:;" class="currproduct" id="' + this.id + '"  title="' + this.name + '">' +
+                        '<span class="brand">' + this.brand + '</span>' +
+                        '<span class="image"><img class="lazy" src="" data-original="' + photoUrl + '" alt="' + this.name + '"></span>' +
+                        '<span class="name">' + this.name + '</span>' +
+                        '<span class="sku">' + this.sku + '</span>' +
+                        '</a>' +
+                        '</div>';
                 });
-			    if (this.offset === 0) {
-				    productsContainer.html(productItemsHtml).scrollTop(0);
+                if (this.offset === 0) {
+                    productsContainer.html(productItemsHtml).scrollTop(0);
                 } else {
                     productsContainer.append(productItemsHtml);
-			    }
+                }
                 $('img.lazy').lazyload({
                     container: productsContainer,
                     effect: 'fadeIn'
                 });
                 hideSpinner();
             }
-	    };
-	    // end uiTab
-	    uiTab.init();
+        };
+        // end uiTab
+        uiTab.init();
     });
 </script>

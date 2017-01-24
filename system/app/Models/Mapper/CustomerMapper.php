@@ -191,11 +191,11 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 			$select->order($order);
 		}
 
-		if ($search) {
-            $searchCond = $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?', '%'. $search. '%');
-            $searchCond .= ' OR '. $userDbTable->getAdapter()->quoteInto('user.email LIKE ?', '%'. $search. '%');
-			$select->where($searchCond);
-		}
+        if ($search) {
+            $orWhere = $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?', '%' . $search . '%');
+            $orWhere .= ' OR ' . $userDbTable->getAdapter()->quoteInto('user.email LIKE ?', '%' . $search . '%');
+            $select->where($orWhere);
+        }
 
 		$select->limit($limit, $offset);
 
