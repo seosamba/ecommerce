@@ -28,6 +28,10 @@ class Forms_BasicsSettings extends Zend_Form {
 			'label' => 'Force use HTTPS for checkout page',
             'class' => 'grid_6 alpha'
 		));
+
+        $this->addElement('text', 'operationalHours', array(
+            'label' => 'store operational hours'
+        ));
 	}
 
 }
