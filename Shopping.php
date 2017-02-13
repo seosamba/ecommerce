@@ -750,14 +750,14 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
+        $tagsPart = ((!empty($tags)) && (is_array($tags))) ? implode(',', $tags) : '';
+
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			if (!empty($productsListDataResult)) {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT)), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
-
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
             } else {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
-
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart)));
             }
 
             $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
