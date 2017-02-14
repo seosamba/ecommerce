@@ -3,7 +3,6 @@
  * @author Pavel Kovalyov <pavlo.kovalyov@gmail.com>
  */
 require.config({
-    deps: ["main"],
     paths: {
         'underscore': '../../libs/underscore/underscore-min',
         'backbone'  : '../../libs/backbone/backbone-min',
@@ -20,3 +19,9 @@ require.config({
         'backbone.paginator': ['backbone']
     }
 });
+
+require(['./views/app'],
+    function(App){
+        App.initializeStoreClientsRouter();
+    }
+);
