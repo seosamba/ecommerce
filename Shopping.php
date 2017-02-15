@@ -867,6 +867,11 @@ class Shopping extends Tools_Plugins_Abstract {
         if($customerAddress) {
             $this->_view->customerAddress = $customerAddress;
         }
+
+        if (!$customer instanceof Models_Model_Customer) {
+            $this->_responseHelper->fail('customer doesn\'t exist');
+        }
+
 		if ($customer) {
 			$this->_view->customer = $customer;
 			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
