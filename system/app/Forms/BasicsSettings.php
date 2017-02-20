@@ -32,6 +32,20 @@ class Forms_BasicsSettings extends Zend_Form {
         $this->addElement('text', 'operationalHours', array(
             'label' => 'store operational hours'
         ));
+
+        $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
+        array_pop($timezones);
+
+        $translator = Zend_Registry::get('Zend_Translate');
+        $this->addElement(new Zend_Form_Element_Select(
+            array(
+                'name' => 'timezone',
+                'id' => 'user-timezone',
+                'label' => 'Timezone',
+                'class' => 'grid_6 alpha mb10px',
+                'multiOptions' => array('0' => $translator->translate('Select timezone')) + array_combine($timezones, $timezones)
+            )
+        ));
 	}
 
 }
