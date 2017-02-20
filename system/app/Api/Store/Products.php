@@ -34,6 +34,8 @@ class Api_Store_Products extends Api_Service_Abstract {
 		)
 	);
 
+    public $productGlobalLimit = 0;
+
 	/**
 	 * Initialization
 	 * @ignore
@@ -101,6 +103,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_SANITIZE_NUMBER_INT);
 			$key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING);
 			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+            $sortlimit = $this->_request->getParam('sortlimit');
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
@@ -112,6 +115,11 @@ class Api_Store_Products extends Api_Service_Abstract {
                 $order = array_unique($filter['order']);
             }
 
+            if(!empty($sortlimit)){
+                $shoppingConfig =  Models_Mapper_ShoppingConfig::getInstance();
+                $this->productGlobalLimit = $shoppingConfig->getConfigParam('productLimit');
+            }
+
             if(in_array(html_entity_decode('&infin;'), $filter['inventory'])){
                 $filter['inventory'][array_search(html_entity_decode('&infin;'), $filter['inventory'])] = 'infinity';
             }
@@ -120,15 +128,15 @@ class Api_Store_Products extends Api_Service_Abstract {
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
-            $cacheKey = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . implode(',', $filter['order']). implode(',', $filter['inventory']). implode(',', $filter['limit']) . $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
+            $cacheKey = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . implode(',', $filter['order']). implode(',', $filter['inventory']). implode(',', $filter['limit']) . $offset . $limit . $this->productGlobalLimit .(($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
 			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
-
 
 				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, $order, $offset, $limit, (bool)$key?$key:null,
 					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 					(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
                     (is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null,
                     (is_array($filter['limit']) && !empty($filter['limit'])) ? $filter['limit']: null,
+                    $this->productGlobalLimit,
                     $strictTagsCount,
                     $organicSearch
                 );

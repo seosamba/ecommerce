@@ -154,6 +154,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $brands = null,
         $inventory = null,
         $productLimit = null,
+        $productGlobalLimit = 0,
         $strictTagsCount = false,
         $organicSearch = false,
         $attributes = array(),
@@ -229,6 +230,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         if(is_array($productLimit) && !empty($productLimit)) {
             $select->where('p.limit IN (?)', $productLimit);
+        }
+
+        if(!empty($productGlobalLimit)){
+            $where = "CASE WHEN p.limit = '0' THEN p.inventory <= ".$productGlobalLimit." ELSE p.inventory <= p.limit END AND p.inventory IS NOT NULL";
+            $select->where($where);
         }
 
         if ((bool)$search) {

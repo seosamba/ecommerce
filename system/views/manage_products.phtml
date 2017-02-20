@@ -16,14 +16,14 @@
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
         <div class="grid_9 omega">
-            <div class="grid_4 alpha ">
+            <div class="grid_3 alpha ">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
                     <?php foreach($this->brands as $brand):?>
                         <option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_4 alpha omega ">
+            <div class="grid_2 alpha omega ">
                 <select class="pfilter" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
                     <?php foreach($this->tags as $tag):?>
                         <option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
@@ -52,6 +52,9 @@
                         <?php endforeach;?>
                     </select>
                 </div>
+                <label class="pfilterLimit grid_3">
+                    <input class="pfilter find-by-limit" type="checkbox" name="find-by-limit"><span> <?php echo $this->translate('Show only low stock products');?><span>
+                </label>
             <?php endif;?>
         </div>
     </div>
@@ -68,7 +71,7 @@
                 <th><?php echo $this->translate('Inventory');?></th>
 
                 <?php if(!empty($this->productLimitFlag)):?>
-                <th><?php echo $this->translate('Limit');?></th>
+                <th><?php echo $this->translate('Alert threshold');?></th>
                 <?php endif;?>
 
 				<th><?php echo $this->translate('Price');?></th>

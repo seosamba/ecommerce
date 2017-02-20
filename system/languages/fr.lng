@@ -632,7 +632,12 @@
         'Deleted'=>'Supprimé',
         'Are you sure want to delete?' => 'Etes-vous sûr de vouloir supprimer?',
         'Custom Shipper' => 'Expéditeur Personnalisé',
-        'Limit' => 'Limite',
-        'Products limit notify' => 'Notification de limite de produits',
-        'Inventory' => 'Inventaire'
+        'Inventory' => 'Inventaire',
+        'Default stock alert threshold' => 'Seuil d\'alerte stock par défaut',
+        'Alert at' => 'Alerte à',
+        'Alert threshold' => 'Seuil d\'alerte',
+        'stock alert' => 'Alerte de stock',
+        'Show only low stock products' => 'Afficher seulement les produits à faible niveau de stock',
+        'Set a default catalog-wide stock alert threshold for all products without a specified threshold value.' => 'Spécifiez un seuil d\'alerte de stock pour tous les produits du catalogue n\'ayant pas un seuil d\'alerte spécifique.'
+
 );?>

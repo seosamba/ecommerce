@@ -8,6 +8,9 @@
 class Forms_BasicsSettings extends Zend_Form {
 
 	public function init() {
+
+        $translator =  Zend_Registry::get('Zend_Translate');
+
 		$this->setLegend('Basics')
 			 ->setDecorators(array('Form', 'FormElements'));
 
@@ -29,14 +32,10 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
 		));
 
-        $this->addElement('checkbox', 'productLimit', array(
-            'label' => 'Products limit notify',
-            'class' => 'grid_6 alpha'
-        ));
-
-        $this->addElement('text', 'productLimitInput', array(
-            'label' => '',
-            'class' => 'grid_6 alpha',
+        $this->addElement('text', 'productLimit', array(
+            'label' => 'Default stock alert threshold',
+            'class' => 'grid_6 alpha tooltip',
+            'title' => $translator->translate('Set a default catalog-wide stock alert threshold for all products without a specified threshold value.'),
             'validators' => array(new Zend_Validate_Int())
         ));
 	}
