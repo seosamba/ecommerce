@@ -154,7 +154,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $strictTagsCount = false,
         $organicSearch = false,
         $attributes = array(),
-        $price = array()
+        $price = array(),
+        $sort = null
+
     ) {
         $entities = array();
 
@@ -163,11 +165,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
             ->group('p.id');
 
-        if (!is_null($order)) {
-			if(is_array($order) && ($key = array_search('p.sku', $order)) !== false) {
-				unset($order[$key]);
-				$select->order('ABS(p.sku)');
-			}
+        if ((!is_null($order)) && (is_array($order)) && (!is_null($sort))) {
+            foreach ($order as $key => $ord){
+                $order[$key] = $ord . ' ' . $sort;
+            }
 			$select->order($order);
         }
 
