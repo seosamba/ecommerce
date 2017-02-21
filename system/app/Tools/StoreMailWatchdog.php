@@ -238,11 +238,25 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $adminEmail = isset($systemConfig['adminEmail']) ? $systemConfig['adminEmail'] : 'admin@localhost';
         $recipient = $this->_options['recipient'];
         $options = $this->_options;
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
 
         if ($options['cartStatus'] == Models_Model_CartSession::CART_STATUS_COMPLETED) {
             switch ($recipient) {
                 case Tools_Security_Acl::ROLE_ADMIN:
                     $this->_mailer->setMailToLabel('Admin')->setMailTo($adminEmail);
+
+                    $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                    $adminUsers = $userMapper->fetchAll($where);
+                    if(!empty($adminUsers)){
+                        foreach($adminUsers as $admin){
+                            array_push($adminBccArray, $admin->getEmail());
+                        }
+                        if(!empty($adminBccArray)){
+                            $this->_mailer->setMailBcc($adminBccArray);
+                        }
+                    }
+
                     break;
                 default:
                     error_log('Unsupported recipient ' . $this->_options['recipient'] . ' given');
@@ -257,7 +271,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             if (!empty($product)) {
                 $productInventory = $product->getInventory();
                 $productLimit = $product->getLimit();
-                $productGeneralLimit = $this->_storeConfig['productLimit'];
+                $productGeneralLimit = $this->_storeConfig['productLimitInput'];
                 if(empty($productLimit) && !empty($productGeneralLimit)){
                     $productLimit = $productGeneralLimit;
                 }

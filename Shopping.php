@@ -855,8 +855,8 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->productLimit = $customerProductLimit;
             }
 
-            $productLimit = $this->_configMapper->getConfigParam('productLimit');
-            $this->_view->productLimitFlag = $productLimit;
+            $productLimitFlag = $this->_configMapper->getConfigParam('productLimit');
+            $this->_view->productLimitFlag = $productLimitFlag;
 
 			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
 			return $this->_view->render('manage_products.phtml');
@@ -1139,8 +1139,8 @@ class Shopping extends Tools_Plugins_Abstract {
             }
 			$cartSession->notifyObservers();
 
-            $productLimit = $this->_configMapper->getConfigParam('productLimit');
-            if(!empty($productLimit)){
+            $productLimitFlag = $this->_configMapper->getConfigParam('productLimit');
+            if(!empty($productLimitFlag)){
                 foreach ($cartSession->getCartContent() as $content){
                     $cartSession->removeObserver(new Tools_Mail_Watchdog);
                     $cartSession->registerObserver(new Tools_Mail_Watchdog(array(

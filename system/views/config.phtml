@@ -150,5 +150,17 @@ $this->headLink()
         $('#save-btn').show();
     });
 
+    if(!$('#productLimit').prop('checked')){
+        $('#productLimitInput').closest('div').hide();
+    }
+
+    $(document).on('change', '#productLimit', function (e) {
+        if(!$('#productLimit').prop('checked')){
+            $('#productLimitInput').closest('div').hide();
+        }else{
+            $('#productLimitInput').closest('div').show();
+        }
+    });
+
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

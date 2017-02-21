@@ -103,7 +103,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_SANITIZE_NUMBER_INT);
 			$key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING);
 			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
-            $sortlimit = $this->_request->getParam('sortlimit');
+            $sortlimit = filter_var($this->_request->getParam('sortlimit'), FILTER_SANITIZE_NUMBER_INT);
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
@@ -117,7 +117,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 
             if(!empty($sortlimit)){
                 $shoppingConfig =  Models_Mapper_ShoppingConfig::getInstance();
-                $this->productGlobalLimit = $shoppingConfig->getConfigParam('productLimit');
+                $this->productGlobalLimit = ($shoppingConfig->getConfigParam('productLimitInput') != 0) ? $shoppingConfig->getConfigParam('productLimitInput') : '';
             }
 
             if(in_array(html_entity_decode('&infin;'), $filter['inventory'])){

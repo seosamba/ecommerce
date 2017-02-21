@@ -46,7 +46,7 @@
             </div>
             <?php if($this->productLimitFlag):?>
                 <div class="<?php echo $grid;?> omega ">
-                    <select class="pfilter" multiple name="filter-limit" data-placeholder="<?php echo $this->translate('Product by limit..');?>">
+                    <select class="pfilter" multiple name="filter-limit" data-placeholder="<?php echo $this->translate('Filter by threshold values..');?>">
                         <?php foreach($this->productLimit as $limit):?>
                             <option value="<?php echo $limit;?>"><?php echo $limit;?></option>
                         <?php endforeach;?>

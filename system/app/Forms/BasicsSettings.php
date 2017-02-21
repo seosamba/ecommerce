@@ -32,7 +32,12 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
 		));
 
-        $this->addElement('text', 'productLimit', array(
+        $this->addElement('checkbox', 'productLimit', array(
+            'label' => $translator->translate('Use products stock threshold'),
+            'class' => 'grid_6 alpha switcher'
+        ));
+
+        $this->addElement('text', 'productLimitInput', array(
             'label' => 'Default stock alert threshold',
             'class' => 'grid_6 alpha tooltip',
             'title' => $translator->translate('Set a default catalog-wide stock alert threshold for all products without a specified threshold value.'),

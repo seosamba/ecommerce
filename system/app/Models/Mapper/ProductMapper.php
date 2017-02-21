@@ -235,6 +235,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         if(!empty($productGlobalLimit)){
             $where = "CASE WHEN p.limit = '0' THEN p.inventory <= ".$productGlobalLimit." ELSE p.inventory <= p.limit END AND p.inventory IS NOT NULL";
             $select->where($where);
+        }elseif ($productGlobalLimit === ''){
+            $where = "CASE WHEN p.limit > '0' THEN p.inventory <= p.limit END AND p.inventory IS NOT NULL";
+            $select->where($where);
         }
 
         if ((bool)$search) {

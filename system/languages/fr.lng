@@ -638,6 +638,7 @@
         'Alert threshold' => 'Seuil d\'alerte',
         'stock alert' => 'Alerte de stock',
         'Show only low stock products' => 'Afficher seulement les produits à faible niveau de stock',
-        'Set a default catalog-wide stock alert threshold for all products without a specified threshold value.' => 'Spécifiez un seuil d\'alerte de stock pour tous les produits du catalogue n\'ayant pas un seuil d\'alerte spécifique.'
+        'Set a default catalog-wide stock alert threshold for all products without a specified threshold value.' => 'Spécifiez un seuil d\'alerte de stock pour tous les produits du catalogue n\'ayant pas un seuil d\'alerte spécifique.',
+        'Use products stock threshold' => 'Utiliser le seuil de stock des produits'
 
 );?>
