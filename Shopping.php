@@ -647,6 +647,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
+                $listFolders = $this->_processNotEmptyDirs($listFolders);
 				$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
 			}
 			$this->_view->imageDirList = $listFolders;
@@ -672,6 +673,29 @@ class Shopping extends Tools_Plugins_Abstract {
 			echo $this->_layout->render();
 		}
 	}
+
+    /**
+     * Check medias product folder
+     * @param $folders
+     * @return mixed
+     */
+    protected function _processNotEmptyDirs($folders)
+    {
+        foreach ($folders as $key => $folder) {
+            $listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder);
+            if (!empty($listFolders) && in_array('product', $listFolders)) {
+                $files = Tools_Filesystem_Tools::scanDirectory($this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder . DIRECTORY_SEPARATOR . 'product',
+                    false, false);
+                if (empty($files)) {
+                    unset($folders[$key]);
+                }
+            } else {
+                unset($folders[$key]);
+            }
+        }
+
+        return $folders;
+    }
 
 	public function searchindexAction() {
 		$cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
