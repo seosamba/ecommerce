@@ -529,7 +529,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                         case 'brand':
                             return $field = 'b.name'; break;
                         case 'date':
-                            return $field = 'p.created_at DESC'; break;
+                            return $field = 'p.created_at'; break;
                         default:
                             return $field =  'p.' . $field;
                     }
