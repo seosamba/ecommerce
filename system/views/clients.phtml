@@ -53,13 +53,13 @@
 ?>
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="clients" class="toaster-widget">
-    <div class="search-line mt20px mb20px clearfix">
+    <div class="search-line mt20px mb20px clearfix hidden">
         <input type="text" id="clients-search" class="grid_6 alpha" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
         <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post">
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
         </form>
     </div>
-    <table id="clients-table" class="widget table-hover">
+    <table id="clients-table" class="widget table-hover hidden">
         <thead>
             <tr class="title-table ws-nowrap">
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
