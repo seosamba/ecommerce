@@ -71,5 +71,5 @@ return array(
 	'Total price'								=> 'Gesamtpreis',
 	'Shipping price'							=> 'Versandkosten',
 	'Shipping via'								=> 'versendet durch',
-	'View/Download Invoice'						=> 'Rechnung ansehen/herunterladen'
+	'View/Download invoice'						=> 'Rechnung ansehen/herunterladen'
 );

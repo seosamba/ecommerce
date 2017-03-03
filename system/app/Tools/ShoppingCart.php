@@ -348,10 +348,13 @@ class Tools_ShoppingCart {
                     if (isset($cartItem['groupPriceEnabled'])) {
                         $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
                         if ($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())) {
+                            $originalProduct = $productMapper->find($cartItem['id']);
+                            $originalProduct->setTaxClass($cartItem['taxClass']);
+                            $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
                             $product->setGroupPriceEnabled(1);
-                            $priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
-                            $product->setPrice($priceForGroup);
-                            $cartItem['price'] = $priceForGroup;
+                            //$priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
+                            $product->setPrice($changedPrice);
+                            $cartItem['price'] = $changedPrice;
                             $cartItem['groupPriceEnabled'] = 1;
                         }
 

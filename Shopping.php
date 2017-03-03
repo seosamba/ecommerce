@@ -290,6 +290,9 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
+                    if (!empty($subFormValues['operationalHours'])) {
+                        $subFormValues['operationalHours'] = serialize($subFormValues['operationalHours']);
+                    }
 					$this->_configMapper->save($subFormValues);
 				}
 				$this->_jsonHelper->direct($form->getValues());
@@ -647,6 +650,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
+                $listFolders = $this->_processNotEmptyDirs($listFolders);
 				$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
 			}
 			$this->_view->imageDirList = $listFolders;
@@ -672,6 +676,29 @@ class Shopping extends Tools_Plugins_Abstract {
 			echo $this->_layout->render();
 		}
 	}
+
+    /**
+     * Check medias product folder
+     * @param $folders
+     * @return mixed
+     */
+    protected function _processNotEmptyDirs($folders)
+    {
+        foreach ($folders as $key => $folder) {
+            $listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder);
+            if (!empty($listFolders) && in_array('product', $listFolders)) {
+                $files = Tools_Filesystem_Tools::scanDirectory($this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder . DIRECTORY_SEPARATOR . 'product',
+                    false, false);
+                if (empty($files)) {
+                    unset($folders[$key]);
+                }
+            } else {
+                unset($folders[$key]);
+            }
+        }
+
+        return $folders;
+    }
 
 	public function searchindexAction() {
 		$cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
@@ -882,6 +909,11 @@ class Shopping extends Tools_Plugins_Abstract {
         if($customerAddress) {
             $this->_view->customerAddress = $customerAddress;
         }
+
+        if (!$customer instanceof Models_Model_Customer) {
+            $this->_responseHelper->fail('customer doesn\'t exist');
+        }
+
 		if ($customer) {
 			$this->_view->customer = $customer;
 			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());

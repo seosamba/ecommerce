@@ -34,15 +34,125 @@ $this->headLink()
 	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
 	<?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">
+            <?php $hoursFrom = array('0' => $this->translate('From')) + Tools_Misc::$_hoursUnits;?>
+            <?php $hoursTo = array('0' => $this->translate('To')) + Tools_Misc::$_hoursUnits;?>
 			<?php foreach ($subform->getElements() as $elem):?>
 			<div>
-                <?php $labelText = $this->translate($elem->getLabel());?>
-                <?php $elem->setLabel($labelText);?>
-				<?php echo $elem->renderLabel();?>
-                <?php echo $elem->renderViewHelper();?>
-			</div>
+                <?php $elemName = $elem->getName();?>
+                <?php if ($elemName !== 'operationalHours') :?>
+                    <?php $labelText = $this->translate($elem->getLabel());?>
+                    <?php $elem->setLabel($labelText);?>
+				    <?php echo $elem->renderLabel();?>
+                    <?php echo $elem->renderViewHelper();?>
+                <?php  else: ?>
+                    <?php $operationalHours = $elem->getValue();?>
+                    <?php if(!empty($operationalHours)) :?>
+                        <?php $operationalHours = unserialize($elem->getValue());?>
+                    <?php endif;?>
+                <?php endif;?>
+            </div>
 			<?php endforeach; ?>
             <?php if ($subform->getId() === 'display'): ?>
+                <p class="grid_12 text-center mb10px mt0px">
+                    <a href="javascript:;" class="text-center" id="switch-operational-hours"><?php echo $this->translate('Store operation hours');?></a>
+                </p>
+                <div id="operation-hours-block" class="hidden">
+                    <p class="grid_6 operational-hours-row" data-operation-day="sunday">
+                        <label  class="grid_2 mt5px alpha omega"><?php echo $this->translate('Sun');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-sunday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['sunday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-sunday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['sunday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+                    <p class="grid_6 operational-hours-row" data-operation-day="monday">
+                        <label class="grid_2 mt5px alpha omega"><?php echo $this->translate('Mon');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-monday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['monday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-monday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['monday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+                    <p class="grid_6 mt5px operational-hours-row" data-operation-day="tuesday">
+                        <label class="grid_2 mt5px alpha omega"><?php echo $this->translate('Tue');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-tuesday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['tuesday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-tuesday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['tuesday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+                    <p class="grid_6 mt5px operational-hours-row" data-operation-day="wednesday">
+                        <label class="grid_2 mt5px alpha omega"><?php echo $this->translate('Wed');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-wednesday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['wednesday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-wednesday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['wednesday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+
+                    <p class="grid_6 mt5px operational-hours-row" data-operation-day="thursday">
+                        <label class="grid_2 mt5px alpha omega"><?php echo $this->translate('Thu');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-thursday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['thursday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-thursday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['thursday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+
+                    <p class="grid_6 mt5px operational-hours-row" data-operation-day="friday">
+                        <label class="grid_2 mt5px alpha omega"><?php echo $this->translate('Fri');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-friday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['friday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-friday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['friday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+
+                    <p class="grid_6 mt5px operational-hours-row" data-operation-day="saturday">
+                        <label class="grid_2 mt5px alpha omega"><?php echo $this->translate('Sat');?>:</label>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-from" name="operational-hours-from-saturday">
+                            <?php foreach($hoursFrom as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['saturday']['from'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                        <select class="grid_5 alpha omega operational-hours-config-dropdown-to" name="operational-hours-to-saturday">
+                            <?php foreach($hoursTo as $hourKey => $hourUnit) :?>
+                                <option value="<?php echo $hourKey;?>" <?php echo (!empty($operationalHours) && ($operationalHours['saturday']['to'] == $hourKey)) ? 'selected' : ''?>><?php echo $hourUnit;?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </p>
+
+                </div>
                 <?php $links = Tools_Misc::getPostPurchaseAndLandingPageLinks(); ?>
                 <?php if (!empty($links)): ?>
                     <?php $pagesArray = array(
@@ -81,8 +191,19 @@ $this->headLink()
 
     var shopping = {};
     shopping.saveconfig = function(){
-        var url = '<?php echo $this->form->getAction(); ?>';
-        var data = $('form[user-changed="true"]').serialize();
+        var url = '<?php echo $this->form->getAction(); ?>',
+            data = $('form[user-changed="true"]').serialize(),
+            operationHours = {'operationalHours' : {}};
+
+        $.each($('.operational-hours-row'), function(){
+            operationHours['operationalHours'][$(this).data('operation-day')] = {
+                'from': $(this).find('.operational-hours-config-dropdown-from').val(),
+                'to': $(this).find('.operational-hours-config-dropdown-to').val()
+            };
+        });
+
+        data = data + '&'+ $.param(operationHours);
+
         if(!data){
             window.console && console.log('nothing to save');
             return false;
@@ -140,6 +261,16 @@ $this->headLink()
             $form.attr('user-changed', true);
             var currentTab = $('#config').tabs('option', 'selected');
             $('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+        }
+    });
+
+    $('#switch-operational-hours').on('click', function() {
+        var operationHoursBlockEl = $('#operation-hours-block');
+
+        if (operationHoursBlockEl.hasClass('hidden')) {
+            operationHoursBlockEl.removeClass('hidden');
+        } else {
+            operationHoursBlockEl.addClass('hidden');
         }
     });
 

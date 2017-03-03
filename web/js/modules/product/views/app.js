@@ -219,7 +219,7 @@ define([
             $('#option-library').val('-1');
         },
 		imageChange: function(e){
-            $('#image-select-dialog').show("slide", { direction: "left"});
+            //$('#image-select-dialog').show("slide", { direction: "left"});
 			var folder = $(e.target).val();
 			if (folder == '0') {
 				return;
@@ -227,10 +227,10 @@ define([
             var self = this;
             this.images.server_api.folder = folder;
             this.images.flush().fetch({ success: function(){ self.images.pager(); hideSpinner();}, silent: true});
-            //$('#image-select-dialog').show("slide", { direction: "right"});
+            $('#image-select-dialog').show("slide", { direction: "left"});
         },
         renderImages: function(){
-            $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}))
+            $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}));
             $('.paginator', '#image-select-dialog').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(
                 this.images.paginator_ui,
                 this.images.info(),
