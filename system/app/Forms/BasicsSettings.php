@@ -51,7 +51,6 @@ class Forms_BasicsSettings extends Zend_Form {
         $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
         array_pop($timezones);
 
-        $translator = Zend_Registry::get('Zend_Translate');
         $this->addElement(new Zend_Form_Element_Select(
             array(
                 'name' => 'timezone',
