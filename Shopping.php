@@ -2061,4 +2061,35 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail('');
     }
 
+    public function getUsersAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $users = Models_Mapper_CustomerMapper::getInstance()->getUsersWithGroupsList();
+            if (!empty($users)) {
+                $exportResult = Tools_System_Tools::arrayToCsv($users, array(
+                    $this->_translator->translate('E-mail'),
+                    $this->_translator->translate('Role'),
+                    $this->_translator->translate('Full name'),
+                    $this->_translator->translate('Last login date'),
+                    $this->_translator->translate('Registration date'),
+                    $this->_translator->translate('IP address'),
+                    $this->_translator->translate('Referer url'),
+                    $this->_translator->translate('Google plus profile'),
+                    $this->_translator->translate('Mobile phone'),
+                    $this->_translator->translate('Notes'),
+                    $this->_translator->translate('Group Name')
+                ));
+                if ($exportResult) {
+                    $usersArchive = Tools_System_Tools::zip($exportResult);
+
+                    $this->_response->setHeader('Content-Disposition', 'attachment; filename=' . Tools_Filesystem_Tools::basename($usersArchive))
+                        ->setHeader('Content-type', 'application/force-download');
+                    readfile($usersArchive);
+                    $this->_response->sendResponse();
+                }
+            }
+            exit;
+        }
+    }
+
 }
