@@ -21,6 +21,9 @@ define([
         },
         toggle: function(e) {
             this.model.set({checked: e.target.checked});
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
+            }
         }
     });
 

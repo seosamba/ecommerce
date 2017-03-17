@@ -89,6 +89,9 @@ define([
             this.customers.each(function(customer){
                 customer.set({checked: value});
             });
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
+            }
         },
         doAction: function(e){
             var method = $(e.target).val();
@@ -121,7 +124,7 @@ define([
                                        model.set('checked', true);
                                    }
                                }else{
-                                   $('#customer-list input[value='+id+']').parent().parent().remove();
+                                   $('#customer-list input[value='+id+']').closest('tr').remove();
                                }
                             });
                             if (msg.length) {
