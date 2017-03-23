@@ -93,7 +93,7 @@ define([
         doAction: function(e){
             var method = $(e.target).val();
 
-            method = this[method]
+            method = this[method];
             if (_.isFunction(method)){
                 method.call(this);
             }

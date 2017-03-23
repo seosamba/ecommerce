@@ -20,7 +20,7 @@ define([
             Toastr.StoreClientsWidget.showCustomerDetails(this.model.get('id'));
         },
         toggle: function(e) {
-            this.model.set({checked: e.target.checked});
+            this.model.set({checked: e.target.checked}, {silent: true});
         }
     });
 
