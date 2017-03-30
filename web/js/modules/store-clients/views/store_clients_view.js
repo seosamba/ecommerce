@@ -87,8 +87,9 @@ define([
         toggleAllPeople: function(e) {
             var value = e.target.checked;
             this.customers.each(function(customer){
-                customer.set({checked: value});
+                customer.set({checked: value}, {silent: true});
             });
+            $('.check-td').find('input').prop('checked', value);
         },
         doAction: function(e){
             var method = $(e.target).val();
@@ -533,6 +534,5 @@ define([
             });
         }
     });
-	
 	return StoreClientsView;
 });
