@@ -22,24 +22,28 @@ $this->headLink()
     );
 ?>
     <div class="with-content-footer">
-        <ul class="header">
-            <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
-            <li><a href="#recurring-payments"><?php echo $this->translate('Recurring payments');?></a></li>
-            <?php if (isset($this->plugins) && !empty($this->plugins)):?>
-                <?php foreach ($this->plugins as $plugin) :?>
-                    <?php
-                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
-                    if ($pluginClass->hasConstant('WITHOUT_TAB')) {
-                        continue;
-                    }
-                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
-                    ?>
-            <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
-                <?php endforeach; ?>
-            <?php endif; ?>
-            <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
-            <li><a href="#quantity-discount"><?php echo $this->translate('Quantity discount');?></a></li>
-        </ul>
+        <div class="tabs-nav-wrap">
+            <span class="arrow left ticon-arrow-left3"></span>
+            <span class="arrow right ticon-arrow-right3"></span>
+            <ul class="header">
+                <li><a href="#coupons"><?php echo $this->translate('Coupons');?></a></li>
+                <li><a href="#recurring-payments"><?php echo $this->translate('Recurring payments');?></a></li>
+                <?php if (isset($this->plugins) && !empty($this->plugins)):?>
+                    <?php foreach ($this->plugins as $plugin) :?>
+                        <?php
+                        $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                        if ($pluginClass->hasConstant('WITHOUT_TAB')) {
+                            continue;
+                        }
+                        $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $this->translate($pluginClass->getConstant('DISPLAY_NAME')) : ucfirst($plugin);
+                        ?>
+                        <li><a href="<?php echo $this->websiteUrl.'plugin/'.$plugin.'/run/merchandising';?>"><?php echo $this->translate($title);?></a></li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <li><a href="#group-pricing"><?php echo $this->translate('Customers groups');?></a></li>
+            </ul>
+        </div>
+
         <div id="coupons">
             <?php echo $this->partial('merchandising/coupon.phtml'); ?>
         </div>

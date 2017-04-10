@@ -55,7 +55,7 @@
 <div id="clients" class="toaster-widget">
     <div class="search-line mt20px mb20px clearfix hidden">
         <input type="text" id="clients-search" class="grid_6 alpha" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
-        <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>backend/backend_user/export/" method="post">
+        <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>plugin/shopping/run/getUsers" method="post">
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
         </form>
     </div>

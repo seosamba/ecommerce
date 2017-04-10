@@ -84,6 +84,9 @@ define(['backbone',
                 ordersIds = _.difference(ordersIds, orderIdsExclude);
             }
             this.orders.ordersChecked = ordersIds;
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
+            }
         },
         toggleOrder: function(e) {
             var orderId = $(e.target).val();
@@ -94,6 +97,9 @@ define(['backbone',
                     return item !== orderId
                 });
                 this.orders.ordersChecked = filtered;
+            }
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
             }
         },
         exportOrdersAction: function(){
