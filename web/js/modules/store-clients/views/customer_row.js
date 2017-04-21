@@ -21,6 +21,10 @@ define([
         },
         toggle: function(e) {
             this.model.set({checked: e.target.checked}, {silent: true});
+
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
+            }
         }
     });
 
