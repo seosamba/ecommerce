@@ -750,7 +750,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
-        $tagsPart = ((!empty($tags)) && (is_array($tags))) ? implode(',', $tags) : '';
+        $tagsPart = (!empty($tags) && is_array($tags)) ? implode(',', $tags) : '';
 
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
