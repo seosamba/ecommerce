@@ -261,7 +261,7 @@ class Tools_ShoppingCart {
 		return $weight;
 	}
 
-	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $skipModifiersRecalculation) {
+	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $skipModifiersRecalculation = false) {
 		$originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
 		$price = $originalPrice;
         if ($skipModifiersRecalculation) {
