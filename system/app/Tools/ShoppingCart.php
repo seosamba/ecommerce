@@ -202,18 +202,19 @@ class Tools_ShoppingCart {
 	 * @param                      $options array of toaster products optionsId => selectionId
 	 * @param int                  $qty     Items quantity
      * @param bool                 $recalculate Recalculate cart
-     * @param bool                 $skipModifiersRecalculation Do not recalculate modifiers
+     * @param bool                 $skipOptionRecalculation Do not recalculate options
+     * @param bool                 $skipGroupPriceRecalculation Do not recalculate group price
 	 * @throws Exceptions_SeotoasterPluginException
 	 * @return string Item storage key
 	 */
-	public function add(Models_Model_Product $item, $options = array(), $qty = 1, $recalculate = true , $skipModifiersRecalculation = false) {
+	public function add(Models_Model_Product $item, $options = array(), $qty = 1, $recalculate = true , $skipOptionRecalculation = false, $skipGroupPriceRecalculation = false) {
 		if (!$item instanceof Models_Model_Product) {
 			throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
 		}
 		$itemKey = $this->_generateStorageKey($item, $options);
 		if (!array_key_exists($itemKey, $this->_content)) {
 			$options = $this->_parseOptions($item, $options);
-			$itemPrice = $this->_calculateItemPrice($item, $options, $skipModifiersRecalculation);
+			$itemPrice = $this->_calculateItemPrice($item, $options, $skipOptionRecalculation);
 			$item->setCurrentPrice($itemPrice);
 			$itemTax = Tools_Tax_Tax::calculateProductTax($item);
 			$this->_content[$itemKey] = array(
@@ -244,7 +245,7 @@ class Tools_ShoppingCart {
 		}
 		unset($item);
         if($recalculate){
-		    $this->calculate(true);
+		    $this->calculate(true, $skipGroupPriceRecalculation);
         }
 		$this->_save();
 
@@ -261,10 +262,10 @@ class Tools_ShoppingCart {
 		return $weight;
 	}
 
-	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $skipModifiersRecalculation = false) {
+	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $skipOptionRecalculation = false) {
 		$originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
 		$price = $originalPrice;
-        if ($skipModifiersRecalculation) {
+        if ($skipOptionRecalculation) {
             return $price;
         }
 		if (!empty($modifiers)) {
@@ -300,7 +301,7 @@ class Tools_ShoppingCart {
 		return $this->_generateStorageKey($item, $options);
 	}
 
-	public function calculate($recalculate = false) {
+	public function calculate($recalculate = false, $skipGroupPriceRecalculation = false) {
 
         $summary = array(
             'subTotal'        => 0,
@@ -349,7 +350,7 @@ class Tools_ShoppingCart {
 						$product->setPrice($cartItem['price']);
 					}
 
-                    if (isset($cartItem['groupPriceEnabled'])) {
+                    if (isset($cartItem['groupPriceEnabled']) && !$skipGroupPriceRecalculation) {
                         $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
                         if ($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())) {
                             $originalProduct = $productMapper->find($cartItem['id']);
