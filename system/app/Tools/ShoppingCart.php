@@ -349,7 +349,9 @@ class Tools_ShoppingCart {
 						$product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
 						$product->setPrice($cartItem['price']);
 					}
-
+                    if ($skipGroupPriceRecalculation) {
+					    $product->setCurrentPrice($product->getPrice());
+                    }
                     if (isset($cartItem['groupPriceEnabled']) && !$skipGroupPriceRecalculation) {
                         $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
                         if ($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())) {
