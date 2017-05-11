@@ -62,6 +62,33 @@ class Tools_Misc
         'lbs' => 'Pound (lbs)'
     );
 
+    public static $_hoursUnits = array(
+        '1' => '12:00 AM',
+        '2' => '1:00 AM',
+        '3' => '2:00 AM',
+        '4' => '3:00 AM',
+        '5' => '4:00 AM',
+        '6' => '5:00 AM',
+        '7' => '6:00 AM',
+        '8' => '7:00 AM',
+        '9' => '8:00 AM',
+        '10' => '9:00 AM',
+        '11' => '10:00 AM',
+        '12' => '11:00 AM',
+        '13' => '12:00 PM',
+        '14' => '1:00 PM',
+        '15' => '2:00 PM',
+        '16' => '3:00 PM',
+        '17' => '4:00 PM',
+        '18' => '5:00 PM',
+        '19' => '6:00 PM',
+        '20' => '7:00 PM',
+        '21' => '8:00 PM',
+        '22' => '9:00 PM',
+        '23' => '10:00 PM',
+        '24' => '11:00 PM'
+    );
+
 
     public static $_helpHashMap = array(
         self::SECTION_STORE_MANAGEZONES => 'shopping-cart-shipping-tax-zones.html',

@@ -258,4 +258,27 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
+
+    public function getUsersWithGroupsList()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('u' => 'user'), array(
+            'u.email',
+            'u.role_id',
+            'u.full_name',
+            'u.last_login',
+            'u.reg_date',
+            'u.ipaddress',
+            'u.referer',
+            'u.gplus_profile',
+            'u.mobile_phone',
+            'u.notes',
+            'sg.groupName'
+        ))
+            ->joinLeft(array('scg' => 'shopping_customer_info'), 'u.id = scg.user_id', array())
+            ->joinLeft(array('sg' => 'shopping_group'), 'sg.id = scg.group_id', array())
+            ->where('role_id <> "' . Tools_Security_Acl::ROLE_SUPERADMIN . '"');
+
+        $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
+        return $users;
+    }
 }

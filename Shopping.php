@@ -299,6 +299,9 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
+                    if (!empty($subFormValues['operationalHours'])) {
+                        $subFormValues['operationalHours'] = serialize($subFormValues['operationalHours']);
+                    }
 					$this->_configMapper->save($subFormValues);
 				}
 				$this->_jsonHelper->direct($form->getValues());
@@ -656,6 +659,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
+                $listFolders = $this->_processNotEmptyDirs($listFolders);
 				$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
 			}
 			$this->_view->imageDirList = $listFolders;
@@ -681,6 +685,29 @@ class Shopping extends Tools_Plugins_Abstract {
 			echo $this->_layout->render();
 		}
 	}
+
+    /**
+     * Check medias product folder
+     * @param $folders
+     * @return mixed
+     */
+    protected function _processNotEmptyDirs($folders)
+    {
+        foreach ($folders as $key => $folder) {
+            $listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder);
+            if (!empty($listFolders) && in_array('product', $listFolders)) {
+                $files = Tools_Filesystem_Tools::scanDirectory($this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder . DIRECTORY_SEPARATOR . 'product',
+                    false, false);
+                if (empty($files)) {
+                    unset($folders[$key]);
+                }
+            } else {
+                unset($folders[$key]);
+            }
+        }
+
+        return $folders;
+    }
 
 	public function searchindexAction() {
 		$cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
@@ -873,6 +900,11 @@ class Shopping extends Tools_Plugins_Abstract {
         if($customerAddress) {
             $this->_view->customerAddress = $customerAddress;
         }
+
+        if (!$customer instanceof Models_Model_Customer) {
+            $this->_responseHelper->fail('customer doesn\'t exist');
+        }
+
 		if ($customer) {
 			$this->_view->customer = $customer;
             $userRole = filter_var($this->_request->getParam('userRole'), FILTER_SANITIZE_STRING);
@@ -2042,6 +2074,37 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         $this->_responseHelper->fail('');
+    }
+
+    public function getUsersAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $users = Models_Mapper_CustomerMapper::getInstance()->getUsersWithGroupsList();
+            if (!empty($users)) {
+                $exportResult = Tools_System_Tools::arrayToCsv($users, array(
+                    $this->_translator->translate('E-mail'),
+                    $this->_translator->translate('Role'),
+                    $this->_translator->translate('Full name'),
+                    $this->_translator->translate('Last login date'),
+                    $this->_translator->translate('Registration date'),
+                    $this->_translator->translate('IP address'),
+                    $this->_translator->translate('Referer url'),
+                    $this->_translator->translate('Google plus profile'),
+                    $this->_translator->translate('Mobile phone'),
+                    $this->_translator->translate('Notes'),
+                    $this->_translator->translate('Group Name')
+                ));
+                if ($exportResult) {
+                    $usersArchive = Tools_System_Tools::zip($exportResult);
+
+                    $this->_response->setHeader('Content-Disposition', 'attachment; filename=' . Tools_Filesystem_Tools::basename($usersArchive))
+                        ->setHeader('Content-type', 'application/force-download');
+                    readfile($usersArchive);
+                    $this->_response->sendResponse();
+                }
+            }
+            exit;
+        }
     }
 
 }

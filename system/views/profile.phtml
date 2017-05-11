@@ -85,7 +85,7 @@
 		</p>
 		<ul class="stats clearfix">
 			<?php foreach ($this->stats as $key => $value) : ?>
-				<li class="grid_6 <?php echo $key;?>" data-sort="<?php echo $this->translate('cs_'.$key);?>"><?php echo $value.' '.$this->translate('cs_'.$key);?></li>
+				<li class="grid_6 <?php echo $key;?>" data-sort="<?php echo $this->translate('cs_'.$key);?>"><?php echo $value.' '.ucfirst(strtolower($this->translate('cs_'.$key)));?></li>
 			<?php endforeach; ?>
 		</ul>
 	</div>
@@ -104,15 +104,15 @@
 			<thead>
 				<tr class="title-table">
 					<th>#</th>
-					<th><?php echo $this->translate('Purchased On');?></th>
+					<th><?php echo $this->translate('Purchased on');?></th>
 					<th><?php echo $this->translate('Products in cart');?></th>
-                    <th><?php echo $this->translate('Total Price');?></th>
+                    <th><?php echo $this->translate('Total price');?></th>
                     <th><?php echo $this->translate('Shipping price');?></th>
                     <th><?php echo $this->translate('Shipping via');?></th>
                     <th style="width: 180px;"><?php echo $this->translate('Status');?></th>
                     <th class="text-center"><?php echo $this->translate('Details');?></th>
                     <?php if(isset($this->invoicePlugin)):?>
-                        <th class="text-center"><?php echo $this->translate('View/Download Invoice');?></th>
+                        <th class="text-center"><?php echo $this->translate('View/Download invoice');?></th>
                     <?php endif;?>
 				</tr>
 			</thead>
