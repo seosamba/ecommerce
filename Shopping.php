@@ -411,7 +411,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
-                $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
+                $mobilePhone = isset($data['originalMobile']) ? $data['originalMobile'] : '';
+                $mobileCountryCode = isset($data['mobilecountrycode']) ? $data['mobilecountrycode'] : '';
+                $mobileCountryCodeValue = isset($data['mobileCountryCodeValue']) ? $data['mobileCountryCodeValue'] : null;
 				if (!empty($data['customerPassword'])) {
                     $password = $data['customerPassword'];
                 } else {
@@ -422,6 +424,8 @@ class Shopping extends Tools_Plugins_Abstract {
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
                         ->setMobilePhone($mobilePhone)
+                        ->setMobileCountryCode($mobileCountryCode)
+                        ->setMobileCountryCodeValue($mobileCountryCodeValue)
 						->setPassword($password);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
