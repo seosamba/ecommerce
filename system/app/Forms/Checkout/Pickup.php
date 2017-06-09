@@ -80,7 +80,13 @@ class Forms_Checkout_Pickup extends Zend_Form {
                 'value'    => $this->_mobile
         )));
 
-
+        $this->addElement(new Zend_Form_Element_Select(array(
+            'name'         => 'phonecountrycode',
+            'label'        => null,
+            'multiOptions' => Tools_System_Tools::getCountryPhoneCodesList(true, array(), true),
+            'value'        => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'),
+            'style'        => 'width: 41.667%;'
+        )));
 
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'       => 'email',
@@ -114,11 +120,15 @@ class Forms_Checkout_Pickup extends Zend_Form {
             new Zend_Filter_StringTrim()
         ));
 
+        $this->getElement('phone')->setLabel(null);
+
         $this->getElement('submitpickup')->removeDecorator('Label');
         $this->getElement('submitpickup')->removeDecorator('HtmlTag');
         $this->getElement('step')->removeDecorator('HtmlTag');
         $this->getElement('mobilecountrycode')->removeDecorator('HtmlTag');
         $this->getElement('mobile')->removeDecorator('HtmlTag');
+        $this->getElement('phonecountrycode')->removeDecorator('HtmlTag');
+        $this->getElement('phone')->removeDecorator('HtmlTag');
 	}
 
 }

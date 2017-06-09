@@ -339,6 +339,10 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `zip` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `mobile` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mobilecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mobile_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phonecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `state` (`state`)

@@ -411,9 +411,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
-                $mobilePhone = isset($data['originalMobile']) ? $data['originalMobile'] : '';
+                $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
                 $mobileCountryCode = isset($data['mobilecountrycode']) ? $data['mobilecountrycode'] : '';
-                $mobileCountryCodeValue = isset($data['mobileCountryCodeValue']) ? $data['mobileCountryCodeValue'] : null;
+                $mobileCountryCodeValue = isset($data['mobile_country_code_value']) ? $data['mobile_country_code_value'] : null;
 				if (!empty($data['customerPassword'])) {
                     $password = $data['customerPassword'];
                 } else {
@@ -2039,10 +2039,15 @@ class Shopping extends Tools_Plugins_Abstract {
 
     private function _normalizeMobilePhoneNumber($arr) {
         if(!empty($arr['mobile'])) {
-            $countryPhoneCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
-            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryPhoneCode);
+            $countryMobileCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
+            $countryPhoneCode = Zend_Locale::getTranslation($arr['phonecountrycode'], 'phoneToTerritory');
+            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryMobileCode);
             if ($mobileNumber !== false) {
-                $arr['mobile'] = $mobileNumber;
+                $arr['mobile_country_code_value'] = '+'.$countryMobileCode;
+            }
+            $phoneNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['phone'], $countryPhoneCode);
+            if ($phoneNumber !== false) {
+                $arr['phone_country_code_value'] = '+'.$countryPhoneCode;
             }
         }
         return $arr;

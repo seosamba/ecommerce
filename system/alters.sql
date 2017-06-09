@@ -240,7 +240,15 @@ CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 06/06/2017
+-- version: 2.5.2
+-- Add mobile and desktop phone country code
+ALTER TABLE `shopping_customer_address` ADD COLUMN `mobilecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_customer_address` ADD COLUMN `mobile_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_customer_address` ADD COLUMN `phonecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_customer_address` ADD COLUMN `phone_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
