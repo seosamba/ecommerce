@@ -4,7 +4,14 @@
     <td class="check-td"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
     <td class="email"><a href="mailto:${email}">${email}</a></td>
-    <td><input type="text" class="mobile-number" data-uid="${id}" data-attribute="mobile" value="${mobile_phone}" /></td>
+    <td>
+        <select data-type="mobile" data-uid="${id}" data-old-value="${mobile_country_code}" data-user-attribute-name="mobileCountryCode" class="mobile-phone-country-code grid_4 change-user-attribute alpha" name="mobile-country-code">
+            <?php foreach($this->phoneCountryCodes as $phoneCountryCodeAbbr => $phoneCountryCodeVal): ?>
+                <option {{if mobile_country_code == '<?php echo $phoneCountryCodeAbbr;?>'}} selected="selected" {{/if}} value="<?php echo $phoneCountryCodeAbbr;?>"><?php echo $phoneCountryCodeVal;?></option>
+            <?php endforeach;?>
+        </select>
+        <input id="user-mobile-attribute-id-${id}" data-old-value="${mobile_phone}" type="text" data-user-attribute-name="mobilePhone" class="mobile-phone-value change-user-attribute mobile-number grid_8" data-uid="${id}" data-attribute="mobile" value="${mobile_phone}" />
+    </td>
     <td class="group">
         <?php if(!empty($this->allGroups)):?>
             <select name="groups">
@@ -47,6 +54,7 @@
 <?php
     $this->headScript()
         ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
+        ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/maskedinput/jquery.maskedinput.js')
         ->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/require.min.js', null, array('data-main' => $this->websiteUrl.'plugins/shopping/web/js/modules/store-clients/config'));
 
 	$this->noLayout ? $this->headScript() : '';

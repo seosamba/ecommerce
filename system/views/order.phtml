@@ -36,7 +36,7 @@
                         <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
-                        <span class="phone"><?php echo $billingAddress['phone'];?></span>
+                        <span class="phone"><?php echo $billingAddress['mobile_country_code_value'].$billingAddress['phone'];?></span>
                         <?php if ($this->order->getGateway()) : ?>
                             <br/>
                             <span><?php echo $this->translate('Payment Method');?>
@@ -60,9 +60,9 @@
                         <span class="last-name"><?php echo $shippingAddress['lastname'];?></span>
                         <br/>
                         <?php if ($this->order->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
-                            <span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                            <span class="phone"><?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
                             <br/>
-                            <span class="phone"><?php echo $shippingAddress['mobile'];?></span>
+                            <span class="phone"><?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
                         <?php else:?>
                             <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
                             <br/>
@@ -74,7 +74,7 @@
                             <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
                             <br/>
                             <span><?php echo $countryList[$shippingAddress['country']];?></span>
-                            <span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                            <span class="phone"><?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
                         <?php endif;?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>

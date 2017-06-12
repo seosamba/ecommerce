@@ -58,7 +58,7 @@
 					<span class="postal-code"><?php echo $billingAddressDefault['zip'];?></span>
                     <?php if(isset($billingAddressDefault['mobile'])):?>
                         <br />
-                        <span class="mobile"><?php echo $billingAddressDefault['mobile'];?></span>
+                        <span class="mobile"><?php echo $billingAddressDefault['mobile_country_code_value'].$billingAddressDefault['mobile'];?></span>
                     <?php endif;?>
 				</div>
 			<?php endif;?>
@@ -71,7 +71,7 @@
 					<span class="postal-code"><?php echo $shippingAddressDefault['zip'];?></span>
                     <?php if(isset($shippingAddressDefault['mobile'])):?>
                         <br />
-                        <span class="mobile"><?php echo $shippingAddressDefault['mobile'];?></span>
+                        <span class="mobile"><?php echo $billingAddressDefault['mobile_country_code_value'].$shippingAddressDefault['mobile'];?></span>
                     <?php endif;?>
 				</div>
 			<?php endif;?>
@@ -254,7 +254,7 @@
                         <?php endif;?>
                         <?php if(isset($billingAddress['mobile'])):?>
                             <br />
-                            <span class="mobile"><?php echo $billingAddress['mobile'];?></span>
+                            <span class="mobile"><?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
                         <?php endif;?>
                     </div>
         <?php endif;?>

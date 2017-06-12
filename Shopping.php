@@ -850,6 +850,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->noLayout = true;
 			$allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
             $this->_view->allGroups = $allGroups;
+            $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
+            $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
+            $this->_view->phoneCountryCodes = Tools_LeadTools::getCountryPhoneCodesList();
             $attributes = Application_Model_Mappers_UserMapper::getInstance();
             $query = $attributes->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'))->where('attribute LIKE ?', 'customer_%');
             $customerAttributes = $attributes->getDbTable()->getAdapter()->fetchCol($query);

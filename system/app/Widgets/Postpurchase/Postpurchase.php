@@ -807,9 +807,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                 }
                 if (self::ADDRESS_MOBILE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
                    return str_replace('+', '', $addressData[$addressKey]);
+                } elseif(self::ADDRESS_MOBILE === $addressKey) {
+                    return $addressData['mobile_country_code_value'].$addressData[$addressKey];
                 }
                 if (self::ADDRESS_PHONE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
                     return str_replace('+', '', $addressData[$addressKey]);
+                } elseif(self::ADDRESS_PHONE === $addressKey) {
+                    return $addressData['phone_country_code_value'].$addressData[$addressKey];
                 }
                 return $addressData[$addressKey];
             }
