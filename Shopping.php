@@ -2087,8 +2087,14 @@ class Shopping extends Tools_Plugins_Abstract {
                     $this->_translator->translate('IP address'),
                     $this->_translator->translate('Referer url'),
                     $this->_translator->translate('Google plus profile'),
+                    $this->_translator->translate('Mobile country code'),
+                    $this->_translator->translate('Mobile country code value'),
                     $this->_translator->translate('Mobile phone'),
                     $this->_translator->translate('Notes'),
+                    $this->_translator->translate('Timezone'),
+                    $this->_translator->translate('Desktop country code'),
+                    $this->_translator->translate('Desktop country code value'),
+                    $this->_translator->translate('Desktop phone'),
                     $this->_translator->translate('Group Name')
                 ));
                 if ($exportResult) {

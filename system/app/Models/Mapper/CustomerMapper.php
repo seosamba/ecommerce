@@ -268,8 +268,14 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
             'u.ipaddress',
             'u.referer',
             'u.gplus_profile',
+            'u.mobile_country_code',
+            'u.mobile_country_code_value',
             'u.mobile_phone',
             'u.notes',
+            'u.timezone',
+            'u.desktop_country_code',
+            'u.desktop_country_code_value',
+            'u.desktop_phone',
             'sg.groupName'
         ))
             ->joinLeft(array('scg' => 'shopping_customer_info'), 'u.id = scg.user_id', array())
