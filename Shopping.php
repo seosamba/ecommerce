@@ -2044,9 +2044,15 @@ class Shopping extends Tools_Plugins_Abstract {
         if(!empty($arr['mobile'])) {
             $countryMobileCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
             $countryPhoneCode = Zend_Locale::getTranslation($arr['phonecountrycode'], 'phoneToTerritory');
+            $arr['mobile'] = preg_replace('~\D~ui', '', $arr['mobile']);
             $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryMobileCode);
             if ($mobileNumber !== false) {
                 $arr['mobile_country_code_value'] = '+'.$countryMobileCode;
+            }
+            if (empty($arr['phone'])) {
+                $arr['phone'] = '';
+            } else {
+                $arr['phone'] = preg_replace('~\D~ui', '', $arr['phone']);
             }
             $phoneNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['phone'], $countryPhoneCode);
             if ($phoneNumber !== false) {
