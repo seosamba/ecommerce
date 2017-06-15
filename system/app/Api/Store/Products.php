@@ -104,6 +104,11 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
+			$filter['order']     = array_filter(filter_var_array((array)$this->_request->getParam('forder'), FILTER_SANITIZE_STRING));
+
+            if (empty($order) && !empty($filter['order'])) {
+                $order = array_unique($filter['order']);
+            }
 
             $organicSearch = filter_var($this->_request->getParam('os', 0), FILTER_SANITIZE_NUMBER_INT);
             if ($key && $organicSearch) {
@@ -114,7 +119,7 @@ class Api_Store_Products extends Api_Service_Abstract {
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
-            $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
+            $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . implode(',', $filter['order']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
 			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
 
 				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, $order, $offset, $limit, (bool)$key?$key:null,

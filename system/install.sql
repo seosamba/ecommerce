@@ -153,7 +153,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('weightUnit', 'kg'),
 ('zip', '94117'),
 ('noZeroPrice', '1'),
-('version', '2.3.0');
+('version', '2.5.1');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -300,6 +300,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `notes` text COLLATE utf8_unicode_ci COMMENT 'Comment for order',
   `discount` decimal(10,2) DEFAULT NULL COMMENT 'Order discount',
   `free_cart` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
+  `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -784,6 +786,23 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_status` ENUM('0', '1') DEFAULT '0',
+  UNIQUE KEY `name` (`name`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
+
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    `id` INT(10) unsigned AUTO_INCREMENT,
    `file_stored_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Stored file name',
@@ -802,4 +821,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.4.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.3' WHERE `name` = 'shopping';
+

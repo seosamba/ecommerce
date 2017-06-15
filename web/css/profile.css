@@ -75,7 +75,7 @@ table#orders-table td.shipping-data p { margin:0; }
 *+html #profile #profile-address-list>div {
 	display:inline;
 }
-#profile #profile-address-list div.adr {
+#profile #profile-address-list div.adr, #profile #profile-address-list div.addr {
 	padding: 5px;
 	border-radius: 3px;
 	border: 1px solid #ccc;

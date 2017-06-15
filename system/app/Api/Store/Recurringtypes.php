@@ -114,8 +114,9 @@ class Api_Store_Recurringtypes extends Api_Service_Abstract
             $recurringParams = array($data['recurringPeriodType'] => $data['recurringTypeStatus']);
         }
 
-        if (!empty($data['recurringPaymentFreePeriod'])) {
-            $recurringParams = array('recurringPaymentFreePeriod' => $data['recurringPaymentFreePeriod']);
+        if (isset($data['recurringPaymentFreePeriod'])) {
+            $recurringPaymentFreePeriod = !empty($data['recurringPaymentFreePeriod']) ? $data['recurringPaymentFreePeriod'] : 0;
+            $recurringParams = array('recurringPaymentFreePeriod' => $recurringPaymentFreePeriod);
         }
 
         if (!empty($recurringParams)) {

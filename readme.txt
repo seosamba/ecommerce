@@ -32,11 +32,12 @@ Plugin widgets.
         sometext - custom text inside span element
 
 2. Product list widget.
-    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date]]]} - Creates a list of products using the same tags.
+    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc} - Creates a list of products using the same tags.
     template_name - template name for the product list
     tagnames-tag1,tag2,...,tagN - filtering by product tags
     brands-brand1,brand2,...,brandN - filtering by product brands
-    order-name,price,brand,date - sorting of the list by: name, price, brand and date
+    order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
+    desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
@@ -80,6 +81,8 @@ Plugin widgets.
     {$postpurchase:discountTax[:clean]} -> discount tax
     {$postpurchase:subTotalTax[:clean]} -> subtotal tax
     {$postpurchase:id} -> cart id
+    {$postpurchase:coupon} -> if coupon was used, show coupon name.
+    {$postpurchase:quotenote} -> show quote disclaimer.
 
     ######### Billing information #############
     {$postpurchase:billing:lastname} -> billing lastname

@@ -1,10 +1,22 @@
 <?php $id = uniqid('pl-'); ?>
 <div class="product-list">
+	<?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+        <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop');?></a>
+	<?php endif;?>
 	<?php echo $this->plContent; ?>
 	<?php if ($this->totalCount >= $this->limit): ?>
     <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
 	<?php endif; ?>
 </div>
+<script type="application/javascript">
+    $(function() {
+        $('.backToOriginal').on('click', function (e) {
+            e.preventDefault();
+            var pathName = window.location.pathname;
+            window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>' + pathName;
+        });
+    });
+</script>
 <?php if ($this->totalCount >= $this->limit): ?>
 <script>
 	$('#<?php echo $id; ?>').on('click', function(e){
@@ -17,7 +29,10 @@
 			    template: '<?php echo $this->productTemplate; ?>',
 			    nextpage: nextpage,
                 limit: '<?php echo $this->limit; ?>'
-		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>);
+		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
+                <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
+                <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
+				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>);
 
 		showSpinner();
 
@@ -31,5 +46,6 @@
             }
 		});
 	});
+
 </script>
 <?php endif; ?>

@@ -8,6 +8,9 @@
     </h3>
     <form id="<?php echo $id; ?>" class="store-coupon" action="<?php echo trim($this->websiteUrl, '/').$_SERVER['REQUEST_URI']; ?>" method="post">
 	    <input type="text" name="code" required>
+        <?php if(!empty($this->currentAppliedCoupons)):?>
+            <input type="hidden" class="current-applied-coupons" name="current-applied-coupons" value="<?php echo implode(',', $this->currentAppliedCoupons);?>" />
+        <?php endif;?>
 	    <button class="btn" type="submit"><?php echo $this->translate('Apply'); ?></button>
 	</form>
 	<div class="coupon-msg"></div>
@@ -37,10 +40,26 @@ $(function(){
 				} else {
 					$msgContainer.empty();
 					if (typeof  r.responseText === 'object'){
-						$.each(r.responseText, function(key, msg) {
-							$("<p></p>", { "class": "store-coupon-notify" }).html(msg)
-									.on('click', function(){ $(this).remove(); })
-									.appendTo($msgContainer);
+                        $.each(r.responseText, function(key, msg) {
+							if (key === 'msg') {
+                                $("<p></p>", { "class": "store-coupon-notify" }).html(msg)
+                                    .on('click', function(){ $(this).remove(); })
+                                    .appendTo($msgContainer);
+                                <?php if(isset($this->forceCouponSuccessStatus)):?>
+                                    showMessage(msg, false, 5000);
+                                <?php endif;?>
+                            }
+                            if (key === 'couponCodes') {
+                                var couponsInfoEl = $(self).find('.current-applied-coupons');
+                                if (couponsInfoEl.length > 0) {
+                                    couponsInfoEl.val(msg);
+                                } else {
+                                    $(self).append($('<input>')
+                                        .attr({'type':'hidden', 'name':'current-applied-coupons'})
+                                        .addClass('current-applied-coupons')
+                                        .val(msg));
+                                }
+                            }
 						});
 					}
 				}

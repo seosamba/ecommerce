@@ -202,17 +202,19 @@ class Tools_ShoppingCart {
 	 * @param                      $options array of toaster products optionsId => selectionId
 	 * @param int                  $qty     Items quantity
      * @param bool                 $recalculate Recalculate cart
+     * @param bool                 $skipOptionRecalculation Do not recalculate options
+     * @param bool                 $skipGroupPriceRecalculation Do not recalculate group price
 	 * @throws Exceptions_SeotoasterPluginException
 	 * @return string Item storage key
 	 */
-	public function add(Models_Model_Product $item, $options = array(), $qty = 1, $recalculate = true) {
+	public function add(Models_Model_Product $item, $options = array(), $qty = 1, $recalculate = true , $skipOptionRecalculation = false, $skipGroupPriceRecalculation = false) {
 		if (!$item instanceof Models_Model_Product) {
 			throw new Exceptions_SeotoasterPluginException('Item should be Models_Model_Product instance');
 		}
 		$itemKey = $this->_generateStorageKey($item, $options);
 		if (!array_key_exists($itemKey, $this->_content)) {
 			$options = $this->_parseOptions($item, $options);
-			$itemPrice = $this->_calculateItemPrice($item, $options);
+			$itemPrice = $this->_calculateItemPrice($item, $options, $skipOptionRecalculation);
 			$item->setCurrentPrice($itemPrice);
 			$itemTax = Tools_Tax_Tax::calculateProductTax($item);
 			$this->_content[$itemKey] = array(
@@ -244,7 +246,7 @@ class Tools_ShoppingCart {
 		}
 		unset($item);
         if($recalculate){
-		    $this->calculate(true);
+		    $this->calculate(true, $skipGroupPriceRecalculation);
         }
 		$this->_save();
 
@@ -261,9 +263,12 @@ class Tools_ShoppingCart {
 		return $weight;
 	}
 
-	private function _calculateItemPrice(Models_Model_Product $item, $modifiers) {
+	private function _calculateItemPrice(Models_Model_Product $item, $modifiers, $skipOptionRecalculation = false) {
 		$originalPrice = is_null($item->getCurrentPrice()) ? $item->getPrice() : $item->getCurrentPrice();
 		$price = $originalPrice;
+        if ($skipOptionRecalculation) {
+            return $price;
+        }
 		if (!empty($modifiers)) {
 			foreach ($modifiers as $modifier) {
 				if (!is_array($modifier) || empty($modifier)) {
@@ -297,7 +302,7 @@ class Tools_ShoppingCart {
 		return $this->_generateStorageKey($item, $options);
 	}
 
-	public function calculate($recalculate = false) {
+	public function calculate($recalculate = false, $skipGroupPriceRecalculation = false) {
 
         $summary = array(
             'subTotal'        => 0,
@@ -325,6 +330,7 @@ class Tools_ShoppingCart {
             $freebiesProductsInCart = array();
             $notFreebiesProductsInCart = array();
             $notFreebiesProductsInCartStorageKeys = array();
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
 			if (is_array($this->_content) && !empty($this->_content)) {
 				foreach ($this->_content as $storageKey => &$cartItem) {
 					if (isset($cartItem['sid'])) {
@@ -344,22 +350,31 @@ class Tools_ShoppingCart {
 						$product = Models_Mapper_ProductMapper::getInstance()->find($cartItem['product_id']);
 						$product->setPrice($cartItem['price']);
 					}
-
-                    if (isset($cartItem['groupPriceEnabled'])) {
+                    if ($skipGroupPriceRecalculation) {
+					    $product->setCurrentPrice($product->getPrice());
+                    }
+                    if (isset($cartItem['groupPriceEnabled']) && !$skipGroupPriceRecalculation) {
                         $product->setGroupPriceEnabled($cartItem['groupPriceEnabled']);
                         if ($cartItem['groupPriceEnabled'] !== 1 && is_int($this->getCustomerId())) {
+                            $originalProduct = $productMapper->find($cartItem['id']);
+                            $originalProduct->setTaxClass($cartItem['taxClass']);
+                            $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
                             $product->setGroupPriceEnabled(1);
-                            $priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
-                            $product->setPrice($priceForGroup);
-                            $cartItem['price'] = $priceForGroup;
+                            //$priceForGroup = Tools_GroupPriceTools::calculateGroupPrice($product, $cartItem['id']);
+                            $product->setPrice($changedPrice);
+                            $cartItem['price'] = $changedPrice;
                             $cartItem['groupPriceEnabled'] = 1;
                         }
 
                         if ($cartItem['groupPriceEnabled'] === 1 && !is_int($this->getCustomerId())) {
                             $cartItem['groupPriceEnabled'] = 0;
                             $product->setGroupPriceEnabled(0);
-                            $product->setPrice($cartItem['originalPrice']);
-                            $cartItem['price'] = $cartItem['originalPrice'];
+                            $originalProduct = $productMapper->find($cartItem['id']);
+                            $originalProduct->setTaxClass($cartItem['taxClass']);
+                            $changedPrice = $this->_calculateItemPrice($originalProduct, $cartItem['options']);
+                            $product->setPrice($changedPrice);
+                            $cartItem['price'] = $changedPrice;
+
                         }
                     }
 
@@ -377,7 +392,7 @@ class Tools_ShoppingCart {
             if(!empty($discountCoupons)){
                 $summary['discount'] = 0;
                 foreach ($discountCoupons as $coupon) {
-                    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon);
+                    $summary['discount'] += Tools_CouponTools::processDiscountCoupon($coupon, $summary);
                 }
                 $summary['discountTaxRate'] = isset($this->_shoppingConfig['couponDiscountTaxRate']) ? $this->_shoppingConfig['couponDiscountTaxRate'] : 0;
             }
@@ -625,9 +640,10 @@ class Tools_ShoppingCart {
 					->setShippingAddressId($this->_shippingAddressKey)
 					->setBillingAddressId($this->_billingAddressKey);
 		}
-
-		if ($customer->getReferer()) {
-			$cartSession->setReferer($customer->getReferer());
+		$sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Session');
+		
+		if(!empty($sessionHelper->refererUrl)){
+			$cartSession->setReferer($sessionHelper->refererUrl);
 		}
 
         if (null !== ($shippingData = $this->getShippingData())) {
@@ -713,9 +729,13 @@ class Tools_ShoppingCart {
 						break;
 					case Models_Model_Option::TYPE_DATE:
 					case Models_Model_Option::TYPE_TEXT:
+						$textValue = '';
+						if (!empty($options[$defaultOption['id']])) {
+							$textValue = $options[$defaultOption['id']];
+						}
 						$modifiers[$defaultOption['title']] = array(
 							'option_id'   => $defaultOption['id'],
-							'title'       => $defaultOption['title'],
+							'title'       => $textValue,
 							'priceSign'   => null,
 							'priceType'   => null,
 							'priceValue'  => null,

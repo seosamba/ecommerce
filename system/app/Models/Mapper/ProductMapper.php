@@ -139,6 +139,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 	 * @param array|null $search Keyword, to search across name, mpn, sku, brand name or tags
 	 * @param array|null $tags List of tags ids to filter by
 	 * @param array|null $brands List of brand names to filter by
+     * @param bool $strictTagsCount
+     * @param bool $organicSearch (search by product name, brand name etc...)
+     * @param array $attributes product attributes
 	 * @return array|null List of products
 	 */
     public function fetchAll(
@@ -150,7 +153,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $tags = null,
         $brands = null,
         $strictTagsCount = false,
-        $organicSearch = false
+        $organicSearch = false,
+        $attributes = array(),
+        $price = array(),
+        $sort = null
+
     ) {
         $entities = array();
 
@@ -159,8 +166,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
             ->group('p.id');
 
-        if (!is_null($order)) {
-            $select->order($order);
+        if ((!is_null($order)) && (is_array($order)) && (!is_null($sort))) {
+            foreach ($order as $key => $ord){
+                $order[$key] = $ord . ' ' . $sort;
+            }
+			$select->order($order);
         }
 
         if (!empty($where)) {
@@ -172,6 +182,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 $brands = (array)$brands;
             }
             $select->where('b.name in (?)', $brands);
+        }
+
+        if (!empty($attributes)) {
+            $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($attributes);
+            if (!empty($productIds)) {
+                $select->where('p.id IN (?)', $productIds);
+            } else {
+                return null;
+            }
+        }
+
+        if(!empty($price)){
+            $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
         }
 
         if (!empty($tags)) {
@@ -208,17 +231,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
             if ($organicSearch) {
 
-//                $brandDbTable = new Models_DbTable_Brand();
-//                $entries      = $brandDbTable->getAdapter()->fetchAll(
-//                    $brandDbTable
-//                        ->select()
-//                        ->where('name in (?)', $brands)
-//                );
-//                $brandExists  = is_array($entries) && !empty($entries);
-
-//                $likeWhere = 'p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?';
                 if (is_array($search)) {
-
                     $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(
                         false
                     );
@@ -227,17 +240,12 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                     }
 
                     $subWhere = implode(' ', $subWhere->getPart('WHERE'));
-//                    if ($brandExists) {
                     $select->where($subWhere);
-//                    } else {
-//                        $select->orWhere($subWhere);
-//                    }
                 } else {
                     $select->orWhere($likeWhere, '%' . $search . '%');
                 }
 
             } else {
-
                 $select->where($likeWhere, '%' . $search . '%');
             }
         }

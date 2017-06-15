@@ -148,6 +148,9 @@ UPDATE `template_type` SET `title` = 'Product' WHERE `id` = 'typeproduct';
 ALTER TABLE `shopping_customer_address` ADD `mobilecountrycode` VARCHAR( 2 ) NULL DEFAULT NULL COMMENT 'Contains mobile phone country code';
 
 -- 20/04/2015
+-- version: 2.4.0
+
+-- 20/04/2015
 -- version: 2.4.1
 -- add recurring payments
 CREATE TABLE IF NOT EXISTS `shopping_recurring_payment` (
@@ -194,8 +197,49 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon_sales` (
   CONSTRAINT `shopping_coupon_sales_ibfk_3` FOREIGN KEY (`cart_id`) REFERENCES `shopping_cart_session` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 28/07/2015
+-- 06/08/2015
 -- version: 2.4.3
+-- Add product type id
+INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
+UPDATE page SET `page_type` = 2 WHERE `id` IN (SELECT `page_id` from `shopping_product`);
+
+-- 15/10/2015
+-- version: 2.4.4
+-- Add order refund information
+ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info';
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_refund'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_refund' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+-- 15/10/2015
+-- version: 2.5.0
+-- Add Carrier tracking url
+
+CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `url` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `default_status` ENUM('0', '1') DEFAULT '0',
+  UNIQUE KEY `name` (`name`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 12/12/2016
+-- version: 2.5.1
+-- Add custom sort for product list
+
+CREATE TABLE IF NOT EXISTS `shopping_draggable` (
+  `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
+  `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 28/07/2015
+-- version: 2.5.2
 -- Add support for digital products
 ALTER TABLE `shopping_product` ADD COLUMN  `is_digital` ENUM('0','1') DEFAULT '0';
 
@@ -220,6 +264,6 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ALTER TABLE `shopping_cart_session_content` ADD COLUMN `is_digital` ENUM('0','1') DEFAULT '0';
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.4.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

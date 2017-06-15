@@ -154,13 +154,24 @@ class Tools_CouponTools {
 		return array_filter($coupons, function($coupon) use ($filter) { return (strtolower($coupon->getType()) === strtolower($filter)); });
 	}
 
-	public static function processDiscountCoupon(Store_Model_Coupon $coupon) {
+    /**
+     * Calculate discount using coupon code
+     *
+     * @param Store_Model_Coupon $coupon
+     * @param array $orderSummary array('subTotalTax' => '', 'subTotal' = '')
+     * @return bool|float
+     */
+	public static function processDiscountCoupon(Store_Model_Coupon $coupon, $orderSummary = array()) {
 		if ($coupon->getType() !== Store_Model_Coupon::COUPON_TYPE_DISCOUNT){
 			return false;
 		}
 
-		$cart = Tools_ShoppingCart::getInstance();
-		$orderAmount = floatval($cart->getSubTotal() + $cart->getTotalTax());
+        if (empty($orderSummary)) {
+            $cart = Tools_ShoppingCart::getInstance();
+            $orderAmount = floatval($cart->getSubTotal() + $cart->getTotalTax());
+        } else {
+            $orderAmount = $orderSummary['subTotal'] + $orderSummary['subTotalTax'];
+        }
 		$discount = 0;
 
 		if ($orderAmount >= $coupon->getMinOrderAmount()){

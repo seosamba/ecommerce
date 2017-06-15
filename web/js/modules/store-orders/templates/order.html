@@ -16,8 +16,12 @@
 <% if (gateway == 'Quote' && status == 'canceled'){ %>
     <% translatedStatus = 'Lost opportunity' %>
 <% } %>
+<% if (status === 'refunded') { %>
+    <td class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : originalTotal %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+<% } else {%>
+    <td class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+<% } %>
 
-<td class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <td><%= total_products %></td>
 <td><%= total %></td>
 <td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
@@ -45,6 +49,7 @@
 <% if(useInvoice == 'enabled') { %>
     <td class="text-center">
     <% if(_.isNull(recurring_id)) { %>
+        <a href="javascript:;" class="ticon-email4 icon16 sendInvoice" title="Send invoice to user via email">Send</a> /
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
             <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
         </a>/

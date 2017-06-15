@@ -97,6 +97,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_recurringId = null;
 
+    protected $_refundAmount = '';
+
+    protected $_refundNotes = '';
+
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -343,6 +347,44 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setRecurringId($recurringId)
     {
         $this->_recurringId = $recurringId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefundAmount()
+    {
+        return $this->_refundAmount;
+    }
+
+    /**
+     * @param string $refundAmount
+     * @return string
+     */
+    public function setRefundAmount($refundAmount)
+    {
+        $this->_refundAmount = $refundAmount;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefundNotes()
+    {
+        return $this->_refundNotes;
+    }
+
+    /**
+     * @param string $refundNotes
+     * @return string
+     */
+    public function setRefundNotes($refundNotes)
+    {
+        $this->_refundNotes = $refundNotes;
+
         return $this;
     }
 

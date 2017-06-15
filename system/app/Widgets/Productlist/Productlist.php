@@ -30,6 +30,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
     const OPTION_FILTERABLE = 'filterable';
 
     /**
+     * Option to create custom product order in product list
+     */
+    const OPTION_DRAGGABLE = 'draggable';
+
+    /**
      * Option to apply "AND" logic for tags filtering
      */
     const OPTION_STRICT_TAGS_COUNT = 'and';
@@ -107,12 +112,46 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
         }
+        if (in_array(self::OPTION_DRAGGABLE, $this->_options) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $this->_cacheable = false;
+        }
 	}
 
 	public function _load() {
 		$this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
 		$this->_view->addHelperPath('ZendX/JQuery/View/Helper/', 'ZendX_JQuery_View_Helper');
         $last = end($this->_options);
+        $isPreview = filter_var(Zend_Controller_Front::getInstance()->getRequest()->getParam('prodListPreview'), FILTER_SANITIZE_STRING);
+        if (!empty($isPreview)) {
+            $this->_view->isPreview = $isPreview;
+        }
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
+            $last = 0;
+        } elseif ((!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
+                    $this->_options))
+            || (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
+                    $this->_options) && $isPreview)
+        ) {
+            $this->last = $last;
+        }
+
+        $dragListId = null;
+
+        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
+            $optionsForDragKey =  $this->_options;
+            $withLimit = end($this->_options);
+            if (is_numeric($withLimit)) {
+                array_pop($optionsForDragKey);
+            }
+            $dragListId = md5(implode(',', $optionsForDragKey));
+            $dragMapper = Models_Mapper_DraggableMapper::getInstance();
+            $dragModel = $dragMapper->find($dragListId);
+            if ($dragModel instanceof Models_Model_Draggable) {
+                $this->draglist['list_id'] = $dragModel->getId();
+                $this->draglist['data'] = unserialize($dragModel->getData());
+            }
+            $this->_view->dragListId = $dragListId;
+        }
 
         if (is_numeric($last)) {
             $last = abs(intval($last));
@@ -142,7 +181,29 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->pageId = $this->_toasterOptions['id'];
 		$this->_view->plContent = $content;
 		$this->_view->productTemplate = $this->_productTemplate->getName();
+
+        if(!empty($this->_priceFilter)){
+            if(in_array('tax', $this->_options)) {
+                $tax = $this->getTax();
+                if(!empty($tax)) {
+                    $tax = (int)$tax;
+                    $percentMax = $this->_priceFilter['max'] / "1.$tax";
+                    $percentMin = $this->_priceFilter['min'] / "1.$tax";
+                    $this->_priceFilter['max'] = $percentMax;
+                    $this->_priceFilter['min'] = $percentMin;
+                }
+            }
+
+
+            $this->_view->price = $this->_priceFilter;
+        }
+
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
+
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
+            return $this->_view->render('draggable.phtml');
+        }
+
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
 		} elseif (!intval($this->_options[0])) {
@@ -152,6 +213,22 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 		return $this->_view->render('productlist.phtml');
 	}
+
+    protected function _dragListNewOrder()
+    {
+        if (isset($this->draglist) && is_array($this->draglist['data']) && isset($this->dragproducts) && is_array($this->dragproducts)) {
+            $res = array();
+            for ($i = 0; $i < count($this->draglist['data']); $i++) {
+                foreach ($this->dragproducts as $product) {
+                    $prod_id = $product->getId();
+                    if ($this->draglist['data'][$i] == $prod_id) {
+                        $res[$i] = $product;
+                    }
+                }
+            }
+            return $res;
+        }
+    }
 
 	/**
 	 * The main list proccessing function
@@ -168,6 +245,50 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
+        if (!empty($this->draglist) && !empty($products)) {
+            $productsToCompare = $products;
+            if($this->_limit){
+                $currentLimit = $this->_limit;
+                unset($this->_limit);
+                $productsToCompare = $this->_loadProducts();
+                $this->_limit = $currentLimit;
+            }
+            $this->_compareProductsWithDraglist($productsToCompare);
+        }
+        if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
+            $neededIds = array();
+            for ($i = 0; $i < $this->last; $i++) {
+                $neededIds[] = $this->draglist['data'][$i];
+            }
+            if (!empty($neededIds)) {
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                    $neededIds));
+                $final = array();
+                for ($i = 0; $i < count($neededIds); $i++) {
+                    foreach ($res as $product) {
+                        $prodId = $product->getId();
+                        if ($neededIds[$i] == $prodId) {
+                            $final[$i] = $product;
+                        }
+                    }
+                }
+                $products = $final;
+            }
+
+        } else {
+            $this->_view->dragproducts = $products;
+            $this->dragproducts = $products;
+        }
+
+        if (isset($this->draglist) && is_array($this->draglist['data']) && isset($this->dragproducts) && is_array($this->dragproducts)) {
+            $dragOrderResult = $this->_dragListNewOrder();
+            if (is_array($dragOrderResult) && (count($dragOrderResult) > 0)) {
+                $products = $dragOrderResult;
+                $this->_view->dragproducts = $products;
+            }
+        }
+
 		$this->_view->totalCount = sizeof($products);
 		$wesiteData = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
@@ -188,12 +309,18 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 
         if (!empty($this->_priceFilter)) {
+            if(!empty($this->_priceFilter['tax'])){
+                $tax = $this->_priceFilter['tax'];
+                $this->_priceFilter['min'] = $this->_priceFilter['min'] * "1.$tax";
+                $this->_priceFilter['max'] = $this->_priceFilter['max'] * "1.$tax";
+            }
             $data['priceFilter'] = $this->_priceFilter;
         }
 
 		$cacheTags = array();
 		// here we go - proccessing the list
-		array_walk($products, function ($product) use (&$renderedContent, $data, &$cacheTags) {
+        $websiteUrl = $this->_websiteUrl;
+		array_walk($products, function ($product) use (&$renderedContent, $data, &$cacheTags, $websiteUrl) {
 			array_push($cacheTags, 'prodid_' . $product->getId());
 			if (strpos($data['templateContent'], '$store:addtocart') !== false) {
 				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
@@ -222,7 +349,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
-                '$product:url'                        => $product->getPage() ? $this->_websiteUrl . $product->getPage()->getUrl() : null,
+                '$product:url'                        => $product->getPage() ? $websiteUrl . $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),
                 '$product:mpn'                        => $product->getMpn(),
@@ -259,6 +386,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $itemDefaultOptionsArray
                 );
 
+                $price = round($price, 2);
+
                 if ($data['priceFilter']['min'] > $price || $data['priceFilter']['max'] < $price) {
                     return false;
                 }
@@ -272,6 +401,36 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		return implode('', $renderedContent);
 	}
 
+    protected function _compareProductsWithDraglist($products)
+    {
+        $productsIds = array();
+        foreach ($products as $productModel) {
+            $productsIds[] = $productModel->getId();
+        }
+        $notInDrag = array_diff($productsIds, $this->draglist['data']);
+        $notInProducts = array_diff($this->draglist['data'], $productsIds);
+        if (!empty($notInDrag)) {
+            foreach ($notInDrag as $productId) {
+                $this->draglist['data'][] = $productId;
+            }
+        }
+        if (!empty($notInProducts)) {
+            foreach ($notInProducts as $productId) {
+                if (($i = array_search($productId, $this->draglist['data'])) !== false) {
+                    unset($this->draglist['data'][$i]);
+                }
+            }
+        }
+        if (!empty($notInDrag) || !empty($notInProducts)) {
+            $this->draglist['data'] = array_values($this->draglist['data']);
+            $mapper = Models_Mapper_DraggableMapper::getInstance();
+            $model = new Models_Model_Draggable();
+            $model->setId($this->draglist['list_id']);
+            $model->setData(serialize($this->draglist['data']));
+            $mapper->save($model);
+        }
+
+    }
 
 	protected function _listSameTags() {
 		//get the product
@@ -348,6 +507,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			'brands' => null,
 			'order'  => null
 		);
+
+        $orderSql = 'ASC';
+        if(in_array('desc', $this->_options)){
+            $orderSql = 'DESC';
+        }
+
 		foreach ($this->_options as $option) {
 			if (preg_match('/^(brands|tag(?:name)?s|order)-(.*)$/u', $option, $parts)) {
 				$filters[$parts[1]] = explode(',', $parts[2]);
@@ -364,7 +529,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                         case 'brand':
                             return $field = 'b.name'; break;
                         case 'date':
-                            return $field = 'p.created_at DESC'; break;
+                            return $field = 'p.created_at'; break;
                         default:
                             return $field =  'p.' . $field;
                     }
@@ -408,10 +573,24 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$this->_view->filters = $filters;
 
+        $attributes = array();
+        $priceFilter = array();
+
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
             if (!empty($urlFilter['price'])) {
-                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to']);
+                if(in_array('tax', $this->_options)) {
+
+                    $tax = $this->getTax();
+                    if(!empty($tax)) {
+                        $tax = (int)$tax;
+                        $percentMax = $urlFilter['price']['to'] / "1.$tax";
+                        $percentMin = $urlFilter['price']['from'] / "1.$tax";
+                        $urlFilter['price']['to'] = ceil($percentMax);
+                        $urlFilter['price']['from'] = floor($percentMin);
+                    }
+                }
+                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to'], 'tax' => $tax);
                 unset($urlFilter['price']);
             }
             // removing all
@@ -419,6 +598,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $idsWhere = '';
             if (!empty($urlFilter)) {
                 $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
+                $attributes['attributes'] = $urlFilter;
                 if (empty($productIds)) {
                     return null;
                 }
@@ -429,14 +609,19 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			$idsWhere = 'p.id IN (' . $this->_options[0] . ')';
 		}
 
+        $this->_view->filterAttributes = $attributes;
+
         if (!empty($idsWhere)) {
             $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+        if(isset($this->_priceFilter) && ($this->_priceFilter !== null)){
+            $priceFilter = $this->_priceFilter;
         }
 
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
 			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,
-			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount);
+			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount,false,array(),(!empty($priceFilter) && (isset($priceFilter)) ? $priceFilter : array()), $orderSql);
 	}
 
 	/**
@@ -502,6 +687,17 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_cleanListOnly = $cleanListOnly;
 		return $this;
 	}
+
+    public function getTax(){
+        $filterTaxRate = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+        if(($filterTaxRate !== null) && (!empty($filterTaxRate))) {
+            $tax = $filterTaxRate[0]['rate1'];
+            return $tax;
+        }else {
+            $tax = '';
+            return $tax;
+        }
+    }
 
 
 }

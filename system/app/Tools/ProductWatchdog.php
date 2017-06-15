@@ -57,18 +57,8 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
 
         $page = new Application_Model_Models_Page();
 
-        $uniqName = array_map(
-            function ($str) {
-                $filter = new Zend_Filter_PregReplace(array(
-                    'match'   => '/[^\w]+/u',
-                    'replace' => '-'
-                ));
-                return trim($filter->filter($str), ' -');
-            }
-            ,
-            array($this->_object->getBrand(), $this->_object->getName(), $this->_object->getSku())
-        );
-        $uniqName = implode('-', $uniqName);
+        $uniqName = $this->_uniqName();
+
         $page->setTemplateId(
             $this->_object->getPageTemplate() ? $this->_object->getPageTemplate(
             ) : Application_Model_Models_Template::ID_DEFAULT
@@ -90,45 +80,51 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
             ->setSystem(0)
             ->setDraft((bool)$this->_object->getEnabled() ? '0' : '1')
             ->setMemLanding(0)
-            ->setNews(0);
+            ->setNews(0)
+            ->setPageType(Shopping::PRODUCT_PAGE_TYPE);
 
         if ($pageMapper->save($page)) {
             $this->_object->setPage($page);
             Models_Mapper_ProductMapper::getInstance()->updatePageIdForProduct($this->_object);
             //setting product photo as page preview
             if ($this->_object->getPhoto() != null) {
-                $miscConfig = Zend_Registry::get('misc');
-                $savePath = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'];
-                $existingFiles = preg_grep(
-                    '~^' . strtolower($uniqName) . '\.(png|jpg|gif)$~i',
-                    Tools_Filesystem_Tools::scanDirectory($savePath, false, false)
-                );
-                if (!empty($existingFiles)) {
-                    foreach ($existingFiles as $file) {
-                        Tools_Filesystem_Tools::deleteFile($savePath . $file);
-                    }
-                }
-                $pathToCropPreview = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'] . 'crop';
-                list($folder, $imgName) = explode('/', $this->_object->getPhoto());
-                $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder . DIRECTORY_SEPARATOR . 'small' . DIRECTORY_SEPARATOR . $imgName;
-                $pagePreviewImg = $savePath . strtolower($uniqName) . '.' . pathinfo($productImg, PATHINFO_EXTENSION);
-                if (is_file($productImg) && copy($productImg, $pagePreviewImg)) {
-                    if (Tools_Image_Tools::resize(
-                        $pagePreviewImg,
-                        $miscConfig['pageTeaserSize'],
-                        true,
-                        $pathToCropPreview,
-                        true
-                    )
-                    ) {
-                        $pageMapper->save($page->setPreviewImage(Tools_Filesystem_Tools::basename($pagePreviewImg)));
-                    }
-                }
+                $this->_processFile($uniqName, $pageMapper, $page);
             }
             $page->notifyObservers();
             $this->_cleanUpCache();
         } else {
             error_log('Can not create page for product #' . $this->_object->getId());
+        }
+    }
+
+    protected function _processFile($uniqName, $pageMapper, $page){
+        $miscConfig = Zend_Registry::get('misc');
+        $savePath = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'];
+        $existingFiles = preg_grep(
+            '~^' . strtolower($uniqName) . '\.(png|jpg|gif)$~i',
+            Tools_Filesystem_Tools::scanDirectory($savePath, false, false)
+        );
+
+        if (!empty($existingFiles)) {
+            foreach ($existingFiles as $file) {
+                Tools_Filesystem_Tools::deleteFile($savePath . $file);
+            }
+        }
+        $pathToCropPreview = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'] . 'crop';
+        list($folder, $imgName) = explode('/', $this->_object->getPhoto());
+        $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder . DIRECTORY_SEPARATOR . 'small' . DIRECTORY_SEPARATOR . $imgName;
+        $pagePreviewImg = $savePath . strtolower($uniqName) . '.' . pathinfo($productImg, PATHINFO_EXTENSION);
+        if (is_file($productImg) && copy($productImg, $pagePreviewImg)) {
+            if (Tools_Image_Tools::resize(
+                $pagePreviewImg,
+                $miscConfig['pageTeaserSize'],
+                true,
+                $pathToCropPreview,
+                true
+            )
+            ) {
+               $pageMapper->save($page->setPreviewImage(Tools_Filesystem_Tools::basename($pagePreviewImg)));
+            }
         }
     }
 
@@ -179,6 +175,10 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
                     )
                 );
             }
+            $uniqName = $this->_uniqName();
+            if ($this->_object->getPhoto() != null) {
+                $this->_processFile($uniqName, $pageMapper, $page);
+            }
 
             $this->_cleanUpCache();
         }
@@ -186,6 +186,22 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
             $this->_updateSearchIndex();
         }
     }
+
+    protected function _uniqName(){
+        $uniq = array_map(
+            function ($str) {
+                $filter = new Zend_Filter_PregReplace(array(
+                    'match'   => '/[^\w]+/u',
+                    'replace' => '-'
+                ));
+                return trim($filter->filter($str), ' -');
+            }
+            ,
+            array($this->_object->getBrand(), $this->_object->getName(), $this->_object->getSku())
+        );
+       return $uniq = implode('-', $uniq);
+    }
+
 
     protected function _runOnDelete()
     {

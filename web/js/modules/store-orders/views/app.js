@@ -3,10 +3,12 @@ define(['backbone',
     './order',
     'text!../templates/paginator.html',
     'text!../templates/export_dialog.html',
+    'text!../templates/tracking_code.html',
+    'text!../templates/refund_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, i18n
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -19,6 +21,7 @@ define(['backbone',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
             'click td.shipping-service .setTracking': 'changeTracking',
+            'click .sendInvoice': 'sendInvoice',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
             'change input[name="check-order[]"]': 'toggleOrder',
@@ -35,7 +38,7 @@ define(['backbone',
                 'filter': function() {
                     return {
                         'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),
-                        'status': $('select[name=filter-status]', '#store-orders form.filters').val(),
+                        'status': $('#filter-status', '#store-orders form.filters').val(),
                         'country': $('select[name=filter-country]', '#store-orders form.filters').val(),
                         'state': $('select[name=filter-state]', '#store-orders form.filters').val(),
                         'carrier': $('select[name=filter-carrier]', '#store-orders form.filters').val(),
@@ -81,6 +84,9 @@ define(['backbone',
                 ordersIds = _.difference(ordersIds, orderIdsExclude);
             }
             this.orders.ordersChecked = ordersIds;
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
+            }
         },
         toggleOrder: function(e) {
             var orderId = $(e.target).val();
@@ -91,6 +97,9 @@ define(['backbone',
                     return item !== orderId
                 });
                 this.orders.ordersChecked = filtered;
+            }
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
             }
         },
         exportOrdersAction: function(){
@@ -211,70 +220,182 @@ define(['backbone',
 
             if (status === 'refunded') {
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to refund this payment?'])?'Are you sure you want to refund this payment?':i18n['Are you sure you want to refund this payment?'];
-            }
 
-            smoke.confirm(confirmMessage, function(e) {
-                if (e){
-                    $.ajax({
-                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                        data: {status: status},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                        },
-                        success: function(response) {
-                            showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved'], response.hasOwnProperty('error') && response.error);
-                            if (!response.error && response.hasOwnProperty('responseText')){
-                                model.set('status', response.responseText.status);
-                            }
-                        }
+                var refundButton  = _.isUndefined(i18n['Refund']) ? 'Refund':i18n['Refund'],
+                    assignRefundButtons = {},
+                    dialog = _.template(RefundTemplate, {
+                        i18n:i18n,
+                        orderId: id,
+                        gateway: model.get('gateway'),
+                        total: model.get('total')
                     });
-                }
-            }, {
-                ok: _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'],
-                cancel: _.isUndefined(i18n['No'])?'No':i18n['No']
-            });
+
+                assignRefundButtons[refundButton] = function() {
+                    $('.ui-dialog').css('zIndex',"101");
+                    smoke.confirm(confirmMessage, function (e) {
+                        if (e) {
+                            $.ajax({
+                                url: $('#website_url').val() + 'plugin/shopping/run/refundPayment/orderId/',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    'orderId': $('#refund-order-id').val(),
+                                    'refundAmount': $('.partial-refund-amount').val(),
+                                    'refundInfo': $('.refund-info').val(),
+                                    'secureToken': $('.orders-secure-token').val(),
+                                    'paymentGateway': model.get('gateway'),
+                                    'refundUsingPaymentGateway': $('input.use-refund-payment-gateway').is(':checked') ? 1 : 0,
+                                    'refundTax': $('.refund-tax').val()
+                                },
+                                success: function (response) {
+                                    if (response.error === 1) {
+                                        showMessage(response.responseText, true, 5000);
+                                    } else {
+                                        showMessage(response.responseText.message, false, 5000);
+                                        model.set('status', status);
+                                        model.set('total', response.responseText.total);
+                                        $('.ui-dialog-titlebar-close').trigger('click');
+                                    }
+                                }
+                            });
+
+                        }
+
+                    }, {
+                        ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                        cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                    });
+
+                };
+
+                $(dialog).dialog({
+                    dialogClass: 'seotoaster',
+                    width: '35%',
+                    height: '450',
+                    buttons: assignRefundButtons,
+                    resizable: false,
+                    open: function (event, ui) {
+
+                    },
+                    close: function (event, ui) {
+                        $(this).dialog('destroy');
+                    }
+                });
+
+            } else {
+                smoke.confirm(confirmMessage, function (e) {
+                    if (e) {
+                        $.ajax({
+                            url: $('#website_url').val() + 'plugin/shopping/run/order?id=' + id,
+                            data: {status: status},
+                            type: 'POST',
+                            dataType: 'json',
+                            beforeSend: function () {
+                                el.closest('td').html('<img src="' + $('#website_url').val() + 'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                            },
+                            success: function (response) {
+                                showMessage(_.isUndefined(i18n['Saved']) ? 'Saved' : i18n['Saved'], response.hasOwnProperty('error') && response.error);
+                                if (!response.error && response.hasOwnProperty('responseText')) {
+                                    model.set('status', response.responseText.status);
+                                }
+                            }
+                        });
+                    }
+                }, {
+                    ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                    cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                });
+            }
         },
-        changeTracking: function(event){
+        changeTracking: function(e){
             var self    = this,
-                el      = $(event.currentTarget),
+                el      = $(e.currentTarget),
                 id      = parseInt(el.closest('tr').find('td.order-id').text());
             var model = this.orders.get(id);
 
-            if (!model) {
-                return false;
-            }
-            smoke.prompt(_.isUndefined(i18n['Insert tracking code for this order'])?'Insert tracking code for this order':i18n['Insert tracking code for this order'], function(value){
-                if (value === false) {
-                    return value;
-                }
-                value = $.trim(value);
-                if (model.get('shipping_tracking_id') !== value) {
-                    $.ajax({
-                        url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                        data: {shippingTrackingId: value},
-                        type: 'POST',
-                        dataType: 'json',
-                        beforeSend: function(){
-                            el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
-                        },
-                        success: function(response) {
-                            if (response.hasOwnProperty('error') && !response.error){
-                                showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
-                            }
-                            if (response.hasOwnProperty('responseText')){
-                                model.set({
-                                    'status': response.responseText.status,
-                                    'shipping_tracking_id': response.responseText.shippingTrackingId
-                                });
-                            }
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames',
+                type: 'GET',
+                dataType: 'json'
+
+            }).done(function(response) {
+                var dialog = _.template(TrackingCodeTemplate, {
+                    data:response.responseText.data,
+                    defaultSelection: response.responseText.defaultSelection,
+                    orderId: id,
+                    i18n:i18n
+                });
+
+                $(dialog).dialog({
+                    width: 600,
+                    dialogClass: 'seotoaster',
+                    resizable:false,
+                    open: function(event, ui) {
+                        $('.save-data').on('click', function(e){
+                            e.preventDefault();
+                            var  trackingUrlId =  $('#marketing-services').val(),
+                                text =  $('#shippingTrackingId').val(),
+                                data = {
+                                    trackingUrlId: trackingUrlId,
+                                    shippingTrackingId: text,
+                                    id:id
+                                };
+
+                            $.ajax({
+                                url: $('#website_url').val()+'plugin/shopping/run/order',
+                                data: data,
+                                type: 'POST',
+                                dataType: 'json',
+                                beforeSend: function(){
+                                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                                },
+                                success: function(response) {
+                                    if (response.hasOwnProperty('error') && !response.error){
+                                        showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
+                                    }
+                                    if (response.hasOwnProperty('responseText')){
+                                        model.set({
+                                            'status': response.responseText.status,
+                                            'shipping_tracking_id': response.responseText.shippingTrackingId
+                                        });
+                                    }
+                                }
+                            });
+                        });
+
+                    },
+                    close: function(event, ui){
+                        $(this).dialog('close').remove();
+                    }
+                });
+            });
+        },
+        sendInvoice: function(event){
+            var el = $(event.currentTarget),
+                id = parseInt(el.closest('tr').find('td.order-id').text()),
+                tdElement  = el.closest('td'),
+                tdContent =  tdElement.html();
+            $.ajax({
+                url: $('#website_url').val()+'plugin/invoicetopdf/run/sendInvoiceToUser/',
+                data: {
+                    'cartId': id,
+                    'dwn': 0
+                },
+                type: 'POST',
+                dataType: 'json',
+                beforeSend: function(){
+                    tdElement.html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                },
+                success: function(response) {
+                    if (response.hasOwnProperty('error')) {
+                        if (!response.error) {
+                            showMessage(_.isUndefined(i18n['Invoice has been sent']) ? 'Invoice has been sent' : i18n['Invoice has been sent']);
+                        } else {
+                            showMessage(response.responseText, false, 5000);
                         }
-                    });
+                    }
+                    tdElement.html(tdContent);
                 }
-            }, {value: model.get('shipping_tracking_id'),
-                ok: _.isUndefined(i18n['OK'])?'OK':i18n['OK'],
-                cancel: _.isUndefined(i18n['Cancel'])?'Cancel':i18n['Cancel']
             });
         },
         toggleRecurring : function(e){
