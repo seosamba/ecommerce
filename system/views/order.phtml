@@ -36,7 +36,7 @@
                         <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
-                        <span class="phone"><?php echo $billingAddress['mobile_country_code_value'].$billingAddress['phone'];?></span>
+                        <span class="phone"><?php echo $billingAddress['phone_country_code_value'].$billingAddress['phone'];?></span>
                         <?php if ($this->order->getGateway()) : ?>
                             <br/>
                             <span><?php echo $this->translate('Payment Method');?>
