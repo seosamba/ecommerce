@@ -222,9 +222,53 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'state',
                 'zip',
                 'phone',
-                'mobile'
+                'mobile',
+                'phonecountrycode',
+                'phone_country_code_value',
+                'mobile',
+                'mobilecountrycode',
+                'mobile_country_code_value'
             ))
             ->where($where);
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
+
+    /**
+     * @param $userId
+     * @return mixed
+     */
+    public function getUserAddressWithPhonesByUserId($userId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('c.user_id = ?', $userId);
+
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('ua.attribute = ?', 'mobilecountrycode');
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('ua.attribute <> ?', '');
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('c.mobile LIKE ?', '%+%');
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('c' => 'shopping_customer_address'), array(
+            'c.id' ,
+            'c.user_id',
+            'c.address_type',
+            'c.firstname',
+            'c.lastname',
+            'c.company',
+            'c.email',
+            'c.address1',
+            'c.address2',
+            'c.country',
+            'c.city',
+            'c.state',
+            'c.zip',
+            'c.phone',
+            'c.mobile',
+            'c.mobilecountrycode',
+            'c.mobile_country_code_value',
+            'c.phonecountrycode',
+            'c.phone_country_code_value',
+            'oldMobileCountryCode' => 'ua.value'
+        ))
+            ->join(array('ua' => 'user_attributes'), 'c.user_id=ua.user_id', array())
+            ->where($where);
+
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
@@ -248,7 +292,11 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'c_adr.state',
                 'c_adr.zip',
                 'c_adr.phone',
+                'c_adr.phonecountrycode',
+                'c_adr.phone_country_code_value',
                 'c_adr.mobile',
+                'c_adr.mobilecountrycode',
+                'c_adr.mobile_country_code_value'
             ))
             ->joinLeft(array('s_cart' => 'shopping_cart_session'), 's_cart.shipping_address_id = c_adr.id', array('shippingId' => '(GROUP_CONCAT(s_cart.id))'))
             ->joinLeft(array('b_cart' => 'shopping_cart_session'), 'b_cart.billing_address_id = c_adr.id', array('billingId' => '(GROUP_CONCAT(b_cart.id))'))
