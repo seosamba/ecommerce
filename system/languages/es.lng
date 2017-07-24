@@ -1,0 +1,11 @@
+<?php return array(
+'Store front name' => 'Nombre de Empresa',
+'Store front e-mail' => 'Correo Eletrónico',
+'Address 1' => 'Dirección 1',
+'Address 2' => 'Dirección 2',
+'Country' => 'País',
+'City' => 'Ciudad/Pueblo/Poblado',
+'State/Province/Region' => 'Departamento/Estado/Provincia/Región',
+'Zip/Postal Code' => 'Código Postal',
+'Phone' => 'Teléfono'
+);
