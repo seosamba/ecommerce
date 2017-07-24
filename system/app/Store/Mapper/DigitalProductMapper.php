@@ -16,8 +16,7 @@ class Store_Mapper_DigitalProductMapper extends Application_Model_Mappers_Abstra
      */
     protected static $_acceptedStatuses = array(
         Models_Model_CartSession::CART_STATUS_COMPLETED,
-        Models_Model_CartSession::CART_STATUS_DELIVERED,
-        Models_Model_CartSession::CART_STATUS_PENDING
+        Models_Model_CartSession::CART_STATUS_DELIVERED
     );
 
     /**
