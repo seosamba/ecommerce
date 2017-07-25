@@ -217,7 +217,6 @@ $this->headLink()
                 <div class="closebutton">
                     <a class="hide-block ticon-chevron-left" href="javascript:;" onclick="$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
                 </div>
-                <?php /*echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); */?>
             </div>
             <div id="image-list" class="content-footer grid_12 list-images"><span class="spinner"></span></div>
             <div class="footer grid_12 text-center">
@@ -235,6 +234,7 @@ $this->headLink()
             <span class="arrow right ticon-arrow-right3"></span>
             <ul class="header">
                 <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
+                <li><a href="#digital-product-tab" class="hide"><?php echo $this->translate('Digital products'); ?></a></li>
                 <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
                 <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
                 <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
@@ -273,7 +273,11 @@ $this->headLink()
                         </div>
                     </div>
                     <div class="grid_9 alpha omega mt0px">
-                        <label class="grid_7 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                        <label class="grid_3 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                        <label class="grid_4 omega fs12 text-right pointer">
+                            <?php echo $this->translate('This product is digital'); ?>
+                            <input type="checkbox" id="digital-product"/>
+                        </label>
                         <label class="grid_5 omega fs12 text-right pointer">
                             <?php echo $this->translate('This product is enabled'); ?>
                             <input type="checkbox" id="product-enabled"/>
@@ -421,6 +425,11 @@ $this->headLink()
             <?php echo $this->partial('product/grouping-price.phtml'); ?>
         </div>
 
+        <div id="digital-product-tab">
+            <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
+            <?php echo $this->partial('product/digital-product.phtml'); ?>
+        </div>
+
         <div class="footer grid_12">
             <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
             <button class="btn ticon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
@@ -431,11 +440,8 @@ $this->headLink()
 
 <script>
 	$(function () {
-		$('#manage-product,#description-box, #preview-box').tabs({
-            beforeLoad: function(event, ui){
-                //showSpinner('#merchandising');
-            }
-        });
+		$('#manage-product,#description-box, #preview-box').tabs({});
+
 		$(".ui-tabs-nav, .ui-tabs-nav > *")
 				.removeClass("ui-corner-all")
 				.addClass("ui-corner-top");
