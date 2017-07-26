@@ -38,7 +38,8 @@ class Tools_FilterOrders {
                     $statuses[$k]['name'] = $aliases[$v];
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
                 }
-                if (in_array($v, $aliases)) {
+                if ($v === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $statuses[$k][self::GATEWAY_QUOTE] = true;
                 }
             }
             $filter['status'] = $statuses;
