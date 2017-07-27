@@ -34,9 +34,11 @@ class Tools_FilterOrders {
             foreach ($filter['status'] as $k => $v) {
                 $statuses[$k]['name'] = $v;
                 $statuses[$k][self::GATEWAY_QUOTE] = false;
+                $statuses[$k]['alliasOnlyQuote'] = false;
                 if (array_key_exists($v, $aliases)) {
                     $statuses[$k]['name'] = $aliases[$v];
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
+                    $statuses[$k]['alliasOnlyQuote'] = true;
                 }
                 if ($v === Models_Model_CartSession::CART_STATUS_SHIPPED || $v === Models_Model_CartSession::CART_STATUS_COMPLETED || $v === Models_Model_CartSession::CART_STATUS_DELIVERED) {
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
