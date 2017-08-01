@@ -204,6 +204,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             return $this->_view->render('draggable.phtml');
         }
 
+        $orderSql = 'ASC';
+        if(in_array('desc', $this->_options)){
+            $orderSql = 'DESC';
+        }
+
+        $this->_view->sort = $orderSql;
+
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
 		} elseif (!intval($this->_options[0])) {
@@ -495,7 +502,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             'free_shipping' => 'free_shipping'
         );
 
-        $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('enabled=?', $enabled);
+        $enabledOnly = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled=?', $enabled);
 
 
 		if (empty($this->_options)) {
@@ -620,7 +627,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 
 		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
-			(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null), $this->_limit,
+			 0/*(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null)*/, $this->_limit,
 			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount,false,array(),(!empty($priceFilter) && (isset($priceFilter)) ? $priceFilter : array()), $orderSql);
 	}
 
