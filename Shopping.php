@@ -742,11 +742,12 @@ class Shopping extends Tools_Plugins_Abstract {
             $brands = $this->_request->getParam('brands');
             $attributes = $this->_request->getParam('attributes');
             $price = $this->_request->getParam('price');
+            $sort = $this->_request->getParam('sort');
 
             $offset = intval($nextPage) * $limit;
         if (empty($dragListId)) {
-            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit,
-                null, $tags, $brands, false, false, $attributes, $price);
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("p.enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($dragListId);
