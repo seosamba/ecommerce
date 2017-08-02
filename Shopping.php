@@ -819,9 +819,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($option == 'country') {
 				$countries = Tools_Geo::getCountries(true);
 				$option = $countries[$config[$option]];
-			} else {
-				$option = $config[$option];
-			}
+            } elseif ($option == 'state') {
+                $stateId = $config[$option];
+                $option = Models_Mapper_ShoppingListStateMapper::getInstance()->find($stateId)->getName();
+            } else {
+                $option = $config[$option];
+            }
 		} else {
 			if ($option == 'state') {
 				$option = '';
