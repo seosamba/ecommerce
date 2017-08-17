@@ -62,6 +62,11 @@ class Tools_Misc
         'lbs' => 'Pound (lbs)'
     );
 
+    public static $_lengthUnits = array(
+        'cm' => 'Centimetre (cm)',
+        'inch' => 'Inch (inch)'
+    );
+
     public static $_hoursUnits = array(
         '1' => '12:00 AM',
         '2' => '1:00 AM',

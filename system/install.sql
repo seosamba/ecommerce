@@ -151,9 +151,10 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('showPriceIncTax', '1'),
 ('state', '5'),
 ('weightUnit', 'kg'),
+('lengthUnit', 'cm'),
 ('zip', '94117'),
 ('noZeroPrice', '1'),
-('version', '2.5.1');
+('version', '2.5.4');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -177,6 +178,9 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `inventory` VARCHAR(50) NULL DEFAULT NULL COLLATE utf8_unicode_ci,
   `free_shipping` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   `is_digital` ENUM('0','1') DEFAULT '0',
+  `prod_length` DECIMAL(10,2) NULL DEFAULT NULL,
+  `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL,
+  `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -821,5 +825,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `version` = '2.5.3' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.4' WHERE `name` = 'shopping';
 

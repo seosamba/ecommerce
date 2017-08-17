@@ -380,6 +380,9 @@ define([
             if(this.model.isNew()){
                 this.$('#product-price').val('');
                 this.$('#product-weight').val('');
+                this.$('#product-width').val('');
+                this.$('#product-length').val('');
+                this.$('#product-depth').val('');
             }
             if (!this.model.isNew()){
                 $('#quick-preview').html(this.quickPreviewTmpl({
