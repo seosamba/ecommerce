@@ -94,6 +94,16 @@ class Tools_Misc
         '24' => '11:00 PM'
     );
 
+    public static $_productConfigTabs = array(
+        0 => array('tabId' => 'main-tab', 'tabName' => 'Main', 'type' => 'internal'),
+        1 => array('tabId' => 'digital-product-tab', 'tabName' => 'Digital products', 'type' => 'internal'),
+        2 => array('tabId' => 'tag-tab', 'tabName' => 'Product tags', 'type' => 'internal'),
+        3 => array('tabId' => 'options-tab', 'tabName' => 'Product options', 'type' => 'internal'),
+        4 => array('tabId' => 'related-tab', 'tabName' => 'Cross selling', 'type' => 'internal'),
+        5 => array('tabId' => 'coupon-tab', 'tabName' => 'Coupons', 'type' => 'internal'),
+        6 => array('tabId' => 'group-pricing-tab', 'tabName' => 'Groups', 'type' => 'internal')
+    );
+
 
     public static $_helpHashMap = array(
         self::SECTION_STORE_MANAGEZONES => 'shopping-cart-shipping-tax-zones.html',
