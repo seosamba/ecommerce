@@ -257,9 +257,18 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
+    public function getUserAttributesNames(){
+       $select = $this->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'));
+
+       $attributes = $this->getDbTable()->getAdapter()->fetchAll($select);
+       return $attributes;
+    }
+
     public function getUsersWithGroupsList()
     {
-        $select = $this->getDbTable()->getAdapter()->select()->from(array('u' => 'user'), array(
+        $userAttributes =  $this->getUserAttributesNames();
+
+        $columns = array(
             'u.email',
             'u.role_id',
             'u.full_name',
@@ -271,9 +280,18 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
             'u.mobile_phone',
             'u.notes',
             'sg.groupName'
-        ))
+        );
+        if(!empty($userAttributes)){
+            foreach ($userAttributes as $attribute){
+                $columns[] = '(GROUP_CONCAT(CASE WHEN `ua`.`attribute`=\''. $attribute['attribute'] .'\' THEN `ua`.`value` END))';
+            }
+        }
+
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('u' => 'user'), $columns)
             ->joinLeft(array('scg' => 'shopping_customer_info'), 'u.id = scg.user_id', array())
             ->joinLeft(array('sg' => 'shopping_group'), 'sg.id = scg.group_id', array())
+            ->joinLeft(array('ua' => 'user_attributes'), 'ua.user_id = u.id', array())
+            ->group('u.id')
             ->where('role_id <> "' . Tools_Security_Acl::ROLE_SUPERADMIN . '"');
 
         $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');

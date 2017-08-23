@@ -83,7 +83,8 @@ define({
         'Export all orders matching filter' : 'Exporter toutes les commandes correspondant au filtre',
         'Download packing slip' : 'Télécharger bon de livraison',
         'Wait a minute! this country is already part of another zone... Add anyway?':'Wait a minute! this country is already part of another zone... Add anyway?',
-        'There are no users for export' : 'Il n\'y a pas d\'utilisateurs pour l\'exportation'
+        'There are no users for export' : 'Il n\'y a pas d\'utilisateurs pour l\'exportation',
+        'Export orders' : 'Exporter les commandes'
 
     }
 });
