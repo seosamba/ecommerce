@@ -2086,9 +2086,11 @@ class Shopping extends Tools_Plugins_Abstract {
     public function getUsersAction()
     {
         if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
-            $users = Models_Mapper_CustomerMapper::getInstance()->getUsersWithGroupsList();
+            $userMapper = Models_Mapper_CustomerMapper::getInstance();
+
+            $users = $userMapper->getUsersWithGroupsList();
             if (!empty($users)) {
-                $exportResult = Tools_System_Tools::arrayToCsv($users, array(
+                $headers = array(
                     $this->_translator->translate('E-mail'),
                     $this->_translator->translate('Role'),
                     $this->_translator->translate('Full name'),
@@ -2100,7 +2102,17 @@ class Shopping extends Tools_Plugins_Abstract {
                     $this->_translator->translate('Mobile phone'),
                     $this->_translator->translate('Notes'),
                     $this->_translator->translate('Group Name')
-                ));
+                );
+
+                $userAttributes = $userMapper->getUserAttributesNames();
+
+                if(!empty($userAttributes)){
+                    foreach ($userAttributes as $attribute){
+                        $headers[] = 'attribute_'.$attribute['attribute'];
+                    }
+                }
+
+                $exportResult = Tools_System_Tools::arrayToCsv($users, $headers);
                 if ($exportResult) {
                     $usersArchive = Tools_System_Tools::zip($exportResult);
 

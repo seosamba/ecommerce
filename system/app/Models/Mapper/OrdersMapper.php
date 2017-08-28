@@ -147,7 +147,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'billing_state' => 'sls_b.name',
             'billing_zip' => 'b_adr.zip',
             'billing_address1' => 'b_adr.address1',
-            'billing_address2' => 'b_adr.address2'
+            'billing_address2' => 'b_adr.address2',
+            'coupon_code' => '(GROUP_CONCAT(scs.coupon_code))',
+            'groupName' => 'sg.groupName',
         );
 
         if (!empty($excludeFields)) {
@@ -195,6 +197,21 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             ->joinLeft(
                 array('sls_b' => 'shopping_list_state'),
                 'sls_b.id = b_adr.state',
+                array('')
+            )
+            ->joinLeft(
+                array('scs' => 'shopping_coupon_sales'),
+                'scs.cart_id = order.id',
+                array('')
+            )
+            ->joinLeft(
+                array('sci' => 'shopping_customer_info'),
+                'sci.user_id = u.id',
+                array('')
+            )
+            ->joinLeft(
+                array('sg' => 'shopping_group'),
+                'sg.id = sci.group_id',
                 array('')
             )
             ->group('order.id');
