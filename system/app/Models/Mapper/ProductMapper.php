@@ -73,7 +73,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'tax_class'         => $model->getTaxClass(),
 			'inventory'         => is_numeric($model->getInventory()) ? $model->getInventory() : null,
             'free_shipping'     => $model->getFreeShipping(),
-            'is_digital'        => $model->getIsDigital()
+            'is_digital'        => $model->getIsDigital(),
+            'prod_length'       => $model->getProdLength(),
+            'prod_depth'        => $model->getProdDepth(),
+            'prod_width'        => $model->getProdWidth()
 		);
 
 		if ($model->getId()){

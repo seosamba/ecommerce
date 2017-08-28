@@ -655,10 +655,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 			$this->_view->imageDirList = $listFolders;
 
-			$this->_view->plugins = array();
-			foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
+            $plugins = array();
+            $pluginsToReorder = array();
+            $configTabs = Tools_Misc::$_productConfigTabs;
+            foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
-					array_push($this->_view->plugins, $plugin->getName());
+					array_push($plugins, $plugin->getName());
 				}
 			}
 
@@ -669,7 +671,33 @@ class Shopping extends Tools_Plugins_Abstract {
 				}
 			}
 
+            if (!empty($plugins)) {
+                foreach ($plugins as $plugin) {
+                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                    if (!$pluginClass->hasMethod('tabAction')) {
+                        continue;
+                    }
+                    if ($pluginClass->hasConstant('TAB_ORDER')) {
+                        $pluginsToReorder[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external', 'tabOrderId' => $pluginClass->getConstant('TAB_ORDER'));
+                    } else {
+                        $configTabs[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external');
+                    }
+                }
+            }
+
+            if (!empty($pluginsToReorder)) {
+                foreach ($pluginsToReorder as $pluginOrder) {
+                    $elementsAfterPosition = array_slice($configTabs, $pluginOrder['tabOrderId'] -1);
+                    $elementsBeforePosition = array_slice($configTabs, 0, $pluginOrder['tabOrderId'] -1);
+                    $elementsBeforePosition[] = array('tabId' => $pluginOrder['tabId'], 'tabName' => $pluginOrder['tabName'], 'type' => 'external');
+                    $configTabs = array_merge($elementsBeforePosition, $elementsAfterPosition);
+                }
+            }
+
+            $this->_view->plugins = $plugins;
 			$this->_view->websiteConfig = $this->_websiteConfig;
+            $this->_view->configTabs = $configTabs;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $this->_layout->content = $this->_view->render('product.phtml');

@@ -263,7 +263,17 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 
 ALTER TABLE `shopping_cart_session_content` ADD COLUMN `is_digital` ENUM('0','1') DEFAULT '0';
 
+-- 16/08/2017
+-- version: 2.5.3
+-- Add product dimension fields
+ALTER TABLE `shopping_product` ADD COLUMN `prod_length` DECIMAL(10,2) NULL DEFAULT NULL;
+ALTER TABLE `shopping_product` ADD COLUMN `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL;
+ALTER TABLE `shopping_product` ADD COLUMN `prod_width` DECIMAL(10,2) NULL DEFAULT NULL;
+
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('lengthUnit', 'cm');
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
