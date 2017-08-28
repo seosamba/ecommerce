@@ -240,8 +240,12 @@ class Tools_ShoppingCart {
                 'freeShipping'     => $item->getFreeShipping(),
                 'freebies'         => $item->getFreebies(),
                 'groupPriceEnabled' => $item->getGroupPriceEnabled(),
-                'originalPrice'     => $item->getPrice(),
-                'productDiscounts'  => $item->getProductDiscounts()
+                'productDiscounts'  => $item->getProductDiscounts(),
+                'originalPrice'    => $item->getPrice(),
+                'isDigital'        => $item->getIsDigital(),
+                'prodLength'       => $item->getProdLength(),
+                'prodWidth'        => $item->getProdWidth(),
+                'prodDepth'        => $item->getProdDepth()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;

@@ -62,6 +62,11 @@ class Tools_Misc
         'lbs' => 'Pound (lbs)'
     );
 
+    public static $_lengthUnits = array(
+        'cm' => 'Centimetre (cm)',
+        'inch' => 'Inch (inch)'
+    );
+
     public static $_hoursUnits = array(
         '1' => '12:00 AM',
         '2' => '1:00 AM',
@@ -87,6 +92,17 @@ class Tools_Misc
         '22' => '9:00 PM',
         '23' => '10:00 PM',
         '24' => '11:00 PM'
+    );
+
+    public static $_productConfigTabs = array(
+        0 => array('tabId' => 'main-tab', 'tabName' => 'Main', 'type' => 'internal'),
+        1 => array('tabId' => 'digital-product-tab', 'tabName' => 'Digital products', 'type' => 'internal'),
+        2 => array('tabId' => 'tag-tab', 'tabName' => 'Product tags', 'type' => 'internal'),
+        3 => array('tabId' => 'options-tab', 'tabName' => 'Product options', 'type' => 'internal'),
+        4 => array('tabId' => 'related-tab', 'tabName' => 'Cross selling', 'type' => 'internal'),
+        5 => array('tabId' => 'coupon-tab', 'tabName' => 'Coupons', 'type' => 'internal'),
+        6 => array('tabId' => 'group-pricing-tab', 'tabName' => 'Groups', 'type' => 'internal'),
+        7 => array('tabId' => 'quantity-discount-tab', 'tabName' => 'Quantity discount', 'type' => 'internal')
     );
 
 

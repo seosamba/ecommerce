@@ -63,6 +63,14 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_productDiscounts = array();
 
+    protected $_isDigital = 0;
+
+    protected $_prodLength = 0;
+
+    protected $_prodWidth = 0;
+
+    protected $_prodDepth = 0;
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -330,4 +338,72 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
     {
         return $this->_productDiscounts;
     }
+
+    public function getIsDigital()
+    {
+        return $this->_isDigital;
+    }
+
+    public function setIsDigital($isDigital)
+    {
+        $this->_isDigital = $isDigital;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProdLength()
+    {
+        return $this->_prodLength;
+    }
+
+    /**
+     * @param int $prodLength
+     * @return int
+     */
+    public function setProdLength($prodLength)
+    {
+        $this->_prodLength = $prodLength;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProdWidth()
+    {
+        return $this->_prodWidth;
+    }
+
+    /**
+     * @param int $prodWidth
+     * @return int
+     */
+    public function setProdWidth($prodWidth)
+    {
+        $this->_prodWidth = $prodWidth;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProdDepth()
+    {
+        return $this->_prodDepth;
+    }
+
+    /**
+     * @param int $prodDepth
+     * @return int
+     */
+    public function setProdDepth($prodDepth)
+    {
+        $this->_prodDepth = $prodDepth;
+
+        return $this;
+    }
+
 }
