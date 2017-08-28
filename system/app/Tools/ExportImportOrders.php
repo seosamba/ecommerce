@@ -595,7 +595,7 @@ class Tools_ExportImportOrders
             'product_tax_price' => array(
                 'label' => 'product_tax_price',
                 'checked' => 1,
-                'label_name' => $translator->translate('Product tax price')
+                'label_name' => $translator->translate('Price inclusive taxes')
             ),
             'product_qty' => array(
                 'label' => 'product_qty',
@@ -806,6 +806,16 @@ class Tools_ExportImportOrders
                 'label' => 'billing_address2',
                 'checked' => 1,
                 'label_name' => $translator->translate('Billing address 2')
+            ),
+            'coupon_code' => array(
+                'label' => 'coupon_code',
+                'checked' => 1,
+                'label_name' => $translator->translate('Coupon code')
+            ),
+            'groupName' => array(
+                'label' => 'groupName',
+                'checked' => 1,
+                'label_name' => $translator->translate('Client group')
             )
         );
     }

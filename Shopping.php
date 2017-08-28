@@ -659,10 +659,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 			$this->_view->imageDirList = $listFolders;
 
-			$this->_view->plugins = array();
-			foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
+            $plugins = array();
+            $pluginsToReorder = array();
+            $configTabs = Tools_Misc::$_productConfigTabs;
+            foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
-					array_push($this->_view->plugins, $plugin->getName());
+					array_push($plugins, $plugin->getName());
 				}
 			}
 
@@ -673,7 +675,33 @@ class Shopping extends Tools_Plugins_Abstract {
 				}
 			}
 
+            if (!empty($plugins)) {
+                foreach ($plugins as $plugin) {
+                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                    if (!$pluginClass->hasMethod('tabAction')) {
+                        continue;
+                    }
+                    if ($pluginClass->hasConstant('TAB_ORDER')) {
+                        $pluginsToReorder[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external', 'tabOrderId' => $pluginClass->getConstant('TAB_ORDER'));
+                    } else {
+                        $configTabs[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external');
+                    }
+                }
+            }
+
+            if (!empty($pluginsToReorder)) {
+                foreach ($pluginsToReorder as $pluginOrder) {
+                    $elementsAfterPosition = array_slice($configTabs, $pluginOrder['tabOrderId'] -1);
+                    $elementsBeforePosition = array_slice($configTabs, 0, $pluginOrder['tabOrderId'] -1);
+                    $elementsBeforePosition[] = array('tabId' => $pluginOrder['tabId'], 'tabName' => $pluginOrder['tabName'], 'type' => 'external');
+                    $configTabs = array_merge($elementsBeforePosition, $elementsAfterPosition);
+                }
+            }
+
+            $this->_view->plugins = $plugins;
 			$this->_view->websiteConfig = $this->_websiteConfig;
+            $this->_view->configTabs = $configTabs;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $this->_layout->content = $this->_view->render('product.phtml');
@@ -746,11 +774,12 @@ class Shopping extends Tools_Plugins_Abstract {
             $brands = $this->_request->getParam('brands');
             $attributes = $this->_request->getParam('attributes');
             $price = $this->_request->getParam('price');
+            $sort = $this->_request->getParam('sort');
 
             $offset = intval($nextPage) * $limit;
         if (empty($dragListId)) {
-            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit,
-                null, $tags, $brands, false, false, $attributes, $price);
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("p.enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($dragListId);
@@ -781,14 +810,14 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
+        $tagsPart = (!empty($tags) && is_array($tags)) ? implode(',', $tags) : '';
+
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			if (!empty($productsListDataResult)) {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT)), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
-
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
             } else {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
-
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart)));
             }
 
             $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
@@ -822,9 +851,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($option == 'country') {
 				$countries = Tools_Geo::getCountries(true);
 				$option = $countries[$config[$option]];
-			} else {
-				$option = $config[$option];
-			}
+            } elseif ($option == 'state') {
+                $stateId = $config[$option];
+                $option = Tools_Geo::getStateById($stateId)['name'];
+            } else {
+                $option = $config[$option];
+            }
 		} else {
 			if ($option == 'state') {
 				$option = '';
@@ -1840,6 +1872,27 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->success($this->_translator->translate('Shipping address updated'));
     }
 
+    /**
+     * Check if this digital product was sold
+     */
+    public function checkDigitalProductUsageAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $productId = filter_var($this->_request->getParam('productId', false), FILTER_SANITIZE_NUMBER_INT);
+            if ($productId) {
+
+                $productSold = Store_Mapper_DigitalProductMapper::getInstance()->checkDigitalProductInCart($productId);
+                $sold = false;
+                if (!empty($productSold)) {
+                    $sold = true;
+                }
+                $this->_responseHelper->success(array('productSold' => $sold));
+            }
+            $this->_responseHelper->fail('Product id missed');
+        }
+        $this->_responseHelper->fail('not authorized');
+    }
+
 
     /**
      * Refund order (full or partial order refund)
@@ -2094,9 +2147,11 @@ class Shopping extends Tools_Plugins_Abstract {
     public function getUsersAction()
     {
         if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
-            $users = Models_Mapper_CustomerMapper::getInstance()->getUsersWithGroupsList();
+            $userMapper = Models_Mapper_CustomerMapper::getInstance();
+
+            $users = $userMapper->getUsersWithGroupsList();
             if (!empty($users)) {
-                $exportResult = Tools_System_Tools::arrayToCsv($users, array(
+                $headers = array(
                     $this->_translator->translate('E-mail'),
                     $this->_translator->translate('Role'),
                     $this->_translator->translate('Full name'),
@@ -2114,7 +2169,17 @@ class Shopping extends Tools_Plugins_Abstract {
                     $this->_translator->translate('Desktop country code value'),
                     $this->_translator->translate('Desktop phone'),
                     $this->_translator->translate('Group Name')
-                ));
+                );
+
+                $userAttributes = $userMapper->getUserAttributesNames();
+
+                if(!empty($userAttributes)){
+                    foreach ($userAttributes as $attribute){
+                        $headers[] = 'attribute_'.$attribute['attribute'];
+                    }
+                }
+
+                $exportResult = Tools_System_Tools::arrayToCsv($users, $headers);
                 if ($exportResult) {
                     $usersArchive = Tools_System_Tools::zip($exportResult);
 
