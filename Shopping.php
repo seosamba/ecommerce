@@ -821,7 +821,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				$option = $countries[$config[$option]];
             } elseif ($option == 'state') {
                 $stateId = $config[$option];
-                $option = Models_Mapper_ShoppingListStateMapper::getInstance()->find($stateId)->getName();
+                $option = Tools_Geo::getStateById($stateId)['name'];
             } else {
                 $option = $config[$option];
             }
