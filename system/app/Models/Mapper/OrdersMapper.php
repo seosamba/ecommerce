@@ -148,7 +148,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'billing_zip' => 'b_adr.zip',
             'billing_address1' => 'b_adr.address1',
             'billing_address2' => 'b_adr.address2',
-            'coupon_code' => '(GROUP_CONCAT(scs.coupon_code))',
+            'coupon_code' => '(GROUP_CONCAT(DISTINCT(scs.coupon_code)))',
             'groupName' => 'sg.groupName',
         );
 
