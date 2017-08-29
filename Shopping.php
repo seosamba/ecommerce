@@ -412,12 +412,15 @@ class Shopping extends Tools_Plugins_Abstract {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
+                $desktopPhone = isset($data['phone']) ? $data['phone'] : '';
                 $mobileCountryCode = isset($data['mobilecountrycode']) ? $data['mobilecountrycode'] : '';
                 $mobileCountryCodeValue = isset($data['mobile_country_code_value']) ? $data['mobile_country_code_value'] : null;
+                $desktopCountryCode = isset($data['phonecountrycode']) ? $data['phonecountrycode'] : '';
+                $desktopCountryCodeValue = isset($data['phone_country_code_value']) ? $data['phone_country_code_value'] : null;
 
                 $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
                 $userDefaultTimezone = $configHelper->getConfig('userDefaultTimezone');
-                $userDefaultMobileCountryCode = $configHelper->getConfig('userDefaultPhoneMobileCode');
+
                 if (empty($data['timezone']) && !empty($userDefaultTimezone)) {
                     $customer->setTimezone($userDefaultTimezone);
                 }
@@ -433,6 +436,9 @@ class Shopping extends Tools_Plugins_Abstract {
                         ->setMobilePhone($mobilePhone)
                         ->setMobileCountryCode($mobileCountryCode)
                         ->setMobileCountryCodeValue($mobileCountryCodeValue)
+                        ->setDesktopPhone($desktopPhone)
+                        ->setDesktopCountryCode($desktopCountryCode)
+                        ->setDesktopCountryCodeValue($desktopCountryCodeValue)
 						->setPassword($password);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
