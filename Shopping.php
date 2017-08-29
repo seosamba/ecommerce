@@ -414,6 +414,13 @@ class Shopping extends Tools_Plugins_Abstract {
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
                 $mobileCountryCode = isset($data['mobilecountrycode']) ? $data['mobilecountrycode'] : '';
                 $mobileCountryCodeValue = isset($data['mobile_country_code_value']) ? $data['mobile_country_code_value'] : null;
+
+                $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+                $userDefaultTimezone = $configHelper->getConfig('userDefaultTimezone');
+                $userDefaultMobileCountryCode = $configHelper->getConfig('userDefaultPhoneMobileCode');
+                if (empty($data['timezone']) && !empty($userDefaultTimezone)) {
+                    $customer->setTimezone($userDefaultTimezone);
+                }
 				if (!empty($data['customerPassword'])) {
                     $password = $data['customerPassword'];
                 } else {
