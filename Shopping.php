@@ -417,6 +417,12 @@ class Shopping extends Tools_Plugins_Abstract {
                 $mobileCountryCodeValue = isset($data['mobile_country_code_value']) ? $data['mobile_country_code_value'] : null;
                 $desktopCountryCode = isset($data['phonecountrycode']) ? $data['phonecountrycode'] : '';
                 $desktopCountryCodeValue = isset($data['phone_country_code_value']) ? $data['phone_country_code_value'] : null;
+                $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+                $defaultMobilePhoneCountryCode = $shoppingConfig['country'];
+
+                if (empty($desktopCountryCode)) {
+                    $desktopCountryCode = $defaultMobilePhoneCountryCode;
+                }
 
                 $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
                 $userDefaultTimezone = $configHelper->getConfig('userDefaultTimezone');
