@@ -678,6 +678,18 @@
         'Billing state' => 'État (facturation)',
         'Billing zip' => 'Code postal (facturation)',
         'Billing address 1' => 'Adresse de facturation 1',
-        'Billing address 2' => 'Adresse de facturation 2'
+        'Billing address 2' => 'Adresse de facturation 2',
+        'Shipping phone country code' => 'Code de pays - numéro fixe (livraison)',
+        'Shipping phone country code value' => 'Valeur du code du pays - numéro fixe (livraison)',
+        'Shipping phone full' => 'Numéro fixe complet (livraison)',
+        'Shipping mobile country code' => 'Code de pays - numéro mobile  (livraison)',
+        'Shipping mobile country code value' => 'Valeur du code de pays - numéro mobile (livraison)',
+        'Shipping mobile full' => 'Numéro mobile complet (livraison)',
+        'Billing phone country code' => 'Code de pays - numéro fixe (facturation)',
+        'Billing phone country code value' => 'Valeur du code du pays - numéro fixe (facturation)',
+        'Billing phone full' => 'Numéro fixe complet (facturation)',
+        'Billing mobile country code' => 'Code de pays - numéro mobile  (facturation)',
+        'Billing mobile country code value' => 'Valeur du code de pays - numéro mobile (facturation)',
+        'Billing mobile full' => 'Numéro mobile complet (facturation)'
 
 );?>
