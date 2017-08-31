@@ -17,9 +17,9 @@
 				<span class="street-address"><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2'];?></span>
 				<br/>
 				<span class="locality"><?php echo $billingAddress['city'] . ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');?></span>
-				<?php $state = Tools_Geo::getStateById($billingAddress['state']); ?>
-				<?php if (isset($state['state']) && $state['state'] != ''): ?>
-					<span class="region"><?php echo $state['state'] . ',';?></span>
+				<?php $state = Tools_Geo::getStateByParam($billingAddress['state']); ?>
+				<?php if (!empty($state)): ?>
+					<span class="region"><?php echo $state . ',';?></span>
 				<?php endif; ?>
 				<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
 				<br/>
@@ -301,9 +301,9 @@
                 <span><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2'];?></span>
 				<br/>
 				<span><?php echo $billingAddress['city'] . ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');?></span>
-				<?php $state = Tools_Geo::getStateById($billingAddress['state']); ?>
-				<?php if (isset($state['state']) && $state['state'] != ''): ?>
-					<span><?php echo $state['state'] . ',';?></span>
+				<?php $state = Tools_Geo::getStateByParam($billingAddress['state']); ?>
+				<?php if (!empty($state)): ?>
+					<span><?php echo $state . ',';?></span>
 				<?php endif; ?>
 				<span><?php echo $billingAddress['zip'];?></span>
 				<br/>
