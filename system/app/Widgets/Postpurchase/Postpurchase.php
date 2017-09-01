@@ -318,6 +318,14 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * @return mixed
+     */
+    protected function _renderUserId()
+    {
+        return $this->_cart->getUserId();
+    }
+
+    /**
      * Return shipping service type
      *
      * @return mixed
