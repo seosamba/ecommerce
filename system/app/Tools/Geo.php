@@ -144,4 +144,22 @@ class Tools_Geo {
         );
     }
 
+    /**
+     * Get state
+     *
+     * @param string $stateParam state id or state abbr
+     * @return string
+     */
+    public static function getStateByParam($stateParam)
+    {
+        if (!empty($stateParam) && is_numeric($stateParam)) {
+            $state = Tools_Geo::getStateById($stateParam);
+            return $state['state'];
+        }  elseif ($stateParam) {
+            return $stateParam;
+        }
+
+        return '';
+    }
+
 }

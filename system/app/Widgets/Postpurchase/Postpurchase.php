@@ -318,6 +318,14 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * @return mixed
+     */
+    protected function _renderUserId()
+    {
+        return $this->_cart->getUserId();
+    }
+
+    /**
      * Return shipping service type
      *
      * @return mixed
@@ -826,11 +834,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      * @return string
      */
     protected function getState($stateId) {
-        $state = Tools_Geo::getStateById($stateId);
-        if (!empty($state['state'])) {
-            return $state['state'];
-        }
-        return '';
+        return Tools_Geo::getStateByParam($stateId);
     }
 
 }
