@@ -64,7 +64,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
         $this->addElement(new Zend_Form_Element_Select(array(
             'name'         => 'mobilecountrycode',
             'label'        => null,
-            'multiOptions' => Tools_System_Tools::getCountryPhoneCodesList(true, array(), true),
+            'multiOptions' => Tools_System_Tools::getFullCountryPhoneCodesList(true, array(), true),
             'value'        => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'),
             'style'        => 'width: 41.667%;'
         )));
