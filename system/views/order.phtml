@@ -32,7 +32,9 @@
                             echo $billingAddress['city'] .
                                     ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');
                             ?></span>
-                        <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+                        <span class="region">
+                            <?php echo Tools_Geo::getStateByParam($billingAddress['state']);?>
+                        </span>
                         <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
