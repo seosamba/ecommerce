@@ -1213,15 +1213,38 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->currency = $this->_configMapper->getConfigParam('currency');
 			$this->_view->couponTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
 
-			$this->_view->plugins = array();
+            $plugins = array();
+            $pluginsToReorder = array();
+            $configTabs = Tools_Misc::$_merchandisingConfigTabs;
 			foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				$tags = $plugin->getTags();
 				if (!empty($tags) && in_array('merchandising', $tags)) {
-					array_push($this->_view->plugins, $plugin->getName());
+					array_push($plugins, $plugin->getName());
 				}
 				unset($tags);
 			}
 
+            if (!empty($plugins)) {
+                foreach ($plugins as $plugin) {
+                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                    if ($pluginClass->hasConstant('WITHOUT_TAB')) {
+                        continue;
+                    }
+                    if ($pluginClass->hasConstant('TAB_MERCHANDISE_ORDER')) {
+                        $pluginsToReorder[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external', 'tabOrderId' => $pluginClass->getConstant('TAB_MERCHANDISE_ORDER'));
+                    } else {
+                        $configTabs[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external');
+                    }
+                }
+            }
+
+            if (!empty($pluginsToReorder)) {
+                $configTabs = Tools_Misc::reorderPluginTabs($pluginsToReorder, $configTabs);
+            }
+
+            $this->_view->configTabs = $configTabs;
+            $this->_view->plugins = $plugins;
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
