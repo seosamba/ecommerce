@@ -154,6 +154,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('lengthUnit', 'cm'),
 ('zip', '94117'),
 ('noZeroPrice', '1'),
+('timezone', 'America/New_York'),
 ('version', '2.5.4');
 
 DROP TABLE IF EXISTS `shopping_product`;
