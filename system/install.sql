@@ -829,5 +829,6 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 UPDATE `plugin` SET `version` = '2.5.6' WHERE `name` = 'shopping';
 
