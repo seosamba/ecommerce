@@ -19,6 +19,7 @@ Plugin widgets.
     {$product:mpn} - Displays the product mnp. MPN = Manufacturer Part Number is the product code assigned by the manufacturer.
     {$product:url} - Displays the product page URL.
     {$product:tags} - Displays selected product tags.
+    {$product:qty} - Displays quantity of product.
     {$product:options} - Displays product options as a drop-down list, text field, a set of check boxes or a set of radio buttons.
                          Can be displayed both on the product page and in the products list.
     {$product:description[:_short_|full]} - Displays a short or a full description of the product.
