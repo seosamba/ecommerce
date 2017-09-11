@@ -364,7 +364,10 @@ class Tools_Misc
             'zip' => '',
             'phone' => '',
             'mobile' => '',
-            'mobilecountrycode' => ''
+            'mobilecountrycode' => '',
+            'phonecountrycode' => '',
+            'mobile_country_code_value' => '',
+            'phone_country_code_value' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);

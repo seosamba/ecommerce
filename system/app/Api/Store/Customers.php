@@ -61,9 +61,15 @@ class Api_Store_Customers extends Api_Service_Abstract {
                 $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('user.id = ?', $id);
             }
 
-            $data = array_map(function($row) use ($currency){
+            $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
+            $mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
+            $desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
+
+            $data = array_map(function($row) use ($currency, $mobileMasks, $desktopMasks){
 				$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
 				$row['total_amount'] = $currency->toCurrency($row['total_amount']);
+                $row['mobileMasks'] = $mobileMasks;
+                $row['desktopMasks'] = $desktopMasks;
                 if (!empty($row['customer_attr'])) {
                     $attributes = explode(',', $row['customer_attr']);
                     unset($row['customer_attr']);

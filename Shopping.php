@@ -412,6 +412,24 @@ class Shopping extends Tools_Plugins_Abstract {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
+                $desktopPhone = isset($data['phone']) ? $data['phone'] : '';
+                $mobileCountryCode = isset($data['mobilecountrycode']) ? $data['mobilecountrycode'] : '';
+                $mobileCountryCodeValue = isset($data['mobile_country_code_value']) ? $data['mobile_country_code_value'] : null;
+                $desktopCountryCode = isset($data['phonecountrycode']) ? $data['phonecountrycode'] : '';
+                $desktopCountryCodeValue = isset($data['phone_country_code_value']) ? $data['phone_country_code_value'] : null;
+                $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+                $defaultMobilePhoneCountryCode = $shoppingConfig['country'];
+
+                if (empty($desktopCountryCode)) {
+                    $desktopCountryCode = $defaultMobilePhoneCountryCode;
+                }
+
+                $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+                $userDefaultTimezone = $configHelper->getConfig('userDefaultTimezone');
+
+                if (empty($data['timezone']) && !empty($userDefaultTimezone)) {
+                    $customer->setTimezone($userDefaultTimezone);
+                }
 				if (!empty($data['customerPassword'])) {
                     $password = $data['customerPassword'];
                 } else {
@@ -422,6 +440,11 @@ class Shopping extends Tools_Plugins_Abstract {
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
                         ->setMobilePhone($mobilePhone)
+                        ->setMobileCountryCode($mobileCountryCode)
+                        ->setMobileCountryCodeValue($mobileCountryCodeValue)
+                        ->setDesktopPhone($desktopPhone)
+                        ->setDesktopCountryCode($desktopCountryCode)
+                        ->setDesktopCountryCodeValue($desktopCountryCodeValue)
 						->setPassword($password);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
@@ -878,6 +901,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->noLayout = true;
 			$allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
             $this->_view->allGroups = $allGroups;
+            $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
+            $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
+            $this->_view->phoneCountryCodes = Tools_System_Tools::getFullCountryPhoneCodesList(true, array(), true);
             $attributes = Application_Model_Mappers_UserMapper::getInstance();
             $query = $attributes->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'))->where('attribute LIKE ?', 'customer_%');
             $customerAttributes = $attributes->getDbTable()->getAdapter()->fetchCol($query);
@@ -965,6 +991,12 @@ class Shopping extends Tools_Plugins_Abstract {
 				$this->_view->invoicePlugin = 1;
 			}
 		}
+
+        $this->_view->phoneCountryCodes = Tools_System_Tools::getFullCountryPhoneCodesList(true, array(), true);
+
+        $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
+        $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
+        $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -2040,13 +2072,13 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
-            if(!empty($data['profileField']) && !empty($data['userId'])){
+            if(!empty($data['fieldName']) && !empty($data['userId'])){
                 $customerToken = '';
                 $countries = Zend_Locale::getTranslationList('territory', null, 2);
                 $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
                 $customerTable = new Models_DbTable_CustomerAddress();
 
-                $data['profileValue'] = trim($data['profileValue']);
+                $data['fieldValue'] = trim($data['fieldValue']);
                 if(empty($data['clientToken'])){
                     $this->_responseHelper->fail();
                 }
@@ -2055,32 +2087,39 @@ class Shopping extends Tools_Plugins_Abstract {
                 $customerAddress = $customerMapper->getUserAddressByUserId($data['userId'], $data['clientToken']);
                 if(!empty($customerAddress)) {
                     foreach ($customerAddress as $value) {
-                        if($data['profileField'] === 'country' || $data['profileField'] === 'state') {
-                            if ($data['profileField'] === 'country') {
-                                $currentCountry = array_search($data['profileValue'], $countries);
+                        if($data['fieldName'] === 'country' || $data['fieldName'] === 'state' || $data['fieldName'] === 'mobile' || $data['fieldName'] === 'phone') {
+                            if ($data['fieldName'] === 'country') {
+                                $currentCountry = array_search($data['fieldValue'], $countries);
                                 if ($currentCountry === false) {
                                     $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken'], 'respText'=> $this->_translator->translate('Can\'t update Country')));
                                 }
-                                $value[$data['profileField']] = $currentCountry;
+                                $value[$data['fieldName']] = $currentCountry;
                             }
-                            if ($data['profileField'] === 'state') {
-                                $currentState = Tools_Geo::getStateByCode($data['profileValue']);
+                            if ($data['fieldName'] === 'state') {
+                                $currentState = Tools_Geo::getStateByCode($data['fieldValue']);
                                 if ($currentState === null) {
                                     $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken'], 'respText'=> $this->_translator->translate('Can\'t update State')));
                                 }
-                                $value[$data['profileField']] = $currentState['id'];
+                                $value[$data['fieldName']] = $currentState['id'];
                             }
+                            if ($data['fieldName'] === 'mobile') {
+                                $value['mobilecountrycode'] = $data['countryCode'];
+                                $value['mobile'] = $data['fieldValue'];
+                                $value = $this->_normalizeMobilePhoneNumber($value);
+                            }
+
+                            if ($data['fieldName'] === 'phone') {
+                                $value['phonecountrycode'] = $data['countryCode'];
+                                $value['phone'] = $data['fieldValue'];
+                                $value = $this->_normalizeMobilePhoneNumber($value);
+                            }
+
                             $addressValues = $value;
 
                         }else{
-                            $value[$data['profileField']] = $data['profileValue'];
+                            $value[$data['fieldName']] = $data['fieldValue'];
 
-                            if($value['address_type'] === 'shipping'){
-                                $value['mobilecountrycode'] = $value['country'];
-                                $value = $this->_normalizeMobilePhoneNumber($value);
-                            }
                             $addressValues = Tools_Misc::clenupAddress($value);
-
                         }
                         $customerToken = $customerMapper->addAddress($currentCustomer, $addressValues, $data['addressType']);
                         $currentCartSession = $cartSessionMapper->fetchOrders($currentCustomer->getId());
@@ -2100,7 +2139,6 @@ class Shopping extends Tools_Plugins_Abstract {
                                 $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
                                 $customerTable->delete($where);
                             }
-
                     }
                     $this->_responseHelper->success(array('newToken'=> $customerToken, 'oldToken'=> $data['clientOldToken']));
                 }
@@ -2111,10 +2149,21 @@ class Shopping extends Tools_Plugins_Abstract {
 
     private function _normalizeMobilePhoneNumber($arr) {
         if(!empty($arr['mobile'])) {
-            $countryPhoneCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
-            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryPhoneCode);
+            $countryMobileCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
+            $countryPhoneCode = Zend_Locale::getTranslation($arr['phonecountrycode'], 'phoneToTerritory');
+            $arr['mobile'] = preg_replace('~\D~ui', '', $arr['mobile']);
+            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryMobileCode);
             if ($mobileNumber !== false) {
-                $arr['mobile'] = $mobileNumber;
+                $arr['mobile_country_code_value'] = '+'.$countryMobileCode;
+            }
+            if (empty($arr['phone'])) {
+                $arr['phone'] = '';
+            } else {
+                $arr['phone'] = preg_replace('~\D~ui', '', $arr['phone']);
+            }
+            $phoneNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['phone'], $countryPhoneCode);
+            if ($phoneNumber !== false) {
+                $arr['phone_country_code_value'] = '+'.$countryPhoneCode;
             }
         }
         return $arr;
@@ -2153,8 +2202,14 @@ class Shopping extends Tools_Plugins_Abstract {
                     $this->_translator->translate('IP address'),
                     $this->_translator->translate('Referer url'),
                     $this->_translator->translate('Google plus profile'),
+                    $this->_translator->translate('Mobile country code'),
+                    $this->_translator->translate('Mobile country code value'),
                     $this->_translator->translate('Mobile phone'),
                     $this->_translator->translate('Notes'),
+                    $this->_translator->translate('Timezone'),
+                    $this->_translator->translate('Desktop country code'),
+                    $this->_translator->translate('Desktop country code value'),
+                    $this->_translator->translate('Desktop phone'),
                     $this->_translator->translate('Group Name')
                 );
 
@@ -2178,6 +2233,58 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             exit;
         }
+    }
+
+    public static function processPhoneCodes($userModel){
+        if($userModel instanceof Application_Model_Models_User){
+            $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+            $customerAddressToProcess = $customerMapper->getUserAddressWithPhonesByUserId($userModel->getId());
+            $customerTable = new Models_DbTable_CustomerAddress();
+
+            if (!empty($customerAddressToProcess)) {
+                foreach ($customerAddressToProcess as $customerAddressToProcesKey => $customerAddressToProces) {
+                    $customer = $customerMapper->find($userModel->getId());
+
+                    $oldMobileCountryCode = $customerAddressToProces['oldMobileCountryCode'];
+                    $mobileCountryPhoneCode = Zend_Locale::getTranslation($oldMobileCountryCode, 'phoneToTerritory');
+                    $mobileCountryCodeValue = '+' . $mobileCountryPhoneCode;
+                    $mobilePhone = str_replace($mobileCountryCodeValue, '', $customerAddressToProces['mobile']);
+
+                    $customerAddressToProces['mobilecountrycode'] = $oldMobileCountryCode;
+                    $customerAddressToProces['mobile_country_code_value'] = $mobileCountryCodeValue;
+                    $customerAddressToProces['mobile'] = $mobilePhone;
+
+                    unset($customerAddressToProces['oldMobileCountryCode']);
+                    $customerToken = $customerMapper->addAddress($customer, $customerAddressToProces, null);
+
+                    $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+
+                    $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
+
+                    if(!empty($currentCartSession) && (!empty($customerToken))) {
+                        foreach ($currentCartSession as $cartSession) {
+                            $newToken = array();
+                            if($customerAddressToProces['address_type'] === 'shipping' && $cartSession->getShippingAddressId() == $customerAddressToProces['id']) {
+                                $newToken['shipping_address_id'] = $customerToken;
+                            } else if($cartSession->getBillingAddressId() == $customerAddressToProces['id']){
+                                $newToken['billing_address_id'] = $customerToken;
+                            }
+                            $newToken['updated_at'] = date(DATE_ATOM);
+                            if(!empty($newToken['shipping_address_id']) || !empty($newToken['billing_address_id'])){
+                                $cartSessionMapper->updateAddress($customerAddressToProces['id'], $customerAddressToProces['address_type'], $newToken);
+                            }
+                        }
+                    }
+
+                    $lastData =  $customerMapper->getUserAddressByUserId($customer->getId(),$customerAddressToProces['id']);
+                    if(!empty($lastData) && ($customerAddressToProces['id'] !== $customerToken)){
+                        $where = $customerTable->getAdapter()->quoteInto('id =?', $customerAddressToProces['id']);
+                        $customerTable->delete($where);
+                    }
+                }
+            }
+        }
+
     }
 
 }

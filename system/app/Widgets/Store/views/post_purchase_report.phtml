@@ -26,11 +26,11 @@
 				<span><?php echo $countries[$billingAddress['country']];?></span>
 				<br/>
 				<?php if (isset($billingAddress['phone']) && $billingAddress['phone'] != ''): ?>
-					<span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone'];?></span>
+					<span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone_country_code_value'].$billingAddress['phone'];?></span>
 					<br/>
 				<?php endif; ?>
 				<?php if (isset($billingAddress['mobile']) && $billingAddress['mobile'] != ''): ?>
-					<span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile'];?></span>
+					<span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
 					<br/>
 				<?php endif; ?>
 				<?php if (isset($billingAddress['email']) && $billingAddress['email'] != ''): ?>
@@ -123,11 +123,11 @@
 				    <br/>
                 <?php endif; ?>
 				<?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
-					<span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+					<span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
 					<br/>
 				<?php endif; ?>
 				<?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
-					<span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+					<span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
 					<br/>
 				<?php endif; ?>
 			<?php endif;?>
@@ -310,11 +310,11 @@
 				<span><?php echo $countries[$billingAddress['country']];?></span>
 				<br/>
 				<?php if (isset($billingAddress['phone']) && $billingAddress['phone'] != ''): ?>
-					<span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone'];?></span>
+					<span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone_country_code_value'].$billingAddress['phone'];?></span>
 					<br/>
 				<?php endif; ?>
 				<?php if (isset($billingAddress['mobile']) && $billingAddress['mobile'] != ''): ?>
-					<span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile'];?></span>
+					<span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
 					<br/>
 				<?php endif; ?>
 				<?php if (isset($billingAddress['email']) && $billingAddress['email'] != ''): ?>
@@ -374,11 +374,11 @@
                     <span><?php echo $shippingAddress['lastname'];?></span>
                     <br/>
                     <?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
-                        <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+                        <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
                         <br/>
                     <?php endif; ?>
                     <?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
-                        <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+                        <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
                         <br/>
                     <?php endif; ?>
                     <br />
@@ -416,11 +416,11 @@
                         <span><?php echo $countries[$shippingAddress['country']];?></span>
                         <br/>
                         <?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
-                            <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone'];?></span>
+                            <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
                             <br/>
                         <?php endif; ?>
                         <?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
-                            <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile'];?></span>
+                            <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
                             <br/>
                         <?php endif; ?>
                 <?php endif;?>

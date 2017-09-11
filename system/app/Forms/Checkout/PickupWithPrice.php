@@ -38,6 +38,8 @@ class Forms_Checkout_PickupWithPrice extends Forms_Checkout_Pickup
         $this->getElement('submitpickup')->removeDecorator('Label');
         $this->getElement('mobilecountrycode')->removeDecorator('HtmlTag');
         $this->getElement('mobile')->removeDecorator('HtmlTag');
+        $this->getElement('phonecountrycode')->removeDecorator('HtmlTag');
+        $this->getElement('phone')->removeDecorator('HtmlTag');
 
     }
 

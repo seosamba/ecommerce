@@ -273,7 +273,19 @@ ALTER TABLE `shopping_product` ADD COLUMN `prod_width` DECIMAL(10,2) NULL DEFAUL
 INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('lengthUnit', 'cm');
 
+-- 06/06/2017
+-- version: 2.5.4
+-- Add mobile and desktop phone country code
+ALTER TABLE `shopping_customer_address` ADD COLUMN `mobilecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_customer_address` ADD COLUMN `mobile_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_customer_address` ADD COLUMN `phonecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_customer_address` ADD COLUMN `phone_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL;
+
+-- 03/07/2017
+-- version: 2.5.5
+UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
