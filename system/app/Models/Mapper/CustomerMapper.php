@@ -222,7 +222,6 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'state',
                 'zip',
                 'phone',
-                'mobile',
                 'phonecountrycode',
                 'phone_country_code_value',
                 'mobile',
