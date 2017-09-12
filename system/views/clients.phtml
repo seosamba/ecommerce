@@ -4,7 +4,13 @@
     <td class="check-td"><input type="checkbox" name="select[]" value="${id}" title="Click to mark/unmark ${full_name}" {{if checked}}checked="checked"{{/if}} /></td>
     <td class="full-name text-left"><a href="javascript:;" class="details">${full_name}</a></td>
     <td class="email"><a href="mailto:${email}">${email}</a></td>
-    <td>
+    <td class="subscribed text-center">
+        <select data-type="subscribed" data-uid="${id}" data-old-value="${subscribed}" data-user-attribute-name="subscribed" class="subscribed grid_12 change-user-attribute alpha" name="subscribed">
+            <option {{if subscribed == '1'}} selected="selected" {{/if}} value="1"><?php echo $this->translate('Yes');?></option>
+            <option {{if subscribed == '0'}} selected="selected" {{/if}} value="0"><?php echo $this->translate('No');?></option>
+        </select>
+    </td>
+    <td class="text-center">
         <select data-type="mobile" data-uid="${id}" data-old-value="${mobile_country_code}" data-user-attribute-name="mobileCountryCode" class="mobile-phone-country-code grid_4 change-user-attribute alpha" name="mobile-country-code">
             <?php foreach($this->phoneCountryCodes as $phoneCountryCodeAbbr => $phoneCountryCodeVal): ?>
                 <option {{if mobile_country_code == '<?php echo $phoneCountryCodeAbbr;?>'}} selected="selected" {{/if}} value="<?php echo $phoneCountryCodeAbbr;?>"><?php echo $phoneCountryCodeVal;?></option>
@@ -73,7 +79,8 @@
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
-	            <th class="sortable" data-sortkey="mobile_phone"><?php echo $this->translate('Mobile number');?></th>
+                <th class="sortable text-center" data-sortkey="subscribed"><?php echo $this->translate('Subscribed');?></th>
+	            <th class="sortable text-center" data-sortkey="mobile_phone"><?php echo $this->translate('Mobile number');?></th>
                 <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
                 <?php if (is_array($this->customerAttributes)): ?>
                     <?php foreach ($this->customerAttributes as $attrName): ?>
@@ -90,7 +97,7 @@
         </thead>
         <tbody id="customer-list">
             <tr>
-	            <td colspan="<?php echo 7 + count($this->customerAttributes); ?>" class="text-center">
+	            <td colspan="<?php echo 8 + count($this->customerAttributes); ?>" class="text-center">
                     <img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" border="0" alt="loading..." />
                 </td>
             </tr>
@@ -113,7 +120,7 @@
 		            </select>
 	            </td>
 
-	            <td colspan="<?php echo 5 + count($this->customerAttributes); ?>" class="text-right">
+	            <td colspan="<?php echo 6 + count($this->customerAttributes); ?>" class="text-right">
 		            <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
 		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
 	            </td>

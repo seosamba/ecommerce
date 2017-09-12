@@ -35,6 +35,14 @@ class Forms_Signup extends Zend_Form {
 
         $this->setDecorators(array('FormElements', 'Form'));
 
+        $this->addElement(new Zend_Form_Element_Checkbox(array(
+            'name'       => 'subscribed',
+            'id'         => 'user-subscribed',
+            'label'      => 'Subscribe',
+            'required'   => false,
+            'value'      => $this->_subscribed
+        )));
+
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'firstname',
             'label'    => 'First Name',

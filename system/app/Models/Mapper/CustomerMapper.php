@@ -155,7 +155,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
         $select = $userDbTable->select()
 				->setIntegrityCheck(false)
-				->from('user',array('id', 'full_name', 'email', 'reg_date', 'mobile_phone', 'mobile_country_code'))
+				->from('user',array('id', 'full_name', 'email', 'reg_date', 'mobile_phone', 'mobile_country_code', 'subscribed'))
 				->joinLeft(
 					array('cart' => 'shopping_cart_session'),
                     $joinCondition,
@@ -332,7 +332,8 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
             'u.desktop_country_code',
             'u.desktop_country_code_value',
             'u.desktop_phone',
-            'sg.groupName'
+            'sg.groupName',
+            'u.subscribed'
         );
         if(!empty($userAttributes)){
             foreach ($userAttributes as $attribute){

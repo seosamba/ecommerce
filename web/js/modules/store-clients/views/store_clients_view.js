@@ -527,7 +527,7 @@ define([
                        showMessage(status, true);
                    } else {
                        $(target).data('old-value', currentValue);
-                       showMessage(_.isUndefined(i18n['Number saved!'])?'Number saved!':i18n['Number saved!']);
+                       showMessage(_.isUndefined(i18n['Saved!'])?'Saved!':i18n['Saved!']);
                    }
                }
             });
