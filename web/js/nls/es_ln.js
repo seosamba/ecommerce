@@ -91,8 +91,8 @@ define({
         'Imported' : 'Importado',
         'Recurring' : 'Recurrente',
         'Regular' : 'Estándar',
-        'Add as related' : 'Add as related',
-        'Delete selected' : 'Delete selected',
-        'add to set' : 'add to set'
+        'Add as related' : 'Añadir como relacionado',
+        'Delete selected' : 'Borrar seleccionado',
+        'add to set' : 'establecer'
     }
 });
