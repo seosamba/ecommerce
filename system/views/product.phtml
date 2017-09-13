@@ -63,7 +63,7 @@ $this->headLink()
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
-	<option value="-1" disabled="disabled" selected="selected">select from library</option>
+	<option value="-1" disabled="disabled" selected="selected"><?php echo $this->translate('select from library'); ?></option>
     <% _.each(items, function (item){ %>
         <option value="<%= item.id %>"><%= item.title %></option>
     <% }); %>
@@ -201,7 +201,7 @@ $this->headLink()
                 </div>
                 <div class="grid_5">
                     <label class="grid_3 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?>:</label>
-                    <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
+                    <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="<?php echo $this->translate('by name, sku, mpn or tags');?>"/>
                 </div>
             </div>
             <div id="product-list-holder" class="content-footer scroll pl2 pr2 column_8 full-width" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>

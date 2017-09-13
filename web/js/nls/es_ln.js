@@ -90,7 +90,9 @@ define({
         'There are no users for export' : 'No hay usuarios que exportar',
         'Imported' : 'Importado',
         'Recurring' : 'Recurrente',
-        'Regular' : 'Estándar'
-
+        'Regular' : 'Estándar',
+        'Add as related' : 'Add as related',
+        'Delete selected' : 'Delete selected',
+        'add to set' : 'add to set'
     }
 });
