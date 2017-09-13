@@ -139,7 +139,7 @@
             </div>
 
             <div class="grid_12 mt20px mb20px">
-                <div class="title"><?php echo $this->translate("Order #%1\$s content", $this->order->getId());?></div>
+                <div class="title"><?php echo $this->translate('Order'); ?><?php echo $this->translate(" #%1\$s content", $this->order->getId());?></div>
                 <table style="width: 100%">
                     <thead>
                     <tr>
@@ -293,9 +293,9 @@
                             <?php $taxName = 'Tax'; ?>
                         <?php endif;?>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Inc. ') . $taxName;?>:</td>
                         <?php else: ?>
-                            <td><?php echo $this->translate('Total ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Total ') . $taxName;?>:</td>
                         <?php endif;?>
                         <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>

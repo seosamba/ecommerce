@@ -674,7 +674,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
                 $listFolders = $this->_processNotEmptyDirs($listFolders);
-				$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
+                $dolderDefaultSelectName = $this->_translator->translate('select folder');
+				$listFolders = array($dolderDefaultSelectName) + array_combine($listFolders, $listFolders);
 			}
 			$this->_view->imageDirList = $listFolders;
 
