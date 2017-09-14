@@ -84,6 +84,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const SHIPPING_FLATRATE = 'flatrateshipping';
 
+    const SHIPPING_TRACKING_URL = 'trackingurl';
+
 	const SHIPPING_TOC_STATUS = 'checkoutShippingTocRequire';
 
 	const SHIPPING_TOC_LABEL = 'checkoutShippingTocLabel';
