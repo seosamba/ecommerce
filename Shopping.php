@@ -1593,7 +1593,8 @@ class Shopping extends Tools_Plugins_Abstract {
             },
             $pickupLocationCategory->fetchAll()
         );
-        $this->_view->countries = Tools_Geo::getCountries();
+        $this->_view->countries = Tools_Geo::getCountries(true);
+        $this->_view->defaultCountries = Zend_Locale::getTranslationList('territory', 'en_GB', 2);
         $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGELOCATION;
         $this->_layout->content = $this->_view->render('pickup-location.phtml');
         $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
