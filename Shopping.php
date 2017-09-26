@@ -421,6 +421,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $desktopCountryCodeValue = isset($data['phone_country_code_value']) ? $data['phone_country_code_value'] : null;
                 $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
                 $defaultMobilePhoneCountryCode = $shoppingConfig['country'];
+                $subscribed = isset($data['subscribed']) ? $data['subscribed'] : '0';
 
                 if (empty($desktopCountryCode)) {
                     $desktopCountryCode = $defaultMobilePhoneCountryCode;
@@ -447,7 +448,8 @@ class Shopping extends Tools_Plugins_Abstract {
                         ->setDesktopPhone($desktopPhone)
                         ->setDesktopCountryCode($desktopCountryCode)
                         ->setDesktopCountryCodeValue($desktopCountryCodeValue)
-						->setPassword($password);
+						->setPassword($password)
+                        ->setSubscribed($subscribed);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
@@ -2214,7 +2216,8 @@ class Shopping extends Tools_Plugins_Abstract {
                     $this->_translator->translate('Desktop country code'),
                     $this->_translator->translate('Desktop country code value'),
                     $this->_translator->translate('Desktop phone'),
-                    $this->_translator->translate('Group Name')
+                    $this->_translator->translate('Group Name'),
+                    $this->_translator->translate('Subscribed')
                 );
 
                 $userAttributes = $userMapper->getUserAttributesNames();
