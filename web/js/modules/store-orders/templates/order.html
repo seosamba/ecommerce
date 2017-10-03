@@ -66,10 +66,16 @@
             <a title="<%= _.isUndefined(i18n['Generate shipping label']) ? 'Generate shipping label':i18n['Generate shipping label'] %>" class="generate-shipping-order-label ticon-picture" data-order-id="<%= id %>" href="javascript:;"></a>
         <% } %>
         <% if(!_.isNull(shipping_label_link)) { %>
-            <a target="_blank" href="<%= shipping_label_link %>">
-                <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>" title="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>"/>
-            </a>
+            <% shippingLabelEl = '' %>
+            <% shippingLabelLink = shipping_label_link %>
+        <%  } else { %>
+            <% shippingLabelEl = 'hidden' %>
+            <% shippingLabelLink = 'javascript:;' %>
         <% } %>
+        <a class="shipping-label-link <%= shippingLabelEl %>" target="_blank" href="<%= shippingLabelLink %>">
+            <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>" title="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>"/>
+        </a>
+
     <% } %>
     </td>
 <% } %>

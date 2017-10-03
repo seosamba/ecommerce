@@ -79,14 +79,15 @@ define(['backbone',
                self = this,
                model = this.orders.get(orderId),
                assignAvailabilityDatesButtons = {},
-               availabilityButton  = _.isUndefined(i18n['Create label']) ? 'Create label':i18n['Create label'];
+               availabilityButton  = _.isUndefined(i18n['Create label']) ? 'Create label':i18n['Create label'],
+               elRow = $(e.currentTarget).closest('tr');
 
             assignAvailabilityDatesButtons[availabilityButton] = function() {
                 $('.ui-dialog').css('zIndex',"101");
                 smoke.confirm(confirmMessageAvailabilityDate, function (e) {
                     if (e) {
                         var availabilityDate = $('.shipping-availability-date-option:checked').val();
-                        self.generateShippingLabelRequest(orderId, availabilityDate);
+                        self.generateShippingLabelRequest(orderId, availabilityDate, elRow);
                     }
 
                 }, {
@@ -116,8 +117,10 @@ define(['backbone',
            });
 
         },
-        generateShippingLabelRequest: function(orderId, availabilityDate)
+        generateShippingLabelRequest: function(orderId, availabilityDate, elRow)
         {
+            var self = this,
+                model = self.orders.get(orderId);
             $.ajax({
                 url: $('#website_url').val()+'plugin/shopping/run/shippingLabel/',
                 type: 'POST',
@@ -131,7 +134,7 @@ define(['backbone',
                     model.set({
                         'shipping_label_link': response.responseText.shipping_label_link
                     });
-
+                    elRow.find('.shipping-label-link').removeClass('hidden').val(response.responseText.shipping_label_link);
                 }
             });
         },
