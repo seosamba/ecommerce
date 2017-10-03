@@ -1,0 +1,12 @@
+<div class="clearfix" style="width: 100%"
+     title="<%= _.isUndefined(i18n['Shipment availability dates']) ? 'Shipment availability dates':i18n['Shipment availability dates'] %> <%= _.isUndefined(i18n['for order']) ? 'for order':i18n['for order'] %> #<%= orderId %>">
+    <input type="hidden" id="shipment-label-order-id" value="<%= orderId %>" />
+    <div class="grid_12 mt10px alpha omega">
+        <% _.each(JSON.parse(shippingAvailabilityDays), function(time, date) { %>
+            <% _.each(time, function(timeInfo) { %>
+                <label class="grid_3 mt5px"><input class="shipping-availability-date-option" type="radio" name="shipping-availability-date[]" value="<%= date %> <%= timeInfo %>" /><%= date %> <%= timeInfo %></label>
+            <% }) %>
+        <% }) %>
+    </div>
+</div>
+
