@@ -155,7 +155,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('zip', '94117'),
 ('noZeroPrice', '1'),
 ('timezone', 'America/New_York'),
-('version', '2.5.4');
+('version', '2.5.7');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -293,6 +293,10 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
+  `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id',
+  `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format',
+  `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format',
+  `shipping_label_link` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping label link url',
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `discount_tax_rate` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '0',
@@ -831,5 +835,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.5.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.7' WHERE `name` = 'shopping';
 

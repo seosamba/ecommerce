@@ -285,7 +285,14 @@ ALTER TABLE `shopping_customer_address` ADD COLUMN `phone_country_code_value` VA
 -- version: 2.5.5
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 
+-- 27/09/2017
+-- version: 2.5.6
+ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id' AFTER `shipping_tracking_id`;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format' AFTER `shipping_service_id`;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format' AFTER `shipping_availability_days`;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_label_link` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping label link url' AFTER `shipping_service_info`;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

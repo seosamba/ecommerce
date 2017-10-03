@@ -2294,4 +2294,44 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    /**
+     * Process shipping label
+     */
+    public function shippingLabelAction()
+    {
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $availabilityDate = filter_var($this->_request->getParam('availabilityDate'), FILTER_SANITIZE_STRING);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && !empty($orderId)) {
+            $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $orderModel = $cartSessionMapper->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can create label only for completed or shipped orders'));
+                }
+            }
+
+            $data = array('orderId' => $orderId, 'availabilityDate' => $availabilityDate);
+            $shippingLabelInfo = Tools_System_Tools::firePluginMethodByPluginName($orderModel->getShippingService(),
+                'generateLabel', $data, false);
+            if (empty($shippingLabelInfo)) {
+                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow label generation'));
+            }
+
+            if ($shippingLabelInfo['error'] === true) {
+                $this->_responseHelper->fail($this->_translator->translate($shippingLabelInfo['message']));
+            }
+
+            $this->_responseHelper->success(array(
+                'shipping_label_link' => $shippingLabelInfo['shipping_label_link'],
+                'message' => $this->_translator->translate($shippingLabelInfo['message'])
+            ));
+        }
+    }
+
 }

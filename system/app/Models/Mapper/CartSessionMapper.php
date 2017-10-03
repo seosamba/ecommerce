@@ -42,7 +42,11 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'discount_tax_rate'     => $model->getDiscountTaxRate(),
             'free_cart'             => $model->getFreeCart(),
             'refund_amount'         => $model->getRefundAmount(),
-            'refund_notes'          => $model->getRefundNotes()
+            'refund_notes'          => $model->getRefundNotes(),
+            'shipping_service_id'   => $model->getShippingServiceId(),
+            'shipping_availability_days' => $model->getShippingAvailabilityDays(),
+            'shipping_service_info' => $model->getShippingServiceInfo(),
+            'shipping_label_link' => $model->getShippingLabelLink()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

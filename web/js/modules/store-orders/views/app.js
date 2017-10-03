@@ -5,10 +5,11 @@ define(['backbone',
     'text!../templates/export_dialog.html',
     'text!../templates/tracking_code.html',
     'text!../templates/refund_dialog.html',
+    'text!../templates/shipping_labels_dates_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, i18n
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, i18n
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -25,7 +26,8 @@ define(['backbone',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
             'change input[name="check-order[]"]': 'toggleOrder',
-            'change #filter-order-type': 'toggleRecurring'
+            'change #filter-order-type': 'toggleRecurring',
+            'click .generate-shipping-order-label' : 'generateShippingLabel'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -67,6 +69,71 @@ define(['backbone',
                 }
             }
             $(e.currentTarget).val(0);
+        },
+        generateShippingLabel: function(e)
+        {
+           var confirmMessage = _.isUndefined(i18n['Do you want to specify shipment date?'])?'Do you want to specify shipment date?':i18n['Do you want to specify shipment date?'],
+               confirmMessageLabel = _.isUndefined(i18n['Do you want to create a label?'])?'Do you want to create a label?':i18n['Do you want to create a label?'],
+               confirmMessageAvailabilityDate = _.isUndefined(i18n['Do you want to use this date for the shipping label?'])?'Do you want to use this date for the shipping label?':i18n['Do you want to use this date for the shipping label?'],
+               orderId = $(e.currentTarget).data('order-id'),
+               self = this,
+               model = this.orders.get(orderId),
+               assignAvailabilityDatesButtons = {},
+               availabilityButton  = _.isUndefined(i18n['Create label']) ? 'Create label':i18n['Create label'];
+
+            assignAvailabilityDatesButtons[availabilityButton] = function() {
+                $('.ui-dialog').css('zIndex',"101");
+                smoke.confirm(confirmMessageAvailabilityDate, function (e) {
+                    if (e) {
+                        var availabilityDate = $('.shipping-availability-date-option:checked').val();
+                        self.generateShippingLabelRequest(orderId, availabilityDate);
+                    }
+
+                }, {
+                    ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                    cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                });
+
+            };
+
+           smoke.confirm(confirmMessageLabel, function (e) {
+               if(e) {
+                   var dialog = _.template(ShippingLabelDates, {
+                        orderId: orderId,
+                        i18n:i18n,
+                        shippingAvailabilityDays: model.get('shipping_availability_days')
+                   });
+                   $(dialog).dialog({
+                        dialogClass: 'seotoaster',
+                        width: '75%',
+                        height: '400',
+                        resizable: false,
+                        buttons: assignAvailabilityDatesButtons
+                   });
+                   checkboxRadioStyle();
+                   return false;
+               }
+           });
+
+        },
+        generateShippingLabelRequest: function(orderId, availabilityDate)
+        {
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/shippingLabel/',
+                type: 'POST',
+                dataType: 'json',
+                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val(), 'availabilityDate': availabilityDate}
+            }).done(function(response) {
+                if (response.error == '1') {
+                    showMessage(response.responseText, true, 5000);
+                } else {
+                    showMessage(response.responseText.message, false, 5000);
+                    model.set({
+                        'shipping_label_link': response.responseText.shipping_label_link
+                    });
+
+                }
+            });
         },
         checkAllOrders: function(e) {
             var ordersIds = this.orders.ordersChecked;

@@ -101,6 +101,14 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_refundNotes = '';
 
+    protected $_shippingServiceId = null;
+
+    protected $_shippingAvailabilityDays = null;
+
+    protected $_shippingServiceInfo = null;
+
+    protected $_shippingLabelLink = null;
+
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -384,6 +392,82 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setRefundNotes($refundNotes)
     {
         $this->_refundNotes = $refundNotes;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getShippingServiceId()
+    {
+        return $this->_shippingServiceId;
+    }
+
+    /**
+     * @param null $shippingServiceId
+     * @return null
+     */
+    public function setShippingServiceId($shippingServiceId)
+    {
+        $this->_shippingServiceId = $shippingServiceId;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getShippingAvailabilityDays()
+    {
+        return $this->_shippingAvailabilityDays;
+    }
+
+    /**
+     * @param null $shippingAvailabilityDays
+     * @return null
+     */
+    public function setShippingAvailabilityDays($shippingAvailabilityDays)
+    {
+        $this->_shippingAvailabilityDays = $shippingAvailabilityDays;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getShippingServiceInfo()
+    {
+        return $this->_shippingServiceInfo;
+    }
+
+    /**
+     * @param null $shippingServiceInfo
+     * @return null
+     */
+    public function setShippingServiceInfo($shippingServiceInfo)
+    {
+        $this->_shippingServiceInfo = $shippingServiceInfo;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getShippingLabelLink()
+    {
+        return $this->_shippingLabelLink;
+    }
+
+    /**
+     * @param null $shippingLabelLink
+     * @return null
+     */
+    public function setShippingLabelLink($shippingLabelLink)
+    {
+        $this->_shippingLabelLink = $shippingLabelLink;
 
         return $this;
     }
