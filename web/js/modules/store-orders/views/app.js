@@ -6,10 +6,12 @@ define(['backbone',
     'text!../templates/tracking_code.html',
     'text!../templates/refund_dialog.html',
     'text!../templates/shipping_labels_dates_dialog.html',
-    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
+    'moment',
+    'accounting'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, i18n
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, i18n, moment, accounting
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -84,12 +86,23 @@ define(['backbone',
 
             assignAvailabilityDatesButtons[availabilityButton] = function() {
                 $('.ui-dialog').css('zIndex',"101");
+                var availabilityDate = $('#shipment-availability-result-'+orderId).data('availability-date'),
+                    availabilityTime = $('#shipment-availability-result-'+orderId).data('availability-time');
+
+                console.log($('#shipment-availability-result-'+orderId).data('availability-date'));
+                if (!$('#shipment-availability-result-'+orderId).data('availability-date')) {
+                    showMessage(_.isUndefined(i18n['Please specify shipment date'])?'Please specify shipment date':i18n['Please specify shipment date'], true, 5000);
+                    return false;
+                }
+
+                if (!$('#shipment-availability-result-'+orderId).data('availability-time')) {
+                    showMessage(_.isUndefined(i18n['Please specify shipment time'])?'Please specify shipment time':i18n['Please specify shipment time'], true, 5000);
+                    return false;
+                }
                 smoke.confirm(confirmMessageAvailabilityDate, function (e) {
                     if (e) {
-                        var availabilityDate = $('.shipping-availability-date-option:checked').val();
-                        self.generateShippingLabelRequest(orderId, availabilityDate, elRow);
+                        self.generateShippingLabelRequest(orderId, availabilityDate, availabilityTime, elRow);
                     }
-
                 }, {
                     ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
                     cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
@@ -99,25 +112,84 @@ define(['backbone',
 
            smoke.confirm(confirmMessageLabel, function (e) {
                if(e) {
-                   var dialog = _.template(ShippingLabelDates, {
+                   var shippingAvailabilityDays = JSON.parse(model.get('shipping_availability_days')),
+                       dialog = _.template(ShippingLabelDates, {
                         orderId: orderId,
                         i18n:i18n,
-                        shippingAvailabilityDays: model.get('shipping_availability_days')
+                        shippingAvailabilityDays: shippingAvailabilityDays,
+                        accounting: accounting,
+                        moneyFormat: self.orders.moneyFormat
+                   }),
+                       availabilityMonths = [],
+                       availableDateAndTime = [];
+
+                   _.each(shippingAvailabilityDays.availabilityDates, function(time, date){
+                       if (typeof availabilityMonths[moment(date, 'YYYY-MM-DD').format("MM")] === 'undefined') {
+                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("MM")] = [parseInt(moment(date, 'YYYY-MM-DD').format("D"))];
+                       } else {
+                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("MM")].push(parseInt(moment(date, 'YYYY-MM-DD').format("D")));
+                       }
+                       if (typeof availableDateAndTime[date] === 'undefined') {
+                           availableDateAndTime[date] = [time];
+                       } else {
+                           availableDateAndTime[date].push(time);
+                       }
                    });
+
                    $(dialog).dialog({
                         dialogClass: 'seotoaster',
                         width: '75%',
                         height: '400',
                         resizable: false,
-                        buttons: assignAvailabilityDatesButtons
+                        buttons: assignAvailabilityDatesButtons,
+                        open: function (event, ui) {
+                            $('#availability-days-datepicker').datepicker({
+                                beforeShowDay: function (date) {
+                                    if (typeof availabilityMonths[date.getMonth() + 1] === 'undefined') {
+                                        return [false, ''];
+                                    }
+                                    if (_.contains(availabilityMonths[date.getMonth() + 1], parseInt(date.getDate()))) {
+                                        return [true, ''];
+                                    }
+                                    return [false, ''];
+                                },
+                                onSelect: function () {
+                                    if (typeof availableDateAndTime[$.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))] !== 'undefined') {
+                                        $('#availability-shipment-time-'+orderId).empty();
+                                        $('#shipment-availability-summary-'+orderId).find('.shipment-availability-date-summary').empty().text($.datepicker.formatDate("dd M yy", $(this).datepicker('getDate')));
+                                        $('#shipment-availability-summary-'+orderId).find('.shipment-availability-time-summary').empty().text('');
+                                        $('#shipment-availability-result-'+orderId).data('availability-date', $.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))).data('availability-time', '');
+                                        _.each(availableDateAndTime[$.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))], function(time, date) {
+                                            _.each(time, function(time){
+                                                $('#availability-shipment-time-'+orderId).append('<button class="availability-shipment-time btn">'+time+'</button>');
+                                            });
+                                        });
+                                    }
+                                }
+                            });
+
+                            $('#availability-shipment-time-'+orderId).on('click', '.availability-shipment-time', function(e){
+                                var el = $(e.currentTarget),
+                                    switchTimeBlock = el.closest('div');
+
+                                switchTimeBlock.find('.availability-shipment-time').removeClass('current');
+                                el.addClass('current');
+                                $('#shipment-availability-summary-'+orderId).find('.shipment-availability-time-summary').empty().text(el.text());
+                                $('#shipment-availability-result-'+orderId).data('availability-time', el.text());
+                            });
+                        },
+                        close: function (event, ui) {
+                            $(this).dialog('destroy');
+                        }
                    });
+
                    checkboxRadioStyle();
                    return false;
                }
            });
 
         },
-        generateShippingLabelRequest: function(orderId, availabilityDate, elRow)
+        generateShippingLabelRequest: function(orderId, availabilityDate, availabilityTime, elRow)
         {
             var self = this,
                 model = self.orders.get(orderId);
@@ -125,7 +197,7 @@ define(['backbone',
                 url: $('#website_url').val()+'plugin/shopping/run/shippingLabel/',
                 type: 'POST',
                 dataType: 'json',
-                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val(), 'availabilityDate': availabilityDate}
+                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val(), 'availabilityDate': availabilityDate, availabilityTime: availabilityTime}
             }).done(function(response) {
                 if (response.error == '1') {
                     showMessage(response.responseText, true, 5000);
@@ -135,6 +207,7 @@ define(['backbone',
                         'shipping_label_link': response.responseText.shipping_label_link
                     });
                     elRow.find('.shipping-label-link').removeClass('hidden').val(response.responseText.shipping_label_link);
+                    $('.ui-dialog-titlebar-close').trigger('click');
                 }
             });
         },

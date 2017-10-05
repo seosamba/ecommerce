@@ -49,21 +49,27 @@
 <% if(useInvoice == 'enabled') { %>
     <td class="text-center">
     <% if(_.isNull(recurring_id)) { %>
-        <a href="javascript:;" class="ticon-email4 icon16 sendInvoice" title="Send invoice to user via email">Send</a> /
+        <a href="javascript:;" class="sendInvoice" title="Send invoice to user via email">
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/send-invoice.png" />
+        </a>
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
-            <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
-        </a>/
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/view-invoice.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
+        </a>
         <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/">
-            <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-invoice.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
         </a>
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/packing/1/">
-            <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>" title="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>"/>
-        </a>/
-        <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
-            <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/view-packing-slip.png" alt="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>" title="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>"/>
         </a>
-        <% if(status == 'completed' || status == 'shipped') { %>
-            <a title="<%= _.isUndefined(i18n['Generate shipping label']) ? 'Generate shipping label':i18n['Generate shipping label'] %>" class="generate-shipping-order-label ticon-picture" data-order-id="<%= id %>" href="javascript:;"></a>
+        <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-packing-slip.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
+        </a>
+        <% if(_.isNull(shipping_label_link)) { %>
+            <% if(status == 'completed' || status == 'shipped') { %>
+                <a title="<%= _.isUndefined(i18n['Generate shipping label']) ? 'Generate shipping label':i18n['Generate shipping label'] %>" class="generate-shipping-order-label" data-order-id="<%= id %>" href="javascript:;">
+                    <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/generate-shipping-label.png" />
+                </a>
+            <% } %>
         <% } %>
         <% if(!_.isNull(shipping_label_link)) { %>
             <% shippingLabelEl = '' %>
@@ -73,7 +79,7 @@
             <% shippingLabelLink = 'javascript:;' %>
         <% } %>
         <a class="shipping-label-link <%= shippingLabelEl %>" target="_blank" href="<%= shippingLabelLink %>">
-            <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>" title="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>"/>
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-shipping-label.png" alt="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>" title="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>"/>
         </a>
 
     <% } %>

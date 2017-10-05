@@ -103,6 +103,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}
+            $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
 			return $orderList;
 		}
 	}
