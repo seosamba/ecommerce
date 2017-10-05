@@ -15,7 +15,7 @@
         </div>
         <div class="grid_6">
             <p><%= _.isUndefined(i18n['Time']) ? 'Time':i18n['Time'] %> <span class="shipment-availability-time-summary"></span></p>
-            <p><%= _.isUndefined(i18n['Shipment price']) ? 'Shipment price':i18n['Shipment price'] %> <%= accounting.formatMoney(Math.round(availabilityDays.shippingPrice), moneyFormat) %></p>
+            <p><%= _.isUndefined(i18n['Shipment price']) ? 'Shipment price':i18n['Shipment price'] %> <%= accounting.formatMoney(availabilityDays.shippingPrice, moneyFormat) %></p>
         </div>
     </div>
 </div>
