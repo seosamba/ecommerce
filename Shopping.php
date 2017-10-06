@@ -1060,6 +1060,13 @@ class Shopping extends Tools_Plugins_Abstract {
                     )));
                     $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
                 }
+
+                if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED) {
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_DELIVERED
+                    )));
+                }
+
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
