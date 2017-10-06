@@ -292,6 +292,12 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_availability_days` TEXT
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format' AFTER `shipping_availability_days`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_label_link` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping label link url' AFTER `shipping_service_info`;
 
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_delivered'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_delivered' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.5.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

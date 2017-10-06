@@ -203,10 +203,13 @@ define(['backbone',
                     showMessage(response.responseText, true, 5000);
                 } else {
                     showMessage(response.responseText.message, false, 5000);
-                    model.set({
-                        'shipping_label_link': response.responseText.shipping_label_link
-                    });
-                    elRow.find('.shipping-label-link').removeClass('hidden').val(response.responseText.shipping_label_link);
+                    if (response.responseText.shipping_label_link) {
+                        elRow.find('.shipping-label-link').removeClass('hidden').val(response.responseText.shipping_label_link);
+                        model.set({
+                            'shipping_label_link': response.responseText.shipping_label_link
+                        });
+
+                    }
                     $('.ui-dialog-titlebar-close').trigger('click');
                 }
             });
