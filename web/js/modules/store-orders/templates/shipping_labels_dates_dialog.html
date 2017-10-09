@@ -9,14 +9,10 @@
     <input type="hidden" name="shipment-availability-result" id="shipment-availability-result-<%= orderId %>" value="">
     <div id="shipment-availability-summary-<%= orderId %>" class="shipment-availability-summary grid_8">
         <h3 class="title"><%= _.isUndefined(i18n['Summary of delivery']) ? 'Summary of delivery':i18n['Summary of delivery'] %></h3>
-        <div class="grid_6">
-            <p><%= _.isUndefined(i18n['Date']) ? 'Date':i18n['Date'] %> <span class="shipment-availability-date-summary"></span></p>
-            <p><%= _.isUndefined(i18n['Order']) ? 'Order':i18n['Order'] %> #<%= orderId %></p>
-        </div>
-        <div class="grid_6">
-            <p><%= _.isUndefined(i18n['Time']) ? 'Time':i18n['Time'] %> <span class="shipment-availability-time-summary"></span></p>
-            <p><%= _.isUndefined(i18n['Shipment price']) ? 'Shipment price':i18n['Shipment price'] %> <%= accounting.formatMoney(availabilityDays.shippingPrice, moneyFormat) %></p>
-        </div>
-    </div>
+        <div class="grid_6 alpha"><%= _.isUndefined(i18n['Date']) ? 'Date':i18n['Date'] %> <span class="shipment-availability-date-summary"></span></div>
+        <div class="grid_6 omega"><%= _.isUndefined(i18n['Order']) ? 'Order':i18n['Order'] %> <span>#<%= orderId %></span></div>
+        <div class="grid_6 alpha"><%= _.isUndefined(i18n['Time']) ? 'Time':i18n['Time'] %> <span class="shipment-availability-time-summary"></span></div>
+        <div class="grid_6 omega"><%= _.isUndefined(i18n['Shipment price']) ? 'Shipment price':i18n['Shipment price'] %> <span><%= accounting.formatMoney(availabilityDays.shippingPrice, moneyFormat) %></span></div>
+     </div>
 </div>
 
