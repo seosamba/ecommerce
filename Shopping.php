@@ -88,6 +88,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const SHIPPING_TOC_STATUS = 'checkoutShippingTocRequire';
 
+    const SHIPPING_SINGLE_RESULT = 'skipSingleShippingResult';
+
 	const SHIPPING_TOC_LABEL = 'checkoutShippingTocLabel';
 
     const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
