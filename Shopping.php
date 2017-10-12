@@ -919,6 +919,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             $this->_view->customerAttributes = $customerAttributes;
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
+            $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
 			return $this->_view->render('clients.phtml');
 		}
 	}
