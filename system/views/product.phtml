@@ -366,11 +366,19 @@ $this->headLink()
                         <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                     </div>
                     <div class="grid_12 alpha omega mt1-5em labeled">
+                        <?php $defaultTaxLabel = $this->translate('Default'); ?>
+                        <?php $alternativeTaxLabel = $this->translate('Alternative'); ?>
+                        <?php $alternative2TaxLabel = $this->translate('Alternative 2'); ?>
+                        <?php if (!empty($this->defaultTaxes)):?>
+                            <?php $defaultTaxLabel .=' '.(($this->defaultTaxes->getRate1() === '0.00') ? 0 : $this->defaultTaxes->getRate1()).' %'; ?>
+                            <?php $alternativeTaxLabel .=' '.(($this->defaultTaxes->getRate2() === '0.00') ? 0 : $this->defaultTaxes->getRate2()).' %'; ?>
+                            <?php $alternative2TaxLabel .=' '.(($this->defaultTaxes->getRate3() === '0.00') ? 0 : $this->defaultTaxes->getRate3()).' %'; ?>
+                        <?php endif;?>
                         <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
                             <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
-                            <option value="1"><?php echo $this->translate('Default'); ?></option>
-                            <option value="2"><?php echo $this->translate('Alternative'); ?></option>
-                            <option value="3"><?php echo $this->translate('Alternative 2'); ?></option>
+                            <option value="1"><?php echo $defaultTaxLabel;?></option>
+                            <option value="2"><?php echo $alternativeTaxLabel;?></option>
+                            <option value="3"><?php echo $alternative2TaxLabel;?></option>
                         </select>
                         <label class="grid_2 alpha omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
                     </div>

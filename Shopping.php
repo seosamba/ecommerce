@@ -730,6 +730,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->configTabs = $configTabs;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
+            $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            $this->_view->defaultTaxes = $defaultTaxes;
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
