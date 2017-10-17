@@ -119,6 +119,7 @@ define(['backbone',
                         accounting: accounting,
                         moneyFormat: self.orders.moneyFormat,
                         shippingTaxRate : self.orders.shippingTaxRate,
+                        defaultTaxes: self.orders.defaultTaxes,
                         order: self.orders.get(orderId)
                    }),
                        availabilityMonths = [],

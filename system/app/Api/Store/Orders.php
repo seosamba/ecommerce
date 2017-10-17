@@ -106,6 +106,14 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}
+
+            $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            if ($defaultTaxes instanceof Models_Model_Tax) {
+                $defaultTaxes = array('rate1' => $defaultTaxes->getRate1(), 'rate2' => $defaultTaxes->getRate2(), 'rate3' => $defaultTaxes->getRate3());
+            } else {
+                $defaultTaxes = null;
+            }
+            $orderList['defaultTaxes'] = $defaultTaxes;
             $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
             $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
 			return $orderList;
