@@ -62,6 +62,9 @@ class Api_Store_Orders extends Api_Service_Abstract {
 		if ($count){
 			$orderMapper->lastQueryResultCount($count);
 		}
+
+        $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
 		if ($id){
 			$where = $orderMapper->getDbTable()->getAdapter()->quoteInto('order.id = ?', intval($id));
 			$order = $orderMapper->fetchAll($where);
@@ -103,6 +106,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}
+            $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
             $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
 			return $orderList;
 		}

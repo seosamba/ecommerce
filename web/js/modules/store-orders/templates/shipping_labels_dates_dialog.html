@@ -12,7 +12,16 @@
         <div class="grid_6 alpha"><%= _.isUndefined(i18n['Date']) ? 'Date':i18n['Date'] %> <span class="shipment-availability-date-summary"></span></div>
         <div class="grid_6 omega"><%= _.isUndefined(i18n['Order']) ? 'Order':i18n['Order'] %> <span>#<%= orderId %></span></div>
         <div class="grid_6 alpha"><%= _.isUndefined(i18n['Time']) ? 'Time':i18n['Time'] %> <span class="shipment-availability-time-summary"></span></div>
-        <div class="grid_6 omega"><%= _.isUndefined(i18n['Shipment price']) ? 'Shipment price':i18n['Shipment price'] %> <span><%= accounting.formatMoney(availabilityDays.shippingPrice, moneyFormat) %></span></div>
+        <% if (shippingTaxRate != 0) { %>
+            <% shippingPriceWithTax = parseFloat(availabilityDays.shippingPrice) + parseFloat(order.get('shipping_tax')) %>
+            <% console.log(shippingPriceWithTax) %>
+        <% } %>
+        <div class="grid_6 omega"><%= _.isUndefined(i18n['Shipment price']) ? 'Shipment price':i18n['Shipment price'] %> <span><%= accounting.formatMoney(shippingPriceWithTax, moneyFormat) %></span>
+            <% if (shippingTaxRate != 0) { %>
+                <%= _.isUndefined(i18n['Include Tax']) ? 'Include Tax':i18n['Include Tax'] %>.
+                <%= accounting.formatMoney(order.get('shipping_tax'), moneyFormat) %>
+            <% } %>
+        </div>
      </div>
 </div>
 

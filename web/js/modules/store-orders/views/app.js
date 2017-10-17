@@ -89,7 +89,6 @@ define(['backbone',
                 var availabilityDate = $('#shipment-availability-result-'+orderId).data('availability-date'),
                     availabilityTime = $('#shipment-availability-result-'+orderId).data('availability-time');
 
-                console.log($('#shipment-availability-result-'+orderId).data('availability-date'));
                 if (!$('#shipment-availability-result-'+orderId).data('availability-date')) {
                     showMessage(_.isUndefined(i18n['Please specify shipment date'])?'Please specify shipment date':i18n['Please specify shipment date'], true, 5000);
                     return false;
@@ -118,7 +117,9 @@ define(['backbone',
                         i18n:i18n,
                         shippingAvailabilityDays: shippingAvailabilityDays,
                         accounting: accounting,
-                        moneyFormat: self.orders.moneyFormat
+                        moneyFormat: self.orders.moneyFormat,
+                        shippingTaxRate : self.orders.shippingTaxRate,
+                        order: self.orders.get(orderId)
                    }),
                        availabilityMonths = [],
                        availableDateAndTime = [];
