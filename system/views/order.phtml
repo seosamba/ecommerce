@@ -293,9 +293,9 @@
                             <?php $taxName = 'Tax'; ?>
                         <?php endif;?>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->translate('Inc. ') . $taxName;?>:</td>
+                            <td><?php echo $this->translate('Inc.') . ' ' . $taxName;?>:</td>
                         <?php else: ?>
-                            <td><?php echo $this->translate('Total ') . $taxName;?>:</td>
+                            <td><?php echo $this->translate('Total') . ' ' . $taxName;?>:</td>
                         <?php endif;?>
                         <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>

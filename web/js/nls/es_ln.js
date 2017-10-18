@@ -93,6 +93,16 @@ define({
         'Regular' : 'Estándar',
         'Add as related' : 'Añadir como relacionado',
         'Delete selected' : 'Borrar seleccionado',
-        'add to set' : 'establecer'
+        'add to set' : 'establecer',
+        'Enter amount to refund below' : 'Introduzca abajo la cantidad a devolver',
+        'How much do you want to refund' : '¿Qué cantidad quiere devolver?',
+        'Tax rate' : 'Impuesto %',
+        'Process refund now through payment processor' : 'Devolver ahora',
+        'Add a refund message (will show on client\'s credit card receipt)' : 'Añadir un mensaje a la devolución (se mostrará en el detalle de la devolución de la tarjeta del cliente)',
+        'Refund order' : 'Devolver pedido',
+        'Refund' : 'Devuelto',
+        'Missing required fields' : 'Faltan campos oblogatorios por rellenar',
+        'Please enter location' : 'Por favor, introduzca una dirección',
+        'Missing required field' : 'Faltan campos oblogatori por rellenar'
     }
 });
