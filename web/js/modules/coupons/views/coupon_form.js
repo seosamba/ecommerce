@@ -1,6 +1,7 @@
 define([
-	'backbone'
-], function(Backbone){
+	'backbone',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(Backbone, i18n){
     var CouponFormView = Backbone.View.extend({
         el: $('#edit-coupon'),
         events: {
@@ -63,7 +64,7 @@ define([
             });
 
             if (!isValid){
-                showMessage('Missing required field', true);
+                showMessage(_.isUndefined(i18n['Missing required field'])?'Missing required field':i18n['Missing required field'], true);
                 return false;
             }
             showSpinner();

@@ -28,20 +28,20 @@ $this->headScript()
                     <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
                 <?php endif;?>
             </h4>
-			<p class="client-info"><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
+			<p class="client-info">  <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?></p>
 			<p class="client-info"><?php
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
 					if ($lastSeen < 7) {
-						$lastSeenStamp = date('l', strtotime($lastSeen.' '.$this->translate(' days ago')));
+						$lastSeenStamp = date('l', strtotime($this->translate('days').' '.$lastSeen.' '.$this->translate('ago')));
 					} else {
-						$lastSeenStamp = $lastSeen.' '.$this->translate(' days ago');
+						$lastSeenStamp = $this->translate('days').' '.$lastSeen.' '.$this->translate('ago');
 					}
 				} else {
 					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
-				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
+				echo $this->translate("Last seen:") . ' ' . $lastSeenStamp;
 				?></p>
             <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                 <h4 class="client-info client-notes grid_12">
