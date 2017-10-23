@@ -1,9 +1,11 @@
 define([
 	'backbone',
     '../collections/coupons',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
-            CouponsCollection
+            CouponsCollection,
+            i18n
             ){
 
     var CouponTableView = Backbone.View.extend({
@@ -30,7 +32,16 @@ define([
                 "bPaginate": true,
                 "iDisplayLength": 8,
                 "bAutoWidth": false,
-                "aoColumnDefs": aoColumnDefs
+                "aoColumnDefs": aoColumnDefs,
+                "oLanguage": {
+                    "sEmptyTable": _.isUndefined(i18n['No data available in table'])?'No data available in table':i18n['No data available in table'],
+                    "oPaginate": {
+                        "sFirst":    _.isUndefined(i18n['First page'])?'First page':i18n['First page'],
+                        "sLast":     _.isUndefined(i18n['Last page'])?'Last page':i18n['Last page'],
+                        "sNext":     _.isUndefined(i18n['Next page'])?'Next page':i18n['Next page'],
+                        "sPrevious": _.isUndefined(i18n['Previous page'])?'Previous page':i18n['Previous page']
+                    }
+                }
             });
             this.coupons = new CouponsCollection();
             this.coupons.on('reset', this.renderCoupons, this);

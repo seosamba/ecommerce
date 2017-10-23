@@ -49,7 +49,7 @@
 <% if(useInvoice == 'enabled') { %>
     <td class="text-center">
     <% if(_.isNull(recurring_id)) { %>
-        <a href="javascript:;" class="sendInvoice" title="Send invoice to user via email">
+        <a href="javascript:;" class="sendInvoice" title="<%= _.isUndefined(i18n['Send invoice to user via email']) ? 'Send invoice to user via email':i18n['Send invoice to user via email'] %>">
             <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/send-invoice.png" />
         </a>
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">

@@ -367,7 +367,12 @@ $this->headScript()
                     }
                 });
             }
-        });
+        },
+            {
+                ok: '<?php echo $this->translate("Ok"); ?>',
+                cancel: '<?php echo $this->translate("Cancel"); ?>'
+            }
+        );
     });
 
     $('#orders-table').on('mouseenter', 'td.current-status', function(){

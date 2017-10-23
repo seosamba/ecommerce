@@ -35,6 +35,7 @@ define({
         'OK'              : 'OK',
         'Cancel'          : 'Cancelar',
         'Saved'           : 'Guardado',
+        'Save'            : 'Guardar',
         'products found'  : 'productos encontrados',
         'yes'             : 'sí',
         'no'              : 'no',
@@ -103,6 +104,13 @@ define({
         'Refund' : 'Devuelto',
         'Missing required fields' : 'Faltan campos oblogatorios por rellenar',
         'Please enter location' : 'Por favor, introduzca una dirección',
-        'Missing required field' : 'Faltan campos oblogatori por rellenar'
+        'Missing required field' : 'Faltan campos oblogatori por rellenar',
+        'Send invoice to user via email' : 'Enviar factura por email',
+        'No data available in table' : 'No existen datos en esta tabla',
+        'First page' : 'Inicio',
+        'Last page' : 'Fin',
+        'Next page' : 'Siguiente',
+        'Previous page' : 'Anterior',
+        'Generate shipping label' : 'Generar etiqueta de envio'
     }
 });

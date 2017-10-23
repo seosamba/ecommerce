@@ -1,4 +1,4 @@
-<div class="clearfix" style="width: 110%" title="Insert tracking code for this order">
+<div class="clearfix" style="width: 110%" title="<%=  _.isUndefined(i18n['Insert tracking code for this order'])?'Insert tracking code for this order':i18n['Insert tracking code for this order'] %>">
     <% ordId = orderId%>
     <% _.each(defaultSelection, function(n, v){
         selection = v;
@@ -14,6 +14,6 @@
         <%})%>
         </select>
         <input type="text" name="shippingTrackingId" id="shippingTrackingId" value="" class="grid_7 alpha fl-right">
-        <button class="btn green ticon-checkmark save-data" style="margin-top: 10px;" type="submit" title="save">Save</button>
+        <button class="btn green ticon-checkmark save-data" style="margin-top: 10px;" type="submit" title="save"><%=  _.isUndefined(i18n['Save'])?'Save':i18n['Save'] %></button>
     </form>
 </div>

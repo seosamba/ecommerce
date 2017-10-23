@@ -236,6 +236,7 @@
 'Location info' => 'Localización',
 'free' => 'gratis',
 'Delivery comments' => 'Comentarios para la entrega',
+'Delivery Comments' => 'Comentarios para la entrega',
 'Discount' => 'Descuento',
 'Shipping' => 'Envío',
 'Inc.' => 'Inc.',
@@ -337,8 +338,8 @@
 'You do not have any orders' => 'No existen pedidos',
 'Insert tracking code for this order' => 'Establecer identificador de envío',
 'Saved' => 'Guardado',
-'cs_total' => 'cs_total',
-'cs_recurring_orders' => 'cs_recurring_orders',
+'cs_total' => 'total',
+'cs_recurring_orders' => 'pedidos recurrentes',
 'back to clients list' => 'volver al listado de clientes',
 'Free pickup' => 'Recogida en tienda gratis',
 'Pickup' => 'Recogida en tienda',
@@ -472,11 +473,9 @@
 'Show product price with tax included.' => 'Show product price with tax included.',
 'Set parameters for cart wide promotions from this screen.' => 'Set parameters for cart wide promotions from this screen.',
 'Set item specific promotions in the "add/edit product" screen.' => 'Set item specific promotions in the "add/edit product" screen.',
-'Coupons' => 'Coupons',
 'Recurring payments' => 'Recurring payments',
 'Customers groups' => 'Customers groups',
 'Digital products' => 'Digital products',
-'Product tags' => 'Product tags',
 'Activate autoship frequencies' => 'Activate autoship frequencies',
 'Day' => 'Day',
 'Week' => 'Week',
@@ -491,7 +490,7 @@
 'Default price modifier' => 'Default price modifier',
 'Set all products on sale' => 'Set all products on sale',
 'Sale discount (%)' => 'Sale discount (%)',
-'Time' => 'Time',
+'Time' => 'Hora',
 'Sales time depends on your local server time settings' => 'Sales time depends on your local server time settings',
 'Dismiss all promo prices' => 'Dismiss all promo prices',
 'Apply to all products' => 'Apply to all products',
@@ -500,6 +499,12 @@
 'Quote' => 'Quote',
 'Dashboard' => 'Dashboard',
 'Documents' => 'Documents',
-'Add/edit product' => 'Add/edit product'
+'Add/edit product' => 'Add/edit product',
+'Ok' => 'Ok',
+'Cancel' => 'Cancelar',
+'Email not valid' => 'Email no es válido',
+'Enter coupon' => 'Escribir código promocional',
+'is not a valid email address' => 'email no es válido'
+
 
 );
