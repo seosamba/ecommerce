@@ -367,7 +367,8 @@ class Tools_Misc
             'mobilecountrycode' => '',
             'phonecountrycode' => '',
             'mobile_country_code_value' => '',
-            'phone_country_code_value' => ''
+            'phone_country_code_value' => '',
+            'customer_notes' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);

@@ -39,6 +39,10 @@
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
                         <span class="phone"><?php echo $billingAddress['phone_country_code_value'].$billingAddress['phone'];?></span>
+                        <br/>
+                        <span class="phone"><?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
+                        <br/>
+                        <span class="notes"><?php echo (!empty($billingAddress['customer_notes']) ? $billingAddress['customer_notes'] : '');?></span>
                         <?php if ($this->order->getGateway()) : ?>
                             <br/>
                             <span><?php echo $this->translate('Payment Method');?>
@@ -77,6 +81,10 @@
                             <br/>
                             <span><?php echo $countryList[$shippingAddress['country']];?></span>
                             <span class="phone"><?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
+                            <br/>
+                            <span class="phone"><?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
+                            <br/>
+                            <span class="notes"><?php echo (!empty($shippingAddress['customer_notes']) ? $shippingAddress['customer_notes'] : '');?></span>
                         <?php endif;?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>

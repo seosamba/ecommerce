@@ -97,19 +97,20 @@ Plugin widgets.
     {$postpurchase:billing:phone} -> billing address phone
     {$postpurchase:billing:mobile} -> billing address mobile
     {$postpurchase:billing:email} -> billing address email
+    {$postpurchase:billing:customer_notes} -> billing customer notes
 
     ######### Shipping information #############
-    {$postpurchase:shipping:lastname} -> billing lastname
-    {$postpurchase:shipping:firstname} -> billing firstname
-    {$postpurchase:shipping:address1} -> billing address
-    {$postpurchase:shipping:address2} -> billing address
-    {$postpurchase:shipping:city}     -> billing address city
-    {$postpurchase:shipping:state}   -> billing address state
-    {$postpurchase:shipping:zip} -> billing address zip
-    {$postpurchase:shipping:country} -> billing address country
-    {$postpurchase:shipping:phone} -> billing address phone
-    {$postpurchase:shipping:mobile} -> billing address mobile
-    {$postpurchase:shipping:email} -> billing address email
+    {$postpurchase:shipping:lastname} -> shipping lastname
+    {$postpurchase:shipping:firstname} -> shipping firstname
+    {$postpurchase:shipping:address1} -> shipping address
+    {$postpurchase:shipping:address2} -> shipping address
+    {$postpurchase:shipping:city}     -> shipping address city
+    {$postpurchase:shipping:state}   -> shipping address state
+    {$postpurchase:shipping:zip} -> shipping address zip
+    {$postpurchase:shipping:country} -> shipping address country
+    {$postpurchase:shipping:phone} -> shipping address phone
+    {$postpurchase:shipping:mobile} -> shipping address mobile
+    {$postpurchase:shipping:customer_notes} -> shipping customer notes
 
     This type of widgets you can use inside 'postpurchasecartcontent' magic space
     It will return result for each product inside your cart

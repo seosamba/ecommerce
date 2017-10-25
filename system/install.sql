@@ -354,6 +354,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `mobile_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phonecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phone_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `state` (`state`)
