@@ -175,7 +175,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 array('customer_attr'=>'(GROUP_CONCAT(DISTINCT(userattr.attribute), \'||\', userattr.value))'))
             ->group('user.id');
 
-		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {
+		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
 			$select->where('user.role_id NOT IN (?)', array(
 				Tools_Security_Acl::ROLE_SUPERADMIN,
 				Tools_Security_Acl::ROLE_ADMIN
