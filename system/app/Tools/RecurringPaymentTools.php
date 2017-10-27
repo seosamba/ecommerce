@@ -29,8 +29,7 @@ class Tools_RecurringPaymentTools
         $paymentInfo = $recurringPaymentMapper->find($cartId);
         if ($paymentInfo instanceof Store_Model_RecurringPayments) {
             $paymentInfo->setRecurringStatus($status);
-            $nextPaymentDate = date('Y-m-d',
-                strtotime($paymentInfo->getNextPaymentDate() . $paymentInfo->getPaymentPeriod()));
+            $nextPaymentDate = date('Y-m-d', strtotime(date('Y-m-d') . $paymentInfo->getPaymentPeriod()));
             $paymentInfo->setLastPaymentDate(date('Y-m-d'));
             $paymentInfo->setNextPaymentDate($nextPaymentDate);
             $paymentInfo->setGatewayType($gatewayName);
