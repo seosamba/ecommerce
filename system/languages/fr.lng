@@ -633,7 +633,7 @@
         'Are you sure want to delete?' => 'Etes-vous sûr de vouloir supprimer?',
         'Custom Shipper' => 'Expéditeur Personnalisé',
         'Shipping carrier' => 'Livreur',
-        'Payment' => 'Paiement'
+        'Payment' => 'Paiement',
         'Coupon code' => 'Code promo',
         'Client group' => 'Groupe de clients',
         'Order Id' => 'Numéro de commande',
