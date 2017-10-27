@@ -98,8 +98,8 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <p>
                     <label><?php echo $this->translate('Country'); ?></label>
                     <select name="country" class="location-country">
-                        <?php foreach ($this->countries as $country): ?>
-                            <option value="<?php echo $country['name']; ?>"><?php echo $country['name']; ?></option>
+                        <?php foreach ($this->countries as $countryCode => $country): ?>
+                            <option value="<?php echo $this->defaultCountries[$countryCode]; ?>"><?php echo $country; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </p>

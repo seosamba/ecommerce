@@ -596,4 +596,22 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         return $result[0]['count'];
     }
 
+    /**
+     * Get products quantity with empty param
+     *
+     * @param string $paramName shopping product table field name
+     * @return mixed
+     * @throws Exception
+     */
+    public function countProductsWithoutParam($paramName)
+    {
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array('count' => 'COUNT(id)'))
+            ->where($paramName.' = 0 OR '.$paramName.' IS NULL');
+        $result = $this->getDbTable()->getAdapter()->fetchAll($select);
+
+        return $result[0]['count'];
+    }
+
 }

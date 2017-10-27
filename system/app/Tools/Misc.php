@@ -105,6 +105,13 @@ class Tools_Misc
         7 => array('tabId' => 'quantity-discount-tab', 'tabName' => 'Quantity discount', 'type' => 'internal')
     );
 
+    public static $_merchandisingConfigTabs = array(
+        0 => array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal'),
+        1 => array('tabId' => 'recurring-payments', 'tabName' => 'Recurring payments', 'type' => 'internal'),
+        2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers groups', 'type' => 'internal'),
+        3 => array('tabId' => 'quantity-discount', 'tabName' => 'Quantity discount', 'type' => 'internal')
+    );
+
 
     public static $_helpHashMap = array(
         self::SECTION_STORE_MANAGEZONES => 'shopping-cart-shipping-tax-zones.html',
@@ -359,7 +366,10 @@ class Tools_Misc
             'zip' => '',
             'phone' => '',
             'mobile' => '',
-            'mobilecountrycode' => ''
+            'mobilecountrycode' => '',
+            'phonecountrycode' => '',
+            'mobile_country_code_value' => '',
+            'phone_country_code_value' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);
@@ -647,6 +657,25 @@ class Tools_Misc
             }
         }
         return $inventoryPluginsStatus;
+    }
+
+    /**
+     * Reorder config screen tabs
+     *
+     * @param array $pluginsToReorder Ex:array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal')
+     * @param array $configTabs Ex: array('tabId' => 'pluginid', 'tabName' => 'title', 'type' => 'external');
+     * @return array
+     */
+    public static function reorderPluginTabs($pluginsToReorder, $configTabs)
+    {
+        foreach ($pluginsToReorder as $pluginOrder) {
+            $elementsAfterPosition = array_slice($configTabs, $pluginOrder['tabOrderId'] -1);
+            $elementsBeforePosition = array_slice($configTabs, 0, $pluginOrder['tabOrderId'] -1);
+            $elementsBeforePosition[] = array('tabId' => $pluginOrder['tabId'], 'tabName' => $pluginOrder['tabName'], 'type' => 'external');
+            $configTabs = array_merge($elementsBeforePosition, $elementsAfterPosition);
+        }
+
+        return $configTabs;
     }
 
 

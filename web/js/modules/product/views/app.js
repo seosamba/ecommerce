@@ -853,9 +853,9 @@ define([
             $('#product-list').show("slide", { direction: "right"});
             $('#product-list-holder').data('type', listtype);
             var labels = {
-                "related": "<span class='success'>[ Add as related ]</span>",
-                "edit": "<span class='error'>[ Delete selected ]</span>",
-                "set": "[ add to set ]"
+                "related": "<span class='success'>[ "+ (_.isUndefined(i18n['Add as related'])?'Add as related':i18n['Add as related']) +" ]</span>",
+                "edit": "<span class='error'>[ "+ (_.isUndefined(i18n['Delete selected'])?'Delete selected':i18n['Delete selected']) +" ]</span>",
+                "set": "[ "+ (_.isUndefined(i18n['add to set'])?'add to set':i18n['add to set']) +" ]"
             };
             $('#massaction').html(labels[listtype]);
 
