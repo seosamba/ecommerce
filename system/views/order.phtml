@@ -6,6 +6,9 @@
             'headerText' => $this->translate('Order #').' '. $this->order->getId()
         )
     ); ?>
+    <?php if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+        <link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" rel="stylesheet" media="all">
+    <?php endif;?>
     <div class="content scroll">
         <div id="order-view" class="toaster-widget clearfix">
             <div class="grid_12 mb20px">

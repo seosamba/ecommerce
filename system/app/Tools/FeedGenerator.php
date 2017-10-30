@@ -99,7 +99,7 @@ class Tools_FeedGenerator {
             $item->appendChild(
                 $feed->createElement(
                     'g:image_link',
-                    Tools_Misc::prepareProductImage($product->getPhoto())
+                    Tools_Misc::prepareProductImage($product->getPhoto(), 'small')
                 )
             );
 
