@@ -72,8 +72,9 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
         $result = array();
         $defaultStatus = $this->findDefaultStatus();
         if (!is_null($defaultStatus)) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('default_status = ?', '1');
             $data = array('default_status' => '0');
-            $result = $this->getDbTable()->update($data);
+            $result = $this->getDbTable()->update($data, $where);
         }
 
         return $result;
