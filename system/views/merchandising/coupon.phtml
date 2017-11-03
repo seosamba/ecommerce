@@ -18,10 +18,18 @@
 
 	<div class="grid_4 alpha mt0px">
         <label><?php echo $this->translate('Type');?></label>
+        <?php $couponsTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
+           if(!empty($couponsTypes)){
+               foreach ($couponsTypes as $key => $couponsType) {
+                   $couponsTypes[$key] = $this->translate($couponsType);
+               }
+           }
+        ?>
+
 		<?php echo $this->formSelect('type', null, array(
 				'data-action'   => 'render',
 				'id'            => 'coupon-type'
-			), Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true) ); ?>
+			), $couponsTypes ); ?>
 	</div>
 
     <div class="grid_2 alpha omega mt0px">

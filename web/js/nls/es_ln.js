@@ -111,6 +111,23 @@ define({
         'Last page' : 'Fin',
         'Next page' : 'Siguiente',
         'Previous page' : 'Anterior',
-        'Generate shipping label' : 'Generar etiqueta de envio'
+        'Generate shipping label' : 'Generar etiqueta de envio',
+        'Do you want to specify shipment date?' : '¿Quiere especificar la fecha de envío?',
+        'Do you want to create a label?' : '¿Quiere crear una etiqueta?',
+        'Do you want to use this date for the shipping label?' : '¿Desea utilizar esta fecha de recogida en la etiqueta de envío?',
+        'Create label' : 'Crear etiqueta',
+        'Please specify shipment date' : 'Por favor especificar la fecha de envío',
+        'Please specify shipment time' : 'Por favor especificar la hora de envío',
+        'Export' : 'Exportar',
+        'Are you sure you want to change status for this order?' : '¿Estas seguro que quieres el rembolso de este pago?',
+        'Invoice has been sent' : 'Factura enviada',
+        'Shipment availability dates' : 'Fechas de recogida disponibles',
+        'for order' : 'para pedido',
+        'Summary of delivery' : 'Resumen de dias',
+        'Date' : 'Fecha',
+        'Order' : 'Pedido',
+        'Time' : 'Hora',
+        'Shipment price' : 'Precio de envío',
+        'Include Tax' : 'Inpuestos incluidos'
     }
 });

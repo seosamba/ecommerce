@@ -504,7 +504,10 @@
 'Cancel' => 'Cancelar',
 'Email not valid' => 'Email no es válido',
 'Enter coupon' => 'Escribir código promocional',
-'is not a valid email address' => 'email no es válido'
+'is not a valid email address' => 'email no es válido',
+'No more products found' => 'No se encuentran más producto',
+'Discount with min. order' => 'Descuento con número mínimo de pedidos',
+'Free shipping with min. order' => 'Envío grátis con número mínimo de pedidos'
 
 
 );
