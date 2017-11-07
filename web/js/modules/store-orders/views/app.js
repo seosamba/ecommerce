@@ -191,7 +191,7 @@ define(['backbone',
            });
 
         },
-        generateShippingLabelRequest: function(orderId, availabilityDate, availabilityTime, elRow)
+        generateShippingLabelRequest: function(orderId, availabilityDate, availabilityTime, elRow, regenerate)
         {
             var self = this,
                 model = self.orders.get(orderId);
@@ -199,10 +199,21 @@ define(['backbone',
                 url: $('#website_url').val()+'plugin/shopping/run/shippingLabel/',
                 type: 'POST',
                 dataType: 'json',
-                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val(), 'availabilityDate': availabilityDate, availabilityTime: availabilityTime}
+                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val(), 'availabilityDate': availabilityDate, availabilityTime: availabilityTime, 'regenerate' : regenerate}
             }).done(function(response) {
                 if (response.error == '1') {
-                    showMessage(response.responseText, true, 5000);
+                    if (typeof response.responseText.regenerate !== 'undefined') {
+                        smoke.confirm(response.responseText.message, function (e) {
+                            if (e) {
+                                self.generateShippingLabelRequest(orderId, availabilityDate, availabilityTime, elRow, true);
+                            }
+                        }, {
+                            ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                            cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                        });
+                    } else {
+                        showMessage(response.responseText, true, 5000);
+                    }
                 } else {
                     showMessage(response.responseText.message, false, 5000);
                     if (response.responseText.shipping_label_link) {

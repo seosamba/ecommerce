@@ -2317,6 +2317,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
         $availabilityDate = filter_var($this->_request->getParam('availabilityDate'), FILTER_SANITIZE_STRING);
         $availabilityTime = filter_var($this->_request->getParam('availabilityTime'), FILTER_SANITIZE_STRING);
+        $regenerateLabel = filter_var($this->_request->getParam('regenerate'), FILTER_SANITIZE_STRING);
         $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
         if (!$valid) {
             exit;
@@ -2331,7 +2332,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 
-            $data = array('orderId' => $orderId, 'availabilityDate' => $availabilityDate, 'availabilityTime' => $availabilityTime);
+            $data = array('orderId' => $orderId, 'availabilityDate' => $availabilityDate, 'availabilityTime' => $availabilityTime, 'regenerateLabel' => $regenerateLabel);
             $shippingLabelInfo = Tools_System_Tools::firePluginMethodByPluginName($orderModel->getShippingService(),
                 'generateLabel', $data, false);
             if (empty($shippingLabelInfo)) {
@@ -2339,6 +2340,9 @@ class Shopping extends Tools_Plugins_Abstract {
             }
 
             if ($shippingLabelInfo['error'] === true) {
+                if (!empty($shippingLabelInfo['regenerate'])) {
+                    $this->_responseHelper->fail(array('regenerate' => true, 'message' => $this->_translator->translate($shippingLabelInfo['message'])));
+                }
                 $this->_responseHelper->fail($this->_translator->translate($shippingLabelInfo['message']));
             }
 
