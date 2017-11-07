@@ -64,13 +64,12 @@
         <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
             <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-packing-slip.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
         </a>
-        <% if((_.isNull(shipping_label_link) || _.isEmpty(shipping_label_link))) { %>
+
             <% if(status == 'completed' || status == 'shipped') { %>
                 <a title="<%= _.isUndefined(i18n['Generate shipping label']) ? 'Generate shipping label':i18n['Generate shipping label'] %>" class="generate-shipping-order-label" data-order-id="<%= id %>" href="javascript:;">
                     <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/generate-shipping-label.png" />
                 </a>
             <% } %>
-        <% } %>
         <% if(!_.isNull(shipping_label_link) || !_.isEmpty(shipping_label_link)) { %>
             <% shippingLabelEl = '' %>
             <% shippingLabelLink = shipping_label_link %>
