@@ -111,8 +111,14 @@ define(['backbone',
 
            smoke.confirm(confirmMessageLabel, function (e) {
                if(e) {
-                   var shippingAvailabilityDays = JSON.parse(model.get('shipping_availability_days')),
-                       dialog = _.template(ShippingLabelDates, {
+                   var shippingAvailabilityDays = JSON.parse(model.get('shipping_availability_days'));
+
+                    if (_.isEmpty(shippingAvailabilityDays) || _.isNull(shippingAvailabilityDays)) {
+                        showMessage('Shipping service doesn\'t support shipment label creation', true, 5000);
+                        return false;
+                    }
+
+                   var dialog = _.template(ShippingLabelDates, {
                         orderId: orderId,
                         i18n:i18n,
                         shippingAvailabilityDays: shippingAvailabilityDays,
