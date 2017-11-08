@@ -355,6 +355,7 @@
 'Edit location' => 'Editar dirección',
 'Ship to this address' => 'Entregar en esta dirección',
 'Show more' => 'Ver más',
+'show more' => 'ver más',
 'Your information' => 'Su información',
 'Edit address' => 'Editar dirección',
 'Pickup information' => 'Información de recogida en tienda',
