@@ -508,7 +508,8 @@
 'is not a valid email address' => 'email no es válido',
 'No more products found' => 'No se encuentran más producto',
 'Discount with min. order' => 'Descuento con número mínimo de pedidos',
-'Free shipping with min. order' => 'Envío grátis con número mínimo de pedidos'
+'Free shipping with min. order' => 'Envío grátis con número mínimo de pedidos',
+'Payment gateway doesn\'t have refund functionality' => '¿La pasarela de pago no tiene funcionalidad de rembolso?'
 
 
 );
