@@ -128,6 +128,7 @@ define({
         'Order' : 'Pedido',
         'Time' : 'Hora',
         'Shipment price' : 'Precio de envío',
-        'Include Tax' : 'Inpuestos incluidos'
+        'Include Tax' : 'Inpuestos incluidos',
+        'Shipping service does not support shipment label creation' : 'El Servicio de entregas no permite la creación de etiquetas de envío'
     }
 });

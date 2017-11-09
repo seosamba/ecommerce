@@ -114,7 +114,7 @@ define(['backbone',
                    var shippingAvailabilityDays = JSON.parse(model.get('shipping_availability_days'));
 
                     if (_.isEmpty(shippingAvailabilityDays) || _.isNull(shippingAvailabilityDays)) {
-                        showMessage('Shipping service doesn\'t support shipment label creation', true, 5000);
+                        showMessage(_.isUndefined(i18n['Shipping service does not support shipment label creation'])?'Shipping service does not support shipment label creation':i18n['Shipping service does not support shipment label creation'], true, 5000);
                         return false;
                     }
 
