@@ -132,6 +132,7 @@ define({
         'Shipment price' : 'Precio de envío',
         'Include Tax' : 'Inpuestos incluidos',
         'Shipping service does not support shipment label creation' : 'El Servicio de entregas no permite la creación de etiquetas de envío',
-        'Are you sure you want to refund this payment?' : '¿Estas seguro que quieres el rembolso de este pago?'
+        'Are you sure you want to refund this payment?' : '¿Estas seguro que quieres el rembolso de este pago?',
+        'Refund shipment order' : 'Solicitar anulación de etiqueta.'
     }
 });
