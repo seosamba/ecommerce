@@ -112,7 +112,7 @@ define([
             if (_.isEmpty(checked)){
                 return false;
             }
-            showConfirm('Are you sure?', function(){
+            showConfirm(_.isUndefined(i18n['Are you sure?'])?'Are you sure?':i18n['Are you sure?'], function(){
                 var self = this,
                     ids = _(checked).pluck('id');
                 Backbone.sync('delete', null, {
