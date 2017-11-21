@@ -6,12 +6,13 @@ define(['backbone',
     'text!../templates/tracking_code.html',
     'text!../templates/refund_dialog.html',
     'text!../templates/shipping_labels_dates_dialog.html',
+    'text!../templates/refund_shipment_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     'moment',
     'accounting'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, i18n, moment, accounting
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, RefundShipmentTmpl, i18n, moment, accounting
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -29,7 +30,8 @@ define(['backbone',
             'change select[name="order-mass-action"]': 'massAction',
             'change input[name="check-order[]"]': 'toggleOrder',
             'change #filter-order-type': 'toggleRecurring',
-            'click .generate-shipping-order-label' : 'generateShippingLabel'
+            'click .generate-shipping-order-label' : 'generateShippingLabel',
+            'click .refund-shipping-order-label' : 'refundShippingLabel'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -71,6 +73,65 @@ define(['backbone',
                 }
             }
             $(e.currentTarget).val(0);
+        },
+        refundShippingLabel: function(e)
+        {
+            e.preventDefault();
+
+            var orderId = $(e.currentTarget).data('order-id'),
+                model = this.orders.get(orderId),
+                self = this;
+
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/getRefundShipmentScreenInfo/',
+                type: 'POST',
+                dataType: 'json',
+                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val()}
+            }).done(function(response){
+                console.log(response);
+                if (response.error == '1') {
+                    showMessage(response.responseText, true, 5000);
+                } else {
+                    var shipmentRefundButton  = _.isUndefined(i18n['Refund']) ? 'Refund':i18n['Refund'],
+                        assignShipmentRefundButtons = {};
+
+                        assignShipmentRefundButtons[shipmentRefundButton] = function() {
+                            $('.ui-button').css('zIndex',"101");
+                        };
+
+                    var dialog = _.template(RefundShipmentTmpl, {
+                            orderId: orderId,
+                            i18n:i18n,
+                            accounting: accounting,
+                            moneyFormat: self.orders.moneyFormat,
+                            shippingTaxRate : self.orders.shippingTaxRate,
+                            defaultTaxes: self.orders.defaultTaxes,
+                            order: self.orders.get(orderId),
+                            shipmentRefundButtonStatus: response.responseText.shipment_refund_button_status,
+                            shipmentRefundScreenDescription: response.responseText.shipment_refund_screen_description
+                        }),
+                        availabilityMonths = [],
+                        availableDateAndTime = [];
+
+
+                    $(dialog).dialog({
+                        dialogClass: 'seotoaster',
+                        width: '50%',
+                        resizable: false,
+                        buttons: assignShipmentRefundButtons,
+                        open: function (event, ui) {
+                            if (response.responseText.shipment_refund_button_status === false) {
+                                $(".ui-dialog-buttonset").remove();
+                            }
+                        },
+                        close: function (event, ui) {
+                            $(this).dialog('destroy');
+                        }
+                    });
+
+
+                }
+            });
         },
         generateShippingLabel: function(e)
         {
