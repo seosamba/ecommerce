@@ -553,7 +553,7 @@ define([
                 showMessage(_.isUndefined(i18n['Product is not saved yet'])?'Product is not saved yet':i18n['Product is not saved yet'], true);
 				return false;
 			}
-            showConfirm('Dragons ahead! Are you sure?', function(){
+            showConfirm(_.isUndefined(i18n['Do you want to delete it?'])?'Do you want to delete it?':i18n['Do you want to delete it?'], function(){
                 self.model.destroy({
                     success: function(model, response){
                         self.products && self.products.pager();

@@ -135,6 +135,7 @@ define({
         'Are you sure you want to refund this payment?' : '¿Estas seguro que quieres el rembolso de este pago?',
         'Are you sure?' : '¿Está seguro?',
         'No available services' : 'Servicio no disponible',
-        'Refund shipment order' : 'Solicitar anulación de etiqueta.'
+        'Refund shipment order' : 'Solicitar anulación de etiqueta.',
+        'Do you want to delete it?' : '¿Desea eliminarlo?'
     }
 });
