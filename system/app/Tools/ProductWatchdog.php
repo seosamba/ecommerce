@@ -113,7 +113,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
         $pathToCropPreview = $this->_websiteConfig['path'] . $this->_websiteConfig['preview'] . 'crop';
         list($folder, $imgName) = explode('/', $this->_object->getPhoto());
         $productImg = $this->_websiteConfig['path'] . $this->_websiteConfig['media'] . $folder . DIRECTORY_SEPARATOR . 'small' . DIRECTORY_SEPARATOR . $imgName;
-        $pagePreviewImg = $savePath . mb_strtolower($uniqName) . '.' . pathinfo($productImg, PATHINFO_EXTENSION);
+        $pagePreviewImg = $savePath . strtolower($uniqName) . '.' . pathinfo($productImg, PATHINFO_EXTENSION);
         if (is_file($productImg) && copy($productImg, $pagePreviewImg)) {
             if (Tools_Image_Tools::resize(
                 $pagePreviewImg,
