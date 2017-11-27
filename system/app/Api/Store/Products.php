@@ -175,6 +175,21 @@ class Api_Store_Products extends Api_Service_Abstract {
 			'field' => 'sku'
 		));
 
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
+
+        if (!empty($productSizeMandatory)) {
+            if (empty($srcData['prodLength']) || !is_numeric($srcData['prodLength'])) {
+                $this->_error(htmlentities($this->_translator->translate('Product length is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodWidth']) || !is_numeric($srcData['prodWidth'])) {
+                $this->_error(htmlentities($this->_translator->translate('Product width is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodDepth']) || !is_numeric($srcData['prodDepth'])) {
+                $this->_error(htmlentities($this->_translator->translate('Product depth is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+        }
+
         if (!$validator->isValid($srcData['sku'])){
 	        $this->_error(htmlentities($this->_translator->translate('You already have a product with this SKU')), self::REST_STATUS_BAD_REQUEST);
         }
@@ -209,6 +224,21 @@ class Api_Store_Products extends Api_Service_Abstract {
 		if (empty($srcData)){
 			$this->_error('Empty data');
 		}
+
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
+
+        if (!empty($productSizeMandatory)) {
+            if (empty($srcData['prodLength']) || !is_numeric($srcData['prodLength'])) {
+                $this->_error(htmlentities($this->_translator->translate('Product length is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodWidth']) || !is_numeric($srcData['prodWidth'])) {
+                $this->_error(htmlentities($this->_translator->translate('Product width is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodDepth']) || !is_numeric($srcData['prodDepth'])) {
+                $this->_error(htmlentities($this->_translator->translate('Product depth is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+        }
 		if (!empty($id)){
 			$products = $this->_productMapper->find($id);
 			!is_array($products) && $products = array($products);
