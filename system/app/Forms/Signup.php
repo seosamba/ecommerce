@@ -35,6 +35,14 @@ class Forms_Signup extends Zend_Form {
 
         $this->setDecorators(array('FormElements', 'Form'));
 
+        $this->addElement(new Zend_Form_Element_Checkbox(array(
+            'name'       => 'subscribed',
+            'id'         => 'user-subscribed',
+            'label'      => 'Subscribe',
+            'required'   => false,
+            'value'      => $this->_subscribed
+        )));
+
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'firstname',
             'label'    => 'First Name',
@@ -62,7 +70,7 @@ class Forms_Signup extends Zend_Form {
         $this->addElement(new Zend_Form_Element_Select(array(
                 'name'         => 'mobilecountrycode',
                 'label'        => null,
-                'multiOptions' => Tools_System_Tools::getCountryPhoneCodesList(),
+                'multiOptions' => Tools_System_Tools::getFullCountryPhoneCodesList(true, array(), true),
                 'value'        => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'),
                 'style'        => 'width: 41.667%;'
         )));

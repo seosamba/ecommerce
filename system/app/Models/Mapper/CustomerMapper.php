@@ -155,7 +155,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
         $select = $userDbTable->select()
 				->setIntegrityCheck(false)
-				->from('user',array('id', 'full_name', 'email', 'reg_date', 'mobile_phone' ))
+				->from('user',array('id', 'full_name', 'email', 'reg_date', 'mobile_phone', 'mobile_country_code', 'subscribed'))
 				->joinLeft(
 					array('cart' => 'shopping_cart_session'),
                     $joinCondition,
@@ -222,9 +222,52 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'state',
                 'zip',
                 'phone',
-                'mobile'
+                'phonecountrycode',
+                'phone_country_code_value',
+                'mobile',
+                'mobilecountrycode',
+                'mobile_country_code_value'
             ))
             ->where($where);
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
+
+    /**
+     * @param $userId
+     * @return mixed
+     */
+    public function getUserAddressWithPhonesByUserId($userId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('c.user_id = ?', $userId);
+
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('ua.attribute = ?', 'mobilecountrycode');
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('ua.attribute <> ?', '');
+        $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('c.mobile LIKE ?', '%+%');
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('c' => 'shopping_customer_address'), array(
+            'c.id' ,
+            'c.user_id',
+            'c.address_type',
+            'c.firstname',
+            'c.lastname',
+            'c.company',
+            'c.email',
+            'c.address1',
+            'c.address2',
+            'c.country',
+            'c.city',
+            'c.state',
+            'c.zip',
+            'c.phone',
+            'c.mobile',
+            'c.mobilecountrycode',
+            'c.mobile_country_code_value',
+            'c.phonecountrycode',
+            'c.phone_country_code_value',
+            'oldMobileCountryCode' => 'ua.value'
+        ))
+            ->join(array('ua' => 'user_attributes'), 'c.user_id=ua.user_id', array())
+            ->where($where);
+
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
@@ -248,12 +291,64 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'c_adr.state',
                 'c_adr.zip',
                 'c_adr.phone',
+                'c_adr.phonecountrycode',
+                'c_adr.phone_country_code_value',
                 'c_adr.mobile',
+                'c_adr.mobilecountrycode',
+                'c_adr.mobile_country_code_value'
             ))
             ->joinLeft(array('s_cart' => 'shopping_cart_session'), 's_cart.shipping_address_id = c_adr.id', array('shippingId' => '(GROUP_CONCAT(s_cart.id))'))
             ->joinLeft(array('b_cart' => 'shopping_cart_session'), 'b_cart.billing_address_id = c_adr.id', array('billingId' => '(GROUP_CONCAT(b_cart.id))'))
             ->where($where)->group('c_adr.id');
 
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
+
+    public function getUserAttributesNames(){
+       $select = $this->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'));
+
+       $attributes = $this->getDbTable()->getAdapter()->fetchAll($select);
+       return $attributes;
+    }
+
+    public function getUsersWithGroupsList()
+    {
+        $userAttributes =  $this->getUserAttributesNames();
+
+        $columns = array(
+            'u.email',
+            'u.role_id',
+            'u.full_name',
+            'u.last_login',
+            'u.reg_date',
+            'u.ipaddress',
+            'u.referer',
+            'u.gplus_profile',
+            'u.mobile_country_code',
+            'u.mobile_country_code_value',
+            'u.mobile_phone',
+            'u.notes',
+            'u.timezone',
+            'u.desktop_country_code',
+            'u.desktop_country_code_value',
+            'u.desktop_phone',
+            'sg.groupName',
+            'u.subscribed'
+        );
+        if(!empty($userAttributes)){
+            foreach ($userAttributes as $attribute){
+                $columns[] = '(GROUP_CONCAT(CASE WHEN `ua`.`attribute`=\''. $attribute['attribute'] .'\' THEN `ua`.`value` END))';
+            }
+        }
+
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('u' => 'user'), $columns)
+            ->joinLeft(array('scg' => 'shopping_customer_info'), 'u.id = scg.user_id', array())
+            ->joinLeft(array('sg' => 'shopping_group'), 'sg.id = scg.group_id', array())
+            ->joinLeft(array('ua' => 'user_attributes'), 'ua.user_id = u.id', array())
+            ->group('u.id')
+            ->where('role_id <> "' . Tools_Security_Acl::ROLE_SUPERADMIN . '"');
+
+        $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
+        return $users;
     }
 }

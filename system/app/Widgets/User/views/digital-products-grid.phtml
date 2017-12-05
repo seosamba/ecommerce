@@ -1,0 +1,24 @@
+<div id="user-recurring-grid">
+    <input type="hidden" class="secureToken" name="secureToken"
+           value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
+    <table id="user-recurring-orders-table" border="1" class="widget">
+        <thead>
+        <tr class="user-orders-title-table">
+            <th><?php echo $this->translate('Order date'); ?></th>
+            <th><?php echo $this->translate('Download link'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php if (!empty($this->digitalProducts)): ?>
+            <?php foreach ($this->digitalProducts as $digitalProduct): ?>
+                <tr>
+                    <td><?php echo date("d-M-Y", strtotime($digitalProduct['orderDate'])); ?></td>
+                    <td>
+                        <a href="<?php echo $this->websiteUrl . 'api/store/digitalproductsdownload/id/' . $digitalProduct['file_hash'] . '/cartId/' . $digitalProduct['cartId'] . '/productId/' . $digitalProduct['product_id'] . '/'; ?>"
+                           target="_blank"><?php echo $digitalProduct['display_file_name']; ?></a></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>

@@ -63,7 +63,7 @@ $this->headLink()
 </script>
 
 <script id="optionLibraryTemplate" type="text/template">
-	<option value="-1" disabled="disabled" selected="selected">select from library</option>
+	<option value="-1" disabled="disabled" selected="selected"><?php echo $this->translate('select from library'); ?></option>
     <% _.each(items, function (item){ %>
         <option value="<%= item.id %>"><%= item.title %></option>
     <% }); %>
@@ -201,7 +201,7 @@ $this->headLink()
                 </div>
                 <div class="grid_5">
                     <label class="grid_3 alpha omega" for="product-list-search"><?php echo $this->translate('Search');?>:</label>
-                    <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="by name, sku, mpn or tags"/>
+                    <input class="grid_9 mt5px" type="text" name="product-list-search" id="product-list-search" placeholder="<?php echo $this->translate('by name, sku, mpn or tags');?>"/>
                 </div>
             </div>
             <div id="product-list-holder" class="content-footer scroll pl2 pr2 column_8 full-width" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
@@ -217,7 +217,6 @@ $this->headLink()
                 <div class="closebutton">
                     <a class="hide-block ticon-chevron-left" href="javascript:;" onclick="$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
                 </div>
-                <?php /*echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'mt5px grid_4 push_4'), $this->imageDirList); */?>
             </div>
             <div id="image-list" class="content-footer grid_12 list-images"><span class="spinner"></span></div>
             <div class="footer grid_12 text-center">
@@ -234,24 +233,13 @@ $this->headLink()
             <span class="arrow left ticon-arrow-left3"></span>
             <span class="arrow right ticon-arrow-right3"></span>
             <ul class="header">
-                <li><a href="#main-tab"><?php echo $this->translate('Main'); ?></a></li>
-                <li><a href="#tag-tab"><?php echo $this->translate('Product tags'); ?></a></li>
-                <li><a href="#options-tab"><?php echo $this->translate('Product options'); ?></a></li>
-                <li><a href="#related-tab"><?php echo $this->translate('Cross selling'); ?></a></li>
-                <li><a href="#coupon-tab"><?php echo $this->translate('Coupons'); ?></a></li>
-                <li><a href="#group-pricing-tab"><?php echo $this->translate('Groups'); ?></a></li>
-                <?php foreach ($this->plugins as $plugin) : ?>
-                    <?php
-                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
-                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
-                    if(!$pluginClass->hasMethod('tabAction')){
-                        continue;
-                    }
-                    ?>
-                    <li>
-                        <a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $plugin; ?>/run/tab/"><?php echo $this->translate($title); ?></a>
-                    </li>
-                <?php endforeach; ?>
+                <?php foreach ($this->configTabs as $configTab) :?>
+                    <?php if ($configTab['type'] === 'internal') :?>
+                        <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
+                    <?php else :?>
+                        <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $configTab['tabId'];?>/run/tab/""><?php echo $this->translate($configTab['tabName']);?></a></li>
+                    <?php endif;?>
+                <?php endforeach;?>
             </ul>
         </div>
         <!--------- MAIN INFO -------------->
@@ -273,7 +261,11 @@ $this->headLink()
                         </div>
                     </div>
                     <div class="grid_9 alpha omega mt0px">
-                        <label class="grid_7 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                        <label class="grid_3 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                        <label class="grid_4 omega fs12 text-right pointer">
+                            <?php echo $this->translate('This product is digital'); ?>
+                            <input type="checkbox" id="digital-product"/>
+                        </label>
                         <label class="grid_5 omega fs12 text-right pointer">
                             <?php echo $this->translate('This product is enabled'); ?>
                             <input type="checkbox" id="product-enabled"/>
@@ -282,11 +274,11 @@ $this->headLink()
                     </div>
                     <div class="grid_3 alpha omega labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id'); ?>"/>
-                        <label class="grid_4 alpha omega" for="product-sku">SKU</label>
+                        <label class="grid_4 alpha omega" for="product-sku"><?php echo $this->translate('SKU'); ?></label>
                     </div>
                     <div class="grid_4 omega labeled mt1-5em">
-                        <input class="grid_9 alpha omega fl-right" type="text" id="product-mpn" data-reflection="mpn" placeholder="manufacturer partnumber"/>
-                        <label class="grid_3 alpha omega" for="product-mpn">MPN</label>
+                        <input class="grid_9 alpha omega fl-right" type="text" id="product-mpn" data-reflection="mpn" placeholder="<?php echo $this->translate('manufacturer partnumber'); ?>"/>
+                        <label class="grid_3 alpha omega" for="product-mpn"><?php echo $this->translate('MPN'); ?></label>
                     </div>
                     <div class="grid_2 omega labeled mt1-5em">
                         <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
@@ -310,16 +302,36 @@ $this->headLink()
                         <?php
                             $lexemShortDescription = $this->translate('Short description');
                             $lexemFullDescription = $this->translate('Full description');
+                            $lexemDimensions = $this->translate('Dimensions');
                         ?>
                         <ul>
                             <li><a href="#short-description-tab"><?php echo $lexemShortDescription; ?></a></li>
                             <li><a href="#full-description-tab"><?php echo $lexemFullDescription; ?></a></li>
+                            <li><a href="#product-dimensions-tab"><?php echo $lexemDimensions; ?></a></li>
                         </ul>
                         <div id="short-description-tab">
                             <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
                         </div>
                         <div id="full-description-tab">
                             <textarea id="product-fullDescription" data-reflection="fullDescription" placeholder="<?php echo $lexemFullDescription; ?>"></textarea>
+                        </div>
+
+                        <div id="product-dimensions-tab">
+                            <div class="grid_4 omega alpha cl-both labeled mt1-5em">
+                                <span class="grid_12"><?php echo $this->translate('Width'); ?></span>
+                                <input class="grid_8 alpha omega" type="text" id="product-width" data-reflection="prodWidth" placeholder="0.00">
+                                <label class="grid_4 alpha omega" for="product-width"><?php echo $this->translate((!empty($this->generalConfig['lengthUnit']) ? $this->generalConfig['lengthUnit'] :'')); ?></label>
+                            </div>
+                            <div class="grid_4 omega labeled mt1-5em">
+                                <span class="grid_12"><?php echo $this->translate('Length'); ?></span>
+                                <input class="grid_8 alpha omega" type="text" id="product-length" data-reflection="prodLength" placeholder="0.00">
+                                <label class="grid_4 alpha omega" for="product-length"><?php echo $this->translate((!empty($this->generalConfig['lengthUnit']) ? $this->generalConfig['lengthUnit'] :'')); ?></label>
+                            </div>
+                            <div class="grid_4 omega labeled mt1-5em clear-both">
+                                <span class="grid_12"><?php echo $this->translate('Depth'); ?></span>
+                                <input class="grid_8 alpha omega" type="text" id="product-depth" data-reflection="prodDepth" placeholder="0.00">
+                                <label class="grid_4 alpha omega" for="product-depth"><?php echo $this->translate((!empty($this->generalConfig['lengthUnit']) ? $this->generalConfig['lengthUnit'] :'')); ?></label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -351,7 +363,7 @@ $this->headLink()
                     }?>
                     <div class="<?php echo $grid;?> alpha labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
-                        <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->generalConfig['currency']; ?></label>
+                        <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->translate($this->generalConfig['currency']); ?></label>
                     </div>
                     <div class="<?php echo $grid;?> omega labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="&infin;">
@@ -431,6 +443,11 @@ $this->headLink()
             <?php echo $this->partial('product/grouping-price.phtml'); ?>
         </div>
 
+        <div id="digital-product-tab">
+            <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
+            <?php echo $this->partial('product/digital-product.phtml'); ?>
+        </div>
+
         <div class="footer grid_12">
             <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
             <button class="btn ticon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
@@ -441,11 +458,8 @@ $this->headLink()
 
 <script>
 	$(function () {
-		$('#manage-product,#description-box, #preview-box').tabs({
-            beforeLoad: function(event, ui){
-                //showSpinner('#merchandising');
-            }
-        });
+		$('#manage-product,#description-box, #preview-box').tabs({});
+
 		$(".ui-tabs-nav, .ui-tabs-nav > *")
 				.removeClass("ui-corner-all")
 				.addClass("ui-corner-top");

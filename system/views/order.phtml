@@ -6,6 +6,9 @@
             'headerText' => $this->translate('Order #').' '. $this->order->getId()
         )
     ); ?>
+    <?php if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+        <link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" rel="stylesheet" media="all">
+    <?php endif;?>
     <div class="content scroll">
         <div id="order-view" class="toaster-widget clearfix">
             <div class="grid_12 mb20px">
@@ -32,11 +35,13 @@
                             echo $billingAddress['city'] .
                                     ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');
                             ?></span>
-                        <span class="region"><?php $state = Tools_Geo::getStateById($billingAddress['state']); echo $state['state']; ?></span>
+                        <span class="region">
+                            <?php echo Tools_Geo::getStateByParam($billingAddress['state']);?>
+                        </span>
                         <span class="postal-code"><?php echo $billingAddress['zip'];?></span>
                         <br/>
                         <span><?php echo $countryList[$billingAddress['country']];?></span>
-                        <span class="phone"><?php echo $billingAddress['phone'];?></span>
+                        <span class="phone"><?php echo $billingAddress['phone_country_code_value'].$billingAddress['phone'];?></span>
                         <?php if ($this->order->getGateway()) : ?>
                             <br/>
                             <span><?php echo $this->translate('Payment Method');?>
@@ -60,9 +65,9 @@
                         <span class="last-name"><?php echo $shippingAddress['lastname'];?></span>
                         <br/>
                         <?php if ($this->order->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
-                            <span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                            <span class="phone"><?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
                             <br/>
-                            <span class="phone"><?php echo $shippingAddress['mobile'];?></span>
+                            <span class="phone"><?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
                         <?php else:?>
                             <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
                             <br/>
@@ -74,7 +79,7 @@
                             <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
                             <br/>
                             <span><?php echo $countryList[$shippingAddress['country']];?></span>
-                            <span class="phone"><?php echo $shippingAddress['phone'];?></span>
+                            <span class="phone"><?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
                         <?php endif;?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>
@@ -137,7 +142,7 @@
             </div>
 
             <div class="grid_12 mt20px mb20px">
-                <div class="title"><?php echo $this->translate("Order #%1\$s content", $this->order->getId());?></div>
+                <div class="title"><?php echo $this->translate('Order'); ?><?php echo $this->translate(" #%1\$s content", $this->order->getId());?></div>
                 <table style="width: 100%">
                     <thead>
                     <tr>
@@ -291,9 +296,9 @@
                             <?php $taxName = 'Tax'; ?>
                         <?php endif;?>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td><?php echo $this->translate('Inc. ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Inc.') . ' ' . $taxName;?>:</td>
                         <?php else: ?>
-                            <td><?php echo $this->translate('Total ' . $taxName);?>:</td>
+                            <td><?php echo $this->translate('Total') . ' ' . $taxName;?>:</td>
                         <?php endif;?>
                         <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>

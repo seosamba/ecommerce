@@ -1,4 +1,6 @@
 <form id="edit-coupon" class="grid_12 alpha omega background">
+
+    <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <!--    <p class="blockquote gray-light-bg fs12 mb0px">--><?php //echo $this->translate('Set parameters for promotional coupons from this screen.  These coupons are valid only when this specific product is part of an order.'); ?><!--</p>-->
 
     <?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>

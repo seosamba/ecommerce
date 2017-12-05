@@ -447,6 +447,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		return $inventoryCount > 0 ? $inventoryCount : $this->_translator->translate('Out of stock');
 	}
 
+    private function  _renderQty() {
+        $inventoryCount = $this->_product->getInventory();
+        if (is_null($inventoryCount)){
+            return '&infin;';
+        }
+        return $inventoryCount > 0 ? $inventoryCount : '0';
+    }
+
     private function _renderFreeShipping() {
         $freeShippingInfo = '';
         $freeShipping = $this->_product->getFreeShipping();

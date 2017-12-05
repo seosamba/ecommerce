@@ -229,7 +229,7 @@ $this->headLink()
                         <legend class="background large p5px"><?php echo $this->translate("Carrier tracking url's"); ?></legend>
                         <div class="labeled" style="text-align: center; line-height: 30px;">
                             <button class="btn success grid_6 alpha fl-left ticon-plus trackingUrl-plus" for="cartamount"><?php echo $this->translate($this->trackingUrlForm->getElement('addNew')->getLabel()); ?></button>
-                            <span>OR</span>
+                            <span><?php echo $this->translate('OR');?></span>
                             <?php echo $this->trackingUrlForm->getElement('quantity')->setAttrib('class', 'grid_5 omega fl-right')->renderViewHelper(); ?>
                         </div>
                         <div class="add-new row-close" data-current="" style="display: none;">
@@ -254,7 +254,7 @@ $this->headLink()
 </div>
 
 <div class="footer grid_12">
-    <?php echo $this->formButton('submit', 'Save', array('class' => 'btn ticon-save', 'type' => 'submit')); ?>
+    <?php echo $this->formButton('submit', $this->translate('Save'), array('class' => 'btn ticon-save', 'type' => 'submit')); ?>
 </div>
 
 <script>

@@ -27,6 +27,12 @@ class Forms_BasicsSettings extends Zend_Form {
 			'multiOptions' => Tools_Misc::$_weightUnits
 		));
 
+        $this->addElement('select', 'lengthUnit', array(
+            'label'	=> 'Length unit',
+            'class' => 'grid_6 alpha',
+            'multiOptions' => Tools_Misc::$_lengthUnits
+        ));
+
 		$this->addElement('checkbox', 'forceSSLCheckout', array(
 			'label' => 'Force use HTTPS for checkout page',
             'class' => 'grid_6 alpha'

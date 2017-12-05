@@ -17,6 +17,9 @@ define([
             this.model.set('productLimit',$('input[name=product-limit]').val());
             this.model.set('currency', $('input[name=system-currency]').val());
             this.$el.html(this.template(this.model.toJSON()));
+            if (typeof _checkboxRadio === "function")  {
+                _checkboxRadio();
+            }
             return this;
         },
         toggle: function(e){
