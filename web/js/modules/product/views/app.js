@@ -482,7 +482,7 @@ define([
         renderBrands: function(brands){
             var tmpl = _.template("<% _.each(brands, function(brand){ %><option value='<%= brand %>'><%= brand %></option><% }); %>");
 
-            $('#product-brand').html('<option value="-1" disabled>Select a brand</option>' +
+            $('#product-brand').html('<option value="-1" disabled="disable">'+ _.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand'] +'</option>' +
                 tmpl({brands: _.sortBy(brands, function(v){ return v.toLowerCase();}) })
             );
 

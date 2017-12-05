@@ -128,14 +128,14 @@
 'Brand' => 'Marca',
 'select brand' => 'Selecciona marca',
 'create new' => 'crear nueva',
-'Choose your image' => 'Seleccina una imagen',
+'Choose your image' => 'Selecciona una imagen',
 'Free Shipping' => 'Envío gratis',
 'Taxes' => 'Imp.',
-'Default' => 'Dor defecto',
+'Default' => 'Por defecto',
 'Non taxable' => 'No imponible',
 'Alternative' => 'Alternativa',
 'Alternative 2' => 'Alternativa 2',
-'Select a product page template' => 'Selecciónó de plantilla producto',
+'Select a product page template' => 'Selecciona una plantilla',
 'SKU' => 'SKU',
 'item id' => 'id del articulo',
 'MPN' => 'EAN',
@@ -509,7 +509,12 @@
 'No more products found' => 'No se encuentran más producto',
 'Discount with min. order' => 'Descuento con número mínimo de pedidos',
 'Free shipping with min. order' => 'Envío grátis con número mínimo de pedidos',
-'Payment gateway doesn\'t have refund functionality' => '¿La pasarela de pago no tiene funcionalidad de rembolso?'
+'Payment gateway doesn\'t have refund functionality' => '¿La pasarela de pago no tiene funcionalidad de rembolso?',
+'Product length is missing. Please check product dimensions tab.' => 'No se ha establecido la longitud del producto. Por favor revise la pestaña de dimensiones de producto.',
+'Product width is missing. Please check product dimensions tab.' => 'No se ha establecido el ancho del producto. Por favor revise la pestaña de dimensiones de producto.',
+'Product depth is missing. Please check product dimensions tab.' => 'No se ha establecido la profundidad del producto. Por favor revise la pestaña de dimensiones de producto.',
+'Product weight is missing.' => 'No se ha establecido el peso del producto.',
+'You already have a product with this SKU' => 'Ya existe un producto con este SKU'
 
 
 );

@@ -134,6 +134,7 @@ define({
         'Refund shipment order' : 'Solicitar anulación de etiqueta.',
         'Are you sure?' : '¿Está seguro?',
         'No available services' : 'Servicio no disponible',
-        'Do you want to delete it?' : '¿Desea eliminarlo?'
+        'Do you want to delete it?' : '¿Desea eliminarlo?',
+        'Select a brand' : 'Selecciona marca'
     }
 });
