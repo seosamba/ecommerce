@@ -256,6 +256,21 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 		if (!empty($id)){
 			$products = $this->_productMapper->find($id);
+
+			if($products instanceof Models_Model_Product){
+                if($products->getSku() != $srcData['sku']){
+                    $validator = new Zend_Validate_Db_NoRecordExists(array(
+                        'table' => 'shopping_product',
+                        'field' => 'sku'
+                    ));
+
+                    if (!$validator->isValid($srcData['sku'])){
+                        $this->_error(htmlentities($this->_translator->translate('You already have a product with this SKU')), self::REST_STATUS_BAD_REQUEST);
+                    }
+
+                }
+            }
+
 			!is_array($products) && $products = array($products);
 			if (isset($srcData['id'])){
 				unset($srcData['id']);
