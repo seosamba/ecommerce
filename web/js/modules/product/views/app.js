@@ -553,7 +553,7 @@ define([
                 showMessage(_.isUndefined(i18n['Product is not saved yet'])?'Product is not saved yet':i18n['Product is not saved yet'], true);
 				return false;
 			}
-            showConfirm(_.isUndefined(i18n['Do you want to delete it?'])?'Do you want to delete it?':i18n['Do you want to delete it?'], function(){
+            showConfirmCustom(_.isUndefined(i18n['Do you want to delete it?'])?'Do you want to delete it?':i18n['Do you want to delete it?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 self.model.destroy({
                     success: function(model, response){
                         self.products && self.products.pager();
@@ -802,7 +802,7 @@ define([
         },
         massDelete: function(ids){
             var self = this;
-            showConfirm('Oh man... Really?', function(){
+            showConfirmCustom(_.isUndefined(i18n['Oh man... Really?'])?'Oh man... Really?':i18n['Oh man... Really?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (!_.isEmpty(ids)) {
                     $.ajax({
                         url: self.products.paginator_core.url()+'id/'+ids.join(','),

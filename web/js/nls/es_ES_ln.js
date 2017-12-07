@@ -137,6 +137,12 @@ define({
         'No available services' : 'Servicio no disponible',
         'Refund shipment order' : 'Solicitar anulación de etiqueta.',
         'Do you want to delete it?' : '¿Desea eliminarlo?',
-        'Select a brand' : 'Selecciona marca'
+        'Select a brand' : 'Selecciona marca',
+        'Do you want delete file?' : '¿Desea eliminar el fichero?',
+        'Are you sure want to delete?' : '¿Desea eliminarlo?',
+        'Oh man... Really?' : '¿Estas seguro?',
+        'Do you really want to delete this column? (Data will be deleted!)' : '¿Desea eliminar la columna? ( Datos serán borrados)',
+        'This product was sold. Do you really want to delete this file?' : '¿Producto vendido. Desea eliminar el fichero?',
+        'Digital products found' : 'Productos digitales encontrados'
     }
 });

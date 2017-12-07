@@ -1,6 +1,7 @@
 define([
-	'backbone'
-], function(Backbone){
+	'backbone',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(Backbone, i18n){
 	
 	var TagView = Backbone.View.extend({
 		tagName: 'li',
@@ -25,7 +26,7 @@ define([
 		kill: function(){
 			var confirmMsg = $('#new-tag').data('confirmmsg').replace('%tag%', this.model.get('name')),
                 model = this.model;
-			showConfirm(confirmMsg, function(){ model.destroy(); });
+            showConfirmCustom(confirmMsg, _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){ model.destroy(); });
 		},
 		edit: function(){
             this.buffer = this.nameInput.text();

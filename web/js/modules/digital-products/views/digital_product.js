@@ -91,10 +91,10 @@ define([
                 cid = $(e.currentTarget).data('cid'),
                 productId = self.digitalProducts.get(cid).get('product_id');
 
-            showConfirm('Do you want delete file?', function() {
+            showConfirmCustom(_.isUndefined(i18n['Do you want delete file?'])?'Do you want delete file?':i18n['Do you want delete file?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function() {
                 $.post($('#website_url').val() + 'plugin/shopping/run/checkDigitalProductUsage/', {'productId': productId}, function(response){
                     if(response.responseText.productSold) {
-                        showConfirm(_.isUndefined(i18n['This product was sold. Do you really want to delete this file?'])?'This product was sold. Do you really want to delete this file?':i18n['This product was sold. Do you really want to delete this file?'], function () {
+                        showConfirmCustom(_.isUndefined(i18n['This product was sold. Do you really want to delete this file?'])?'This product was sold. Do you really want to delete this file?':i18n['This product was sold. Do you really want to delete this file?'],  _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function () {
                             self.digitalProducts.get(cid).destroy({
                                 success: function (model, response) {
                                     showMessage(response.message);

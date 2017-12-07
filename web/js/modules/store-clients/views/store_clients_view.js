@@ -112,7 +112,7 @@ define([
             if (_.isEmpty(checked)){
                 return false;
             }
-            showConfirm(_.isUndefined(i18n['Are you sure?'])?'Are you sure?':i18n['Are you sure?'], function(){
+            showConfirmCustom(_.isUndefined(i18n['Are you sure?'])?'Are you sure?':i18n['Are you sure?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 var self = this,
                     ids = _(checked).pluck('id');
                 Backbone.sync('delete', null, {
@@ -561,7 +561,7 @@ define([
         deleteCustomAttr:function(){
             $('body').on('click', 'th.customer-attribute span', function(e){
                 var attrName = $(this).parent().data('custom');
-                showConfirm('Do you really want to delete this column? (Data will be deleted!)', function(){
+                showConfirmCustom(_.isUndefined(i18n['Do you really want to delete this column? (Data will be deleted!)'])?'Do you really want to delete this column? (Data will be deleted!)':i18n['Do you really want to delete this column? (Data will be deleted!)'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                     $.ajax({
                         url: $('#website_url').val() + 'api/store/customer/attr/' + attrName,
                         method: 'DELETE',

@@ -372,7 +372,7 @@ $(function(){
         if(selectName === '0'){
             return false;
         }
-        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+        showConfirmCustom('<?php echo $this->translate('Are you sure want to delete?');?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>', function() {
             var selectId = row.data('current');
             row.removeClass( "add-new-config" );
             row.hide();
@@ -517,7 +517,7 @@ $(function(){
         var locationRow = $(this).closest('.pickup-location-conf-row'),
             locationId = locationRow.data('pickup-location-row');
 
-        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+        showConfirmCustom('<?php echo $this->translate('Are you sure want to delete?');?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>', function() {
             $.ajax({
                url: $('#website_url').val()+'plugin/shopping/run/deletePickupLocation/locationId/'+locationId,
                type: 'DELETE',

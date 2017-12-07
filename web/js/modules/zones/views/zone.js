@@ -1,8 +1,9 @@
 define([
 	'underscore',
 	'backbone',
-    '../../common/views/listitem'
-], function(_, Backbone, ListItemView){
+    '../../common/views/listitem',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(_, Backbone, ListItemView, i18n){
 
     var zoneTabView = Backbone.View.extend({
         template: _.template($('#zoneTemplate').text()),
@@ -55,7 +56,7 @@ define([
         setZip: function(e){
             this.model.set('zip', e.target.value.match(/^[\-0-9A-z*?]{2,10}$/gm));
         }
-    })
+    });
 	
 	return zoneTabView;
 });

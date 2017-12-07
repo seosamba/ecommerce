@@ -476,7 +476,7 @@
 'Set item specific promotions in the "add/edit product" screen.' => 'Set item specific promotions in the "add/edit product" screen.',
 'Recurring payments' => 'Recurring payments',
 'Customers groups' => 'Customers groups',
-'Digital products' => 'Digital products',
+'Digital products' => 'Productos digitales',
 'Activate autoship frequencies' => 'Activate autoship frequencies',
 'Day' => 'Day',
 'Week' => 'Week',
@@ -514,7 +514,21 @@
 'Product width is missing. Please check product dimensions tab.' => 'No se ha establecido el ancho del producto. Por favor revise la pestaña de dimensiones de producto.',
 'Product depth is missing. Please check product dimensions tab.' => 'No se ha establecido la profundidad del producto. Por favor revise la pestaña de dimensiones de producto.',
 'Product weight is missing.' => 'No se ha establecido el peso del producto.',
-'You already have a product with this SKU' => 'Ya existe un producto con este SKU'
+'You already have a product with this SKU' => 'Ya existe un producto con este SKU',
+'yes' => 'sí',
+'Yes' => 'Sí',
+'No' => 'No',
+'no' => 'no',
+'File uploaded' => 'Fichero subido correctamente',
+'File type not supported' => 'Tipo de fichero no soportado',
+'File remove issue' => 'No es posible eliminar el fichero',
+'File removed' => 'Fichero eliminado',
+'Attach new file to your product' => 'Adjuntar un nuevo fichero',
+'Uploading' => 'Subiendo',
+'Valid from' => 'Validó desde',
+'Expires on' => 'Caducó',
+'Authorized # of downloads' => '# de descargas autorizadas',
+'Display label' => 'Mostrar etiqueta'
 
 
 );
