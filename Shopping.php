@@ -89,6 +89,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const SHIPPING_FLATRATE = 'flatrateshipping';
 
+    const SHIPPING_TRACKING_URL = 'trackingurl';
+
 	const SHIPPING_TOC_STATUS = 'checkoutShippingTocRequire';
 
 	const SHIPPING_TOC_LABEL = 'checkoutShippingTocLabel';
@@ -421,6 +423,25 @@ class Shopping extends Tools_Plugins_Abstract {
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
+                $desktopPhone = isset($data['phone']) ? $data['phone'] : '';
+                $mobileCountryCode = isset($data['mobilecountrycode']) ? $data['mobilecountrycode'] : '';
+                $mobileCountryCodeValue = isset($data['mobile_country_code_value']) ? $data['mobile_country_code_value'] : null;
+                $desktopCountryCode = isset($data['phonecountrycode']) ? $data['phonecountrycode'] : '';
+                $desktopCountryCodeValue = isset($data['phone_country_code_value']) ? $data['phone_country_code_value'] : null;
+                $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+                $defaultMobilePhoneCountryCode = $shoppingConfig['country'];
+                $subscribed = isset($data['subscribed']) ? $data['subscribed'] : '0';
+
+                if (empty($desktopCountryCode)) {
+                    $desktopCountryCode = $defaultMobilePhoneCountryCode;
+                }
+
+                $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+                $userDefaultTimezone = $configHelper->getConfig('userDefaultTimezone');
+
+                if (empty($data['timezone']) && !empty($userDefaultTimezone)) {
+                    $customer->setTimezone($userDefaultTimezone);
+                }
 				if (!empty($data['customerPassword'])) {
                     $password = $data['customerPassword'];
                 } else {
@@ -431,7 +452,13 @@ class Shopping extends Tools_Plugins_Abstract {
 						->setFullName($fullname)
 						->setIpaddress($_SERVER['REMOTE_ADDR'])
                         ->setMobilePhone($mobilePhone)
-						->setPassword($password);
+                        ->setMobileCountryCode($mobileCountryCode)
+                        ->setMobileCountryCodeValue($mobileCountryCodeValue)
+                        ->setDesktopPhone($desktopPhone)
+                        ->setDesktopCountryCode($desktopCountryCode)
+                        ->setDesktopCountryCodeValue($desktopCountryCodeValue)
+						->setPassword($password)
+                        ->setSubscribed($subscribed);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
@@ -660,14 +687,17 @@ class Shopping extends Tools_Plugins_Abstract {
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
                 $listFolders = $this->_processNotEmptyDirs($listFolders);
-				$listFolders = array('select folder') + array_combine($listFolders, $listFolders);
+                $dolderDefaultSelectName = $this->_translator->translate('select folder');
+				$listFolders = array($dolderDefaultSelectName) + array_combine($listFolders, $listFolders);
 			}
 			$this->_view->imageDirList = $listFolders;
 
-			$this->_view->plugins = array();
-			foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
+            $plugins = array();
+            $pluginsToReorder = array();
+            $configTabs = Tools_Misc::$_productConfigTabs;
+            foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
-					array_push($this->_view->plugins, $plugin->getName());
+					array_push($plugins, $plugin->getName());
 				}
 			}
 
@@ -678,7 +708,33 @@ class Shopping extends Tools_Plugins_Abstract {
 				}
 			}
 
+            if (!empty($plugins)) {
+                foreach ($plugins as $plugin) {
+                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                    if (!$pluginClass->hasMethod('tabAction')) {
+                        continue;
+                    }
+                    if ($pluginClass->hasConstant('TAB_ORDER')) {
+                        $pluginsToReorder[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external', 'tabOrderId' => $pluginClass->getConstant('TAB_ORDER'));
+                    } else {
+                        $configTabs[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external');
+                    }
+                }
+            }
+
+            if (!empty($pluginsToReorder)) {
+                foreach ($pluginsToReorder as $pluginOrder) {
+                    $elementsAfterPosition = array_slice($configTabs, $pluginOrder['tabOrderId'] -1);
+                    $elementsBeforePosition = array_slice($configTabs, 0, $pluginOrder['tabOrderId'] -1);
+                    $elementsBeforePosition[] = array('tabId' => $pluginOrder['tabId'], 'tabName' => $pluginOrder['tabName'], 'type' => 'external');
+                    $configTabs = array_merge($elementsBeforePosition, $elementsAfterPosition);
+                }
+            }
+
+            $this->_view->plugins = $plugins;
 			$this->_view->websiteConfig = $this->_websiteConfig;
+            $this->_view->configTabs = $configTabs;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $this->_layout->content = $this->_view->render('product.phtml');
@@ -751,11 +807,12 @@ class Shopping extends Tools_Plugins_Abstract {
             $brands = $this->_request->getParam('brands');
             $attributes = $this->_request->getParam('attributes');
             $price = $this->_request->getParam('price');
+            $sort = $this->_request->getParam('sort');
 
             $offset = intval($nextPage) * $limit;
         if (empty($dragListId)) {
-            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("enabled='1'", $order, $offset, $limit,
-                null, $tags, $brands, false, false, $attributes, $price);
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("p.enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($dragListId);
@@ -786,14 +843,14 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
+        $tagsPart = (!empty($tags) && is_array($tags)) ? implode(',', $tags) : '';
+
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
 			if (!empty($productsListDataResult)) {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT)), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
-
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
             } else {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
-
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart)));
             }
 
             $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
@@ -827,9 +884,12 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($option == 'country') {
 				$countries = Tools_Geo::getCountries(true);
 				$option = $countries[$config[$option]];
-			} else {
-				$option = $config[$option];
-			}
+            } elseif ($option == 'state') {
+                $stateId = $config[$option];
+                $option = Tools_Geo::getStateById($stateId)['name'];
+            } else {
+                $option = $config[$option];
+            }
 		} else {
 			if ($option == 'state') {
 				$option = '';
@@ -855,6 +915,9 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->noLayout = true;
 			$allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
             $this->_view->allGroups = $allGroups;
+            $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
+            $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
+            $this->_view->phoneCountryCodes = Tools_System_Tools::getFullCountryPhoneCodesList(true, array(), true);
             $attributes = Application_Model_Mappers_UserMapper::getInstance();
             $query = $attributes->getDbTable()->getAdapter()->select()->distinct()->from('user_attributes', array('attribute'))->where('attribute LIKE ?', 'customer_%');
             $customerAttributes = $attributes->getDbTable()->getAdapter()->fetchCol($query);
@@ -947,6 +1010,12 @@ class Shopping extends Tools_Plugins_Abstract {
 				$this->_view->invoicePlugin = 1;
 			}
 		}
+
+        $this->_view->phoneCountryCodes = Tools_System_Tools::getFullCountryPhoneCodesList(true, array(), true);
+
+        $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
+        $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
+        $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -1196,15 +1265,38 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->currency = $this->_configMapper->getConfigParam('currency');
 			$this->_view->couponTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
 
-			$this->_view->plugins = array();
+            $plugins = array();
+            $pluginsToReorder = array();
+            $configTabs = Tools_Misc::$_merchandisingConfigTabs;
 			foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				$tags = $plugin->getTags();
 				if (!empty($tags) && in_array('merchandising', $tags)) {
-					array_push($this->_view->plugins, $plugin->getName());
+					array_push($plugins, $plugin->getName());
 				}
 				unset($tags);
 			}
 
+            if (!empty($plugins)) {
+                foreach ($plugins as $plugin) {
+                    $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
+                    $title = $pluginClass->hasConstant('DISPLAY_NAME') ? $pluginClass->getConstant('DISPLAY_NAME') : ucfirst($plugin);
+                    if ($pluginClass->hasConstant('WITHOUT_TAB')) {
+                        continue;
+                    }
+                    if ($pluginClass->hasConstant('TAB_MERCHANDISE_ORDER')) {
+                        $pluginsToReorder[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external', 'tabOrderId' => $pluginClass->getConstant('TAB_MERCHANDISE_ORDER'));
+                    } else {
+                        $configTabs[] = array('tabId' => $plugin, 'tabName' => $title, 'type' => 'external');
+                    }
+                }
+            }
+
+            if (!empty($pluginsToReorder)) {
+                $configTabs = Tools_Misc::reorderPluginTabs($pluginsToReorder, $configTabs);
+            }
+
+            $this->_view->configTabs = $configTabs;
+            $this->_view->plugins = $plugins;
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
@@ -1518,7 +1610,8 @@ class Shopping extends Tools_Plugins_Abstract {
             },
             $pickupLocationCategory->fetchAll()
         );
-        $this->_view->countries = Tools_Geo::getCountries();
+        $this->_view->countries = Tools_Geo::getCountries(true);
+        $this->_view->defaultCountries = Zend_Locale::getTranslationList('territory', 'en_GB', 2);
         $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGELOCATION;
         $this->_layout->content = $this->_view->render('pickup-location.phtml');
         $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
@@ -1842,6 +1935,27 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->success($this->_translator->translate('Shipping address updated'));
     }
 
+    /**
+     * Check if this digital product was sold
+     */
+    public function checkDigitalProductUsageAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $productId = filter_var($this->_request->getParam('productId', false), FILTER_SANITIZE_NUMBER_INT);
+            if ($productId) {
+
+                $productSold = Store_Mapper_DigitalProductMapper::getInstance()->checkDigitalProductInCart($productId);
+                $sold = false;
+                if (!empty($productSold)) {
+                    $sold = true;
+                }
+                $this->_responseHelper->success(array('productSold' => $sold));
+            }
+            $this->_responseHelper->fail('Product id missed');
+        }
+        $this->_responseHelper->fail('not authorized');
+    }
+
 
     /**
      * Refund order (full or partial order refund)
@@ -1979,13 +2093,13 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
-            if(!empty($data['profileField']) && !empty($data['userId'])){
+            if(!empty($data['fieldName']) && !empty($data['userId'])){
                 $customerToken = '';
                 $countries = Zend_Locale::getTranslationList('territory', null, 2);
                 $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
                 $customerTable = new Models_DbTable_CustomerAddress();
 
-                $data['profileValue'] = trim($data['profileValue']);
+                $data['fieldValue'] = trim($data['fieldValue']);
                 if(empty($data['clientToken'])){
                     $this->_responseHelper->fail();
                 }
@@ -1994,32 +2108,39 @@ class Shopping extends Tools_Plugins_Abstract {
                 $customerAddress = $customerMapper->getUserAddressByUserId($data['userId'], $data['clientToken']);
                 if(!empty($customerAddress)) {
                     foreach ($customerAddress as $value) {
-                        if($data['profileField'] === 'country' || $data['profileField'] === 'state') {
-                            if ($data['profileField'] === 'country') {
-                                $currentCountry = array_search($data['profileValue'], $countries);
+                        if($data['fieldName'] === 'country' || $data['fieldName'] === 'state' || $data['fieldName'] === 'mobile' || $data['fieldName'] === 'phone') {
+                            if ($data['fieldName'] === 'country') {
+                                $currentCountry = array_search($data['fieldValue'], $countries);
                                 if ($currentCountry === false) {
                                     $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken'], 'respText'=> $this->_translator->translate('Can\'t update Country')));
                                 }
-                                $value[$data['profileField']] = $currentCountry;
+                                $value[$data['fieldName']] = $currentCountry;
                             }
-                            if ($data['profileField'] === 'state') {
-                                $currentState = Tools_Geo::getStateByCode($data['profileValue']);
+                            if ($data['fieldName'] === 'state') {
+                                $currentState = Tools_Geo::getStateByCode($data['fieldValue']);
                                 if ($currentState === null) {
                                     $this->_responseHelper->fail(array('oldToken'=> $data['clientOldToken'], 'respText'=> $this->_translator->translate('Can\'t update State')));
                                 }
-                                $value[$data['profileField']] = $currentState['id'];
+                                $value[$data['fieldName']] = $currentState['id'];
                             }
+                            if ($data['fieldName'] === 'mobile') {
+                                $value['mobilecountrycode'] = $data['countryCode'];
+                                $value['mobile'] = $data['fieldValue'];
+                                $value = $this->_normalizeMobilePhoneNumber($value);
+                            }
+
+                            if ($data['fieldName'] === 'phone') {
+                                $value['phonecountrycode'] = $data['countryCode'];
+                                $value['phone'] = $data['fieldValue'];
+                                $value = $this->_normalizeMobilePhoneNumber($value);
+                            }
+
                             $addressValues = $value;
 
                         }else{
-                            $value[$data['profileField']] = $data['profileValue'];
+                            $value[$data['fieldName']] = $data['fieldValue'];
 
-                            if($value['address_type'] === 'shipping'){
-                                $value['mobilecountrycode'] = $value['country'];
-                                $value = $this->_normalizeMobilePhoneNumber($value);
-                            }
                             $addressValues = Tools_Misc::clenupAddress($value);
-
                         }
                         $customerToken = $customerMapper->addAddress($currentCustomer, $addressValues, $data['addressType']);
                         $currentCartSession = $cartSessionMapper->fetchOrders($currentCustomer->getId());
@@ -2039,7 +2160,6 @@ class Shopping extends Tools_Plugins_Abstract {
                                 $where = $customerTable->getAdapter()->quoteInto('id =?', $data['clientToken']);
                                 $customerTable->delete($where);
                             }
-
                     }
                     $this->_responseHelper->success(array('newToken'=> $customerToken, 'oldToken'=> $data['clientOldToken']));
                 }
@@ -2050,10 +2170,21 @@ class Shopping extends Tools_Plugins_Abstract {
 
     private function _normalizeMobilePhoneNumber($arr) {
         if(!empty($arr['mobile'])) {
-            $countryPhoneCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
-            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryPhoneCode);
+            $countryMobileCode = Zend_Locale::getTranslation($arr['mobilecountrycode'], 'phoneToTerritory');
+            $countryPhoneCode = Zend_Locale::getTranslation($arr['phonecountrycode'], 'phoneToTerritory');
+            $arr['mobile'] = preg_replace('~\D~ui', '', $arr['mobile']);
+            $mobileNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['mobile'], $countryMobileCode);
             if ($mobileNumber !== false) {
-                $arr['mobile'] = $mobileNumber;
+                $arr['mobile_country_code_value'] = '+'.$countryMobileCode;
+            }
+            if (empty($arr['phone'])) {
+                $arr['phone'] = '';
+            } else {
+                $arr['phone'] = preg_replace('~\D~ui', '', $arr['phone']);
+            }
+            $phoneNumber = Apps_Tools_Twilio::normalizePhoneNumberToE164($arr['phone'], $countryPhoneCode);
+            if ($phoneNumber !== false) {
+                $arr['phone_country_code_value'] = '+'.$countryPhoneCode;
             }
         }
         return $arr;
@@ -2079,9 +2210,11 @@ class Shopping extends Tools_Plugins_Abstract {
     public function getUsersAction()
     {
         if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
-            $users = Models_Mapper_CustomerMapper::getInstance()->getUsersWithGroupsList();
+            $userMapper = Models_Mapper_CustomerMapper::getInstance();
+
+            $users = $userMapper->getUsersWithGroupsList();
             if (!empty($users)) {
-                $exportResult = Tools_System_Tools::arrayToCsv($users, array(
+                $headers = array(
                     $this->_translator->translate('E-mail'),
                     $this->_translator->translate('Role'),
                     $this->_translator->translate('Full name'),
@@ -2090,10 +2223,27 @@ class Shopping extends Tools_Plugins_Abstract {
                     $this->_translator->translate('IP address'),
                     $this->_translator->translate('Referer url'),
                     $this->_translator->translate('Google plus profile'),
+                    $this->_translator->translate('Mobile country code'),
+                    $this->_translator->translate('Mobile country code value'),
                     $this->_translator->translate('Mobile phone'),
                     $this->_translator->translate('Notes'),
-                    $this->_translator->translate('Group Name')
-                ));
+                    $this->_translator->translate('Timezone'),
+                    $this->_translator->translate('Desktop country code'),
+                    $this->_translator->translate('Desktop country code value'),
+                    $this->_translator->translate('Desktop phone'),
+                    $this->_translator->translate('Group Name'),
+                    $this->_translator->translate('Subscribed')
+                );
+
+                $userAttributes = $userMapper->getUserAttributesNames();
+
+                if(!empty($userAttributes)){
+                    foreach ($userAttributes as $attribute){
+                        $headers[] = 'attribute_'.$attribute['attribute'];
+                    }
+                }
+
+                $exportResult = Tools_System_Tools::arrayToCsv($users, $headers);
                 if ($exportResult) {
                     $usersArchive = Tools_System_Tools::zip($exportResult);
 
@@ -2105,6 +2255,58 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             exit;
         }
+    }
+
+    public static function processPhoneCodes($userModel){
+        if($userModel instanceof Application_Model_Models_User){
+            $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+            $customerAddressToProcess = $customerMapper->getUserAddressWithPhonesByUserId($userModel->getId());
+            $customerTable = new Models_DbTable_CustomerAddress();
+
+            if (!empty($customerAddressToProcess)) {
+                foreach ($customerAddressToProcess as $customerAddressToProcesKey => $customerAddressToProces) {
+                    $customer = $customerMapper->find($userModel->getId());
+
+                    $oldMobileCountryCode = $customerAddressToProces['oldMobileCountryCode'];
+                    $mobileCountryPhoneCode = Zend_Locale::getTranslation($oldMobileCountryCode, 'phoneToTerritory');
+                    $mobileCountryCodeValue = '+' . $mobileCountryPhoneCode;
+                    $mobilePhone = str_replace($mobileCountryCodeValue, '', $customerAddressToProces['mobile']);
+
+                    $customerAddressToProces['mobilecountrycode'] = $oldMobileCountryCode;
+                    $customerAddressToProces['mobile_country_code_value'] = $mobileCountryCodeValue;
+                    $customerAddressToProces['mobile'] = $mobilePhone;
+
+                    unset($customerAddressToProces['oldMobileCountryCode']);
+                    $customerToken = $customerMapper->addAddress($customer, $customerAddressToProces, null);
+
+                    $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+
+                    $currentCartSession = $cartSessionMapper->fetchOrders($customer->getId());
+
+                    if(!empty($currentCartSession) && (!empty($customerToken))) {
+                        foreach ($currentCartSession as $cartSession) {
+                            $newToken = array();
+                            if($customerAddressToProces['address_type'] === 'shipping' && $cartSession->getShippingAddressId() == $customerAddressToProces['id']) {
+                                $newToken['shipping_address_id'] = $customerToken;
+                            } else if($cartSession->getBillingAddressId() == $customerAddressToProces['id']){
+                                $newToken['billing_address_id'] = $customerToken;
+                            }
+                            $newToken['updated_at'] = date(DATE_ATOM);
+                            if(!empty($newToken['shipping_address_id']) || !empty($newToken['billing_address_id'])){
+                                $cartSessionMapper->updateAddress($customerAddressToProces['id'], $customerAddressToProces['address_type'], $newToken);
+                            }
+                        }
+                    }
+
+                    $lastData =  $customerMapper->getUserAddressByUserId($customer->getId(),$customerAddressToProces['id']);
+                    if(!empty($lastData) && ($customerAddressToProces['id'] !== $customerToken)){
+                        $where = $customerTable->getAdapter()->quoteInto('id =?', $customerAddressToProces['id']);
+                        $customerTable->delete($where);
+                    }
+                }
+            }
+        }
+
     }
 
 }

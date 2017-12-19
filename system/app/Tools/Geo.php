@@ -11,12 +11,17 @@ class Tools_Geo {
 	 * Method builds a list of world countries with ISO codes and country name translated to current locale language
 	 * @static
 	 * @param bool $pairs If true returns plain array of ISOcode => CountryName pairs
+     * @param bool $withDefaultLocale return list of countries with en_GB locale
 	 * @return array list of world countries
 	 * @todo add caching
 	 */
-	public static function getCountries($pairs = false) {
+	public static function getCountries($pairs = false, $withDefaultLocale = false) {
         $data = array();
-        $countriesNames = Zend_Locale::getTranslationList('territory', null, 2);
+        if ($withDefaultLocale === true) {
+            $countriesNames = Zend_Locale::getTranslationList('territory', 'en_GB', 2);
+        } else {
+            $countriesNames = Zend_Locale::getTranslationList('territory', null, 2);
+        }
 
         $countryTable = new Models_DbTable_Country();
         $countryList = $countryTable->fetchAll()->toArray();
@@ -142,6 +147,24 @@ class Tools_Geo {
             'lat' => $json['results'][0]['geometry']['location']['lat'],
             'lng' => $json['results'][0]['geometry']['location']['lng']
         );
+    }
+
+    /**
+     * Get state
+     *
+     * @param string $stateParam state id or state abbr
+     * @return string
+     */
+    public static function getStateByParam($stateParam)
+    {
+        if (!empty($stateParam) && is_numeric($stateParam)) {
+            $state = Tools_Geo::getStateById($stateParam);
+            return $state['state'];
+        }  elseif ($stateParam) {
+            return $stateParam;
+        }
+
+        return '';
     }
 
 }

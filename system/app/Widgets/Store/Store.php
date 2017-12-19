@@ -99,6 +99,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 	 */
 	protected function _makeOptionOrders() {
 		if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)){
+            $translator = Zend_Registry::get('Zend_Translate');
 			$this->_view->noLayout = true;
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
@@ -108,7 +109,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $shippingServices = array('');
             if(!empty($shippingPlugins)){
                 foreach($shippingPlugins as $shippingPlugin){
-                   $shippingServices[$shippingPlugin['name']] = $shippingPlugin['name'];
+                   $shippingServices[$shippingPlugin['name']] = $translator->translate($shippingPlugin['name']);
                 }
                 $shippingServices = array_merge(array(''=>'shipping carrier'), $shippingServices);
             }

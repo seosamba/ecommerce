@@ -19,6 +19,7 @@ Plugin widgets.
     {$product:mpn} - Displays the product mnp. MPN = Manufacturer Part Number is the product code assigned by the manufacturer.
     {$product:url} - Displays the product page URL.
     {$product:tags} - Displays selected product tags.
+    {$product:qty} - Displays quantity of product.
     {$product:options} - Displays product options as a drop-down list, text field, a set of check boxes or a set of radio buttons.
                          Can be displayed both on the product page and in the products list.
     {$product:description[:_short_|full]} - Displays a short or a full description of the product.
@@ -32,11 +33,12 @@ Plugin widgets.
         sometext - custom text inside span element
 
 2. Product list widget.
-    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date]]]} - Creates a list of products using the same tags.
+    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc} - Creates a list of products using the same tags.
     template_name - template name for the product list
     tagnames-tag1,tag2,...,tagN - filtering by product tags
     brands-brand1,brand2,...,brandN - filtering by product brands
-    order-name,price,brand,date - sorting of the list by: name, price, brand and date
+    order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
+    desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 

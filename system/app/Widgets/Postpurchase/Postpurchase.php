@@ -318,6 +318,14 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * @return mixed
+     */
+    protected function _renderUserId()
+    {
+        return $this->_cart->getUserId();
+    }
+
+    /**
      * Return shipping service type
      *
      * @return mixed
@@ -807,9 +815,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                 }
                 if (self::ADDRESS_MOBILE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
                    return str_replace('+', '', $addressData[$addressKey]);
+                } elseif(self::ADDRESS_MOBILE === $addressKey) {
+                    return $addressData['mobile_country_code_value'].$addressData[$addressKey];
                 }
                 if (self::ADDRESS_PHONE === $addressKey && in_array(self::CLEAN_CART_PARAM, $this->_options)) {
                     return str_replace('+', '', $addressData[$addressKey]);
+                } elseif(self::ADDRESS_PHONE === $addressKey) {
+                    return $addressData['phone_country_code_value'].$addressData[$addressKey];
                 }
                 return $addressData[$addressKey];
             }
@@ -822,11 +834,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      * @return string
      */
     protected function getState($stateId) {
-        $state = Tools_Geo::getStateById($stateId);
-        if (!empty($state['state'])) {
-            return $state['state'];
-        }
-        return '';
+        return Tools_Geo::getStateByParam($stateId);
     }
 
 }

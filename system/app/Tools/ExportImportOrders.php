@@ -136,7 +136,11 @@ class Tools_ExportImportOrders
             'shipping_lastname',
             'shipping_company',
             'shipping_email',
+            'shipping_phonecountrycode',
+            'shipping_phone_country_code_value',
             'shipping_phone',
+            'shipping_mobilecountrycode',
+            'shipping_mobile_country_code_value',
             'shipping_mobile',
             'shipping_country',
             'shipping_city',
@@ -148,7 +152,11 @@ class Tools_ExportImportOrders
             'billing_lastname',
             'billing_company',
             'billing_email',
+            'billing_phonecountrycode',
+            'billing_phone_country_code_value',
             'billing_phone',
+            'billing_mobilecountrycode',
+            'billing_mobile_country_code_value',
             'billing_mobile',
             'billing_country',
             'billing_city',
@@ -397,7 +405,11 @@ class Tools_ExportImportOrders
                         $shippingAddress['lastname'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_lastname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_lastname']]] : '';
                         $shippingAddress['company'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_company']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_company']]] : '';
                         $shippingAddress['email'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_email']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_email']]] : '';
+                        $shippingAddress['phonecountrycode'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_phonecountrycode']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_phonecountrycode']]] : '';
+                        $shippingAddress['phone_country_code_value'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_phone_country_code_value']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_phone_country_code_value']]] : '';
                         $shippingAddress['phone'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_phone']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_phone']]] : '';
+                        $shippingAddress['mobilecountrycode'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_mobilecountrycode']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_mobilecountrycode']]] : '';
+                        $shippingAddress['mobile_country_code_value'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_mobile_country_code_value']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_mobile_country_code_value']]] : '';
                         $shippingAddress['mobile'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_mobile']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_mobile']]] : '';
                         $shippingAddress['country'] = $shippingCountry;
                         $shippingAddress['city'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_city']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_city']]] : '';
@@ -439,7 +451,11 @@ class Tools_ExportImportOrders
                         $billingAddress['lastname'] = isset($ordersHeaders[$importOrdersConfigFields['billing_lastname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_lastname']]] : '';
                         $billingAddress['company'] = isset($ordersHeaders[$importOrdersConfigFields['billing_company']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_company']]] : '';
                         $billingAddress['email'] = isset($ordersHeaders[$importOrdersConfigFields['billing_email']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_email']]] : '';
+                        $billingAddress['phonecountrycode'] = isset($ordersHeaders[$importOrdersConfigFields['billing_phonecountrycode']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_phonecountrycode']]] : '';
+                        $billingAddress['phone_country_code_value'] = isset($ordersHeaders[$importOrdersConfigFields['billing_phone_country_code_value']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_phone_country_code_value']]] : '';
                         $billingAddress['phone'] = isset($ordersHeaders[$importOrdersConfigFields['billing_phone']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_phone']]] : '';
+                        $billingAddress['mobilecountrycode'] = isset($ordersHeaders[$importOrdersConfigFields['billing_mobilecountrycode']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_mobilecountrycode']]] : '';
+                        $billingAddress['mobile_country_code_value'] = isset($ordersHeaders[$importOrdersConfigFields['billing_mobile_country_code_value']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_mobile_country_code_value']]] : '';
                         $billingAddress['mobile'] = isset($ordersHeaders[$importOrdersConfigFields['billing_mobile']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_mobile']]] : '';
                         $billingAddress['country'] = $billingCountry;
                         $billingAddress['city'] = isset($ordersHeaders[$importOrdersConfigFields['billing_city']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_city']]] : '';
@@ -595,7 +611,7 @@ class Tools_ExportImportOrders
             'product_tax_price' => array(
                 'label' => 'product_tax_price',
                 'checked' => 1,
-                'label_name' => $translator->translate('Product tax price')
+                'label_name' => $translator->translate('Price inclusive taxes')
             ),
             'product_qty' => array(
                 'label' => 'product_qty',
@@ -707,15 +723,45 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Shipping email')
             ),
+            'shipping_phonecountrycode' => array(
+                'label' => 'shipping_phonecountrycode',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping phone country code')
+            ),
+            'shipping_phone_country_code_value' => array(
+                'label' => 'shipping_phone_country_code_value',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping phone country code value')
+            ),
             'shipping_phone' => array(
                 'label' => 'shipping_phone',
                 'checked' => 1,
                 'label_name' => $translator->translate('Shipping phone')
             ),
+            'shipping_phone_full' => array(
+                'label' => 'shipping_phone_full',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping phone full')
+            ),
+            'shipping_mobilecountrycode' => array(
+                'label' => 'shipping_mobilecountrycode',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping mobile country code')
+            ),
+            'shipping_mobile_country_code_value' => array(
+                'label' => 'shipping_mobile_country_code_value',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping mobile country code value')
+            ),
             'shipping_mobile' => array(
                 'label' => 'shipping_mobile',
                 'checked' => 1,
                 'label_name' => $translator->translate('Shipping mobile')
+            ),
+            'shipping_mobile_full' => array(
+                'label' => 'shipping_mobile_full',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping mobile full')
             ),
             'shipping_country' => array(
                 'label' => 'shipping_country',
@@ -767,15 +813,45 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Billing email')
             ),
+            'billing_phonecountrycode' => array(
+                'label' => 'billing_phonecountrycode',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing phone country code')
+            ),
+            'billing_phone_country_code_value' => array(
+                'label' => 'billing_phone_country_code_value',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing phone country code value')
+            ),
             'billing_phone' => array(
                 'label' => 'billing_phone',
                 'checked' => 1,
                 'label_name' => $translator->translate('Billing phone')
             ),
+            'billing_phone_full' => array(
+                'label' => 'billing_phone_full',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing phone full')
+            ),
+            'billing_mobilecountrycode' => array(
+                'label' => 'billing_mobilecountrycode',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing mobile country code')
+            ),
+            'billing_mobile_country_code_value' => array(
+                'label' => 'billing_mobile_country_code_value',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing mobile country code value')
+            ),
             'billing_mobile' => array(
                 'label' => 'billing_mobile',
                 'checked' => 1,
                 'label_name' => $translator->translate('Billing mobile')
+            ),
+            'billing_mobile_full' => array(
+                'label' => 'billing_mobile_full',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing mobile full')
             ),
             'billing_country' => array(
                 'label' => 'billing_country',
@@ -806,6 +882,16 @@ class Tools_ExportImportOrders
                 'label' => 'billing_address2',
                 'checked' => 1,
                 'label_name' => $translator->translate('Billing address 2')
+            ),
+            'coupon_code' => array(
+                'label' => 'coupon_code',
+                'checked' => 1,
+                'label_name' => $translator->translate('Coupon code')
+            ),
+            'groupName' => array(
+                'label' => 'groupName',
+                'checked' => 1,
+                'label_name' => $translator->translate('Client group')
             )
         );
     }
@@ -842,7 +928,11 @@ class Tools_ExportImportOrders
             'Doe',
             'Joe company',
             'jondoe@gmail.com',
+            'US',
+            '+1',
             '18002221222',
+            'US',
+            '+1',
             '18002221222',
             'US',
             'CALIFORNIA CITY',
@@ -854,7 +944,11 @@ class Tools_ExportImportOrders
             'Doe',
             'Joe company',
             'jondoe@gmail.com',
+            'US',
+            '+1',
             '18002221222',
+            'US',
+            '+1',
             '18002221222',
             'US',
             'CALIFORNIA CITY',

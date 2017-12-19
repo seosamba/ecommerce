@@ -100,9 +100,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'updated_at' => 'order.updated_at',
             'status' => 'order.status',
             'total_products' => 'COUNT(DISTINCT oc.id)',
-            'sku' => '(GROUP_CONCAT(DISTINCT(sp.sku)))',
-            'mpn' => '(GROUP_CONCAT(DISTINCT(sp.mpn)))',
-            'product_name' => '(GROUP_CONCAT(DISTINCT(sp.name)))',
+            'sku' => '(GROUP_CONCAT(sp.sku))',
+            'mpn' => '(GROUP_CONCAT(sp.mpn))',
+            'product_name' => '(GROUP_CONCAT(sp.name))',
             'product_price' => '(GROUP_CONCAT(oc.price))',
             'product_tax' => '(GROUP_CONCAT(oc.tax))',
             'product_tax_price' => '(GROUP_CONCAT(oc.tax_price))',
@@ -128,8 +128,14 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'shipping_lastname' => 's_adr.lastname',
             'shipping_company' => 's_adr.company',
             'shipping_email' => 's_adr.email',
+            'shipping_phonecountrycode' => 's_adr.phonecountrycode',
+            'shipping_phone_country_code_value' => 's_adr.phone_country_code_value',
             'shipping_phone' => 's_adr.phone',
+            'shipping_phone_full' => 'CONCAT(s_adr.phone_country_code_value, s_adr.phone)',
+            'shipping_mobilecountrycode' => 's_adr.mobilecountrycode',
+            'shipping_mobile_country_code_value' => 's_adr.mobile_country_code_value',
             'shipping_mobile' => 's_adr.mobile',
+            'shipping_mobile_full' => 'CONCAT(s_adr.mobile_country_code_value, s_adr.mobile)',
             'shipping_country' => 's_adr.country',
             'shipping_city' => 's_adr.city',
             'shipping_state' => 'sls_s.name',
@@ -140,14 +146,22 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'billing_lastname' => 'b_adr.lastname',
             'billing_company' => 'b_adr.company',
             'billing_email' => 'b_adr.email',
+            'billing_phonecountrycode' => 's_adr.phonecountrycode',
+            'billing_phone_country_code_value' => 's_adr.phone_country_code_value',
             'billing_phone' => 'b_adr.phone',
+            'billing_phone_full' => 'CONCAT(s_adr.phone_country_code_value, s_adr.phone)',
+            'billing_mobilecountrycode' => 's_adr.mobilecountrycode',
+            'billing_mobile_country_code_value' => 's_adr.mobile_country_code_value',
             'billing_mobile' => 'b_adr.mobile',
+            'billing_mobile_full' => 'CONCAT(s_adr.mobile_country_code_value, s_adr.mobile)',
             'billing_country' => 'b_adr.country',
             'billing_city' => 'b_adr.city',
             'billing_state' => 'sls_b.name',
             'billing_zip' => 'b_adr.zip',
             'billing_address1' => 'b_adr.address1',
-            'billing_address2' => 'b_adr.address2'
+            'billing_address2' => 'b_adr.address2',
+            'coupon_code' => '(GROUP_CONCAT(DISTINCT(scs.coupon_code)))',
+            'groupName' => 'sg.groupName',
         );
 
         if (!empty($excludeFields)) {
@@ -195,6 +209,21 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             ->joinLeft(
                 array('sls_b' => 'shopping_list_state'),
                 'sls_b.id = b_adr.state',
+                array('')
+            )
+            ->joinLeft(
+                array('scs' => 'shopping_coupon_sales'),
+                'scs.cart_id = order.id',
+                array('')
+            )
+            ->joinLeft(
+                array('sci' => 'shopping_customer_info'),
+                'sci.user_id = u.id',
+                array('')
+            )
+            ->joinLeft(
+                array('sg' => 'shopping_group'),
+                'sg.id = sci.group_id',
                 array('')
             )
             ->group('order.id');
@@ -309,12 +338,14 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 							$filterWhere = '(';
 							foreach ($val as $status) {
 								$filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.status = ?', $status['name']);
-								if ($status[Tools_FilterOrders::GATEWAY_QUOTE]) {
-									$filterWhere .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('order.gateway = ?', Tools_FilterOrders::GATEWAY_QUOTE);
-								} else {
-									$filterWhere .= ' AND (' .$this->getDbTable()->getAdapter()->quoteInto('order.gateway <> ?', Tools_FilterOrders::GATEWAY_QUOTE);
-									$filterWhere .= ' OR order.gateway IS NULL)';
-								}
+                                if (!$status[Tools_FilterOrders::GATEWAY_QUOTE] && empty($status['alliasOnlyQuote'])) {
+                                    $filterWhere .= ' AND (' .$this->getDbTable()->getAdapter()->quoteInto('order.gateway <> ?', Tools_FilterOrders::GATEWAY_QUOTE);
+                                    $filterWhere .= ' OR order.gateway IS NULL)';
+                                }
+                                if($status['alliasOnlyQuote']){
+                                    $filterWhere .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('order.gateway = ?', Tools_FilterOrders::GATEWAY_QUOTE);
+                                }
+
 								$filterWhere .= ') OR (';
 							}
 							$filterWhere = rtrim($filterWhere, ' OR (');

@@ -72,7 +72,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			'price'             => $model->getPrice(),
 			'tax_class'         => $model->getTaxClass(),
 			'inventory'         => is_numeric($model->getInventory()) ? $model->getInventory() : null,
-            'free_shipping'     => $model->getFreeShipping()
+            'free_shipping'     => $model->getFreeShipping(),
+            'is_digital'        => $model->getIsDigital(),
+            'prod_length'       => $model->getProdLength(),
+            'prod_depth'        => $model->getProdDepth(),
+            'prod_width'        => $model->getProdWidth()
 		);
 
 		if ($model->getId()){
@@ -154,7 +158,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $strictTagsCount = false,
         $organicSearch = false,
         $attributes = array(),
-        $price = array()
+        $price = array(),
+        $sort = null
+
     ) {
         $entities = array();
 
@@ -163,11 +169,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
             ->group('p.id');
 
-        if (!is_null($order)) {
-			if(is_array($order) && ($key = array_search('p.sku', $order)) !== false) {
-				unset($order[$key]);
-				$select->order('ABS(p.sku)');
-			}
+        if ((!is_null($order)) && (is_array($order)) && (!is_null($sort))) {
+            foreach ($order as $key => $ord){
+                $order[$key] = $ord . ' ' . $sort;
+            }
 			$select->order($order);
         }
 
@@ -588,6 +593,24 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->from('shopping_product', array('count' => 'COUNT(id)'))
             ->where('weight = 0 OR weight IS NULL');
         $result = $this->getDbTable()->getAdapter()->fetchAll($select);
+        return $result[0]['count'];
+    }
+
+    /**
+     * Get products quantity with empty param
+     *
+     * @param string $paramName shopping product table field name
+     * @return mixed
+     * @throws Exception
+     */
+    public function countProductsWithoutParam($paramName)
+    {
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array('count' => 'COUNT(id)'))
+            ->where($paramName.' = 0 OR '.$paramName.' IS NULL');
+        $result = $this->getDbTable()->getAdapter()->fetchAll($select);
+
         return $result[0]['count'];
     }
 

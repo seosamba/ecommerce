@@ -4,6 +4,11 @@
 <script>
 	$.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
 </script>
+<?php
+$this->headScript()
+    ->appendFile($this->websiteUrl . 'system/js/external/jquery/plugins/maskedinput/jquery.maskedinput.js');
+
+?>
 <div class="clearfix profile-header">
 	<div class="grid_5">
 		<div class="grid_4 text-center profile-picture">
@@ -23,20 +28,20 @@
                     <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
                 <?php endif;?>
             </h4>
-			<p class="client-info"><?php echo $this->translate("%1\$s since %2\$s", $this->customer->getRoleId(), date('jS F, Y', strtotime($this->customer->getRegDate())) );?></p>
+			<p class="client-info">  <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?></p>
 			<p class="client-info"><?php
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
 					if ($lastSeen < 7) {
-						$lastSeenStamp = date('l', strtotime($lastSeen.' '.$this->translate(' days ago')));
+						$lastSeenStamp = date('l', strtotime($this->translate('days').' '.$lastSeen.' '.$this->translate('ago')));
 					} else {
-						$lastSeenStamp = $lastSeen.' '.$this->translate(' days ago');
+						$lastSeenStamp = $this->translate('days').' '.$lastSeen.' '.$this->translate('ago');
 					}
 				} else {
 					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
-				echo $this->translate("Last seen: %1\$s", $lastSeenStamp );
+				echo $this->translate("Last seen:") . ' ' . $lastSeenStamp;
 				?></p>
             <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                 <h4 class="client-info client-notes grid_12">
@@ -58,7 +63,7 @@
 					<span class="postal-code"><?php echo $billingAddressDefault['zip'];?></span>
                     <?php if(isset($billingAddressDefault['mobile'])):?>
                         <br />
-                        <span class="mobile"><?php echo $billingAddressDefault['mobile'];?></span>
+                        <span class="mobile"><?php echo $billingAddressDefault['mobile_country_code_value'].$billingAddressDefault['mobile'];?></span>
                     <?php endif;?>
 				</div>
 			<?php endif;?>
@@ -71,7 +76,7 @@
 					<span class="postal-code"><?php echo $shippingAddressDefault['zip'];?></span>
                     <?php if(isset($shippingAddressDefault['mobile'])):?>
                         <br />
-                        <span class="mobile"><?php echo $shippingAddressDefault['mobile'];?></span>
+                        <span class="mobile"><?php echo $billingAddressDefault['mobile_country_code_value'].$shippingAddressDefault['mobile'];?></span>
                     <?php endif;?>
 				</div>
 			<?php endif;?>
@@ -212,29 +217,74 @@
             ?>
         <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)): ?>
         <div><h3><?php echo $this->translate('Type');?>: <?php echo $billingAddress['address_type'];?> <?php echo $this->translate('Order');?> № <?php echo $href; ?></h3>
-		<div class="addr" id="<?php echo $billingAddress['id'];?>" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>">
+		<div class="addr wrap" id="<?php echo $billingAddress['id'];?>" data-old-token="<?php echo $billingAddress['id'];?>" data-client-token="<?php echo $billingAddress['id'];?>" data-client-type="<?php echo $billingAddress['address_type'];?>">
 			<?php echo $this->formHidden('id', $billingAddress['id'], array('id'=>'id_'.$billingAddress['id']));?>
 			<?php echo $this->formHidden('type', $billingAddress['address_type'], array('id'=>'type_'.$billingAddress['id']));?>
             <?php
             $billingAddressData = $billingAddress;
             $id = $billingAddressData['id'];
             $addressType = $billingAddressData['address_type'];
-            unset($billingAddressData['user_id'], $billingAddressData['shippingId'], $billingAddressData['billingId'], $billingAddressData['email'], $billingAddressData['id'], $billingAddressData['address_type']);
+            $mobileCountryCodeValue = $billingAddressData['mobile_country_code_value'];
+            $phoneCountryCodeValue = $billingAddressData['phone_country_code_value'];
+            unset($billingAddressData['user_id'],
+                $billingAddressData['shippingId'],
+                $billingAddressData['billingId'],
+                $billingAddressData['email'],
+                $billingAddressData['id'],
+                $billingAddressData['address_type'],
+                $billingAddressData['phonecountrycode'],
+                $billingAddressData['phone_country_code_value'],
+                $billingAddressData['mobilecountrycode'],
+                $billingAddressData['mobile_country_code_value']
+            );
             ?>
-            <?php foreach($billingAddressData as $key => $val):?>
-                <span class="text-bold"><?php echo $this->translate($key);?>:</span>
-                <?php if($key == 'state'):?>
-                    <span class="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> client-info"><span class="inline-data"><?php echo $state['state'];?></span>
-                <?php elseif($key == 'country'):?>
-                    <span class="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> client-info"><span class="inline-data"><?php echo $country;?></span>
-                <?php else:?>
-                <span class="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> client-info"><span class="inline-data"><?php echo $val;?></span>
-                <?php endif;?>
-                    <input class="edit-profile edit-client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?> edit-client-profile-address-<?php echo $addressType.'-'.$id;?>" style="display:none;" type="text" data-client-param="<?php echo $key;?>" name="edit-client-<?php echo $key;?>" />
-                    <img data-client-param="client-<?php echo $key;?>-<?php echo $addressType.'-'.$id;?>" class="edit-inline-profile edit-<?php echo $id;?>" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
-                </span>
+            <?php foreach ($billingAddressData as $key => $val): ?>
+                <div class="grid_12">
+                    <span class="text-bold grid_2 omega mt15px"><?php echo $this->translate($key); ?>:</span>
+                    <?php if ($key == 'state'): ?>
+                        <input class="grid_10 mt10px alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order"
+                               data-old-value="<?php echo $val; ?>" data-field-name="<?php echo $key; ?>"
+                               value="<?php echo $state['state']; ?>"/>
+                    <?php elseif ($key == 'country'): ?>
+                        <input class="grid_10 mt10px alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order"
+                               data-old-value="<?php echo $val; ?>" data-field-name="<?php echo $key; ?>"
+                               value="<?php echo $country; ?>"/>
+                    <?php elseif ($key == 'mobile'): ?>
+                        <select class="mt10px omega client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> mobile-country-code grid_4 alpha"
+                                data-current-row="<?php echo $key . '-' . $id; ?>"
+                                data-old-value="<?php echo $billingAddress['mobilecountrycode']; ?>"
+                                name="mobile-country-code" data-type="mobile">
+                            <?php foreach ($this->phoneCountryCodes as $phoneCountryCodeAbbr => $phoneCountryCodeVal): ?>
+                                <option <?php if ($billingAddress['mobilecountrycode'] == $phoneCountryCodeAbbr): ?> selected="selected" <?php endif; ?>
+                                        value="<?php echo $phoneCountryCodeAbbr; ?>"><?php echo $phoneCountryCodeVal; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <input data-old-value="<?php echo $val; ?>" data-field-name="<?php echo $key; ?>" type="text"
+                               class="grid_6 mt10px client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order mask-<?php echo $key . '-' . $id; ?>"
+                               name="<?php echo $key; ?>"
+                               value="<?php echo $val; ?>"/>
+                    <?php elseif ($key == 'phone'): ?>
+                        <select class="mt10px omega client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> phone-country-code grid_4 alpha"
+                                data-current-row="<?php echo $key . '-' . $id; ?>"
+                                data-old-value="<?php echo $billingAddress['phonecountrycode']; ?>"
+                                name="phone-country-code" data-type="phone">
+                            <?php foreach ($this->phoneCountryCodes as $phoneCountryCodeAbbr => $phoneCountryCodeVal): ?>
+                                <option <?php if ($billingAddress['phonecountrycode'] == $phoneCountryCodeAbbr): ?> selected="selected" <?php endif; ?>
+                                        value="<?php echo $phoneCountryCodeAbbr; ?>"><?php echo $phoneCountryCodeVal; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <input data-old-value="<?php echo $val; ?>" data-field-name="<?php echo $key; ?>" type="text"
+                               class="grid_6 mt10px client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order mask-<?php echo $key . '-' . $id; ?>"
+                               name="<?php echo $key; ?>"
+                               value="<?php echo $val; ?>"/>
+                    <?php else: ?>
+                        <input class="grid_10 mt10px alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order"
+                               data-field-name="<?php echo $key; ?>" data-old-value="<?php echo $val; ?>"
+                               value="<?php echo $val; ?>"/>
+                    <?php endif; ?>
+                </div>
                 <br/>
-            <?php endforeach;?>
+            <?php endforeach; ?>
         </div>
         </div>
         <?php else:?>
@@ -255,7 +305,7 @@
                         <?php endif;?>
                         <?php if(isset($billingAddress['mobile'])):?>
                             <br />
-                            <span class="mobile"><?php echo $billingAddress['mobile'];?></span>
+                            <span class="mobile"><?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
                         <?php endif;?>
                     </div>
         <?php endif;?>
@@ -391,6 +441,7 @@
         var clientElementData = $(this).closest('.client-info').find('span').text();
         $('.'+editClientElement+' span').hide();
         $('.edit-'+editClientElement).val(clientElementData).show().focus();
+        $('.'+editClientElement).show();
     });
 
     $('.edit-client-profile').on('blur', function(){
@@ -419,50 +470,138 @@
         return false;
     });
 
-    $('.edit-profile').on('blur', function(){
-        var clientEditParam = $(this).data('client-param'),
-            editedValue = $(this).val(),
+    $('.client-info-order').on('change', function(e){
+        e.preventDefault();
+        var thisEl      = $(this),
+            fieldName   = thisEl.data('field-name'),
+            fieldValue  = thisEl.val(),
+            addrRow     = thisEl.closest('.addr'),
+            addrType    = addrRow.data('client-type'),
+            clientToken = addrRow.data('client-token'),
+            oldToken    = addrRow.data('old-token'),
+            oldValue    = thisEl.data('old-value'),
+            countryCode = '';
+
+        if(fieldName == 'mobile' || fieldName == 'phone'){
+            countryCode = $('.client-code-'+fieldName+'-'+addrType+'-'+oldToken).val();
+            fieldValue = fieldValue.replace(/\D/g, '');
+        }
+
+        if(fieldValue != oldValue){
+            showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+                function (){
+                    sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, countryCode, thisEl);
+                }, function () {
+                    var oldVal = thisEl.data('old-value');
+                    thisEl.val(oldVal);
+            });
+        }
+    });
+
+
+
+    $(function() {
+        var mobileMasks = JSON.parse('<?php echo json_encode($this->mobileMasks);?>'),
+            desktopMasks = JSON.parse('<?php echo json_encode($this->desktopMasks);?>'),
+            mobileCountryCodes = $('.mobile-country-code'),
+            phoneCountryCodes = $('.phone-country-code');
+
+        mobileCountryCodes.each(function(key, value){
+            var mobileCountryCode = $(value).val();
+            var currentRowId = $(value).data('current-row');
+
+            if (typeof mobileMasks[mobileCountryCode] !== 'undefined') {
+                $('.mask-'+currentRowId).mask(mobileMasks[mobileCountryCode].mask_value, {autoclear: false});
+            } else {
+                $('.mask-'+currentRowId).mask('(999) 999 9999', {autoclear: false});
+            }
+        });
+
+        phoneCountryCodes.each(function(key, value){
+            var phoneCountryCode = $(value).val();
+            var currentRowId = $(value).data('current-row');
+
+            if (typeof desktopMasks[phoneCountryCode] !== 'undefined') {
+                $('.mask-'+currentRowId).mask(desktopMasks[phoneCountryCode].mask_value, {autoclear: false});
+            } else {
+                $('.mask-'+currentRowId).mask('(999) 999 9999', {autoclear: false});
+            }
+        });
+    });
+
+    $(document).on('change', '.mobile-country-code', function(e) {
+        e.preventDefault();
+        var countryEl = $(e.currentTarget),
+            chosenCountryCode = countryEl.val(),
+            mobileMasks = JSON.parse('<?php echo json_encode($this->mobileMasks);?>'),
+            inputEl = countryEl.next('input.client-info-order');
+
+        if (typeof mobileMasks[chosenCountryCode] !== 'undefined') {
+            inputEl.mask(mobileMasks[chosenCountryCode].mask_value, {autoclear: false});
+        } else {
+            inputEl.mask('(999) 999 9999', {autoclear: false});
+        }
+
+        var fieldName = inputEl.data('field-name'),
+            fieldValue = inputEl.val(),
             addrRow = $(this).closest('.addr'),
             addrType = addrRow.data('client-type'),
             clientToken = addrRow.data('client-token'),
             oldToken = addrRow.data('old-token');
-        showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
-            function (){
-                $.ajax({
-                    type: "POST",
-                    url: $('#website_url').val() + 'plugin/shopping/run/editUserProfileAddress/',
-                    dataType: "json",
-                    data: {
-                        profileField: clientEditParam,
-                        profileValue: editedValue,
-                        userId: $('#userId').val(),
-                        secureToken: $('.secure-token-user').val(),
-                        addressType: addrType,
-                        clientToken: clientToken,
-                        clientOldToken: oldToken
-                    }
-                }).done(function (response) {
-                    var oldToken = response.responseText.oldToken;
-                    if (response.error == 1) {
-                        $('.edit-' + oldToken).css({"display":"inline"});
-                        $('.edit-client-' + clientEditParam + '-' + addrType + '-' + oldToken).css({"display":"none"});
-                        $('.inline-data').css({"display":"inline"});
-                        showMessage(response.responseText.respText, true, 5000);
-                    } else {
-                        var addressId = response.responseText.newToken;
-                        $('#'+oldToken).data('clientToken', addressId).attr('data-client-token',addressId);
-                        $('[data-client-param="client-' + clientEditParam + '-' + addrType + '-'+ oldToken+'"]').show();
-                        $('.edit-client-' + clientEditParam + '-' + addrType + '-'+ oldToken).hide();
-                        $('.client-' + clientEditParam + '-' + addrType + '-'+ oldToken).find('.inline-data').text(editedValue).show();
-                        showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
-                    }
-                });
-            }, function () {
-                $('.edit-' + oldToken).css({"display":"inline"});
-                $('.edit-client-' + clientEditParam + '-' + addrType + '-' + oldToken).css({"display":"none"});
-                $('.inline-data').css({"display":"inline"});
-            });
+
+        sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, chosenCountryCode, inputEl);
     });
+
+    $(document).on('change', '.phone-country-code', function(e) {
+        e.preventDefault();
+        var countryEl = $(e.currentTarget),
+            chosenCountryCode = countryEl.val(),
+            phoneMasks = JSON.parse('<?php echo json_encode($this->desktopMasks);?>'),
+            inputEl = countryEl.next('input.client-info-order');
+
+        if (typeof phoneMasks[chosenCountryCode] !== 'undefined') {
+            inputEl.mask(phoneMasks[chosenCountryCode].mask_value, {autoclear: false});
+        } else {
+            inputEl.mask('(999) 999 9999', {autoclear: false});
+        }
+
+        var fieldName = inputEl.data('field-name'),
+            fieldValue = inputEl.val(),
+            addrRow = $(this).closest('.addr'),
+            addrType = addrRow.data('client-type'),
+            clientToken = addrRow.data('client-token'),
+            oldToken = addrRow.data('old-token');
+
+        sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, chosenCountryCode, inputEl);
+    });
+
+    function sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, countryCode, thisEl) {
+        $.ajax({
+            type: "POST",
+            url: $('#website_url').val() + 'plugin/shopping/run/editUserProfileAddress/',
+            dataType: "json",
+            data: {
+                fieldName:      fieldName,
+                fieldValue:     fieldValue,
+                userId:         $('#userId').val(),
+                secureToken:    $('.secure-token-user').val(),
+                addressType:    addrType,
+                clientToken:    clientToken,
+                clientOldToken: oldToken,
+                countryCode:    countryCode
+            }
+        }).done(function (response) {
+            var oldToken = response.responseText.oldToken;
+            if (response.error == 1) {
+                showMessage(response.responseText.respText, true, 5000);
+            } else {
+                var addressId = response.responseText.newToken;
+                $('#'+oldToken).data('client-token', addressId);
+                $(thisEl).data('old-value', fieldValue);
+                showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
+            }
+        });
+    }
 
     <?php endif;?>
 

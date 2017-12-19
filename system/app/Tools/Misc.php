@@ -62,6 +62,11 @@ class Tools_Misc
         'lbs' => 'Pound (lbs)'
     );
 
+    public static $_lengthUnits = array(
+        'cm' => 'Centimetre (cm)',
+        'inch' => 'Inch (inch)'
+    );
+
     public static $_hoursUnits = array(
         '1' => '12:00 AM',
         '2' => '1:00 AM',
@@ -87,6 +92,22 @@ class Tools_Misc
         '22' => '9:00 PM',
         '23' => '10:00 PM',
         '24' => '11:00 PM'
+    );
+
+    public static $_productConfigTabs = array(
+        0 => array('tabId' => 'main-tab', 'tabName' => 'Main', 'type' => 'internal'),
+        1 => array('tabId' => 'digital-product-tab', 'tabName' => 'Digital products', 'type' => 'internal'),
+        2 => array('tabId' => 'tag-tab', 'tabName' => 'Product tags', 'type' => 'internal'),
+        3 => array('tabId' => 'options-tab', 'tabName' => 'Product options', 'type' => 'internal'),
+        4 => array('tabId' => 'related-tab', 'tabName' => 'Cross selling', 'type' => 'internal'),
+        5 => array('tabId' => 'coupon-tab', 'tabName' => 'Coupons', 'type' => 'internal'),
+        6 => array('tabId' => 'group-pricing-tab', 'tabName' => 'Groups', 'type' => 'internal')
+    );
+
+    public static $_merchandisingConfigTabs = array(
+        0 => array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal'),
+        1 => array('tabId' => 'recurring-payments', 'tabName' => 'Recurring payments', 'type' => 'internal'),
+        2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers groups', 'type' => 'internal')
     );
 
 
@@ -343,7 +364,10 @@ class Tools_Misc
             'zip' => '',
             'phone' => '',
             'mobile' => '',
-            'mobilecountrycode' => ''
+            'mobilecountrycode' => '',
+            'phonecountrycode' => '',
+            'mobile_country_code_value' => '',
+            'phone_country_code_value' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);
@@ -631,6 +655,25 @@ class Tools_Misc
             }
         }
         return $inventoryPluginsStatus;
+    }
+
+    /**
+     * Reorder config screen tabs
+     *
+     * @param array $pluginsToReorder Ex:array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal')
+     * @param array $configTabs Ex: array('tabId' => 'pluginid', 'tabName' => 'title', 'type' => 'external');
+     * @return array
+     */
+    public static function reorderPluginTabs($pluginsToReorder, $configTabs)
+    {
+        foreach ($pluginsToReorder as $pluginOrder) {
+            $elementsAfterPosition = array_slice($configTabs, $pluginOrder['tabOrderId'] -1);
+            $elementsBeforePosition = array_slice($configTabs, 0, $pluginOrder['tabOrderId'] -1);
+            $elementsBeforePosition[] = array('tabId' => $pluginOrder['tabId'], 'tabName' => $pluginOrder['tabName'], 'type' => 'external');
+            $configTabs = array_merge($elementsBeforePosition, $elementsAfterPosition);
+        }
+
+        return $configTabs;
     }
 
 

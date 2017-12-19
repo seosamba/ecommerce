@@ -22,8 +22,10 @@ define([
             'keyup #clients-search': 'searchClient',
             'change select[name=groups]': 'assignGroup',
             'blur input.customer-attribute': 'changeCustomAttr',
-            'blur input.mobile-number': 'changeMobileNumber',
-            'click th.customer-attribute':'deleteCustomAttr'
+            'blur input.change-user-attribute': 'changeUserAttr',
+            'change select.change-user-attribute': 'changeUserAttr',
+            'click th.customer-attribute':'deleteCustomAttr',
+            'change .mobile-phone-country-code':'changeMobileDesktopMask'
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -501,10 +503,21 @@ define([
                 })
             });
         },
-        changeMobileNumber:function(e){
+        changeUserAttr:function(e){
             var target = e.currentTarget,
-                data = {};
-            data['mobilePhone'] = $(target).val();
+                attrName = $(target).data('user-attribute-name'),
+                data = {},
+                oldValue = $(target).data('old-value'),
+                currentValue = $(target).val();
+
+            if (attrName === 'mobilePhone') {
+                currentValue = currentValue.replace(/\D/g, '');
+            }
+
+            if (oldValue == currentValue) {
+                return false;
+            }
+            data[attrName] = $(target).val();
             $.ajax({
                url: $('#website_url').val() + 'api/toaster/users/id/' + $(target).data('uid'),
                method: 'PUT',
@@ -513,11 +526,37 @@ define([
                    if (status === 'error'){
                        showMessage(status, true);
                    } else {
-                       showMessage(_.isUndefined(i18n['Number saved!'])?'Number saved!':i18n['Number saved!']);
+                       $(target).data('old-value', currentValue);
+                       showMessage(_.isUndefined(i18n['Saved!'])?'Saved!':i18n['Saved!']);
                    }
                }
             });
 
+        },
+        changeMobileDesktopMask: function(e)
+        {
+            var selectionType = $(e.currentTarget).data('type'),
+                value =  $(e.currentTarget).val(),
+                customerId = $(e.currentTarget).data('uid'),
+                customerModel = this.customers.get(customerId),
+                mobileMasks = customerModel.get('mobileMasks'),
+                desktopMasks = customerModel.get('desktopMasks');
+
+            if (selectionType === 'mobile') {
+                if (typeof mobileMasks[value] !== 'undefined') {
+                    $(e.currentTarget).closest('tr').find('.mobile-phone-value').mask(mobileMasks[value].mask_value, {autoclear: false});
+                } else {
+                    $(e.currentTarget).closest('tr').find('.mobile-phone-value').mask('(999) 999 9999', {autoclear: false});
+                }
+            }
+
+            if (selectionType === 'desktop') {
+                if (typeof desktopMasks[value] !== 'undefined') {
+                    $(e.currentTarget).closest('tr').find('.mobile-phone-value').mask(desktopMasks[value].mask_value, {autoclear: false});
+                } else {
+                    $(e.currentTarget).closest('tr').find('.mobile-phone-value').mask('(999) 999 9999', {autoclear: false});
+                }
+            }
         },
         deleteCustomAttr:function(){
             $('body').on('click', 'th.customer-attribute span', function(e){
