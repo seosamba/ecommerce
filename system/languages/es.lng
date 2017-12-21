@@ -35,7 +35,7 @@
 'Search' => 'Búsqueda',
 'search' => 'Búsqueda',
 'by order ID' => 'por ID de pedido',
-'by product name, sku, mpn' => 'por nombre de producto, sku, código EAN',
+'by product name, SKU, MPN' => 'por nombre de producto, SKU, código EAN',
 'by name' => 'por nombre',
 'show/hide advanced filters' => 'mostrar/ocultar filtros avanzados',
 'By order amount' => 'Por cantidad de pedidos',
@@ -87,7 +87,7 @@
 'pickup' => 'recoger',
 'Pickup' => 'Recoger',
 'shippingzones' => 'zonas de envío',
-'search by name, sku, mpn' => 'filtra por nombre, sky, código EAN',
+'search by name, SKU, MPN' => 'filtra por nombre, SKU, código EAN',
 'Filter by brand..' => 'Filtrar por marca..',
 'Filter by tag..' => 'Filtrar por etiqueta..',
 'Name' => 'Nombre',
@@ -528,7 +528,14 @@
 'Valid from' => 'Validó desde',
 'Expires on' => 'Caducó',
 'Authorized # of downloads' => '# de descargas autorizadas',
-'Display label' => 'Mostrar etiqueta'
+'Display label' => 'Mostrar etiqueta',
+'Wrong date format' => 'Formato de fecha incorrecto',
+'Done' => 'Hecho',
+'Error' => 'Error',
+'Updated' => 'Actualizado',
+'Sales discount should be between 0 and 100 percents' => 'El descuento debe ser entre 0 y 100 por ciento',
+'Sale discount should be a number' => 'El descuento debe ser un numero',
+'All products were updated' => 'Todos los productos fueron actualizados'
 
 
 );

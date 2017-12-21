@@ -143,6 +143,7 @@ define({
         'Oh man... Really?' : '¿Estas seguro?',
         'Do you really want to delete this column? (Data will be deleted!)' : '¿Desea eliminar la columna? ( Datos serán borrados)',
         'This product was sold. Do you really want to delete this file?' : '¿Producto vendido. Desea eliminar el fichero?',
-        'Digital products found' : 'Productos digitales encontrados'
+        'Digital products found' : 'Productos digitales encontrados',
+        'discount' : 'descuento'
     }
 });

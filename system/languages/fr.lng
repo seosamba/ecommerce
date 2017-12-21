@@ -594,7 +594,7 @@
         'to' =>'A',
         'by order ID'=>'par numéro de commande',
         'Order #' => 'N ° de commande',
-        'by product name, sku, mpn' =>  'par nom de produit, mpn, sku',
+        'by product name, SKU, MPN' =>  'par nom de produit, MPN, SKU',
         'select folder'=>'sélectionnez le dossier',
         'Owner' =>'Créateur',
         'Not set' =>'Aucun',

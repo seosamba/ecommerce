@@ -56,14 +56,15 @@ define([
             this.coupons.each(this.renderCoupon, this);
         },
         renderCoupon: function(coupon){
+            var couponType = coupon.get('type');
             this.$el.fnAddData([
                 coupon.get('id'),
-                (coupon.get('type') === 'freeshipping' ? 'free shipping' : coupon.get('type') ),
+                (couponType === 'freeshipping' ? _.isUndefined(i18n['free shipping'])?'free shipping':i18n['free shipping'] : _.isUndefined(i18n[couponType])?couponType:i18n[couponType] ),
                 '<a class="coupon-code-dashboard" data-coupon-code-dashboard="'+coupon.get('code')+'" href="'+$('#website_url').val()+'dashboard/orders/" target="_blank">'+coupon.get('code')+'</a>',
                 coupon.get('startDate'),
                 coupon.get('endDate'),
-                coupon.get('allowCombination') === '1' ? 'yes' : 'no',
-                coupon.get('scope') === 'client' ? 'yes' : '-',
+                coupon.get('allowCombination') === '1' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : _.isUndefined(i18n['no'])?'no':i18n['no'],
+                coupon.get('scope') === 'client' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : '-',
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
