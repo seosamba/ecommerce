@@ -317,7 +317,7 @@
 'admin' => 'admin',
 'superadmin' => 'superadmin',
 'system' => 'sistema',
-'sales person' => 'vendedor',
+'sales person' => 'encargado de ventas',
 'since' => 'desde',
 'days' => 'jours',
 'ago' => 'il y a',
