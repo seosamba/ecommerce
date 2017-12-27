@@ -554,7 +554,7 @@ class Tools_ShoppingCart {
         return $totalWeight;
     }
 
-    public function calculateCubicWeight($constraints = array())
+    /*public function calculateCubicWeight($constraints = array())
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $parcels = array();
@@ -590,25 +590,30 @@ class Tools_ShoppingCart {
         } else {
             $errorMessages[] = $translator->translate('Required constraints missed');
         }
-    }
+    }*/
 
     protected function _makeParcels($constraints)
     {
+//cubic weight = H x W x L x 200
         $parcels = array();
-        $cartContentArray = $this->_makeCartContentArray();
+
+        $cartContentArray = Tools_Shipping_Parcel::_makeCartContentArray();
         $parcelsCounter = 0;
 
-        $currentWeight = 0;
-        $currentLength = 0;
-        $currentWidth = 0;
-        $currentDepth = 0;
+        $firstItem = array_pop($cartContentArray);
+        $currentWeight = $firstItem[1];
+        $currentLength = $firstItem[2];
+        $currentWidth = $firstItem[3];
+        $currentDepth = $firstItem[4];
 
-        while (!empty($cartContentArray) || $parcelsCounter < 10) {
-            $currentItem = end($cartContentArray);
-            $limitWeight = $currentWeight + $currentItem[1];
-            $limitLength = $currentLength + $currentItem[2];
-            $limitWidth = $currentWidth + $currentItem[3];
-            $limitDepth = $currentDepth + $currentItem[4];
+        while (!empty($cartContentArray)) {
+
+            $nextItem = $this->_findNextItem($cartContentArray, $limitWeight, $limitLength, $limitWidth, $limitDepth);
+
+
+            foreach (array_reverse($cartContentArray) as $item){
+
+            }
             if($limitWeight < $constraints['maxWeight']){
                 $parcels[$parcelsCounter][] = $currentItem;
 
@@ -625,7 +630,7 @@ class Tools_ShoppingCart {
 
     }
 
-    protected function _makeCartContentArray()
+    /*protected function _makeCartContentArray()
     {
         $result = array();
         foreach ($this->_content as $cartItem) {
@@ -664,7 +669,7 @@ class Tools_ShoppingCart {
 
         usort($itemsArray, 'lengthCmp');
         return $itemsArray;
-    }
+    }*/
 
 	public function calculateCartPrice() {
 		$totalPrice = 0;
