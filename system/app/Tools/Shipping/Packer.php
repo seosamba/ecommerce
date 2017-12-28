@@ -33,19 +33,14 @@ class Tools_Shipping_Packer
 
                 } else {
                     array_unshift($cartContentArray, $currentItem);
-                    foreach (array_reverse($cartContentArray) as $index => $item) {
+                    foreach (array_reverse($cartContentArray, true) as $index=>$item) {
                         if ($parcels[$parcelCounter]->addItem($item)) {
                             unset($cartContentArray[$index]);
-                            $cartContentArray = self::_sortCartItemsByLength($cartContentArray);
-                            continue;
-                        } else {
-                            $isNewParcel = true;
-                            $parcelCounter++;
                         }
                     }
-
+                    $isNewParcel = true;
+                    $parcelCounter++;
                 }
-
             }
             return $parcels;
 

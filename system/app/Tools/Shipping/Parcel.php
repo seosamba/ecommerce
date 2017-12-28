@@ -21,7 +21,7 @@ class Tools_Shipping_Parcel
             $this->_maxWeight = (float)$constraints['maxWeight'];
             $this->_maxLength = (float)$constraints['maxLength'];
             $this->_maxWidth = (float)$constraints['maxWidth'];
-            $this->_maxDepth = (float)$constraints['maDepth'];
+            $this->_maxDepth = (float)$constraints['maxDepth'];
         }
 
     }
@@ -42,7 +42,6 @@ class Tools_Shipping_Parcel
                 $this->currentDepth = $item[4];
             }
 
-
             return true;
         } else {
             return false;
@@ -52,11 +51,8 @@ class Tools_Shipping_Parcel
     protected function _isItemCanBeAdded(array $item)
     {
         $itemWeight = $item[1];
-        $itemLength = $item[2];
-        $itemWidth = $item[3];
         $itemDepth = $item[4];
-
-        if (($this->currentDepth + $itemDepth) > 500) {
+        if (($this->currentDepth + $itemDepth) > $this->_maxDepth || ($this->currentWeight + $itemWeight) > $this->_maxWeight) {
             return false;
         }
         return true;
