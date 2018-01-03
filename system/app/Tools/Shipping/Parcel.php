@@ -7,6 +7,7 @@ class Tools_Shipping_Parcel
     protected $_maxLength = 240;
     protected $_maxWidth = 240;
     protected $_maxDepth = 240;
+    protected $_cubicWeight = 0;
 
     public $currentWeight = 0;
     public $currentLength = 0;
@@ -41,7 +42,7 @@ class Tools_Shipping_Parcel
                 $this->currentWidth = $item[3];
                 $this->currentDepth = $item[4];
             }
-
+            $this->_updateCubicWeight();
             return true;
         } else {
             return false;
@@ -51,11 +52,21 @@ class Tools_Shipping_Parcel
     protected function _isItemCanBeAdded(array $item)
     {
         $itemWeight = $item[1];
+        $itemLength = $item[2];
+        $itemWidth = $item[3];
         $itemDepth = $item[4];
-        if (($this->currentDepth + $itemDepth) > $this->_maxDepth || ($this->currentWeight + $itemWeight) > $this->_maxWeight) {
+        $lengthForCubicWeight = $this->currentLength > $itemLength ? $this->currentLength : $itemLength;
+        $widthForCubicWeight = $this->currentWidth > $itemWidth ? $this->currentWidth : $itemWidth;
+        $newCubicWeight = ($this->currentDepth + $itemDepth) * $widthForCubicWeight * $lengthForCubicWeight * 200 / 1000000;
+        if (($this->currentDepth + $itemDepth) > $this->_maxDepth || ($this->currentWeight + $itemWeight) > $this->_maxWeight || $newCubicWeight >= $this->_maxWeight) {
             return false;
         }
         return true;
+    }
+
+    protected function _updateCubicWeight()
+    {
+        $this->_cubicWeight = $this->currentDepth * $this->currentWidth * $this->currentLength * 200 / 1000000;
     }
 
 
