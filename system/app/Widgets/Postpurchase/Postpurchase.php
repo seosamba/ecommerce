@@ -14,6 +14,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     const CLEAN_CART_PARAM = 'clean';
 
     /**
+     * Wrap link description
+     */
+    const WRAP_DESCRIPTION_LINK = 'wraplink';
+
+    /**
      * Remove price value from options
      */
     const CLEAN_OPTIONS_PRICE = 'cleanOptionPrice';
@@ -562,6 +567,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCartItemShortdescription($sid)
     {
         if (!empty($this->_cartContent[$sid]['short_description'])) {
+            if (in_array(self::WRAP_DESCRIPTION_LINK, $this->_options, true) && preg_match('~((http|https):\/\/(.*))~ui', $this->_cartContent[$sid]['short_description'], $matched)) {
+                if (!empty($matched) && !empty($matched['0']) && !empty($this->_options[1])) {
+                    return '<a target="_blank" href="' . trim($matched['0']) . '">' . $this->_options[1] . '</a>';
+                }
+            }
+
             return $this->_cartContent[$sid]['short_description'];
         }
 
@@ -578,6 +589,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCartItemFulldescription($sid)
     {
         if (!empty($this->_cartContent[$sid]['full_description'])) {
+            if (in_array(self::WRAP_DESCRIPTION_LINK, $this->_options, true) && preg_match('~((http|https):\/\/(.*))~ui', $this->_cartContent[$sid]['full_description'], $matched)) {
+                if (!empty($matched) && !empty($matched['0']) && !empty($this->_options[1])) {
+                    return '<a target="_blank" href="' . trim($matched['0']) . '">' . $this->_options[1] . '</a>';
+                }
+            }
             return $this->_cartContent[$sid]['full_description'];
         }
 
