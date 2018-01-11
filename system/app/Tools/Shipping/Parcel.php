@@ -65,6 +65,18 @@ class Tools_Shipping_Parcel
     {
         return $this->_cubicWeight > $this->_currentWeight ? $this->_cubicWeight : $this->_currentWeight;
     }
+    public function getLength()
+    {
+        return $this->_currentLength;
+    }
+    public function getWidth()
+    {
+        return $this->_currentWidth;
+    }
+    public function getDepth()
+    {
+        return $this->_currentDepth;
+    }
 
 
 }

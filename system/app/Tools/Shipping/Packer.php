@@ -52,22 +52,22 @@ class Tools_Shipping_Packer
                 if (empty((float)$cartItem['weight'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product weight is empty');
                 } elseif ((float)$cartItem['weight'] > $constraints['maxWeight']) {
-                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong weight');
+                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product weight');
                 };
                 if (empty((float)$cartItem['prodLength'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product length is empty');
                 } elseif ((float)$cartItem['prodLength'] > $constraints['maxLength']) {
-                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong length');
+                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product length');
                 }
                 if (empty((float)$cartItem['prodWidth'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product width is empty');
                 } elseif ((float)$cartItem['prodWidth'] > $constraints['maxWidth']) {
-                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong width');
+                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product width');
                 }
                 if (empty((float)$cartItem['prodDepth'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product depth is empty');
                 } elseif ((float)$cartItem['prodDepth'] > $constraints['maxDepth']) {
-                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong depth');
+                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product depth');
                 }
             }
         } else {
