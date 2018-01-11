@@ -2,17 +2,16 @@
 
 
 class Tools_Shipping_Packer
-
 {
-    public static function completeParcels(array $cartContent, array $constraints)
+    public static function prepareParcels(array $cartContent, array $constraints)
     {
         if (empty($cartContent) || empty($constraints)) {
             return false;
         }
-        if (empty($errors = self::_checkForConstraints($cartContent, $constraints)['errors'])) {
-
+        $errors = self::checkForConstraints($cartContent, $constraints);
+        if (empty($errors)) {
             $parcels = array();
-            $cartContentArray = self::_makeCartContentArray($cartContent);
+            $cartContentArray = self::prepareCartContent($cartContent);
             $parcelCounter = 0;
             $isNewParcel = true;
 
@@ -33,6 +32,7 @@ class Tools_Shipping_Packer
                     $parcelCounter++;
                 }
             }
+
             return array('parcels' => $parcels);
 
         } else {
@@ -42,29 +42,29 @@ class Tools_Shipping_Packer
 
     }
 
-    protected static function _checkForConstraints($cartContent, $constraints)
+    public static function checkForConstraints($cartContent, $constraints)
     {
         $translator = Zend_Registry::get('Zend_Translate');
 
         $errorMessages = array();
         if (!empty($constraints['maxLength']) && !empty($constraints['maxWidth']) && !empty($constraints['maxDepth']) && !empty($constraints['maxWeight'])) {
             foreach ($cartContent as $cartItem) {
-                if (empty((float)$cartItem['weight'])) {
+                if (empty($cartItem['weight'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product weight is empty');
                 } elseif ((float)$cartItem['weight'] > $constraints['maxWeight']) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product weight');
                 };
-                if (empty((float)$cartItem['prodLength'])) {
+                if (empty($cartItem['prodLength'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product length is empty');
                 } elseif ((float)$cartItem['prodLength'] > $constraints['maxLength']) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product length');
                 }
-                if (empty((float)$cartItem['prodWidth'])) {
+                if (empty($cartItem['prodWidth'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product width is empty');
                 } elseif ((float)$cartItem['prodWidth'] > $constraints['maxWidth']) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product width');
                 }
-                if (empty((float)$cartItem['prodDepth'])) {
+                if (empty($cartItem['prodDepth'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product depth is empty');
                 } elseif ((float)$cartItem['prodDepth'] > $constraints['maxDepth']) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product depth');
@@ -73,35 +73,29 @@ class Tools_Shipping_Packer
         } else {
             $errorMessages[] = $translator->translate('Required constraints missed');
         }
-        return array('errors' => $errorMessages);
+
+        return $errorMessages;
     }
 
-    protected static function _makeCartContentArray($cartContent)
+    public static function prepareCartContent($cartContent)
     {
         $result = array();
         foreach ($cartContent as $cartItem) {
-            if ($cartItem['qty'] > 1) {
-                for ($i = 1; $i < $cartItem['qty']; $i++) {
-                    $result[] = array(
-                        'id' => $cartItem['id'],
-                        'weight' => (float)$cartItem['weight'],
-                        'length' => (float)$cartItem['prodLength'],
-                        'width' => (float)$cartItem['prodWidth'],
-                        'depth' => (float)$cartItem['prodDepth']
-                    );
-                }
+            for ($i = 0; $i < $cartItem['qty']; $i++) {
+                $result[] = array(
+                    'id' => $cartItem['id'],
+                    'weight' => (float)$cartItem['weight'],
+                    'length' => (float)$cartItem['prodLength'],
+                    'width' => (float)$cartItem['prodWidth'],
+                    'depth' => (float)$cartItem['prodDepth']
+                );
             }
-            $result[] = array(
-                'id' => $cartItem['id'],
-                'weight' => (float)$cartItem['weight'],
-                'length' => (float)$cartItem['prodLength'],
-                'width' => (float)$cartItem['prodWidth'],
-                'depth' => (float)$cartItem['prodDepth']
-            );
+
         }
         usort($result, function ($a, $b) {
             return $a['length'] < $b['length'] ? 1 : -1;
         });
+
         return $result;
     }
 }

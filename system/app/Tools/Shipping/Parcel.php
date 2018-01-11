@@ -13,10 +13,10 @@ class Tools_Shipping_Parcel
 
     public function __construct(array $constraints)
     {
-            $this->_maxWeight = (float)$constraints['maxWeight'];
-            $this->_maxLength = (float)$constraints['maxLength'];
-            $this->_maxWidth = (float)$constraints['maxWidth'];
-            $this->_maxDepth = (float)$constraints['maxDepth'];
+        $this->_maxWeight = (float)$constraints['maxWeight'];
+        $this->_maxLength = (float)$constraints['maxLength'];
+        $this->_maxWidth = (float)$constraints['maxWidth'];
+        $this->_maxDepth = (float)$constraints['maxDepth'];
     }
 
     public function addItem(array $item)
@@ -35,6 +35,7 @@ class Tools_Shipping_Parcel
                 $this->_currentDepth = $item['depth'];
             }
             $this->_updateCubicWeight();
+
             return true;
         } else {
             return false;
@@ -53,6 +54,7 @@ class Tools_Shipping_Parcel
         if (($this->_currentDepth + $itemDepth) > $this->_maxDepth || ($this->_currentWeight + $itemWeight) > $this->_maxWeight || $new_cubicWeight >= $this->_maxWeight) {
             return false;
         }
+
         return true;
     }
 
@@ -65,14 +67,17 @@ class Tools_Shipping_Parcel
     {
         return $this->_cubicWeight > $this->_currentWeight ? $this->_cubicWeight : $this->_currentWeight;
     }
+
     public function getLength()
     {
         return $this->_currentLength;
     }
+
     public function getWidth()
     {
         return $this->_currentWidth;
     }
+
     public function getDepth()
     {
         return $this->_currentDepth;
