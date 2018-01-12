@@ -14,6 +14,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     const CLEAN_CART_PARAM = 'clean';
 
     /**
+     * Wrap link description
+     */
+    const WRAP_DESCRIPTION_LINK = 'wraplink';
+
+    /**
      * Remove price value from options
      */
     const CLEAN_OPTIONS_PRICE = 'cleanOptionPrice';
@@ -127,6 +132,8 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $cartContent[$key]['photo'] = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
                         $cartContent[$key]['taxRate'] = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
+                        $cartContent[$key]['short_description'] = $productObject->getShortDescription();
+                        $cartContent[$key]['full_description'] = $productObject->getFullDescription();
                     }
                 }
                 $this->_cart->setCartContent($cartContent);
@@ -549,6 +556,48 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCartItemName($sid)
     {
         return $this->_cartContent[$sid]['name'];
+    }
+
+    /**
+     * Return product short description for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemShortdescription($sid)
+    {
+        if (!empty($this->_cartContent[$sid]['short_description'])) {
+            if (in_array(self::WRAP_DESCRIPTION_LINK, $this->_options, true) && preg_match('~((http|https):\/\/(.*))~ui', $this->_cartContent[$sid]['short_description'], $matched)) {
+                if (!empty($matched) && !empty($matched['0']) && !empty($this->_options[1])) {
+                    return '<a target="_blank" href="' . trim($matched['0']) . '">' . $this->_options[1] . '</a>';
+                }
+            }
+
+            return $this->_cartContent[$sid]['short_description'];
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Return product full description for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemFulldescription($sid)
+    {
+        if (!empty($this->_cartContent[$sid]['full_description'])) {
+            if (in_array(self::WRAP_DESCRIPTION_LINK, $this->_options, true) && preg_match('~((http|https):\/\/(.*))~ui', $this->_cartContent[$sid]['full_description'], $matched)) {
+                if (!empty($matched) && !empty($matched['0']) && !empty($this->_options[1])) {
+                    return '<a target="_blank" href="' . trim($matched['0']) . '">' . $this->_options[1] . '</a>';
+                }
+            }
+            return $this->_cartContent[$sid]['full_description'];
+        }
+
+        return '';
     }
 
     /**
