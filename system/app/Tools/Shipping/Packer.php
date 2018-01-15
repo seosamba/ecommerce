@@ -57,7 +57,7 @@ class Tools_Shipping_Packer
                 if (empty($cartItem['prodLength'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product length is empty');
                 } elseif ((float)$cartItem['prodLength'] > $constraints['maxLength']) {
-                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product length').'  '.(float)$cartItem['prodLength'].' id: '.$cartItem['id'];
+                    $errorMessages[$cartItem['id']][] = $translator->translate('Wrong product length');
                 }
                 if (empty($cartItem['prodWidth'])) {
                     $errorMessages[$cartItem['id']][] = $translator->translate('Product width is empty');
