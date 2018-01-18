@@ -295,6 +295,13 @@ class Shopping extends Tools_Plugins_Abstract {
                     if (!empty($subFormValues['operationalHours'])) {
                         $subFormValues['operationalHours'] = serialize($subFormValues['operationalHours']);
                     }
+                    if(!empty($subFormValues['outOfStock'])){
+                        $subFormValues['outOfStock'] = strip_tags($subFormValues['outOfStock'], '<br><a><hr>');
+                    }
+                    if(!empty($subFormValues['limitQty'])){
+                        $subFormValues['limitQty'] = strip_tags($subFormValues['limitQty'], '<br><a><hr>');
+                    }
+
 					$this->_configMapper->save($subFormValues);
 				}
 				$this->_jsonHelper->direct($form->getValues());
