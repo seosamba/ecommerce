@@ -15,7 +15,8 @@ class Forms_StoreNotifications extends Zend_Form {
             'class' => 'out-of-stock',
             'cols'  => '20',
             'rows'  => '3',
-            'maxlength' => '250'
+            'maxlength' => '250',
+            'placeholder' => $translator->translate('The requested product is out of stock')
         ));
 
         $this->addElement('textarea', 'limitQty', array(
@@ -24,7 +25,8 @@ class Forms_StoreNotifications extends Zend_Form {
             'class' => 'limit-qty',
             'cols'  => '20',
             'rows'  => '3',
-            'maxlength' => '250'
+            'maxlength' => '250',
+            'placeholder' => $translator->translate('The requested quantity is not available')
         ));
     }
 
