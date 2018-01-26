@@ -68,7 +68,7 @@ define([
             var self = this;
             this.initProduct();
 
-            //this.initDigitalProductUploader();
+            this.initDigitalProductUploader();
             $(document).ajaxStart(function(){
                 $('#product-list-search').attr('disabled', 'disabled');
             }).ajaxStop(function(){
