@@ -13,11 +13,16 @@ define([
     '../../coupons/views/coupons_table',
     '../../groups/views/group_price',
     '../../digital-products/views/digital_product',
+    'plupload',
+    'pluploadhtml5',
+    'pluploadflash',
+    'pluploadhtml4',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, i18n){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView,
+            plupload, pluploadhtml5, pluploadflash, pluploadhtml4, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -50,7 +55,8 @@ define([
                 $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
-            'change #automated-set-price': 'toggleSetPriceConfig'
+            'change #automated-set-price': 'toggleSetPriceConfig',
+            'click #product-teaser-uploader': 'productTeaserUploaderImage'
 		},
         products: null,
         tags: null,
@@ -157,6 +163,15 @@ define([
 
             return this;
 		},
+        productTeaserUploaderImage : function () {
+            jsProductTeaserUploader.bind('FileUploaded', function(uploader, file){
+                newSrc = $('#website_url').val()+'media/products/small/'+file.name.replace(/\s+/g, '-').toLowerCase();
+                window.app.model.set('photo', 'products/' + file.name.replace(/\s+/g, '-').toLowerCase());
+                $('#product-image').attr('src', newSrc);
+                window.app.trigger('change');
+                $('#progressbar').delay(800).fadeOut();
+            });
+        },
         initDigitalProductUploader: function() {
             var self = this;
             self.uploader = new plupload.Uploader({
