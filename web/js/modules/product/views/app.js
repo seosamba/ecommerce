@@ -66,7 +66,7 @@ define([
         tags: null,
         brands: null,
         searchIndex: null,
-		websiteUrl: $('#website_url').val(),
+		websiteUrl: window.location.origin + '/',
         mediaPath: $('#media-path').val(),
 		initialize: function(){
             this.$el = $('#manage-product');
@@ -334,13 +334,13 @@ define([
             }
 
 			//setting model properties to view
-            var photoUrl = $('#website_url').val()+'system/images/noimage.png';
+            var photoUrl = window.location.origin+'/system/images/noimage.png';
 			if (!this.model.has('photo')){
-                this.$('#product-image').attr('src', $('#website_url').val()+'system/images/noimage.png');
+                this.$('#product-image').attr('src', window.location.origin+'/system/images/noimage.png');
             } else {
                 photoUrl = this.model.get('photo');
                 if (!/^https?:\/\/.*/.test(photoUrl)){
-                    photoUrl = $('#website_url').val()+ this.mediaPath + photoUrl.replace('/', '/small/');
+                    photoUrl = window.location.origin+'/'+ this.mediaPath + photoUrl.replace('/', '/small/');
                 }
             }
             this.$('#product-image').attr('src', photoUrl);
