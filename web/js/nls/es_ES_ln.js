@@ -103,6 +103,21 @@ define({
         'Refund' : 'Devuelto',
         'Missing required fields' : 'Faltan campos oblogatorios por rellenar',
         'Please enter location' : 'Por favor, introduzca una dirección',
-        'Missing required field' : 'Faltan campos oblogatori por rellenar'
+        'Missing required field' : 'Faltan campos oblogatori por rellenar',
+        'select from library' : 'Seleccionar',
+        'Title' : 'Título',
+        'Price modifier' : 'Modificador del precio',
+        'Weight modifier' : 'Modificador del tamaño',
+        'Add new selection' : 'Añadir nueva selección',
+        'Option name' : 'Nombre de la opción',
+        'Type' : 'Tipo',
+        'Dropdown Box' : 'Desplegable',
+        'Radio Switch' : 'Radio (Seleccionable)',
+        'Datepicker' : 'Campo fecha',
+        'Add to library?' : 'Añadir',
+        'Delete option' : 'Borrar opción',
+        'Delete' : 'eliminar',
+        'Edit' : 'Editar',
+        'Click preview to get to product landing page' : 'Click para ir a la página de destino del producto'
     }
 });

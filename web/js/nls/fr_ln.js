@@ -84,7 +84,19 @@ define({
         'Download packing slip' : 'Télécharger bon de livraison',
         'Wait a minute! this country is already part of another zone... Add anyway?':'Wait a minute! this country is already part of another zone... Add anyway?',
         'There are no users for export' : 'Il n\'y a pas d\'utilisateurs pour l\'exportation',
-        'Export orders' : 'Exporter les commandes'
+        'Export orders' : 'Exporter les commandes',
+        'select from library' : 'choisir dans la liste',
+        'Title' : 'Titre',
+        'Price modifier' : 'modificateur de prix',
+        'Weight modifier' : 'modificateur de poids',
+        'Add new selection' : 'Ajouter une sélection',
+        'Option name' : 'Nom de l&rsquo;option',
+        'Type' : 'Catégorie',
+        'Add to library?' : 'Ajouter a liste?',
+        'Enter label' : 'Entrez étiquette',
+        'Delete option' : 'L&rsquo;option Supprimer',
+        'Delete' : 'Supprimer',
+        'Edit'   : 'Editer'
 
     }
 });

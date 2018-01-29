@@ -17,12 +17,16 @@ define([
     'pluploadhtml5',
     'pluploadflash',
     'pluploadhtml4',
+    'text!../templates/quick-preview-template.html',
+    'text!../templates/img-template.html',
+    'text!../templates/paginator-template.html',
+    'text!../templates/option-library-template.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
             TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView,
-            plupload, pluploadhtml5, pluploadflash, pluploadhtml4, i18n){
+            plupload, pluploadhtml5, pluploadflash, pluploadhtml4, quickPreviewTmpl, imgTmpl, paginatorTmpl, optionLibraryTmpl, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -65,6 +69,7 @@ define([
 		websiteUrl: $('#website_url').val(),
         mediaPath: $('#media-path').val(),
 		initialize: function(){
+            this.$el = $('#manage-product');
             var self = this;
             this.initProduct();
 
@@ -74,8 +79,7 @@ define([
             }).ajaxStop(function(){
                 $('#product-list-search').removeAttr('disabled');
             });
-
-            this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
+            this.quickPreviewTmpl = _.template(quickPreviewTmpl);
 
             $('#product-list').hide("slide", { direction: "right"});
 			hideSpinner();
@@ -128,7 +132,6 @@ define([
             if (this.tags === null){
                 showSpinner('#tag-tab');
                 this.tags = new TagsCollection();
-                this.tags.template = _.template($('#tagTemplate').html());
                 this.tags.on('add', this.renderTag, this);
                 this.tags.on('reset', this.renderTags, this);
                 this.tags.pager();
@@ -295,11 +298,11 @@ define([
             $('#image-select-dialog').show("slide", { direction: "left"});
         },
         renderImages: function(){
-            $('#image-list').html(_.template($('#imgTemplate').html(), {images: this.images.toJSON()}));
-            $('.paginator', '#image-select-dialog').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(
+            $('#image-list').html(_.template(imgTmpl, {'images': this.images.toJSON()}));
+            $('.paginator', '#image-select-dialog').replaceWith(_.template(paginatorTmpl, _.extend(
                 this.images.paginator_ui,
                 this.images.info(),
-                {collection: 'images', cssClass: ''}
+                {collection: 'images', cssClass: '', 'i18n': i18n}
             )));
         },
         setProductImage: function(e){
@@ -319,7 +322,7 @@ define([
             console.log('render: app.js', this.model.changedAttributes());
             this.$el.tabs({ active: 0 });
 
-            $('#product-list:visible').hide("slide", { direction: "right"});
+            this.$('#product-list:visible').hide("slide", { direction: "right"});
 
             $('#quick-preview').empty(); //clening preview content
 
@@ -404,7 +407,8 @@ define([
                     product: this.model.toJSON(),
                     websiteUrl: $('#website_url').val(),
                     currency: this.$('#currency-unit').text(),
-                    photoUrl: photoUrl
+                    photoUrl: photoUrl,
+                    i18n: i18n
                 }));
             }
 
@@ -432,10 +436,11 @@ define([
             var paginatorData = {
                 pages: 2,
                 collection : 'tags',
-                cssClass: 'fl-right ml-grid mt5px'
+                cssClass: 'fl-right ml-grid mt5px',
+                i18n: i18n
             };
 
-            $('.paginator', '#tag-tab').replaceWith(_.template($('#paginatorTemplate').html(), _.extend(paginatorData, this.tags.info())));
+            $('.paginator', '#tag-tab').replaceWith(_.template(paginatorTmpl, _.extend(paginatorData, this.tags.info())));
             hideSpinner();
         },
         toggleTag: function(e){
@@ -523,10 +528,11 @@ define([
                 this.products.each(this.renderProduct, this);
                 var paginatorData = {
                     collection : 'products',
-                    cssClass: ''
+                    cssClass: '',
+                    i18n: i18n
                 };
                 paginatorData = _.extend(paginatorData, this.products.info());
-                $('.paginator', '#product-list').replaceWith(_.template($('#paginatorTemplate').html(), paginatorData));
+                $('.paginator', '#product-list').replaceWith(_.template(paginatorTmpl, paginatorData));
             } else {
                 $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>');
             }
@@ -757,7 +763,7 @@ define([
             if (!_.has(this, 'optionLibrary')){
                 this.optionLibrary = new OptionsCollection();
                 this.optionLibrary.on('reset', function(collection){
-                    $('#option-library').html(_.template($('#optionLibraryTemplate').html(), {items: collection.toJSON()}));
+                    $('#option-library').html(_.template(optionLibraryTmpl, {'items': collection.toJSON(), 'i18n': i18n}));
                 }, this);
                 this.optionLibrary.fetch();
             }

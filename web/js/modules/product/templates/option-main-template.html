@@ -1,0 +1,23 @@
+<div class="grid_4 alpha omega">
+    <label class="grid_4 alpha omega mt5px"><%=_.isUndefined(i18n['Option name'])?'Option name':i18n['Option name']%></label>
+    <input class="grid_8 alpha omega option-title" type="text" value="${title}"/>
+</div>
+<div class="grid_4">
+    <label class="grid_4 alpha omega text-center mt5px"><%=_.isUndefined(i18n['Type'])?'Type':i18n['Type']%></label>
+    <select class="option-type-select grid_8 alpha omega">
+        <option value="dropdown"><%=_.isUndefined(i18n['Dropdown Box'])?'Dropdown Box':i18n['Dropdown Box']%></option>
+        <option value="radio"><%=_.isUndefined(i18n['Radio Switch'])?'Radio Switch':i18n['Radio Switch']%></option>
+        <option value="text"><%=_.isUndefined(i18n['Text Field'])?'Text Field':i18n['Text Field']%></option>
+        <option value="date"><%=_.isUndefined(i18n['Datepicker'])?'Datepicker':i18n['Datepicker']%></option>
+    </select>
+</div>
+<div class="grid_3 alpha omega text-center">
+    {{if id}}
+    &nbsp;
+    {{else}}
+    <label class="block mt5px"><%=_.isUndefined(i18n['Add to library?'])?'Add to library?':i18n['Add to library?']%> <input type="checkbox" title="<%=_.isUndefined(i18n['Add to library?'])?'Add to library?':i18n['Add to library?']%>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
+    <input class="hide" type="text" name="templateName" placeholder="<%=_.isUndefined(i18n['Enter label'])?'Enter label':i18n['Enter label']%>"/>
+    {{/if}}
+</div>
+<a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<%=_.isUndefined(i18n['Delete option'])?'Delete option':i18n['Delete option']%>"></a>
+<div class="option-content grid_12 alpha omega"></div>

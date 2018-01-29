@@ -3,7 +3,7 @@ define([
     '../collections/pickup-location',
     'text!../templates/paginator.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
-    $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
+    window.location.origin+'/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
             PickupLocationCollection,PaginatorTmpl, i18n
     ){

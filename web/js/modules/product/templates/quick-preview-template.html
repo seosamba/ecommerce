@@ -1,0 +1,11 @@
+<a href="<%= (_.isObject(product.page) ? $('#website_url').val() + product.page.url : '#') %>" target="_blank">
+    <span class="name"><%= product.name %></span>
+    <span class="image background"><img src="<%= photoUrl %>"/></span>
+    <span class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></span>
+    <span class="price">
+            <% pricePreview = parseFloat(product.price) %>
+            <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
+			<%= pricePreview.toFixed(2) + '&nbsp;' + currency %>
+		</span>
+    <span class="info"><%=_.isUndefined(i18n['Click preview to get to product landing page'])?'Click preview to get to product landing page':i18n['Click preview to get to product landing page']%></span>
+</a>

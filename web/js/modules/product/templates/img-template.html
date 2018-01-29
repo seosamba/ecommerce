@@ -1,0 +1,5 @@
+<% _.each(images, function (img){ %>
+<div class="box">
+    <img class="lazy" src="<%= img.src %>" width="100px" data-name="<%= img.name %>" title="<%= img.name %>"/>
+</div>
+<% }) %>

@@ -1,11 +1,13 @@
 define([
-	'backbone'
-], function(Backbone){
+	'backbone',
+    'text!../templates/tag-template.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(Backbone, tagTmpl, i18n){
 	
 	var TagView = Backbone.View.extend({
 		tagName: 'li',
 		className: 'tag-widget',
-		template: _.template($('#tagTemplate').html()),
+		template: {},
 		nameInput: null,
 		events: {
 			"click .ticon-close": "kill",
@@ -18,7 +20,7 @@ define([
             this.model.on('destroy', this.remove, this);
 		},
 		render: function(){
-			$(this.el).addClass('tagid-'+this.model.get('id')).html(this.template({tag: this.model}));
+			$(this.el).addClass('tagid-'+this.model.get('id')).html(_.template(tagTmpl, {'tag' : this.model, 'i18n' : i18n}));
             this.nameInput = this.$el.children('.tag-editable');
 			return this;
 		},

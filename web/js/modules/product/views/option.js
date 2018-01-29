@@ -2,11 +2,14 @@ define([
 	'underscore',
 	'backbone',
 	'../collections/selections',
-	'../views/selection'
-], function(_, Backbone, Selections, SelectionView){
+	'../views/selection',
+    'text!../templates/option-main-template.html',
+    'text!../templates/option-list-template.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(_, Backbone, Selections, SelectionView, optionMainTmpl, optionListTmpl, i18n){
 	var ProductOptionView = Backbone.View.extend({
-		template: $('#optionMainTemplate').template(),
-		optionListTemplate: $('#optionListTemplate').template(),
+		template: _.template(optionMainTmpl, {'i18n': i18n}),
+		optionListTemplate: _.template(optionListTmpl, {'i18n': i18n}),
         tagName: 'div',
         className: 'option-wrapper grid_12 alpha omega mt10px background',
 

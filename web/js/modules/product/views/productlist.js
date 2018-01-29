@@ -1,12 +1,14 @@
 define([
 	'underscore',
-	'backbone'
-], function(_, Backbone){
+	'backbone',
+    'text!../templates/product-listing-template.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(_, Backbone, productListingTmpl, i18n){
 	
 	var ProductView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'productlisting',
-		template: _.template($('#productListingTemplate').html()),
+		template: {},
         container: $('#product-list-holder'),
 		events: {},
 		initialize: function(){
@@ -17,13 +19,16 @@ define([
             var data = {
                 websiteUrl: $('#website_url').val(),
                 mediaPath: $('#media-path').val(),
-                showDelete: _.has(this.options, 'showDelete') ? this.options.showDelete : false
+                showDelete: _.has(this.options, 'showDelete') ? this.options.showDelete : false,
+                i18n: i18n
             };
             if (!this.model.has('rendered')){
                 data.lazy = true;
                 this.model.set({rendered: true}, {silent: true});
             }
-			$(this.el).html(this.template(_.extend(data, this.model.toJSON())));
+            var products = _.extend(data, this.model.toJSON());
+
+			$(this.el).html(_.template(productListingTmpl, products));
 			return this;
 		}
 	});

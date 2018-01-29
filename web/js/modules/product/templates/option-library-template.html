@@ -1,0 +1,4 @@
+<option value="-1" disabled="disabled" selected="selected"><%=_.isUndefined(i18n['select from library'])?'select from library':i18n['select from library']%></option>
+<% _.each(items, function (item){ %>
+<option value="<%= item.id %>"><%= item.title %></option>
+<% }); %>

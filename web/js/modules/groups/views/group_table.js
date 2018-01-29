@@ -1,7 +1,7 @@
 define([
 	'backbone',
     '../collections/group',
-    $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
+    window.location.origin+'/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
             GroupCollection
             ){

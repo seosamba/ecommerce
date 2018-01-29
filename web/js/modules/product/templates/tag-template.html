@@ -1,0 +1,5 @@
+<a href="javascript:;" class="fl-right ml1 mr1 ticon-close error" title="<%=_.isUndefined(i18n['Delete'])?'Delete':i18n['Delete']%>"></a>
+<label class="fl-left mr-grid">
+    <input type="checkbox" name="tag[]" value="<%= tag.get('id') %>"/>
+</label>
+<span class="tag-editable" title="<%=_.isUndefined(i18n['Click to edit'])?'Click to edit':i18n['Click to edit']%>"><%= tag.get('name') %></span>

@@ -1,0 +1,23 @@
+<% if (showDelete) { %>
+    <a class="delete ticon-close error small" href="javascript:;" title="<%=_.isUndefined(i18n['Delete'])?'Delete':i18n['Delete']%>"></a>
+<% } else { %>
+    <a href="/plugin/shopping/run/product/id/<%= id %>" data-role="editProduct" data-pid="<%= id %>" title="<%=_.isUndefined(i18n['Edit'])?'Edit':i18n['Edit']%> <%= name %>">
+<% } %>
+    <span class="brand"><%= brand %></span>
+    <%
+        if (!photo) {
+            photo = websiteUrl+'/system/images/noimage.png';
+        } else if (! /^https?:\/\//.test(photo) ) {
+            photo = websiteUrl + mediaPath + photo.replace('/', '/product/');
+        }
+    %>
+    <span class="image">
+		    <img src="<%= photo %>" alt="<%= name %>"/>
+		</span>
+    <span class="name"><%= name %></span>
+
+    <span class="sku"><%= sku %></span>
+<% if (!showDelete) { %>
+</a>
+<label class="checkbox-del"><input type="checkbox" class="marker" name="marker" value=<%= id %>></label>
+<% } %>
