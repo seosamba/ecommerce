@@ -8,7 +8,10 @@ define([ './views/app' ], function(AppView){
 
     window.app = new AppView();
     $(function(){
-        $(document).trigger('loaded.product');
+        window.setTimeout(function () {
+            $(document).trigger('loaded.product');
+        }, 1000);
+
         /*jsProductTeaserUploader.bind('FileUploaded', function(uploader, file){
             newSrc = $('#website_url').val()+'media/products/small/'+file.name.replace(/\s+/g, '-').toLowerCase();
             window.app.model.set('photo', 'products/' + file.name.replace(/\s+/g, '-').toLowerCase());
