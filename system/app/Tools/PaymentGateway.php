@@ -26,7 +26,7 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
 			$cart->setStatus($status);
 			$cart->setGateway($gateway);
 
-			if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED || $status === Models_Model_CartSession::CART_STATUS_PENDING) {
+			if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED) {
                 $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
             }
 
