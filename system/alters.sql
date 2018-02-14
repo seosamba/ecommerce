@@ -288,7 +288,7 @@ UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 -- 07/02/2018
 -- version: 2.5.6
 ALTER TABLE `shopping_cart_session` ADD COLUMN `purchased_on` timestamp NULL;
-UPDATE `shopping_cart_session` SET `purchased_on` = `updated_at` WHERE `purchased_on` IS NULL AND  `updated_at` <> '0000-00-00 00:00:00' AND `status` IN('delivered', 'shipped', 'pending', 'completed', 'refunded');
+UPDATE `shopping_cart_session` SET `purchased_on` = `updated_at` WHERE `purchased_on` IS NULL AND  `updated_at` <> '0000-00-00 00:00:00' AND `status` IN('delivered', 'shipped', 'completed', 'refunded');
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.5.7' WHERE `name`='shopping';
