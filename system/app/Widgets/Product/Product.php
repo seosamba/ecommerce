@@ -370,7 +370,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 
     private function _renderWeight() {
-        return $this->_product->getWeight() . ' ' .self::$_shoppingConfig['weightUnit'];
+        $weight = Tools_Misc::processingWeightFormat($this->_product->getWeight());
+        return $weight . ' ' .self::$_shoppingConfig['weightUnit'];
     }
 
     private function _renderMpn() {

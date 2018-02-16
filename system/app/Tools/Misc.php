@@ -677,5 +677,22 @@ class Tools_Misc
         return $configTabs;
     }
 
+    /**
+     * Remove last zero number
+     * Weight format conversion by Country location
+     * ex. fr_FR = 15,35
+     * ex. en_US = 15.35
+     *
+     * @param $weight
+     * @return string
+     */
+    public static function processingWeightFormat($weight) {
+        $weight = round($weight, 3);
+        $locale = Zend_Locale::getLocaleToTerritory(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'));
+        $weightFormat = Zend_Locale_Format::toNumber($weight, array('locale' => $locale));
+
+        return $weightFormat;
+    }
+
 
 }
