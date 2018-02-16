@@ -535,7 +535,8 @@
 'Updated' => 'Actualizado',
 'Sales discount should be between 0 and 100 percents' => 'El descuento debe ser entre 0 y 100 por ciento',
 'Sale discount should be a number' => 'El descuento debe ser un numero',
-'All products were updated' => 'Todos los productos fueron actualizados'
+'All products were updated' => 'Todos los productos fueron actualizados',
+'Out of stock' => 'No disponible'
 
 
 );
