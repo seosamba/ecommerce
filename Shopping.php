@@ -2301,4 +2301,24 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    /**
+     * Find customers by mobilecountrycode|phonecountrycode
+     *
+     * @param $codes
+     * @return string
+     */
+    public function getCountryCodes($codes){
+        $translator = Zend_Registry::get('Zend_Translate');
+        if(!empty($codes)){
+            $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+
+            $customers = $customerMapper->findCustomersByCountryCodes($codes);
+
+            if(!empty($customers)){
+                return $translator->translate('You have') . ' ' . count($customers) . ' ' .$translator->translate('record(s) in shipping/billing address with disabled country codes.') . '<br/>';
+            }
+        }
+        return '';
+    }
+
 }

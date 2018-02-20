@@ -351,4 +351,26 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
         return $users;
     }
+
+    /**
+     * Find customers by mobilecountrycode|phonecountrycode
+     *
+     * @param $codes
+     * @return array
+     */
+    public function findCustomersByCountryCodes($codes){
+        $where =  '('.$this->getDbTable()->getAdapter()->quoteInto('sca.mobilecountrycode IN (?)', $codes);
+        $where .= ' OR ' .$this->getDbTable()->getAdapter()->quoteInto('sca.phonecountrycode IN (?)', $codes).')';
+        $where .= ' AND  '.new Zend_Db_Expr('sca.user_id IS NOT NULL');
+
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sca' => 'shopping_customer_address'), array(
+                'sca.id',
+                'sca.email'
+            ))
+            ->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
+
 }

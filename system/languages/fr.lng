@@ -690,6 +690,8 @@
         'Billing phone full' => 'Numéro fixe complet (facturation)',
         'Billing mobile country code' => 'Code de pays - numéro mobile  (facturation)',
         'Billing mobile country code value' => 'Valeur du code de pays - numéro mobile (facturation)',
-        'Billing mobile full' => 'Numéro mobile complet (facturation)'
+        'Billing mobile full' => 'Numéro mobile complet (facturation)',
+        'You have' => 'You have',
+        'record(s) in shipping/billing address with disabled country codes.' => 'record(s) in shipping/billing address with disabled country codes.'
 
 );?>

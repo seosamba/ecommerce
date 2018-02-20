@@ -285,7 +285,11 @@ ALTER TABLE `shopping_customer_address` ADD COLUMN `phone_country_code_value` VA
 -- version: 2.5.5
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 
+-- 20/02/2018
+-- version: 2.5.6
+UPDATE `plugin` SET `tags`='processphones,countrycodesfiltration' WHERE `name` = 'shopping';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
