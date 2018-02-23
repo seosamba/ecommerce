@@ -26,7 +26,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 		$select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
 				->setIntegrityCheck(false)
 				->from(array('order' => 'shopping_cart_session'))
-				->joinLeft(array('oc' => 'shopping_cart_session_content'), 'oc.cart_id = order.id', array('total_products' => 'COUNT(DISTINCT oc.id)'))
+				->joinLeft(array('oc' => 'shopping_cart_session_content'), 'oc.cart_id = order.id', array('total_products' => 'COUNT(DISTINCT oc.id)', 'aggregatedPurchasedOn' => new Zend_Db_Expr('IFNULL(order.purchased_on, order.created_at)')))
 				->joinLeft(array('s_adr' => 'shopping_customer_address'), 's_adr.id = order.shipping_address_id', array(
 					'shipping_firstname' => 'firstname',
 					'shipping_lastname' => 'lastname',
@@ -68,7 +68,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 
 		if ($where){
 			$where = (array) $where;
-			$this->_parseWhere($select, $where);
+			$this->_parseWhere($select, $where, $order);
 		}
 
 		if (!empty($order)){
@@ -237,7 +237,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
         return $this->getDbTable()->fetchAll($select)->toArray();
     }
 
-	private function _parseWhere(Zend_Db_Table_Select $select, $where){
+	private function _parseWhere(Zend_Db_Table_Select $select, $where, $order = ''){
 		if (isset($where['product-id']) || isset($where['product-key'])){
 			$select->join(array('p' => 'shopping_product'), 'p.id = oc.product_id', null);
 		}
@@ -286,10 +286,18 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 						$select->where('order.shipping_service = ?', $val);
 						break;
 					case 'date-from':
-						$select->where('order.created_at > ?', date(DATE_ATOM, strtotime($val)));
+					    if (!empty($order) && preg_match('~aggregatedPurchasedOn~', $order)) {
+                            $select->having('aggregatedPurchasedOn > ?', date(DATE_ATOM, strtotime($val)));
+                        } else {
+                            $select->where('order.created_at > ?', date(DATE_ATOM, strtotime($val)));
+                        }
 						break;
 					case 'date-to':
-						$select->where('order.created_at < ?', date(DATE_ATOM, strtotime($val)));
+                        if (!empty($order) && preg_match('~aggregatedPurchasedOn~', $order)) {
+                            $select->having('aggregatedPurchasedOn < ?', date(DATE_ATOM, strtotime($val)));
+                        } else {
+                            $select->where('order.created_at < ?', date(DATE_ATOM, strtotime($val)));
+                        }
 						break;
 					case 'amount-from':
 						$val = filter_var($val, FILTER_SANITIZE_NUMBER_FLOAT);
