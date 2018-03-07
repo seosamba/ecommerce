@@ -78,7 +78,7 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 
         $this->getElement('phone')->setLabel(null);
 
-		$emailValidator = new Zend_Validate_EmailAddress(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL);
+		$emailValidator = new Tools_System_CustomEmailValidator(Zend_Validate_Hostname::ALLOW_DNS | Zend_Validate_Hostname::ALLOW_LOCAL);
 		$emailValidator->setMessages(array(
 			Zend_Validate_EmailAddress::INVALID_FORMAT => "'%value%' is not a valid email address",
 		));

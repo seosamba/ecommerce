@@ -1553,7 +1553,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 if($user instanceof Application_Model_Models_User){
                     switch($data['profileElement']) {
                         case 'email':
-                            $validator = new Zend_Validate_EmailAddress();
+                            $validator = new Tools_System_CustomEmailValidator();
                             if ($validator->isValid($data['profileValue'])) {
                                 $user->setEmail($data['profileValue']);
                             }else{
