@@ -241,7 +241,7 @@
 'Shipping' => 'Envío',
 'Inc.' => 'Inc.',
 'Total ' => 'Total ',
-'Refund' => 'Devuelto',
+'Refund' => 'Realizar devolución',
 'Grand Total' => 'Total',
 'by name, sku, mpn or tags' => 'por nombre, sku, código EAN o etiquetas',
 'First' => 'Inicio',
@@ -536,7 +536,8 @@
 'Sales discount should be between 0 and 100 percents' => 'El descuento debe ser entre 0 y 100 por ciento',
 'Sale discount should be a number' => 'El descuento debe ser un numero',
 'All products were updated' => 'Todos los productos fueron actualizados',
-'Out of stock' => 'No disponible'
+'Out of stock' => 'No disponible',
+'You\'ve added a note. No amount refunded to credit card by this system' => 'El pedido se ha cancelado, pero NO se ha realizado la devolución del importe a la tarjeta del cliente.'
 
 
 );
