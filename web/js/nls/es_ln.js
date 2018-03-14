@@ -98,7 +98,7 @@ define({
         'Delete selected' : 'Borrar seleccionado',
         'add to set' : 'establecer',
         'Enter amount to refund below' : 'Introduzca abajo la cantidad a devolver',
-        'How much do you want to refund' : '¿Qué cantidad quiere devolver?',
+        'How much do you want to refund?' : '¿Qué cantidad quiere devolver?',
         'Tax rate' : 'Impuesto %',
         'Process refund now through payment processor' : 'Devolver a tarjeta de cliente',
         'Add a refund message (will show on client\'s credit card receipt)' : 'Añadir un mensaje a la devolución (se mostrará en el detalle de la devolución de la tarjeta del cliente)',
