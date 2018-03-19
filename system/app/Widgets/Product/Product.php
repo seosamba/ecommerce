@@ -397,6 +397,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
                 }
                 return htmlentities($tagsData);
             }
+            if (!empty($this->_options[0]) && $this->_options[0] === 'productlist') {
+                $tagsData = '';
+                foreach ($tags as $num => $tag) {
+                    $tagsData .= ($num !== 0) ? ',' . trim($tag['name']) : trim($tag['name']);
+                }
+                return htmlentities($tagsData);
+            }
             $pageHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('page');
 	        $pagesList = $pageMapper->getDbTable()->getAdapter()->fetchCol($pageMapper->getDbTable()->select()->from($pageMapper->getDbTable()->info('name'), 'url')->where("system = '0'"));
             foreach ($tags as &$tag) {
