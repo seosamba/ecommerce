@@ -290,7 +290,11 @@ UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `purchased_on` timestamp NULL;
 UPDATE `shopping_cart_session` SET `purchased_on` = `updated_at` WHERE `purchased_on` IS NULL AND  `updated_at` <> '0000-00-00 00:00:00' AND `status` IN('delivered', 'shipped', 'completed', 'refunded');
 
+-- 20/03/2018
+-- version: 2.5.7
+ALTER TABLE `shopping_product` ADD COLUMN `gtin` BIGINT(10) UNSIGNED DEFAULT NULL;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.7' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.8' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
