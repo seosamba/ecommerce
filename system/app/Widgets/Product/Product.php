@@ -386,6 +386,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
         return $this->_product->getSku();
     }
 
+    private function _renderGtin() {
+        return $this->_product->getGtin();
+    }
+
     private function _renderTags() {
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
 	    $tags = $this->_product->getTags();

@@ -182,6 +182,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_length` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
+  `gtin` BIGINT(10) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -832,5 +833,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.5.7' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.8' WHERE `name` = 'shopping';
 

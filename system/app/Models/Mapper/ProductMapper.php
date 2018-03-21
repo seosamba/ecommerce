@@ -76,7 +76,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'is_digital'        => $model->getIsDigital(),
             'prod_length'       => $model->getProdLength(),
             'prod_depth'        => $model->getProdDepth(),
-            'prod_width'        => $model->getProdWidth()
+            'prod_width'        => $model->getProdWidth(),
+            'gtin'              => $model->getGtin()
 		);
 
 		if ($model->getId()){

@@ -89,6 +89,11 @@ class Tools_FeedGenerator {
 				$item->appendChild($feed->createElement('g:mpn', $product->getMpn()));
 			}
 
+			$gtin = $product->getGtin();
+			if (!empty($gtin)) {
+                $item->appendChild($feed->createElement('g:gtin', $gtin));
+            }
+
 			$tags = $product->getTags();
 			if (!empty($tags)){
 				$tags = array_map(function($tag){ return $tag['name']; }, $tags);
