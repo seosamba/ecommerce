@@ -66,7 +66,7 @@ class Tools_FeedGenerator {
                 continue;
             }
 			$item = $feed->createElement('item');
-			$item->appendChild($feed->createElement('title', $product->getName()));
+			$item->appendChild($feed->createElement('title', htmlspecialchars($product->getName())));
 			$item->appendChild($feed->createElement('link', $websiteUrl.$productPage->getUrl()));
 			$item->appendChild($feed->createElement('description', $product->getShortDescription()));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
