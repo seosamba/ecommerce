@@ -35,6 +35,12 @@ class Tools_FeedGenerator {
 			'lastBuildDate' => date(DATE_RFC822),
 			'generator' => 'SEOTOASTER CMS 2.0 ('.Tools_System_Tools::REMOTE_TOASTER_URL.')'
 		);
+
+        $feedData['generator'] = ' ';
+        if (!Tools_System_Whitelabel::isWhiteLabel()) {
+            $feedData['generator'] =  'SEOTOASTER CMS 2.0 ('.Tools_System_Tools::REMOTE_TOASTER_URL.')';
+        }
+
 		unset($indexPage);
 
 		$feed = new DOMDocument('1.0', 'utf-8');
