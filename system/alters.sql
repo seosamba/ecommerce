@@ -285,8 +285,17 @@ ALTER TABLE `shopping_customer_address` ADD COLUMN `phone_country_code_value` VA
 -- version: 2.5.5
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 
--- 27/09/2017
+-- 07/02/2018
 -- version: 2.5.6
+ALTER TABLE `shopping_cart_session` ADD COLUMN `purchased_on` timestamp NULL;
+UPDATE `shopping_cart_session` SET `purchased_on` = `updated_at` WHERE `purchased_on` IS NULL AND  `updated_at` <> '0000-00-00 00:00:00' AND `status` IN('delivered', 'shipped', 'completed', 'refunded');
+
+-- 20/03/2018
+-- version: 2.5.7
+ALTER TABLE `shopping_product` ADD COLUMN `gtin` BIGINT(10) UNSIGNED DEFAULT NULL;
+
+-- 27/09/2017
+-- version: 2.5.8
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id' AFTER `shipping_tracking_id`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format' AFTER `shipping_service_id`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format' AFTER `shipping_availability_days`;
@@ -301,6 +310,6 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 ALTER TABLE `shopping_customer_address` ADD COLUMN `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.7' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.5.9' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

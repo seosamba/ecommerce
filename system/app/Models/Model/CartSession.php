@@ -109,6 +109,7 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_shippingLabelLink = null;
 
+    protected $_purchasedOn = null;
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -468,6 +469,20 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setShippingLabelLink($shippingLabelLink)
     {
         $this->_shippingLabelLink = $shippingLabelLink;
+    }
+
+    public function getPurchasedOn()
+    {
+        return $this->_purchasedOn;
+    }
+
+    /**
+     * @param null $purchasedOn
+     * @return null
+     */
+    public function setPurchasedOn($purchasedOn)
+    {
+        $this->_purchasedOn = $purchasedOn;
 
         return $this;
     }

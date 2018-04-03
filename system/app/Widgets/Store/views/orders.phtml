@@ -54,11 +54,11 @@ $this->headLink()
                     <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
                     <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
                              <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW); ?></option>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
+                             <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
                              <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?></option>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
-                             <option value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?></option>
+                             <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
+                             <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
+                             <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?></option>
                              <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED); ?></option>
                              <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?></option>
                              <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?></option>
@@ -119,7 +119,7 @@ $this->headLink()
                 <th>#</th>
 				<th class="sortable" data-sortkey="name"><?php echo $this->translate('Customer name');?></th>
 				<th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
-				<th class="sortable sortDown" data-sortkey="date"><?php echo $this->translate('Purchased on');?></th>
+				<th class="sortable sortDown" data-sortkey="aggregatedPurchasedOn"><?php echo $this->translate('Purchased on');?></th>
 				<th class="sortable" data-sortkey="status" style="min-width: 180px;"><?php echo $this->translate('Status');?></th>
 				<th class="sortable" data-sortkey="products"><?php echo $this->translate('Products in cart');?></th>
 				<th class="sortable" data-sortkey="total"><?php echo $this->translate('Total price');?></th>
