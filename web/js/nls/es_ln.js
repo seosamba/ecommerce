@@ -121,7 +121,7 @@ define({
         'Please specify shipment date' : 'Por favor especificar la fecha de envío',
         'Please specify shipment time' : 'Por favor especificar la hora de envío',
         'Export' : 'Exportar',
-        'Are you sure you want to change status for this order?' : '¿Estas seguro que quieres el rembolso de este pago?',
+        'Are you sure you want to change status for this order?' : '¿Desea cambiar de estado este pedido?',
         'Invoice has been sent' : 'Factura enviada',
         'Shipment availability dates' : 'Fechas de recogida disponibles',
         'for order' : 'para pedido',
