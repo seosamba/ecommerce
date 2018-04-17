@@ -116,7 +116,6 @@ class Tools_Geo {
 			$addressLine = implode(', ', array_filter(array(
 				$countries[$marker['country']],
 				$marker['address1'],
-				$marker['address2'],
 				$marker['city'],
 				$state['state'],
 				$marker['zip'],
