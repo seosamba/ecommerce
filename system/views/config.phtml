@@ -22,6 +22,9 @@ $this->headLink()
     <ul class="header">
 	    <?php $subForms = $this->form->getSubForms(); ?>
         <?php foreach ($subForms as $subform): ?>
+            <?php if($subform->getId() == 'notifications'){
+                continue;
+            }?>
             <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $this->translate($subform->getLegend()); ?></a></li>
         <?php endforeach; ?>
         <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
@@ -29,6 +32,9 @@ $this->headLink()
                 <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
             <?php endforeach; ?>
         <?php endif; ?>
+        <?php if(!empty($subForms['notifications'])):?>
+            <li><a href="#<?php echo $subForms['notifications']->getId(); ?>-tab"><?php echo $this->translate($subForms['notifications']->getLegend()); ?></a></li>
+        <?php endif;?>
 	</ul>
     </div>
 	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">

@@ -1,7 +1,5 @@
 E-commerce store plugin
 
-More info you can find here http://www.seotoaster.com/ecommerce-cms.html and http://seotoaster-documentation.seotoaster.com/
-
 Plugin widgets.
 
 1. Product widgets (works on product pages)

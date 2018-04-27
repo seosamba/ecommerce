@@ -11,6 +11,7 @@ define([
                 name: '',
                 sku: '',
                 mpn: '',
+                gtin: '',
                 brand: null,
                 shortDescription: '',
                 fullDescription: '',

@@ -519,6 +519,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * Return product gtin for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemGtin($sid)
+    {
+        return $this->_cartContent[$sid]['gtin'];
+    }
+
+    /**
      * Return product price without tax for single item in cart
      *
      * @param $sid

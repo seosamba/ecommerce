@@ -21,7 +21,7 @@ define(['backbone', '../models/order', 'backbone.paginator'],
                 count: true,
                 limit: function() { return this.perPage; },
                 offset: function() { return this.currentPage * this.perPage },
-                order: 'order.created_at DESC'
+                order: 'aggregatedPurchasedOn DESC'
             },
             parse: function(response){
                 if (this.server_api.count){

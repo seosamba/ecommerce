@@ -386,6 +386,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
         return $this->_product->getSku();
     }
 
+    private function _renderGtin() {
+        return $this->_product->getGtin();
+    }
+
     private function _renderTags() {
         $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
 	    $tags = $this->_product->getTags();
@@ -394,6 +398,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
                 $tagsData = '';
                 foreach ($tags as $num => $tag) {
                     $tagsData .= ($num !== 0) ? ', ' . trim($tag['name']) : trim($tag['name']);
+                }
+                return htmlentities($tagsData);
+            }
+            if (!empty($this->_options[0]) && $this->_options[0] === 'productlist') {
+                $tagsData = '';
+                foreach ($tags as $num => $tag) {
+                    $tagsData .= ($num !== 0) ? ',' . trim($tag['name']) : trim($tag['name']);
                 }
                 return htmlentities($tagsData);
             }

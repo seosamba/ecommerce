@@ -69,6 +69,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_prodDepth = 0;
 
+    protected $_gtin = '';
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -394,7 +396,24 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getGtin()
+    {
+        return $this->_gtin;
+    }
 
+    /**
+     * @param string $gtin
+     * @return string
+     */
+    public function setGtin($gtin)
+    {
+        $this->_gtin = $gtin;
+
+        return $this;
+    }
 
 
 }

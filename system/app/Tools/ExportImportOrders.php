@@ -228,7 +228,7 @@ class Tools_ExportImportOrders
                     $countries = Tools_Geo::getCountries(true);
                     $states = Tools_Geo::getState(null, true);
                     $importOrderDbTable = new Store_DbTable_ImportOrder();
-                    $emailValidate = new Zend_Validate_EmailAddress();
+                    $emailValidate = new Tools_System_CustomEmailValidator();
                     $importOrdersErrors = array();
                     $importedOrdersIds = array();
                     $importedContentData = array();
