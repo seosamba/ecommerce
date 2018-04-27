@@ -174,7 +174,7 @@ define([
                 runtimes       : 'html5,flash,html4',
                 browse_button  : 'uploader-digital-product',
                 rename         : true,
-                max_file_size  : '10mb',
+                max_file_size  : '1000mb',
                 max_file_count : 1,
                 multi_selection: false,
                 url            : self.websiteUrl + 'api/store/digitalproducts/',

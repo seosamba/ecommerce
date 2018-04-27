@@ -103,6 +103,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_refundNotes = '';
 
+    protected $_purchasedOn = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -396,6 +398,25 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setRefundNotes($refundNotes)
     {
         $this->_refundNotes = $refundNotes;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPurchasedOn()
+    {
+        return $this->_purchasedOn;
+    }
+
+    /**
+     * @param null $purchasedOn
+     * @return null
+     */
+    public function setPurchasedOn($purchasedOn)
+    {
+        $this->_purchasedOn = $purchasedOn;
 
         return $this;
     }

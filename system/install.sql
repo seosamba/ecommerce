@@ -182,6 +182,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_length` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
+  `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -307,6 +308,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `free_cart` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
+  `purchased_on` timestamp NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -869,4 +871,4 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.5.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.5.9' WHERE `name` = 'shopping';

@@ -87,6 +87,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
 					'name'  => 'u.full_name',
 					'email' => 'u.email',
 					'date'  => 'order.created_at',
+					'aggregatedPurchasedOn' => 'aggregatedPurchasedOn',
 					'status' => 'order.status',
 					'products' => 'total_products',
 					'total' => 'order.total',

@@ -519,7 +519,7 @@ class Tools_ShoppingCart {
 	}
 
 	public function calculateCartWeight($withFreeShipping = false) {
-		$totalWeight = 0;
+        $totalWeight = 0;
         if(is_array($this->_content) && !empty($this->_content)) {
             foreach($this->_content as $cartItem) {
                 if(!$withFreeShipping){
