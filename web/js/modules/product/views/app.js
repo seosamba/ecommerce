@@ -329,9 +329,16 @@ define([
 
             this.$('#product-brand').val(-1); //reseting brand field
 
-            var self = this;
+            var self = this,
+                decimalSeparator = $('.decimal-separator').val();
+
             _.each(this.model.toJSON(), function(value, name){
-                self.$('[data-reflection='+name+']').val(value);
+                if((name == 'price' || name == 'weight' || name == 'prodWidth' || name == 'prodLength' || name == 'prodDepth') && !_.isEmpty(value)){
+                    self.$('[data-reflection='+name+']').val(value.replace('.', decimalSeparator));
+                }else{
+                    self.$('[data-reflection='+name+']').val(value);
+                }
+
             });
 
             if (this.model.has('related')){
@@ -389,7 +396,8 @@ define([
                     product: this.model.toJSON(),
                     websiteUrl: $('#website_url').val(),
                     currency: this.$('#currency-unit').text(),
-                    photoUrl: photoUrl
+                    photoUrl: photoUrl,
+                    decimalSeparator: $('.decimal-separator').val()
                 }));
             }
 
@@ -536,6 +544,16 @@ define([
             if (newBrandName){
                 this.addNewBrand(newBrandName).$('#new-brand').val('');
             }
+
+
+            var decimalSeparator = $('.decimal-separator').val();
+            this.model.set({
+                price       : !_.isEmpty(this.model.get('price')) ? this.model.get('price').replace(decimalSeparator , '.') : '',
+                weight      : !_.isEmpty(this.model.get('weight')) ? this.model.get('weight').replace(decimalSeparator , '.') : '',
+                prodWidth   : !_.isEmpty(this.model.get('prodWidth')) ? this.model.get('prodWidth').replace(decimalSeparator , '.') : '',
+                prodLength  : !_.isEmpty(this.model.get('prodLength')) ? this.model.get('prodLength').replace(decimalSeparator , '.') : '',
+                prodDepth   : !_.isEmpty(this.model.get('prodDepth')) ? this.model.get('prodDepth').replace(decimalSeparator , '.') : ''
+            });
 
             this.model.save();
 

@@ -176,7 +176,7 @@ $this->headLink()
 		<span class="price">
             <% pricePreview = parseFloat(product.price) %>
             <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
-			<%= pricePreview.toFixed(2) + '&nbsp;' + currency %>
+			<%= pricePreview.toFixed(2).replace('.', decimalSeparator) + '&nbsp;' + currency %>
 		</span>
 		<span class="info"><?php echo $this->translate('Click preview to get to product landing page');?></span>
 	</a>
@@ -453,6 +453,7 @@ $this->headLink()
         </div>
     </div>
     <input class="secure-token-tax" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
+    <input class="decimal-separator" type="hidden" name="decimal-separator" value="<?php echo $this->decimalSeparator;?>" />
 </div>
 
 <script>

@@ -735,6 +735,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->configTabs = $configTabs;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
+
+            $this->_view->decimalSeparator = $this->decimalSeparator();
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
@@ -2299,6 +2301,13 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
+    }
+
+    public function decimalSeparator(){
+        $locale = Zend_Locale::getLocaleToTerritory(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'));
+        $symbols = Zend_Locale_Data::getList($locale,'symbols');
+
+        return $symbols['decimal'];
     }
 
 }
