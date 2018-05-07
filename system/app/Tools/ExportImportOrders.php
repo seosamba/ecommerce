@@ -51,7 +51,34 @@ class Tools_ExportImportOrders
             $filePath = $websiteHelper->getPath() . $websiteHelper->getTmp() . $fileName;
             $expFile = fopen($filePath, 'w');
             $dataToExport = array_merge($headers, $dataToExport);
-            foreach ($dataToExport as $data) {
+            $statesNumeric = Tools_Geo::getState(null, true);
+            $stateTable = new Zend_Db_Table('shopping_list_state');
+            $select = $stateTable->select()->from($stateTable,array('id','state'));
+            $statesAlpha = $stateTable->getAdapter()->fetchPairs($select);
+            foreach ($dataToExport as $key => $data) {
+                if (!empty($key)) {
+                    if (!empty($data['billing_state'])) {
+                        if (is_numeric($data['billing_state']) && array_key_exists($data['billing_state'], $statesNumeric)) {
+                            $data['billing_state'] = $statesNumeric[$data['billing_state']];
+                        } else {
+                            $stateExists = array_search($data['billing_state'], $statesAlpha, true);
+                            if ($stateExists !== false) {
+                                $data['billing_state'] = $statesNumeric[$stateExists];
+                            }
+                        }
+                    }
+                    if (!empty($data['shipping_state'])) {
+                        if (is_numeric($data['shipping_state']) && array_key_exists($data['shipping_state'], $statesNumeric)) {
+                            $data['shipping_state'] = $statesNumeric[$data['shipping_state']];
+                        }  else {
+                            $stateExists = array_search($data['shipping_state'], $statesAlpha, true);
+                            if ($stateExists !== false) {
+                                $data['shipping_state'] = $statesNumeric[$stateExists];
+                            }
+                        }
+
+                    }
+                }
                 fputcsv($expFile, $data, ',', '"');
             }
             fclose($expFile);
