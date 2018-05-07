@@ -31,14 +31,14 @@ Plugin widgets.
         sometext - custom text inside span element
 
 2. Product list widget.
-    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:limit:5} - Creates a list of products using the same tags.
+    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
     template_name - template name for the product list
     tagnames-tag1,tag2,...,tagN - filtering by product tags
     brands-brand1,brand2,...,brandN - filtering by product brands
     order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
     unwrap - remowed the <div class="product-list"></div> HTML element
-    limit: 5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
+    5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
