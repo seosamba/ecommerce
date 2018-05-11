@@ -442,7 +442,8 @@ define(['backbone',
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to change status for this order?'])?'Are you sure you want to change status for this order?':i18n['Are you sure you want to change status for this order?'],
                 status = el.data('status');
 
-            var model = this.orders.get(id);
+            var model = this.orders.get(id),
+                realRefundByDefault = this.orders.realRefundByDefault;
 
             if (status === 'refunded') {
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to refund this payment?'])?'Are you sure you want to refund this payment?':i18n['Are you sure you want to refund this payment?'];
@@ -453,7 +454,8 @@ define(['backbone',
                         i18n:i18n,
                         orderId: id,
                         gateway: model.get('gateway'),
-                        total: model.get('total')
+                        total: model.get('total'),
+                        realRefundByDefault: realRefundByDefault
                     });
 
                 assignRefundButtons[refundButton] = function() {

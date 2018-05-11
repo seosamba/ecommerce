@@ -116,6 +116,11 @@ class Api_Store_Orders extends Api_Service_Abstract {
             }
             $orderList['defaultTaxes'] = $defaultTaxes;
             $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
+            if (!empty($shoppingConfig['realRefundByDefault'])) {
+                $orderList['realRefundByDefault'] = 1;
+            } else {
+                $orderList['realRefundByDefault'] = 0;
+            }
             $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
 			return $orderList;
 		}

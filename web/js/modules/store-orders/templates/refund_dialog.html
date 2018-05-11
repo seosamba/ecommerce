@@ -15,9 +15,11 @@
                 <option value="2"><%= _.isUndefined(i18n['Alternative']) ? 'Alternative':i18n['Alternative'] %></option>
                 <option value="3"><%= _.isUndefined(i18n['Alternative']) ? 'Alternative':i18n['Alternative'] %> 2</option>
             </select>
-            <label class="grid_9 fl-left mt20px pointer"><%= _.isUndefined(i18n['Process refund now through payment processor']) ? 'Process refund now through payment processor':i18n['Process refund now through payment processor'] %>
-                (< <%= gateway %> >) <input type="checkbox" class="use-refund-payment-gateway" name="gatewayRefund" value="1"/>
-            </label>
+            <% if (gateway !== 'Quote') { %>
+                <label class="grid_9 fl-left mt20px pointer"><%= _.isUndefined(i18n['Process refund now through payment processor']) ? 'Process refund now through payment processor':i18n['Process refund now through payment processor'] %>
+                    (< <%= gateway %> >) <input <%= ((realRefundByDefault == '1') ? 'checked' : '' )%> type="checkbox" class="use-refund-payment-gateway" name="gatewayRefund" value="1"/>
+                </label>
+            <% } %>
             <label class="grid_12 fl-left mt20px pointer"><%= _.isUndefined(i18n['Add a refund message (will show on client\'s credit card receipt)']) ? 'Add a refund message (will show on client\'s credit card receipt)': i18n['Add a refund message (will show on client\'s credit card receipt)']  %>:
                 <textarea class="refund-info grid_12 mt10px"></textarea>
             </label>
