@@ -102,6 +102,8 @@ class Tools_Geo {
 		if (is_array($markers) && !is_array(current($markers))){
 			$markers = array($markers);
 		}
+        $generalConfig = Application_Model_Mappers_ConfigMapper::getInstance()->getConfig();
+
 		$params = array(
 			'sensor'    => 'false',
 			'size'      => intval($width).'x'.intval($height),
@@ -124,6 +126,10 @@ class Tools_Geo {
 		}
 
 		$params['markers'] = implode('|', $params['markers']);
+
+        if(!empty($generalConfig['googleApiKey'])) {
+            $params['key'] = $generalConfig['googleApiKey'];
+        }
 
 		return 'https://maps.googleapis.com/maps/api/staticmap?'.http_build_query($params);
 	}
