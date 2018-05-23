@@ -275,7 +275,7 @@
         'Set parameters for cart wide promotions from this screen.'=>'Définissez les promos applicable au panier entier de cet écran.',
         'Set item specific promotions in the "add/edit product" screen.'=>'Réglez promotions spécifiques a 1 produit dans l&rsquo;écran "ajouter / modifier des produits".',
         'Coupons'=>'Coupons',
-        'Customers groups'=>'groupes de clients',
+        'Customers/Leads groups'=>'groupes de clients',
         'Manage products '=>'Gérer les produits',
         'Search:'=>'Recherche:',
         'by name, sku, mpn '=>'par nom, sku, MPN',
