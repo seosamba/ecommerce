@@ -2,7 +2,7 @@
     <select name="choose-service" id="marketing-services" style="float:none;">
         <option value="select"><%= _.isUndefined(i18n['Select service']) ? 'Select service':i18n['Select service'] %></option>
         <% _.each(enabledServices, function(status, service){ %>
-            <option value="<%= service %>"><%= service %></option>
+            <option value="<%= service %>"><%= enabledServicesLabels[service] %></option>
         <% }); %>
     </select>
 </div>
