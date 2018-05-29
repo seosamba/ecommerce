@@ -474,7 +474,7 @@
 'Set item specific promotions in the "add/edit product" screen.' => 'Set item specific promotions in the "add/edit product" screen.',
 'Coupons' => 'Coupons',
 'Recurring payments' => 'Recurring payments',
-'Customers groups' => 'Customers groups',
+'Customers/Leads groups' => 'Customers/Leads groups',
 'Digital products' => 'Digital products',
 'Product tags' => 'Product tags',
 'Activate autoship frequencies' => 'Activate autoship frequencies',

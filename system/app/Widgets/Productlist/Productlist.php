@@ -211,6 +211,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         $this->_view->sort = $orderSql;
 
+        if(in_array('unwrap', $this->_options)){
+            $this->_view->unwrap = true;
+        }
+
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
 		} elseif (!intval($this->_options[0])) {

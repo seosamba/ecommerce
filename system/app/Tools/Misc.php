@@ -107,7 +107,7 @@ class Tools_Misc
     public static $_merchandisingConfigTabs = array(
         0 => array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal'),
         1 => array('tabId' => 'recurring-payments', 'tabName' => 'Recurring payments', 'type' => 'internal'),
-        2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers groups', 'type' => 'internal')
+        2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers/Leads groups', 'type' => 'internal')
     );
 
 
