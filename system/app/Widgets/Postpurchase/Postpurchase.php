@@ -305,7 +305,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderShippingprice()
     {
         $shippingPrice = (is_null($this->_cart->getShippingPrice())) ? 0 : $this->_cart->getShippingPrice();
-        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $shippingPrice != 0) {
+        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $shippingPrice != 0 && !in_array(self::WITHOUT_TAX, $this->_options)) {
             $shippingPrice = $shippingPrice + $this->_cart->getShippingTax();
         }
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
@@ -413,7 +413,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderDiscount()
     {
         $discount = (is_null($this->_cart->getDiscount())) ? 0 : $this->_cart->getDiscount();
-        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $discount != 0) {
+        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $discount != 0 && !in_array(self::WITHOUT_TAX, $this->_options)) {
             $discount = $discount + $this->_cart->getDiscountTax();
         }
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
