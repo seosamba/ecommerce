@@ -193,10 +193,10 @@ define(['backbone',
                        availableDateAndTime = [];
 
                    _.each(shippingAvailabilityDays.availabilityDates, function(time, date){
-                       if (typeof availabilityMonths[moment(date, 'YYYY-MM-DD').format("MM")] === 'undefined') {
-                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("MM")] = [parseInt(moment(date, 'YYYY-MM-DD').format("D"))];
+                       if (typeof availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")] === 'undefined') {
+                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")] = [parseInt(moment(date, 'YYYY-MM-DD').format("D"))];
                        } else {
-                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("MM")].push(parseInt(moment(date, 'YYYY-MM-DD').format("D")));
+                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")].push(parseInt(moment(date, 'YYYY-MM-DD').format("D")));
                        }
                        if (typeof availableDateAndTime[date] === 'undefined') {
                            availableDateAndTime[date] = [time];
