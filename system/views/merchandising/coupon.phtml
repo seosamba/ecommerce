@@ -16,7 +16,18 @@
         </select>
     </div>
 
-	<div class="grid_4 alpha mt0px">
+    <div class="grid_2 alpha mt0px">
+        <?php $zones = Models_Mapper_Zone::getInstance()->fetchAll();?>
+        <label><?php echo $this->translate('Restricted by zone'); ?></label>
+        <select name="zoneId" id="coupon-zone">
+            <option value="0"><?php echo $this->translate('Select');?></option>
+            <?php foreach ($zones as $zone):?>
+                <option value="<?php echo $zone->getId();?>" <?php echo (isset($generalConfig[Shopping::COUPON_ZONE]) && $generalConfig[Shopping::COUPON_ZONE] === $zone->getId()) ? 'selected' : '';?>><?php echo $zone->getName();?></option>
+            <?php endforeach;?>
+        </select>
+    </div>
+
+	<div class="grid_3 alpha mt0px">
         <label><?php echo $this->translate('Type');?></label>
 		<?php echo $this->formSelect('type', null, array(
 				'data-action'   => 'render',
@@ -33,7 +44,7 @@
         )); ?>
     </div>
 
-    <div class="grid_4 omega mt0px">
+    <div class="grid_3 omega mt0px">
 		<label class="mb0-5em mt0-5em pointer" for="allowCombination">
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
@@ -81,6 +92,7 @@
             <th><?php echo $this->translate('Combine?');?></th>
             <th><?php echo $this->translate('One use');?></th>
             <th><?php echo $this->translate('Target');?></th>
+            <th><?php echo $this->translate('Zone name');?></th>
             <th><?php echo $this->translate('Action');?></th>
             <th>&nbsp;</th>
         </tr>

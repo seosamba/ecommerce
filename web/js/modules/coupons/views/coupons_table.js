@@ -56,6 +56,7 @@ define([
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
+                '<a href="javascript:;" class="tpopup" data-url="'+$('#website_url').val()+'plugin/shopping/run/zones/">'+coupon.get('zoneName')+'</acl>',
                 coupon.get('action'),
                 '<a class="ticon-remove error icon14" data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;"></a>'
             ]);

@@ -17,6 +17,8 @@ class Tools_CouponTools {
 
 	const STATUS_FAIL_NOT_REUSABLE  = 'fail_not_reusable';
 
+	const STATUS_FAIL_ZONE_RESTRICTION = 'fail_zone_restriction';
+
 	const STATUS_APPLIED            = true;
 
 
@@ -112,6 +114,15 @@ class Tools_CouponTools {
 				return self::STATUS_FAIL_NOT_REUSABLE;
 			}
 		}
+
+        $zoneId = $coupon->getZoneId();
+		if (!empty($zoneId)) {
+            $shippingAddress = $cart->getAddressById($cart->getShippingAddressKey());
+            $zoneStatus =  Tools_Tax_Tax::getZone($shippingAddress, false, array($zoneId));
+            if (empty($zoneStatus)) {
+                return self::STATUS_FAIL_ZONE_RESTRICTION;
+            }
+        }
 
 		// saving coupon to cart session and recalculating cart
 		array_push($currentCoupons, $coupon);
