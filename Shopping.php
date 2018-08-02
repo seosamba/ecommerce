@@ -418,6 +418,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()) {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
+                $prefix = isset($data['prefix']) ? $data['prefix'] : '';
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
@@ -456,7 +457,8 @@ class Shopping extends Tools_Plugins_Abstract {
                         ->setDesktopCountryCode($desktopCountryCode)
                         ->setDesktopCountryCodeValue($desktopCountryCodeValue)
 						->setPassword($password)
-                        ->setSubscribed($subscribed);
+                        ->setSubscribed($subscribed)
+                        ->setPrefix($prefix);
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
@@ -960,6 +962,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $customerAddress = Models_Mapper_CustomerMapper::getInstance()->getUserAddressOrdersByUserId($id);
         if($customerAddress) {
             $this->_view->customerAddress = $customerAddress;
+            $this->_view->userPrefixes  = Tools_ShoppingCart::$userPrefixes;
         }
 
         if (!$customer instanceof Models_Model_Customer) {
@@ -1009,6 +1012,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
         $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
         $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
+
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -1538,6 +1542,9 @@ class Shopping extends Tools_Plugins_Abstract {
                                 $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
                             }
                         break;
+                        case 'prefix':
+                            $user->setPrefix($data['profileValue']);
+                            break;
                         case 'fullname':
                             $user->setFullName($data['profileValue']);
                         break;
@@ -2209,6 +2216,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $headers = array(
                     $this->_translator->translate('E-mail'),
                     $this->_translator->translate('Role'),
+                    $this->_translator->translate('Prefix'),
                     $this->_translator->translate('Full name'),
                     $this->_translator->translate('Last login date'),
                     $this->_translator->translate('Registration date'),

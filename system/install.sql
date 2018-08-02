@@ -336,6 +336,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `id` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   `address_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   `firstname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `company` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -833,5 +834,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.5.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.0' WHERE `name` = 'shopping';
 

@@ -29,6 +29,7 @@
                         <?php if(isset($billingAddress['company']) && $billingAddress['company'] != ''):?>
                             <span><?php echo $billingAddress['company'];?></span><br />
                         <?php endif;?>
+                        <span class="prefix"><?php echo $billingAddress['prefix'];?></span>
                         <span class="first-name"><?php echo $billingAddress['firstname'];?></span>
                         <span class="last-name"><?php echo $billingAddress['lastname'];?></span><br />
                         <?php echo $this->formHidden('id', $billingAddress['id'], array('id' => 'id_' . $billingAddress['id'])); ?>
@@ -65,6 +66,7 @@
                         <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
                             <span class="company"><?php echo $shippingAddress['company'];?></span><br />
                         <?php endif;?>
+                        <span class="prefix"><?php echo $shippingAddress['prefix'];?></span>
                         <span class="first-name"><?php echo $shippingAddress['firstname'];?></span>
                         <span class="last-name"><?php echo $shippingAddress['lastname'];?></span>
                         <br/>
