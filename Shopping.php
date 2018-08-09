@@ -960,9 +960,9 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
         $customerAddress = Models_Mapper_CustomerMapper::getInstance()->getUserAddressOrdersByUserId($id);
+        $this->_view->userPrefixes  = Tools_ShoppingCart::$userPrefixes;
         if($customerAddress) {
             $this->_view->customerAddress = $customerAddress;
-            $this->_view->userPrefixes  = Tools_ShoppingCart::$userPrefixes;
         }
 
         if (!$customer instanceof Models_Model_Customer) {
