@@ -172,7 +172,7 @@ $this->headLink()
 	<a href="<%= (_.isObject(product.page) ? $('#website_url').val() + product.page.url : '#') %>" target="_blank">
 		<span class="name"><%= product.name %></span>
 		<span class="image background"><img src="<%= photoUrl %>"/></span>
-		<span class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></span>
+		<div class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></div>
 		<span class="price">
             <% pricePreview = parseFloat(product.price) %>
             <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
