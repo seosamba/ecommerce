@@ -98,6 +98,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
 
+    const COUPON_ZONE = 'zoneId';
+
 
     const QUANTITY_PICKUP_LOCATION_ON_SCREEN = 6;
 

@@ -28,6 +28,9 @@ class Tools_Shipping_Parcel
                 if ($this->_currentWidth < $item['width']) {
                     $this->_currentWidth = $item['width'];
                 }
+                if ($this->_currentLength < $item['length']) {
+                    $this->_currentLength = $item['length'];
+                }
                 $this->_currentDepth += $item['depth'];
             } else {
                 $this->_currentLength = $item['length'];
@@ -68,6 +71,12 @@ class Tools_Shipping_Parcel
         return $this->_cubicWeight > $this->_currentWeight ? $this->_cubicWeight : $this->_currentWeight;
     }
 
+    public function setCurrentWeight($currentWeight)
+    {
+        $this->_currentWeight = $currentWeight;
+        return $this;
+    }
+
     public function getLength()
     {
         return $this->_currentLength;
@@ -83,5 +92,24 @@ class Tools_Shipping_Parcel
         return $this->_currentDepth;
     }
 
+    public function getCurrentWeight()
+    {
+        return $this->_currentWeight;
+    }
+
+    public function getCurrentLength()
+    {
+        return $this->_currentLength;
+    }
+
+    public function getCurrentWidth()
+    {
+        return $this->_currentWidth;
+    }
+
+    public function getCurrentDepth()
+    {
+        return $this->_currentDepth;
+    }
 
 }

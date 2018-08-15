@@ -17,6 +17,8 @@ class Tools_CouponTools {
 
 	const STATUS_FAIL_NOT_REUSABLE  = 'fail_not_reusable';
 
+	const STATUS_FAIL_ZONE_RESTRICTION = 'fail_zone_restriction';
+
 	const STATUS_APPLIED            = true;
 
 
@@ -113,6 +115,15 @@ class Tools_CouponTools {
 			}
 		}
 
+        $zoneId = $coupon->getZoneId();
+		if (!empty($zoneId)) {
+            $shippingAddress = $cart->getAddressById($cart->getShippingAddressKey());
+            $zoneStatus =  Tools_Tax_Tax::getZone($shippingAddress, false, array($zoneId));
+            if (empty($zoneStatus)) {
+                return self::STATUS_FAIL_ZONE_RESTRICTION;
+            }
+        }
+
 		// saving coupon to cart session and recalculating cart
 		array_push($currentCoupons, $coupon);
 		$cart->setCoupons($currentCoupons);
@@ -174,6 +185,15 @@ class Tools_CouponTools {
         }
 		$discount = 0;
 
+        $zoneId = $coupon->getZoneId();
+        if (!empty($zoneId)) {
+            $shippingAddress = Tools_ShoppingCart::getInstance()->getAddressById(Tools_ShoppingCart::getInstance()->getShippingAddressKey());
+            $zoneStatus =  Tools_Tax_Tax::getZone($shippingAddress, false, array($zoneId));
+            if (empty($zoneStatus)) {
+                return floatval($discount);
+            }
+        }
+
 		if ($orderAmount >= $coupon->getMinOrderAmount()){
 			switch ($coupon->getDiscountUnit()){
 				case Store_Model_Coupon::DISCOUNT_PERCENTS:
@@ -192,6 +212,15 @@ class Tools_CouponTools {
 	public static function processFreeshippingCoupon(Store_Model_Coupon $coupon){
 		$minOrderAmount = floatval($coupon->getMinOrderAmount());
 		$cartSummary = Tools_ShoppingCart::getInstance()->calculate();
+        $zoneId = $coupon->getZoneId();
+        if (!empty($zoneId)) {
+            $shippingAddress = Tools_ShoppingCart::getInstance()->getAddressById(Tools_ShoppingCart::getInstance()->getShippingAddressKey());
+            $zoneStatus =  Tools_Tax_Tax::getZone($shippingAddress, false, array($zoneId));
+            if (empty($zoneStatus)) {
+                return false;
+            }
+        }
+
 		if (floatval($cartSummary['subTotal']) > $minOrderAmount){
 			Tools_ShoppingCart::getInstance()->setShippingData(array(
 				'service'   => Shopping::SHIPPING_FREESHIPPING,
