@@ -23,7 +23,7 @@ $this->headScript()
                         <?php $prefix = $this->customer->getPrefix();?>
                         <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
                             <option <?php if ($prefix == $userPrefixVal): ?> selected="selected" <?php endif; ?>
-                                    value="<?php echo $userPrefixVal; ?>"><?php echo $userPrefixVal; ?></option>
+                                    value="<?php echo $userPrefixVal; ?>"><?php echo $this->translate($userPrefixVal); ?></option>
                         <?php endforeach; ?>
                     </select>
                 <?php endif;?>
@@ -312,7 +312,7 @@ $this->headScript()
                             <option value=""><?php echo $this->translate('Select'); ?></option>
                             <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
                                 <option <?php if ($billingAddress['prefix'] == $userPrefixVal): ?> selected="selected" <?php endif; ?>
-                                        value="<?php echo $userPrefixVal; ?>"><?php echo $userPrefixVal; ?></option>
+                                        value="<?php echo $userPrefixVal; ?>"><?php echo $this->translate($userPrefixVal); ?></option>
                             <?php endforeach; ?>
                         </select>
                     <?php else: ?>

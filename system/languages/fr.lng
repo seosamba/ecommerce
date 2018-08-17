@@ -690,6 +690,12 @@
         'Billing phone full' => 'Numéro fixe complet (facturation)',
         'Billing mobile country code' => 'Code de pays - numéro mobile  (facturation)',
         'Billing mobile country code value' => 'Valeur du code de pays - numéro mobile (facturation)',
-        'Billing mobile full' => 'Numéro mobile complet (facturation)'
+        'Billing mobile full' => 'Numéro mobile complet (facturation)',
+        'Select'=>'Sélectionner',
+        'Mr' => 'M',
+        'Mrs' => 'Mme',
+        'Ms' => 'Mme',
+        'Miss' => 'Mlle',
+        'Dr' => 'Dr'
 
 );?>
