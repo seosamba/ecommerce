@@ -298,12 +298,17 @@ ALTER TABLE `shopping_product` ADD COLUMN `gtin` BIGINT(10) UNSIGNED DEFAULT NUL
 -- version: 2.5.8
 ALTER TABLE `shopping_product` MODIFY COLUMN `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL;
 
--- 31/07/2018
+-- 18/06/2017
 -- version: 2.5.9
+-- Add zone id for the coupon
+ALTER TABLE `shopping_coupon` ADD COLUMN `zoneId` int(10) unsigned DEFAULT NULL;
+
+-- 31/07/2018
+-- version: 2.6.0
 -- Add new prefix column
 ALTER TABLE `shopping_customer_address` ADD COLUMN `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `address_type`;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

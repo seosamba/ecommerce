@@ -99,7 +99,7 @@ class Tools_Tax_Tax {
 	 *
 	 * @return int
 	 */
-	public static function getZone($address = null, $withTaxable = true) {
+	public static function getZone($address = null, $withTaxable = true, $customTaxZoneIds = array()) {
 		if (is_null($address) || empty($address)){
 			return 0;
 		} else {
@@ -116,7 +116,11 @@ class Tools_Tax_Tax {
                 $zones =  $zoneMapper->fetchAll($zoneMapper->getDbTable()->getAdapter()->quoteInto('id IN(?)', $zoneIds));
             }
         }else{
-            $zones = $zoneMapper->fetchAll();
+            if (!empty($customTaxZoneIds)) {
+                $zones = $zoneMapper->fetchAll($zoneMapper->getDbTable()->getAdapter()->quoteInto('id IN(?)', $customTaxZoneIds));
+            } else {
+                $zones = $zoneMapper->fetchAll();
+            }
         }
 
 		if(is_array($zones) && !empty($zones)) {

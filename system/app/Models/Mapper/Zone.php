@@ -154,4 +154,16 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 		}
 		return $result;
 	}
+
+    /**
+     * Get zone names
+     *
+     * @return mixed
+     * @throws Exception
+     */
+	public function getZoneNames()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_zone');
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
 }
