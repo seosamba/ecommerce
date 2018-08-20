@@ -539,21 +539,34 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
 	}
 
-    public function buildIndex(){
+    /**
+     * Search products by name, sku, mpn, brand name, tag name
+     *
+     * @param $searchTerm
+     * @return mixed
+     * @throws Exception
+     */
+    public function buildIndex($searchTerm){
         $db = $this->getDbTable()->getAdapter();
 
-        $select[] = $db->select()
-            ->from('shopping_product', array('name'));
-        $select[] = $db->select()
-            ->from('shopping_product', array('sku'));
-        $select[] = $db->select()
-            ->from('shopping_product', array('mpn'));
-        $select[] = $db->select()
-            ->from('shopping_tags', array('name'));
-        $select[] = $db->select()
-            ->from('shopping_brands', array('name'));
+        $where = $this->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('sp.sku LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('sp.mpn LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('sb.name LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('st.name LIKE ?', '%' . $searchTerm . '%');
 
-        return $db->fetchCol($db->select()->union($select));
+        $select = $db->select()->from(array('sp' => 'shopping_product'), array(
+            'prod' => 'sp.name'
+        ))
+            ->join(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array())
+            ->joinLeft(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
+            ->joinLeft(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
+            ->where($where)
+            ->group('sp.id');
+
+        $data = $db->fetchCol($select);
+
+        return $data;
     }
 
 	public function updateAttributes($id, $attributes){
