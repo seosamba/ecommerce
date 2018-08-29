@@ -28,6 +28,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				->from(array('order' => 'shopping_cart_session'))
 				->joinLeft(array('oc' => 'shopping_cart_session_content'), 'oc.cart_id = order.id', array('total_products' => 'COUNT(DISTINCT oc.id)', 'aggregatedPurchasedOn' => new Zend_Db_Expr('IFNULL(order.purchased_on, order.created_at)')))
 				->joinLeft(array('s_adr' => 'shopping_customer_address'), 's_adr.id = order.shipping_address_id', array(
+                    'shipping_prefix' => 'prefix',
 					'shipping_firstname' => 'firstname',
 					'shipping_lastname' => 'lastname',
 					'shipping_company' => 'company',
@@ -42,6 +43,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 					'shipping_address2' => 'address2'
 				))
 				->joinLeft(array('b_adr' => 'shopping_customer_address'), 'b_adr.id = order.billing_address_id', array(
+                    'billing_prefix' => 'firstname',
 					'billing_firstname' => 'firstname',
 					'billing_lastname' => 'lastname',
 					'billing_company' => 'company',
@@ -122,8 +124,10 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'notes' => 'order.notes',
             'shipping_tracking_id' => 'order.shipping_tracking_id',
             'brand' => 'sb.name',
+            'user_prefix' => 'u.prefix',
             'user_name' => 'u.full_name',
             'user_email' => 'u.email',
+            'shipping_prefix' => 's_adr.prefix',
             'shipping_firstname' => 's_adr.firstname',
             'shipping_lastname' => 's_adr.lastname',
             'shipping_company' => 's_adr.company',
@@ -142,6 +146,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'shipping_zip' => 's_adr.zip',
             'shipping_address1' => 's_adr.address1',
             'shipping_address2' => 's_adr.address2',
+            'billing_prefix' => 'b_adr.prefix',
             'billing_firstname' => 'b_adr.firstname',
             'billing_lastname' => 'b_adr.lastname',
             'billing_company' => 'b_adr.company',

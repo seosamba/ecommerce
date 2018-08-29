@@ -500,6 +500,12 @@
 'Quote' => 'Quote',
 'Dashboard' => 'Dashboard',
 'Documents' => 'Documents',
-'Add/edit product' => 'Add/edit product'
+'Add/edit product' => 'Add/edit product',
+'Select' => 'Seleccionar',
+'Mr' => 'Sr',
+'Mrs' => 'Sra',
+'Ms' => 'Sra',
+'Miss' => 'Srta',
+'Dr' => 'Dr'
 
 );

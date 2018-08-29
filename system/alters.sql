@@ -303,8 +303,13 @@ ALTER TABLE `shopping_product` MODIFY COLUMN `gtin` VARCHAR (255) COLLATE utf8_u
 -- Add zone id for the coupon
 ALTER TABLE `shopping_coupon` ADD COLUMN `zoneId` int(10) unsigned DEFAULT NULL;
 
--- 23/08/2018
+-- 31/07/2018
 -- version: 2.6.0
+-- Add new prefix column
+ALTER TABLE `shopping_customer_address` ADD COLUMN `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `address_type`;
+
+-- 23/08/2018
+-- version: 2.6.1
 -- Add historical cart session option
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `id` INT(10) unsigned AUTO_INCREMENT,
@@ -326,8 +331,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
