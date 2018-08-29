@@ -132,7 +132,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
 		if (isset($sessionHelper->storeCartSessionKey)){
 			$cartId = intval($sessionHelper->storeCartSessionKey);
-            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId, true);
             if(isset($this->_options[1]) && $this->_options[1] == 'mailreport'){
                 $this->_view->mailReport = 1;
             }else{

@@ -833,6 +833,26 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
+`id` INT(10) unsigned AUTO_INCREMENT,
+`cart_id` int(10) unsigned NOT NULL,
+`product_id` int(10) unsigned NOT NULL,
+`option_id` int(10) unsigned NOT NULL,
+`cart_content_id` int (10) unsigned NOT NULL,
+`option_title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+`option_type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+`option_selection_id` int(10) unsigned NULL,
+`title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceValue` decimal(10,4) DEFAULT NULL,
+`priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightValue` decimal(8,3) DEFAULT NULL,
+`cart_item_key` CHAR(32) NOT NULL,
+`cart_item_option_key` CHAR(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.1' WHERE `name` = 'shopping';
 
