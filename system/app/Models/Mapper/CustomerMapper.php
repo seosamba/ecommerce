@@ -355,4 +355,23 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
         return $users;
     }
+
+    /**
+     * Find customer address by phonecountrycode|mobilecountrycode
+     *
+     * @param $codes
+     * @return array
+     */
+    public function findCustomerAddressByCountryCodes($codes){
+        $where =  '('.$this->getDbTable()->getAdapter()->quoteInto('sca.phonecountrycode IN (?)', $codes);
+        $where .= ' OR ' .$this->getDbTable()->getAdapter()->quoteInto('sca.mobilecountrycode IN (?)', $codes).')';
+
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sca' => 'shopping_customer_address'), array(
+                'count' => 'COUNT(DISTINCT(sca.user_id))'
+            ))
+            ->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchRow($select);
+    }
 }

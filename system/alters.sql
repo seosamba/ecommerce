@@ -308,6 +308,10 @@ ALTER TABLE `shopping_coupon` ADD COLUMN `zoneId` int(10) unsigned DEFAULT NULL;
 -- Add new prefix column
 ALTER TABLE `shopping_customer_address` ADD COLUMN `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `address_type`;
 
+-- 06/09/2018
+-- version: 2.6.1
+UPDATE `plugin` SET `tags`='processphones,countrycodesfiltration' WHERE `name` = 'shopping';
+
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.6.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

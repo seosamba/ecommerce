@@ -2311,4 +2311,23 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    /**
+     * Find customer address by phonecountrycode|mobilecountrycode
+     *
+     * @param $codes
+     * @return string
+     */
+    public function getCountryCodes($codes){
+        if(!empty($codes)){
+            $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+
+            $customer = $customerMapper->findCustomerAddressByCountryCodes($codes);
+
+            if(!empty($customer['count'])){
+                return $this->_translator->translate('You have') . ' ' . $customer['count'] . ' ' . $this->_translator->translate('record(s) in Store with selected country code.') . '<br/>';
+            }
+        }
+        return '';
+    }
+
 }
