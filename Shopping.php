@@ -964,6 +964,20 @@ class Shopping extends Tools_Plugins_Abstract {
         $customerAddress = Models_Mapper_CustomerMapper::getInstance()->getUserAddressOrdersByUserId($id);
         $this->_view->userPrefixes  = Tools_ShoppingCart::$userPrefixes;
         if($customerAddress) {
+            $configHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
+            $userDefaultPhoneMobileCountryCode = $configHelper->getConfig('userDefaultPhoneMobileCode');
+
+            foreach ($customerAddress as $key => $customerAddr) {
+                if(empty($customerAddr['phonecountrycode']) && !empty($userDefaultPhoneMobileCountryCode)) {
+                    $customerAddress[$key]['phonecountrycode'] = $userDefaultPhoneMobileCountryCode;
+                }
+
+                if(empty($customerAddr['mobilecountrycode']) && !empty($userDefaultPhoneMobileCountryCode)) {
+                    $customerAddress[$key]['mobilecountrycode'] = $userDefaultPhoneMobileCountryCode;
+                }
+
+            }
+
             $this->_view->customerAddress = $customerAddress;
         }
 
