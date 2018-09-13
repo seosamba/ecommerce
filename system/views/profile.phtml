@@ -15,21 +15,49 @@ $this->headScript()
 			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
 		</div>
 		<div class="grid_8 profile-main-info vcard">
-			<h2 class="client-fullname client-info"><span class="inline-data"><?php echo $this->customer->getFullName();?></span>
+            <div class="grid_12 alpha client-prefix client-info">
+                <b class="grid_3 mt10px"><?php echo $this->translate('Prefix');?>:</b>
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                    <input class="edit-client-fullname edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname" />
-                    <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <select class="edit-client-prefix grid_5" data-client-param="prefix" name="edit-client-prefix" >
+                        <option value=""><?php echo $this->translate('Select'); ?></option>
+                        <?php $prefix = $this->customer->getPrefix();?>
+                        <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
+                            <option <?php if ($prefix == $userPrefixVal): ?> selected="selected" <?php endif; ?>
+                                    value="<?php echo $userPrefixVal; ?>"><?php echo $this->translate($userPrefixVal); ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 <?php endif;?>
-            </h2>
-         	<h4 class="client-email client-info"><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data"><?php echo $this->customer->getEmail();?></span></a>
-                <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                    <input class="edit-client-email edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
-                    <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
-                    <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
-                <?php endif;?>
-            </h4>
-			<p class="client-info">  <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?></p>
-			<p class="client-info"><?php
+            </div>
+			<div class="grid_12 alpha client-fullname client-info">
+                <b class="grid_3"><?php echo $this->translate('Full name');?>:</b>
+                <div class="grid_9">
+                    <span class="edit-client-fullname inline-data"><?php echo $this->customer->getFullName();?></span>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <input class="edit-client-fullname-input edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname-input" />
+                        <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <?php endif;?>
+                </div>
+            </div>
+         	<div class="grid_12 alpha client-email client-info">
+                <b class="grid_3"><?php echo $this->translate('Email');?>:</b>
+                <div class="grid_9">
+                    <a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data edit-client-email"><?php echo $this->customer->getEmail();?></span></a>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <input class="edit-client-email-input edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
+                        <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
+                    <?php endif;?>
+                </div>
+            </div>
+			<div class="grid_12 alpha client-info">
+                <b class="grid_3"><?php echo $this->translate('Info');?>:</b>
+                <div class="grid_9">
+                    <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?>
+                </div>
+            </div>
+			<div class="grid_12 alpha client-info">
+                <b class="grid_3"><?php echo $this->translate('Last seen:');?></b>
+                <?php
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
@@ -41,17 +69,17 @@ $this->headScript()
 				} else {
 					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
-				echo $this->translate("Last seen:") . ' ' . $lastSeenStamp;
-				?></p>
+				echo $lastSeenStamp;
+				?></div>
             <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                <h4 class="client-info client-notes grid_12">
-                    <label class="grid_8 ml0px" for="client-notes"><?php echo $this->translate('Account notes');?>:</label>
-
-                        <img data-client-param="client-notes" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
-
-                    <span class="grid_8 mt5px ml0px inline-data"><?php echo $this->customer->getNotes();?></span>
-                    <textarea id="client-notes" class="edit-client-profile edit-client-notes" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
-                </h4>
+                <div class="grid_12 alpha client-info client-notes">
+                    <b class="grid_3 omega" for="client-notes"><?php echo $this->translate('Account notes');?>:</b>
+                    <div class="grid_9">
+                        <img data-client-param="client-notes" class="edit-inline-profile ml0px" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    </div>
+                    <span class="grid_12 mt5px inline-data edit-client-notes"><?php echo $this->customer->getNotes();?></span>
+                    <textarea id="client-notes" class="grid_12 edit-client-profile edit-client-notes-input" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
+                </div>
             <?php endif;?>
             <input type="hidden" name="userId" id="userId" value="<?php echo $this->customer->getId();?>"/>
 			<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
@@ -250,7 +278,7 @@ $this->headScript()
                                data-old-value="<?php echo $val; ?>" data-field-name="<?php echo $key; ?>"
                                value="<?php echo $country; ?>"/>
                     <?php elseif ($key == 'mobile'): ?>
-                        <select class="mt10px omega client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> mobile-country-code grid_4 alpha"
+                        <select class="mt10px client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> mobile-country-code grid_4 alpha"
                                 data-current-row="<?php echo $key . '-' . $id; ?>"
                                 data-old-value="<?php echo $billingAddress['mobilecountrycode']; ?>"
                                 name="mobile-country-code" data-type="mobile">
@@ -264,7 +292,7 @@ $this->headScript()
                                name="<?php echo $key; ?>"
                                value="<?php echo $val; ?>"/>
                     <?php elseif ($key == 'phone'): ?>
-                        <select class="mt10px omega client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> phone-country-code grid_4 alpha"
+                        <select class="mt10px client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> phone-country-code grid_4 alpha"
                                 data-current-row="<?php echo $key . '-' . $id; ?>"
                                 data-old-value="<?php echo $billingAddress['phonecountrycode']; ?>"
                                 name="phone-country-code" data-type="phone">
@@ -277,6 +305,17 @@ $this->headScript()
                                class="grid_6 mt10px client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order mask-<?php echo $key . '-' . $id; ?>"
                                name="<?php echo $key; ?>"
                                value="<?php echo $val; ?>"/>
+                    <?php elseif ($key == 'prefix'): ?>
+                        <select class="mt10px grid_10 alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-prefix"
+                                data-current-row="<?php echo $key . '-' . $id; ?>"
+                                data-old-value="<?php echo $val; ?>"
+                                name="prefix" data-type="prefix" data-field-name="<?php echo $key; ?>">
+                            <option value=""><?php echo $this->translate('Select'); ?></option>
+                            <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
+                                <option <?php if ($billingAddress['prefix'] == $userPrefixVal): ?> selected="selected" <?php endif; ?>
+                                        value="<?php echo $userPrefixVal; ?>"><?php echo $this->translate($userPrefixVal); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     <?php else: ?>
                         <input class="grid_10 mt10px alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order"
                                data-field-name="<?php echo $key; ?>" data-old-value="<?php echo $val; ?>"
@@ -406,9 +445,8 @@ $this->headScript()
                 .html(html);
             $(this).html(popup);
         }
-
-
     });
+
     $('#orders-table').on('mouseleave', 'td.current-status', function(){
         var oldStatus = $(this).data('currentStatus');
         if (oldStatus) $(this).text(oldStatus);
@@ -435,39 +473,55 @@ $this->headScript()
         });
     });
 
-    $('.edit-inline-profile').on('click', function(){
-        $(this).hide();
-        var editClientElement = $(this).data('client-param');
-        var clientElementData = $(this).closest('.client-info').find('span').text();
-        $('.'+editClientElement+' span').hide();
-        $('.edit-'+editClientElement).val(clientElementData).show().focus();
-        $('.'+editClientElement).show();
+    $('.edit-inline-profile').on('click', function(e){
+        e.preventDefault();
+        var self = $(this);
+        showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+            function (){
+                self.hide();
+                var editClientElement = self.data('client-param');
+                var clientElementData = self.closest('.client-info').find('span').text();
+                $('.'+editClientElement+' span').hide();
+                $('.edit-'+editClientElement+'-input').val(clientElementData).show().focus();
+                $('.'+editClientElement).show();
+            }, function () {});
     });
-
-    $('.edit-client-profile').on('blur', function(){
+    $('.edit-client-prefix').on('change', function(e) {
+        e.preventDefault();
         var clientEditParam = $(this).data('client-param');
         var editedValue     = $(this).val();
-        $.ajax({
-            type: "POST",
-            url: $('#website_url').val()+'plugin/shopping/run/editUserProfile/',
-            dataType: "json",
-            data: {
-                profileElement:clientEditParam,
-                profileValue:editedValue,
-                userId:$('#userId').val(),
-                secureToken:$('.secure-token-user').val()
-            }
-        }).done(function(response) {
-            if(response.error == 1){
-                smoke.alert(response.responseText,{'classname':'errors'});
-            }else{
-                $('[data-client-param="client-'+clientEditParam+'"]').show();
-                $('.edit-client-'+clientEditParam).hide();
-                $('.client-'+clientEditParam).find('.inline-data').text(editedValue).show();
-                smoke.signal('<?php echo $this->translate('Saved');?>');
-            }
-        });
-        return false;
+
+        editUserProfileSendAjax(clientEditParam, editedValue);
+    });
+
+    $('.edit-client-profile').on('blur', function(e){
+        e.preventDefault();
+        var clientEditParam = $(this).data('client-param');
+        var editedValue     = $(this).val();
+
+        editUserProfileSendAjax(clientEditParam, editedValue);
+    });
+    $('.client-info-prefix').on('change', function(e) {
+        e.preventDefault();
+        var thisEl      = $(this),
+            fieldName   = thisEl.data('field-name'),
+            fieldValue  = thisEl.val(),
+            addrRow     = thisEl.closest('.addr'),
+            addrType    = addrRow.data('client-type'),
+            clientToken = addrRow.data('client-token'),
+            oldToken    = addrRow.data('old-token'),
+            oldValue    = thisEl.data('old-value'),
+            countryCode = '';
+
+        if(fieldValue != oldValue){
+            showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+                function (){
+                    sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, countryCode, thisEl);
+                }, function () {
+                    var oldVal = thisEl.data('old-value');
+                    thisEl.val(oldVal);
+                });
+        }
     });
 
     $('.client-info-order').on('change', function(e){
@@ -497,8 +551,6 @@ $this->headScript()
             });
         }
     });
-
-
 
     $(function() {
         var mobileMasks = JSON.parse('<?php echo json_encode($this->mobileMasks);?>'),
@@ -601,6 +653,32 @@ $this->headScript()
                 showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
             }
         });
+    }
+
+    function editUserProfileSendAjax(clientEditParam, editedValue) {
+        $.ajax({
+            type: "POST",
+            url: $('#website_url').val()+'plugin/shopping/run/editUserProfile/',
+            dataType: "json",
+            data: {
+                profileElement:clientEditParam,
+                profileValue:editedValue,
+                userId:$('#userId').val(),
+                secureToken:$('.secure-token-user').val()
+            }
+        }).done(function(response) {
+            if(response.error == 1){
+                smoke.alert(response.responseText,{'classname':'errors'});
+            }else{
+                if(clientEditParam != 'prefix') {
+                    $('[data-client-param="client-'+clientEditParam+'"]').show();
+                    $('.edit-client-'+clientEditParam+'-input').hide();
+                    $('.client-'+clientEditParam).find('.inline-data').text(editedValue).show();
+                }
+                smoke.signal('<?php echo $this->translate('Saved');?>');
+            }
+        });
+        return false;
     }
 
     <?php endif;?>

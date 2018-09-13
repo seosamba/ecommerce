@@ -86,6 +86,7 @@ Plugin widgets.
     {$postpurchase:quotenote} -> show quote disclaimer.
 
     ######### Billing information #############
+    {$postpurchase:billing:prefix} -> billing prefix
     {$postpurchase:billing:lastname} -> billing lastname
     {$postpurchase:billing:firstname} -> billing firstname
     {$postpurchase:billing:address1} -> billing address
@@ -99,17 +100,18 @@ Plugin widgets.
     {$postpurchase:billing:email} -> billing address email
 
     ######### Shipping information #############
-    {$postpurchase:shipping:lastname} -> billing lastname
-    {$postpurchase:shipping:firstname} -> billing firstname
-    {$postpurchase:shipping:address1} -> billing address
-    {$postpurchase:shipping:address2} -> billing address
-    {$postpurchase:shipping:city}     -> billing address city
-    {$postpurchase:shipping:state}   -> billing address state
-    {$postpurchase:shipping:zip} -> billing address zip
-    {$postpurchase:shipping:country} -> billing address country
-    {$postpurchase:shipping:phone} -> billing address phone
-    {$postpurchase:shipping:mobile} -> billing address mobile
-    {$postpurchase:shipping:email} -> billing address email
+    {$postpurchase:shipping:prefix} -> shipping prefix
+    {$postpurchase:shipping:lastname} -> shipping lastname
+    {$postpurchase:shipping:firstname} -> shipping firstname
+    {$postpurchase:shipping:address1} -> shipping address
+    {$postpurchase:shipping:address2} -> shipping address
+    {$postpurchase:shipping:city}     -> shipping address city
+    {$postpurchase:shipping:state}   -> shipping address state
+    {$postpurchase:shipping:zip} -> shipping address zip
+    {$postpurchase:shipping:country} -> shipping address country
+    {$postpurchase:shipping:phone} -> shipping address phone
+    {$postpurchase:shipping:mobile} -> shipping address mobile
+    {$postpurchase:shipping:email} -> shipping address email
 
     This type of widgets you can use inside 'postpurchasecartcontent' magic space
     It will return result for each product inside your cart

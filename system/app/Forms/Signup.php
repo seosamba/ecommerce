@@ -43,6 +43,14 @@ class Forms_Signup extends Zend_Form {
             'value'      => $this->_subscribed
         )));
 
+        $this->addElement(new Zend_Form_Element_Select(array(
+            'name'         => 'prefix',
+            'id'           => 'prefix',
+            'label'        => $translator->translate('Prefix'),
+            'value'        => $this->_prefix,
+            'multiOptions' => array('' => $translator->translate('Select')) + array_combine(Tools_ShoppingCart::$userPrefixes, Tools_ShoppingCart::$userPrefixes)
+        )));
+
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'firstname',
             'label'    => 'First Name',

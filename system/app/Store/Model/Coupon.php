@@ -34,6 +34,8 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 
 	protected $_action;
 
+	protected $_zoneId;
+
 	protected $_data = array();
 
 	public function setAllowCombination($allowCombination) {
@@ -98,6 +100,25 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 	public function getProducts() {
 		return $this->_products;
 	}
+
+    /**
+     * @return mixed
+     */
+    public function getZoneId()
+    {
+        return $this->_zoneId;
+    }
+
+    /**
+     * @param mixed $zoneId
+     * @return mixed
+     */
+    public function setZoneId($zoneId)
+    {
+        $this->_zoneId = $zoneId;
+
+        return $this;
+    }
 
 
 	public function __call($name, $arguments) {
