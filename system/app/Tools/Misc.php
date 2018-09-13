@@ -354,6 +354,7 @@ class Tools_Misc
     {
         $_addressTmpl = array(
             'address_type' => '',
+            'prefix' => '',
             'firstname' => '',
             'lastname' => '',
             'company' => '',

@@ -79,6 +79,18 @@ class Tools_ShoppingCart {
 	private function __wakeup() {
 	}
 
+    /**
+     * Defined user prefixes
+     * @var array
+     */
+    public static $userPrefixes = array(
+        'Mr',
+        'Mrs',
+        'Ms',
+        'Miss',
+        'Dr'
+    );
+
 	/**
 	 * Returns instance of Shopping Cart
 	 * @return Tools_ShoppingCart
