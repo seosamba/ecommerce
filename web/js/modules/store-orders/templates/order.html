@@ -1,8 +1,8 @@
 <td class="check-order textcentered"><input type="checkbox" name="check-order[]" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> title=""/></td>
-<td class="order-id"><%= id %></td>
-<td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
-<td><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
-<td><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
+<td data-mobile-title="#" class="order-id"><%= id %></td>
+<td data-mobile-title="Customer name"><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
+<td data-mobile-title="Email"><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
+<td data-mobile-title="Purchased on"><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
 <% translatedStatus = 'cs_'+status %>
 
 <% if (gateway == 'Quote' && status == 'pending'){ %>
@@ -17,18 +17,18 @@
     <% translatedStatus = 'Lost opportunity' %>
 <% } %>
 <% if (status === 'refunded') { %>
-    <td class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : originalTotal %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+    <td data-mobile-title="Status" class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : originalTotal %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } else {%>
-    <td class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+    <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
 
-<td><%= total_products %></td>
-<td><%= total %></td>
-<td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
-<td class="shipping-service">
-    <p><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
+<td data-mobile-title="Products in cart"><%= total_products %></td>
+<td data-mobile-title="Total price"><%= total %></td>
+<td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
+<td data-mobile-title="Shipping via" class="shipping-service">
+    <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
     <% if(_.isNull(recurring_id)) {%>
-    <p><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %>
+    <p class="full-width-td word-break"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %>
 <% if (status == 'completed' || status == 'shipped') { %>
         <% addButton = 'add' %>
         <% editButton = 'edit' %>
@@ -43,11 +43,11 @@
     </p>
     <% } %>
 </td>
-<td class="text-center">
+<td data-mobile-title="Details" class="text-center">
     <a href="javascript:;" class="tpopup" data-pheight="560" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a>
 </td>
 <% if(useInvoice == 'enabled') { %>
-    <td class="text-center">
+    <td data-mobile-title="Invoice & packing slip" class="text-center">
     <% if(_.isNull(recurring_id)) { %>
         <a href="javascript:;" class="ticon-email4 icon16 sendInvoice" title="Send invoice to user via email">Send</a> /
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
@@ -65,7 +65,7 @@
     <% } %>
     </td>
 <% } %>
-  <td><% if(!_.isNull(real_order_id)) { %>
+  <td data-mobile-title="Order type"><% if(!_.isNull(real_order_id)) { %>
         <%= _.isUndefined(i18n['Imported']) ? 'Imported':i18n['Imported'] %>
       <% } else if(!_.isNull(recurring_id)) { %>
         <%= _.isUndefined(i18n['Recurring']) ? 'Recurring':i18n['Recurring'] %>

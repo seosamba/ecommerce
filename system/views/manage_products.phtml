@@ -15,14 +15,14 @@
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
         <div class="grid_9 omega">
-            <div class="grid_6 alpha mb20px">
+            <div class="grid_6 alpha t-grid_3 t-alpha mb20px">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
                     <?php foreach($this->brands as $brand):?>
                         <option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_6 omega mb20px">
+            <div class="grid_6 omega t-grid_3 t-omega mb20px">
                 <select class="pfilter" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
                     <?php foreach($this->tags as $tag):?>
                         <option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
