@@ -34,21 +34,21 @@ $this->headLink()
         </div>
 
         <div id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
-            <div class="grid_4 alpha t-grid_3">
+            <p class="grid_3 alpha t-grid_3">
                 <label class="text-bold"><?php echo $this->translate('By order amount');?></label>
                 <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>">
                 <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>">
-            </div>
-            <div class="grid_1 alpha omega t-grid_3">
+            </p>
+            <p class="grid_3 alpha t-grid_3">
                 <label class="text-bold"><?php echo $this->translate('By coupon');?></label>
                 <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>">
-            </div>
-            <div class="grid_4 t-grid_3">
+            </p>
+            <p class="grid_3 alpha t-grid_3">
                 <label class="text-bold"><?php echo $this->translate('By date');?></label>
                 <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>">
                 <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>">
-            </div>
-            <div class="grid_3 alpha omega t-grid_3">
+            </p>
+            <p class="grid_3 alpha omega t-grid_3">
                 <label class="text-bold"><?php echo $this->translate('By order status');?></label>
                 <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
                 <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
@@ -64,8 +64,8 @@ $this->headLink()
                          <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?></option>
                          <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?></option>
                 </select>
-            </div>
-            <div class="grid_2 alpha mt20px hidden recurring-filters t-grid_3">
+            </p>
+            <p class="grid_2 alpha hidden recurring-filters t-grid_3">
                 <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
                 <?php echo $this->formSelect('filter-recurring-order-type', null, array(
                     'class' => 'filter',
@@ -79,8 +79,8 @@ $this->headLink()
                     'suspended' => $this->translate('Suspended'),
                     'canceled' => $this->translate('Canceled')
                 )); ?>
-            </div>
-            <div class="grid_1 alpha t-grid_3">
+            </p>
+            <p class="grid_2 alpha omega t-grid_3">
                 <label class="text-bold"><?php echo $this->translate('By order type');?></label>
                 <?php echo $this->formSelect('filter-order-type', null, array(
                     'class' => 'filter',
@@ -91,8 +91,8 @@ $this->headLink()
                     'recurring_id' => $this->translate('Recurring'),
                     'real_order_id' => $this->translate('Regular')
                 )); ?>
-            </div>
-            <div class="grid_8 alpha omega">
+            </p>
+            <div class="grid_8 omega">
                 <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
                 <?php
                 $countryList = Tools_Geo::getCountries(true);
@@ -104,7 +104,7 @@ $this->headLink()
                 echo '<div class="grid_4 omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
                 ?>
             </div>
-            <div class="grid_12 text-right">
+            <div class="grid_12 alpha omega text-right">
                 <button class="btn green ticon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
                 <button class="btn red ticon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>
             </div>
