@@ -60,7 +60,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
 			$currency = Zend_Registry::get('Zend_Currency');
             $where = null;
             if (!empty($id)) {
-                $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('id = ?', $id);
+                $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('user.id = ?', $id);
             }
             if (!empty($roleId)) {
                 if (!empty($where)) {
