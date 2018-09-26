@@ -767,17 +767,12 @@ class Shopping extends Tools_Plugins_Abstract {
         return $folders;
     }
 
-	public function searchindexAction() {
-		$cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+    public function searchindexAction() {
+        $searchTerm = filter_var($this->_request->getParam('searchTerm'), FILTER_SANITIZE_STRING);
+        $data = Models_Mapper_ProductMapper::getInstance()->buildIndex($searchTerm);
 
-		if (($data = $cacheHelper->load('index', 'store_')) === null) {
-			$data = Models_Mapper_ProductMapper::getInstance()->buildIndex();
-
-			$cacheHelper->save('index', $data, 'store_', array('productindex'), Helpers_Action_Cache::CACHE_NORMAL);
-		}
-
-		echo json_encode($data);
-	}
+        echo json_encode($data);
+    }
 
 	protected function _getConfig() {
 		return array_map(function ($param) {

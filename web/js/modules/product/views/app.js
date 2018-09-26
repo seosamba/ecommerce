@@ -63,11 +63,11 @@ define([
             this.initProduct();
 
             this.initDigitalProductUploader();
-            $(document).ajaxStart(function(){
+            /*$(document).ajaxStart(function(){
                 $('#product-list-search').attr('disabled', 'disabled');
             }).ajaxStop(function(){
                 $('#product-list-search').removeAttr('disabled');
-            });
+            });*/
 
             this.quickPreviewTmpl = _.template($('#quickPreviewTemplate').html());
 
@@ -820,16 +820,45 @@ define([
             });
         },
         initSearchIndex: _.once(function(){
-            var self = this;
-            $.getJSON($('#website_url').val() + 'plugin/shopping/run/searchindex', function(response){
-                self.searchIndex = response;
-                $('#product-list-search').autocomplete({
-                    minLength: 2,
-                    source: self.searchIndex,
-                    select: function(event, ui){
-                        $('#product-list-search').val(ui.item.value).trigger('keypress', true);
-                    }
-                });
+            $("#product-list-search").on("keydown", function(event) {
+                if ( event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete( "instance" ).menu.active) {
+                    event.preventDefault();
+                }
+            }).autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        'url': $('#website_url').val() + 'plugin/shopping/run/searchindex',
+                        'type':'GET',
+                        'dataType':'json',
+                        'data': {searchTerm: request.term}
+                    }).done(function(responseData){
+                        if (!_.isEmpty(responseData)) {
+                            response($.map(responseData, function (responseData) {
+                                return {
+                                    label: responseData,
+                                    value: responseData
+                                };
+                            }));
+                        } else {
+                            $('#product-list-search').prop('disabled', true).prop('disabled', false).focus();
+                        }
+                    });
+                },
+                search: function() {
+
+                },
+                focus: function() {
+                    return true;
+                },
+                select: function(event, ui) {
+                    $('#product-list-search').val(ui.item.value).trigger('keypress', true);
+                },
+                minLength: 1,
+                messages: {
+                    noResults: '',
+                    results: function() {}
+                }
             });
         }),
         toggleList: function(e) {
