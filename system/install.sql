@@ -522,7 +522,8 @@ INSERT INTO `shopping_zone_state` (`zone_id`, `state_id`) VALUES
 
 INSERT INTO `email_triggers_recipient` (`recipient`) VALUES
 ('customer'),
-('sales person');
+('sales person'),
+('supplier');
 
 DROP TABLE IF EXISTS `shopping_coupon`;
 CREATE TABLE IF NOT EXISTS `shopping_coupon` (
@@ -810,6 +811,29 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
+CREATE TABLE IF NOT EXISTS `shopping_companies`(
+  `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE (`company_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
+  `supplier_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`supplier_id`, `company_id`),
+  FOREIGN KEY (`supplier_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`, `company_id`),
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
@@ -835,5 +859,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.2' WHERE `name` = 'shopping';
 

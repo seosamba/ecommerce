@@ -37,6 +37,7 @@
 				<th><input type="checkbox" name="check-all" title="<?php echo $this->translate('Select all');?>"></th>
 				<th><?php echo $this->translate('Name');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
+                <th><?php echo $this->translate('Suppliers');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
 				<th><?php echo $this->translate('Mpn');?></th>
                 <th><?php echo $this->translate('Free shipping');?></th>
@@ -50,14 +51,14 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td colspan="9" class="text-center">
+				<td colspan="10" class="text-center">
 					<img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" alt="Loading..." />
 				</td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="9">
+				<td colspan="10">
                     <div class="grid_3 alpha">
                         <?php echo $this->translate('with selected');?>:&nbsp;
                         <select name="product-mass-action" id="">
@@ -67,6 +68,7 @@
                             <option value="tax"><?php echo $this->translate('assign tax');?></option>
                             <option value="freeshipping"><?php echo $this->translate('assign free shipping');?></option>
                             <option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
+                            <option value="company"><?php echo $this->translate('assign suppliers');?></option>
                             <option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
                             <option value="toggle"><?php echo $this->translate('enable/disable');?></option>
                         </select>
