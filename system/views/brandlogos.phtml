@@ -1,9 +1,8 @@
 <?php
 $this->headScript()
-    ->appendFile($this->websiteUrl.'system/js/external/jquery/plugins/tmpl/jquery.tmpl.min.js')
     ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
         null,
-        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/brandlogos/main')
+        array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/brandlogos/config')
     );
 
 $this->headLink()
@@ -37,7 +36,7 @@ $this->headLink()
         </div>
 
         <div id="manage-logos" class="grid_12">
-            <ul class="brand-list list-images column_8 full-width"></ul>
+            <ul id="manage-logos-brand-list" class="brand-list list-images column_8 full-width"></ul>
             <span class="spinner"></span>
         </div>
     </div>
@@ -47,3 +46,4 @@ $this->headLink()
         </div>
     </div>
 </div>
+<input type="hidden" id="brand-system-language" name="brand-system-language" value="en" />
