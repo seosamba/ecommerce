@@ -17,7 +17,7 @@
     <% translatedStatus = 'Lost opportunity' %>
 <% } %>
 <% if (status === 'refunded') { %>
-    <td data-mobile-title="Status" class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : originalTotal %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+    <td data-mobile-title="Status" class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : (parseFloat(total) + parseFloat((parseFloat(refund_amount).toFixed(2)))) %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } else {%>
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
