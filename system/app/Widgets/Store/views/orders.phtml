@@ -104,6 +104,9 @@ $this->headLink()
                 echo '<div class="grid_4 omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
                 ?>
             </div>
+            <div class="grid_2 mt35px">
+                <label><input type="checkbox" id="exclude-quotes-from-search" name="exclude-quotes-from-search"> <?php echo $this->translate('Exclude quotes');?></label>
+            </div>
             <div class="grid_12 alpha omega text-right">
                 <button class="btn green ticon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
                 <button class="btn red ticon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>

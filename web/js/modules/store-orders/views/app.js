@@ -33,6 +33,87 @@ define(['backbone',
         initialize: function(){
             this.orders = new OrdersCollection;
             this.orders.ordersChecked = [];
+
+            var options = this.getParams();
+            if (!_.isEmpty(options)) {
+                if (typeof options.filter !== 'undefined') {
+                    console.log(options);
+                    var withDetailedFilters = false;
+                    if (typeof options.filter_from_date !== 'undefined') {
+                        $('#orders-filter-fromdate').val(options.filter_from_date);
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_to_date !== 'undefined') {
+                        $('#orders-filter-todate').val(options.filter_to_date);
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_status !== 'undefined') {
+                        $('#filter-status').val(options.filter_status.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_by_coupon_code !== 'undefined') {
+                        $('#filter-by-coupon-code').val(options.filter_by_coupon_code);
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_from_amount !== 'undefined') {
+                        $('input[name=filter-from-amount]', '#store-orders form.filters').val(options.filter_from_amount);
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_from_amount !== 'undefined') {
+                        $('input[name=filter-to-amount]', '#store-orders form.filters').val(options.filter_from_to);
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_order_type !== 'undefined') {
+                        $('#filter-order-type').val(options.filter_order_type.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_country !== 'undefined') {
+                        $('#filter-country').val(options.filter_country.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_state !== 'undefined') {
+                        $('#filter-state').val(options.filter_state.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_carrier !== 'undefined') {
+                        $('#filter-carrier').val(options.filter_carrier.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.exclude_quotes !== 'undefined') {
+                        if (options.exclude_quotes === '1') {
+                            $('#exclude-quotes-from-search').prop('checked', true);
+                            withDetailedFilters = true;
+                        }
+                    }
+
+                    if (typeof options.filter_by_order_id !== 'undefined') {
+                        $('input[name=search]').val(options.filter_by_order_id);
+                    }
+
+                    if (typeof options.filter_product_key!== 'undefined') {
+                        $('input[name=filter-product-key]').val(options.filter_product_key);
+                    }
+
+                    if (typeof options.filter_by_user_name !== 'undefined') {
+                        $('input[name=user-name]').val(options.filter_by_user_name);
+                    }
+
+                    if (withDetailedFilters === true) {
+                        $('#extra-filters').slideToggle();
+                    }
+                }
+            }
+
             this.orders.server_api = _.extend(this.orders.server_api, {
                 'id': function() { return $('input[name=search]').val(); },
                 'filter': function() {
@@ -49,7 +130,8 @@ define(['backbone',
                         'user': $('input[name=user-name]', '#store-orders form.filters').val(),
                         'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
                         'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
-                        'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val()
+                        'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val(),
+                        'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; }
                     };
                 }
             });
@@ -405,6 +487,18 @@ define(['backbone',
             } else {
                 $('.recurring-filters').addClass('hidden');
             }
+        },
+        getParams:  function () {
+            var result = {},
+                tmpData = [];
+            location.search
+                .substr(1)
+                .split("&")
+                .forEach(function (item) {
+                    tmpData = item.split("=");
+                    result[decodeURIComponent(tmpData[0])] = decodeURIComponent(tmpData[1]);
+                });
+            return result;
         }
     });
 

@@ -345,6 +345,12 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             $select->where('shcoupon.coupon_code = ?', $val);
                         }
                         break;
+                    case 'filter-exclude-quotes':
+                        $val = trim(filter_var($val, FILTER_SANITIZE_STRING));
+                        if (!empty($val)) {
+                            $select->where('order.gateway <> ?', 'Quote');
+                        }
+                        break;
 					case 'status':
 						$val = filter_var_array($val, FILTER_SANITIZE_STRING);
 						if (!empty($val)) {
