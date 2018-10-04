@@ -243,6 +243,8 @@ define(['backbone',
             var $form = $(e.currentTarget).closest('form');
             $form.find('input:text').val('').end()
                  .find('select.filter').val('0').trigger('chosen:updated');
+
+            $('#exclude-quotes-from-search').prop('checked', false);
             this.applyFilter();
         },
         navigate: function(e){
