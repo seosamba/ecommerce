@@ -2,6 +2,7 @@ define([
 	'backbone',
     '../collections/productlist',
     '../../product/collections/brands',
+    '../../companies/collections/company',
     '../../product/collections/tags',
     '../../common/collections/templates',
     './productrow',
@@ -13,10 +14,12 @@ define([
     'text!../templates/toggle_dialog.html',
     'text!../templates/delete_dialog.html',
     'text!../templates/freeShipping_dialog.html',
+    'text!../templates/company_product_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
-], function(Backbone, ProductsCollection, BrandsCollection, TagsCollection, TemplatesCollection,
+], function(Backbone, ProductsCollection, BrandsCollection, CompaniesCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
-            PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl, FreeShippingDialogTmpl, i18n){
+            PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl,
+            FreeShippingDialogTmpl, CompanyProductDialogTmpl, i18n){
     var MainView = Backbone.View.extend({
         el: $('#store-products'),
         events: {
@@ -38,6 +41,8 @@ define([
             this.products = new ProductsCollection();
             this.products.on('reset', this.renderProducts, this);
             this.products.on('reset', this.loadStats, this);
+            this.products.on('reset', this.loadSuppliersCompanies, this);
+            this.products.on('reset', this.loadCompanies, this);
             this.products.pager();
             $.extend($.ui.dialog.prototype.options, {
                 modal: true,
@@ -322,6 +327,77 @@ define([
                 buttons: toogleButtons
             })
         },
+        companyAction: function() {
+            if (!this.companies){
+                this.companies = new CompaniesCollection();
+                this.companies.fetch({async: false});
+            }
+
+            var checked = this.products.where({checked: true}),
+                productIds     = _.pluck(checked, 'id');
+
+            if (!productIds.length){
+                return false;
+            }
+
+            var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
+            var companyProductButtons = {};
+
+            companyProductButtons[applyButton] = function() {
+
+                var companies = [];
+                $(this).find('input[name=company]:checked').each(function(){
+                    companies.push($(this).val());
+                });
+
+                $.ajax({
+                    url: $('#website_url').val() + 'api/store/companyproducts/',
+                    type: 'POST',
+                    data: {'companies': companies, productIds:productIds, removeOldCompanies: '1'},
+                    dataType: 'json',
+                    success: function(response){
+                        showMessage(_.isUndefined(i18n['Saved']) ? 'Saved':i18n['Saved'], false, 5000);
+                    }
+                });
+
+                $(this).dialog('close');
+            };
+
+            $.ajax({
+                url: $('#website_url').val() + 'api/store/companyproducts/',
+                type: 'GET',
+                data: {'groupByCompany': 1, productIds:productIds.join(',')},
+                context: this,
+                dataType: 'json',
+                success: function(response){
+                    var usedCompanyIds = [];
+                    if (_.isObject(response)) {
+                        $.each(response, function(key, val) {
+                            usedCompanyIds[val.companyId] = val.companyId;
+                        });
+                    }
+
+                    var dialog = _.template(CompanyProductDialogTmpl, {
+                        companies: this.companies.toJSON(),
+                        companyProducts:this.companyProducts,
+                        totalProducts: this.products.totalRecords,
+                        products:this.products,
+                        usedCompanyIds:usedCompanyIds,
+                        i18n:i18n
+                    });
+                    $(dialog).dialog({
+                        dialogClass: 'seotoaster',
+                        buttons: companyProductButtons,
+                        close: function (event, ui) {
+                            $(this).dialog('destroy');
+                        }
+                    });
+
+                }
+            });
+            return false;
+
+        },
         loadStats: function(){
             var self = this;
             $.ajax({
@@ -336,6 +412,36 @@ define([
                     }
                 }
             })
+        },
+        loadSuppliersCompanies: function() {
+            var self = this;
+            $.ajax({
+                url: $('#website_url').val()+'api/store/companyproducts/',
+                data: {productIds: this.products.pluck('id').join(','), 'groupByCompany':true},
+                success: function(response){
+                    if (_.isArray(response)){
+                        var suppliersCompanies = _.groupBy(response, function(r){ return r.productId; });
+                        self.products.each(function(prod){
+                            prod.set('suppliersCompanies', _.isUndefined(suppliersCompanies[prod.get('id')]) ? [] : suppliersCompanies[prod.get('id')] );
+                        });
+                    }
+                }
+            });
+        },
+        loadCompanies: function(){
+            var self = this;
+            $.ajax({
+                url: $('#website_url').val()+'api/store/companies/',
+                data: {},
+                success: function(response){
+                    if (_.isArray(response)){
+                        var suppliersCompanies = _.groupBy(response, function(r){ return r.id; });
+                        self.products.each(function(prod){
+                            prod.set('companyInfo', suppliersCompanies);
+                        });
+                    }
+                }
+            });
         }
     });
 

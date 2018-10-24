@@ -1,0 +1,13 @@
+<div title="<%= _.isUndefined(i18n['Assign suppliers']) ? 'Assign suppliers':i18n['Assign suppliers'] %>">
+        <% _.each(companies, function(company){ %>
+            <% checked = '' %>
+            <% if (_.isArray(usedCompanyIds) && usedCompanyIds[company.id]) { %>
+                <% checked = 'checked' %>
+            <% } %>
+            <label class="fl-left mr30px pointer" ><%= company.companyName %> &nbsp; <input type="checkbox" <%= checked %> name="company" value="<%= company.id %>"/></label>
+        <% }); %>
+
+    <% if (totalProducts) { %>
+
+    <% } %>
+</div>

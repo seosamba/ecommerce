@@ -280,4 +280,19 @@ class Widgets_Store_Store extends Widgets_Abstract {
         $this->_view->activeRecurringPaymentTypes = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringTypes();
         return $this->_view->render('recurring.phtml');
     }
+
+    /**
+     * Generates a list of suppliers - dashboard section suppliers widget
+     *
+     * @return string
+     */
+    protected function _makeOptionSuppliers()
+    {
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+
+            $this->_view->allCompanies = Store_Mapper_CompaniesMapper::getInstance()->fetchAll();
+
+            return $this->_view->render('suppliers.phtml');
+        }
+    }
 }

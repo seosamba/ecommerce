@@ -16,7 +16,8 @@ define([
             asc: false
         },
         searchTerm: '',
-        cached: {}, //@todo add caching mecanism
+        roleId: '',
+        cached: {},
         initialize: function(){
             this.bind('reset', this.updatePaginator, this);
         },
@@ -29,6 +30,9 @@ define([
             }
             if (this.searchTerm) {
                 url += '&search='+this.searchTerm;
+            }
+            if (this.roleId) {
+                url += '&roleId='+this.roleId;
             }
             return $('#website_url').val() + url + '&id=';
         },

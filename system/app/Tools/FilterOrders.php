@@ -16,10 +16,10 @@ class Tools_FilterOrders {
             unset($filter['state']);
         }
         if (isset($filter['date-from']) && !empty($filter['date-from'])) {
-            $filter['date-from'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-from']));
+            $filter['date-from'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-from'].' 00:00:00'));
         }
         if (isset($filter['date-to']) && !empty($filter['date-to'])) {
-            $filter['date-to'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-to']));
+            $filter['date-to'] = date(Tools_System_Tools::DATE_MYSQL, strtotime($filter['date-to'].' 23:59:59'));
         }
 
         $filter = array_filter(filter_var_array($filter, FILTER_SANITIZE_STRING));

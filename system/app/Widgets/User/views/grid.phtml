@@ -3,7 +3,7 @@
             <?php foreach ($this->stats as $status => $value) : ?>
                 <?php if($status != Models_Model_CartSession::CART_STATUS_NEW):?>
                     <?php if($status == 'all'):?>
-                        <li class="<?php echo $status;?> active" data-status="all" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
+                        <li class="<?php echo $status;?> active" data-status="all" data-sort="<?php echo $status;?>"><?php echo ucfirst($this->translate($status));?></li>
                     <?php else:?>
                         <?php if($status == 'quote_sent'):?>
                             <li class="quote_sent" data-status="quote_sent" data-sort="<?php echo $this->translate('Open Quotes');?>"><?php echo $this->translate('Open Quotes');?></li>
