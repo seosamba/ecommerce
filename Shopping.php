@@ -124,6 +124,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const ORDER_IMPORT_CONFIG = 'order_import_config';
 
+    const DEFAULT_USER_GROUP = 'default_user_group';
+
     /**
      * shipping restriction key
      */
@@ -470,6 +472,13 @@ class Shopping extends Tools_Plugins_Abstract {
 						->setPassword($password)
                         ->setSubscribed($subscribed)
                         ->setPrefix($prefix);
+
+                $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(self::DEFAULT_USER_GROUP));
+
+                if(!empty($defaultUserGroupId)) {
+                    $customer->setGroupId($defaultUserGroupId);
+                }
+
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
@@ -2319,6 +2328,21 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
+    }
+
+    /**
+     * @throws Exceptions_SeotoasterPluginException
+     *
+     * Change default user group
+     */
+    public function changeDefaultUserGroupAction() {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $defaultGroupId = filter_var($this->_request->getParam('defaultGroupId'), FILTER_SANITIZE_NUMBER_INT);
+
+            $this->_configMapper->save(array(self::DEFAULT_USER_GROUP => $defaultGroupId));
+
+            $this->_responseHelper->success('');
+        }
     }
 
 }

@@ -20,7 +20,7 @@ define([
 
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 12,
+                "iDisplayLength": 9,
                 "bPaginate": true,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs
@@ -36,10 +36,12 @@ define([
         },
         renderGroups: function(){
             this.$el.fnClearTable();
+            $('#groups-list').empty().append('<option value="0">Select group</option>');
             this.groups.each(this.renderGroup, this);
            // $('#group-pricing .dataTables_paginate')[0].style.display = "none";
         },
         renderGroup: function(group){
+            this.groupSelect(group);
             var priceType = $('.group-currency').val();
             var priceSign = '-';
             if(group.get('priceType') == 'percent'){
@@ -54,11 +56,31 @@ define([
                 '<a class="ticon-pencil icon14" data-role="edit" data-cid="'+group.get('id')+'" href="javascript:;"></a> <a class="ticon-remove error icon14" data-role="delete" data-cid="'+group.get('id')+'" href="javascript:;"></a>',
             ]);
         },
+        groupSelect: function(group) {
+            var optionSelected = '';
+            if(typeof group.get('defaultGroupId') !== 'undefined') {
+                optionSelected = 'selected';
+            }
+
+            var option = '<option value="'+ group.get('id') +'" '+ optionSelected +'>'+ group.get('groupName') +'</option>';
+
+            $('#groups-list').append(option);
+        },
         deleteGroup: function(e){
             var cid = $(e.currentTarget).data('cid');
             var model = this.groups.get(cid);
             if (model){
-                model.destroy();
+               var defaultGroupId = model.get('defaultGroupId');
+
+               if(typeof defaultGroupId === 'undefined') {
+                   showConfirm('Are you sure want to delete?', function(){
+                       model.destroy();
+                   });
+               } else {
+                   showConfirm('"' + model.get('groupName')+ '"' + ' used as default user group! Are you sure want to delete?', function(){
+                       model.destroy();
+                   });
+               }
             }
         },
         editGroup: function(e){

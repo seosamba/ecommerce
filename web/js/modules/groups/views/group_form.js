@@ -4,13 +4,14 @@ define([
     var GroupFormView = Backbone.View.extend({
         el: $('#edit-group'),
         events: {
-            'submit': 'submit'
+            'submit': 'submit',
+            'change #groups-list': 'changeUserDefaultGroup'
         },
         templates: {
 
         },
         initialize: function(){
-            this.$el.attr('action', $('#website_url').val()+'api/store/groups');
+            this.$el.find('#edit-group-form').attr('action', $('#website_url').val()+'api/store/groups');
 
         },
         render: function(){
@@ -19,7 +20,7 @@ define([
         submit: function(e){
             e.preventDefault();
             var self = this,
-                form = $(e.currentTarget),
+                form = $(e.currentTarget).find('#edit-group-form'),
                 isValid = true;
 
             _.each(form.find('.required'), function(el){
@@ -34,13 +35,14 @@ define([
             }
             showSpinner();
             $.ajax({
-                url: this.$el.attr('action'),
-                data: this.$el.serialize(),
+                url: this.$el.find('#edit-group-form').attr('action'),
+                data: form.serialize(),
                 type: 'POST',
                 dataType: 'json',
                 success: function(response){
-                    self.$el.trigger('reset');
-                    self.$el.trigger('group:created');
+                    self.$el.find('#edit-group-form').trigger('reset');
+                    self.$el.find('#edit-group-form').trigger('group:created');
+
                     hideSpinner();
                 },
                 error: function(response){
@@ -52,6 +54,20 @@ define([
         validate: function(e){
             var el = $(e.currentTarget);
             console.log(el.data());
+        },
+        changeUserDefaultGroup: function (e) {
+            var defaultGropId = $(e.currentTarget).val();
+            $.ajax({
+                url        : $('#website_url').val() + 'plugin/shopping/run/changeDefaultUserGroup/',
+                type       : 'post',
+                dataType   : 'json',
+                data       : {
+                    defaultGroupId : defaultGropId
+                },
+                success : function(response) {
+                    showMessage('Changed', false, 3000);
+                }
+            });
         }
 
     });
