@@ -489,6 +489,23 @@ class Shopping extends Tools_Plugins_Abstract {
                     } elseif(isset($session->clientWithNewPassword)) {
                         unset($session->clientWithNewPassword);
                     }
+
+                    if(!empty($defaultUserGroupId)){
+                        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                        $userModel = $userMapper->find($newCustomerId);
+
+                        if($userModel instanceof Application_Model_Models_User) {
+                            $userModel->setLastLogin(date(Tools_System_Tools::DATE_MYSQL));
+
+                            $userMapper->save($userModel);
+
+                            $session->setCurrentUser($userModel);
+                            Zend_Session::regenerateId();
+                            $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+                            $cacheHelper->clean();
+                        }
+                    }
+
 				} elseif(isset($session->clientWithNewPassword)) {
                     unset($session->clientWithNewPassword);
                 }
@@ -504,6 +521,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @throws Exceptions_SeotoasterPluginException
 	 */
 	public function cartAction() {
+
 		$checkoutPage = Tools_Misc::getCheckoutPage();
 		if (!$checkoutPage instanceof Application_Model_Models_Page) {
 			throw new Exceptions_SeotoasterPluginException('Error rendering cart. Please select a checkout page');
