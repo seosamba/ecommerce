@@ -40,6 +40,11 @@ define([
                 type: 'POST',
                 dataType: 'json',
                 success: function(response){
+                    if(response.id) {
+                        var option = '<option value="'+ response.id +'">'+ response.groupName +'</option>';
+                        $('#groups-list').append(option);
+                    }
+
                     self.$el.find('#edit-group-form').trigger('reset');
                     self.$el.find('#edit-group-form').trigger('group:created');
 

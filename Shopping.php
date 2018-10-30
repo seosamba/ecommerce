@@ -1333,6 +1333,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->configTabs = $configTabs;
             $this->_view->plugins = $plugins;
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
+            $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::DEFAULT_USER_GROUP));
+            $this->_view->defaultGroupId = $defaultUserGroupId;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}

@@ -54,19 +54,9 @@ class Api_Store_Groups extends Api_Service_Abstract {
 			$data = Store_Mapper_GroupMapper::getInstance()->fetchAll();
 		}
 
-        $groups = array();
-
-        $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::DEFAULT_USER_GROUP));
-
-		foreach ($data as $key => $group) {
-            $groups[$key] = $group->toArray();
-		    if(!empty($defaultUserGroupId) && $defaultUserGroupId == $group->getId()) {
-                $groups[$key]['defaultGroupId'] = $defaultUserGroupId;
-            }
-
-        }
-
-        return $groups;
+        return array_map(function ($group) {
+            return $group->toArray();
+        }, $data);
 
 	}
 

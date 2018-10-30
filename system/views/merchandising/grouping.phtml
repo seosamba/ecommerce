@@ -1,8 +1,16 @@
 <input type="hidden" name="group-currency" class="group-currency" value="<?php echo Models_Mapper_ShoppingConfig::getInstance()->getConfigParam( 'currency' ); ?>" xmlns="http://www.w3.org/1999/html"/>
 <div id="edit-group">
     <fieldset class="background mb10px grid_12 alpha omega">
-        <legend class="background p5px">Default user group</legend>
-        <select class="grid_4 alpha groups-list" name="groups-list" id="groups-list"></select>
+        <legend class="background p5px"><?php echo $this->translate('Default user group'); ?></legend>
+        <?php $groupList = array($this->translate('Select group'));
+            $groups = Store_Mapper_GroupMapper::getInstance()->fetchPairsAll();
+            if(!empty($groups)) {
+                foreach ($groups as $key => $group) {
+                    $groupList[$key] = $group;
+                }
+            }
+        ?>
+        <?php echo $this->formSelect('groups-list', $this->defaultGroupId, array('id' => 'groups-list','class' => 'grid_4 alpha'), $groupList);?>
     </fieldset>
     <form id="edit-group-form" class="grid_12 alpha omega background">
         <div class="grid_3 alpha">
@@ -10,7 +18,6 @@
                 'class' => 'new-group-name', 'placeholder' => $this->translate( 'Enter group name' )
             ) ); ?>
         </div>
-
         <div class="grid_1 alpha omega mt0px">
             <?php echo $this->formSelect( 'priceSign', null, array(
                 'id' => 'group-sign',

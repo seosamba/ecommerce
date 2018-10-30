@@ -40,7 +40,7 @@ $this->headLink()
             <?php echo $this->partial('merchandising/coupon.phtml'); ?>
         </div>
         <div id="group-pricing">
-            <?php echo $this->partial('merchandising/grouping.phtml'); ?>
+            <?php echo $this->partial('merchandising/grouping.phtml', array('defaultGroupId'=> $this->defaultGroupId)); ?>
         </div>
         <div id="recurring-payments">
             <?php echo $this->partial('merchandising/recurring.phtml'); ?>
