@@ -3,7 +3,7 @@
     <fieldset class="background mb10px grid_12 alpha omega">
         <legend class="background p5px"><?php echo $this->translate('Default user group'); ?></legend>
         <?php $groupList = array($this->translate('Select group'));
-            $groups = Store_Mapper_GroupMapper::getInstance()->fetchPairsAll();
+            $groups = Store_Mapper_GroupMapper::getInstance()->fetchGroupList();
             if(!empty($groups)) {
                 foreach ($groups as $key => $group) {
                     $groupList[$key] = $group;
