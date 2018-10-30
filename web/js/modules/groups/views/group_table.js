@@ -20,7 +20,7 @@ define([
 
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
-                "iDisplayLength": 12,
+                "iDisplayLength": 9,
                 "bPaginate": true,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs
@@ -58,7 +58,22 @@ define([
             var cid = $(e.currentTarget).data('cid');
             var model = this.groups.get(cid);
             if (model){
-                model.destroy();
+               var defaultGroupId = $('#groups-list').val();
+               var groupOption = $('#groups-list option[value='+ model.get('id') +']');
+
+               if(defaultGroupId != model.get('id')) {
+                   showConfirm('Are you sure want to delete?', function(){
+                       groupOption.remove();
+                       model.destroy();
+                   });
+               } else {
+                   showConfirm('"' + model.get('groupName')+ '"' + ' used as default user group! Are you sure want to delete?', function(){
+                       groupOption.remove();
+                       model.destroy();
+                   });
+               }
+
+
             }
         },
         editGroup: function(e){
