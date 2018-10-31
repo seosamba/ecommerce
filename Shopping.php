@@ -1500,7 +1500,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
                     $emailAlreadyExist = $userMapper->fetchAll($where, array(), true);
                     if(!empty($emailAlreadyExist)){
-                        $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                        $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                     }
                     $userData->setPassword($data['newPassword']);
                     $userData->setEmail($data['newEmail']);
@@ -1512,7 +1512,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 }else{
                     $this->_responseHelper->fail($this->_translator->translate('Autification failed'));
                 }
-                $this->_responseHelper->success(array('message'=>$this->_translator->translate('New account information send at your email'), 'email'=> $data['newEmail']));
+                $this->_responseHelper->success(array('message'=>$this->_translator->translate('Please, find your new account details in your email'), 'email'=> $data['newEmail']));
             }else{
                 $errorMessage = $form->getErrors();
                 $singleMessage = 0;
@@ -1580,7 +1580,7 @@ class Shopping extends Tools_Plugins_Abstract {
                                 )
                             );
                             if ($validator->isValid($data['profileValue'])) {
-                                $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                                $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                             }
                         break;
                         case 'prefix':

@@ -19,8 +19,8 @@ class Forms_User extends Zend_Form {
             'required'   => true,
             'breakChainOnFailure' => true,
             'errorMessages' => array(
-                'EmailAddress'=>'New email have not right format',
-                'isEmpty' => 'New email have not right format'
+                'EmailAddress'=>'Wrong format for New Email',
+                'isEmpty' => 'Wrong format for New Email'
              ),
 	        'class'      => array('required')
         )));
@@ -35,9 +35,9 @@ class Forms_User extends Zend_Form {
                 new Zend_Validate_Identical('newEmail')
             ),
             'errorMessages' => array(
-                'Identical' => 'Confirm email must match to new email',
-                'EmailAddress'=>'Confirm new email have not right format',
-                'isEmpty' => 'Confirm new email have not right format',
+                'Identical' => 'Confirm email must match New Email',
+                'EmailAddress'=>'Wrong format for Confirm New Email',
+                'isEmpty' => 'Wrong format for Confirm New Email',
             ),
             'class'      => array('required')
         )));
@@ -68,9 +68,9 @@ class Forms_User extends Zend_Form {
             ),
             'required' => true,
             'errorMessages' => array(
-                'Identical' => 'new password must match to confirm password',
+                'Identical' => 'New Password must match Confirm Password',
                 'isEmpty'   => 'Invalid new password',
-                'StringLength' => 'password can\'t be less than 4 symbols'
+                'StringLength' => 'Password can\'t be less than 4 symbols'
             ),
         )));
 
@@ -88,9 +88,9 @@ class Forms_User extends Zend_Form {
             ),
             'required' => true,
             'errorMessages' => array(
-                'isEmpty' => 'Invalid confirm new password',
-                'Identical' => 'confirm password must match to new password',
-                'StringLength' => 'password can\'t be less than 4 symbols'
+                'isEmpty' => 'Invalid Confirm New Password',
+                'Identical' => 'Confirm Password must match New password',
+                'StringLength' => 'Password can\'t be less than 4 symbols'
             ),
         )));
 
