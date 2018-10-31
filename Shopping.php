@@ -1512,7 +1512,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 }else{
                     $this->_responseHelper->fail($this->_translator->translate('Autification failed'));
                 }
-                $this->_responseHelper->success(array('message'=>$this->_translator->translate('Please, find your new account details in your email'), 'email'=> $data['newEmail']));
+                $this->_responseHelper->success(array('message'=>$this->_translator->translate('Your account information has been updated'), 'email'=> $data['newEmail']));
             }else{
                 $errorMessage = $form->getErrors();
                 $singleMessage = 0;
