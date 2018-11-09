@@ -266,20 +266,54 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 						$select->where('p.id = ?', $val);
 						break;
 					case 'product-key':
-                        $likeWhere = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
+                        $subSelect = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+                            ->setIntegrityCheck(false)
+                            ->from(array('scsc' => 'shopping_cart_session_content'), array('scsc.cart_id'))
+                            ->joinLeft(array('product' => 'shopping_product'), 'scsc.product_id = product.id', array(''))
+                            ->joinLeft(array('scs' => 'shopping_cart_session'), 'scsc.cart_id = scs.id', array(''));
+
+                        if(!empty($where['status'])) {
+                            $subWhere = filter_var_array($where['status'], FILTER_SANITIZE_STRING);
+                            if (!empty($subWhere)) {
+                                $filterSubWhere = '(';
+                                foreach ($subWhere as $status) {
+                                    $filterSubWhere .= $this->getDbTable()->getAdapter()->quoteInto('scs.status = ?', $status['name']);
+                                    if (!$status[Tools_FilterOrders::GATEWAY_QUOTE] && empty($status['alliasOnlyQuote'])) {
+                                        $filterSubWhere .= ' AND (' .$this->getDbTable()->getAdapter()->quoteInto('scs.gateway <> ?', Tools_FilterOrders::GATEWAY_QUOTE);
+                                        $filterSubWhere .= ' OR scs.gateway IS NULL)';
+                                    }
+                                    if($status['alliasOnlyQuote']){
+                                        $filterSubWhere .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('scs.gateway = ?', Tools_FilterOrders::GATEWAY_QUOTE);
+                                    }
+
+                                    $filterSubWhere .= ') OR (';
+                                }
+                                $filterSubWhere = rtrim($filterSubWhere, ' OR (');
+
+                                $subSelect->where($filterSubWhere);
+                            }
+                        }
+
+                        $likeWhere = "product.name LIKE ? OR product.sku LIKE ? OR product.mpn LIKE ?";
                         if (strpos($val, ',')) {
                             $valArr = array_filter(explode(',', $val));
                             for ($i = 0; $i < sizeof($valArr); $i++) {
                                 if ($i == 0) {
-                                    $select->where($likeWhere, '%'.$valArr[$i].'%');
+                                    $subSelect->where($likeWhere, '%'.$valArr[$i].'%');
                                 }
                                 else {
-                                    $select->orWhere($likeWhere, '%'.$valArr[$i].'%');
+                                    $subSelect->orWhere($likeWhere, '%'.$valArr[$i].'%');
                                 }
                             }
                         }
                         else {
-                            $select->where($likeWhere, '%'.$val.'%');
+                            $subSelect->where($likeWhere, '%'.$val.'%');
+                        }
+
+                        $cartIds = $this->getDbTable()->getAdapter()->fetchCol($subSelect);
+                        if(!empty($cartIds)) {
+                            $whereCartIds = $this->getDbTable()->getAdapter()->quoteInto('order.id IN (?)', $cartIds);
+                            $select->where($whereCartIds);
                         }
 						break;
 					case 'country':
