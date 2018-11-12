@@ -11,6 +11,28 @@ class Tools_ExportImportOrders
 
     const MAGENTO_IMPORT_ORDER = 'magento_import_order';
 
+    /**
+     * Orders statuses
+     *
+     * @var array
+     */
+    public static $statuses = array(
+        Shopping::GATEWAY_QUOTE => array(
+            Models_Model_CartSession::CART_STATUS_PROCESSING => 'Quote Sent',
+            Models_Model_CartSession::CART_STATUS_PENDING    => 'New quote',
+            Models_Model_CartSession::CART_STATUS_CANCELED   => 'Lost opportunity'
+        ),
+        Models_Model_CartSession::CART_STATUS_NEW        => 'Abandoned carts',
+        Models_Model_CartSession::CART_STATUS_PENDING    => 'Merchant action required - Customer charged',
+        Models_Model_CartSession::CART_STATUS_PROCESSING => 'Technical processing - Customer not charged',
+        Models_Model_CartSession::CART_STATUS_COMPLETED  => 'Payment Received',
+        Models_Model_CartSession::CART_STATUS_CANCELED   => 'Canceled',
+        Models_Model_CartSession::CART_STATUS_SHIPPED    => 'Items Shipped',
+        Models_Model_CartSession::CART_STATUS_DELIVERED  => 'Items Delivered',
+        Models_Model_CartSession::CART_STATUS_REFUNDED   => 'Refunded purchase',
+        Models_Model_CartSession::CART_STATUS_ERROR      => 'Error'
+    );
+
     public static function prepareOrdersDataForExport($data, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
@@ -78,6 +100,8 @@ class Tools_ExportImportOrders
                         }
 
                     }
+
+                    $data['status'] = Tools_ExportImportOrders::exportImportCartStatuses('export', $data['gateway'], $data['status']);
                 }
                 fputcsv($expFile, $data, ',', '"');
             }
@@ -85,6 +109,48 @@ class Tools_ExportImportOrders
             Tools_ExportImportOrders::downloadCsv($filePath, $fileName);
         }
 
+    }
+
+    /**
+     * @param $action
+     * @param $gateway
+     * @param $status
+     * @return false|int|mixed|string
+     */
+    public static function exportImportCartStatuses($action, $gateway, $status)
+    {
+        $processingStatus = $status;
+        if($action == 'export') {
+            if($gateway == Shopping::GATEWAY_QUOTE) {
+                $status = Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$status];
+
+                if(empty($status)) {
+                    $status = Tools_ExportImportOrders::$statuses[$processingStatus];
+                }
+            } else {
+                $status = Tools_ExportImportOrders::$statuses[$status];
+            }
+        } else {
+            if($gateway == Shopping::GATEWAY_QUOTE) {
+                $status = array_search($status, Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE]);
+
+                if(empty($status) && !empty(Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$processingStatus])) {
+                    $status = $processingStatus;
+                }
+            } else {
+                $status = array_search($status, Tools_ExportImportOrders::$statuses);
+
+                if(empty($status) && !empty(Tools_ExportImportOrders::$statuses[$processingStatus])) {
+                    $status = $processingStatus;
+                }
+            }
+        }
+
+        if(empty($status) && $action == 'export') {
+            return $processingStatus;
+        }
+
+        return $status;
     }
 
     public static function prepareImportOrdersReport($importErrors)
@@ -519,6 +585,15 @@ class Tools_ExportImportOrders
                     } else {
                         $total = $subTotal + $shippingPrice + $discountTax + $subTotalTax;
                     }
+
+                    $processedStatus = Tools_ExportImportOrders::exportImportCartStatuses('import', $gateway, $status);
+
+                    if(!empty($processedStatus)) {
+                        $status = $processedStatus;
+                    } else {
+                        $status = $defaultOrderStatus;
+                    }
+
                     $data = array(
                         'ip_address' => '',
                         'referer' => '',
