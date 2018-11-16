@@ -359,6 +359,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
             $inventoryCount = $product->getInventory();
 
+			if(!is_null($inventoryCount)) {
+                $inventoryCount = trim($product->getInventory());
+            }
+
             if (is_null($inventoryCount)){
                 $productQty = '&infin;';
             } else {
