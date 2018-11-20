@@ -314,6 +314,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         if(!empty($cartIds)) {
                             $whereCartIds = $this->getDbTable()->getAdapter()->quoteInto('order.id IN (?)', $cartIds);
                             $select->where($whereCartIds);
+                        } else {
+                            $likeWhereNotFound = "p.name LIKE ? OR p.sku LIKE ? OR p.mpn LIKE ?";
+                            $select->where($likeWhereNotFound, '%'.$val.'%');
                         }
 						break;
 					case 'country':
