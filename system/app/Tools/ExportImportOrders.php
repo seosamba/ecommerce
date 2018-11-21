@@ -100,8 +100,9 @@ class Tools_ExportImportOrders
                         }
 
                     }
-
-                    $data['status'] = Tools_ExportImportOrders::exportImportCartStatuses('export', $data['gateway'], $data['status']);
+                    if(!empty($data['status_label'])) {
+                        $data['status_label'] = Tools_ExportImportOrders::exportImportCartStatuses($data['gateway'], $data['status_label']);
+                    }
                 }
                 fputcsv($expFile, $data, ',', '"');
             }
@@ -117,40 +118,25 @@ class Tools_ExportImportOrders
      * @param $status
      * @return false|int|mixed|string
      */
-    public static function exportImportCartStatuses($action, $gateway, $status)
+    public static function exportImportCartStatuses($gateway, $status)
     {
+        $translator = Zend_Registry::get('Zend_Translate');
         $processingStatus = $status;
-        if($action == 'export') {
-            if($gateway == Shopping::GATEWAY_QUOTE) {
-                $status = Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$status];
+        $status = Tools_ExportImportOrders::$statuses[$status];
 
-                if(empty($status)) {
-                    $status = Tools_ExportImportOrders::$statuses[$processingStatus];
-                }
-            } else {
-                $status = Tools_ExportImportOrders::$statuses[$status];
-            }
-        } else {
-            if($gateway == Shopping::GATEWAY_QUOTE) {
-                $status = array_search($status, Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE]);
+        if($gateway == Shopping::GATEWAY_QUOTE) {
+            $status = Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$status];
 
-                if(empty($status) && !empty(Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$processingStatus])) {
-                    $status = $processingStatus;
-                }
-            } else {
-                $status = array_search($status, Tools_ExportImportOrders::$statuses);
-
-                if(empty($status) && !empty(Tools_ExportImportOrders::$statuses[$processingStatus])) {
-                    $status = $processingStatus;
-                }
+            if(empty($status)) {
+                $status = Tools_ExportImportOrders::$statuses[$processingStatus];
             }
         }
 
-        if(empty($status) && $action == 'export') {
-            return $processingStatus;
+        if(empty($status)) {
+            $status = $processingStatus;
         }
 
-        return $status;
+        return $translator->translate($status);
     }
 
     public static function prepareImportOrdersReport($importErrors)
@@ -586,14 +572,6 @@ class Tools_ExportImportOrders
                         $total = $subTotal + $shippingPrice + $discountTax + $subTotalTax;
                     }
 
-                    $processedStatus = Tools_ExportImportOrders::exportImportCartStatuses('import', $gateway, $status);
-
-                    if(!empty($processedStatus)) {
-                        $status = $processedStatus;
-                    } else {
-                        $status = $defaultOrderStatus;
-                    }
-
                     $data = array(
                         'ip_address' => '',
                         'referer' => '',
@@ -693,6 +671,11 @@ class Tools_ExportImportOrders
                 'label' => 'status',
                 'checked' => 1,
                 'label_name' => $translator->translate('Status')
+            ),
+            'status_label' => array(
+                'label' => 'status_label',
+                'checked' => 1,
+                'label_name' => $translator->translate('Status Label')
             ),
             'total_products' => array(
                 'label' => 'total_products',

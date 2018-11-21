@@ -101,6 +101,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'order_id' => 'order.id',
             'updated_at' => 'order.updated_at',
             'status' => 'order.status',
+            'status_label' => 'order.status',
             'total_products' => 'COUNT(DISTINCT oc.id)',
             'sku' => '(GROUP_CONCAT(sp.sku))',
             'mpn' => '(GROUP_CONCAT(sp.mpn))',
