@@ -758,6 +758,21 @@ class Tools_ShoppingCart {
 							'weightValue' => null
 						);
 						break;
+                    case Models_Model_Option::TYPE_TEXTAREA:
+                        $textValue = '';
+                        if (!empty($options[$defaultOption['id']])) {
+                            $textValue = $options[$defaultOption['id']];
+                        }
+                        $modifiers[$defaultOption['title']] = array(
+                            'option_id'   => $defaultOption['id'],
+                            'title'       => $textValue,
+                            'priceSign'   => null,
+                            'priceType'   => null,
+                            'priceValue'  => null,
+                            'weightSign'  => null,
+                            'weightValue' => null
+                        );
+                        break;
 				}
 			}
 		}
