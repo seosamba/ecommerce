@@ -28,7 +28,7 @@ define([
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
                 "bPaginate": true,
-                "iDisplayLength": 8,
+                "iDisplayLength": 7,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs
             });
@@ -53,6 +53,7 @@ define([
                 coupon.get('endDate'),
                 coupon.get('allowCombination') === '1' ? 'yes' : 'no',
                 coupon.get('scope') === 'client' ? 'yes' : '-',
+                coupon.get('oneTimeUse') === '1' ? 'yes' : 'no',
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
@@ -65,7 +66,9 @@ define([
             var cid = $(e.currentTarget).data('cid');
             var model = this.coupons.get(cid);
             if (model){
-                model.destroy();
+                showConfirm('Are you sure?', function(){
+                    model.destroy();
+                });
             }
         },
         loadProductPage: function(e){

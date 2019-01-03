@@ -274,7 +274,7 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 		$dbTable = new Zend_Db_Table('shopping_coupon_usage');
 		$coupons = $cart->getCoupons();
 
-		$dbTable->delete(array('cart_id' => $cart->getCartId()));
+		$dbTable->delete(array('cart_id = ?' => $cart->getCartId()));
 		foreach ($coupons as $coupon) {
 			if ($coupon->getScope() === Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT ){
 				try {
@@ -329,5 +329,17 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
         $dbTable = new Zend_Db_Table('shopping_coupon_sales');
         $select = $dbTable->getAdapter()->select()->from('shopping_coupon_sales', array('coupon_code', 'coupon_code'))->group('coupon_code');
         return $dbTable->getAdapter()->fetchPairs($select);
+    }
+
+    /**
+     * @param $coupon
+     * @return mixed
+     */
+    public function findCouponSalesByCoupon($coupon){
+        $dbTable = new Zend_Db_Table('shopping_coupon_sales');
+        $where = $dbTable->getAdapter()->quoteInto('coupon_code = ?', $coupon);
+        $select =  $dbTable->getAdapter()->select()->from('shopping_coupon_sales', array('coupon_code'))->where($where);
+
+        return $dbTable->getAdapter()->fetchRow($select);
     }
 }

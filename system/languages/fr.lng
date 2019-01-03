@@ -706,6 +706,7 @@
         'Items Shipped' => 'Livraison en cours',
         'Items Delivered' => 'Livraison effectuée',
         'Refunded purchase' => 'Achat remboursé',
-        'Error' => 'Erreur'
-
+        'Error' => 'Erreur',
+        'Sorry, some coupon codes you provided had already been used.' => 'Certains codes promos ont déjà été utilisés.',
+        'Go back to swap promo codes or proceed with shipping information to checkout.' => 'Retournez à la page précédente pour essayer un autre code ou continuez la validation de votre commande.'
 );?>

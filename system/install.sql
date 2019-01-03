@@ -535,6 +535,7 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon` (
   `endDate` date DEFAULT NULL COMMENT 'Coupon expire date',
   `allowCombination` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'Allow combination with other coupons',
   `zoneId` int(10) unsigned DEFAULT NULL,
+  `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon',
   PRIMARY KEY (`id`),
   KEY `code` (`code`),
   KEY `type` (`type`)
@@ -859,5 +860,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.2' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.3' WHERE `name` = 'shopping';
 

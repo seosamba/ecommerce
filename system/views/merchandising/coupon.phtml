@@ -44,18 +44,17 @@
         )); ?>
     </div>
 
-    <div class="grid_3 omega mt0px">
+    <div class="grid_10 alpha mt0px">
 		<label class="mb0-5em mt0-5em pointer" for="allowCombination">
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
         </label>
-		<label class="mb0px pointer" for="scope">
-			<?php echo $this->formCheckbox('scope', 'client', null, array(
-                'checked' => 'client',
-                'unChecked' => ''
-            )); ?>
-            <?php echo $this->translate('One use per client');?>
-		</label>
+
+        <div class="triple-switch grid_8 alpha omega">
+            <input id="scope" name="couponUsage" type="radio" checked="checked" class="processed processed-success" data-title="<?php echo $this->translate('One use per client'); ?>" value="client">
+            <input id="notUsed" name="couponUsage" type="radio" class="processed" data-title="<?php echo $this->translate('Coupon usage selection'); ?>" value="0">
+            <input id="oneUse" name="couponUsage" type="radio" class="processed processed-success" data-title="<?php echo $this->translate('One time use'); ?>" value="oneTimeUse">
+        </div>
     </div>
 
 	<div class="grid_4 alpha cl-both">
@@ -91,6 +90,7 @@
             <th><?php echo $this->translate('End');?></th>
             <th><?php echo $this->translate('Combine?');?></th>
             <th><?php echo $this->translate('One use');?></th>
+            <th><?php echo $this->translate('One time use');?></th>
             <th><?php echo $this->translate('Target');?></th>
             <th><?php echo $this->translate('Zone name');?></th>
             <th><?php echo $this->translate('Action');?></th>

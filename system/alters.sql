@@ -350,7 +350,12 @@ CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
   FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 02/01/2019
+-- version: 2.6.2
+-- Add zone id for the coupon
+ALTER TABLE `shopping_coupon` ADD COLUMN `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
