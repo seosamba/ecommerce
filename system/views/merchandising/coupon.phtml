@@ -52,7 +52,7 @@
 
         <div class="triple-switch grid_8 alpha omega">
             <input id="scope" name="couponUsage" type="radio" checked="checked" class="processed processed-success" data-title="<?php echo $this->translate('One use per client'); ?>" value="client">
-            <input id="notUsed" name="couponUsage" type="radio" class="processed" data-title="<?php echo $this->translate('Coupon usage selection'); ?>" value="0">
+            <input id="notUsed" name="couponUsage" type="radio" class="processed" data-title="<?php echo $this->translate('Unlimited use'); ?>" value="0">
             <input id="oneUse" name="couponUsage" type="radio" class="processed processed-success" data-title="<?php echo $this->translate('One time use'); ?>" value="oneTimeUse">
         </div>
     </div>
@@ -89,8 +89,7 @@
             <th><?php echo $this->translate('Start');?></th>
             <th><?php echo $this->translate('End');?></th>
             <th><?php echo $this->translate('Combine?');?></th>
-            <th><?php echo $this->translate('One use');?></th>
-            <th><?php echo $this->translate('One time use');?></th>
+            <th><?php echo $this->translate('Usage');?></th>
             <th><?php echo $this->translate('Target');?></th>
             <th><?php echo $this->translate('Zone name');?></th>
             <th><?php echo $this->translate('Action');?></th>

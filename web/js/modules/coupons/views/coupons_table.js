@@ -45,6 +45,13 @@ define([
             this.coupons.each(this.renderCoupon, this);
         },
         renderCoupon: function(coupon){
+            var usageInfo = 'unlimited';
+            if(coupon.get('scope') === 'client') {
+                usageInfo = 'one per client';
+            } else if (coupon.get('oneTimeUse') === '1') {
+                usageInfo = 'one time';
+            }
+
             this.$el.fnAddData([
                 coupon.get('id'),
                 (coupon.get('type') === 'freeshipping' ? 'free shipping' : coupon.get('type') ),
@@ -52,8 +59,7 @@ define([
                 coupon.get('startDate'),
                 coupon.get('endDate'),
                 coupon.get('allowCombination') === '1' ? 'yes' : 'no',
-                coupon.get('scope') === 'client' ? 'yes' : '-',
-                coupon.get('oneTimeUse') === '1' ? 'yes' : 'no',
+                usageInfo,
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
