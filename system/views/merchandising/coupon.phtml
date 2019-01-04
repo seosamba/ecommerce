@@ -5,7 +5,7 @@
 
     <?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
 
-    <div class="grid_2 alpha mt0px">
+    <div class="grid_3 alpha mt0px">
     <?php $generalConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();?>
         <label><?php echo $this->translate('Discount Tax Rate'); ?></label>
         <select name="coupon-discount-tax-rate" id="coupon-discount-tax-rate">
@@ -16,7 +16,7 @@
         </select>
     </div>
 
-    <div class="grid_2 alpha mt0px">
+    <div class="grid_3 alpha mt0px">
         <?php $zones = Models_Mapper_Zone::getInstance()->fetchAll();?>
         <label><?php echo $this->translate('Restricted by zone'); ?></label>
         <select name="zoneId" id="coupon-zone">
@@ -35,7 +35,7 @@
 			), Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true) ); ?>
 	</div>
 
-    <div class="grid_2 alpha omega mt0px">
+    <div class="grid_3 alpha omega mt0px">
         <label class="grid_4 alpha"><?php echo $this->translate('Code');?></label>
         <a id="genCoupon" class="grid_8 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="ticon-refresh"></span></a>
         <?php echo $this->formText('code', null, array(
