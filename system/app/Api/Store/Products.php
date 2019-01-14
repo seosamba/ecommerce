@@ -126,7 +126,11 @@ class Api_Store_Products extends Api_Service_Abstract {
 					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 					(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
                     $strictTagsCount,
-                    $organicSearch
+                    $organicSearch,
+                    array(),
+                    array(),
+                    null,
+                    true
                 );
 
 				$data = !is_null($products) ? array_map(function($prod){
@@ -233,7 +237,25 @@ class Api_Store_Products extends Api_Service_Abstract {
 		}
 
 		if (!empty($products)){
+            $allowanceProductsMapper = Store_Mapper_AllowanceProductsMapper::getInstance();
+
 			foreach ($products as $product) {
+			    $productId = $product->getId();
+                $allowanceProduct = $allowanceProductsMapper->findByProductId($productId);
+
+                if($allowanceProduct instanceof Store_Model_AllowanceProducts && empty($srcData['allowance'])) {
+                    $allowanceProductsMapper->deleteByProductId($productId);
+                }
+
+                if(!empty($srcData['allowance'])) {
+                    $allowanceProductModel = new Store_Model_AllowanceProducts();
+
+                    $allowanceProductModel->setProductId($productId);
+                    $allowanceProductModel->setAllowanceDue($srcData['allowance']);
+
+                    $allowanceProductsMapper->save($allowanceProductModel);
+                }
+
 				$product->setOptions($srcData);
 				if ($this->_productMapper->save($product)){
 					$data[] = $product->toArray();

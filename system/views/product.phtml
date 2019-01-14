@@ -270,6 +270,12 @@ $this->headLink()
                             <?php echo $this->translate('This product is enabled'); ?>
                             <input type="checkbox" id="product-enabled"/>
                         </label>
+                        <div class="grid_6 labeled alpha mb5px mt5px omega fl-right product-allowance-block icon right" style="display: none;">
+                            <?php echo $this->formText('product-allowance', isset($this->data['allowance_due']) ? date('d-M-Y', strtotime($this->data['allowance_due'])) : null, array('class' => 'grid_7 alpha omega fl-right')); ?>
+                            <label class="grid_5 alpha omega" for="product-allowance"><?php echo $this->translate('Allowance'); ?></label>
+                            <i class="ticon-calendar icon16"></i>
+                        </div>
+
                         <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
                     </div>
                     <div class="grid_3 alpha omega labeled mt1-5em">
@@ -294,13 +300,9 @@ $this->headLink()
                         <input class="grid_9 alpha omega fl-right" type="text" id="product-gtin" data-reflection="gtin" placeholder="<?php echo $this->translate('global trade item number'); ?>"/>
                         <label class="grid_3 alpha omega" for="product-gtin"><?php echo $this->translate('Gtin'); ?></label>
                     </div>
-
-
-
-
                 </fieldset>
 
-                <div class="mt2-25em">
+                <div class="mt10px">
                     <div id="description-box" class="tabs-gray">
                         <?php
                             $lexemShortDescription = $this->translate('Short description');
@@ -369,8 +371,8 @@ $this->headLink()
                         <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                     </div>
                     <div class="grid_6 alpha labeled mt1-5em">
+                        <input class="grid_8 alpha omega fl-right" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                         <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
-                        <input class="grid_8 alpha omega" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                     </div>
                     <label class="grid_6 mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
 
@@ -447,7 +449,7 @@ $this->headLink()
             <?php echo $this->partial('product/digital-product.phtml'); ?>
         </div>
 
-        <div class="footer grid_12">
+        <div class="mt10px grid_12">
             <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>
             <button class="btn ticon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
         </div>

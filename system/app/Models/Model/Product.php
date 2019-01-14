@@ -71,6 +71,9 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_gtin = '';
 
+    protected $_allowance = '';
+
+
     public function  __construct(array $options = null) {
         parent::__construct($options);
         $this->notifyObservers();
@@ -416,4 +419,19 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
     }
 
 
+    /**
+     * @return string
+     */
+    public function getAllowance()
+    {
+        return $this->_allowance;
+    }
+
+    /**
+     * @param string $allowance
+     */
+    public function setAllowance($allowance)
+    {
+        $this->_allowance = $allowance;
+    }
 }

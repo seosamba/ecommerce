@@ -350,7 +350,18 @@ CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
   FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 08/01/2019
+-- version: 2.6.2
+-- Add product allowance
+CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `allowance_due` date DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
