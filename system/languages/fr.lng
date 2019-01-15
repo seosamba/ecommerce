@@ -706,6 +706,7 @@
         'Items Shipped' => 'Livraison en cours',
         'Items Delivered' => 'Livraison effectuée',
         'Refunded purchase' => 'Achat remboursé',
-        'Error' => 'Erreur'
+        'Error' => 'Erreur',
+        'Additional info' => 'Informations supplémentaires'
 
 );?>

@@ -52,6 +52,11 @@
                             <span><?php echo $this->translate('Payment Method');?>
                                 : <?php echo $this->order->getGateway() ;?></span>
                         <?php endif; ?>
+                        <?php if ($this->order->getAdditionalInfo()) : ?>
+                            <br/>
+                            <span><?php echo $this->translate('Additional info');?>
+                                : <?php echo $this->order->getAdditionalInfo() ;?></span>
+                        <?php endif; ?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>
                     <?php endif;?>
