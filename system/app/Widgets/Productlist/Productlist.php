@@ -357,6 +357,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				$productOptionsView = $view->render('options.phtml');
 			}
 
+            $inventoryCount = $product->getInventory();
+
+			if(!is_null($inventoryCount)) {
+                $inventoryCount = trim($product->getInventory());
+            }
+
+            if (is_null($inventoryCount)){
+                $productQty = '&infin;';
+            } else {
+                $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
+            }
+
+			if(is_null($inventoryCount) || !empty($inventoryCount)) {
+                $inventoryCount = $this->_translator->translate('In stock');
+            } else {
+                $inventoryCount = $this->_translator->translate('Out of stock');
+            }
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
@@ -372,7 +389,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$store:addtocart'                    => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:'.$product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:checkbox'           => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
-                '$product:options'                    => isset($productOptionsView) ? $productOptionsView : ''
+                '$product:options'                    => isset($productOptionsView) ? $productOptionsView : '',
+                '$product:inventory'                  => $inventoryCount,
+                '$product:qty'                        => $productQty
             );
 
             if (isset($data['priceFilter'])) {

@@ -696,6 +696,16 @@
         'Mrs' => 'Mme',
         'Ms' => 'Mme',
         'Miss' => 'Mlle',
-        'Dr' => 'Dr'
+        'Dr' => 'Dr',
+        'Payment Received' => 'Paiement reçu',
+        'New quote' => 'Nouveau devis',
+        'Abandoned carts' => 'Panier abandonné',
+        'Merchant action required - Customer charged' => 'Action requise par vendeur - Carte débitée',
+        'Technical processing - Customer not charged' => 'Processus en cours - Carte non débitée',
+        'Canceled' => 'Commande annulée',
+        'Items Shipped' => 'Livraison en cours',
+        'Items Delivered' => 'Livraison effectuée',
+        'Refunded purchase' => 'Achat remboursé',
+        'Error' => 'Erreur'
 
 );?>
