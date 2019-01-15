@@ -103,6 +103,8 @@ define({
         'Refund' : 'Devuelto',
         'Missing required fields' : 'Faltan campos oblogatorios por rellenar',
         'Please enter location' : 'Por favor, introduzca una dirección',
-        'Missing required field' : 'Faltan campos oblogatori por rellenar'
+        'Missing required field' : 'Faltan campos oblogatori por rellenar',
+        'Your session has timed out. Please log again' : 'Su sesión ha cadicado. Inicie sesión de nuevo',
+        'here' : 'aquí'
     }
 });
