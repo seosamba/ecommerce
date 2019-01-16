@@ -1,10 +1,9 @@
 define([
 	'backbone',
     '../collections/coupons',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
-], function(Backbone,
-            CouponsCollection
-            ){
+], function(Backbone, CouponsCollection, i18n){
 
     var CouponTableView = Backbone.View.extend({
         el: $('#coupon-table'),
@@ -69,11 +68,30 @@ define([
             ]);
         },
         deleteCoupon: function(e){
-            var cid = $(e.currentTarget).data('cid');
-            var model = this.coupons.get(cid);
+            var cid = $(e.currentTarget).data('cid'),
+                couponName = $(e.currentTarget).closest('tr').find('.coupon-code-dashboard').data('coupon-code-dashboard'),
+                model = this.coupons.get(cid);
+
             if (model){
-                showConfirm('Are you sure?', function(){
-                    model.destroy();
+                $.ajax({
+                    'url': $('#website_url').val() + 'plugin/shopping/run/checkUseCoupon',
+                    'type':'GET',
+                    'dataType':'json',
+                    'data': {cid: cid}
+                }).done(function(response){
+                    if (response.error == 1) {
+                        showMessage(_.isUndefined(i18n['Can\'t delete coupon!']) ? 'Can\'t delete coupon!':i18n['Can\'t delete coupon!'], true, 5000);
+                    } else {
+                        if(typeof response.responseText.used !== 'undefined') {
+                            showConfirm(couponName + ' ' + response.responseText.used + '. ' + (_.isUndefined(i18n['Are you sure to delete?']) ? 'Are you sure to delete?':i18n['Are you sure to delete?']), function(){
+                                model.destroy();
+                            });
+                        } else {
+                            showConfirm(_.isUndefined(i18n['Are you sure to delete?']) ? 'Are you sure to delete?':i18n['Are you sure to delete?'], function(){
+                                model.destroy();
+                            });
+                        }
+                    }
                 });
             }
         },

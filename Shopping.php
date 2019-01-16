@@ -2369,4 +2369,24 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    /**
+     * Check if coupon found in shopping_coupon_usage DbTable
+     */
+    public function checkUseCouponAction() {
+        if ($this->_request->isGet() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $couponId = filter_var($this->_request->getParam('cid'), FILTER_SANITIZE_NUMBER_INT);
+            if(!empty($couponId)) {
+                $coupon = Store_Mapper_CouponMapper::getInstance()->findCouponUsageByCouponId($couponId);
+
+                if(!empty($coupon)) {
+                    $this->_responseHelper->success(array('used' => $this->_translator->translate('was used in purchase.')));
+                } else {
+                    $this->_responseHelper->success('');
+                }
+            }
+            $this->_responseHelper->fail('');
+        }
+        $this->_responseHelper->fail('');
+    }
+
 }

@@ -84,7 +84,9 @@ define({
         'Download packing slip' : 'Télécharger bon de livraison',
         'Wait a minute! this country is already part of another zone... Add anyway?':'Wait a minute! this country is already part of another zone... Add anyway?',
         'There are no users for export' : 'Il n\'y a pas d\'utilisateurs pour l\'exportation',
-        'Export orders' : 'Exporter les commandes'
+        'Export orders' : 'Exporter les commandes',
+        'Can\'t delete coupon!' : 'Impossible de supprimer le coupon',
+        'Are you sure to delete?' : 'Êtes-vous sûr de vouloir supprimer?'
 
     }
 });
