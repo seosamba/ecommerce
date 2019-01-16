@@ -1362,7 +1362,7 @@ class Shopping extends Tools_Plugins_Abstract {
 				if (!empty($coupons)) {
 					$status = Tools_CouponTools::applyCoupons($coupons);
 					if (!empty($status)) {
-					    if(in_array(Tools_CouponTools::STATUS_FAIL_OME_TIME_USED, $status)) {
+					    if(in_array(Tools_CouponTools::STATUS_FAIL_ONE_TIME_USED, $status)) {
                             $defaultErrorMessage = $this->_translator->translate('Sorry, some coupon codes you provided had already been used.') . '</br>' . $this->_translator->translate('Go back to swap promo codes or proceed with shipping information to checkout.');
                         }
 

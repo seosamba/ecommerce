@@ -136,6 +136,8 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
     public function setOneTimeUse($oneTimeUse)
     {
         $this->_oneTimeUse = $oneTimeUse;
+
+        return $this;
     }
 
 	public function __call($name, $arguments) {

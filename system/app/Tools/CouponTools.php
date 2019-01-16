@@ -19,7 +19,7 @@ class Tools_CouponTools {
 
 	const STATUS_FAIL_ZONE_RESTRICTION = 'fail_zone_restriction';
 
-    const STATUS_FAIL_OME_TIME_USED = 'fail_one_time_used';
+    const STATUS_FAIL_ONE_TIME_USED = 'fail_one_time_used';
 
 	const STATUS_APPLIED            = true;
 
@@ -127,9 +127,9 @@ class Tools_CouponTools {
         }
 
         if((bool)$coupon->getOneTimeUse() === true) {
-            $usedCoupon =  Store_Mapper_CouponMapper::getInstance()->findCouponSalesByCoupon($coupon->getCode());
+            $usedCoupon =  Store_Mapper_CouponMapper::getInstance()->findCouponUsageByCouponId($coupon->getId());
             if(!empty($usedCoupon)) {
-                return self::STATUS_FAIL_OME_TIME_USED;
+                return self::STATUS_FAIL_ONE_TIME_USED;
             }
         }
 

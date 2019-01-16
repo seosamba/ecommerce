@@ -252,17 +252,18 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
 		return $coupons;
 	}
 
-	/**
-	 * Check if coupon used by client
-	 * @param $couponId Coupon ID
-	 * @param $clientId Client ID
-	 * @return bool Result
-	 */
+    /**
+     * Check if coupon used by client
+     * @param $couponId Coupon ID
+     * @param $clientId Client ID
+     * @return bool Result
+     */
 	public function checkCouponByClientId($couponId, $clientId) {
 		$select = $this->getDbTable()->getAdapter()->select()
 				->from(array('u' => 'shopping_coupon_usage'))
 				->join(array('c' => 'shopping_cart_session'), 'c.id = u.cart_id')
 				->where('c.user_id = ?', $clientId)
+                ->where('u.coupon_id = ?', $couponId)
 				->where('c.status != ?', Models_Model_CartSession::CART_STATUS_NEW );
 
 		$results = $this->getDbTable()->getAdapter()->fetchAll($select);
@@ -332,14 +333,14 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
     }
 
     /**
-     * @param $coupon
-     * @return mixed
+     * @param $couponId
+     * @return array
      */
-    public function findCouponSalesByCoupon($coupon){
-        $dbTable = new Zend_Db_Table('shopping_coupon_sales');
-        $where = $dbTable->getAdapter()->quoteInto('coupon_code = ?', $coupon);
-        $select =  $dbTable->getAdapter()->select()->from('shopping_coupon_sales', array('coupon_code'))->where($where);
+    public function findCouponUsageByCouponId($couponId){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('scu.coupon_id = ?', $couponId);
+        $select =  $this->getDbTable()->getAdapter()->select()->from(array('scu' => 'shopping_coupon_usage'), array('sc.id','sc.code'))
+            ->join(array('sc' => 'shopping_coupon'), 'sc.id = scu.coupon_id')->where($where);
 
-        return $dbTable->getAdapter()->fetchRow($select);
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
     }
 }
