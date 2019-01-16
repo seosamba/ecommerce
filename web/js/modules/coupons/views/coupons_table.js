@@ -83,7 +83,7 @@ define([
                         showMessage(_.isUndefined(i18n['Can\'t delete coupon!']) ? 'Can\'t delete coupon!':i18n['Can\'t delete coupon!'], true, 5000);
                     } else {
                         if(typeof response.responseText.used !== 'undefined') {
-                            showConfirm(couponName + ' ' + response.responseText.used + '. ' + (_.isUndefined(i18n['Are you sure to delete?']) ? 'Are you sure to delete?':i18n['Are you sure to delete?']), function(){
+                            showConfirm(couponName + ' ' + response.responseText.used + ' ' + (_.isUndefined(i18n['Are you sure to delete?']) ? 'Are you sure to delete?':i18n['Are you sure to delete?']), function(){
                                 model.destroy();
                             });
                         } else {
