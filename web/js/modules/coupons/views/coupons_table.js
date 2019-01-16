@@ -45,10 +45,10 @@ define([
         },
         renderCoupon: function(coupon){
             var usageInfo = 'unlimited';
-            if(coupon.get('scope') === 'client') {
-                usageInfo = 'one per client';
-            } else if (coupon.get('oneTimeUse') === '1') {
+            if(coupon.get('oneTimeUse') === '1') {
                 usageInfo = 'one time';
+            } else if (coupon.get('scope') === 'client') {
+                usageInfo = 'one per client';
             }
 
             this.$el.fnAddData([
