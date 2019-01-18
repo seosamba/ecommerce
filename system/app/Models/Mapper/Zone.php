@@ -135,10 +135,12 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 		if (!empty ($zip)){
 			$zoneZipTable->getAdapter()->beginTransaction();
 			foreach ($zip as $code){
-				$zoneZipTable->insert(array(
-					'zone_id'	=> $zone->getId(),
-					'zip'		=> $code
-				));
+                if (!empty($code)) {
+                    $zoneZipTable->insert(array(
+                        'zone_id' => $zone->getId(),
+                        'zip' => $code
+                    ));
+                }
 			}
 			$zoneZipTable->getAdapter()->commit();
 		}
