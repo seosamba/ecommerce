@@ -506,6 +506,7 @@
 'Mrs' => 'Sra',
 'Ms' => 'Sra',
 'Miss' => 'Srta',
-'Dr' => 'Dr'
+'Dr' => 'Dr',
+'Additional info' => 'Información adicional'
 
 );
