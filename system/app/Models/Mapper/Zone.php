@@ -158,6 +158,43 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
 	}
 
     /**
+     * Delete countries by zone id
+     *
+     * @param int $zoneId zone id
+     * @throws Exception
+     */
+	public function deleteCountriesByZoneId($zoneId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('zone_id = ?', $zoneId);
+        $this->getDbTable()->getAdapter()->delete('shopping_zone_country', $where);
+    }
+
+    /**
+     * Delete states by zone id
+     *
+     * @param int $zoneId zone id
+     * @throws Exception
+     */
+    public function deleteStatesByZoneId($zoneId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('zone_id = ?', $zoneId);
+        $this->getDbTable()->getAdapter()->delete('shopping_zone_state', $where);
+    }
+
+    /**
+     * Delete zips by zone id
+     *
+     * @param int $zoneId zone id
+     * @throws Exception
+     */
+    public function deleteZipsByZoneId($zoneId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('zone_id = ?', $zoneId);
+        $this->getDbTable()->getAdapter()->delete('shopping_zone_zip', $where);
+    }
+
+
+    /**
      * Get zone names
      *
      * @return mixed
