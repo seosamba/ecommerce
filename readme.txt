@@ -78,6 +78,7 @@ Plugin widgets.
     {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
+    {$postpurchase:additionalInfo} -> additional info of purchase
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
     {$postpurchase:shippingTax[:clean]} -> shipping tax
     {$postpurchase:discountTax[:clean]} -> discount tax

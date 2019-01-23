@@ -123,6 +123,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'discount' => 'order.discount',
             'total' => 'order.total',
             'notes' => 'order.notes',
+            'additional_info' => 'order.additional_info',
             'shipping_tracking_id' => 'order.shipping_tracking_id',
             'brand' => 'sb.name',
             'user_prefix' => 'u.prefix',

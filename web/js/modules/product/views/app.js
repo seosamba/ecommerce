@@ -609,7 +609,13 @@ define([
 		},
         processSaveError: function(model, response){
             hideSpinner();
-            showMessage(response.responseText, true);
+
+            var message = response.responseText;
+            if(message === ''){
+                message =  _.isUndefined(i18n['Your session has timed out. Please log again'])?'Your session has timed out. Please log again':i18n['Your session has timed out. Please log again'];
+                message += ' <u><a target="_blank" href="' + $('#website_url').val() + 'go">' + (_.isUndefined(i18n['here'])?'here':i18n['here']) + '</a></u>';
+            }
+            showMessage(message, true);
         },
 		deleteProduct: function(){
 			var self = this;
