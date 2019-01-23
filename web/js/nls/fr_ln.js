@@ -86,7 +86,10 @@ define({
         'There are no users for export' : 'Il n\'y a pas d\'utilisateurs pour l\'exportation',
         'Export orders' : 'Exporter les commandes',
         'Your session has timed out. Please log again' : 'Votre session a expiré. Veuillez vous connecter à nouveau',
-        'here' : 'ici'
+        'here' : 'ici',
+        'Can\'t delete coupon!' : 'Impossible de supprimer le coupon',
+        'Are you sure to delete?' : 'Êtes-vous sûr de vouloir supprimer?',
+        'A coupon name can\'t contain gaps' : 'Le nom du coupon ne peut pas contenir des espaces'
 
     }
 });

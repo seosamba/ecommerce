@@ -1362,6 +1362,10 @@ class Shopping extends Tools_Plugins_Abstract {
 				if (!empty($coupons)) {
 					$status = Tools_CouponTools::applyCoupons($coupons);
 					if (!empty($status)) {
+					    if(in_array(Tools_CouponTools::STATUS_FAIL_ONE_TIME_USED, $status)) {
+                            $defaultErrorMessage = $this->_translator->translate('Sorry, some coupon codes you provided had already been used.') . '</br>' . $this->_translator->translate('Go back to swap promo codes or proceed with shipping information to checkout.');
+                        }
+
 						$hasErrors = count(array_filter($status, function ($status) {
 							return $status !== true;
 						}));
@@ -2363,6 +2367,26 @@ class Shopping extends Tools_Plugins_Abstract {
 
             $this->_responseHelper->success('');
         }
+    }
+
+    /**
+     * Check if coupon found in shopping_coupon_usage DbTable
+     */
+    public function checkUseCouponAction() {
+        if ($this->_request->isGet() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $couponId = filter_var($this->_request->getParam('cid'), FILTER_SANITIZE_NUMBER_INT);
+            if(!empty($couponId)) {
+                $coupon = Store_Mapper_CouponMapper::getInstance()->findCouponUsageByCouponId($couponId);
+
+                if(!empty($coupon)) {
+                    $this->_responseHelper->success(array('used' => $this->_translator->translate('was used in purchase.')));
+                } else {
+                    $this->_responseHelper->success('');
+                }
+            }
+            $this->_responseHelper->fail('');
+        }
+        $this->_responseHelper->fail('');
     }
 
 }

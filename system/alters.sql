@@ -355,7 +355,12 @@ CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
 -- Add charity col
 ALTER TABLE `shopping_cart_session` ADD COLUMN `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL AFTER `purchased_on`;
 
+-- 02/01/2019
+-- version: 2.6.3
+-- Add zone id for the coupon
+ALTER TABLE `shopping_coupon` ADD COLUMN `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
