@@ -96,6 +96,9 @@ class Api_Store_Zones extends Api_Service_Abstract {
 		$id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
 		$zonesMapper = Models_Mapper_Zone::getInstance();
         if ($id){
+            $zonesMapper->deleteCountriesByZoneId($id);
+            $zonesMapper->deleteStatesByZoneId($id);
+            $zonesMapper->deleteZipsByZoneId($id);
             return $zonesMapper->delete($id);
         }
 	}
