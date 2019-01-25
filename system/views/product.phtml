@@ -261,22 +261,23 @@ $this->headLink()
                         </div>
                     </div>
                     <div class="grid_9 alpha omega mt0px">
-                        <label class="grid_3 alpha" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
-                        <label class="grid_4 omega fs12 text-right pointer">
-                            <?php echo $this->translate('This product is digital'); ?>
+
+                        <label class="grid_3 omega fs12 text-right pointer">
+                            <?php echo $this->translate('Digital product'); ?>
                             <input type="checkbox" id="digital-product"/>
                         </label>
-                        <label class="grid_5 omega fs12 text-right pointer">
-                            <?php echo $this->translate('This product is enabled'); ?>
+                        <label class="grid_4 omega fs12 text-right pointer">
+                            <?php echo $this->translate('Product enabled'); ?>
                             <input type="checkbox" id="product-enabled"/>
                         </label>
-                        <div class="grid_6 labeled alpha mb5px mt5px omega fl-right product-allowance-block icon right" style="display: none;">
-                            <?php echo $this->formText('product-allowance', isset($this->data['allowance_due']) ? date('d-M-Y', strtotime($this->data['allowance_due'])) : null, array('class' => 'grid_7 alpha omega fl-right')); ?>
-                            <label class="grid_5 alpha omega" for="product-allowance"><?php echo $this->translate('Allowance'); ?></label>
+                        <div class="grid_5 labeled alpha mb5px omega fl-right product-allowance-block icon right" style="display: none;">
+                            <?php echo $this->formText('product-allowance', isset($this->data['allowance_due']) ? date('d-M-Y', strtotime($this->data['allowance_due'])) : null, array('placeholder'=> $this->translate('product always on'), 'class' => 'grid_11 alpha omega fl-right')); ?>
                             <i class="ticon-calendar icon16"></i>
                         </div>
-
-                        <input type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
+                        <div class="grid_12 alpha omega labeled mt1em">
+                            <input class="grid_9 alpha omega fl-right" type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
+                            <label class="grid_3 alpha omega" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                        </div>
                     </div>
                     <div class="grid_3 alpha omega labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-sku" data-reflection="sku" placeholder="<?php echo $this->translate('item id'); ?>"/>
