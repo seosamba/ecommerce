@@ -20,6 +20,8 @@ class Store_Model_AllowanceProducts extends Application_Model_Models_Abstract {
     public function setProductId($productId)
     {
         $this->_productId = $productId;
+
+        return $this;
     }
 
     /**
@@ -36,6 +38,8 @@ class Store_Model_AllowanceProducts extends Application_Model_Models_Abstract {
     public function setAllowanceDue($allowanceDue)
     {
         $this->_allowanceDue = $allowanceDue;
+
+        return $this;
     }
 
 }
