@@ -497,4 +497,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	    return $allowedOptions;
 	}
 
+    private function _renderAllowance() {
+        return $this->_product->getAllowance();
+    }
+
 }

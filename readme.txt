@@ -29,6 +29,7 @@ Plugin widgets.
     {$product:inventory} - Displays "In stock" or "Out of stock" message
     {$product:freeshipping[:sometext]} - Displays <span class="product-free-shipping">sometext</span> if free shipping enabled for this product
         sometext - custom text inside span element
+    {$product:allowance} - Displays the product allowance end date.
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
