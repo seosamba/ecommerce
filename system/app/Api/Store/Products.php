@@ -247,15 +247,6 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $allowanceProductsMapper->deleteByProductId($productId);
                 }
 
-                if(!empty($srcData['allowance'])) {
-                    $allowanceProductModel = new Store_Model_AllowanceProducts();
-
-                    $allowanceProductModel->setProductId($productId);
-                    $allowanceProductModel->setAllowanceDue($srcData['allowance']);
-
-                    $allowanceProductsMapper->save($allowanceProductModel);
-                }
-
 				$product->setOptions($srcData);
 				if ($this->_productMapper->save($product)){
 					$data[] = $product->toArray();

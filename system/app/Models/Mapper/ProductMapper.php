@@ -504,14 +504,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         $allowanceProduct = $allowanceProductsMapper->findByProductId($model->getId());
 
-        if(!$allowanceProduct instanceof Store_Model_AllowanceProducts) {
-            $allowanceProductModel = new Store_Model_AllowanceProducts();
-
-            $allowanceProductModel->setProductId($model->getId());
-            $allowanceProductModel->setAllowanceDue($model->getAllowance());
-
-            $allowanceProductsMapper->save($allowanceProductModel);
+        if (!$allowanceProduct instanceof Store_Model_AllowanceProducts) {
+            $allowanceProduct = new Store_Model_AllowanceProducts();
+            $allowanceProduct->setProductId($model->getId());
         }
+
+        $allowanceProduct->setAllowanceDue($model->getAllowance());
+        $allowanceProductsMapper->save($allowanceProduct);
     }
 
     /**
