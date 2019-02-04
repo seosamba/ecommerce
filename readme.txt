@@ -154,4 +154,7 @@ Magic spaces:
     If you want to use it with action email system add param 'email' for magic space {postpurchasecartcontent:email}
     somename - You should provide optional name if you want use several magicspaces on one page.
 
+8. Product params widgets:
+      {$productparams:titleoption:{$product:id}:SIZE} - Displays option title selected by default. Where "SIZE" - option name. Used only for dropdown and radio options.
+
 
