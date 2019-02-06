@@ -121,5 +121,33 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
         return $entries;
     }
 
+    /**
+     * @param $productId
+     * @param $optionParam
+     * @return mixed
+     * return dropdown|radio default option title
+     */
+    public function findDefaultSelectionOptionByProductId($productId, $optionParam) {
+        $data = array();
+
+	    if(!empty($productId) && !empty($optionParam)) {
+            $productOptionDbTable = new Models_DbTable_ProductOption();
+
+            $where = $productOptionDbTable->getAdapter()->quoteInto('pho.product_id = ?', intval($productId));
+            $where .= ' AND '.$productOptionDbTable->getAdapter()->quoteInto('pos.isDefault = ?', '1');
+            $where .= ' AND '.$productOptionDbTable->getAdapter()->quoteInto('po.title = ?', $optionParam);
+
+            $select = $productOptionDbTable->getAdapter()->select()->from(array('pho' => 'shopping_product_has_option'), array('title' => 'pos.title'))
+                ->join(array('po' => 'shopping_product_option'), 'pho.option_id = po.id', array())
+                ->join(array('pos' => 'shopping_product_option_selection'), 'pos.option_id = pho.option_id', array())
+                ->where($where);
+
+            $data = $productOptionDbTable->getAdapter()->fetchRow($select);
+
+            return $data;
+        }
+	    return $data;
+    }
+
 
 }
