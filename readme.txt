@@ -158,3 +158,9 @@ Magic spaces:
       {$productparams:titleoption:{$product:id}:SIZE} - Displays option title selected by default. Where "SIZE" - option name. Used only for dropdown and radio options.
 
 
+9. Product filters widget:
+{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft]]]}
+ tagnames-tag1,tag2,...,tagN - filtering by product tags
+ brands-brand1,brand2,...,brandN - filtering by product brands
+ order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
+ productsqft - special option (special option for surfacecalc plugin)
