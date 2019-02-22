@@ -291,6 +291,29 @@ class Filtering_Mappers_Eav
     }
 
     /**
+     * @param $productTags
+     * @param $additionalAttributeName
+     * @return array
+     */
+    public function getPriceRangeForProductSqft($productTags, $additionalAttributeName)
+    {
+        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+
+        $where = $dbAdapter->quoteInto('pt.tag_id IN (?)', $productTags);
+        $where .= ' AND ' . $dbAdapter->quoteInto('sfa.name = ?', $additionalAttributeName);
+
+        $select = $dbAdapter->select()->from(array('sfv' => 'shopping_filtering_values'), array('sfv.value'))
+            ->join(array('p' => 'shopping_product'), 'p.id = sfv.product_id', null)
+            ->join(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = sfv.product_id', null)
+            ->join(array('sfa' => 'shopping_filtering_attributes'), 'sfa.id = sfv.attribute_id', null)
+            ->where($where);
+
+        $result = $dbAdapter->fetchCol($select);
+
+        return $result;
+    }
+
+    /**
      * Returns array of brand => count pairs for given tags
      * @param $productTags array Product tags to filer with
      * @param $filterByNames null|array List of allowed brand names
@@ -344,5 +367,28 @@ class Filtering_Mappers_Eav
             ->joinLeft(array('sfa' => 'shopping_filtering_attributes'), 'sfv.attribute_id=sfa.id')
             ->where($where);
         return $this->_dbAdapter->fetchRow($select);
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function findAttributeIdByName($name)
+    {
+        $where = $this->_dbAdapter->quoteInto('sfa.name = ?', $name);
+        $select = $this->_dbAdapter->select()->from(array('sfa' => 'shopping_filtering_attributes'), array('sfa.id'))->where($where);
+
+        $currentData = $this->_dbAdapter->fetchRow($select);
+
+        return $currentData;
+    }
+
+    /**
+     * @param null $attributeId
+     * @return int|null
+     */
+    public function deleteAttributeById($attributeId = null) {
+        $where = $this->_dbAdapter->quoteInto('attribute_id = ?', $attributeId);
+        return $this->_dbAdapter->delete('shopping_filtering_values', $where);
     }
 }

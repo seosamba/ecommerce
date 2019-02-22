@@ -68,6 +68,19 @@
                 <?php echo $this->translate('Price'); ?>
             </label>
         </li>
+        <?php if($this->useProductSqft) :?>
+            <li class="filter-productsqft">
+                <label class="filter-label">
+                    <input type="hidden" name="show[productsqft]" value="0" />
+                    <input type="checkbox" name="show[productsqft]" value="1"
+                        <?php if (!isset($this->settings['productsqft']) || $this->settings['productsqft']): ?>
+                            checked
+                        <?php endif; ?>
+                    />
+                    <?php echo $this->translate('Productsqft'); ?>
+                </label>
+            </li>
+        <?php endif;?>
         <?php foreach ($this->filters as $filterId => $filter) : ?>
             <?php $show = !isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]); ?>
             <li data-attributeId="<?php echo $filterId; ?>">

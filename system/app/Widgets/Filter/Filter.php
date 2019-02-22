@@ -100,6 +100,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $options = array();
         $priceTax = '';
+        $useProductSqft = false;
+        $additionalAttributeName = '';
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
@@ -109,6 +111,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 if($priceTax !== null){
                    $priceTax = $priceTax[0]['rate1'];
                 }
+            }
+
+            if(in_array($option, Filtering_Tools::$allowedAdditionalOptions)) {
+                $additionalAttributeName = strtolower($option);
+                $useProductSqft = true;
             }
         }
 
@@ -155,6 +162,22 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
         $this->_priceRange['name'] = 'price';
         $this->_priceRange['label'] = 'Price';
+
+        $productSqftPriceRange = array();
+        $this->_view->useProductSqft = false;
+        if($useProductSqft) {
+            $this->_view->useProductSqft = true;
+            $productSqftPriceData = $eavMapper->getPriceRangeForProductSqft($tagIds, $additionalAttributeName);
+            if(!empty($productSqftPriceData)) {
+                $productSqftPriceRange['min'] = floor(min($productSqftPriceData));
+                $productSqftPriceRange['max'] = ceil(max($productSqftPriceData));
+            }
+
+            $productSqftPriceRange['name'] = $additionalAttributeName;
+            $productSqftPriceRange['label'] = ucfirst($additionalAttributeName);
+        }
+
+        $this->productSqftPriceRange = $productSqftPriceRange;
 
         $this->_brands = $eavMapper->getBrands($tagIds);
 
@@ -249,6 +272,14 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             $this->_view->priceRange = $this->_priceRange;
         }
 
+        if (!empty($appliedFilters['productsqft'])) {
+            $this->productSqftPriceRange = array_merge($this->productSqftPriceRange, $appliedFilters['productsqft']);
+            unset($appliedFilters['productsqft'], $price);
+        }
+
+        if (!isset($widgetSettings['productsqft']) || !empty($widgetSettings['productsqft'])) {
+            $this->_view->productSqftPriceRange = $this->productSqftPriceRange;
+        }
 
         return $this->_view->render('filter-widget.phtml');
     }
