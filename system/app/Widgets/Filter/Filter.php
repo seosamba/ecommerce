@@ -100,7 +100,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $options = array();
         $priceTax = '';
-        $useProductSqft = false;
+        $useProduct = false;
         $additionalAttributeName = '';
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
@@ -115,7 +115,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
             if(in_array($option, Filtering_Tools::$allowedAdditionalOptions)) {
                 $additionalAttributeName = strtolower($option);
-                $useProductSqft = true;
+                $useProduct = true;
             }
         }
 
@@ -163,21 +163,23 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_priceRange['name'] = 'price';
         $this->_priceRange['label'] = 'Price';
 
-        $productSqftPriceRange = array();
-        $this->_view->useProductSqft = false;
-        if($useProductSqft) {
-            $this->_view->useProductSqft = true;
-            $productSqftPriceData = $eavMapper->getPriceRangeForProductSqft($tagIds, $additionalAttributeName);
-            if(!empty($productSqftPriceData)) {
-                $productSqftPriceRange['min'] = floor(min($productSqftPriceData));
-                $productSqftPriceRange['max'] = ceil(max($productSqftPriceData));
+        $productPriceRange = array();
+        $this->_view->useProduct = false;
+        if($useProduct) {
+            $this->_view->useProduct = true;
+            $this->_view->additionalAttributeName = $additionalAttributeName;
+
+            $productPriceData = $eavMapper->getPriceRangeForProduct($tagIds, $additionalAttributeName);
+            if(!empty($productPriceData)) {
+                $productPriceRange['min'] = floor(min($productPriceData));
+                $productPriceRange['max'] = ceil(max($productPriceData));
             }
 
-            $productSqftPriceRange['name'] = $additionalAttributeName;
-            $productSqftPriceRange['label'] = ucfirst($additionalAttributeName);
+            $productPriceRange['name'] = $additionalAttributeName;
+            $productPriceRange['label'] = ucfirst($additionalAttributeName);
         }
 
-        $this->productSqftPriceRange = $productSqftPriceRange;
+        $this->productPriceRange = $productPriceRange;
 
         $this->_brands = $eavMapper->getBrands($tagIds);
 
@@ -273,12 +275,12 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
 
         if (!empty($appliedFilters['productsqft'])) {
-            $this->productSqftPriceRange = array_merge($this->productSqftPriceRange, $appliedFilters['productsqft']);
+            $this->productPriceRange = array_merge($this->productPriceRange, $appliedFilters['productsqft']);
             unset($appliedFilters['productsqft'], $price);
         }
 
         if (!isset($widgetSettings['productsqft']) || !empty($widgetSettings['productsqft'])) {
-            $this->_view->productSqftPriceRange = $this->productSqftPriceRange;
+            $this->_view->productPriceRange = $this->productPriceRange;
         }
 
         return $this->_view->render('filter-widget.phtml');

@@ -21,11 +21,11 @@
             <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
         </li>
     <?php endif; ?>
-    <?php if(!empty($this->productSqftPriceRange)) :?>
-        <?php $this->productSqftPriceRange['useCurrency'] = true; ?>
-        <li data-scroll-type="productsqft">
-            <p class="filter-header"><?php echo $this->translate($this->productSqftPriceRange['label']); ?></p>
-            <?php echo $this->partial('_range-slider.phtml', $this->productSqftPriceRange); ?>
+    <?php if(!empty($this->productPriceRange)) :?>
+        <?php $this->productPriceRange['useCurrency'] = true; ?>
+        <li data-scroll-type="<?php echo $this->productPriceRange['name'];?>">
+            <p class="filter-header"><?php echo $this->translate($this->productPriceRange['label']); ?></p>
+            <?php echo $this->partial('_range-slider.phtml', $this->productPriceRange); ?>
         </li>
     <?php endif;?>
     <?php foreach ($this->filters as $filter) : ?>

@@ -295,7 +295,7 @@ class Filtering_Mappers_Eav
      * @param $additionalAttributeName
      * @return array
      */
-    public function getPriceRangeForProductSqft($productTags, $additionalAttributeName)
+    public function getPriceRangeForProduct($productTags, $additionalAttributeName)
     {
         $dbAdapter = Zend_Db_Table::getDefaultAdapter();
 
