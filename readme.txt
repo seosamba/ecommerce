@@ -40,6 +40,7 @@ Plugin widgets.
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
     unwrap - remowed the <div class="product-list"></div> HTML element
     5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
+    additionalfilters-somename,somename2,.. - Special filter for {$filter... widget where somename* is unique filter name
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
@@ -158,3 +159,9 @@ Magic spaces:
       {$productparams:titleoption:{$product:id}:SIZE} - Displays option title selected by default. Where "SIZE" - option name. Used only for dropdown and radio options.
 
 
+9. Product filters widget:
+{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft]]]}
+ tagnames-tag1,tag2,...,tagN - filtering by product tags
+ brands-brand1,brand2,...,brandN - filtering by product brands
+ order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
+ productsqft - special option (special option for surfacecalc plugin)

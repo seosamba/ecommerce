@@ -8,16 +8,17 @@ if(isset($this->priceTax) && !empty($this->priceTax)){
     $min = floor(floatval($this->min));
     $max = ceil(floatval($this->max));
 }
+$sliderType = $this->name;
 ?>
 <p>
     <?php echo $this->translate('From'); ?>
     <?php
-    $from =  !empty($this->from) ? $this->from : $min;
-    $to =  !empty($this->to) ? $this->to : $max;
+        $from =  !empty($this->from) ? $this->from : $min;
+        $to =  !empty($this->to) ? $this->to : $max;
     ?>
-    <span class="filter-from"><?php echo $this->useCurrency ? $this->currency($from) : $from; ?></span>
+    <span class="filter-from-<?php echo $sliderType; ?>"><?php echo $this->useCurrency ? $this->currency($from) : $from; ?></span>
     <?php echo $this->translate('to'); ?>
-    <span class="filter-to"><?php echo $this->useCurrency ? $this->currency($to) : $to; ?></span>
+    <span class="filter-to-<?php echo $sliderType; ?>"><?php echo $this->useCurrency ? $this->currency($to) : $to; ?></span>
 </p>
 <div class="filter-slider"
      data-min="<?php echo $min; ?>"
@@ -32,4 +33,4 @@ if (isset($this->from) && isset($this->to)) {
     $filterRange = '';
 }
 ?>
-<input type="hidden" class="filter-value" name="<?php echo $this->name; ?>" value="<?php echo $filterRange; ?>"/>
+<input type="hidden" class="filter-value-<?php echo $sliderType; ?>" name="<?php echo $this->name; ?>" value="<?php echo $filterRange; ?>"/>

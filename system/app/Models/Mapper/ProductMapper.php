@@ -167,7 +167,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $attributes = array(),
         $price = array(),
         $sort = null,
-        $allowance = false
+        $allowance = false,
+        $productPrice = array()
 
     ) {
         $entities = array();
@@ -206,6 +207,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         if(!empty($price)){
             $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
+        }
+
+        if(!empty($productPrice)) {
+            $select->joinLeft(array('sfv' => 'shopping_filtering_values'), 'sfv.product_id = p.id', array());
+            foreach ($productPrice as $pPrice) {
+                $select->where("sfv.value BETWEEN " . $pPrice['min'] ." AND ".$pPrice['max']);
+            }
         }
 
         if (!empty($tags)) {
