@@ -102,6 +102,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $priceTax = '';
         $useProduct = false;
         $additionalAttributeName = '';
+        $additionalAttributeLabel = '';
+        $eavMapper = Filtering_Mappers_Eav::getInstance();
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
@@ -114,8 +116,12 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             }
 
             if(in_array($option, Filtering_Tools::$allowedAdditionalOptions)) {
-                $additionalAttributeName = strtolower($option);
-                $useProduct = true;
+                $additionalAttributeData = $eavMapper->findAttributeDataByName(strtolower($option));
+                if(!empty($additionalAttributeData)) {
+                    $additionalAttributeName = $additionalAttributeData['name'];
+                    $additionalAttributeLabel =  $additionalAttributeData['label'];
+                    $useProduct = true;
+                }
             }
         }
 
@@ -147,8 +153,6 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
         $this->_widgetSettings = $widgetSettings;
 
-        $eavMapper = Filtering_Mappers_Eav::getInstance();
-
         // fetch list filters by given tags
         $listFilters = $eavMapper->findListFiltersByTags($tagIds, $widgetSettings);
         $rangeFilters = $eavMapper->findRangeFiltersByTags($tagIds, $widgetSettings);
@@ -168,6 +172,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         if($useProduct) {
             $this->_view->useProduct = true;
             $this->_view->additionalAttributeName = $additionalAttributeName;
+            $this->_view->additionalAttributeLabel = $additionalAttributeLabel;
 
             $productPriceData = $eavMapper->getPriceRangeForProduct($tagIds, $additionalAttributeName);
             if(!empty($productPriceData)) {
@@ -176,7 +181,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             }
 
             $productPriceRange['name'] = $additionalAttributeName;
-            $productPriceRange['label'] = ucfirst($additionalAttributeName);
+            $productPriceRange['label'] = ucfirst($additionalAttributeLabel);
         }
 
         $this->productPriceRange = $productPriceRange;

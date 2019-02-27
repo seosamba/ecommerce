@@ -384,6 +384,24 @@ class Filtering_Mappers_Eav
     }
 
     /**
+     * @param $name
+     * @return mixed
+     */
+    public function findAttributeDataByName($name)
+    {
+        $where = $this->_dbAdapter->quoteInto('sfa.name = ?', $name);
+        $select = $this->_dbAdapter->select()->from(array('sfa' => 'shopping_filtering_attributes'), array(
+            'sfa.id',
+            'sfa.name',
+            'sfa.label'
+        ))->where($where);
+
+        $currentData = $this->_dbAdapter->fetchRow($select);
+
+        return $currentData;
+    }
+
+    /**
      * @param null $attributeId
      * @return int|null
      */

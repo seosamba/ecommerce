@@ -69,21 +69,15 @@
             </label>
         </li>
         <?php if($this->useProduct) :?>
-            <?php
-            $additionalAttributeName = 'default-name';
-            if(!empty($this->additionalAttributeName)) {
-                $additionalAttributeName = $this->additionalAttributeName;
-            }
-            ?>
-            <li class="filter-<?php echo $additionalAttributeName;?>">
+            <li class="filter-<?php echo $this->additionalAttributeName;?>">
                 <label class="filter-label">
-                    <input type="hidden" name="show[<?php echo $additionalAttributeName;?>]" value="0" />
-                    <input type="checkbox" name="show[<?php echo $additionalAttributeName;?>]" value="1"
-                        <?php if (!isset($this->settings[$additionalAttributeName]) || $this->settings[$additionalAttributeName]): ?>
+                    <input type="hidden" name="show[<?php echo $this->additionalAttributeName;?>]" value="0" />
+                    <input type="checkbox" name="show[<?php echo $this->additionalAttributeName;?>]" value="1"
+                        <?php if (!isset($this->settings[$this->additionalAttributeName]) || $this->settings[$this->additionalAttributeName]): ?>
                             checked
                         <?php endif; ?>
                     />
-                    <?php echo $this->translate(ucfirst($additionalAttributeName)); ?>
+                    <?php echo $this->translate($this->additionalAttributeLabel); ?>
                 </label>
             </li>
         <?php endif;?>
