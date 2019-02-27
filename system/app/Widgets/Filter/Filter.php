@@ -103,7 +103,6 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $useProduct = false;
         $additionalAttributeName = '';
         $additionalAttributeLabel = '';
-        $eavMapper = Filtering_Mappers_Eav::getInstance();
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
@@ -116,7 +115,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             }
 
             if(in_array($option, Filtering_Tools::$allowedAdditionalOptions)) {
-                $additionalAttributeData = $eavMapper->findAttributeDataByName(strtolower($option));
+                $additionalAttributeData = Filtering_Mappers_Eav::getInstance()->findAttributeDataByName(strtolower($option));
                 if(!empty($additionalAttributeData)) {
                     $additionalAttributeName = $additionalAttributeData['name'];
                     $additionalAttributeLabel =  $additionalAttributeData['label'];
@@ -154,6 +153,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_widgetSettings = $widgetSettings;
 
         // fetch list filters by given tags
+        $eavMapper = Filtering_Mappers_Eav::getInstance();
+
         $listFilters = $eavMapper->findListFiltersByTags($tagIds, $widgetSettings);
         $rangeFilters = $eavMapper->findRangeFiltersByTags($tagIds, $widgetSettings);
 
