@@ -39,7 +39,7 @@
                 $others = array();
                 ksort($filter['values']);
                 foreach ($filter['values'] as $value => $count) : ?>
-                    <?php if (intval($count) === 1) {
+                    <?php if (!$this->showAllItems && intval($count) === 1) {
                         array_push($others, $value);
                         continue;
                     }
@@ -58,7 +58,7 @@
                         </label>
                     </li>
                 <?php endforeach; ?>
-                <?php if (!empty($others)) : ?>
+                <?php if (!empty($others) && !$this->showAllItems) : ?>
                     <?php
                     Zend_Controller_Action_HelperBroker::getExistingHelper('cache')->save(
                         md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $filter['name']),

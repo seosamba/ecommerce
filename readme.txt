@@ -165,3 +165,4 @@ Magic spaces:
  brands-brand1,brand2,...,brandN - filtering by product brands
  order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
  productsqft - special option (special option for surfacecalc plugin)
+ allitems - Show all filter values without All others group
