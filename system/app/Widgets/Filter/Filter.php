@@ -187,7 +187,17 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $this->productPriceRange = $productPriceRange;
 
-        $this->_brands = $eavMapper->getBrands($tagIds);
+        $brands = $eavMapper->getBrands($tagIds);
+
+        $tmpBrandsArr = array();
+        if(!empty($brands)) {
+            foreach ($brands as $pId => $brandName) {
+                $tmpBrandsArr[$brandName] += 1;
+            }
+            arsort($tmpBrandsArr);
+        }
+
+        $this->_brands = $tmpBrandsArr;
 
         // if this user allowed to manage content
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && !$request->has('filter_preview')) {
