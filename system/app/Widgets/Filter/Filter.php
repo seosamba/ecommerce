@@ -16,6 +16,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
     const FILTER_READONLY = 'readonly';
 
+    /**
+     * Show all filter values without All others group
+     */
+    const FILTER_ALLITEMS = 'allitems';
+
     private $_allowedOptions = array(
         'builder', 'product', 'attribute'
     );
@@ -103,6 +108,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $useProduct = false;
         $additionalAttributeName = '';
         $additionalAttributeLabel = '';
+        $showAllItems = false;
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
@@ -121,6 +127,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                     $additionalAttributeLabel =  $additionalAttributeData['label'];
                     $useProduct = true;
                 }
+            }
+
+            if(in_array(self::FILTER_ALLITEMS, $this->_options)) {
+                $showAllItems = true;
             }
         }
 
@@ -297,6 +307,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         if (!isset($widgetSettings['productsqft']) || !empty($widgetSettings['productsqft'])) {
             $this->_view->productPriceRange = $this->productPriceRange;
+        }
+
+        if($showAllItems) {
+            $this->_view->showAllItems = $showAllItems;
         }
 
         return $this->_view->render('filter-widget.phtml');
