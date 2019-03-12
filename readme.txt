@@ -29,6 +29,7 @@ Plugin widgets.
     {$product:inventory} - Displays "In stock" or "Out of stock" message
     {$product:freeshipping[:sometext]} - Displays <span class="product-free-shipping">sometext</span> if free shipping enabled for this product
         sometext - custom text inside span element
+    {$product:allowance} - Displays the product allowance end date.
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
@@ -39,6 +40,7 @@ Plugin widgets.
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
     unwrap - remowed the <div class="product-list"></div> HTML element
     5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
+    additionalfilters-somename,somename2,.. - Special filter for {$filter... widget where somename* is unique filter name
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
@@ -77,6 +79,7 @@ Plugin widgets.
     {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
+    {$postpurchase:additionalInfo} -> additional info of purchase
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
     {$postpurchase:shippingTax[:clean]} -> shipping tax
     {$postpurchase:discountTax[:clean]} -> discount tax
@@ -152,4 +155,14 @@ Magic spaces:
     If you want to use it with action email system add param 'email' for magic space {postpurchasecartcontent:email}
     somename - You should provide optional name if you want use several magicspaces on one page.
 
+8. Product params widgets:
+      {$productparams:titleoption:{$product:id}:SIZE} - Displays option title selected by default. Where "SIZE" - option name. Used only for dropdown and radio options.
 
+
+9. Product filters widget:
+{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft]]]}
+ tagnames-tag1,tag2,...,tagN - filtering by product tags
+ brands-brand1,brand2,...,brandN - filtering by product brands
+ order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
+ productsqft - special option (special option for surfacecalc plugin)
+ allitems - Show all filter values without All others group

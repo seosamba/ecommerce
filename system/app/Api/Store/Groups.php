@@ -53,9 +53,10 @@ class Api_Store_Groups extends Api_Service_Abstract {
 		} else {
 			$data = Store_Mapper_GroupMapper::getInstance()->fetchAll();
 		}
+
         return array_map(function ($group) {
-				return $group->toArray();
-		}, $data);
+            return $group->toArray();
+        }, $data);
 
 	}
 
@@ -147,6 +148,14 @@ class Api_Store_Groups extends Api_Service_Abstract {
         $groupId = null;
         $where = $customerInfoDbTable->getAdapter()->quoteInto('group_id = ?', $id);
         $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
+
+        $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+
+        $defaultUserGroupId = intval($shoppingConfigMapper->getConfigParam(Shopping::DEFAULT_USER_GROUP));
+        if(!empty($defaultUserGroupId) && $defaultUserGroupId == $id) {
+            $shoppingConfigMapper->save(array(Shopping::DEFAULT_USER_GROUP => 0));
+        }
+
         $cache->clean('', '', array('0'=>'product_price'));
         $cache->clean('products_groups_price', 'store_');
         $cache->clean('customers_groups', 'store_');

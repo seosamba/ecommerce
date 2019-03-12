@@ -350,8 +350,29 @@ CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
   FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 23/08/2018
+-- 16/01/2019
 -- version: 2.6.2
+-- Add charity col
+ALTER TABLE `shopping_cart_session` ADD COLUMN `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL AFTER `purchased_on`;
+
+-- 02/01/2019
+-- version: 2.6.3
+-- Add zone id for the coupon
+ALTER TABLE `shopping_coupon` ADD COLUMN `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon';
+
+-- 08/01/2019
+-- version: 2.6.4
+-- Add product allowance
+CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `allowance_due` date DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
+
+-- 23/08/2018
+-- version: 2.6.5
 -- Add historical cart session option
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `id` INT(10) unsigned AUTO_INCREMENT,
@@ -371,8 +392,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `cart_item_key` CHAR(32) NOT NULL,
 `cart_item_option_key` CHAR(32) NOT NULL,
 PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

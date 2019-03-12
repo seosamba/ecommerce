@@ -255,12 +255,22 @@
                     </tbody>
                     <tfoot>
                     <tr><td colspan="<?php echo $colSpan + 7 ?>"></td></tr>
-                    <tr>
-                        <td colspan="<?php echo $colSpan + 7 ?>">
-                            <?php echo $this->translate('Delivery comments');?>:
-                            <p class="order-notes text-normal"><?php echo nl2br($this->order->getNotes());?></p>
-                        </td>
-                    </tr>
+                    <?php if ($this->order->getNotes()): ?>
+                        <tr>
+                            <td colspan="<?php echo $colSpan + 7 ?>">
+                                <?php echo $this->translate('Delivery comments');?>:
+                                <p class="order-notes text-normal"><?php echo nl2br($this->order->getNotes());?></p>
+                            </td>
+                        </tr>
+                    <?php endif;?>
+                    <?php if ($this->order->getAdditionalInfo()): ?>
+                        <tr>
+                            <td colspan="<?php echo $colSpan + 7 ?>">
+                                <?php echo $this->translate('Additional info');?>:
+                                <p class="order-additional-info text-normal"><?php echo nl2br($this->order->getAdditionalInfo());?></p>
+                            </td>
+                        </tr>
+                    <?php endif;?>
                     <tr>
                         <td colspan="<?php echo $colSpan + 5 ?>" rowspan="7"></td>
                         <td><?php echo $this->translate('Subtotal');?>:</td>

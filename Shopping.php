@@ -124,6 +124,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const ORDER_IMPORT_CONFIG = 'order_import_config';
 
+    const DEFAULT_USER_GROUP = 'default_user_group';
+
     /**
      * shipping restriction key
      */
@@ -470,6 +472,13 @@ class Shopping extends Tools_Plugins_Abstract {
 						->setPassword($password)
                         ->setSubscribed($subscribed)
                         ->setPrefix($prefix);
+
+                $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(self::DEFAULT_USER_GROUP));
+
+                if(!empty($defaultUserGroupId)) {
+                    $customer->setGroupId($defaultUserGroupId);
+                }
+
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
@@ -480,6 +489,23 @@ class Shopping extends Tools_Plugins_Abstract {
                     } elseif(isset($session->clientWithNewPassword)) {
                         unset($session->clientWithNewPassword);
                     }
+
+                    if(!empty($defaultUserGroupId)){
+                        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                        $userModel = $userMapper->find($newCustomerId);
+
+                        if($userModel instanceof Application_Model_Models_User) {
+                            $userModel->setLastLogin(date(Tools_System_Tools::DATE_MYSQL));
+
+                            $userMapper->save($userModel);
+
+                            $session->setCurrentUser($userModel);
+                            Zend_Session::regenerateId();
+                            $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+                            $cacheHelper->clean();
+                        }
+                    }
+
 				} elseif(isset($session->clientWithNewPassword)) {
                     unset($session->clientWithNewPassword);
                 }
@@ -495,6 +521,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @throws Exceptions_SeotoasterPluginException
 	 */
 	public function cartAction() {
+
 		$checkoutPage = Tools_Misc::getCheckoutPage();
 		if (!$checkoutPage instanceof Application_Model_Models_Page) {
 			throw new Exceptions_SeotoasterPluginException('Error rendering cart. Please select a checkout page');
@@ -1306,6 +1333,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->configTabs = $configTabs;
             $this->_view->plugins = $plugins;
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
+            $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::DEFAULT_USER_GROUP));
+            $this->_view->defaultGroupId = $defaultUserGroupId;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}
@@ -1333,6 +1362,10 @@ class Shopping extends Tools_Plugins_Abstract {
 				if (!empty($coupons)) {
 					$status = Tools_CouponTools::applyCoupons($coupons);
 					if (!empty($status)) {
+					    if(in_array(Tools_CouponTools::STATUS_FAIL_ONE_TIME_USED, $status)) {
+                            $defaultErrorMessage = $this->_translator->translate('Sorry, some coupon codes you provided had already been used.') . '</br>' . $this->_translator->translate('Go back to swap promo codes or proceed with shipping information to checkout.');
+                        }
+
 						$hasErrors = count(array_filter($status, function ($status) {
 							return $status !== true;
 						}));
@@ -2319,6 +2352,41 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
 
+    }
+
+    /**
+     * @throws Exceptions_SeotoasterPluginException
+     *
+     * Change default user group
+     */
+    public function changeDefaultUserGroupAction() {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $defaultGroupId = filter_var($this->_request->getParam('defaultGroupId'), FILTER_SANITIZE_NUMBER_INT);
+
+            $this->_configMapper->save(array(self::DEFAULT_USER_GROUP => $defaultGroupId));
+
+            $this->_responseHelper->success('');
+        }
+    }
+
+    /**
+     * Check if coupon found in shopping_coupon_usage DbTable
+     */
+    public function checkUseCouponAction() {
+        if ($this->_request->isGet() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $couponId = filter_var($this->_request->getParam('cid'), FILTER_SANITIZE_NUMBER_INT);
+            if(!empty($couponId)) {
+                $coupon = Store_Mapper_CouponMapper::getInstance()->findCouponUsageByCouponId($couponId);
+
+                if(!empty($coupon)) {
+                    $this->_responseHelper->success(array('used' => $this->_translator->translate('was used in purchase.')));
+                } else {
+                    $this->_responseHelper->success('');
+                }
+            }
+            $this->_responseHelper->fail('');
+        }
+        $this->_responseHelper->fail('');
     }
 
 }

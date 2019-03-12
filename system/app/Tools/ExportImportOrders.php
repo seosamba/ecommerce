@@ -11,6 +11,28 @@ class Tools_ExportImportOrders
 
     const MAGENTO_IMPORT_ORDER = 'magento_import_order';
 
+    /**
+     * Orders statuses
+     *
+     * @var array
+     */
+    public static $statuses = array(
+        Shopping::GATEWAY_QUOTE => array(
+            Models_Model_CartSession::CART_STATUS_PROCESSING => 'Quote Sent',
+            Models_Model_CartSession::CART_STATUS_PENDING    => 'New quote',
+            Models_Model_CartSession::CART_STATUS_CANCELED   => 'Lost opportunity'
+        ),
+        Models_Model_CartSession::CART_STATUS_NEW        => 'Abandoned carts',
+        Models_Model_CartSession::CART_STATUS_PENDING    => 'Merchant action required - Customer charged',
+        Models_Model_CartSession::CART_STATUS_PROCESSING => 'Technical processing - Customer not charged',
+        Models_Model_CartSession::CART_STATUS_COMPLETED  => 'Payment Received',
+        Models_Model_CartSession::CART_STATUS_CANCELED   => 'Canceled',
+        Models_Model_CartSession::CART_STATUS_SHIPPED    => 'Items Shipped',
+        Models_Model_CartSession::CART_STATUS_DELIVERED  => 'Items Delivered',
+        Models_Model_CartSession::CART_STATUS_REFUNDED   => 'Refunded purchase',
+        Models_Model_CartSession::CART_STATUS_ERROR      => 'Error'
+    );
+
     public static function prepareOrdersDataForExport($data, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
@@ -78,6 +100,9 @@ class Tools_ExportImportOrders
                         }
 
                     }
+                    if(!empty($data['status_label'])) {
+                        $data['status_label'] = Tools_ExportImportOrders::exportImportCartStatuses($data['gateway'], $data['status_label']);
+                    }
                 }
                 fputcsv($expFile, $data, ',', '"');
             }
@@ -85,6 +110,33 @@ class Tools_ExportImportOrders
             Tools_ExportImportOrders::downloadCsv($filePath, $fileName);
         }
 
+    }
+
+    /**
+     * @param $action
+     * @param $gateway
+     * @param $status
+     * @return false|int|mixed|string
+     */
+    public static function exportImportCartStatuses($gateway, $status)
+    {
+        $translator = Zend_Registry::get('Zend_Translate');
+        $processingStatus = $status;
+        $status = Tools_ExportImportOrders::$statuses[$status];
+
+        if($gateway == Shopping::GATEWAY_QUOTE) {
+            $status = Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$status];
+
+            if(empty($status)) {
+                $status = Tools_ExportImportOrders::$statuses[$processingStatus];
+            }
+        }
+
+        if(empty($status)) {
+            $status = $processingStatus;
+        }
+
+        return $translator->translate($status);
     }
 
     public static function prepareImportOrdersReport($importErrors)
@@ -519,6 +571,7 @@ class Tools_ExportImportOrders
                     } else {
                         $total = $subTotal + $shippingPrice + $discountTax + $subTotalTax;
                     }
+
                     $data = array(
                         'ip_address' => '',
                         'referer' => '',
@@ -619,6 +672,11 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Status')
             ),
+            'status_label' => array(
+                'label' => 'status_label',
+                'checked' => 1,
+                'label_name' => $translator->translate('Status Label')
+            ),
             'total_products' => array(
                 'label' => 'total_products',
                 'checked' => 1,
@@ -715,6 +773,11 @@ class Tools_ExportImportOrders
                 'label' => 'notes',
                 'checked' => 1,
                 'label_name' => $translator->translate('Notes')
+            ),
+            'additional_info' => array(
+                'label' => 'additional_info',
+                'checked' => 1,
+                'label_name' => $translator->translate('Additional info')
             ),
             'shipping_tracking_id' => array(
                 'label' => 'shipping_tracking_id',

@@ -13,11 +13,12 @@ define([
     '../../coupons/views/coupons_table',
     '../../groups/views/group_price',
     '../../digital-products/views/digital_product',
+    'moment',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, i18n){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -129,6 +130,7 @@ define([
             }
         },
         initProduct: function () {
+
             this.model = new ProductModel();
 
             this.model.on('change:tags', this.renderProductTags, this);
@@ -202,6 +204,11 @@ define([
         },
 		toggleEnabled: function(e){
 			this.model.set({enabled: this.$('#product-enabled').prop('checked') ? 1 :0 });
+			if(this.$('#product-enabled').prop('checked')) {
+                $('.product-allowance-block').show();
+            } else {
+                $('.product-allowance-block').hide();
+            }
 		},
         toggleFreeShipping: function(e){
             this.model.set({freeShipping: this.$('#free-shipping').prop('checked') ? 1 :0 });
@@ -301,7 +308,7 @@ define([
 			this.model.set(propName, _.isNaN(e.currentTarget.value) ? null : e.currentTarget.value) ;
 		},
 		render: function(){
-            console.log('render: app.js', this.model.changedAttributes());
+            //console.log('render: app.js', this.model.changedAttributes());
             this.$el.tabs({ active: 0 });
 
             $('#product-list:visible').hide("slide", { direction: "right"});
@@ -346,9 +353,58 @@ define([
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
                 this.$('#product-enabled').prop('checked',true);
+                $('.product-allowance-block').show();
 			} else {
 				this.$('#product-enabled').prop('checked', false);
+                $('.product-allowance-block').hide();
 			}
+
+            $('#product-allowance').datepicker({
+                dateFormat: 'dd-M-yy',
+                defaultDate: "+1w",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "c:c+10",
+                minDate: 0,
+                onSelect: function (input, inst) {
+                    allowanceCheckbox(input);
+                },
+                onChangeMonthYear: function (input, inst) {
+                    allowanceCheckbox(input);
+                },
+                beforeShow: function (input, inst) {
+                   allowanceCheckbox(input);
+                }
+            });
+
+			function allowanceCheckbox(input) {
+                setTimeout(function () {
+                    var checkedEl = '',
+                        allowanceDate = $('#product-allowance').val();
+
+                    if(allowanceDate == '') {
+                        checkedEl = 'checked="checked"';
+                    }
+
+                    var buttonPane = $(input).datepicker("widget"),
+                        html = '<div class="allowance-date text-center"><span> '+(_.isUndefined(i18n['Always on'])?'Always on':i18n['Always on'])+' </span> <input type="checkbox" '+ checkedEl +' id="allowance-date"> '+ (_.isUndefined(i18n['or till'])?'or till':i18n['or till']) +'</div>';
+
+                    buttonPane.prepend(html);
+                }, 10);
+            }
+
+            $(document).on('click', '.allowance-date',function(e){
+                e.preventDefault();
+                if($('#allowance-date').prop('checked')) {
+                    $('#product-allowance').val('').datepicker('hide');
+                }
+            });
+
+            if(!_.isEmpty(this.model.get('allowance'))) {
+                $('#product-allowance').val(moment(this.model.get('allowance'), 'YYYY-MM-DD').format('DD-MMM-YYYY'));
+            } else {
+                $('#product-allowance').val('');
+            }
 
             //toggle free-shipping flag
             if (parseInt(this.model.get('freeShipping'))){
@@ -537,6 +593,14 @@ define([
                 this.addNewBrand(newBrandName).$('#new-brand').val('');
             }
 
+            var productAllowanceDate = ($('#product-allowance').val()) ? $.datepicker.formatDate('yy-mm-dd', $('#product-allowance').datepicker("getDate")): '';
+
+            if(!this.model.get('enabled')) {
+                productAllowanceDate = '';
+            }
+
+            this.model.set({allowance: productAllowanceDate});
+
             this.model.save();
 
             if (newInLibrary && self.hasOwnProperty('optionLibrary')){
@@ -545,7 +609,13 @@ define([
 		},
         processSaveError: function(model, response){
             hideSpinner();
-            showMessage(response.responseText, true);
+
+            var message = response.responseText;
+            if(message === ''){
+                message =  _.isUndefined(i18n['Your session has timed out. Please log again'])?'Your session has timed out. Please log again':i18n['Your session has timed out. Please log again'];
+                message += ' <u><a target="_blank" href="' + $('#website_url').val() + 'go">' + (_.isUndefined(i18n['here'])?'here':i18n['here']) + '</a></u>';
+            }
+            showMessage(message, true);
         },
 		deleteProduct: function(){
 			var self = this;

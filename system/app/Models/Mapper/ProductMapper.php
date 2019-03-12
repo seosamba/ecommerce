@@ -124,6 +124,12 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         //process product parts if any
         $this->_processParts($model);
 
+        //process product Allowance
+        $allowanceDate = $model->getAllowance();
+        if(!empty($allowanceDate)) {
+            $this->_processAllowance($model);
+        }
+
 		$model->notifyObservers();
 
 		return $model;
@@ -160,7 +166,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $organicSearch = false,
         $attributes = array(),
         $price = array(),
-        $sort = null
+        $sort = null,
+        $allowance = false,
+        $productPrice = array()
 
     ) {
         $entities = array();
@@ -199,6 +207,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         if(!empty($price)){
             $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
+        }
+
+        if(!empty($productPrice)) {
+            $select->joinLeft(array('sfv' => 'shopping_filtering_values'), 'sfv.product_id = p.id', array());
+            foreach ($productPrice as $pPrice) {
+                $select->where("sfv.value BETWEEN " . $pPrice['min'] ." AND ".$pPrice['max']);
+            }
         }
 
         if (!empty($tags)) {
@@ -252,6 +267,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             } else {
                 $select->where($likeWhere, '%' . $search . '%');
             }
+        }
+
+        if($allowance) {
+            $select->joinLeft(array('ap' => 'shopping_allowance_products'), 'ap.product_id = p.id', array('allowance' => 'ap.allowance_due'));
         }
 
         if (self::$_logSelectResultLength === false) {
@@ -369,6 +388,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				$entity->setPage($page);
 			}
 		}
+
+        $allowanceData = Store_Mapper_AllowanceProductsMapper::getInstance()->findByProductId($row->id);
+        if($allowanceData instanceof Store_Model_AllowanceProducts) {
+            $allowanceDate = $allowanceData->getAllowanceDue();
+            $entity->setAllowance($allowanceDate);
+        }
+
 		return $entity;
 	}
 
@@ -476,6 +502,35 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 'part_id'    => intval($partId)
             ));
         }
+    }
+
+    /**
+     * @param Models_Model_Product $model
+     */
+    private function _processAllowance(Models_Model_Product $model) {
+        $allowanceProductsMapper = Store_Mapper_AllowanceProductsMapper::getInstance();
+
+        $allowanceProduct = $allowanceProductsMapper->findByProductId($model->getId());
+
+        if (!$allowanceProduct instanceof Store_Model_AllowanceProducts) {
+            $allowanceProduct = new Store_Model_AllowanceProducts();
+            $allowanceProduct->setProductId($model->getId());
+        }
+
+        $allowanceProduct->setAllowanceDue($model->getAllowance());
+        $allowanceProductsMapper->save($allowanceProduct);
+    }
+
+    /**
+     * @param $productId
+     * @return mixed
+     * @throws Exception
+     */
+    public function findByProductId($productId) {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $productId);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product')->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchRow($select);
     }
 
 	/**
