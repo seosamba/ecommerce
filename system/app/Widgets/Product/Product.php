@@ -202,7 +202,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     private function _renderName() {
-		return $this->_product->getName();
+		return htmlspecialchars($this->_product->getName(),ENT_QUOTES,'UTF-8');
 	}
 
 	private function _renderPhotourl() {
