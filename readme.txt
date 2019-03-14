@@ -7,7 +7,6 @@ Plugin widgets.
         product|small|medium|large|original - size of the product pre-loaded image output
         product - default size (80x80 pixels)
     {$product:name} - Displays the product name.
-    {$product:name:clean} - Displays the product name without (" and ') symbols.
     {$product:price[:nocurrency|realtimeupdate|currency]} - Displays the product price.
         nocurrency - displays price without currency
         realtimeupdate - update price according to chosen product options
