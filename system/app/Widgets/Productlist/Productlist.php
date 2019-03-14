@@ -377,6 +377,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
             $dictionary = array(
                 '$product:name'                       => $product->getName(),
+                '$product:name:clean'                 => str_replace(array('"', '\''), '', $product->getName()),
                 '$product:url'                        => $product->getPage() ? $websiteUrl . $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),

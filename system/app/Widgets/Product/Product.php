@@ -202,6 +202,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     private function _renderName() {
+	    if(in_array('clean', $this->_options)) {
+          return str_replace(array('"', '\''), '', $this->_product->getName());
+        }
 		return $this->_product->getName();
 	}
 
