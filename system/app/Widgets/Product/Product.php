@@ -501,4 +501,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
         return $this->_product->getAllowance();
     }
 
+    private function _renderWishlistQty() {
+        return '<span data-qty="'. $this->_product->getWishlistQty() .'" class="product-wishlist-qty product-wishlist-'. $this->_product->getId() .'">' . $this->_product->getWishlistQty() . '</span>';
+    }
+
 }

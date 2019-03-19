@@ -1,0 +1,19 @@
+<div class="wish-list-block">
+    <?php if(!$this->isLogged) :?>
+        <?php if(!empty($this->toFavoritesType)) :?>
+            <a href="<?php echo $this->websiteUrl . $this->clientPage ;?>"><img src="plugins/shopping/web/images/not-wished.png" class="wish-product not-wished" alt="<?php echo $this->toFavoritesBtnName;?>"></a>
+        <?php else :?>
+            <a href="<?php echo $this->websiteUrl . $this->clientPage ;?>" class="wish-product not-wished btn <?php echo $this->toFavoritesType;?>" title="<?php echo $this->toFavoritesBtnName;?>"><?php echo $this->toFavoritesBtnName;?></a>
+        <?php endif;?>
+    <?php else :?>
+        <?php if(!empty($this->toFavoritesType)) :?>
+            <?php if($this->readyWished) :?>
+                <a href="javascript:;" class="wish-product add-to-wish-list already-wished <?php echo $this->toFavoritesType;?>" data-pid="<?php echo $this->productId;?>" data-client-page="<?php echo $this->websiteUrl . $this->clientPage ;?>"><img src="plugins/shopping/web/images/already-wished.png" alt="<?php echo $this->toFavoritesBtnName;?>"></a>
+            <?php else :?>
+                <a href="javascript:;" class="wish-product add-to-wish-list not-wished <?php echo $this->toFavoritesType;?>" data-pid="<?php echo $this->productId;?>" data-client-page="<?php echo $this->websiteUrl . $this->clientPage ;?>" data-to-profile="<?php echo $this->goToProgile;?>"><img src="plugins/shopping/web/images/not-wished.png" alt="<?php echo $this->toFavoritesBtnName;?>"></a>
+            <?php endif;?>
+        <?php else :?>
+            <a href="javascript:;" class="wish-product add-to-wish-list btn <?php echo ($this->readyWished) ? 'already-wished' : 'not-wished'?> <?php echo $this->toFavoritesType;?>" title="<?php echo $this->toFavoritesBtnName;?>" data-pid="<?php echo $this->productId;?>" data-client-page="<?php echo $this->websiteUrl . $this->clientPage ;?>" data-to-profile="<?php echo $this->goToProgile;?>"><?php echo $this->toFavoritesBtnName;?></a>
+        <?php endif;?>
+    <?php endif;?>
+</div>

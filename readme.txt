@@ -30,6 +30,7 @@ Plugin widgets.
     {$product:freeshipping[:sometext]} - Displays <span class="product-free-shipping">sometext</span> if free shipping enabled for this product
         sometext - custom text inside span element
     {$product:allowance} - Displays the product allowance end date.
+    {$product:wishlistqty} - Displays the product wish list qty.
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
@@ -166,3 +167,20 @@ Magic spaces:
  order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
+
+ 10. Wish list widget:
+a. {$storewishlist:addtowishlist:{$product:id}:[heart[:btnname:sometext[:profile]]]}
+   heart - show "Add to favorites" like a heart icon.
+   btnname:sometext - where sometext is custom text for button name.
+   profile - redirected user on profile after add product to wish list.
+
+b. {$storewishlist:wishList:_products wishlist list[:limit[:10]]}
+   Option "_products wishlist list" template - used for show product on page.
+   Into this template you can use any product and store widgets and magicspases.
+
+   Option limit - you can set custom limit before pagination "show more" for product list ex. {$storewishlist:_products wishlist list:limit:10}
+   where 10 - is count of products. By default limit is 20.
+c. {$storewishlist:removeproduct:{$product:id}[:btn:sometext]}
+   btn:sometext - where sometext is custom text for button name.
+
+d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name who last added product to wish list.

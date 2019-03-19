@@ -371,7 +371,24 @@ CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
 
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
 
+-- 15/03/2019
+-- version: 2.6.5
+-- Add wishlist
+CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` date DEFAULT '0000-00-00',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `shopping_wishlist_wished_products_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `shopping_wishlist_wished_products_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_product` ADD COLUMN `wishlist_qty` int(10) unsigned DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.5' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
