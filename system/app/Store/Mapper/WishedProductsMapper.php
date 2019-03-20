@@ -92,7 +92,7 @@ class Store_Mapper_WishedProductsMapper extends Application_Model_Mappers_Abstra
     }
 
     /**
-     * Find last added under wish list products
+     * Find last added under Wishlist products
      *
      * @param $productId
      * @return mixed
@@ -105,7 +105,7 @@ class Store_Mapper_WishedProductsMapper extends Application_Model_Mappers_Abstra
             'u.full_name'
         ))
          ->joinLeft(array('u' => 'user'), 'wp.user_id = u.id', array())
-         ->where($where)->order('wp.user_id ASC')->limit(1);
+         ->where($where)->order('wp.user_id DESC')->limit(1);
 
         return $this->getDbTable()->getAdapter()->fetchRow($select);
     }

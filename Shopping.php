@@ -2412,7 +2412,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $wishedProduct = new Store_Model_WishedProducts();
                     $wishedProduct->setUserId($userId);
                     $wishedProduct->setProductId($product->getId());
-                    $wishedProduct->setAddedDate(date('Y-m-d'));
+                    $wishedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
 
                     $wishedProductsMapper->save($wishedProduct);
 
@@ -2423,14 +2423,14 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $this->_responseHelper->success(array('lastAddedUser' => $user->getFullName()));
                 } else {
-                    $this->_responseHelper->success(array('alreadyWished' => $this->_translator->translate('Product already added to wish list')));
+                    $this->_responseHelper->success(array('alreadyWished' => $this->_translator->translate('Product already added to Wishlist')));
                 }
             }
         }
     }
 
     /**
-     * This action is used to help wish list gets an portional content
+     * This action is used to help Wishlist gets an portional content
      *
      * @throws Exceptions_SeotoasterException
      * @throws Exceptions_SeotoasterPluginException

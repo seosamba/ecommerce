@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
   `id` int(10) unsigned AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
   `product_id` INT(10) unsigned NOT NULL,
-  `added_date` date DEFAULT '0000-00-00',
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `product_id` (`product_id`),
