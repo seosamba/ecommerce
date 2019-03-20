@@ -44,7 +44,7 @@ $(function() {
                     if(toProfile == 1) {
                         window.location.href = clientPage;
                     } else {
-                        showMessage('Done', false, 3000);
+                        showMessage('Added to Wishlist', false, 3000);
                         var productQty = $('.product-wishlist-'+pid).data('qty');
                         $('.product-wishlist-'+pid).text(parseInt(productQty) + qty);
                         $('.last-user-full-name-'+pid).text(response.responseText.lastAddedUser);
