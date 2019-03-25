@@ -2401,8 +2401,15 @@ class Shopping extends Tools_Plugins_Abstract {
         $qty = $this->_request->getParam('qty');
         $user = $this->_sessionHelper->getCurrentUser();
         $userId = $user->getId();
+        $userRole = $user->getRoleId();
 
-        if(!empty($productId) && !empty($userId)) {
+        if(!empty($productId) && !empty($userId) && $userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
             $productMapper = Models_Mapper_ProductMapper::getInstance();
             $product = $productMapper->find($productId);
             if($product instanceof Models_Model_Product) {
@@ -2421,11 +2428,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $productMapper->save($product);
 
-                    $this->_responseHelper->success(array('lastAddedUser' => $user->getFullName()));
+                    $this->_responseHelper->success(array('lastAddedUser' => $user->getFullName(), 'addedToList' => $this->_translator->translate('Added to Wishlist')));
                 } else {
                     $this->_responseHelper->success(array('alreadyWished' => $this->_translator->translate('Product already added to Wishlist')));
                 }
             }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t add product to Wishlist! Please re-login into system.'));
         }
     }
 

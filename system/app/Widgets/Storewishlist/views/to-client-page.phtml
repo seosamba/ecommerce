@@ -16,4 +16,5 @@
             <a href="javascript:;" class="wish-product add-to-wish-list btn <?php echo ($this->readyWished) ? 'already-wished' : 'not-wished'?> <?php echo $this->toFavoritesType;?>" title="<?php echo $this->toFavoritesBtnName;?>" data-pid="<?php echo $this->productId;?>" data-client-page="<?php echo $this->websiteUrl . $this->clientPage ;?>" data-to-profile="<?php echo $this->goToProgile;?>"><?php echo $this->toFavoritesBtnName;?></a>
         <?php endif;?>
     <?php endif;?>
+    <input type="hidden" class="secureToken" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>">
 </div>

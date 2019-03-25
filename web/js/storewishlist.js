@@ -30,26 +30,31 @@ $(function() {
             pid  = self.data('pid'),
             qty = 1,
             toProfile = self.data('to-profile'),
-            clientPage = self.data('client-page');
+            clientPage = self.data('client-page'),
+            secureToken = $('.secureToken').val();
 
         $.ajax({
             url: $('#website_url').val()+'plugin/shopping/run/addToWishList/',
             type: 'POST',
             dataType: 'json',
-            data: {pid : pid, qty : qty},
+            data: {pid : pid, qty : qty, secureToken : secureToken},
             success: function(response){
-                if (typeof response.responseText.alreadyWished !== 'undefined'){
-                    showMessage(response.responseText.alreadyWished, false, 3000);
-                } else {
-                    if(toProfile == 1) {
-                        window.location.href = clientPage;
+                if(response.error != 1) {
+                    if (typeof response.responseText.alreadyWished !== 'undefined'){
+                        showMessage(response.responseText.alreadyWished, false, 3000);
                     } else {
-                        showMessage('Added to Wishlist', false, 3000);
-                        var productQty = $('.product-wishlist-'+pid).data('qty');
-                        $('.product-wishlist-'+pid).text(parseInt(productQty) + qty);
-                        $('.last-user-full-name-'+pid).text(response.responseText.lastAddedUser);
-                        self.find('img').attr('src', 'plugins/shopping/web/images/already-wished.png');
+                        if(toProfile == 1) {
+                            window.location.href = clientPage;
+                        } else {
+                            showMessage(response.responseText.addedToList, false, 3000);
+                            var productQty = $('.product-wishlist-'+pid).data('qty');
+                            $('.product-wishlist-'+pid).text(parseInt(productQty) + qty);
+                            $('.last-user-full-name-'+pid).text(response.responseText.lastAddedUser);
+                            self.find('img').attr('src', 'plugins/shopping/web/images/already-wished.png');
+                        }
                     }
+                } else {
+                    showMessage(response.responseText, true, 3000);
                 }
             }
         });
