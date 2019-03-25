@@ -2389,4 +2389,142 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail('');
     }
 
+    /**
+     * Added product to wishlist and wishListQty increase by one
+     */
+    public function addToWishListAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+        }
+
+        $productId = $this->_request->getParam('pid');
+        $qty = $this->_request->getParam('qty');
+        $user = $this->_sessionHelper->getCurrentUser();
+        $userId = $user->getId();
+        $userRole = $user->getRoleId();
+
+        if(!empty($productId) && !empty($userId) && $userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+            $product = $productMapper->find($productId);
+            if($product instanceof Models_Model_Product) {
+                $wishedProductsMapper = Store_Mapper_WishedProductsMapper::getInstance();
+                $wishedProduct = $wishedProductsMapper->findByUserIdProductId($userId, $productId);
+                if(!$wishedProduct instanceof Store_Model_WishedProducts) {
+                    $wishedProduct = new Store_Model_WishedProducts();
+                    $wishedProduct->setUserId($userId);
+                    $wishedProduct->setProductId($product->getId());
+                    $wishedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
+
+                    $wishedProductsMapper->save($wishedProduct);
+
+                    $productWishedQty = $product->getWishlistQty();
+                    $product->setWishlistQty($productWishedQty + $qty);
+
+                    $productMapper->save($product);
+
+                    $this->_responseHelper->success(array('lastAddedUser' => $user->getFullName(), 'addedToList' => $this->_translator->translate('Added to Wishlist')));
+                } else {
+                    $this->_responseHelper->success(array('alreadyWished' => $this->_translator->translate('Product already added to Wishlist')));
+                }
+            }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t add product to Wishlist! Please re-login into system.'));
+        }
+    }
+
+    /**
+     * This action is used to help Wishlist gets an portional content
+     *
+     * @throws Exceptions_SeotoasterException
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function renderwishlistproductsAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $content = '';
+        $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Storewishlist_Storewishlist::DEFAULT_LIMIT;
+        }
+
+        $offset = intval($nextPage) * $limit;
+
+        $productIds = $this->_request->getParam('productIds');
+        $productIds = explode(',', $productIds);
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $enabledOnly = $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled=?', '1');
+        $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
+        $products = Models_Mapper_ProductMapper::getInstance()->fetchAll($enabledOnly, null, $offset, $limit,
+            null, null, null, false, false, array(), array(), null);
+
+        if (!empty($products)) {
+            $template = $this->_request->getParam('template');
+            $widget = Tools_Factory_WidgetFactory::createWidget('storewishlist', array('wishList', $template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+            unset($widget);
+        }
+        if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
+            $page = Application_Model_Mappers_PageMapper::getInstance()->find($pageId);
+            if ($page instanceof Application_Model_Models_Page && !empty($content)) {
+                $content = $this->_renderViaParser($content, $page);
+            }
+        }
+        echo $content;
+    }
+
+    /**
+     * Remove wished product
+     */
+    public function removeWishedProductAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $productId = filter_var($this->_request->getParam('pid'), FILTER_SANITIZE_NUMBER_INT);
+        $currentUserModel = $this->_sessionHelper->getCurrentUser();
+        $userRole = $currentUserModel->getRoleId();
+
+        if($userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $userId = $currentUserModel->getId();
+
+            if ($userId) {
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+
+                if(!empty($productId)) {
+                    $product = $productMapper->find($productId);
+                    if($product instanceof Models_Model_Product) {
+                        $wishedProductsMapper = Store_Mapper_WishedProductsMapper::getInstance();
+                        $wishedProduct = $wishedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                        if($wishedProduct instanceof Store_Model_WishedProducts) {
+                            $wishedProductsMapper->delete($wishedProduct);
+                            $wishlistQty = $product->getWishlistQty();
+                            $product->setWishlistQty($wishlistQty - 1);
+
+                            $productMapper->save($product);
+
+                            $this->_responseHelper->success($this->_translator->translate('Removed'));
+                        }
+                    }
+                }
+            }
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Can\'t remove wished product! Please re-login into system.'));
+    }
+
 }

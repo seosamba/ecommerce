@@ -183,6 +183,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
   `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `wishlist_qty` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -868,6 +869,16 @@ CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
 
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
 
+CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.5' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.6' WHERE `name` = 'shopping';
 

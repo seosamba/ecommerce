@@ -391,7 +391,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$store:addtocart:checkbox'           => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
                 '$product:options'                    => isset($productOptionsView) ? $productOptionsView : '',
                 '$product:inventory'                  => $inventoryCount,
-                '$product:qty'                        => $productQty
+                '$product:qty'                        => $productQty,
+                '$product:wishlistqty'                => $product->getWishlistQty()
             );
 
             if (isset($data['priceFilter'])) {
