@@ -56,7 +56,7 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
     }
 
     /**
-     * {$storewishlist:addtowishlist:{$product:id}:[heart[:btnname:sometext[:profile]]]}
+     * {$storewishlist:addtowishlist:{$product:id}[:htmlclass:calass class2 class3[:btnname:sometext[:profile]]]]}
      *
      * @return string
      * @throws Zend_Exception
@@ -64,21 +64,25 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
     protected function _makeOptionAddToWishList() {
         $translator = Zend_Registry::get('Zend_Translate');
 
-        $toFavoritesType = '';
         $toFavoritesBtnName = $translator->translate('Add to favorites');
         $readyWished = false;
         $isLogged = false;
         $goToProgile = 0;
-
-        if(in_array('heart', $this->_options)) {
-            $toFavoritesType = 'wish-heart';
-        }
+        $htmlClassName = '';
 
         if(in_array('btnname', $this->_options)) {
             $btnOptionKey = array_search('btnname', $this->_options);
             $btnName = $this->_options[$btnOptionKey+1];
             if(!empty($btnName)) {
                 $toFavoritesBtnName = preg_replace('~[^A-Za-z\s]+~','',$btnName);
+            }
+        }
+
+        if(in_array('htmlclass', $this->_options)) {
+            $classOptionKey = array_search('htmlclass', $this->_options);
+            $htmlClassName = $this->_options[$classOptionKey+1];
+            if(!empty($htmlClassName)) {
+                $htmlClassName = preg_replace('~[^a-z1-9-_\s]+~','', $htmlClassName);
             }
         }
 
@@ -114,35 +118,47 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
         $this->_view->isLogged = $isLogged;
         $this->_view->clientPage = $page;
         $this->_view->readyWished = $readyWished;
-        $this->_view->toFavoritesType = $toFavoritesType;
         $this->_view->toFavoritesBtnName = $toFavoritesBtnName;
         $this->_view->goToProgile = $goToProgile;
+        $this->_view->htmlClass = $htmlClassName;
 
         return $this->_view->render('to-client-page.phtml');
     }
 
     /**
-     * {$storewishlist:removeproduct:{$product:id}[:btn:sometext]}
+     * {$storewishlist:removeproduct:{$product:id}[htmlclass:calass class2 class3[:btnname:sometext]]}
      *
      * @return string
      * @throws Zend_Exception
      */
     protected function  _makeOptionRemoveproduct() {
+
         $currentUserModel = $this->_sessionHelper->getCurrentUser();
         $userRole = $currentUserModel->getRoleId();
+        $htmlClassName = '';
 
         if($userRole !== Tools_Security_Acl::ROLE_GUEST) {
             $translator = Zend_Registry::get('Zend_Translate');
             if(!empty($this->_options[1]) && is_numeric($this->_options[1])) {
                 $productId = intval($this->_options[1]);
-                $btnOptionName = $translator->translate('Remove wished product');
                 if(!empty($productId)) {
                     $this->_view->productId = $productId;
 
+                    if(in_array('htmlclass', $this->_options)) {
+                        $classOptionKey = array_search('htmlclass', $this->_options);
+                        $htmlClassName = $this->_options[$classOptionKey+1];
+                        if(!empty($htmlClassName)) {
+                            $htmlClassName = preg_replace('~[^a-z1-9-_\s]+~','', $htmlClassName);
+                        }
+                    }
+
+                    $this->_view->htmlClass = $htmlClassName;
+
+                    $btnOptionName = $translator->translate('Remove wished product');
                     $useBtn = false;
-                    if(in_array('btn', $this->_options)) {
+                    if(in_array('btnname', $this->_options)) {
                         $useBtn = true;
-                        $btnOptionKey = array_search('btn', $this->_options);
+                        $btnOptionKey = array_search('btnname', $this->_options);
                         $btnName = $this->_options[$btnOptionKey+1];
                         if(!empty($btnName)) {
                             $btnOptionName = preg_replace('~[^A-Za-z\s]+~','',$btnName);
