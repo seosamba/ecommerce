@@ -169,8 +169,8 @@ Magic spaces:
  allitems - Show all filter values without All others group
 
  10. Wishlist widget:
-a. {$storewishlist:addtowishlist:{$product:id}:[heart[:btnname:sometext[:profile]]]}
-   heart - show "Add to favorites" like a heart icon.
+a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
+   htmlclass:class class2 class3 - added html classes, where classX is name of html class.
    btnname:sometext - where sometext is custom text for button name.
    profile - redirected user on profile after add product to Wishlist.
 
@@ -180,7 +180,8 @@ b. {$storewishlist:wishList:_products wishlist list[:limit[:10]]}
 
    Option limit - you can set custom limit before pagination "show more" for product list ex. {$storewishlist:_products wishlist list:limit:10}
    where 10 - is count of products. By default limit is 20.
-c. {$storewishlist:removeproduct:{$product:id}[:btn:sometext]}
-   btn:sometext - where sometext is custom text for button name.
+c. {$storewishlist:removeproduct:{$product:id}[htmlclass:class class2 class3[:btnname:sometext]]}
+   htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+   btnname:sometext - where sometext is custom text for button name.
 
 d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name who last added product to Wishlist.

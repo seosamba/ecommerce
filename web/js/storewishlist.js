@@ -31,7 +31,7 @@ $(function() {
             qty = 1,
             toProfile = self.data('to-profile'),
             clientPage = self.data('client-page'),
-            secureToken = $('.secureToken').val();
+            secureToken =  self.closest('.wish-list-block').find('.secureToken').val();
 
         $.ajax({
             url: $('#website_url').val()+'plugin/shopping/run/addToWishList/',
@@ -50,7 +50,7 @@ $(function() {
                             var productQty = $('.product-wishlist-'+pid).data('qty');
                             $('.product-wishlist-'+pid).text(parseInt(productQty) + qty);
                             $('.last-user-full-name-'+pid).text(response.responseText.lastAddedUser);
-                            self.find('img').attr('src', 'plugins/shopping/web/images/already-wished.png');
+                            self.addClass('already-wished');
                         }
                     }
                 } else {
