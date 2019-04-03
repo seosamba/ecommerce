@@ -31,7 +31,7 @@ $(function() {
             qty = 1,
             toProfile = self.data('to-profile'),
             clientPage = self.data('client-page'),
-            secureToken = $('.secureToken').val();
+            secureToken =  self.closest('.wish-list-block').find('.secureToken').val();
 
         $.ajax({
             url: $('#website_url').val()+'plugin/shopping/run/addToWishList/',
