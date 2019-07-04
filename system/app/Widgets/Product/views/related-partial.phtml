@@ -4,6 +4,7 @@
     <?php endforeach;?>
 <?php endif;?>
 
+<?php if(!empty($this->checkoutPageUrl)) :?>
 <script type="text/javascript">
     $(function() {
         $(document).on('click', '.related-cart-add', function(e) {
@@ -17,3 +18,4 @@
         })
     });
 </script>
+<?php endif;?>
