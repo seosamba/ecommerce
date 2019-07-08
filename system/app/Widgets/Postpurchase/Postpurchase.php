@@ -343,6 +343,8 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         $shippingService = 'Shipping Address';
         if ($this->_cart->getShippingService() === Shopping::SHIPPING_PICKUP) {
             $shippingService = 'Pickup information';
+        } else {
+            $shippingService = $this->_cart->getShippingService();
         }
         return $this->_translator->translate($shippingService);
     }
