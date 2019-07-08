@@ -22,8 +22,36 @@ Plugin widgets.
                          Can be displayed both on the product page and in the products list.
     {$product:description[:_short_|full]} - Displays a short or a full description of the product.
                         _short_|full - short or full description output type
-    {$product:related[:img]} - Displays a list of relevant products on a specific product page.
-                       img - displays a list of relevant products with image
+    {$product:related[:img:addtocart:template=some_template]} - Displays a list of relevant products on a specific product page.
+                       img - displays a list of relevant products with image.
+                       addtocart - displays add to cart button.
+                       template - template name.
+
+     Allowed dictionary widgets in template for related widget :
+        {$product:name}
+        {$product:url}
+        {$product:brand}
+        {$product:weight}
+        {$product:mpn}
+        {$product:sku}
+        {$product:id}
+        {$product:description}
+        {$product:description:short}
+        {$product:description:full}
+        {$store:addtocart}
+        {$store:addtocart:(related prod id)}
+        {$store:addtocart:checkbox}
+        {$product:inventory}
+        {$product:qty}
+        {$product:wishlistqty}
+        {$product:price}
+        {$product:price:nocurrency}
+        {$product:photourl}
+        {$product:photourl:small}
+        {$product:photourl:medium}
+        {$product:photourl:large}
+        {$product:photourl:original}
+
     {$product:editproduct} - This widget displays a link to the edit page of the product that is visible only to users with a copywriter or administrator rights.
     {$product:id} - Displays product id
     {$product:inventory} - Displays "In stock" or "Out of stock" message
