@@ -386,7 +386,16 @@ CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
 
 ALTER TABLE `shopping_product` ADD COLUMN `wishlist_qty` int(10) unsigned DEFAULT '0';
 
+-- 24/07/2019
+-- version: 2.6.6
+-- Fix group price observer
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
+SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
+NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
+WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

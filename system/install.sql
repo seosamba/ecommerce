@@ -879,6 +879,16 @@ CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
   FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+
+-- 24/07/2019
+-- version: 2.6.5
+-- Fix group price observer
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
+SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
+NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
+WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.7' WHERE `name` = 'shopping';
 
