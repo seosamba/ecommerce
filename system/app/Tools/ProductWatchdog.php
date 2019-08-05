@@ -261,10 +261,10 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
             implode(
                 PHP_EOL,
                 array(
-                    $this->_object->getShortDescription(),
-                    $this->_object->getFullDescription(),
-                    $page->getTeaserText(),
-                    $tags
+                    '<div class="search-product-short-description">'.$this->_object->getShortDescription().'</div>',
+                    '<div class="search-product-full-description">'.$this->_object->getFullDescription().'</div>',
+                    '<div class="search-teaser-text">'.$page->getTeaserText().'</div>',
+                    '<div class="search-product-tags">'.$tags.'</div>'
                 )
             )
         );
