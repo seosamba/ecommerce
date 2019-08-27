@@ -506,6 +506,8 @@
 'Mrs' => 'Sra',
 'Ms' => 'Sra',
 'Miss' => 'Srta',
-'Dr' => 'Dr'
+'Dr' => 'Dr',
+'Additional info' => 'Información adicional',
+'Add to favorites' => 'Agregar a favoritos'
 
 );

@@ -63,6 +63,12 @@ define([
                 }
             });
 
+            var couponCode = form.find('#code').val();
+            if (couponCode.match(/\s/g)){
+                showMessage(_.isUndefined(i18n['A coupon name can\'t contain gaps'])?'A coupon name can\'t contain gaps':i18n['A coupon name can\'t contain gaps'], true);
+                return false;
+            }
+
             if (!isValid){
                 showMessage(_.isUndefined(i18n['Missing required field'])?'Missing required field':i18n['Missing required field'], true);
                 return false;

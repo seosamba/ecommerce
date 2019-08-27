@@ -55,10 +55,19 @@ class Api_Store_Customers extends Api_Service_Abstract {
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
 			$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
 
+            $roleId = filter_var($this->_request->getParam('roleId'), FILTER_SANITIZE_STRING);
+
 			$currency = Zend_Registry::get('Zend_Currency');
-			$where = null;
+            $where = null;
             if (!empty($id)) {
                 $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('user.id = ?', $id);
+            }
+            if (!empty($roleId)) {
+                if (!empty($where)) {
+                    $where .= ' AND '. $customerMapper->getDbTable()->getAdapter()->quoteInto('role_id = ?', $roleId);
+                } else {
+                    $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('role_id = ?', $roleId);
+                }
             }
 
             $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();

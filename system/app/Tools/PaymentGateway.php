@@ -23,6 +23,10 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 new Tools_InventoryObserver($cart->getStatus())
             );
 
+            $cart->registerObserver(
+                new Tools_SupplierObserver($cart->getStatus())
+            );
+
 			$cart->setStatus($status);
 			$cart->setGateway($gateway);
 

@@ -16,11 +16,18 @@
         <?php if ($this->priceTax) : ?>
             <?php $this->priceRange['priceTax'] = $this->priceTax; ?>
         <?php endif; ?>
-        <li>
+        <li data-scroll-type="price">
             <p class="filter-header"><?php echo $this->translate('Price'); ?></p>
             <?php echo $this->partial('_range-slider.phtml', $this->priceRange); ?>
         </li>
     <?php endif; ?>
+    <?php if(!empty($this->productPriceRange)) :?>
+        <?php $this->productPriceRange['useCurrency'] = true; ?>
+        <li data-scroll-type="<?php echo $this->productPriceRange['name'];?>">
+            <p class="filter-header"><?php echo $this->translate($this->productPriceRange['label']); ?></p>
+            <?php echo $this->partial('_range-slider.phtml', $this->productPriceRange); ?>
+        </li>
+    <?php endif;?>
     <?php foreach ($this->filters as $filter) : ?>
         <li class="filter-<?php echo filter_var($filter['label'], FILTER_SANITIZE_STRING); ?>">
             <p class="filter-header"><?php echo $filter['label']; ?></p>
@@ -32,7 +39,7 @@
                 $others = array();
                 ksort($filter['values']);
                 foreach ($filter['values'] as $value => $count) : ?>
-                    <?php if (intval($count) === 1) {
+                    <?php if (!$this->showAllItems && intval($count) === 1) {
                         array_push($others, $value);
                         continue;
                     }
@@ -51,7 +58,7 @@
                         </label>
                     </li>
                 <?php endforeach; ?>
-                <?php if (!empty($others)) : ?>
+                <?php if (!empty($others) && !$this->showAllItems) : ?>
                     <?php
                     Zend_Controller_Action_HelperBroker::getExistingHelper('cache')->save(
                         md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $filter['name']),
@@ -113,11 +120,12 @@
                 max: parseFloat(data.max),
                 values: [ parseFloat(data.from || data.min), parseFloat(data.to || data.max) ],
                 slide: function( event, ui ) {
-                    var $wrapper = $(self).closest('li');
-                    if ($wrapper.length) {
-                        $('span.filter-from', $wrapper).text(accounting.formatMoney(ui.values[0], moneyFormat));
-                        $('span.filter-to', $wrapper).text(accounting.formatMoney(ui.values[1], moneyFormat));
-                        $('input.filter-value', $wrapper).val( ui.values[0] + '-' + ui.values[1] );
+                    var wrapper = $(self).closest('li');
+                    var scrollType = $(wrapper).data('scroll-type');
+                    if (wrapper.length) {
+                        $('span.filter-from-'+ scrollType, wrapper).text(accounting.formatMoney(ui.values[0], moneyFormat));
+                        $('span.filter-to-' + scrollType, wrapper).text(accounting.formatMoney(ui.values[1], moneyFormat));
+                        $('input.filter-value-' + scrollType, wrapper).val( ui.values[0] + '-' + ui.values[1] );
                     }
                 }
             });

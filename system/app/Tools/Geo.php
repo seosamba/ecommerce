@@ -126,6 +126,12 @@ class Tools_Geo {
 
 		$params['markers'] = implode('|', $params['markers']);
 
+        $googleApiKey = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('googleApiKey');
+
+        if(!empty($googleApiKey)) {
+            $params['key'] = $googleApiKey;
+        }
+
 		return 'https://maps.googleapis.com/maps/api/staticmap?'.http_build_query($params);
 	}
 

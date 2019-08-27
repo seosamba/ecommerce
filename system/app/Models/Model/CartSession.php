@@ -105,6 +105,9 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_purchasedOn = null;
 
+
+    protected $_additionalInfo   = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -418,6 +421,23 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     {
         $this->_purchasedOn = $purchasedOn;
 
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getAdditionalInfo()
+    {
+        return $this->_additionalInfo;
+    }
+
+    /**
+     * @param null $additionalInfo
+     */
+    public function setAdditionalInfo($additionalInfo)
+    {
+        $this->_additionalInfo = $additionalInfo;
         return $this;
     }
 

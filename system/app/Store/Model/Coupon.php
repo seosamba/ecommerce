@@ -36,6 +36,8 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 
 	protected $_zoneId;
 
+    protected $_oneTimeUse;
+
 	protected $_data = array();
 
 	public function setAllowCombination($allowCombination) {
@@ -120,6 +122,23 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getOneTimeUse()
+    {
+        return $this->_oneTimeUse;
+    }
+
+    /**
+     * @param mixed $oneTimeUse
+     */
+    public function setOneTimeUse($oneTimeUse)
+    {
+        $this->_oneTimeUse = $oneTimeUse;
+
+        return $this;
+    }
 
 	public function __call($name, $arguments) {
 		$prefix     = strtolower(substr($name, 0, 3));

@@ -408,6 +408,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * Return cart additional info
+     *
+     * @return mixed
+     */
+
+    protected function _renderAdditionalInfo()
+    {
+        return $this->_cart->getAdditionalInfo();
+    }
+
+    /**
      * Return cart discount. Depends on tax include config.
      *
      * @return mixed

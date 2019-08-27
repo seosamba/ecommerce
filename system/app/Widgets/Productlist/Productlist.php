@@ -357,9 +357,26 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				$productOptionsView = $view->render('options.phtml');
 			}
 
+            $inventoryCount = $product->getInventory();
+
+			if(!is_null($inventoryCount)) {
+                $inventoryCount = trim($product->getInventory());
+            }
+
+            if (is_null($inventoryCount)){
+                $productQty = '&infin;';
+            } else {
+                $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
+            }
+
+			if(is_null($inventoryCount) || !empty($inventoryCount)) {
+                $inventoryCount = $this->_translator->translate('In stock');
+            } else {
+                $inventoryCount = $this->_translator->translate('Out of stock');
+            }
 
             $dictionary = array(
-                '$product:name'                       => $product->getName(),
+                '$product:name'                       => htmlspecialchars($product->getName(),ENT_QUOTES,'UTF-8'),
                 '$product:url'                        => $product->getPage() ? $websiteUrl . $product->getPage()->getUrl() : null,
                 '$product:brand'                      => $product->getBrand(),
                 '$product:weight'                     => $product->getWeight(),
@@ -372,7 +389,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$store:addtocart'                    => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:'.$product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:checkbox'           => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
-                '$product:options'                    => isset($productOptionsView) ? $productOptionsView : ''
+                '$product:options'                    => isset($productOptionsView) ? $productOptionsView : '',
+                '$product:inventory'                  => $inventoryCount,
+                '$product:qty'                        => $productQty,
+                '$product:wishlistqty'                => $product->getWishlistQty()
             );
 
             if (isset($data['priceFilter'])) {
@@ -586,6 +606,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         $attributes = array();
         $priceFilter = array();
+        $productPriceFilter = array();
 
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
@@ -603,6 +624,22 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
                 $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to'], 'tax' => $tax);
                 unset($urlFilter['price']);
+            }
+
+            $options = array();
+            foreach ($this->_options as $option) {
+                if (preg_match('/^(additionalfilters)-(.*)$/u', $option, $parts)) {
+                    $options = explode(',', $parts[2]);
+                }
+            }
+
+            if (!empty($options)) {
+                foreach ($options as $option) {
+                    if(isset($urlFilter[$option])) {
+                        $this->_productPriceFilter[] = array('min' => $urlFilter[$option]['from'], 'max' => $urlFilter[$option]['to']);
+                        unset($urlFilter[$option]);
+                    }
+                }
             }
             // removing all
             $urlFilter = array_intersect_key($urlFilter, $attr);
@@ -625,14 +662,31 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (!empty($idsWhere)) {
             $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
         }
-        if(isset($this->_priceFilter) && ($this->_priceFilter !== null)){
+
+        if(isset($this->_priceFilter) && ($this->_priceFilter !== null) && (!empty($this->_priceFilter))){
             $priceFilter = $this->_priceFilter;
         }
 
+        if(isset($this->_productPriceFilter) && ($this->_productPriceFilter !== null) && (!empty($this->_productPriceFilter)) && is_array($this->_productPriceFilter)){
+            $productPriceFilter = $this->_productPriceFilter;
+        }
 
-		return $this->_productMapper->fetchAll($enabledOnly, $filters['order'],
-			 0/*(isset($this->_options[0]) && is_numeric($this->_options[0]) ? intval($this->_options[0]) : null)*/, $this->_limit,
-			null, $filters['tags'], $filters['brands'], $this->_strictTagsCount,false,array(),(!empty($priceFilter) && (isset($priceFilter)) ? $priceFilter : array()), $orderSql);
+		return $this->_productMapper->fetchAll(
+		    $enabledOnly,
+            $filters['order'],
+            0,
+            $this->_limit,
+            null,
+            $filters['tags'],
+            $filters['brands'],
+            $this->_strictTagsCount,
+            false,
+            array(),
+            $priceFilter,
+            $orderSql,
+            false,
+            $productPriceFilter
+        );
 	}
 
 	/**

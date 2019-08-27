@@ -78,4 +78,10 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
+    public function fetchGroupList() {
+        $dbTable = new Store_DbTable_Group();
+        $select = $dbTable->select()->from('shopping_group', array('id', 'groupName'));
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
+
 }

@@ -1,0 +1,10 @@
+<div title="<%= _.isUndefined(i18n['Assign/create company']) ? 'Assign/create company':i18n['Assign/create company'] %>">
+    <select name="companies" id="company-list">
+        <option value="0"><%= _.isUndefined(i18n['select company']) ? 'select company':i18n['select company'] %>
+        </option>
+        <% _.each(companies, function(company){ %>
+        <option value="<%= company.id %>"><%= company.companyName %></option>
+        <% }); %>
+    </select>
+    <input name="newCompany" type="text" placeholder="<%= _.isUndefined(i18n['or create new']) ? 'or create new':i18n['or create new'] %>" />
+</div>

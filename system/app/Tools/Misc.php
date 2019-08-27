@@ -539,7 +539,7 @@ class Tools_Misc
 
         // fetching $product:price and $product:freeshipping widgets and rendering them via native widget
         if (preg_match_all(
-            '~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~',
+            '~{\$product:((?:price|freeshipping|photourl|wishlistqty):?[^}]*)}~',
             $templateContent,
             $productPriceWidgets
         )
