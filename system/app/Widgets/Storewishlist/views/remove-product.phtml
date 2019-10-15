@@ -1,0 +1,9 @@
+<div class="wish-list-remove-product-block">
+    <?php if(!empty($this->useBtn)) :?>
+        <a href="javascript:;" class="remove-wished-product <?php echo (!empty($this->htmlClass)) ? $this->htmlClass : '';?>" title="<?php echo $this->btnName;?>" data-pid="<?php echo $this->productId;?>"><?php echo $this->btnName;?></a>
+    <?php else :?>
+        <a href="javascript:;" class="<?php echo (!empty($this->htmlClass)) ? $this->htmlClass : 'ticon-close error' ?> remove-wished-product" title="<?php echo $this->btnName;?>" data-pid="<?php echo $this->productId;?>"></a>
+    <?php endif;?>
+</div>
+
+

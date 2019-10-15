@@ -1,0 +1,35 @@
+<?php $id = uniqid('wl-'); ?>
+    <div class="product-list">
+        <?php echo $this->plContent; ?>
+        <?php if ($this->totalCount >= $this->limit): ?>
+            <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
+        <?php endif; ?>
+    </div>
+<?php if ($this->totalCount >= $this->limit): ?>
+    <script>
+        $('#<?php echo $id; ?>').on('click', function(e){
+            e.preventDefault();
+
+            var self = this,
+                nextpage = $(this).data('nextpage') || 1,
+                filters = $.extend({
+                        pageId: '<?php echo $this->pageId; ?>',
+                        template: '<?php echo $this->productTemplate; ?>',
+                        nextpage: nextpage,
+                        limit: '<?php echo $this->limit; ?>',
+                        productIds: '<?php echo $this->productIds; ?>'
+                    }, <?php echo array(); ?>);
+            showSpinner();
+
+            $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderwishlistproducts/', filters, function(response) {
+                hideSpinner();
+                if (response) {
+                    $(self).before(response);
+                    $(self).data('nextpage', ++nextpage);
+                } else {
+                    $(self).replaceWith('<span><?php echo $this->translate('No more products found'); ?></span>');
+                }
+            });
+        });
+    </script>
+<?php endif; ?>

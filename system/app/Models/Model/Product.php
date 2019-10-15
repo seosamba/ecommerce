@@ -73,6 +73,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_allowance = '';
 
+    protected $_wishlistQty = '';
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -681,6 +683,24 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
     public function setAllowance($allowance)
     {
         $this->_allowance = $allowance;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWishlistQty()
+    {
+        return $this->_wishlistQty;
+    }
+
+    /**
+     * @param string $wishlistQty
+     */
+    public function setWishlistQty($wishlistQty)
+    {
+        $this->_wishlistQty = $wishlistQty;
 
         return $this;
     }

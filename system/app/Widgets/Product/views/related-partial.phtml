@@ -1,0 +1,21 @@
+<?php if(!empty($this->renderedContent)) :?>
+    <?php foreach ($this->renderedContent as $content) : ?>
+        <?php echo $content; ?>
+    <?php endforeach;?>
+<?php endif;?>
+
+<?php if(!empty($this->checkoutPageUrl)) :?>
+<script type="text/javascript">
+    $(function() {
+        $(document).on('click', '.related-cart-add', function(e) {
+            e.preventDefault();
+            var pid  = $(this).data('pid');
+            $.post('<?php echo $this->websiteUrl;?>plugin/cart/run/cart/', {
+                pid     : pid
+            }, function() {
+                window.location.href = '<?php echo $this->websiteUrl, $this->checkoutPageUrl; ?>';
+            })
+        })
+    });
+</script>
+<?php endif;?>

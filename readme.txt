@@ -22,14 +22,43 @@ Plugin widgets.
                          Can be displayed both on the product page and in the products list.
     {$product:description[:_short_|full]} - Displays a short or a full description of the product.
                         _short_|full - short or full description output type
-    {$product:related[:img]} - Displays a list of relevant products on a specific product page.
-                       img - displays a list of relevant products with image
+    {$product:related[:img:addtocart:template=some_template]} - Displays a list of relevant products on a specific product page.
+                       img - displays a list of relevant products with image.
+                       addtocart - displays add to cart button.
+                       template - template name.
+
+     Allowed dictionary widgets in template for related widget :
+        {$product:name}
+        {$product:url}
+        {$product:brand}
+        {$product:weight}
+        {$product:mpn}
+        {$product:sku}
+        {$product:id}
+        {$product:description}
+        {$product:description:short}
+        {$product:description:full}
+        {$store:addtocart}
+        {$store:addtocart:(related prod id)}
+        {$store:addtocart:checkbox}
+        {$product:inventory}
+        {$product:qty}
+        {$product:wishlistqty}
+        {$product:price}
+        {$product:price:nocurrency}
+        {$product:photourl}
+        {$product:photourl:small}
+        {$product:photourl:medium}
+        {$product:photourl:large}
+        {$product:photourl:original}
+
     {$product:editproduct} - This widget displays a link to the edit page of the product that is visible only to users with a copywriter or administrator rights.
     {$product:id} - Displays product id
     {$product:inventory} - Displays "In stock" or "Out of stock" message
     {$product:freeshipping[:sometext]} - Displays <span class="product-free-shipping">sometext</span> if free shipping enabled for this product
         sometext - custom text inside span element
     {$product:allowance} - Displays the product allowance end date.
+    {$product:wishlistqty} - Displays the product Wishlist qty.
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
@@ -166,3 +195,21 @@ Magic spaces:
  order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
+
+ 10. Wishlist widget:
+a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
+   htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+   btnname:sometext - where sometext is custom text for button name.
+   profile - redirected user on profile after add product to Wishlist.
+
+b. {$storewishlist:wishList:_products wishlist list[:limit[:10]]}
+   Option "_products wishlist list" template - used for show product on page.
+   Into this template you can use any product and store widgets and magicspases.
+
+   Option limit - you can set custom limit before pagination "show more" for product list ex. {$storewishlist:_products wishlist list:limit:10}
+   where 10 - is count of products. By default limit is 20.
+c. {$storewishlist:removeproduct:{$product:id}[htmlclass:class class2 class3[:btnname:sometext]]}
+   htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+   btnname:sometext - where sometext is custom text for button name.
+
+d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name who last added product to Wishlist.
