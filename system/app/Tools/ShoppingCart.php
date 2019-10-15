@@ -254,7 +254,8 @@ class Tools_ShoppingCart {
                 'isDigital'        => $item->getIsDigital(),
                 'prodLength'       => $item->getProdLength(),
                 'prodWidth'        => $item->getProdWidth(),
-                'prodDepth'        => $item->getProdDepth()
+                'prodDepth'        => $item->getProdDepth(),
+                'brand'            => $item->getBrand()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;
