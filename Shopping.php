@@ -1590,6 +1590,9 @@ class Shopping extends Tools_Plugins_Abstract {
                         case 'prefix':
                             $user->setPrefix($data['profileValue']);
                             break;
+                        case 'signature':
+                            $user->setSignature($data['profileValue']);
+                            break;
                         case 'fullname':
                             $user->setFullName($data['profileValue']);
                         break;
