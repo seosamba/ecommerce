@@ -1590,6 +1590,9 @@ class Shopping extends Tools_Plugins_Abstract {
                         case 'prefix':
                             $user->setPrefix($data['profileValue']);
                             break;
+                        case 'signature':
+                            $user->setSignature($data['profileValue']);
+                            break;
                         case 'fullname':
                             $user->setFullName($data['profileValue']);
                         break;
@@ -1600,7 +1603,7 @@ class Shopping extends Tools_Plugins_Abstract {
                             $this->_responseHelper->fail($this->_translator->translate('Element doesn\'t exists'));
 
                     }
-
+                    $user->setPassword(null);
                     $userMapper->save($user);
                     $this->_responseHelper->success('');
                 }
