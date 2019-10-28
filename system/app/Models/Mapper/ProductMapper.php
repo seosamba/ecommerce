@@ -684,4 +684,26 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         return $result[0]['count'];
     }
 
+    /**
+     * Get products dimensions and weight
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    public function fetchDimensionsProducts()
+    {
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array(
+                'product_id' => 'id',
+                'prod_length',
+                'prod_depth',
+                'prod_width',
+                'weight'
+            ));
+        $result = $this->getDbTable()->getAdapter()->fetchAssoc($select);
+
+        return $result;
+    }
+
 }
