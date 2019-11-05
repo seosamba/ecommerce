@@ -311,6 +311,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
+  `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -890,5 +892,5 @@ WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceOb
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.7' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.8' WHERE `name` = 'shopping';
 

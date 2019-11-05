@@ -101,6 +101,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const SHIPPING_TAX_RATE     = 'shippingTaxRate';
 
+    const SHIPPING_IS_GIFT = 'checkoutShippingIsGift';
+
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
 
     const COUPON_ZONE = 'zoneId';
