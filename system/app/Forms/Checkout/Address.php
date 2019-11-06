@@ -105,6 +105,9 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 
 		// setting required fields
 		$this->getElement('email')->setValidators(array($emailValidator));
+        if (!empty($shoppingConfig[Shopping::SHIPPING_IS_GIFT])) {
+            $this->getElement('giftEmail')->setValidators(array($emailValidator));
+        }
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(
