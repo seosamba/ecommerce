@@ -395,7 +395,16 @@ NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
 WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+ALTER TABLE `shopping_cart_session` ADD `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email';
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_giftorder'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_giftorder' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.7' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.8' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
