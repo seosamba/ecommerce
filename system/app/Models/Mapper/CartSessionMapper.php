@@ -44,7 +44,9 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'refund_amount'         => $model->getRefundAmount(),
             'refund_notes'          => $model->getRefundNotes(),
             'purchased_on'          => $model->getPurchasedOn(),
-            'additional_info'       => $model->getAdditionalInfo()
+            'additional_info'       => $model->getAdditionalInfo(),
+            'is_gift'               => $model->getIsGift(),
+            'gift_email'            => $model->getGiftEmail()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

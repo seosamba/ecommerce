@@ -134,6 +134,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $cartContent[$key]['taxRate'] = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                         $cartContent[$key]['short_description'] = $productObject->getShortDescription();
                         $cartContent[$key]['full_description'] = $productObject->getFullDescription();
+                        $cartContent[$key]['brand'] = $productObject->getBrand();
                     }
                 }
                 $this->_cart->setCartContent($cartContent);
@@ -777,6 +778,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCartItemProducturl($sid)
     {
         return $this->_cartContent[$sid]['productUrl'];
+    }
+
+    /**
+     * * Return product brand for single item in cart
+     *
+     * @param $sid
+     * @return mixed
+     */
+    protected function _renderCartItemBrand($sid)
+    {
+        return $this->_cartContent[$sid]['brand'];
     }
 
     /**

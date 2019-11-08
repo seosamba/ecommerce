@@ -108,6 +108,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_additionalInfo   = null;
 
+    protected $_isGift = '0';
+
+    protected $_giftEmail = '';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -440,5 +444,44 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         $this->_additionalInfo = $additionalInfo;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getIsGift()
+    {
+        return $this->_isGift;
+    }
+
+    /**
+     * @param string $isGift
+     * @return string
+     */
+    public function setIsGift($isGift)
+    {
+        $this->_isGift = $isGift;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGiftEmail()
+    {
+        return $this->_giftEmail;
+    }
+
+    /**
+     * @param string $giftEmail
+     * @return string
+     */
+    public function setGiftEmail($giftEmail)
+    {
+        $this->_giftEmail = $giftEmail;
+
+        return $this;
+    }
+
 
 }

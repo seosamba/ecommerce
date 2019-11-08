@@ -59,7 +59,13 @@ class Tools_ShoppingCart {
 
     protected $_recurringPaymentType = '';
 
+
     protected $_disableProductDiscounts = false;
+
+    protected $_isGift = '0';
+
+    protected $_giftEmail = '';
+
 
 	private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
@@ -257,7 +263,8 @@ class Tools_ShoppingCart {
                 'isDigital'        => $item->getIsDigital(),
                 'prodLength'       => $item->getProdLength(),
                 'prodWidth'        => $item->getProdWidth(),
-                'prodDepth'        => $item->getProdDepth()
+                'prodDepth'        => $item->getProdDepth(),
+                'brand'            => $item->getBrand()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;
@@ -659,6 +666,9 @@ class Tools_ShoppingCart {
 			$cartSession->setNotes($this->getNotes());
 		}
 
+        $cartSession->setIsGift($this->getIsGift());
+        $cartSession->setGiftEmail($this->getGiftEmail());
+
 		$result = Models_Mapper_CartSessionMapper::getInstance()->save($cartSession);
 		if ($result && $this->getCartId() === null) {
 			$cartSession->notifyObservers();
@@ -954,11 +964,46 @@ class Tools_ShoppingCart {
     public function setDisableProductDiscounts($disableProductDiscounts)
     {
         $this->_disableProductDiscounts = $disableProductDiscounts;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsGift()
+    {
+        return $this->_isGift;
+    }
+
+    /**
+     * @param string $isGift
+     * @return string
+     */
+    public function setIsGift($isGift)
+    {
+        $this->_isGift = $isGift;
 
         return $this;
     }
 
 
+    /**
+     * @return string
+     */
+    public function getGiftEmail()
+    {
+        return $this->_giftEmail;
+    }
+
+    /**
+     * @param string $giftEmail
+     * @return string
+     */
+    public function setGiftEmail($giftEmail)
+    {
+        $this->_giftEmail = $giftEmail;
+
+        return $this;
+    }
 
 
 }
