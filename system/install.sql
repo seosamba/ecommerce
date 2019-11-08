@@ -882,9 +882,6 @@ CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
--- 24/07/2019
--- version: 2.6.5
--- Fix group price observer
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
 SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
 NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`

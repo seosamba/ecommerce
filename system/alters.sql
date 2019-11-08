@@ -395,6 +395,9 @@ NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
 WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+-- 24/11/2019
+-- version: 2.6.7
+-- Gift purchase
 ALTER TABLE `shopping_cart_session` ADD `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email';
 
