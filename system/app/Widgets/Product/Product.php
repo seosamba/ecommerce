@@ -611,6 +611,46 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     }
 
+    private function _renderGroupDiscount()
+    {
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+        $dbTable = new Models_DbTable_CustomerInfo();
+        $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+        $allCustomersGroups = $dbTable->getAdapter()->fetchAssoc($select);
+        if (!empty($currentUser)) {
+            if (array_key_exists($currentUser, $allCustomersGroups)) {
+                $allProductsWithGroups = Store_Mapper_GroupPriceMapper::getInstance()->fetchAssocAll();
+                $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                if (!empty($allProductsGroups[$groupId])) {
+                    $productId = $this->_product->getId();
+                    if ($productId != null) {
+                        $groupProductKey = $groupId . '_' . $productId;
+                        $priceNow = $this->_product->getPrice();
+                        $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                        $priceSign = $allProductsGroups[$groupId]['priceSign'];
+                        $priceType = $allProductsGroups[$groupId]['priceType'];
+                        if (array_key_exists($groupProductKey, $allProductsWithGroups)) {
+                            $priceValue = $allProductsWithGroups[$groupProductKey]['priceValue'];
+                            $priceSign = $allProductsWithGroups[$groupProductKey]['priceSign'];
+                            $priceType = $allProductsWithGroups[$groupProductKey]['priceType'];
+                        }
+                        if ($priceType == 'percent') {
+                            return (float) $priceValue . '%';
+                        }
+                        if ($priceType == 'unit') {
+                            return $priceValue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
     public static function getAllowedOptions() {
 		$translator = Zend_Registry::get('Zend_Translate');
 	    $allowedOptions = array();
