@@ -338,7 +338,11 @@ define([
 
             var self = this;
             _.each(this.model.toJSON(), function(value, name){
-                self.$('[data-reflection='+name+']').val(value);
+                if(name == 'brand' && value === null) {
+                    self.$('#product-brand').val(-1);
+                } else {
+                    self.$('[data-reflection='+name+']').val(value);
+                }
             });
 
             if (this.model.has('related')){
