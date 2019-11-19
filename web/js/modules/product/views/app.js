@@ -781,9 +781,21 @@ define([
         },
         addNewBrand: function(newBrand){
             newBrand = $.trim(newBrand);
-            var brandsList = _.map($('#product-brand option'), function(opt){ return opt.value; });
 
-            if (!_.include(_.map(brandsList, function(b){ return b.toLowerCase(); }), newBrand.toLowerCase())){
+           var brandsList = [];
+
+            _.each($('#product-brand option'), function(opt, name){
+                if(opt.value != '-1') {
+                    brandsList.push(opt.value);
+                }
+            });
+            //var brandsList = _.map($('#product-brand option'), function(opt){ return opt.value; });
+
+            if (!_.include(_.map(brandsList, function(b){
+                if(typeof b !== 'undefined') {
+                    return b.toLowerCase();
+                }
+            }), newBrand.toLowerCase())){
                 brandsList.push(newBrand);
             } else {
                 newBrand = _.find(brandsList, function(item){
