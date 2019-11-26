@@ -142,8 +142,8 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             );
             $pickupLocationModel->setLat($coordinates['lat']);
             $pickupLocationModel->setLng($coordinates['lng']);
-            $pickupLocationModel->setExternalId(null);
-            $pickupLocationModel->setAllowedToDelete(0);
+            $pickupLocationModel->setExternalId($data['locationExternalId']);
+            $pickupLocationModel->setAllowedToDelete($data['locationAllowedToDelete']);
             $pickupLocationMapper->save($pickupLocationModel);
         } else {
             $this->_error();

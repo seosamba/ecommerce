@@ -69,6 +69,8 @@ define([
             $('.location-weight').val(model.get('weight'));
             $('.location-country [value="'+model.get('country')+'"]').prop('selected', true);
             $('.location-phone').val(model.get('phone'));
+            $('#location-external-id').val(model.get('external_id'));
+            $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
             _.each(workingHours, function(value, name){
                 $('input[name="working-hours-'+name+'"]').val(value);
             });
