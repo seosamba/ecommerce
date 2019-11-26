@@ -722,7 +722,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->generalConfig = $this->_configMapper->getConfigParams();
 
 			$this->_view->templateList = Application_Model_Mappers_TemplateMapper::getInstance()->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
-			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
+
+            $this->_view->brands = Models_Mapper_Brand::getInstance()->getAllBrands();
 
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
