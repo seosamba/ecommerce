@@ -407,7 +407,12 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_giftorder' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+-- 24/11/2019
+-- version: 2.6.8
+ALTER TABLE `shopping_pickup_location` ADD `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_pickup_location` ADD `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.6.8' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.6.9' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

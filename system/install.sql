@@ -724,6 +724,8 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `lng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `notes` text 	COLLATE utf8_unicode_ci DEFAULT NULL,
   `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `external_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `allowed_to_delete` enum('up to','over') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   INDEX `country` (`country`),
   INDEX `city` (`city`),
@@ -889,5 +891,5 @@ WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceOb
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.6.8' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.6.9' WHERE `name` = 'shopping';
 
