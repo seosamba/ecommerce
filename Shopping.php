@@ -484,6 +484,14 @@ class Shopping extends Tools_Plugins_Abstract {
 
                 $customerMapper = Models_Mapper_CustomerMapper::getInstance();
 				$newCustomerId = $customerMapper->save($customer);
+
+				if (!empty($customParams)) {
+                    foreach ($customParams as $paramName => $paramLabel) {
+                        $customer->setAttribute($paramName, $data[$paramName]);
+                    }
+                    Application_Model_Mappers_UserMapper::getInstance()->saveUserAttributes($customer);
+                }
+
 				if ($newCustomerId) {
                     $customParamsAssignment = false;
 				    if (!empty($customParams)) {
