@@ -27,15 +27,14 @@ class Tools_GroupAssignment
             return array('error' => '1', 'User not found');
         }
 
-        $userModel = $userMapper->loadUserAttributes($userModel);
-        $attributes = $userModel->getAttributes();
+        $attributes = $userMapper->fetchUniqueAttributesNames();
         if (empty($attributes)) {
             return array('error' => '1', 'message' => 'There are no attributes has been found.');
         }
 
         $cleanAttributes = array();
         foreach ($userCustomParams as $attrName => $attrValue) {
-            if (array_key_exists($attrName, $attributes)) {
+            if (in_array($attrName, $attributes, true)) {
                 $cleanAttributes[$attrName] = $attrValue;
             }
         }
