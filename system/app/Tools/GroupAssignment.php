@@ -34,9 +34,10 @@ class Tools_GroupAssignment
 
         $cleanAttributes = array();
         foreach ($userCustomParams as $attrName => $attrValue) {
-            if (in_array($attrName, $attributes, true)) {
+            //Disabled until we have custom params config
+            //if (in_array($attrName, $attributes, true)) {
                 $cleanAttributes[$attrName] = $attrValue;
-            }
+            //}
         }
 
         if (empty($cleanAttributes)) {
