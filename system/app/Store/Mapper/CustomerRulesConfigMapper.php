@@ -53,7 +53,7 @@ class Store_Mapper_CustomerRulesConfigMapper extends Application_Model_Mappers_A
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('scra.rule_id = ?', $ruleId);
 
-        $select = $this->getDbTable()->getAdapter()->select()->from(array('scra' => 'shopping_customer_rules_actions'),
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('scra' => 'shopping_customer_rules_config'),
             array('scra.field_name', 'scra.id', 'scra.rule_comparison_operator', 'scra.field_value'))
             ->where($where)->order('scra.field_name');
 

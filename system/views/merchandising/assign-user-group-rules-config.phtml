@@ -1,0 +1,11 @@
+<div id="olark-chat-rules-config"></div>
+<input type="hidden" id="assign-groups-rules-config-token" name="secureToken"
+           value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Usergrouprules::USER_GROUP_RULES_TOKEN); ?>"/>
+<input id="system-language-rule-groups" type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
+
+
+<script>
+    $(function () {
+        $.getScript('<?php echo $this->websiteUrl . "plugins/shopping/web/js/vue-modules/groupassignmentconfig.js"?>', function(result){});
+    });
+</script>
