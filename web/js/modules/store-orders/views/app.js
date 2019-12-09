@@ -96,6 +96,13 @@ define(['backbone',
                         }
                     }
 
+                    if (typeof options.is_gift !== 'undefined') {
+                        if (options.is_gift === '1') {
+                            $('#is-a-gift').prop('checked', true);
+                            withDetailedFilters = true;
+                        }
+                    }
+
                     if (typeof options.filter_by_order_id !== 'undefined') {
                         $('input[name=search]').val(options.filter_by_order_id);
                     }
@@ -131,7 +138,8 @@ define(['backbone',
                         'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
                         'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
                         'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val(),
-                        'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; }
+                        'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; },
+                        'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; }
                     };
                 }
             });
@@ -245,6 +253,7 @@ define(['backbone',
                  .find('select.filter').val('0').trigger('chosen:updated');
 
             $('#exclude-quotes-from-search').prop('checked', false);
+            $('#is-a-gift').prop('checked', false);
             this.applyFilter();
         },
         navigate: function(e){
