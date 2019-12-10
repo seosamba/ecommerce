@@ -1274,9 +1274,11 @@ class Shopping extends Tools_Plugins_Abstract {
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
             if (!empty($shoppingConfig[Shopping::SHIPPING_IS_GIFT])){
-                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
-                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_GIFT_ORDER
-                )));
+                if (!empty($cartSession->getIsGift())) {
+                    $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_GIFT_ORDER
+                    )));
+                }
             }
             if (class_exists('Tools_AppsServiceWatchdog')) {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
