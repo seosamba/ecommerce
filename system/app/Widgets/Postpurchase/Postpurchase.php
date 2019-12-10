@@ -518,6 +518,9 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderIsGift()
     {
        if (!empty($this->_cart->getIsGift())) {
+           if (!empty($this->_options[0])) {
+               return $this->_options[0];
+           }
            return $this->_translator->translate('Is a gift');
        }
 

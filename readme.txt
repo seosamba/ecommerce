@@ -116,6 +116,8 @@ Plugin widgets.
     {$postpurchase:id} -> cart id
     {$postpurchase:coupon} -> if coupon was used, show coupon name.
     {$postpurchase:quotenote} -> show quote disclaimer.
+    {$postpurchase:isGift:some text here} -> Is a gift message will be returned
+    {$postpurchase:giftEmail} -> return receiver gift email
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
