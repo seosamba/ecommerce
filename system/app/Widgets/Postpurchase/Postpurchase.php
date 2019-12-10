@@ -511,6 +511,37 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * Return is a gift message
+     *
+     * @return string
+     */
+    protected function _renderIsGift()
+    {
+       if (!empty($this->_cart->getIsGift())) {
+           return $this->_translator->translate('Is a gift');
+       }
+
+       return '';
+
+    }
+
+    /**
+     * Return email of the gift receiver
+     *
+     * @return string
+     */
+    protected function _renderGiftEmail()
+    {
+        if (!empty($this->_cart->getIsGift()) && !empty($this->_cart->getGiftEmail())) {
+            return $this->_cart->getGiftEmail();
+        }
+
+        return '';
+
+    }
+
+
+    /**
      * Return product sku for single item in cart
      *
      * @param $sid
