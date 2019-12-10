@@ -102,6 +102,8 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $pickupLocationModel->setWorkingHours(serialize($workingHours));
         $pickupLocationModel->setName($data['location-name']);
         $pickupLocationModel->setLocationCategoryId($data['categoryId']);
+        $pickupLocationModel->setExternalId(null);
+        $pickupLocationModel->setAllowedToDelete(0);
         $pickupLocationMapper->save($pickupLocationModel);
     }
 
@@ -140,6 +142,8 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             );
             $pickupLocationModel->setLat($coordinates['lat']);
             $pickupLocationModel->setLng($coordinates['lng']);
+            $pickupLocationModel->setExternalId($data['locationExternalId']);
+            $pickupLocationModel->setAllowedToDelete($data['locationAllowedToDelete']);
             $pickupLocationMapper->save($pickupLocationModel);
         } else {
             $this->_error();
