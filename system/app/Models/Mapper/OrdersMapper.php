@@ -390,6 +390,12 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             $select->where('order.gateway <> ?', 'Quote');
                         }
                         break;
+                    case 'is_gift':
+                        $val = trim(filter_var($val, FILTER_SANITIZE_STRING));
+                        if (!empty($val)) {
+                            $select->where('order.is_gift = ?', '1');
+                        }
+                        break;
 					case 'status':
 						$val = filter_var_array($val, FILTER_SANITIZE_STRING);
 						if (!empty($val)) {

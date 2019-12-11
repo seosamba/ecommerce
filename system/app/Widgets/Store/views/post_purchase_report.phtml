@@ -485,6 +485,13 @@
                                 <br/>
                             <?php endif; ?>
                         <?php endif; ?>
+                        <?php if(!empty($this->cart->getIsGift())):?>
+                            <br/>
+                            <br/>
+                            <?php echo $this->translate('Is a gift');?>
+                            <br/>
+                            <?php echo $this->translate('Recipient\'s email');?>: <?php echo $this->cart->getGiftEmail();?>
+                        <?php endif;?>
 
                     <?php else: ?>
                         <span><?php echo $this->translate('not provided'); ?></span>
