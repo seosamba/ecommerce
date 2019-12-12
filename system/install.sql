@@ -182,7 +182,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_length` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
-  `gtin` BIGINT(10) UNSIGNED DEFAULT NULL,
+  `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `wishlist_qty` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -313,6 +314,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
+  `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
+  `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -340,6 +344,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `id` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   `address_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   `firstname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `company` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -526,7 +531,8 @@ INSERT INTO `shopping_zone_state` (`zone_id`, `state_id`) VALUES
 
 INSERT INTO `email_triggers_recipient` (`recipient`) VALUES
 ('customer'),
-('sales person');
+('sales person'),
+('supplier');
 
 DROP TABLE IF EXISTS `shopping_coupon`;
 CREATE TABLE IF NOT EXISTS `shopping_coupon` (
@@ -537,6 +543,8 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon` (
   `startDate` date DEFAULT NULL COMMENT 'Coupon start date',
   `endDate` date DEFAULT NULL COMMENT 'Coupon expire date',
   `allowCombination` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'Allow combination with other coupons',
+  `zoneId` int(10) unsigned DEFAULT NULL,
+  `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon',
   PRIMARY KEY (`id`),
   KEY `code` (`code`),
   KEY `type` (`type`)
@@ -721,6 +729,8 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `lng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `notes` text 	COLLATE utf8_unicode_ci DEFAULT NULL,
   `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   INDEX `country` (`country`),
   INDEX `city` (`city`),
@@ -813,6 +823,29 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
+CREATE TABLE IF NOT EXISTS `shopping_companies`(
+  `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE (`company_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
+  `supplier_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`supplier_id`, `company_id`),
+  FOREIGN KEY (`supplier_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`, `company_id`),
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
@@ -837,6 +870,31 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `allowance_due` date DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
+
+CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
+SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
+NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
+WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.5.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.0' WHERE `name` = 'shopping';
 

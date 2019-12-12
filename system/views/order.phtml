@@ -29,6 +29,7 @@
                         <?php if(isset($billingAddress['company']) && $billingAddress['company'] != ''):?>
                             <span><?php echo $billingAddress['company'];?></span><br />
                         <?php endif;?>
+                        <span class="prefix"><?php echo $billingAddress['prefix'];?></span>
                         <span class="first-name"><?php echo $billingAddress['firstname'];?></span>
                         <span class="last-name"><?php echo $billingAddress['lastname'];?></span><br />
                         <?php echo $this->formHidden('id', $billingAddress['id'], array('id' => 'id_' . $billingAddress['id'])); ?>
@@ -71,6 +72,7 @@
                         <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
                             <span class="company"><?php echo $shippingAddress['company'];?></span><br />
                         <?php endif;?>
+                        <span class="prefix"><?php echo $shippingAddress['prefix'];?></span>
                         <span class="first-name"><?php echo $shippingAddress['firstname'];?></span>
                         <span class="last-name"><?php echo $shippingAddress['lastname'];?></span>
                         <br/>
@@ -96,6 +98,13 @@
                                 <br/>
                                 <span class="notes"><?php echo (!empty($shippingAddress['customer_notes']) ? $shippingAddress['customer_notes'] : '');?></span>
                             <?php endif;?>
+                        <?php endif;?>
+                        <?php if($this->order->getIsGift()):?>
+                            <br/>
+                            <br/>
+                            <?php echo $this->translate('Is a gift');?>
+                            <br/>
+                            <?php echo $this->translate('Recipient\'s email');?>: <?php echo $this->order->getGiftEmail();?>
                         <?php endif;?>
                     <?php else: ?>
                         <p><?php echo $this->translate('not provided');?></p>
@@ -260,12 +269,22 @@
                     </tbody>
                     <tfoot>
                     <tr><td colspan="<?php echo $colSpan + 7 ?>"></td></tr>
-                    <tr>
-                        <td colspan="<?php echo $colSpan + 7 ?>">
-                            <?php echo $this->translate('Delivery comments');?>:
-                            <p class="order-notes text-normal"><?php echo nl2br($this->order->getNotes());?></p>
-                        </td>
-                    </tr>
+                    <?php if ($this->order->getNotes()): ?>
+                        <tr>
+                            <td colspan="<?php echo $colSpan + 7 ?>">
+                                <?php echo $this->translate('Delivery comments');?>:
+                                <p class="order-notes text-normal"><?php echo nl2br($this->order->getNotes());?></p>
+                            </td>
+                        </tr>
+                    <?php endif;?>
+                    <?php if ($this->order->getAdditionalInfo()): ?>
+                        <tr>
+                            <td colspan="<?php echo $colSpan + 7 ?>">
+                                <?php echo $this->translate('Additional info');?>:
+                                <p class="order-additional-info text-normal"><?php echo nl2br($this->order->getAdditionalInfo());?></p>
+                            </td>
+                        </tr>
+                    <?php endif;?>
                     <tr>
                         <td colspan="<?php echo $colSpan + 5 ?>" rowspan="7"></td>
                         <td><?php echo $this->translate('Subtotal');?>:</td>

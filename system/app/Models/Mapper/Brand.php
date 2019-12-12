@@ -53,4 +53,15 @@ class Models_Mapper_Brand extends Application_Model_Mappers_Abstract {
     public function delete(Models_Model_Brand $model) {
         return $this->getDbTable()->delete($this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId()));
     }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function getAllBrands()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sb' => 'shopping_brands'), array('id', 'name'))->order('name ASC');
+        return  $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
 }

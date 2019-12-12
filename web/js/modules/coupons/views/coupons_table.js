@@ -3,10 +3,7 @@ define([
     '../collections/coupons',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
-], function(Backbone,
-            CouponsCollection,
-            i18n
-            ){
+], function(Backbone, CouponsCollection, i18n){
 
     var CouponTableView = Backbone.View.extend({
         el: $('#coupon-table'),
@@ -30,7 +27,7 @@ define([
             this.$el.dataTable({
                 'sDom': 't<"clearfix"p>',
                 "bPaginate": true,
-                "iDisplayLength": 8,
+                "iDisplayLength": 7,
                 "bAutoWidth": false,
                 "aoColumnDefs": aoColumnDefs,
                 "oLanguage": {
@@ -57,6 +54,13 @@ define([
         },
         renderCoupon: function(coupon){
             var couponType = coupon.get('type');
+            var usageInfo = 'unlimited';
+            if(coupon.get('oneTimeUse') === '1') {
+                usageInfo = 'one time';
+            } else if (coupon.get('scope') === 'client') {
+                usageInfo = 'one per client';
+            }
+
             this.$el.fnAddData([
                 coupon.get('id'),
                 (couponType === 'freeshipping' ? _.isUndefined(i18n['free shipping'])?'free shipping':i18n['free shipping'] : _.isUndefined(i18n[couponType])?couponType:i18n[couponType] ),
@@ -65,18 +69,41 @@ define([
                 coupon.get('endDate'),
                 coupon.get('allowCombination') === '1' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : _.isUndefined(i18n['no'])?'no':i18n['no'],
                 coupon.get('scope') === 'client' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : '-',
+                usageInfo,
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
                 }, ''),
+                '<a href="javascript:;" class="tpopup" data-url="'+$('#website_url').val()+'plugin/shopping/run/zones/">'+coupon.get('zoneName')+'</acl>',
                 coupon.get('action'),
                 '<a class="ticon-remove error icon14" data-role="delete" data-cid="'+coupon.get('id')+'" href="javascript:;"></a>'
             ]);
         },
         deleteCoupon: function(e){
-            var cid = $(e.currentTarget).data('cid');
-            var model = this.coupons.get(cid);
+            var cid = $(e.currentTarget).data('cid'),
+                couponName = $(e.currentTarget).closest('tr').find('.coupon-code-dashboard').data('coupon-code-dashboard'),
+                model = this.coupons.get(cid);
+
             if (model){
-                model.destroy();
+                $.ajax({
+                    'url': $('#website_url').val() + 'plugin/shopping/run/checkUseCoupon',
+                    'type':'GET',
+                    'dataType':'json',
+                    'data': {cid: cid}
+                }).done(function(response){
+                    if (response.error == 1) {
+                        showMessage(_.isUndefined(i18n['Can\'t delete coupon!']) ? 'Can\'t delete coupon!':i18n['Can\'t delete coupon!'], true, 5000);
+                    } else {
+                        if(typeof response.responseText.used !== 'undefined') {
+                            showConfirm(couponName + ' ' + response.responseText.used + ' ' + (_.isUndefined(i18n['Are you sure to delete?']) ? 'Are you sure to delete?':i18n['Are you sure to delete?']), function(){
+                                model.destroy();
+                            });
+                        } else {
+                            showConfirm(_.isUndefined(i18n['Are you sure to delete?']) ? 'Are you sure to delete?':i18n['Are you sure to delete?'], function(){
+                                model.destroy();
+                            });
+                        }
+                    }
+                });
             }
         },
         loadProductPage: function(e){

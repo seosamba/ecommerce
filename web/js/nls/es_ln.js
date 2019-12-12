@@ -144,6 +144,9 @@ define({
         'Do you really want to delete this column? (Data will be deleted!)' : '¿Desea eliminar la columna? ( Datos serán borrados)',
         'This product was sold. Do you really want to delete this file?' : '¿Producto vendido. Desea eliminar el fichero?',
         'Digital products found' : 'Productos digitales encontrados',
-        'discount' : 'descuento'
+        'discount' : 'descuento',
+        'Your session has timed out. Please log again' : 'Su sesión ha cadicado. Inicie sesión de nuevo',
+        'here' : 'aquí',
+        'A coupon name can\'t contain gaps' : 'El nombre de cupón no puede contener espacios'
     }
 });

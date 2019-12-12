@@ -23,6 +23,11 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	const ROLE_SALESPERSON = 'sales person';
 
+    /**
+     * System role 'supplier'
+     */
+    const ROLE_SUPPLIER = 'supplier';
+
 	/**
 	 * New system resource 'cart'
 	 *
@@ -98,7 +103,11 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const SHIPPING_TAX_RATE     = 'shippingTaxRate';
 
+    const SHIPPING_IS_GIFT = 'checkoutShippingIsGift';
+
     const COUPON_DISCOUNT_TAX_RATE  = 'couponDiscountTaxRate';
+
+    const COUPON_ZONE = 'zoneId';
 
 
     const QUANTITY_PICKUP_LOCATION_ON_SCREEN = 6;
@@ -118,6 +127,8 @@ class Shopping extends Tools_Plugins_Abstract {
     const ORDER_EXPORT_CONFIG = 'order_export_config';
 
     const ORDER_IMPORT_CONFIG = 'order_import_config';
+
+    const DEFAULT_USER_GROUP = 'default_user_group';
 
     /**
      * shipping restriction key
@@ -221,6 +232,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		if (!$acl->hasRole(self::ROLE_CUSTOMER)) {
 			$acl->addRole(new Zend_Acl_Role(self::ROLE_CUSTOMER), Tools_Security_Acl::ROLE_GUEST);
 		}
+        if (!$acl->hasRole(self::ROLE_SUPPLIER)) {
+            $acl->addRole(new Zend_Acl_Role(self::ROLE_SUPPLIER), Tools_Security_Acl::ROLE_GUEST);
+        }
 		if (!$acl->hasRole(self::ROLE_SALESPERSON)) {
 			$acl->addRole(new Zend_Acl_Role(self::ROLE_SALESPERSON), Tools_Security_Acl::ROLE_MEMBER);
 		}
@@ -234,6 +248,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			$acl->addResource(new Zend_Acl_Resource(self::RESOURCE_STORE_MANAGEMENT));
 		}
 		$acl->allow(self::ROLE_CUSTOMER, self::RESOURCE_CART);
+		$acl->allow(self::ROLE_SUPPLIER, self::RESOURCE_CART);
 		$acl->deny(Tools_Security_Acl::ROLE_GUEST, self::RESOURCE_API);
 		$acl->deny(Tools_Security_Acl::ROLE_MEMBER, self::RESOURCE_API);
 		$acl->deny(self::ROLE_SALESPERSON);
@@ -422,6 +437,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
 		if (!$customer->getId()) {
 			if (null === ($existingCustomer = Models_Mapper_CustomerMapper::getInstance()->findByEmail($data['email']))) {
+                $prefix = isset($data['prefix']) ? $data['prefix'] : '';
                 $fullname = isset($data['firstname']) ? $data['firstname'] : '';
                 $fullname .= isset($data['lastname']) ? ' ' . $data['lastname'] : '';
                 $mobilePhone = isset($data['mobile']) ? $data['mobile'] : '';
@@ -460,7 +476,15 @@ class Shopping extends Tools_Plugins_Abstract {
                         ->setDesktopCountryCode($desktopCountryCode)
                         ->setDesktopCountryCodeValue($desktopCountryCodeValue)
 						->setPassword($password)
-                        ->setSubscribed($subscribed);
+                        ->setSubscribed($subscribed)
+                        ->setPrefix($prefix);
+
+                $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(self::DEFAULT_USER_GROUP));
+
+                if(!empty($defaultUserGroupId)) {
+                    $customer->setGroupId($defaultUserGroupId);
+                }
+
 				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
 				if ($newCustomerId) {
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
@@ -471,6 +495,23 @@ class Shopping extends Tools_Plugins_Abstract {
                     } elseif(isset($session->clientWithNewPassword)) {
                         unset($session->clientWithNewPassword);
                     }
+
+                    if(!empty($defaultUserGroupId)){
+                        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                        $userModel = $userMapper->find($newCustomerId);
+
+                        if($userModel instanceof Application_Model_Models_User) {
+                            $userModel->setLastLogin(date(Tools_System_Tools::DATE_MYSQL));
+
+                            $userMapper->save($userModel);
+
+                            $session->setCurrentUser($userModel);
+                            Zend_Session::regenerateId();
+                            $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+                            $cacheHelper->clean();
+                        }
+                    }
+
 				} elseif(isset($session->clientWithNewPassword)) {
                     unset($session->clientWithNewPassword);
                 }
@@ -486,6 +527,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * @throws Exceptions_SeotoasterPluginException
 	 */
 	public function cartAction() {
+
 		$checkoutPage = Tools_Misc::getCheckoutPage();
 		if (!$checkoutPage instanceof Application_Model_Models_Page) {
 			throw new Exceptions_SeotoasterPluginException('Error rendering cart. Please select a checkout page');
@@ -684,7 +726,8 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->generalConfig = $this->_configMapper->getConfigParams();
 
 			$this->_view->templateList = Application_Model_Mappers_TemplateMapper::getInstance()->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
-			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
+
+            $this->_view->brands = Models_Mapper_Brand::getInstance()->getAllBrands();
 
 			$listFolders = Tools_Filesystem_Tools::scanDirectoryForDirs($this->_websiteConfig['path'] . $this->_websiteConfig['media']);
 			if (!empty ($listFolders)) {
@@ -769,17 +812,12 @@ class Shopping extends Tools_Plugins_Abstract {
         return $folders;
     }
 
-	public function searchindexAction() {
-		$cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+    public function searchindexAction() {
+        $searchTerm = filter_var($this->_request->getParam('searchTerm'), FILTER_SANITIZE_STRING);
+        $data = Models_Mapper_ProductMapper::getInstance()->buildIndex($searchTerm);
 
-		if (($data = $cacheHelper->load('index', 'store_')) === null) {
-			$data = Models_Mapper_ProductMapper::getInstance()->buildIndex();
-
-			$cacheHelper->save('index', $data, 'store_', array('productindex'), Helpers_Action_Cache::CACHE_NORMAL);
-		}
-
-		echo json_encode($data);
-	}
+        echo json_encode($data);
+    }
 
 	protected function _getConfig() {
 		return array_map(function ($param) {
@@ -965,6 +1003,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($id);
         $customerAddress = Models_Mapper_CustomerMapper::getInstance()->getUserAddressOrdersByUserId($id);
+        $this->_view->userPrefixes  = Tools_ShoppingCart::$userPrefixes;
         if($customerAddress) {
             $this->_view->customerAddress = $customerAddress;
         }
@@ -975,7 +1014,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		if ($customer) {
 			$this->_view->customer = $customer;
-			$orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
+            $userRole = filter_var($this->_request->getParam('userRole'), FILTER_SANITIZE_STRING);
+            if ($userRole === Shopping::ROLE_SUPPLIER) {
+                $this->_view->supplier = true;
+                $this->_responseHelper->success($this->_view->render('profile.phtml'));
+            }
+            $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($customer->getId());
 			$this->_view->stats = array(
 				'total'     => sizeof($orders),
 				'new'       => sizeof(array_filter($orders, function ($order) {
@@ -1017,6 +1061,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
         $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
+
 		$content = $this->_view->render('profile.phtml');
 
 		if ($this->_request->isXmlHttpRequest()) {
@@ -1045,6 +1090,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
 			if ($this->_request->isPost()) {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
+                $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
                 if (isset($params['shippingTrackingId'])) {
                     $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
@@ -1238,6 +1284,16 @@ class Shopping extends Tools_Plugins_Abstract {
 			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
 				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
 			)));
+
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
+            if (!empty($shoppingConfig[Shopping::SHIPPING_IS_GIFT])){
+                if (!empty($cartSession->getIsGift())) {
+                    $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_GIFT_ORDER
+                    )));
+                }
+            }
             if (class_exists('Tools_AppsServiceWatchdog')) {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
@@ -1304,6 +1360,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->configTabs = $configTabs;
             $this->_view->plugins = $plugins;
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
+            $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::DEFAULT_USER_GROUP));
+            $this->_view->defaultGroupId = $defaultUserGroupId;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}
@@ -1331,6 +1389,10 @@ class Shopping extends Tools_Plugins_Abstract {
 				if (!empty($coupons)) {
 					$status = Tools_CouponTools::applyCoupons($coupons);
 					if (!empty($status)) {
+					    if(in_array(Tools_CouponTools::STATUS_FAIL_ONE_TIME_USED, $status)) {
+                            $defaultErrorMessage = $this->_translator->translate('Sorry, some coupon codes you provided had already been used.') . '</br>' . $this->_translator->translate('Go back to swap promo codes or proceed with shipping information to checkout.');
+                        }
+
 						$hasErrors = count(array_filter($status, function ($status) {
 							return $status !== true;
 						}));
@@ -1469,7 +1531,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $where .= ' AND '.$userMapper->getDbTable()->getAdapter()->quoteInto("email = ?", $data['newEmail']);
                     $emailAlreadyExist = $userMapper->fetchAll($where, array(), true);
                     if(!empty($emailAlreadyExist)){
-                        $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                        $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                     }
                     $userData->setPassword($data['newPassword']);
                     $userData->setEmail($data['newEmail']);
@@ -1481,7 +1543,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 }else{
                     $this->_responseHelper->fail($this->_translator->translate('Autification failed'));
                 }
-                $this->_responseHelper->success(array('message'=>$this->_translator->translate('New account information send at your email'), 'email'=> $data['newEmail']));
+                $this->_responseHelper->success(array('message'=>$this->_translator->translate('Your account information has been updated'), 'email'=> $data['newEmail']));
             }else{
                 $errorMessage = $form->getErrors();
                 $singleMessage = 0;
@@ -1549,9 +1611,15 @@ class Shopping extends Tools_Plugins_Abstract {
                                 )
                             );
                             if ($validator->isValid($data['profileValue'])) {
-                                $this->_responseHelper->fail($this->_translator->translate('User with this email already exist'));
+                                $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                             }
                         break;
+                        case 'prefix':
+                            $user->setPrefix($data['profileValue']);
+                            break;
+                        case 'signature':
+                            $user->setSignature($data['profileValue']);
+                            break;
                         case 'fullname':
                             $user->setFullName($data['profileValue']);
                         break;
@@ -1562,7 +1630,7 @@ class Shopping extends Tools_Plugins_Abstract {
                             $this->_responseHelper->fail($this->_translator->translate('Element doesn\'t exists'));
 
                     }
-
+                    $user->setPassword(null);
                     $userMapper->save($user);
                     $this->_responseHelper->success('');
                 }
@@ -2223,6 +2291,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $headers = array(
                     $this->_translator->translate('E-mail'),
                     $this->_translator->translate('Role'),
+                    $this->_translator->translate('Prefix'),
                     $this->_translator->translate('Full name'),
                     $this->_translator->translate('Last login date'),
                     $this->_translator->translate('Registration date'),
@@ -2399,6 +2468,179 @@ class Shopping extends Tools_Plugins_Abstract {
                 'message' => $this->_translator->translate($shipmentRefundServiceInfo['message'])
             ));
         }
+    }
+
+    /*
+     * @throws Exceptions_SeotoasterPluginException
+     *
+     * Change default user group
+     */
+    public function changeDefaultUserGroupAction() {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $defaultGroupId = filter_var($this->_request->getParam('defaultGroupId'), FILTER_SANITIZE_NUMBER_INT);
+
+            $this->_configMapper->save(array(self::DEFAULT_USER_GROUP => $defaultGroupId));
+
+            $this->_responseHelper->success('');
+        }
+    }
+
+    /**
+     * Check if coupon found in shopping_coupon_usage DbTable
+     */
+    public function checkUseCouponAction() {
+        if ($this->_request->isGet() && Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $couponId = filter_var($this->_request->getParam('cid'), FILTER_SANITIZE_NUMBER_INT);
+            if(!empty($couponId)) {
+                $coupon = Store_Mapper_CouponMapper::getInstance()->findCouponUsageByCouponId($couponId);
+
+                if(!empty($coupon)) {
+                    $this->_responseHelper->success(array('used' => $this->_translator->translate('was used in purchase.')));
+                } else {
+                    $this->_responseHelper->success('');
+                }
+            }
+            $this->_responseHelper->fail('');
+        }
+        $this->_responseHelper->fail('');
+    }
+
+    /**
+     * Added product to wishlist and wishListQty increase by one
+     */
+    public function addToWishListAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+        }
+
+        $productId = $this->_request->getParam('pid');
+        $qty = $this->_request->getParam('qty');
+        $user = $this->_sessionHelper->getCurrentUser();
+        $userId = $user->getId();
+        $userRole = $user->getRoleId();
+
+        if(!empty($productId) && !empty($userId) && $userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+            $product = $productMapper->find($productId);
+            if($product instanceof Models_Model_Product) {
+                $wishedProductsMapper = Store_Mapper_WishedProductsMapper::getInstance();
+                $wishedProduct = $wishedProductsMapper->findByUserIdProductId($userId, $productId);
+                if(!$wishedProduct instanceof Store_Model_WishedProducts) {
+                    $wishedProduct = new Store_Model_WishedProducts();
+                    $wishedProduct->setUserId($userId);
+                    $wishedProduct->setProductId($product->getId());
+                    $wishedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
+
+                    $wishedProductsMapper->save($wishedProduct);
+
+                    $productWishedQty = $product->getWishlistQty();
+                    $product->setWishlistQty($productWishedQty + $qty);
+
+                    $productMapper->save($product);
+
+                    $this->_responseHelper->success(array('lastAddedUser' => $user->getFullName(), 'addedToList' => $this->_translator->translate('Added to Wishlist')));
+                } else {
+                    $this->_responseHelper->success(array('alreadyWished' => $this->_translator->translate('Product already added to Wishlist')));
+                }
+            }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t add product to Wishlist! Please re-login into system.'));
+        }
+    }
+
+    /**
+     * This action is used to help Wishlist gets an portional content
+     *
+     * @throws Exceptions_SeotoasterException
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function renderwishlistproductsAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $content = '';
+        $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Storewishlist_Storewishlist::DEFAULT_LIMIT;
+        }
+
+        $offset = intval($nextPage) * $limit;
+
+        $productIds = $this->_request->getParam('productIds');
+        $productIds = explode(',', $productIds);
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $enabledOnly = $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled=?', '1');
+        $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
+        $products = Models_Mapper_ProductMapper::getInstance()->fetchAll($enabledOnly, null, $offset, $limit,
+            null, null, null, false, false, array(), array(), null);
+
+        if (!empty($products)) {
+            $template = $this->_request->getParam('template');
+            $widget = Tools_Factory_WidgetFactory::createWidget('storewishlist', array('wishList', $template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+            unset($widget);
+        }
+        if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
+            $page = Application_Model_Mappers_PageMapper::getInstance()->find($pageId);
+            if ($page instanceof Application_Model_Models_Page && !empty($content)) {
+                $content = $this->_renderViaParser($content, $page);
+            }
+        }
+        echo $content;
+    }
+
+    /**
+     * Remove wished product
+     */
+    public function removeWishedProductAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $productId = filter_var($this->_request->getParam('pid'), FILTER_SANITIZE_NUMBER_INT);
+        $currentUserModel = $this->_sessionHelper->getCurrentUser();
+        $userRole = $currentUserModel->getRoleId();
+
+        if($userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $userId = $currentUserModel->getId();
+
+            if ($userId) {
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+
+                if(!empty($productId)) {
+                    $product = $productMapper->find($productId);
+                    if($product instanceof Models_Model_Product) {
+                        $wishedProductsMapper = Store_Mapper_WishedProductsMapper::getInstance();
+                        $wishedProduct = $wishedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                        if($wishedProduct instanceof Store_Model_WishedProducts) {
+                            $wishedProductsMapper->delete($wishedProduct);
+                            $wishlistQty = $product->getWishlistQty();
+                            $product->setWishlistQty($wishlistQty - 1);
+
+                            $productMapper->save($product);
+
+                            $this->_responseHelper->success($this->_translator->translate('Removed'));
+                        }
+                    }
+                }
+            }
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Can\'t remove wished product! Please re-login into system.'));
     }
 
 }

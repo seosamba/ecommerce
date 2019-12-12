@@ -129,6 +129,11 @@ class Tools_Geo {
 
         if(!empty($generalConfig['googleApiKey'])) {
             $params['key'] = $generalConfig['googleApiKey'];
+            $googleApiKey = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('googleApiKey');
+
+            if (!empty($googleApiKey)) {
+                $params['key'] = $googleApiKey;
+            }
         }
 
 		return 'https://maps.googleapis.com/maps/api/staticmap?'.http_build_query($params);
@@ -139,8 +144,14 @@ class Tools_Geo {
      */
     public static function getMapCoordinates($address)
     {
+        $googleApiKey = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('googleApiKey');
+
+        $gApiKey = '';
+        if(!empty($googleApiKey)) {
+            $gApiKey = '&key='. $googleApiKey;
+        }
         // replace all the white space with "+" sign to match with google search pattern
-        $url = 'http://maps.google.com/maps/api/geocode/json?sensor=false&address=' . str_replace(' ', '+', $address);
+        $url = 'https://maps.google.com/maps/api/geocode/json?sensor=false'. $gApiKey .'&address=' . str_replace(' ', '+', $address);
         $response = file_get_contents($url);
         //generate array object from the response from the web
         $json = json_decode($response, true);

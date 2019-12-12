@@ -9,6 +9,7 @@ require.config({
         'backbone'  : '../../libs/backbone/backbone-min',
         'backbone.paginator'  : '../../libs/backbone/backbone.paginator.min',
         'text'      : '../../libs/require/text',
+        'moment' : '../../libs/moment.min',
         'i18n'  : '../../libs/require/i18n'
     },
     shim: {

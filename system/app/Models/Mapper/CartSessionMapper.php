@@ -47,7 +47,10 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'shipping_availability_days' => $model->getShippingAvailabilityDays(),
             'shipping_service_info' => $model->getShippingServiceInfo(),
             'shipping_label_link' => $model->getShippingLabelLink(),
-            'purchased_on'          => $model->getPurchasedOn()
+            'purchased_on'          => $model->getPurchasedOn(),
+            'additional_info'       => $model->getAdditionalInfo(),
+            'is_gift'               => $model->getIsGift(),
+            'gift_email'            => $model->getGiftEmail()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

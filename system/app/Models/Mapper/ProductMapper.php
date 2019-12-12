@@ -77,7 +77,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'prod_length'       => $model->getProdLength(),
             'prod_depth'        => $model->getProdDepth(),
             'prod_width'        => $model->getProdWidth(),
-            'gtin'              => $model->getGtin()
+            'gtin'              => $model->getGtin(),
+            'wishlist_qty'      => $model->getWishlistQty()
 		);
 
 		if ($model->getId()){
@@ -124,6 +125,12 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         //process product parts if any
         $this->_processParts($model);
 
+        //process product Allowance
+        $allowanceDate = $model->getAllowance();
+        if(!empty($allowanceDate)) {
+            $this->_processAllowance($model);
+        }
+
 		$model->notifyObservers();
 
 		return $model;
@@ -160,7 +167,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $organicSearch = false,
         $attributes = array(),
         $price = array(),
-        $sort = null
+        $sort = null,
+        $allowance = false,
+        $productPrice = array()
 
     ) {
         $entities = array();
@@ -199,6 +208,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         if(!empty($price)){
             $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
+        }
+
+        if(!empty($productPrice)) {
+            $select->joinLeft(array('sfv' => 'shopping_filtering_values'), 'sfv.product_id = p.id', array());
+            foreach ($productPrice as $pPrice) {
+                $select->where("sfv.value BETWEEN " . $pPrice['min'] ." AND ".$pPrice['max']);
+            }
         }
 
         if (!empty($tags)) {
@@ -252,6 +268,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             } else {
                 $select->where($likeWhere, '%' . $search . '%');
             }
+        }
+
+        if($allowance) {
+            $select->joinLeft(array('ap' => 'shopping_allowance_products'), 'ap.product_id = p.id', array('allowance' => 'ap.allowance_due'));
         }
 
         if (self::$_logSelectResultLength === false) {
@@ -369,6 +389,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				$entity->setPage($page);
 			}
 		}
+
+        $allowanceData = Store_Mapper_AllowanceProductsMapper::getInstance()->findByProductId($row->id);
+        if($allowanceData instanceof Store_Model_AllowanceProducts) {
+            $allowanceDate = $allowanceData->getAllowanceDue();
+            $entity->setAllowance($allowanceDate);
+        }
+
 		return $entity;
 	}
 
@@ -478,6 +505,35 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
     }
 
+    /**
+     * @param Models_Model_Product $model
+     */
+    private function _processAllowance(Models_Model_Product $model) {
+        $allowanceProductsMapper = Store_Mapper_AllowanceProductsMapper::getInstance();
+
+        $allowanceProduct = $allowanceProductsMapper->findByProductId($model->getId());
+
+        if (!$allowanceProduct instanceof Store_Model_AllowanceProducts) {
+            $allowanceProduct = new Store_Model_AllowanceProducts();
+            $allowanceProduct->setProductId($model->getId());
+        }
+
+        $allowanceProduct->setAllowanceDue($model->getAllowance());
+        $allowanceProductsMapper->save($allowanceProduct);
+    }
+
+    /**
+     * @param $productId
+     * @return mixed
+     * @throws Exception
+     */
+    public function findByProductId($productId) {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $productId);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product')->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchRow($select);
+    }
+
 	/**
 	 * Find product which contains given tags
 	 * Shorthand method to self::fetchAll
@@ -539,21 +595,34 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
 	}
 
-    public function buildIndex(){
+    /**
+     * Search products by name, sku, mpn, brand name, tag name
+     *
+     * @param $searchTerm
+     * @return mixed
+     * @throws Exception
+     */
+    public function buildIndex($searchTerm){
         $db = $this->getDbTable()->getAdapter();
 
-        $select[] = $db->select()
-            ->from('shopping_product', array('name'));
-        $select[] = $db->select()
-            ->from('shopping_product', array('sku'));
-        $select[] = $db->select()
-            ->from('shopping_product', array('mpn'));
-        $select[] = $db->select()
-            ->from('shopping_tags', array('name'));
-        $select[] = $db->select()
-            ->from('shopping_brands', array('name'));
+        $where = $this->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('sp.sku LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('sp.mpn LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('sb.name LIKE ?', '%' . $searchTerm . '%');
+        $where .= ' OR ' .  $this->getDbTable()->getAdapter()->quoteInto('st.name LIKE ?', '%' . $searchTerm . '%');
 
-        return $db->fetchCol($db->select()->union($select));
+        $select = $db->select()->from(array('sp' => 'shopping_product'), array(
+            'prod' => 'sp.name'
+        ))
+            ->join(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array())
+            ->joinLeft(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
+            ->joinLeft(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
+            ->where($where)
+            ->group('sp.id');
+
+        $data = $db->fetchCol($select);
+
+        return $data;
     }
 
 	public function updateAttributes($id, $attributes){
@@ -613,6 +682,28 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $result = $this->getDbTable()->getAdapter()->fetchAll($select);
 
         return $result[0]['count'];
+    }
+
+    /**
+     * Get products dimensions and weight
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    public function fetchDimensionsProducts()
+    {
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array(
+                'product_id' => 'id',
+                'prod_length',
+                'prod_depth',
+                'prod_width',
+                'weight'
+            ));
+        $result = $this->getDbTable()->getAdapter()->fetchAssoc($select);
+
+        return $result;
     }
 
 }

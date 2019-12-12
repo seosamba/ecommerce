@@ -231,7 +231,6 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 -- 12/12/2016
 -- version: 2.5.1
 -- Add custom sort for product list
-
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
@@ -294,8 +293,127 @@ UPDATE `shopping_cart_session` SET `purchased_on` = `updated_at` WHERE `purchase
 -- version: 2.5.7
 ALTER TABLE `shopping_product` ADD COLUMN `gtin` BIGINT(10) UNSIGNED DEFAULT NULL;
 
--- 27/09/2017
+-- 13/04/2018
 -- version: 2.5.8
+ALTER TABLE `shopping_product` MODIFY COLUMN `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL;
+
+-- 18/06/2017
+-- version: 2.5.9
+-- Add zone id for the coupon
+ALTER TABLE `shopping_coupon` ADD COLUMN `zoneId` int(10) unsigned DEFAULT NULL;
+
+-- 31/07/2018
+-- version: 2.6.0
+-- Add new prefix column
+ALTER TABLE `shopping_customer_address` ADD COLUMN `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `address_type`;
+
+-- 25/04/2015
+-- version: 2.6.1
+-- Add Supplier
+INSERT IGNORE INTO `email_triggers_recipient` (`recipient`)
+SELECT CONCAT('supplier') FROM `email_triggers_recipient` WHERE
+NOT EXISTS (SELECT `recipient` FROM `email_triggers_recipient`
+WHERE `recipient` = 'supplier') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_suppliercompleted'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_suppliercompleted' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_suppliershipped'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_suppliershipped' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+CREATE TABLE IF NOT EXISTS `shopping_companies`(
+  `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE (`company_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`, `company_id`),
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
+  `supplier_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`supplier_id`, `company_id`),
+  FOREIGN KEY (`supplier_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 16/01/2019
+-- version: 2.6.2
+-- Add charity col
+ALTER TABLE `shopping_cart_session` ADD COLUMN `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL AFTER `purchased_on`;
+
+-- 02/01/2019
+-- version: 2.6.3
+-- Add zone id for the coupon
+ALTER TABLE `shopping_coupon` ADD COLUMN `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon';
+
+-- 08/01/2019
+-- version: 2.6.4
+-- Add product allowance
+CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `allowance_due` date DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
+
+-- 15/03/2019
+-- version: 2.6.5
+-- Add wishlist
+CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_product` ADD COLUMN `wishlist_qty` int(10) unsigned DEFAULT '0';
+
+-- 24/07/2019
+-- version: 2.6.6
+-- Fix group price observer
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
+SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
+NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
+WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+-- 24/11/2019
+-- version: 2.6.7
+-- Gift purchase
+ALTER TABLE `shopping_cart_session` ADD `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email';
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_giftorder'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_giftorder' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+-- 24/11/2019
+-- version: 2.6.8
+ALTER TABLE `shopping_pickup_location` ADD `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_pickup_location` ADD `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
+
+-- 12/12/2019
+-- version: 2.6.9
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id' AFTER `shipping_tracking_id`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format' AFTER `shipping_service_id`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format' AFTER `shipping_availability_days`;
@@ -310,6 +428,6 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 ALTER TABLE `shopping_customer_address` ADD COLUMN `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.5.9' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

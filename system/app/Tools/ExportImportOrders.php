@@ -11,6 +11,28 @@ class Tools_ExportImportOrders
 
     const MAGENTO_IMPORT_ORDER = 'magento_import_order';
 
+    /**
+     * Orders statuses
+     *
+     * @var array
+     */
+    public static $statuses = array(
+        Shopping::GATEWAY_QUOTE => array(
+            Models_Model_CartSession::CART_STATUS_PROCESSING => 'Quote Sent',
+            Models_Model_CartSession::CART_STATUS_PENDING    => 'New quote',
+            Models_Model_CartSession::CART_STATUS_CANCELED   => 'Lost opportunity'
+        ),
+        Models_Model_CartSession::CART_STATUS_NEW        => 'Abandoned carts',
+        Models_Model_CartSession::CART_STATUS_PENDING    => 'Merchant action required - Customer charged',
+        Models_Model_CartSession::CART_STATUS_PROCESSING => 'Technical processing - Customer not charged',
+        Models_Model_CartSession::CART_STATUS_COMPLETED  => 'Payment Received',
+        Models_Model_CartSession::CART_STATUS_CANCELED   => 'Canceled',
+        Models_Model_CartSession::CART_STATUS_SHIPPED    => 'Items Shipped',
+        Models_Model_CartSession::CART_STATUS_DELIVERED  => 'Items Delivered',
+        Models_Model_CartSession::CART_STATUS_REFUNDED   => 'Refunded purchase',
+        Models_Model_CartSession::CART_STATUS_ERROR      => 'Error'
+    );
+
     public static function prepareOrdersDataForExport($data, $ordersIds)
     {
         $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
@@ -51,13 +73,70 @@ class Tools_ExportImportOrders
             $filePath = $websiteHelper->getPath() . $websiteHelper->getTmp() . $fileName;
             $expFile = fopen($filePath, 'w');
             $dataToExport = array_merge($headers, $dataToExport);
-            foreach ($dataToExport as $data) {
+            $statesNumeric = Tools_Geo::getState(null, true);
+            $stateTable = new Zend_Db_Table('shopping_list_state');
+            $select = $stateTable->select()->from($stateTable,array('id','state'));
+            $statesAlpha = $stateTable->getAdapter()->fetchPairs($select);
+            foreach ($dataToExport as $key => $data) {
+                if (!empty($key)) {
+                    if (!empty($data['billing_state'])) {
+                        if (is_numeric($data['billing_state']) && array_key_exists($data['billing_state'], $statesNumeric)) {
+                            $data['billing_state'] = $statesNumeric[$data['billing_state']];
+                        } else {
+                            $stateExists = array_search($data['billing_state'], $statesAlpha, true);
+                            if ($stateExists !== false) {
+                                $data['billing_state'] = $statesNumeric[$stateExists];
+                            }
+                        }
+                    }
+                    if (!empty($data['shipping_state'])) {
+                        if (is_numeric($data['shipping_state']) && array_key_exists($data['shipping_state'], $statesNumeric)) {
+                            $data['shipping_state'] = $statesNumeric[$data['shipping_state']];
+                        }  else {
+                            $stateExists = array_search($data['shipping_state'], $statesAlpha, true);
+                            if ($stateExists !== false) {
+                                $data['shipping_state'] = $statesNumeric[$stateExists];
+                            }
+                        }
+
+                    }
+                    if(!empty($data['status_label'])) {
+                        $data['status_label'] = Tools_ExportImportOrders::exportImportCartStatuses($data['gateway'], $data['status_label']);
+                    }
+                }
                 fputcsv($expFile, $data, ',', '"');
             }
             fclose($expFile);
             Tools_ExportImportOrders::downloadCsv($filePath, $fileName);
         }
 
+    }
+
+    /**
+     * @param $action
+     * @param $gateway
+     * @param $status
+     * @return false|int|mixed|string
+     */
+    public static function exportImportCartStatuses($gateway, $status)
+    {
+        $translator = Zend_Registry::get('Zend_Translate');
+        $processingStatus = $status;
+        $status = Tools_ExportImportOrders::$statuses[$status];
+
+        if($gateway == Shopping::GATEWAY_QUOTE) {
+            $status = Tools_ExportImportOrders::$statuses[Shopping::GATEWAY_QUOTE][$status];
+
+            if(empty($status)) {
+                $status = Tools_ExportImportOrders::$statuses[$processingStatus];
+            }
+        }
+
+        if(empty($status)) {
+            $status = $processingStatus;
+        }
+
+        return $translator->translate($status);
     }
 
     public static function prepareImportOrdersReport($importErrors)
@@ -130,8 +209,10 @@ class Tools_ExportImportOrders
             'total',
             'notes',
             'shipping_tracking_id',
+            'user_prefix',
             'user_name',
             'user_email',
+            'shipping_prefix',
             'shipping_firstname',
             'shipping_lastname',
             'shipping_company',
@@ -148,6 +229,7 @@ class Tools_ExportImportOrders
             'shipping_zip',
             'shipping_address1',
             'shipping_address2',
+            'billing_prefix',
             'billing_firstname',
             'billing_lastname',
             'billing_company',
@@ -267,6 +349,7 @@ class Tools_ExportImportOrders
                 if (!array_key_exists($userEmail, $existingUsers)) {
                     $userModel->setId(null);
                     $userModel->setEmail($orderData[$ordersHeaders[$importOrdersConfigFields['user_email']]]);
+                    $userModel->setPrefix($orderData[$ordersHeaders[$importOrdersConfigFields['user_prefix']]]);
                     $userModel->setFullName($orderData[$ordersHeaders[$importOrdersConfigFields['user_name']]]);
                     $userModel->setPassword(microtime());
                     $userModel->setRoleId(Shopping::ROLE_CUSTOMER);
@@ -401,6 +484,7 @@ class Tools_ExportImportOrders
                             $shippingState = null;
                         }
 
+                        $shippingAddress['prefix'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_prefix']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_prefix']]] : '';
                         $shippingAddress['firstname'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_firstname']]] : '';
                         $shippingAddress['lastname'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_lastname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_lastname']]] : '';
                         $shippingAddress['company'] = isset($ordersHeaders[$importOrdersConfigFields['shipping_company']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_company']]] : '';
@@ -447,6 +531,7 @@ class Tools_ExportImportOrders
                             $billingState = null;
                         }
 
+                        $billingAddress['prefix'] = isset($ordersHeaders[$importOrdersConfigFields['billing_prefix']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_prefix']]] : '';
                         $billingAddress['firstname'] = isset($ordersHeaders[$importOrdersConfigFields['billing_firstname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_firstname']]] : '';
                         $billingAddress['lastname'] = isset($ordersHeaders[$importOrdersConfigFields['billing_lastname']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_lastname']]] : '';
                         $billingAddress['company'] = isset($ordersHeaders[$importOrdersConfigFields['billing_company']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['billing_company']]] : '';
@@ -486,6 +571,7 @@ class Tools_ExportImportOrders
                     } else {
                         $total = $subTotal + $shippingPrice + $discountTax + $subTotalTax;
                     }
+
                     $data = array(
                         'ip_address' => '',
                         'referer' => '',
@@ -586,6 +672,11 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Status')
             ),
+            'status_label' => array(
+                'label' => 'status_label',
+                'checked' => 1,
+                'label_name' => $translator->translate('Status Label')
+            ),
             'total_products' => array(
                 'label' => 'total_products',
                 'checked' => 1,
@@ -683,6 +774,11 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Notes')
             ),
+            'additional_info' => array(
+                'label' => 'additional_info',
+                'checked' => 1,
+                'label_name' => $translator->translate('Additional info')
+            ),
             'shipping_tracking_id' => array(
                 'label' => 'shipping_tracking_id',
                 'checked' => 1,
@@ -693,6 +789,11 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Brand')
             ),
+            'user_prefix' => array(
+                'label' => 'user_prefix',
+                'checked' => 1,
+                'label_name' => $translator->translate('Prefix')
+            ),
             'user_name' => array(
                 'label' => 'user_name',
                 'checked' => 1,
@@ -702,6 +803,11 @@ class Tools_ExportImportOrders
                 'label' => 'user_email',
                 'checked' => 1,
                 'label_name' => $translator->translate('User Email')
+            ),
+            'shipping_prefix' => array(
+                'label' => 'shipping_prefix',
+                'checked' => 1,
+                'label_name' => $translator->translate('Shipping user prefix')
             ),
             'shipping_firstname' => array(
                 'label' => 'shipping_firstname',
@@ -792,6 +898,11 @@ class Tools_ExportImportOrders
                 'label' => 'shipping_address2',
                 'checked' => 1,
                 'label_name' => $translator->translate('Shipping address 2')
+            ),
+            'billing_prefix' => array(
+                'label' => 'billing_prefix',
+                'checked' => 1,
+                'label_name' => $translator->translate('Billing user prefix')
             ),
             'billing_firstname' => array(
                 'label' => 'billing_firstname',
@@ -922,8 +1033,10 @@ class Tools_ExportImportOrders
             '152.47',
             'some info from customer',
             'https://tools.usps.com/go/TrackConfirmAction_input?origTrackNum=12333',
+            'Mr',
             'Jon Doe',
             'jondoe@gmail.com',
+            'Mr',
             'Jon',
             'Doe',
             'Joe company',
@@ -940,6 +1053,7 @@ class Tools_ExportImportOrders
             '93505',
             '1156 High Street',
             '',
+            'Mr',
             'Jon',
             'Doe',
             'Joe company',

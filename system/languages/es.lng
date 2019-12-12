@@ -477,6 +477,8 @@
 'Recurring payments' => 'Recurring payments',
 'Customers groups' => 'Customers groups',
 'Digital products' => 'Productos digitales',
+'Customers/Leads groups' => 'Customers/Leads groups',
+'Product tags' => 'Product tags',
 'Activate autoship frequencies' => 'Activate autoship frequencies',
 'Day' => 'Day',
 'Week' => 'Week',
@@ -537,7 +539,14 @@
 'Sale discount should be a number' => 'El descuento debe ser un numero',
 'All products were updated' => 'Todos los productos fueron actualizados',
 'Out of stock' => 'No disponible',
-'You\'ve added a note. No amount refunded to credit card by this system' => 'El pedido se ha cancelado, pero NO se ha realizado la devolución del importe a la tarjeta del cliente.'
-
+'You\'ve added a note. No amount refunded to credit card by this system' => 'El pedido se ha cancelado, pero NO se ha realizado la devolución del importe a la tarjeta del cliente.',
+'Select' => 'Seleccionar',
+'Mr' => 'Sr',
+'Mrs' => 'Sra',
+'Ms' => 'Sra',
+'Miss' => 'Srta',
+'Dr' => 'Dr',
+'Additional info' => 'Información adicional',
+'Add to favorites' => 'Agregar a favoritos'
 
 );

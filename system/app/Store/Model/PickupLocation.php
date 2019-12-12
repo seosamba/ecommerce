@@ -31,6 +31,10 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_weight;
 
+    protected $_external_id = null;
+
+    protected $_allowed_to_delete = 0;
+
     public function setName($name)
     {
         $this->_name = $name;
@@ -172,6 +176,40 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function getWeight()
     {
         return $this->_weight;
+    }
+
+    /**
+     * @return null
+     */
+    public function getExternalId()
+    {
+        return $this->_external_id;
+    }
+
+    /**
+     * @param null $external_id
+     */
+    public function setExternalId($external_id)
+    {
+        $this->_external_id = $external_id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAllowedToDelete()
+    {
+        return $this->_allowed_to_delete;
+    }
+
+    /**
+     * @param int $allowed_to_delete
+     */
+    public function setAllowedToDelete($allowed_to_delete)
+    {
+        $this->_allowed_to_delete = $allowed_to_delete;
+        return $this;
     }
 
 

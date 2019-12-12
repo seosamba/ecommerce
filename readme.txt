@@ -22,21 +22,54 @@ Plugin widgets.
                          Can be displayed both on the product page and in the products list.
     {$product:description[:_short_|full]} - Displays a short or a full description of the product.
                         _short_|full - short or full description output type
-    {$product:related[:img]} - Displays a list of relevant products on a specific product page.
-                       img - displays a list of relevant products with image
+    {$product:related[:img:addtocart:template=some_template]} - Displays a list of relevant products on a specific product page.
+                       img - displays a list of relevant products with image.
+                       addtocart - displays add to cart button.
+                       template - template name.
+
+     Allowed dictionary widgets in template for related widget :
+        {$product:name}
+        {$product:url}
+        {$product:brand}
+        {$product:weight}
+        {$product:mpn}
+        {$product:sku}
+        {$product:id}
+        {$product:description}
+        {$product:description:short}
+        {$product:description:full}
+        {$store:addtocart}
+        {$store:addtocart:(related prod id)}
+        {$store:addtocart:checkbox}
+        {$product:inventory}
+        {$product:qty}
+        {$product:wishlistqty}
+        {$product:price}
+        {$product:price:nocurrency}
+        {$product:photourl}
+        {$product:photourl:small}
+        {$product:photourl:medium}
+        {$product:photourl:large}
+        {$product:photourl:original}
+
     {$product:editproduct} - This widget displays a link to the edit page of the product that is visible only to users with a copywriter or administrator rights.
     {$product:id} - Displays product id
     {$product:inventory} - Displays "In stock" or "Out of stock" message
     {$product:freeshipping[:sometext]} - Displays <span class="product-free-shipping">sometext</span> if free shipping enabled for this product
         sometext - custom text inside span element
+    {$product:allowance} - Displays the product allowance end date.
+    {$product:wishlistqty} - Displays the product Wishlist qty.
 
 2. Product list widget.
-    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc} - Creates a list of products using the same tags.
+    {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
     template_name - template name for the product list
     tagnames-tag1,tag2,...,tagN - filtering by product tags
     brands-brand1,brand2,...,brandN - filtering by product brands
     order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
+    unwrap - remowed the <div class="product-list"></div> HTML element
+    5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
+    additionalfilters-somename,somename2,.. - Special filter for {$filter... widget where somename* is unique filter name
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
@@ -75,6 +108,7 @@ Plugin widgets.
     {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
+    {$postpurchase:additionalInfo} -> additional info of purchase
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
     {$postpurchase:shippingTax[:clean]} -> shipping tax
     {$postpurchase:discountTax[:clean]} -> discount tax
@@ -82,8 +116,11 @@ Plugin widgets.
     {$postpurchase:id} -> cart id
     {$postpurchase:coupon} -> if coupon was used, show coupon name.
     {$postpurchase:quotenote} -> show quote disclaimer.
+    {$postpurchase:isGift:some text here} -> Is a gift message will be returned
+    {$postpurchase:giftEmail} -> return receiver gift email
 
     ######### Billing information #############
+    {$postpurchase:billing:prefix} -> billing prefix
     {$postpurchase:billing:lastname} -> billing lastname
     {$postpurchase:billing:firstname} -> billing firstname
     {$postpurchase:billing:address1} -> billing address
@@ -98,6 +135,7 @@ Plugin widgets.
     {$postpurchase:billing:customer_notes} -> billing customer notes
 
     ######### Shipping information #############
+    {$postpurchase:shipping:prefix} -> shipping prefix
     {$postpurchase:shipping:lastname} -> shipping lastname
     {$postpurchase:shipping:firstname} -> shipping firstname
     {$postpurchase:shipping:address1} -> shipping address
@@ -109,6 +147,7 @@ Plugin widgets.
     {$postpurchase:shipping:phone} -> shipping address phone
     {$postpurchase:shipping:mobile} -> shipping address mobile
     {$postpurchase:shipping:customer_notes} -> shipping customer notes
+    {$postpurchase:shipping:email} -> shipping address email
 
     This type of widgets you can use inside 'postpurchasecartcontent' magic space
     It will return result for each product inside your cart
@@ -125,6 +164,7 @@ Plugin widgets.
     {$postpurchase:cartitem:total[:clean]} -> total price with tax
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:producturl} -> product url
+    {$postpurchase:cartitem:brand} -> product brand
 
 Magic spaces:
     MAGICSPACE: freebies
@@ -149,4 +189,32 @@ Magic spaces:
     If you want to use it with action email system add param 'email' for magic space {postpurchasecartcontent:email}
     somename - You should provide optional name if you want use several magicspaces on one page.
 
+8. Product params widgets:
+      {$productparams:titleoption:{$product:id}:SIZE} - Displays option title selected by default. Where "SIZE" - option name. Used only for dropdown and radio options.
 
+
+9. Product filters widget:
+{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft]]]}
+ tagnames-tag1,tag2,...,tagN - filtering by product tags
+ brands-brand1,brand2,...,brandN - filtering by product brands
+ order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
+ productsqft - special option (special option for surfacecalc plugin)
+ allitems - Show all filter values without All others group
+
+ 10. Wishlist widget:
+a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
+   htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+   btnname:sometext - where sometext is custom text for button name.
+   profile - redirected user on profile after add product to Wishlist.
+
+b. {$storewishlist:wishList:_products wishlist list[:limit[:10]]}
+   Option "_products wishlist list" template - used for show product on page.
+   Into this template you can use any product and store widgets and magicspases.
+
+   Option limit - you can set custom limit before pagination "show more" for product list ex. {$storewishlist:_products wishlist list:limit:10}
+   where 10 - is count of products. By default limit is 20.
+c. {$storewishlist:removeproduct:{$product:id}[htmlclass:class class2 class3[:btnname:sometext]]}
+   htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+   btnname:sometext - where sometext is custom text for button name.
+
+d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name who last added product to Wishlist.

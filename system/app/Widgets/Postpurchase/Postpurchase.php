@@ -134,6 +134,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $cartContent[$key]['taxRate'] = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                         $cartContent[$key]['short_description'] = $productObject->getShortDescription();
                         $cartContent[$key]['full_description'] = $productObject->getFullDescription();
+                        $cartContent[$key]['brand'] = $productObject->getBrand();
                     }
                 }
                 $this->_cart->setCartContent($cartContent);
@@ -305,7 +306,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderShippingprice()
     {
         $shippingPrice = (is_null($this->_cart->getShippingPrice())) ? 0 : $this->_cart->getShippingPrice();
-        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $shippingPrice != 0) {
+        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $shippingPrice != 0 && !in_array(self::WITHOUT_TAX, $this->_options)) {
             $shippingPrice = $shippingPrice + $this->_cart->getShippingTax();
         }
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
@@ -343,6 +344,8 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         $shippingService = 'Shipping Address';
         if ($this->_cart->getShippingService() === Shopping::SHIPPING_PICKUP) {
             $shippingService = 'Pickup information';
+        } else {
+            $shippingService = $this->_cart->getShippingService();
         }
         return $this->_translator->translate($shippingService);
     }
@@ -406,6 +409,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * Return cart additional info
+     *
+     * @return mixed
+     */
+
+    protected function _renderAdditionalInfo()
+    {
+        return $this->_cart->getAdditionalInfo();
+    }
+
+    /**
      * Return cart discount. Depends on tax include config.
      *
      * @return mixed
@@ -413,7 +427,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderDiscount()
     {
         $discount = (is_null($this->_cart->getDiscount())) ? 0 : $this->_cart->getDiscount();
-        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $discount != 0) {
+        if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $discount != 0 && !in_array(self::WITHOUT_TAX, $this->_options)) {
             $discount = $discount + $this->_cart->getDiscountTax();
         }
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
@@ -495,6 +509,40 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     {
         return intval($this->_cart->getId());
     }
+
+    /**
+     * Return is a gift message
+     *
+     * @return string
+     */
+    protected function _renderIsGift()
+    {
+       if (!empty($this->_cart->getIsGift())) {
+           if (!empty($this->_options[0])) {
+               return $this->_options[0];
+           }
+           return $this->_translator->translate('Is a gift');
+       }
+
+       return '';
+
+    }
+
+    /**
+     * Return email of the gift receiver
+     *
+     * @return string
+     */
+    protected function _renderGiftEmail()
+    {
+        if (!empty($this->_cart->getIsGift()) && !empty($this->_cart->getGiftEmail())) {
+            return $this->_cart->getGiftEmail();
+        }
+
+        return '';
+
+    }
+
 
     /**
      * Return product sku for single item in cart
@@ -753,6 +801,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCartItemProducturl($sid)
     {
         return $this->_cartContent[$sid]['productUrl'];
+    }
+
+    /**
+     * * Return product brand for single item in cart
+     *
+     * @param $sid
+     * @return mixed
+     */
+    protected function _renderCartItemBrand($sid)
+    {
+        return $this->_cartContent[$sid]['brand'];
     }
 
     /**

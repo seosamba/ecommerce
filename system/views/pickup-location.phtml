@@ -120,6 +120,8 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 ?> ]</a>
             </p>
             <input type="hidden" name="id" id="location-edit-id"/>
+            <input type="hidden" name="locationExternalId" id="location-external-id" value="" />
+            <input type="hidden" name="locationAllowedToDelete" id="location-allowed-to-delete" value="" />
             <button class="btn omega ticon-plus" type="submit"/><?php echo $this->translate('Create or Update'); ?></button>
             <input type="hidden" class="secure-token-pickup-cat" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Pickuplocationcategories::PICKUPLOCATIONS_SECURE_TOKEN);?>">
         </form>
