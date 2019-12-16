@@ -3,7 +3,7 @@ const messages = {
         message: {
             groupConfigLegend: 'Custom params/groups rules config',
             selectCustomParam: 'Select user attribute',
-            selectGroup: 'Select customer group',
+            selectGroup: 'Customer group',
             specifyPropertyAction: 'Please specify at least one property/action',
             specifyGroup: 'Please specify group',
             specifyRuleName: 'Please specify rule name',
@@ -15,7 +15,7 @@ const messages = {
         message: {
             groupConfigLegend: 'Custom params/groups rules config',
             selectCustomParam: 'Select user attribute',
-            selectGroup: 'Select customer group',
+            selectGroup: 'Customer group',
             specifyPropertyAction: 'Please specify at least one property/action',
             specifyGroup: 'Please specify group',
             specifyRuleName: 'Please specify rule name',
@@ -27,7 +27,7 @@ const messages = {
         message: {
             groupConfigLegend: 'Custom params/groups rules config',
             selectCustomParam: 'Select user attribute',
-            selectGroup: 'Select customer group',
+            selectGroup: 'Customer group',
             specifyPropertyAction: 'Please specify at least one property/action',
             specifyGroup: 'Please specify group',
             specifyRuleName: 'Please specify rule name',
