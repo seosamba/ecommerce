@@ -36,6 +36,7 @@
 			<tr>
 				<th><input type="checkbox" name="check-all" title="<?php echo $this->translate('Select all');?>"></th>
 				<th><?php echo $this->translate('Name');?></th>
+                <th><?php echo $this->translate('Stock');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
                 <th><?php echo $this->translate('Suppliers');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
@@ -51,14 +52,14 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td colspan="10" class="text-center">
+				<td colspan="11" class="text-center">
 					<img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" alt="Loading..." />
 				</td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="10">
+				<td colspan="11">
                     <div class="grid_3 alpha">
                         <?php echo $this->translate('with selected');?>:&nbsp;
                         <select name="product-mass-action" id="">

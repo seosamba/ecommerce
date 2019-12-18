@@ -706,4 +706,17 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         return $result;
     }
 
+    /**
+     * Find product model by sku
+     *
+     * @param string $sku product sku
+     * @return Models_Model_Product|null
+     * @throws Exception
+     */
+    public function findBySku($sku)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('sku = ?', $sku);
+        return $this->_findWhere($where);
+    }
+
 }

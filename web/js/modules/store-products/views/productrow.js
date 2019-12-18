@@ -34,8 +34,17 @@ define([
                 prop = $(e.currentTarget).data('prop');
             smoke.prompt(_.isUndefined(i18n['Input new value']) ? 'Input new value':i18n['Input new value'], function(e){
                 if (e && self.model.get(prop) !== e){
+                    var oldProp = self.model.get(prop);
                     self.model.set(prop, e);
-                    self.model.save
+                    self.model.save(null, {
+                        success: function(model, response){
+                            showMessage(response.responseText, false, 5000);
+                        },
+                        error: function(model, response){
+                            self.model.set(prop, oldProp);
+                            showMessage(response.responseText, true, 5000);
+                        }
+                    });
                 }
             }, {value: this.model.get(prop)});
             return false;
