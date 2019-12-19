@@ -109,7 +109,8 @@ class Tools_Misc
         0 => array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal'),
         1 => array('tabId' => 'recurring-payments', 'tabName' => 'Recurring payments', 'type' => 'internal'),
         2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers/Leads groups', 'type' => 'internal'),
-        3 => array('tabId' => 'quantity-discount', 'tabName' => 'Quantity discount', 'type' => 'internal')
+        3 => array('tabId' => 'quantity-discount', 'tabName' => 'Quantity discount', 'type' => 'internal'),
+        4 => array('tabId' => 'user-attributes-assignment-rules', 'tabName' => 'User custom params/Groups rules', 'type' => 'internal')
     );
 
 
