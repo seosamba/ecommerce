@@ -38,7 +38,7 @@ define([
                     self.model.set(prop, e);
                     self.model.save(null, {
                         success: function(model, response){
-                            showMessage(response.responseText, false, 5000);
+                            //showMessage(response.responseText, false, 5000);
                         },
                         error: function(model, response){
                             self.model.set(prop, oldProp);
