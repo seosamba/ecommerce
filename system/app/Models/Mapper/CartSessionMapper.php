@@ -31,6 +31,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 			'shipping_type'         => $model->getShippingType(),
 			'shipping_service'      => $model->getShippingService(),
 			'shipping_tracking_id'  => $model->getShippingTrackingId(),
+			'tracking_id'           => $model->getTrackingId(),
 			'sub_total'             => $model->getSubTotal(),
 			'total_tax'             => $model->getTotalTax(),
 			'total'                 => $model->getTotal(),

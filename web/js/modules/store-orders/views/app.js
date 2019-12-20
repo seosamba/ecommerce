@@ -403,11 +403,11 @@ define(['backbone',
         changeTracking: function(e){
             var self    = this,
                 el      = $(e.currentTarget),
-                id      = parseInt(el.closest('tr').find('td.order-id').text());
-            var model = this.orders.get(id);
+                id      = parseInt(el.closest('tr').find('td.order-id').text()),
+                model = this.orders.get(id);
 
             $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames',
+                url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames/orderId/' + id,
                 type: 'GET',
                 dataType: 'json'
 
@@ -415,6 +415,8 @@ define(['backbone',
                 var dialog = _.template(TrackingCodeTemplate, {
                     data:response.responseText.data,
                     defaultSelection: response.responseText.defaultSelection,
+                    trackingId: response.responseText.trackingId,
+                    trackingName: response.responseText.trackingName,
                     orderId: id,
                     i18n:i18n
                 });

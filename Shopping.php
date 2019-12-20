@@ -585,13 +585,35 @@ class Shopping extends Tools_Plugins_Abstract {
         if($defaultSelection instanceof Models_Model_ShippingUrl) {
             $arrDataDefault = array($defaultSelection->getName() => $defaultSelection->getDefaultStatus());
         }
-        if(!empty($trackingData)) {
+
+        $orderId = $this->_request->getParam('orderId');
+        $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+
+        $trackingId = '';
+        $shippingTrackingId = '';
+        $trackingName = '';
+        if($order instanceof Models_Model_CartSession) {
+            $trackingId = $order->getTrackingId();
+            $shippingTrackingId = $order->getShippingTrackingId();
+
+            if(!empty($shippingTrackingId)) {
+                $trackingName = $shippingTrackingId;
+            }
+        }
+
+        $shippingConfigMapper = Models_Mapper_ShippingConfigMapper::getInstance();
+        $trackingurlConfig = $shippingConfigMapper->find(self::SHIPPING_TRACKING_URL);
+
+        if(!empty($trackingData) && !empty($trackingurlConfig['enabled'])) {
             foreach ($trackingData as $dataValue) {
+                if($dataValue['id'] == $trackingId) {
+                    $trackingName = str_replace($dataValue['url'], '', $shippingTrackingId);
+                }
                 $arrData[$dataValue['id']] = $dataValue['name'];
             }
 
         }
-        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
+        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault, 'trackingId' => $trackingId, 'trackingName' => $trackingName));
     }
 
 
@@ -1109,6 +1131,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if ($this->_request->isPost()) {
+                $currenttrackingUrlId = '';
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
@@ -1121,11 +1144,13 @@ class Shopping extends Tools_Plugins_Abstract {
                     $shippingUrlMapper->clearDefaultStatus();
                     if (!empty($params['trackingUrlId'])) {
                         $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
-                        if (!empty($currentData)) {
+                        if ($currentData instanceof Models_Model_ShippingUrl) {
                             $selectedName = $currentData->getName();
                             $url = $currentData->getUrl();
                             $currentData->setDefaultStatus(1);
-                            $shippingUrlMapper->save($currentData);
+                            $shippingUrlData = $shippingUrlMapper->save($currentData);
+
+                            $currenttrackingUrlId = $shippingUrlData->getId();
                         }
                     }
                     unset($params['trackingUrlId'], $params['id']);
@@ -1139,6 +1164,8 @@ class Shopping extends Tools_Plugins_Abstract {
                         'url' => $url
                     )));
                     $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+
+                    $params['trackingId'] = $currenttrackingUrlId;
                 }
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);

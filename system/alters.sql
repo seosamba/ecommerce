@@ -447,7 +447,11 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
   FOREIGN KEY (`rule_id`) REFERENCES `shopping_customer_rules_general_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- 19/12/2019
+-- version: 2.7.0
+ALTER TABLE `shopping_cart_session` ADD `tracking_id` int(10) unsigned DEFAULT NULL AFTER `shipping_tracking_id`;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

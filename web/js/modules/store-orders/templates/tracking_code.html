@@ -6,14 +6,16 @@
     <form id="tracking-code-form" method="post">
         <select name="choose-service" id="marketing-services" class="grid_5 alpha fl-left" style="float:none;">
         <% _.each(data, function(name, value){%>
-            <% if (selection === name) { %>
+            <% if (trackingId) {%>
+                <option value="<%= value %>" <%= (value == trackingId ? 'selected' : '') %>><%= name %></option>
+            <% } else if (selection === name) { %>
                 <option value="<%= value %>" selected><%= name %></option>
             <% } else {%>
                 <option value="<%= value %>"><%= name %></option>
             <% } %>
         <%})%>
         </select>
-        <input type="text" name="shippingTrackingId" id="shippingTrackingId" value="" class="grid_7 alpha fl-right">
+        <input type="text" name="shippingTrackingId" id="shippingTrackingId" value="<%= (trackingName) ? trackingName : '' %>" class="grid_7 alpha fl-right">
         <button class="btn green ticon-checkmark save-data" style="margin-top: 10px;" type="submit" title="save">Save</button>
     </form>
 </div>

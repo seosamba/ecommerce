@@ -295,6 +295,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
+  `tracking_id` int(10) unsigned DEFAULT NULL,
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `discount_tax_rate` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '0',
@@ -924,5 +925,5 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.1' WHERE `name` = 'shopping';
 
