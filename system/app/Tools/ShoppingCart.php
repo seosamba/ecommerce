@@ -668,6 +668,10 @@ class Tools_ShoppingCart {
 			$cartSession->setNotes($this->getNotes());
 		}
 
+        if ($this->getAdditionalInfo()) {
+            $cartSession->setAdditionalInfo($this->getAdditionalInfo());
+        }
+
         $cartSession->setIsGift($this->getIsGift());
         $cartSession->setGiftEmail($this->getGiftEmail());
 
