@@ -66,6 +66,8 @@ class Tools_ShoppingCart {
 
     protected $_giftEmail = '';
 
+    protected $_additionalInfo = '';
+
 
 	private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
@@ -1001,6 +1003,25 @@ class Tools_ShoppingCart {
     public function setGiftEmail($giftEmail)
     {
         $this->_giftEmail = $giftEmail;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdditionalInfo()
+    {
+        return $this->_additionalInfo;
+    }
+
+    /**
+     * @param string $additionalInfo
+     * @return string
+     */
+    public function setAdditionalInfo($additionalInfo)
+    {
+        $this->_additionalInfo = $additionalInfo;
 
         return $this;
     }
