@@ -3,8 +3,9 @@ define([
 	'backbone',
     '../collections/zones',
     './zone',
-    '../models/zone'
-], function(_, Backbone, ZonesCollection, ZoneView, ZoneModel){
+    '../models/zone',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(_, Backbone, ZonesCollection, ZoneView, ZoneModel, i18n){
 
     var appView = Backbone.View.extend({
         el: $('#manage-zones'),
@@ -29,12 +30,11 @@ define([
             this.zoneHolder.tabs('option', 'active', lastIndex);
         },
         deleteZone: function(){
-            console.log('dfd');
             var zoneHolder = this.zoneHolder;
                 index = zoneHolder.tabs('option', 'active');
                 model = this.zonesCollection.at(index);
             if (model){
-                showConfirm('Are you sure?', function(){
+                showConfirmCustom(_.isUndefined(i18n['Are you sure?'])?'Are you sure?':i18n['Are you sure?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                     model.destroy();
                 });
             } else {
@@ -49,7 +49,7 @@ define([
             var view = new ZoneView({model: zone}),
                 id   = '#zone-'+zone.cid;
 
-            this.zoneHolder.find('.ui-tabs-nav .add-new-zone').before('<li><a href="#'+zone.cid+'">'+zone.get('name')+'</a></li>')
+            this.zoneHolder.find('.ui-tabs-nav .add-new-zone').before('<li><a href="#'+zone.cid+'">'+zone.get('name')+'</a></li>');
             view.render().$el.appendTo(this.zoneHolder);
             this.zoneHolder.tabs('refresh');
         },
@@ -92,7 +92,7 @@ define([
         render: function(){
             return this;
         }
-    })
+    });
 
 	return appView;
 });

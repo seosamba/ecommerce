@@ -678,6 +678,24 @@ class Tools_ShoppingCart {
             } else {
                 $cartSession->setShippingService(null);
             }
+
+            if (isset($shippingData['service_id'])) {
+                $cartSession->setShippingServiceId($shippingData['service_id']);
+            } else {
+                $cartSession->setShippingServiceId(null);
+            }
+
+            if (isset($shippingData['availability_days'])) {
+                $cartSession->setShippingAvailabilityDays($shippingData['availability_days']);
+            } else {
+                $cartSession->setShippingAvailabilityDays(null);
+            }
+
+            if (isset($shippingData['service_info'])) {
+                $cartSession->setShippingServiceInfo($shippingData['service_info']);
+            } else {
+                $cartSession->setShippingServiceInfo(null);
+            }
         }
 
 		if ($this->getNotes()) {

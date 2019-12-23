@@ -62,6 +62,9 @@ class Api_Store_Orders extends Api_Service_Abstract {
 		if ($count){
 			$orderMapper->lastQueryResultCount($count);
 		}
+
+        $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
 		if ($id){
 			$where = $orderMapper->getDbTable()->getAdapter()->quoteInto('order.id = ?', intval($id));
 			$order = $orderMapper->fetchAll($where);
@@ -104,6 +107,21 @@ class Api_Store_Orders extends Api_Service_Abstract {
 			} else {
 				$orderList = $orderMapper->fetchAll();
 			}
+
+            $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            if ($defaultTaxes instanceof Models_Model_Tax) {
+                $defaultTaxes = array('rate1' => $defaultTaxes->getRate1(), 'rate2' => $defaultTaxes->getRate2(), 'rate3' => $defaultTaxes->getRate3());
+            } else {
+                $defaultTaxes = null;
+            }
+            $orderList['defaultTaxes'] = $defaultTaxes;
+            $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
+            if (!empty($shoppingConfig['realRefundByDefault'])) {
+                $orderList['realRefundByDefault'] = 1;
+            } else {
+                $orderList['realRefundByDefault'] = 0;
+            }
+            $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
 			return $orderList;
 		}
 	}

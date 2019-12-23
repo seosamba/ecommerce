@@ -24,81 +24,83 @@ $this->headLink()
 </style>
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <div id="store-orders" class="toaster-widget clearfix">
-    <form class="filters mb30px clearfix">
-        <div class="grid_12 alpha omega">
-            <label class="h2 mt20px"><?php echo $this->translate('Search');?></label>
-            <input type="text" class="filter grid_3 alpha t-grid_2 t-alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
-            <input type="text" class="filter grid_3 t-grid_2" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
-            <input type="text" class="filter grid_3 omega t-grid_2 t-omega" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
-        <div id="extra-filters-switch" class="fl-right"><a class="btn icon-arrow-down2" href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
-        </div>
+	<div>
+        <form class="filters mb30px clearfix">
+            <div class="grid_12 alpha omega">
+                <label class="h2 mt20px"><?php echo $this->translate('Search');?></label>
+                <input type="text" class="filter grid_3 alpha t-grid_2 t-alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+                <input type="text" class="filter grid_3 t-grid_2" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
+                <input type="text" class="filter grid_3 omega t-grid_2 t-omega" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
+                <div id="extra-filters-switch" class="fl-right"><a class="btn icon-arrow-down2" href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
+            </div>
+            <div id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
+                <p class="grid_3 alpha t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By order amount');?></label>
+                    <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>">
+                    <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>">
+                </p>
+                <p class="grid_3 alpha t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By coupon');?></label>
+                    <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>">
+                </p>
+                <p class="grid_3 alpha t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By date');?></label>
+                    <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>">
+                    <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>">
+                </p>
+                <p class="grid_3 alpha omega t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By order status');?></label>
+                    <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
+                    <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
+                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW); ?></option>
+                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
+                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?></option>
+                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
+                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
+                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?></option>
+                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED); ?></option>
+                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?></option>
+                        <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?></option>
+                        <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?></option>
+                        <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?></option>
+                    </select>
+                </p>
+                <p class="grid_2 alpha hidden recurring-filters t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
+                    <?php echo $this->formSelect('filter-recurring-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), array(
+                        '',
+                        'new' => $this->translate('New'),
+                        'active' => $this->translate('Active'),
+                        'pending' => $this->translate('Pending'),
+                        'expired' => $this->translate('Expired'),
+                        'suspended' => $this->translate('Suspended'),
+                        'canceled' => $this->translate('Canceled')
+                    )); ?>
+                </p>
+                <p class="grid_2 alpha omega t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By order type');?></label>
+                    <?php echo $this->formSelect('filter-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), array(
+                        '',
+                        'cart_imported_id' => $this->translate('Imported'),
+                        'recurring_id' => $this->translate('Recurring'),
+                        'real_order_id' => $this->translate('Regular')
+                    )); ?>
+                </p>
+                <div class="grid_8 omega">
+                    <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
+                    <?php
+                    $countryList = Tools_Geo::getCountries(true);
+                    $countryList = array_merge(array('_' => ''), $countryList);
+                    echo '<div class="grid_4 alpha t-grid_2 t-alpha">' . $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
+                    echo '<div class="grid_4 t-grid_2">' . $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), array('') ) . '</div>';
 
-        <div id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
-            <p class="grid_3 alpha t-grid_3">
-                <label class="text-bold"><?php echo $this->translate('By order amount');?></label>
-                <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>">
-                <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>">
-            </p>
-            <p class="grid_3 alpha t-grid_3">
-                <label class="text-bold"><?php echo $this->translate('By coupon');?></label>
-                <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>">
-            </p>
-            <p class="grid_3 alpha t-grid_3">
-                <label class="text-bold"><?php echo $this->translate('By date');?></label>
-                <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>">
-                <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>">
-            </p>
-            <p class="grid_3 alpha omega t-grid_3">
-                <label class="text-bold"><?php echo $this->translate('By order status');?></label>
-                <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
-                <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
-                         <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW); ?></option>
-                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
-                         <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?></option>
-                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
-                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
-                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?></option>
-                         <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED); ?></option>
-                         <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?></option>
-                         <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?></option>
-                         <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?></option>
-                         <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?></option>
-                </select>
-            </p>
-            <p class="grid_2 alpha hidden recurring-filters t-grid_3">
-                <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
-                <?php echo $this->formSelect('filter-recurring-order-type', null, array(
-                    'class' => 'filter',
-                    'data-placeholder' => $this->translate('show all')
-                ), array(
-                    '',
-                    'new' => $this->translate('New'),
-                    'active' => $this->translate('Active'),
-                    'pending' => $this->translate('Pending'),
-                    'expired' => $this->translate('Expired'),
-                    'suspended' => $this->translate('Suspended'),
-                    'canceled' => $this->translate('Canceled')
-                )); ?>
-            </p>
-            <p class="grid_2 alpha omega t-grid_3">
-                <label class="text-bold"><?php echo $this->translate('By order type');?></label>
-                <?php echo $this->formSelect('filter-order-type', null, array(
-                    'class' => 'filter',
-                    'data-placeholder' => $this->translate('show all')
-                ), array(
-                    '',
-                    'cart_imported_id' => $this->translate('Imported'),
-                    'recurring_id' => $this->translate('Recurring'),
-                    'real_order_id' => $this->translate('Regular')
-                )); ?>
-            </p>
-            <div class="grid_8 omega">
-                <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
-                <?php
-                $countryList = Tools_Geo::getCountries(true);
-                $countryList = array_merge(array('_' => ''), $countryList);
-                echo '<div class="grid_4 alpha t-grid_2 t-alpha">' . $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
-                echo '<div class="grid_4 t-grid_2">' . $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), array('') ) . '</div>';
+
 
                 $shippingServices = array_merge(array(''), $this->shippingServices);
                 echo '<div class="grid_4 omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';

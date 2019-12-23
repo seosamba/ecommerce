@@ -25,6 +25,9 @@ class Api_Store_Customer extends Api_Service_Abstract
         Tools_Security_Acl::ROLE_MEMBER => array(
             'allow' => array('get', 'put')
         ),
+        Shopping::ROLE_SALESPERSON => array(
+            'allow' => array('get', 'put')
+        ),
         Tools_Security_Acl::ROLE_USER => array(
             'allow' => array('get', 'put')
         ),

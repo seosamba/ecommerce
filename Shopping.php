@@ -93,6 +93,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const SHIPPING_TOC_STATUS = 'checkoutShippingTocRequire';
 
+    const SHIPPING_SINGLE_RESULT = 'skipSingleShippingResult';
+
 	const SHIPPING_TOC_LABEL = 'checkoutShippingTocLabel';
 
     const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
@@ -258,6 +260,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
+        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_USERS);
+
 		Zend_Registry::set('acl', $acl);
 	}
 
@@ -805,6 +809,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->configTabs = $configTabs;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
+            $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            $this->_view->defaultTaxes = $defaultTaxes;
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
@@ -989,6 +995,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             $this->_view->customerAttributes = $customerAttributes;
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
+            $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
 			return $this->_view->render('clients.phtml');
 		}
 	}
@@ -1140,6 +1147,13 @@ class Shopping extends Tools_Plugins_Abstract {
                     )));
                     $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
                 }
+
+                if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED) {
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_DELIVERED
+                    )));
+                }
+
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
@@ -2398,6 +2412,92 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
     /**
+     * Process shipping label
+     */
+    public function shippingLabelAction()
+    {
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $availabilityDate = filter_var($this->_request->getParam('availabilityDate'), FILTER_SANITIZE_STRING);
+        $availabilityTime = filter_var($this->_request->getParam('availabilityTime'), FILTER_SANITIZE_STRING);
+        $regenerateLabel = filter_var($this->_request->getParam('regenerate'), FILTER_SANITIZE_STRING);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && !empty($orderId)) {
+            $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $orderModel = $cartSessionMapper->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can create label only for completed or shipped orders'));
+                }
+            }
+
+            $data = array('orderId' => $orderId, 'availabilityDate' => $availabilityDate, 'availabilityTime' => $availabilityTime, 'regenerateLabel' => $regenerateLabel);
+            $shippingLabelInfo = Tools_System_Tools::firePluginMethodByPluginName($orderModel->getShippingService(),
+                'generateLabel', $data, false);
+            if (empty($shippingLabelInfo)) {
+                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow label generation'));
+            }
+
+            if ($shippingLabelInfo['error'] === true) {
+                if (!empty($shippingLabelInfo['regenerate'])) {
+                    $this->_responseHelper->fail(array('regenerate' => true, 'message' => $this->_translator->translate($shippingLabelInfo['message'])));
+                }
+                $this->_responseHelper->fail($this->_translator->translate($shippingLabelInfo['message']));
+            }
+
+            $this->_responseHelper->success(array(
+                'shipping_label_link' => $shippingLabelInfo['shipping_label_link'],
+                'message' => $this->_translator->translate($shippingLabelInfo['message'])
+            ));
+        }
+    }
+
+
+    /**
+     * Get refund shipment screen info
+     */
+    public function getRefundShipmentScreenInfoAction()
+    {
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && !empty($orderId)) {
+            $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $orderModel = $cartSessionMapper->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can do shipment refund only for the completed or shipped orders'));
+                }
+            }
+
+            $data = array('orderId' => $orderId);
+            $shipmentRefundServiceInfo = Tools_System_Tools::firePluginMethodByPluginName($orderModel->getShippingService(),
+                'shipmentRefundServiceInfo', $data, false);
+            if (empty($shipmentRefundServiceInfo)) {
+                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow shipment refund'));
+            }
+
+            if ($shipmentRefundServiceInfo['error'] === true || $shipmentRefundServiceInfo['error'] === 1) {
+                $this->_responseHelper->fail($this->_translator->translate($shipmentRefundServiceInfo['message']));
+            }
+
+            $this->_responseHelper->success(array(
+                'shipment_refund_screen_description' => $shipmentRefundServiceInfo['shipment_refund_screen_description'],
+                'shipment_refund_button_status' => $shipmentRefundServiceInfo['shipment_refund_button_status'],
+                'message' => $this->_translator->translate($shipmentRefundServiceInfo['message'])
+            ));
+        }
+    }
+
+    /*
      * @throws Exceptions_SeotoasterPluginException
      *
      * Change default user group

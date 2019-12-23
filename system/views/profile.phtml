@@ -412,7 +412,12 @@ $this->headScript()
                     }
                 });
             }
-        });
+        },
+            {
+                ok: '<?php echo $this->translate("Ok"); ?>',
+                cancel: '<?php echo $this->translate("Cancel"); ?>'
+            }
+        );
     });
 
     $('#orders-table').on('mouseenter', 'td.current-status', function(){
@@ -546,7 +551,7 @@ $this->headScript()
         }
 
         if(fieldValue != oldValue){
-            showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+            showConfirmCustom('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>',
                 function (){
                     sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, countryCode, thisEl);
                 }, function () {

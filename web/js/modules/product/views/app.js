@@ -542,7 +542,7 @@ define([
         renderBrands: function(brands){
             var tmpl = _.template("<% _.each(brands, function(brand){ %><option value='<%= brand %>'><%= brand %></option><% }); %>");
 
-            $('#product-brand').html('<option value="-1" disabled>Select a brand</option>' +
+            $('#product-brand').html('<option value="-1" disabled="disable">'+ _.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand'] +'</option>' +
                 tmpl({brands: _.sortBy(brands, function(v){ return v.toLowerCase();}) })
             );
 
@@ -627,7 +627,7 @@ define([
                 showMessage(_.isUndefined(i18n['Product is not saved yet'])?'Product is not saved yet':i18n['Product is not saved yet'], true);
 				return false;
 			}
-            showConfirm('Dragons ahead! Are you sure?', function(){
+            showConfirmCustom(_.isUndefined(i18n['Do you want to delete it?'])?'Do you want to delete it?':i18n['Do you want to delete it?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 self.model.destroy({
                     success: function(model, response){
                         self.products && self.products.pager();
@@ -888,7 +888,7 @@ define([
         },
         massDelete: function(ids){
             var self = this;
-            showConfirm('Oh man... Really?', function(){
+            showConfirmCustom(_.isUndefined(i18n['Oh man... Really?'])?'Oh man... Really?':i18n['Oh man... Really?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (!_.isEmpty(ids)) {
                     $.ajax({
                         url: self.products.paginator_core.url()+'id/'+ids.join(','),

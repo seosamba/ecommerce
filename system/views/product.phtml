@@ -235,7 +235,10 @@ $this->headLink()
             <ul class="header">
                 <?php foreach ($this->configTabs as $configTab) :?>
                     <?php if ($configTab['type'] === 'internal') :?>
-                        <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
+                        <?php if(!empty($this->generalConfig['hideGroupPriceTabFromProduct']) && $configTab['tabId'] === 'group-pricing-tab') :?>
+                        <?php else:?>
+                            <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
+                        <?php endif;?>
                     <?php else :?>
                         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $configTab['tabId'];?>/run/tab/""><?php echo $this->translate($configTab['tabName']);?></a></li>
                     <?php endif;?>
@@ -378,11 +381,19 @@ $this->headLink()
                     <label class="grid_6 mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
 
                     <div class="grid_12 alpha omega mt1-5em labeled">
+                        <?php $defaultTaxLabel = $this->translate('Default'); ?>
+                        <?php $alternativeTaxLabel = $this->translate('Alternative'); ?>
+                        <?php $alternative2TaxLabel = $this->translate('Alternative 2'); ?>
+                        <?php if (!empty($this->defaultTaxes)):?>
+                            <?php $defaultTaxLabel .=' '.(($this->defaultTaxes->getRate1() === '0.00') ? 0 : $this->defaultTaxes->getRate1()).' %'; ?>
+                            <?php $alternativeTaxLabel .=' '.(($this->defaultTaxes->getRate2() === '0.00') ? 0 : $this->defaultTaxes->getRate2()).' %'; ?>
+                            <?php $alternative2TaxLabel .=' '.(($this->defaultTaxes->getRate3() === '0.00') ? 0 : $this->defaultTaxes->getRate3()).' %'; ?>
+                        <?php endif;?>
                         <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
                             <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
-                            <option value="1"><?php echo $this->translate('Default'); ?></option>
-                            <option value="2"><?php echo $this->translate('Alternative'); ?></option>
-                            <option value="3"><?php echo $this->translate('Alternative 2'); ?></option>
+                            <option value="1"><?php echo $defaultTaxLabel;?></option>
+                            <option value="2"><?php echo $alternativeTaxLabel;?></option>
+                            <option value="3"><?php echo $alternative2TaxLabel;?></option>
                         </select>
                         <label class="grid_2 alpha omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
                     </div>
@@ -439,11 +450,12 @@ $this->headLink()
             <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
             <?php echo $this->partial('merchandising/coupon.phtml'); ?>
         </div>
-
-        <div id="group-pricing-tab">
-            <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
-            <?php echo $this->partial('product/grouping-price.phtml'); ?>
-        </div>
+        <?php if(empty($this->generalConfig['hideGroupPriceTabFromProduct'])) :?>
+            <div id="group-pricing-tab">
+                <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
+                <?php echo $this->partial('product/grouping-price.phtml'); ?>
+            </div>
+        <?php endif;?>
 
         <div id="digital-product-tab">
             <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
