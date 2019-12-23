@@ -308,9 +308,19 @@ class Api_Store_Products extends Api_Service_Abstract {
                 }
 
 				$product->setOptions($srcData);
-				if ($this->_productMapper->save($product)){
-					$data[] = $product->toArray();
-				}
+                $currentProductWithSkuModel = $this->_productMapper->findBySku($product->getSku());
+                if ($currentProductWithSkuModel instanceof Models_Model_Product) {
+                    if ($productId != $currentProductWithSkuModel->getId()) {
+                        $this->_error('Product with the same sku already exists');
+                    }
+                }
+                try {
+                    if ($this->_productMapper->save($product)) {
+                        $data[] = $product->toArray();
+                    }
+                } catch (Exception $e) {
+                    $this->_error('Something went wrong. Please contact support.');
+                }
 			}
 
 			if (count($data) === 1){

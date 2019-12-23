@@ -412,8 +412,43 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 ALTER TABLE `shopping_pickup_location` ADD `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_pickup_location` ADD `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
 
--- 12/12/2019
+-- 02/12/2019
 -- version: 2.6.9
+CREATE TABLE IF NOT EXISTS `shopping_customer_rules_general_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `rule_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` TIMESTAMP NOT NULL,
+  `creator_id` INT(10) UNSIGNED DEFAULT NULL,
+  `updated_at` TIMESTAMP NOT NULL,
+  `editor_id` INT(10) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY(`id`),
+  FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  FOREIGN KEY (`editor_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  UNIQUE (`rule_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_rules_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `rule_id` INT(10) UNSIGNED NOT NULL,
+  `field_name` VARCHAR (255) COLLATE utf8_unicode_ci NOT NULL,
+  `rule_comparison_operator` ENUM('equal', 'notequal', 'like', 'in', 'greaterthan', 'lessthan') DEFAULT 'equal',
+  `field_value` MEDIUMTEXT COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  FOREIGN KEY (`rule_id`) REFERENCES `shopping_customer_rules_general_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `rule_id` INT(10) UNSIGNED NOT NULL,
+  `action_type` ENUM ('assign_group') DEFAULT 'assign_group',
+  `action_config` TEXT COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE(`rule_id`, `action_type`),
+  FOREIGN KEY (`rule_id`) REFERENCES `shopping_customer_rules_general_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 12/12/2019
+-- version: 2.7.0
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id' AFTER `shipping_tracking_id`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format' AFTER `shipping_service_id`;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format' AFTER `shipping_availability_days`;
@@ -428,6 +463,6 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 ALTER TABLE `shopping_customer_address` ADD COLUMN `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

@@ -39,6 +39,9 @@
             <% editButton = i18n['edit'] %>
         <% } %>
         <a href="javascript:;" class="setTracking">[&nbsp;<%= _.isNull(shipping_tracking_id) ? addButton : editButton %>&nbsp;]</a>
+        <% if(!_.isNull(shipping_tracking_id)) { %>
+            <a target="_blank" class="tracking-link" href="<%= shipping_tracking_id %>"><%= _.isUndefined(i18n['Where is my order?']) ? 'Where is my order?':i18n['Where is my order?'] %></a>
+        <% } %>
 <% } %>
     </p>
     <% } %>

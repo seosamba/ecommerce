@@ -429,9 +429,10 @@ class Shopping extends Tools_Plugins_Abstract {
 	 * Method creates customer or returns existing one
 	 * @static
 	 * @param $data array Customer details
+     * @param $customParams custom params
 	 * @return Models_Model_Customer
 	 */
-	public static function processCustomer($data) {
+	public static function processCustomer($data, $customParams = array()) {
 		$session = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
 
 		$customer = Tools_ShoppingCart::getInstance()->getCustomer();
@@ -485,8 +486,34 @@ class Shopping extends Tools_Plugins_Abstract {
                     $customer->setGroupId($defaultUserGroupId);
                 }
 
-				$newCustomerId = Models_Mapper_CustomerMapper::getInstance()->save($customer);
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+				$newCustomerId = $customerMapper->save($customer);
+
+				if (!empty($customParams)) {
+                    foreach ($customParams as $paramName => $paramLabel) {
+                        $customer->setAttribute($paramName, $data[$paramName]);
+                    }
+                    Application_Model_Mappers_UserMapper::getInstance()->saveUserAttributes($customer);
+                }
+
 				if ($newCustomerId) {
+                    $customParamsAssignment = false;
+				    if (!empty($customParams)) {
+                        $preparedCustomParams = array();
+                        foreach ($customParams as $paramName => $paramLabel) {
+                            $preparedCustomParams[$paramName] = $data[$paramName];
+                        }
+                        $processCustomParamsResult = Tools_GroupAssignment::processGroupsByUserCustomParams($newCustomerId, $preparedCustomParams);
+                        if (!empty($processCustomParamsResult) && empty($processCustomParamsResult['error'])) {
+                            $customParamsAssignment = true;
+                        }
+                        $customerInfo = $customerMapper->find($newCustomerId);
+                        $groupId = $customerInfo->getGroupId();
+                        if (!empty($groupId)) {
+                            $customer->setGroupId($groupId);
+                        }
+                    }
+
 //					Tools_ShoppingCart::getInstance()->setCustomerId($newCustomerId)->save();
 					$customer->setId($newCustomerId);
 					$session->storeIsNewCustomer = true;
@@ -496,7 +523,7 @@ class Shopping extends Tools_Plugins_Abstract {
                         unset($session->clientWithNewPassword);
                     }
 
-                    if(!empty($defaultUserGroupId)){
+                    if(!empty($defaultUserGroupId) || $customParamsAssignment === true){
                         $userMapper = Application_Model_Mappers_UserMapper::getInstance();
                         $userModel = $userMapper->find($newCustomerId);
 
