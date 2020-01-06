@@ -82,15 +82,21 @@ $this->headLink()
                 </p>
                 <p class="grid_2 alpha omega t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order type');?></label>
-                    <?php echo $this->formSelect('filter-order-type', null, array(
-                        'class' => 'filter',
-                        'data-placeholder' => $this->translate('show all')
-                    ), array(
+                    <?php $orderTypes = array(
                         '',
                         'cart_imported_id' => $this->translate('Imported'),
                         'recurring_id' => $this->translate('Recurring'),
                         'real_order_id' => $this->translate('Regular')
-                    )); ?>
+                    );?>
+                    <?php if(!empty($this->orderSubtypes)):?>
+                        <?php foreach ($this->orderSubtypes as $orderSubtype):?>
+                            <?php $orderTypes[$orderSubtype] = $this->translate(ucfirst($orderSubtype));?>
+                        <?php endforeach;?>
+                    <?php endif;?>
+                    <?php echo $this->formSelect('filter-order-type', null, array(
+                        'class' => 'filter',
+                        'data-placeholder' => $this->translate('show all')
+                    ), $orderTypes); ?>
                 </p>
                 <div class="grid_8 omega">
                     <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
@@ -134,7 +140,7 @@ $this->headLink()
                     <?php if(isset($this->invoicePlugin)):?>
                         <th class="text-center"><?php echo $this->translate('Invoice & packing slip');?></th>
                     <?php endif;?>
-                    <th class="sortable" data-sortkey="real_order_id"><?php echo $this->translate('Order type');?></th>
+                    <th data-sortkey="real_order_id"><?php echo $this->translate('Order type');?></th>
                 </tr>
             </thead>
             <tbody id="orders-list">

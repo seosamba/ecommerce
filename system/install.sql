@@ -317,6 +317,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
+  `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -929,5 +930,5 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.2' WHERE `name` = 'shopping';
 
