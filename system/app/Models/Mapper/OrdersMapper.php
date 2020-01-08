@@ -373,6 +373,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         if ($val === 'real_order_id') {
                             $select->where('shrp.cart_id IS NULL');
                             $select->where('imp.real_order_id IS NULL');
+                            $subWhere = '( order.order_subtype = "" OR order.order_subtype IS NULL';
+                            $subWhere .= ')';
+                            $select->where($subWhere);
                         }
                         if ($val === 'cart_imported_id') {
                             $select->where('imp.real_order_id IS NOT NULL');
