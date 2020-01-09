@@ -462,7 +462,11 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 ALTER TABLE `shopping_customer_address` ADD COLUMN `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
 
+-- 06/01/2020
+-- version: 2.7.1
+ALTER TABLE `shopping_cart_session` ADD `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

@@ -97,6 +97,8 @@
         <%= _.isUndefined(i18n['Imported']) ? 'Imported':i18n['Imported'] %>
       <% } else if(!_.isNull(recurring_id)) { %>
         <%= _.isUndefined(i18n['Recurring']) ? 'Recurring':i18n['Recurring'] %>
+      <% } else if(!_.isNull(order_subtype) && order_subtype !== '') { %>
+            <%= _.isUndefined(i18n[order_subtype]) ? order_subtype :i18n[order_subtype] %>
       <% } else { %>
         <%= _.isUndefined(i18n['Regular']) ? 'Regular':i18n['Regular'] %>
       <% } %>

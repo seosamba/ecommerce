@@ -50,7 +50,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'purchased_on'          => $model->getPurchasedOn(),
             'additional_info'       => $model->getAdditionalInfo(),
             'is_gift'               => $model->getIsGift(),
-            'gift_email'            => $model->getGiftEmail()
+            'gift_email'            => $model->getGiftEmail(),
+            'order_subtype'         => $model->getOrderSubtype()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

@@ -117,6 +117,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_giftEmail = '';
 
+    protected $_orderSubtype = '';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -547,6 +549,25 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getOrderSubtype()
+    {
+        return $this->_orderSubtype;
+    }
+
+    /**
+     * @param string $orderSubtype
+     * @return Models_Model_CartSession
+     */
+    public function setOrderSubtype($orderSubtype)
+    {
+        $this->_orderSubtype = $orderSubtype;
+        return $this;
+    }
+
 
 
 }
