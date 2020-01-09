@@ -2,6 +2,7 @@
 <td class="editable text-left" data-prop="name">
     <a href="javascript:;" title="Click to open editor" class="tpopup" data-url="<%= $('#website_url').val() %>plugin/shopping/run/product/id/<%= id%>"><%= name %></a>
 </td>
+<td class="editable" data-prop="inventory"><%= (_.isNull(inventory) ||  inventory == '') ? (_.isUndefined(i18n['unlimited']) ? 'unlimited':i18n['unlimited']) : inventory %></td>
 <td><%= brand %></td>
 <td data-prop="supplier-companies">
     <% if (this.model.has('suppliersCompanies') && this.model.has('companyInfo')) {%>
@@ -18,7 +19,7 @@
         <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/spinner_16.gif" alt="loading" />
     <% } %>
 </td>
-<td class="editable " data-prop="sku"><%= sku %></td>
+<td class="editable" data-prop="sku"><%= sku %></td>
 <td class="editable" data-prop="mpn"><%= mpn %></td>
 <% if (freeShipping == '0' || _.isNull(freeShipping)){%>
     <td><%= _.isUndefined(i18n['no']) ? 'no':i18n['no'] %></td>

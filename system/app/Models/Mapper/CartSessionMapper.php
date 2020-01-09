@@ -43,10 +43,15 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'free_cart'             => $model->getFreeCart(),
             'refund_amount'         => $model->getRefundAmount(),
             'refund_notes'          => $model->getRefundNotes(),
+            'shipping_service_id'   => $model->getShippingServiceId(),
+            'shipping_availability_days' => $model->getShippingAvailabilityDays(),
+            'shipping_service_info' => $model->getShippingServiceInfo(),
+            'shipping_label_link' => $model->getShippingLabelLink(),
             'purchased_on'          => $model->getPurchasedOn(),
             'additional_info'       => $model->getAdditionalInfo(),
             'is_gift'               => $model->getIsGift(),
-            'gift_email'            => $model->getGiftEmail()
+            'gift_email'            => $model->getGiftEmail(),
+            'order_subtype'         => $model->getOrderSubtype()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

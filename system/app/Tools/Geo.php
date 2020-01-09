@@ -102,6 +102,8 @@ class Tools_Geo {
 		if (is_array($markers) && !is_array(current($markers))){
 			$markers = array($markers);
 		}
+        $generalConfig = Application_Model_Mappers_ConfigMapper::getInstance()->getConfig();
+
 		$params = array(
 			'sensor'    => 'false',
 			'size'      => intval($width).'x'.intval($height),
@@ -116,7 +118,6 @@ class Tools_Geo {
 			$addressLine = implode(', ', array_filter(array(
 				$countries[$marker['country']],
 				$marker['address1'],
-				$marker['address2'],
 				$marker['city'],
 				$state['state'],
 				$marker['zip'],
@@ -126,10 +127,13 @@ class Tools_Geo {
 
 		$params['markers'] = implode('|', $params['markers']);
 
-        $googleApiKey = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('googleApiKey');
+        if(!empty($generalConfig['googleApiKey'])) {
+            $params['key'] = $generalConfig['googleApiKey'];
+            $googleApiKey = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig('googleApiKey');
 
-        if(!empty($googleApiKey)) {
-            $params['key'] = $googleApiKey;
+            if (!empty($googleApiKey)) {
+                $params['key'] = $googleApiKey;
+            }
         }
 
 		return 'https://maps.googleapis.com/maps/api/staticmap?'.http_build_query($params);

@@ -132,6 +132,7 @@ Plugin widgets.
     {$postpurchase:billing:phone} -> billing address phone
     {$postpurchase:billing:mobile} -> billing address mobile
     {$postpurchase:billing:email} -> billing address email
+    {$postpurchase:billing:customer_notes} -> billing customer notes
 
     ######### Shipping information #############
     {$postpurchase:shipping:prefix} -> shipping prefix
@@ -145,6 +146,7 @@ Plugin widgets.
     {$postpurchase:shipping:country} -> shipping address country
     {$postpurchase:shipping:phone} -> shipping address phone
     {$postpurchase:shipping:mobile} -> shipping address mobile
+    {$postpurchase:shipping:customer_notes} -> shipping customer notes
     {$postpurchase:shipping:email} -> shipping address email
 
     This type of widgets you can use inside 'postpurchasecartcontent' magic space

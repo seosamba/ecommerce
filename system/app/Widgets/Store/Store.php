@@ -123,6 +123,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
                     $this->_view->invoicePlugin = 1;
                 }
             }
+
+            $ordersMapper = Models_Mapper_OrdersMapper::getInstance();
+            $orderSubtypes = $ordersMapper->getUniqueSubtypes();
+            $orderSubtypes = array_filter($orderSubtypes);
+            $this->_view->orderSubtypes = $orderSubtypes;
 			return $this->_view->render('orders.phtml');
 		}
 	}

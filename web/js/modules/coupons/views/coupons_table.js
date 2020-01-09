@@ -29,7 +29,16 @@ define([
                 "bPaginate": true,
                 "iDisplayLength": 7,
                 "bAutoWidth": false,
-                "aoColumnDefs": aoColumnDefs
+                "aoColumnDefs": aoColumnDefs,
+                "oLanguage": {
+                    "sEmptyTable": _.isUndefined(i18n['No data available in table'])?'No data available in table':i18n['No data available in table'],
+                    "oPaginate": {
+                        "sFirst":    _.isUndefined(i18n['First page'])?'First page':i18n['First page'],
+                        "sLast":     _.isUndefined(i18n['Last page'])?'Last page':i18n['Last page'],
+                        "sNext":     _.isUndefined(i18n['Next page'])?'Next page':i18n['Next page'],
+                        "sPrevious": _.isUndefined(i18n['Previous page'])?'Previous page':i18n['Previous page']
+                    }
+                }
             });
             this.coupons = new CouponsCollection();
             this.coupons.on('reset', this.renderCoupons, this);
@@ -44,6 +53,7 @@ define([
             this.coupons.each(this.renderCoupon, this);
         },
         renderCoupon: function(coupon){
+            var couponType = coupon.get('type');
             var usageInfo = 'unlimited';
             if(coupon.get('oneTimeUse') === '1') {
                 usageInfo = 'one time';
@@ -53,11 +63,12 @@ define([
 
             this.$el.fnAddData([
                 coupon.get('id'),
-                (coupon.get('type') === 'freeshipping' ? 'free shipping' : coupon.get('type') ),
+                (couponType === 'freeshipping' ? _.isUndefined(i18n['free shipping'])?'free shipping':i18n['free shipping'] : _.isUndefined(i18n[couponType])?couponType:i18n[couponType] ),
                 '<a class="coupon-code-dashboard" data-coupon-code-dashboard="'+coupon.get('code')+'" href="'+$('#website_url').val()+'dashboard/orders/" target="_blank">'+coupon.get('code')+'</a>',
                 coupon.get('startDate'),
                 coupon.get('endDate'),
-                coupon.get('allowCombination') === '1' ? 'yes' : 'no',
+                coupon.get('allowCombination') === '1' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : _.isUndefined(i18n['no'])?'no':i18n['no'],
+                coupon.get('scope') === 'client' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : '-',
                 usageInfo,
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';

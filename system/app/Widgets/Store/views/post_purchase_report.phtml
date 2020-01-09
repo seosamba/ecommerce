@@ -1,328 +1,348 @@
 <?php $countries = Tools_Geo::getCountries(true); ?>
 <?php if (!isset($this->mailReport)): ?>
-	<div class="post-purchase">
-	<h3 class="post-purchase-report-customer-order-id"><?php echo $this->translate('Order number');?> # <?php echo $this->cart->getId();?></h3>
+    <div class="post-purchase">
+        <h3 class="post-purchase-report-customer-order-id"><?php echo $this->translate('Order number'); ?>
+            # <?php echo $this->cart->getId(); ?></h3>
 
-	<p class="createdOrderDate"><?php echo date("d-M-Y", strtotime($this->cart->getCreatedAt()));?></p>
+        <p class="createdOrderDate"><?php echo date("d-M-Y", strtotime($this->cart->getCreatedAt())); ?></p>
 
-	<div class="post-purchase-report-billing">
-		<h4 class="title"><?php echo $this->translate('Billing Address');?>:</h4>
+        <div class="post-purchase-report-billing">
+            <h4 class="title"><?php echo $this->translate('Billing Address'); ?>:</h4>
 
-		<div class="post-purchase-report-billing-address">
-			<?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
-				<?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
-                <span><?php echo $billingAddress['firstname'];?></span>
-                <span><?php echo $billingAddress['lastname'];?></span>
-                <br/>
-				<span class="street-address"><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2'];?></span>
-				<br/>
-				<span class="locality"><?php echo $billingAddress['city'] . ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : '');?></span>
-				<?php $state = Tools_Geo::getStateByParam($billingAddress['state']); ?>
-				<?php if (!empty($state)): ?>
-					<span class="region"><?php echo $state . ',';?></span>
-				<?php endif; ?>
-				<span class="postal-code"><?php echo $billingAddress['zip'];?></span>
-				<br/>
-				<span><?php echo $countries[$billingAddress['country']];?></span>
-				<br/>
-				<?php if (isset($billingAddress['phone']) && $billingAddress['phone'] != ''): ?>
-					<span><?php echo $this->translate('Phone');?>: <?php echo $billingAddress['phone_country_code_value'].$billingAddress['phone'];?></span>
-					<br/>
-				<?php endif; ?>
-				<?php if (isset($billingAddress['mobile']) && $billingAddress['mobile'] != ''): ?>
-					<span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
-					<br/>
-				<?php endif; ?>
-				<?php if (isset($billingAddress['email']) && $billingAddress['email'] != ''): ?>
-					<span><?php echo $this->translate('Email');?>: <?php echo $billingAddress['email'];?></span>
-					<br/>
-				<?php endif; ?>
-				<span><?php echo $this->translate('Payment Method');?>
-					: <?php echo $this->cart->getGateway();?></span>
-			<?php else: ?>
-				<span><?php echo $this->translate('not provided');?></span>
-			<?php endif;?>
-            <?php if($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
-                <div class="pickup-location-info">
-                    <h4 class="title"><?php echo $this->translate('Location info');?>:</h4>
-                    <p><?php echo $this->translate('Location name');?>: <span class="location-name"><?php echo $this->pickupLocationData['name'];?></span></p>
-                    <p><?php echo $this->translate('Location phone');?>: <span class="location-phone"><?php echo $this->pickupLocationData['phone'];?></span></p>
-                    <?php $pickupWorkingHours = unserialize($this->pickupLocationData['working_hours']);?>
-                    <div class="location-working-hours">
-                        <p><?php echo $this->translate('Sunday');?>: <span><?php echo $pickupWorkingHours['sunday'];?></span></p>
-                        <p><?php echo $this->translate('Monday');?>: <span><?php echo $pickupWorkingHours['monday'];?></span></p>
-                        <p><?php echo $this->translate('Tuesday');?>: <span><?php echo $pickupWorkingHours['tuesday'];?></span></p>
-                        <p><?php echo $this->translate('Wednesday');?>: <span><?php echo $pickupWorkingHours['wednesday'];?></span></p>
-                        <p><?php echo $this->translate('Thursday');?>: <span><?php echo $pickupWorkingHours['thursday'];?></span></p>
-                        <p><?php echo $this->translate('Friday');?>: <span><?php echo $pickupWorkingHours['friday'];?></span></p>
-                        <p><?php echo $this->translate('Saturday');?>: <span><?php echo $pickupWorkingHours['saturday'];?></span></p>
-                    </div>
-                </div>
-            <?php endif;?>
-		</div>
-	</div>
-
-	<div class="post-purchase-report-shipping">
-		<h4 class="title"><?php echo $this->translate($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP ? 'Pickup information' : 'Shipping Address'); ?>
-			:</h4>
-
-		<div class="post-purchase-report-shipping-address">
-			<?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
-			<?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId);?>
-            <?php if(isset($shippingAddress['company']) && $shippingAddress['company'] != ''):?>
-                <span><?php echo $shippingAddress['company'];?></span><br />
-            <?php endif;?>
-            <span><?php echo $shippingAddress['firstname'];?></span>
-			<span><?php echo $shippingAddress['lastname'];?></span>
-			<br/>
-			<?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && $this->defaultPickup) : ?>
-			<span><?php echo $shippingAddress['phone'];?></span>
-		</div>
-		<h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
-
-		<div>
-			<span class="company"><?php echo $this->shoppingConfig['company'];?></span><br/>
-			<span class="phone"><?php echo $this->translate('Phone') . ': ' . $this->shoppingConfig['phone'];?></span><br/>
-			<span class="street-address"><?php echo $this->shoppingConfig['address1'] . ' ' . $this->shoppingConfig['address2'];?></span>
-			<br/>
-			<span class="locality"><?php echo $this->shoppingConfig['city'] . ($this->shoppingConfig['city'] && ($this->shoppingConfig['state'] || $this->shoppingConfig['zip']) ? ',' : '');?></span>
-			<span class="region"><?php $state = Tools_Geo::getStateById($this->shoppingConfig['state']); echo $state['state']; ?></span>
-			<span class="postal-code"><?php echo $this->shoppingConfig['zip'];?></span>
-			<br/>
-			<span><?php echo $this->shoppingConfig['country'];?></span>
-			<br/>
-			<img class="pickup-location-map" src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig, 640, 300); ?>" alt="">
-            <?php elseif($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
-                <span><?php echo $shippingAddress['phone'];?></span>
-                </div>
-                <h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
-                <div>
-                    <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
+            <div class="post-purchase-report-billing-address">
+                <?php if (null !== ($billingAddressId = $this->cart->getBillingAddressId())): ?>
+                    <?php $billingAddress = Tools_ShoppingCart::getAddressById($billingAddressId); ?>
+                    <span><?php echo $billingAddress['firstname']; ?></span>
+                    <span><?php echo $billingAddress['lastname']; ?></span>
                     <br/>
-                    <span class="locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
-                    <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
-                    <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
+                    <span class="street-address"><?php echo $billingAddress['address1'] . ' ' . $billingAddress['address2']; ?></span>
                     <br/>
-                    <span><?php echo $countries[$shippingAddress['country']];?></span>
+                    <span class="locality"><?php echo $billingAddress['city'] . ($billingAddress['city'] && ($billingAddress['state'] || $billingAddress['zip']) ? ',' : ''); ?></span>
+                    <?php $state = Tools_Geo::getStateByParam($billingAddress['state']); ?>
+                    <?php if (!empty($state)): ?>
+                        <span class="region"><?php echo $state . ','; ?></span>
+                    <?php endif; ?>
+                    <span class="postal-code"><?php echo $billingAddress['zip']; ?></span>
                     <br/>
-                   <a href="<?php echo 'https://maps.google.com/?q='.$shippingAddress['address1'].'+'.$shippingAddress['city'].'+'.$shippingAddress['state'];?>" target="_blank">
-                     <img class="pickup-location-map" src="<?php echo Tools_Geo::generateStaticGmaps($shippingAddress, 640, 300); ?>" alt="">
-                   </a>
-            <?php else : ?>
-				<span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2'];?></span>
-				<br/>
-				<span class="locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');?></span>
-				<?php $state = Tools_Geo::getStateById($shippingAddress['state']); ?>
-				<?php if (isset($state['state']) && $state['state'] != ''): ?>
-					<span class="region"><?php echo $state['state'] . ','; ?></span>
-				<?php endif; ?>
-				<span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
-				<br/>
-                <?php if(isset($countries[$shippingAddress['country']])):?>
-				    <span><?php echo $countries[$shippingAddress['country']];?></span>
-				    <br/>
+                    <span><?php echo $countries[$billingAddress['country']]; ?></span>
+                    <br/>
+                    <?php if (isset($billingAddress['phone']) && $billingAddress['phone'] != ''): ?>
+                        <span><?php echo $this->translate('Phone'); ?>
+                            : <?php echo $billingAddress['phone_country_code_value'] . $billingAddress['phone']; ?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <?php if (isset($billingAddress['mobile']) && $billingAddress['mobile'] != ''): ?>
+                        <span><?php echo $this->translate('Mobile'); ?>
+                            : <?php echo $billingAddress['mobile_country_code_value'] . $billingAddress['mobile']; ?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <?php if (isset($billingAddress['email']) && $billingAddress['email'] != ''): ?>
+                        <span><?php echo $this->translate('Email'); ?>: <?php echo $billingAddress['email']; ?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <span><?php echo $this->translate('Payment Method'); ?>
+                        : <?php echo $this->cart->getGateway(); ?></span>
+                <?php else: ?>
+                    <span><?php echo $this->translate('not provided'); ?></span>
                 <?php endif; ?>
-				<?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
-					<span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
-					<br/>
-				<?php endif; ?>
-				<?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
-					<span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
-					<br/>
-				<?php endif; ?>
-			<?php endif;?>
-			<?php else: ?>
-				<span><?php echo $this->translate('not provided');?></span>
-			<?php endif;?>
-		</div>
-	</div>
-	<div style="clear:both"></div>
-	<table class="post-purchase-report cart-content">
-		<thead>
-		<tr>
-			<th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
-			<?php if (!isset($this->renamedTableRows)): ?>
-				<?php if (isset($this->additionalTableRows)): ?>
-					<?php foreach ($this->additionalTableRows as $tableRow): ?>
-						<th class="product-unit-additional-row"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
-					<?php endforeach; ?>
-				<?php endif; ?>
-			<?php else: ?>
-				<?php if (isset($this->renamedTableRows)): ?>
-					<?php foreach ($this->renamedTableRows as $tableRow): ?>
-						<th class="product-unit-additional-row"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
-					<?php endforeach; ?>
-				<?php endif; ?>
-			<?php endif; ?>
-			<th class="product-unit-price"><?php echo $this->translate('Price'); ?></th>
-			<th class="product-qty"><?php echo $this->translate('Qty'); ?></th>
-			<th class="product-total"><?php echo $this->translate('Total'); ?></th>
-		</tr>
-		</thead>
-		<tbody>
-		<?php foreach ($this->cartContent as $product) : ?>
-			<tr>
-				<td class="product-img">
-					<?php if (isset($product['photo']) && $product['photo'] != ''): ?>
-						<a class="page-teaser-image"
-						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
-						   title="<?php echo $product['name']; ?>" target="_blank">
-							<img src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
-							     width="100" height="100" alt="<?php echo $product['name']; ?>"/>
-						</a>
-					<?php else: ?>
-						<img src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
-						     width="100" height="100" alt="<?php echo $product['name']; ?>"/>
-					<?php endif;?>
-				</td>
-				<td class="product-info">
-					<span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
-					<?php if (!empty($product['options'])): ?>
-						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
-							<?php
-							if (is_array($optData)) {
-								$optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
-								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-                                    if (!empty($product['productDiscounts'])) {
-                                        foreach ($product['productDiscounts'] as $discountRule) {
-                                            $optData['priceValue'] = Tools_DiscountTools::applyDiscountData($optData['priceValue'],
-                                                $discountRule, false, true);
+                <?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                    <div class="pickup-location-info">
+                        <h4 class="title"><?php echo $this->translate('Location info'); ?>:</h4>
+                        <p><?php echo $this->translate('Location name'); ?>: <span
+                                    class="location-name"><?php echo $this->pickupLocationData['name']; ?></span></p>
+                        <p><?php echo $this->translate('Location phone'); ?>: <span
+                                    class="location-phone"><?php echo $this->pickupLocationData['phone']; ?></span></p>
+                        <?php $pickupWorkingHours = unserialize($this->pickupLocationData['working_hours']); ?>
+                        <div class="location-working-hours">
+                            <p><?php echo $this->translate('Sunday'); ?>:
+                                <span><?php echo $pickupWorkingHours['sunday']; ?></span></p>
+                            <p><?php echo $this->translate('Monday'); ?>:
+                                <span><?php echo $pickupWorkingHours['monday']; ?></span></p>
+                            <p><?php echo $this->translate('Tuesday'); ?>:
+                                <span><?php echo $pickupWorkingHours['tuesday']; ?></span></p>
+                            <p><?php echo $this->translate('Wednesday'); ?>:
+                                <span><?php echo $pickupWorkingHours['wednesday']; ?></span></p>
+                            <p><?php echo $this->translate('Thursday'); ?>:
+                                <span><?php echo $pickupWorkingHours['thursday']; ?></span></p>
+                            <p><?php echo $this->translate('Friday'); ?>:
+                                <span><?php echo $pickupWorkingHours['friday']; ?></span></p>
+                            <p><?php echo $this->translate('Saturday'); ?>:
+                                <span><?php echo $pickupWorkingHours['saturday']; ?></span></p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="post-purchase-report-shipping">
+            <h4 class="title"><?php echo $this->translate($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP ? 'Pickup information' : 'Shipping Address'); ?>
+                :</h4>
+
+            <div class="post-purchase-report-shipping-address">
+                <?php if (null !== ($shippingAddressId = $this->cart->getShippingAddressId())): ?>
+                <?php $shippingAddress = Tools_ShoppingCart::getAddressById($shippingAddressId); ?>
+                <?php if (isset($shippingAddress['company']) && $shippingAddress['company'] != ''): ?>
+                    <span><?php echo $shippingAddress['company']; ?></span><br/>
+                <?php endif; ?>
+                <span><?php echo $shippingAddress['firstname']; ?></span>
+                <span><?php echo $shippingAddress['lastname']; ?></span>
+                <br/>
+                <?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && $this->defaultPickup) : ?>
+                <span><?php echo $shippingAddress['phone']; ?></span>
+            </div>
+            <h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
+
+            <div>
+                <span class="company"><?php echo $this->shoppingConfig['company']; ?></span><br/>
+                <span class="phone"><?php echo $this->translate('Phone') . ': ' . $this->shoppingConfig['phone']; ?></span><br/>
+                <span class="street-address"><?php echo $this->shoppingConfig['address1'] . ' ' . $this->shoppingConfig['address2']; ?></span>
+                <br/>
+                <span class="locality"><?php echo $this->shoppingConfig['city'] . ($this->shoppingConfig['city'] && ($this->shoppingConfig['state'] || $this->shoppingConfig['zip']) ? ',' : ''); ?></span>
+                <span class="region"><?php $state = Tools_Geo::getStateById($this->shoppingConfig['state']);
+                    echo $state['state']; ?></span>
+                <span class="postal-code"><?php echo $this->shoppingConfig['zip']; ?></span>
+                <br/>
+                <span><?php echo $this->shoppingConfig['country']; ?></span>
+                <br/>
+                <img class="pickup-location-map"
+                     src="<?php echo Tools_Geo::generateStaticGmaps($this->shoppingConfig, 640, 300); ?>" alt="">
+                <?php elseif ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
+                <span><?php echo $shippingAddress['phone']; ?></span>
+            </div>
+            <h4 class="title"><?php echo $this->translate('Pickup location'); ?>:</h4>
+            <div>
+                <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2']; ?></span>
+                <br/>
+                <span class="locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : ''); ?></span>
+                <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']);
+                    echo $state['state']; ?></span>
+                <span class="postal-code"><?php echo $shippingAddress['zip']; ?></span>
+                <br/>
+                <span><?php echo $countries[$shippingAddress['country']]; ?></span>
+                <br/>
+                <a href="<?php echo 'https://maps.google.com/?q=' . $shippingAddress['address1'] . '+' . $shippingAddress['city'] . '+' . $shippingAddress['state']; ?>"
+                   target="_blank">
+                    <img class="pickup-location-map"
+                         src="<?php echo Tools_Geo::generateStaticGmaps($shippingAddress, 640, 300); ?>" alt="">
+                </a>
+                <?php else : ?>
+                    <span class="street-address"><?php echo $shippingAddress['address1'] . ' ' . $shippingAddress['address2']; ?></span>
+                    <br/>
+                    <span class="locality"><?php echo $shippingAddress['city'] . ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : ''); ?></span>
+                    <?php $state = Tools_Geo::getStateById($shippingAddress['state']); ?>
+                    <?php if (isset($state['state']) && $state['state'] != ''): ?>
+                        <span class="region"><?php echo $state['state'] . ','; ?></span>
+                    <?php endif; ?>
+                    <span class="postal-code"><?php echo $shippingAddress['zip']; ?></span>
+                    <br/>
+                    <?php if (isset($countries[$shippingAddress['country']])): ?>
+                        <span><?php echo $countries[$shippingAddress['country']]; ?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
+                        <span><?php echo $this->translate('Phone'); ?>
+                            : <?php echo $shippingAddress['phone_country_code_value'] . $shippingAddress['phone']; ?></span>
+                        <br/>
+                    <?php endif; ?>
+                    <?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
+                        <span><?php echo $this->translate('Mobile'); ?>
+                            : <?php echo $shippingAddress['mobile_country_code_value'] . $shippingAddress['mobile']; ?></span>
+                        <br/>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php else: ?>
+                    <span><?php echo $this->translate('not provided'); ?></span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div style="clear:both"></div>
+        <table class="post-purchase-report cart-content">
+            <thead>
+            <tr>
+                <th class="product-info" colspan="2"><?php echo $this->translate('Product'); ?></th>
+                <?php if (!isset($this->renamedTableRows)): ?>
+                    <?php if (isset($this->additionalTableRows)): ?>
+                        <?php foreach ($this->additionalTableRows as $tableRow): ?>
+                            <th class="product-unit-additional-row"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <?php if (isset($this->renamedTableRows)): ?>
+                        <?php foreach ($this->renamedTableRows as $tableRow): ?>
+                            <th class="product-unit-additional-row"><?php echo $this->translate(ucfirst($tableRow)); ?></th>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <th class="product-unit-price"><?php echo $this->translate('Price'); ?></th>
+                <th class="product-qty"><?php echo $this->translate('Qty'); ?></th>
+                <th class="product-total"><?php echo $this->translate('Total'); ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($this->cartContent as $product) : ?>
+                <tr>
+                    <td class="product-img">
+                        <?php if (isset($product['photo']) && $product['photo'] != ''): ?>
+                            <a class="page-teaser-image"
+                               href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
+                               title="<?php echo $product['name']; ?>" target="_blank">
+                                <img src="<?php echo Tools_Misc::prepareProductImage($product['photo']); ?>"
+                                     width="100" height="100" alt="<?php echo $product['name']; ?>"/>
+                            </a>
+                        <?php else: ?>
+                            <img src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
+                                 width="100" height="100" alt="<?php echo $product['name']; ?>"/>
+                        <?php endif; ?>
+                    </td>
+                    <td class="product-info">
+                        <span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
+                        <?php if (!empty($product['options'])): ?>
+                            <?php foreach ($product['options'] as $optionTitle => $optData): ?>
+                                <?php
+                                if (is_array($optData)) {
+                                    $optionStr = '<span>' . $optionTitle . ':</span> <span>' . $optData['title'] . '</span> ';
+                                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+                                        if (!empty($product['productDiscounts'])) {
+                                            foreach ($product['productDiscounts'] as $discountRule) {
+                                                $optData['priceValue'] = Tools_DiscountTools::applyDiscountData($optData['priceValue'],
+                                                    $discountRule, false, true);
+                                            }
+                                        }
+                                        if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1) {
+                                            $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate']) / 100;
+                                        } else {
+                                            $optPriceMod = $optData['priceValue'];
+                                        }
+                                        if ($optData['priceType'] === 'percent') {
+                                            $optionStr .= '<span>(' . $optData['priceSign'] . '%' . number_format($optPriceMod,
+                                                    2) . ')</span>';
+                                        } else {
+                                            $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) . ')</span>';
                                         }
                                     }
-                                    if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
-										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
-									} else {
-										$optPriceMod = $optData['priceValue'];
-									}
-                                    if ($optData['priceType'] === 'percent') {
-									    $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
-                                    } else {
-                                        $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                    if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+                                        $optionStr .= '<span>(' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->weightSign . ')</span>';
                                     }
-								}
-								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-									$optionStr .= '<span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>' ;
-								}
-							} else {
-								$optionStr = $optionTitle . ': ' . $optData;
-							} ?>
-							<div class="options"><?php echo $optionStr; ?></div>
-						<?php endforeach; ?>
-					<?php endif;?>
-				</td>
-				<?php if (isset($this->additionalTableRows)): ?>
-					<?php foreach ($this->additionalTableRows as $tableRow): ?>
-						<?php if (isset($product[$tableRow])): ?>
-							<td class="product-unit-additional-row"><?php echo $product[$tableRow]; ?></td>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				<?php endif; ?>
-                <td class="product-unit-price">
-                <?php if($product['freebies'] == 1):?>
-                    <?php echo $this->translate('free'); ?>
-                <?php elseif ($this->showPriceIncTax == 1):?>
-                    <?php echo $this->currency(is_null($product['tax_price'])?0:$product['tax_price']); ?>
-                    <?php if(!empty($product['productDiscounts'])):?>
-                        <?php $finalDiscount = 0;?>
-                        <?php foreach($product['productDiscounts'] as $discountData):?>
-                        <?php $discountData['unitSave'] = round($discountData['unitSave'] + ($discountData['unitSave'] / 100) * $product['taxRate'],
-                            2); ?>
-                        <?php $discountData['discount'] = round($discountData['discount'] + ($discountData['discount'] / 100) * $product['taxRate'],
-                            2); ?>
-                        <?php if($discountData['type'] === 'percent'):?>
-                            <?php $discount = $this->currency($discountData['unitSave']); ?>
-                        <?php else:?>
-                            <?php $discount = $this->currency($discountData['discount']); ?>
-                        <?php endif;?>
-                        <?php $finalDiscount += $discount;?>
-                        <?php endforeach;?>
-                        <?php echo $this->translate('you save') . ' ' .  $finalDiscount . ' ' . $this->translate('per unit')?>
-                    <?php endif;?>
-                <?php else:?>
-                    <?php echo $this->currency(is_null($product['price'])?0:$product['price']); ?>
-                     <?php if(!empty($product['productDiscounts'])):?>
-                        <?php $finalDiscount = 0;?>
-                        <?php foreach($product['productDiscounts'] as $discountData):?>
-                            <?php if($discountData['type'] === 'percent'):?>
-                                <?php $discount = $discountData['unitSave']; ?>
-                            <?php else:?>
-                                <?php $discount = $discountData['discount']; ?>
-                            <?php endif;?>
-                            <?php $finalDiscount += $discount;?>
-                        <?php endforeach;?>
-                        <?php echo $this->translate('you save') . ' ' .  $finalDiscount . ' ' . $this->translate('per unit')?>
-                     <?php endif;?>
-                <?php endif;?>
-                </td>
-				<td class="product-qty"><?php echo $product['qty']; ?></td>
-                <td class="product-total">
-                <?php if($product['freebies'] == 1):?>
-                    <?php echo $this->translate('free'); ?>
-                <?php elseif ($this->showPriceIncTax == 1):?>
-                    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
-                <?php else:?>
-				    <?php echo $this->currency($product['price'] * $product['qty']); ?>
-                <?php endif;?>
-                </td>
-			</tr>
-		<?php endforeach; ?>
-		</tbody>
-	</table>
+                                } else {
+                                    $optionStr = $optionTitle . ': ' . $optData;
+                                } ?>
+                                <div class="options"><?php echo $optionStr; ?></div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </td>
+                    <?php if (isset($this->additionalTableRows)): ?>
+                        <?php foreach ($this->additionalTableRows as $tableRow): ?>
+                            <?php if (isset($product[$tableRow])): ?>
+                                <td class="product-unit-additional-row"><?php echo $product[$tableRow]; ?></td>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    <td class="product-unit-price">
+                        <?php if ($product['freebies'] == 1): ?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php elseif ($this->showPriceIncTax == 1): ?>
+                            <?php echo $this->currency(is_null($product['tax_price']) ? 0 : $product['tax_price']); ?>
+                            <?php if (!empty($product['productDiscounts'])): ?>
+                                <?php $finalDiscount = 0; ?>
+                                <?php foreach ($product['productDiscounts'] as $discountData): ?>
+                                    <?php $discountData['unitSave'] = round($discountData['unitSave'] + ($discountData['unitSave'] / 100) * $product['taxRate'],
+                                        2); ?>
+                                    <?php $discountData['discount'] = round($discountData['discount'] + ($discountData['discount'] / 100) * $product['taxRate'],
+                                        2); ?>
+                                    <?php if ($discountData['type'] === 'percent'): ?>
+                                        <?php $discount = $this->currency($discountData['unitSave']); ?>
+                                    <?php else: ?>
+                                        <?php $discount = $this->currency($discountData['discount']); ?>
+                                    <?php endif; ?>
+                                    <?php $finalDiscount += $discount; ?>
+                                <?php endforeach; ?>
+                                <?php echo $this->translate('you save') . ' ' . $finalDiscount . ' ' . $this->translate('per unit') ?>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <?php echo $this->currency(is_null($product['price']) ? 0 : $product['price']); ?>
+                            <?php if (!empty($product['productDiscounts'])): ?>
+                                <?php $finalDiscount = 0; ?>
+                                <?php foreach ($product['productDiscounts'] as $discountData): ?>
+                                    <?php if ($discountData['type'] === 'percent'): ?>
+                                        <?php $discount = $discountData['unitSave']; ?>
+                                    <?php else: ?>
+                                        <?php $discount = $discountData['discount']; ?>
+                                    <?php endif; ?>
+                                    <?php $finalDiscount += $discount; ?>
+                                <?php endforeach; ?>
+                                <?php echo $this->translate('you save') . ' ' . $finalDiscount . ' ' . $this->translate('per unit') ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td class="product-qty"><?php echo $product['qty']; ?></td>
+                    <td class="product-total">
+                        <?php if ($product['freebies'] == 1): ?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php elseif ($this->showPriceIncTax == 1): ?>
+                            <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                        <?php else: ?>
+                            <?php echo $this->currency($product['price'] * $product['qty']); ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
 
-	<div class="post-purchase-report-summary">
-		<h3 class="summary-title"><?php echo $this->translate('Summary'); ?></h3>
+        <div class="post-purchase-report-summary">
+            <h3 class="summary-title"><?php echo $this->translate('Summary'); ?></h3>
 
-		<div class="post-purchase-row cart-subtotal">
-			<span><?php echo $this->translate('Sub-Total');?>:</span>
-			<?php if ($this->showPriceIncTax == 1): ?>
-				<span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getSubTotalTax());?></span>
-			<?php else: ?>
-				<span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal());?></span>
-			<?php endif;?>
-		</div>
-        <?php if ($this->cart->getDiscount() > 0) : ?>
-            <div class="post-purchase-row cart-discount">
-                <span><?php echo $this->translate('Discount');?>:</span>
+            <div class="post-purchase-row cart-subtotal">
+                <span><?php echo $this->translate('Sub-Total'); ?>:</span>
                 <?php if ($this->showPriceIncTax == 1): ?>
-                    <span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount() + $this->cart->getDiscountTax());?></span>
-                <?php else:?>
-                    <span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount());?></span>
-                <?php endif;?>
+                    <span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal() + $this->cart->getSubTotalTax()); ?></span>
+                <?php else: ?>
+                    <span id="subtotal-val"><?php echo $this->currency($this->cart->getSubTotal()); ?></span>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
-        <div class="post-purchase-row cart-shipping">
-            <span><?php echo $this->translate('Shipping');?>:</span>
-            <?php if ($this->showPriceIncTax == 1): ?>
-                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
-            <?php else:?>
-                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice());?></span>
-            <?php endif;?>
+            <?php if ($this->cart->getDiscount() > 0) : ?>
+                <div class="post-purchase-row cart-discount">
+                    <span><?php echo $this->translate('Discount'); ?>:</span>
+                    <?php if ($this->showPriceIncTax == 1): ?>
+                        <span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount() + $this->cart->getDiscountTax()); ?></span>
+                    <?php else: ?>
+                        <span><?php echo $this->cart->getDiscount() === null ? $this->currency(0) : $this->currency($this->cart->getDiscount()); ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+            <div class="post-purchase-row cart-shipping">
+                <span><?php echo $this->translate('Shipping'); ?>:</span>
+                <?php if ($this->showPriceIncTax == 1): ?>
+                    <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax()); ?></span>
+                <?php else: ?>
+                    <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice()); ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="post-purchase-row cart-total-tax">
+                <?php if (Tools_Misc::getTaxName() != ''): ?>
+                    <?php $taxName = Tools_Misc::getTaxName(); ?>
+                <?php else: ?>
+                    <?php $taxName = 'Tax'; ?>
+                <?php endif; ?>
+                <?php if ($this->showPriceIncTax == 1): ?>
+                    <span><?php echo $this->translate('Inc.') . ' ' . $taxName; ?>:</span>
+                <?php else: ?>
+                    <span><?php echo $this->translate('Total') . ' ' . $taxName; ?>:</span>
+                <?php endif; ?>
+                <span><?php echo $this->currency($this->cart->getTotalTax()); ?></span>
+            </div>
+            <?php if ($this->cart->getRefundAmount() > 0) : ?>
+                <div class="post-purchase-row cart-refund">
+                    <span><?php echo $this->translate('Refund'); ?>:</span>
+                    <span><?php echo $this->cart->getRefundAmount() === null ? $this->currency(0) : $this->currency($this->cart->getRefundAmount()); ?></span>
+                </div>
+            <?php endif; ?>
+            <div class="post-purchase-row cart-total">
+                <span><?php echo $this->translate('Total'); ?>:</span>
+                <span><?php echo $this->currency($this->cart->getTotal()); ?></span>
+            </div>
         </div>
-		<div class="post-purchase-row cart-total-tax">
-			<?php if (Tools_Misc::getTaxName() != ''): ?>
-				<?php $taxName = Tools_Misc::getTaxName(); ?>
-			<?php else: ?>
-				<?php $taxName = 'Tax'; ?>
-			<?php endif;?>
-			<?php if ($this->showPriceIncTax == 1): ?>
-				<span><?php echo $this->translate('Inc.'). ' ' . $taxName;?>:</span>
-			<?php else: ?>
-				<span><?php echo $this->translate('Total'). ' ' . $taxName;?>:</span>
-			<?php endif;?>
-			<span><?php echo $this->currency($this->cart->getTotalTax());?></span>
-		</div>
-        <?php if ($this->cart->getRefundAmount() > 0) : ?>
-            <div class="post-purchase-row cart-refund">
-                <span><?php echo $this->translate('Refund');?>:</span>
-                <span><?php echo $this->cart->getRefundAmount() === null ? $this->currency(0) : $this->currency($this->cart->getRefundAmount());?></span>
-            </div>
-        <?php endif; ?>
-		<div class="post-purchase-row cart-total">
-			<span><?php echo $this->translate('Total');?>:</span>
-			<span><?php echo $this->currency($this->cart->getTotal());?></span>
-		</div>
-	</div>
-	</div>
+    </div>
 
 <?php else: ?>
     <table width="100%" border="0" style="border:none; margin-bottom:15px;">
@@ -365,11 +385,13 @@
                         <span><?php echo $countries[$billingAddress['country']]; ?></span>
                         <br/>
                         <?php if (isset($shippingAddress['phone']) && $shippingAddress['phone'] != ''): ?>
-                            <span><?php echo $this->translate('Phone');?>: <?php echo $shippingAddress['phone_country_code_value'].$shippingAddress['phone'];?></span>
+                            <span><?php echo $this->translate('Phone'); ?>
+                                : <?php echo $shippingAddress['phone_country_code_value'] . $shippingAddress['phone']; ?></span>
                             <br/>
                         <?php endif; ?>
                         <?php if (isset($shippingAddress['mobile']) && $shippingAddress['mobile'] != ''): ?>
-                            <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
+                            <span><?php echo $this->translate('Mobile'); ?>
+                                : <?php echo $shippingAddress['mobile_country_code_value'] . $shippingAddress['mobile']; ?></span>
                             <br/>
                         <?php endif; ?>
                         <?php if (isset($billingAddress['email']) && $billingAddress['email'] != ''): ?>
@@ -385,14 +407,14 @@
                     <?php if ($this->cart->getShippingService() === Shopping::SHIPPING_PICKUP && !$this->defaultPickup): ?>
                         <div class="pickup-location-info">
                             <span
-                                style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Location info'); ?>
+                                    style="font-weight:bold; font-size:14px; color:#222222"><?php echo $this->translate('Location info'); ?>
                                 :</span>
                             <br/>
                             <?php echo $this->translate('Location name'); ?>: <span
-                                class="location-name"><?php echo $this->pickupLocationData['name']; ?></span>
+                                    class="location-name"><?php echo $this->pickupLocationData['name']; ?></span>
                             <br/>
                             <?php echo $this->translate('Location phone'); ?>: <span
-                                class="location-phone"><?php echo $this->pickupLocationData['phone']; ?></span>
+                                    class="location-phone"><?php echo $this->pickupLocationData['phone']; ?></span>
                             <br/>
                             <?php $pickupWorkingHours = unserialize($this->pickupLocationData['working_hours']); ?>
                             <div class="location-working-hours">
@@ -485,13 +507,13 @@
                                 <br/>
                             <?php endif; ?>
                         <?php endif; ?>
-                        <?php if(!empty($this->cart->getIsGift())):?>
+                        <?php if (!empty($this->cart->getIsGift())): ?>
                             <br/>
                             <br/>
-                            <?php echo $this->translate('Is a gift');?>
+                            <?php echo $this->translate('Is a gift'); ?>
                             <br/>
-                            <?php echo $this->translate('Recipient\'s email');?>: <?php echo $this->cart->getGiftEmail();?>
-                        <?php endif;?>
+                            <?php echo $this->translate('Recipient\'s email'); ?>: <?php echo $this->cart->getGiftEmail(); ?>
+                        <?php endif; ?>
 
                     <?php else: ?>
                         <span><?php echo $this->translate('not provided'); ?></span>
@@ -605,7 +627,8 @@
         <thead>
         <tr>
             <th width="70%">&nbsp;</th>
-            <th width="30%" align="left"><span style="font-weight:bold;color:#222222;"><?php echo $this->translate('Summary'); ?>
+            <th width="30%" align="left"><span
+                        style="font-weight:bold;color:#222222;"><?php echo $this->translate('Summary'); ?>
                     :</span></th>
         </tr>
         </thead>

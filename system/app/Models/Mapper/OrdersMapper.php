@@ -103,13 +103,13 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'status' => 'order.status',
             'status_label' => 'order.status',
             'total_products' => 'COUNT(DISTINCT oc.id)',
-            'sku' => '(GROUP_CONCAT(sp.sku))',
-            'mpn' => '(GROUP_CONCAT(sp.mpn))',
-            'product_name' => '(GROUP_CONCAT(sp.name))',
-            'product_price' => '(GROUP_CONCAT(oc.price))',
-            'product_tax' => '(GROUP_CONCAT(oc.tax))',
-            'product_tax_price' => '(GROUP_CONCAT(oc.tax_price))',
-            'product_qty' => '(GROUP_CONCAT(oc.qty))',
+            'sku' => new Zend_Db_Expr('(GROUP_CONCAT(sp.sku))'),
+            'mpn' => new Zend_Db_Expr('(GROUP_CONCAT(sp.mpn))'),
+            'product_name' => new Zend_Db_Expr('(GROUP_CONCAT(sp.name))'),
+            'product_price' => new Zend_Db_Expr('(GROUP_CONCAT(oc.price))'),
+            'product_tax' => new Zend_Db_Expr('(GROUP_CONCAT(oc.tax))'),
+            'product_tax_price' => new Zend_Db_Expr('(GROUP_CONCAT(oc.tax_price))'),
+            'product_qty' => new Zend_Db_Expr('(GROUP_CONCAT(oc.qty))'),
             'shipping_type' => 'order.shipping_type',
             'shipping_service' => 'order.shipping_service',
             'gateway' => 'order.gateway',
@@ -124,6 +124,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'total' => 'order.total',
             'notes' => 'order.notes',
             'additional_info' => 'order.additional_info',
+            'order_subtype' => 'order.order_subtype',
             'shipping_tracking_id' => 'order.shipping_tracking_id',
             'brand' => 'sb.name',
             'user_prefix' => 'u.prefix',
@@ -137,11 +138,11 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'shipping_phonecountrycode' => 's_adr.phonecountrycode',
             'shipping_phone_country_code_value' => 's_adr.phone_country_code_value',
             'shipping_phone' => 's_adr.phone',
-            'shipping_phone_full' => 'CONCAT(s_adr.phone_country_code_value, s_adr.phone)',
+            'shipping_phone_full' => new Zend_Db_Expr('CONCAT(s_adr.phone_country_code_value, s_adr.phone)'),
             'shipping_mobilecountrycode' => 's_adr.mobilecountrycode',
             'shipping_mobile_country_code_value' => 's_adr.mobile_country_code_value',
             'shipping_mobile' => 's_adr.mobile',
-            'shipping_mobile_full' => 'CONCAT(s_adr.mobile_country_code_value, s_adr.mobile)',
+            'shipping_mobile_full' => new Zend_Db_Expr('CONCAT(s_adr.mobile_country_code_value, s_adr.mobile)'),
             'shipping_country' => 's_adr.country',
             'shipping_city' => 's_adr.city',
             'shipping_state' => 's_adr.state',
@@ -156,18 +157,18 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'billing_phonecountrycode' => 's_adr.phonecountrycode',
             'billing_phone_country_code_value' => 's_adr.phone_country_code_value',
             'billing_phone' => 'b_adr.phone',
-            'billing_phone_full' => 'CONCAT(s_adr.phone_country_code_value, s_adr.phone)',
+            'billing_phone_full' => new Zend_Db_Expr('CONCAT(s_adr.phone_country_code_value, s_adr.phone)'),
             'billing_mobilecountrycode' => 's_adr.mobilecountrycode',
             'billing_mobile_country_code_value' => 's_adr.mobile_country_code_value',
             'billing_mobile' => 'b_adr.mobile',
-            'billing_mobile_full' => 'CONCAT(s_adr.mobile_country_code_value, s_adr.mobile)',
+            'billing_mobile_full' => new Zend_Db_Expr('CONCAT(s_adr.mobile_country_code_value, s_adr.mobile)'),
             'billing_country' => 'b_adr.country',
             'billing_city' => 'b_adr.city',
             'billing_state' => 'b_adr.state',
             'billing_zip' => 'b_adr.zip',
             'billing_address1' => 'b_adr.address1',
             'billing_address2' => 'b_adr.address2',
-            'coupon_code' => '(GROUP_CONCAT(DISTINCT(scs.coupon_code)))',
+            'coupon_code' => new Zend_Db_Expr('(GROUP_CONCAT(DISTINCT(scs.coupon_code)))'),
             'groupName' => 'sg.groupName',
         );
 
@@ -254,6 +255,9 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 		if (!is_array($where)){
 			return $select;
 		}
+
+		$filterTypes = array('recurring_id', 'real_order_id', 'cart_imported_id');
+
 		foreach ($where as $key => $val){
  			if (is_int($key)) {
 				$select->where($val);
@@ -369,9 +373,17 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                         if ($val === 'real_order_id') {
                             $select->where('shrp.cart_id IS NULL');
                             $select->where('imp.real_order_id IS NULL');
+                            $subWhere = '( order.order_subtype = "" OR order.order_subtype IS NULL';
+                            $subWhere .= ')';
+                            $select->where($subWhere);
                         }
                         if ($val === 'cart_imported_id') {
                             $select->where('imp.real_order_id IS NOT NULL');
+                        }
+                        if (!empty($val) && !in_array($val, $filterTypes, true)) {
+                            $select->where('shrp.cart_id IS NULL');
+                            $select->where('imp.real_order_id IS NULL');
+                            $select->where('order.order_subtype = ?', strtolower($val));
                         }
                         break;
                     case 'filter-recurring-order-type':
@@ -437,6 +449,24 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
         }
         return false;
+    }
+
+    /**
+     * Get unique order sub-types
+     *
+     * @return array
+     */
+    public function getUniqueSubtypes()
+    {
+        $column = array('order_subtypes' => new Zend_Db_Expr('DISTINCT(order.order_subtype)'));
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(
+                array('order' => 'shopping_cart_session'),
+                $column
+            );
+
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
     }
 
 }

@@ -779,6 +779,11 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Additional info')
             ),
+            'order_subtype' => array(
+                'label' => 'order_subtype',
+                'checked' => 1,
+                'label_name' => $translator->translate('Order subtype')
+            ),
             'shipping_tracking_id' => array(
                 'label' => 'shipping_tracking_id',
                 'checked' => 1,

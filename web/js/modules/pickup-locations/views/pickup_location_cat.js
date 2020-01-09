@@ -1,7 +1,8 @@
 define([
 	'backbone',
-    '../collections/pickup-location-cat'
-], function(Backbone, PickupLocationCategoriesCollection){
+    '../collections/pickup-location-cat',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(Backbone, PickupLocationCategoriesCollection, i18n){
     var PickupLocationCatView = Backbone.View.extend({
         el: $('#manage-pickup-locations'),
         events: {
@@ -81,7 +82,7 @@ define([
                 removeEl = $(e.currentTarget).parent('li');
             var self = this;
             var model = this.categories.get(currentCategoryId);
-            showConfirm('Are you sure want delete '+ model.get('name')+ ' ?', function(){
+            showConfirmCustom(_.isUndefined(i18n['Are you sure?'])?'Are you sure?':i18n['Are you sure?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (model){
                     showSpinner();
                     model.destroy({success:function(){
