@@ -752,6 +752,24 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return '<img class="cart-product-image" src="' . $photoSrc . '" alt="' . $this->_cartContent[$sid]['name'] . '">';
     }
 
+    /**
+     * Return product photo for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemPhotourl($sid)
+    {
+        if (isset($this->_options[0])) {
+            $folder = $this->_options[0];
+        } else {
+            $folder = 'product';
+        }
+        $photoSrc = $this->_cartContent[$sid]['photo'];
+        $photoSrc = Tools_Misc::prepareProductImage($photoSrc, $folder);
+        return $photoSrc;
+    }
+
 
     /**
      * Return product options for single item in cart
