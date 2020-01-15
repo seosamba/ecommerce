@@ -89,7 +89,23 @@ define({
         'here' : 'ici',
         'Can\'t delete coupon!' : 'Impossible de supprimer le coupon',
         'Are you sure to delete?' : 'Êtes-vous sûr de vouloir supprimer?',
-        'A coupon name can\'t contain gaps' : 'Le nom du coupon ne peut pas contenir des espaces'
+        'A coupon name can\'t contain gaps' : 'Le nom du coupon ne peut pas contenir des espaces',
+        'Are you sure?' : 'Etes-vous d\'accord?',
+        'Are you sure want to add all not in use countries?' : 'Etes-vous d\'accord d\'ajouter tous les pays non utilisés?',
+        'Done. Don\'t forget to save zone' : 'C\'est fait. N\'oubliez pas de sauvegarder la zone',
+        'Nothing to process. All countries are already added' : 'Rien à ajouter. Tous les pays ont été ajoutés avant',
+        'Can\'t process countries' : 'Impossible d\'ajouter les pays',
+        'Zone Name' : 'Nom de la zone',
+        'enter name for zone' : 'introduire le nom de la zone',
+        'Countries' : 'Pays',
+        'clear' : 'supprimer',
+        'Add all not in use' : 'Pays non utilisés',
+        'Add Country' : 'Ajouer un pays',
+        'States' : 'Etats',
+        'Add State' : 'Ajouter un état',
+        'Postal codes' : 'Code Postal',
+        'Insert list of zip/postal codes: one per line' : 'Introduire la liste des codes postaux: un par ligne',
+        'Wait a minute! this country is already part of another zone... Add anyway?' : 'Attendez une minute! Сe pays fait déjà partie d\'une autre zone... Ajouter tout de même?'
 
     }
 });

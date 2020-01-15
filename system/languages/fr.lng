@@ -154,7 +154,7 @@
         'Zone Name'=>'Nom de la zone:',
         'Close'=>'Fermer',
         'Add new'=>'Ajouter',
-        'Delete this zone ]'=>'Supprimer cette zone]',
+        'Delete this zone'=>'Supprimer cette zone',
         'Save'=>'Sauvegarder',
         'Add country'=>'Ajoutez pays',
         'Start typing country name here' =>'Commencez à taper le nom du pays ici',

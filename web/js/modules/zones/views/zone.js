@@ -2,11 +2,12 @@ define([
 	'underscore',
 	'backbone',
     '../../common/views/listitem',
+    'text!../templates/zones.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
-], function(_, Backbone, ListItemView, i18n){
+], function(_, Backbone, ListItemView, ZonesTmpl, i18n){
 
     var zoneTabView = Backbone.View.extend({
-        template: _.template($('#zoneTemplate').text()),
+        templates: {},
         tagName: 'div',
         className: 'content-footer',
         events: {
@@ -20,7 +21,7 @@ define([
             this.model.on('destroy', this.remove, this);
         },
         render: function(){
-            $(this.el).html(this.template(this.model.toJSON()));
+            this.$el.html( _.template(ZonesTmpl, {'zonesModel':this.model.toJSON(), 'i18n':i18n}));
             //rendering list of countries for zone
             var countriesList = this.$el.find('.zone-countries');
 

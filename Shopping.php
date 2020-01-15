@@ -2670,4 +2670,14 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail($this->_translator->translate('Can\'t remove wished product! Please re-login into system.'));
     }
 
+    /**
+     * Get saved countries by all zones
+     */
+    public function getUsedZoneCountriesAction() {
+        $zonesMapper = Models_Mapper_Zone::getInstance();
+        $countries = $zonesMapper->getSavedZoneCountries();
+
+        $this->_responseHelper->success(array('savedCounties' => $countries));
+    }
+
 }
