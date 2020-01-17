@@ -369,7 +369,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
             }
 
-			if(is_null($inventoryCount) || !empty($inventoryCount)) {
+			if(is_null($inventoryCount) || !empty($productQty)) {
                 $inventoryCount = $this->_translator->translate('In stock');
             } else {
                 $inventoryCount = $this->_translator->translate('Out of stock');
