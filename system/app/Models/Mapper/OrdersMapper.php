@@ -234,6 +234,10 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                 'sg.id = sci.group_id',
                 array('')
             )
+            ->joinLeft(array('shrp'=>'shopping_recurring_payment'), 'shrp.cart_id=order.id',
+                array('recurring_id'=>'shrp.cart_id'))
+            ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
+                array('real_order_id'=>'imp.real_order_id'))
             ->group('order.id');
         if (!empty($orderIds)) {
             $where = $this->getDbTable()->getAdapter()->quoteInto('order.id IN (?)', $orderIds);
