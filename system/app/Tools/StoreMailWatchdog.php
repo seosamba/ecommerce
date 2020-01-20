@@ -232,6 +232,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
     {
         $productIds = $this->_options['productIds'];
         $productPagesUrls = $this->_options['productPagesUrls'];
+        $orderDataObject = $this->_options['orderDataObject'];
         switch ($this->_options['recipient']) {
             case self::RECIPIENT_SUPPLIER:
                 $this->_mailer->setMailToLabel($this->_object->getFullName())
@@ -248,6 +249,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             $prodUrl = $this->_websiteHelper->getUrl() . $productPagesUrls[$prodId]['url'];
             $productUrls .= '<a href="' . $prodUrl . '">' . $productPagesUrls[$prodId]['name'] . '</a>';
         }
+        $this->_entityParser->objectToDictionary($orderDataObject, 'order');
         $this->_entityParser->addToDictionary(array('product:urls' => $productUrls));
         $this->_entityParser->objectToDictionary($this->_object, 'customer');
     }

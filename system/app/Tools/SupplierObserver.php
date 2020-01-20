@@ -99,7 +99,8 @@ class Tools_SupplierObserver implements Interfaces_Observer
                 $userModel->registerObserver(new Tools_Mail_Watchdog(array(
                     'trigger' => $triggerName,
                     'productIds' => explode(',', $supplierProduct['productsIds']),
-                    'productPagesUrls' => $productPagesUrls
+                    'productPagesUrls' => $productPagesUrls,
+                    'orderDataObject' =>  $this->_object
                 )));
                 $userModel->notifyObservers();
             }
