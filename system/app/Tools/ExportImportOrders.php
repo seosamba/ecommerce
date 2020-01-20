@@ -245,7 +245,9 @@ class Tools_ExportImportOrders
             'billing_state',
             'billing_zip',
             'billing_address1',
-            'billing_address2'
+            'billing_address2',
+            'is_gift',
+            'gift_email'
         );
         return $orderImportFieldNames;
     }
@@ -1008,6 +1010,16 @@ class Tools_ExportImportOrders
                 'label' => 'groupName',
                 'checked' => 1,
                 'label_name' => $translator->translate('Client group')
+            ),
+            'is_gift' => array(
+                'label' => 'is_gift',
+                'checked' => 1,
+                'label_name' => $translator->translate('Is gift')
+            ),
+            'gift_email' => array(
+                'label' => 'gift_email',
+                'checked' => 1,
+                'label_name' => $translator->translate('Gift email')
             )
         );
     }

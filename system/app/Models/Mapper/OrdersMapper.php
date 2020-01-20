@@ -170,6 +170,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'billing_address2' => 'b_adr.address2',
             'coupon_code' => new Zend_Db_Expr('(GROUP_CONCAT(DISTINCT(scs.coupon_code)))'),
             'groupName' => 'sg.groupName',
+            'is_gift' => 'order.is_gift',
+            'gift_email' => 'order.gift_email'
         );
 
         if (!empty($excludeFields)) {
