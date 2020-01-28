@@ -3,7 +3,8 @@ require.config({
     paths: {
         'underscore'         : './libs/underscore/underscore-min',
         'backbone'           : './libs/backbone/backbone-min',
-        'i18n'               : './libs/require/i18n'
+        'i18n'               : './libs/require/i18n',
+        'text'               : './libs/require/text'
     },
     shim: {
         'underscore': {exports: '_'},

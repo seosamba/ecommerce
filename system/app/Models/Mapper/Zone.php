@@ -205,4 +205,19 @@ class Models_Mapper_Zone extends Application_Model_Mappers_Abstract {
         $select = $this->getDbTable()->getAdapter()->select()->from('shopping_zone');
         return $this->getDbTable()->getAdapter()->fetchPairs($select);
     }
+
+    /**
+     * @return array
+     * @throws Zend_Db_Table_Exception
+     */
+    public function getSavedZoneCountries() {
+        $zoneCountryTable = new Models_DbTable_ZoneCountry();
+
+        $sql = $zoneCountryTable->getAdapter()->select()->distinct()->from($zoneCountryTable->info('name'), array(
+            'country_id',
+        ));
+        $countriesList = $zoneCountryTable->getAdapter()->fetchCol($sql);
+
+        return $countriesList;
+    }
 }
