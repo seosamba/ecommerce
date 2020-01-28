@@ -68,7 +68,6 @@ define([
                 coupon.get('startDate'),
                 coupon.get('endDate'),
                 coupon.get('allowCombination') === '1' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : _.isUndefined(i18n['no'])?'no':i18n['no'],
-                coupon.get('scope') === 'client' ? _.isUndefined(i18n['yes'])?'yes':i18n['yes'] : '-',
                 usageInfo,
                 _.isEmpty(coupon.get('products')) ? 'cart' : _.reduce(coupon.get('products'), function(memo, p){
                     return memo + '<a href="javascript:;" data-role="loadProductPage" data-pid="'+p+'" title="Click to open product page">'+p+'</a>';
