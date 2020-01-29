@@ -5,7 +5,7 @@ $(function() {
         var self = $(this),
             pid  = self.data('pid');
 
-        showConfirm('Are you sure to delete?', function(){
+        showConfirm('Are you sure you would like to remove this item from your Wish List?', function(){
             $.ajax({
                 url: $('#website_url').val()+'plugin/shopping/run/removeWishedProduct/',
                 type: 'POST',
