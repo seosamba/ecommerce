@@ -132,7 +132,7 @@ class Tools_RecurringPaymentTools
         if ($cart instanceof Models_Model_CartSession && !empty($paymentInfo)) {
             $recurringPluginClassName = 'Tools_RecurringPayment' . ucfirst(strtolower($cart->getGateway()));
             if (class_exists($recurringPluginClassName)) {
-                $recurringPayment = new $recurringPluginClassName();
+                $recurringPayment = new $recurringPluginClassName($params);
                 if ($recurringPayment instanceof Interfaces_RecurringPayment) {
                     switch ($changeSubscription) {
                         case Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT:
