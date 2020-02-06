@@ -7,7 +7,9 @@
             <th><?php echo $this->translate('Order date'); ?></th>
 <!--            <th>--><?php //echo $this->translate('Recurring order details'); ?><!--</th>-->
             <th><?php echo $this->translate('Your autoship invoices'); ?></th>
-            <th><?php echo $this->translate('Payment period cycle'); ?></th>
+            <?php if (!$this->withoutPeriodCycle): ?>
+                <th><?php echo $this->translate('Payment period cycle'); ?></th>
+            <?php endif; ?>
             <th><?php echo $this->translate('Recurring Payment amount'); ?></th>
             <th><?php echo $this->translate('Last billing date'); ?></th>
             <th><?php echo $this->translate('Next billing date'); ?></th>
@@ -33,28 +35,30 @@
                                 # <?php echo $dependentOrderId; ?></a>
                         <?php endforeach; ?>
                     </td>
-                    <td class="user-order-current-status">
-                        <?php $changePaymentPeriod =  trim(str_replace('+1', '', strtolower($order['payment_period'])));?>
-                        <?php if($changePaymentPeriod === '+3 month') :?>
-                            <?php $changePaymentPeriod = 'quarter';?>
-                        <?php elseif($changePaymentPeriod === '+6 month'):?>
-                            <?php $changePaymentPeriod = 'semester';?>
-                        <?php endif;?>
-                        <?php if (array_key_exists(strtolower('recurring-payment-' . $changePaymentPeriod),
-                            $this->activeRecurringPaymentTypes)): ?>
-                            <select class="change-recurring-payment-period" name="change-recurring-payment-period">
-                                <?php foreach (Api_Store_Recurringtypes::$recurringAcceptType as $recurringType => $recurringTypeFullName): ?>
-                                    <?php if (array_key_exists(strtolower('recurring-payment-' . $recurringType),
-                                        $this->activeRecurringPaymentTypes)): ?>
-                                    <option
-                                        value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo 'Every ' . $this->translate($recurringType); ?></option>
-                                    <?php endif;?>
-                                <?php endforeach; ?>
-                            </select>
-                        <?php else: ?>
-                            <?php echo 'Every ' . $this->translate($order['payment_period']); ?>
-                        <?php endif; ?>
-                    </td>
+                    <?php if (!$this->withoutPeriodCycle): ?>
+                        <td class="user-order-current-status">
+                            <?php $changePaymentPeriod = trim(str_replace('+1', '', strtolower($order['payment_period']))); ?>
+                            <?php if ($changePaymentPeriod === '+3 month') : ?>
+                                <?php $changePaymentPeriod = 'quarter'; ?>
+                            <?php elseif ($changePaymentPeriod === '+6 month'): ?>
+                                <?php $changePaymentPeriod = 'semester'; ?>
+                            <?php endif; ?>
+                            <?php if (array_key_exists(strtolower('recurring-payment-' . $changePaymentPeriod),
+                                $this->activeRecurringPaymentTypes)): ?>
+                                <select class="change-recurring-payment-period" name="change-recurring-payment-period">
+                                    <?php foreach (Api_Store_Recurringtypes::$recurringAcceptType as $recurringType => $recurringTypeFullName): ?>
+                                        <?php if (array_key_exists(strtolower('recurring-payment-' . $recurringType),
+                                            $this->activeRecurringPaymentTypes)): ?>
+                                            <option
+                                                    value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo 'Every ' . $this->translate($recurringType); ?></option>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php else: ?>
+                                <?php echo 'Every ' . $this->translate($order['payment_period']); ?>
+                            <?php endif; ?>
+                        </td>
+                    <?php endif; ?>
                     <td><?php echo $this->currency(floatval($order['payment_cycle_amount'])); ?></td>
                     <td class="user-order-current-status"><?php echo ($order['last_payment_date'] === '0000-00-00') ? '' : date("d-M-Y",
                             strtotime($order['last_payment_date'])); ?></td>
