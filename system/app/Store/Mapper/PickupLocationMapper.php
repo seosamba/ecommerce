@@ -131,4 +131,18 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
 
         return null;
     }
+
+    /**
+     * @return array
+     */
+    public function getUniqueCountries()
+    {
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(array('shopping_pickup_location'), array('country'));
+
+        $select->group('country');
+
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
 }
