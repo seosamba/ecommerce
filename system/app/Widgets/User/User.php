@@ -12,6 +12,8 @@ class Widgets_User_User extends Widgets_User_Base {
 
     const GRID_TYPE_RECURRING = 'recurring';
 
+    const GRID_OPTION_WITHOUT_PERIOD_CYCLE = 'without_period_cycle';
+
     /**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -172,6 +174,9 @@ class Widgets_User_User extends Widgets_User_Base {
             Models_Model_CartSession::CART_STATUS_SHIPPED,
             Models_Model_CartSession::CART_STATUS_DELIVERED
         );
+        if (isset($this->_options[1]) && $this->_options[1] === self::GRID_OPTION_WITHOUT_PERIOD_CYCLE) {
+            $this->_view->withoutPeriodCycle = $this->_options[1];
+        }
 
         return $this->_view->render('recurring_user_grid.phtml');
     }
