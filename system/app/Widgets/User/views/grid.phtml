@@ -1,3 +1,6 @@
+<?php
+    $this->headScript()->appendFile($this->websiteUrl . "system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js");
+?>
 <div id="user-grid-part">
         <ul class="user-stats clearfix">
             <?php foreach ($this->stats as $status => $value) : ?>
@@ -88,7 +91,7 @@
         </table>
 </div>
 <script>
-    $.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
+
        $(function(){
             var oTable = $('#user-orders-table').dataTable({
                 iDisplayLength:10,
