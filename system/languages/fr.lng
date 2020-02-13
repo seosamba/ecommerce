@@ -711,5 +711,27 @@
         'Sorry, some coupon codes you provided had already been used.' => 'Certains codes promos ont déjà été utilisés.',
         'Go back to swap promo codes or proceed with shipping information to checkout.' => 'Retournez à la page précédente pour essayer un autre code ou continuez la validation de votre commande.',
         'was used in purchase.' => 'a été utilisé dans l\'achat',
-        'Add to favorites' => 'Ajouter aux favoris'
+        'Add to favorites' => 'Ajouter aux favoris',
+        'Order date' => 'Date de commande',
+        'Your autoship invoices' => 'Vos factures de livraison automatique',
+        'Recurring Payment amount' => 'Montant du paiement récurrent',
+        'Last billing date' => 'Dernière date de facturation',
+        'Next billing date' => 'Prochaine date de facturation',
+        'Shipping address' => 'Adresse de livraison',
+        'Payment period cycle' => 'Cycle de période de paiement',
+        'day' => 'jour',
+        'week' => 'semaine',
+        'month' => 'mois',
+        'quarter' => 'quartier',
+        'semester' => 'semestre',
+        'year' => 'année',
+        'Every' => 'Chaque',
+        'Update shipping address' => 'Mettre à jour l\'adresse de livraison',
+        'new' => 'nouveau',
+        'active' => 'actif',
+        'pending' => 'en attente',
+        'expired' => 'expiré',
+        'suspended' => 'suspendu',
+        'canceled' => 'supprimé'
+
 );?>
