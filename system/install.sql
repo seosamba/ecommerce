@@ -155,7 +155,9 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('zip', '94117'),
 ('noZeroPrice', '1'),
 ('timezone', 'America/New_York'),
-('version', '2.7.0');
+('pickupLocationLinks', 0),
+('pickupLocationLinksLimit', 4),
+('version', '2.7.3');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -930,5 +932,5 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.2' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.3' WHERE `name` = 'shopping';
 
