@@ -78,7 +78,9 @@ class Tools_RecurringPaymentTools
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
         $dependentCart = $cartSessionMapper->find($dependentCartId);
-        if ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER) {
+        if ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_TWO_MONTHS) {
+            $recurrentPeriod = '+2 month';
+        } elseif ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER) {
             $recurrentPeriod = '+3 month';
         } elseif($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER) {
             $recurrentPeriod = '+6 month';
