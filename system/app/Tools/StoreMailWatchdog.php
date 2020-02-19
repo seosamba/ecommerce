@@ -429,7 +429,24 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
         $this->_entityParser->addToDictionary(array('order:currency'=>$currency));
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
-		return $this->_send();
+
+        $pluginInvoicePdf = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+        if ($pluginInvoicePdf instanceof Application_Model_Models_Plugin && $pluginInvoicePdf->getStatus() === Application_Model_Models_Plugin::ENABLED) {
+            $invoicetopdfConfig = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams('attachInvoiceActionEmail');
+            if (isset($invoicetopdfConfig['attachInvoiceActionEmail']) && $invoicetopdfConfig['attachInvoiceActionEmail'] === '1') {
+                $fileInfo = Tools_Misc::prepareInvoice(['cartId' => $this->_object->getId(), 'dwn' => 0]);
+                if (isset($fileInfo['folder']) && isset($fileInfo['fileName'])) {
+                    $attachment = new Zend_Mime_Part(file_get_contents($fileInfo['folder'] . $fileInfo['fileName']));
+                    $attachment->type = 'application/pdf';
+                    $attachment->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
+                    $attachment->encoding = Zend_Mime::ENCODING_BASE64;
+                    $attachment->filename = $fileInfo['fileName'];
+                    $this->_mailer->addAttachment($attachment);
+                }
+            }
+        }
+
+        return $this->_send();
 	}
 
     /**
