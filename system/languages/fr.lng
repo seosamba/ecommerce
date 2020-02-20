@@ -744,7 +744,7 @@
         'Activate autoship frequencies' => 'Activer la fréquence de livraison automatique',
         'A free order is offered every' => 'Commande gratuite est offerte tous les',
         'orders' => 'commandes',
-        'Select recurring subscription type' => 'Sélectionnez le type d'abonnement récurrent',
+        'Select recurring subscription type' => 'Sélectionnez le type d\'abonnement récurrent',
         'Receive this order every day' => 'Recevoir cette commande chaque jour',
         'Receive this order every week' => 'Recevoir cette commande chaque semaine',
         'Receive this order every month' => 'Recevoir cette commande chaque mois',
