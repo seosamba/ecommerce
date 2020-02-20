@@ -732,6 +732,25 @@
         'pending' => 'en attente',
         'expired' => 'expiré',
         'suspended' => 'suspendu',
-        'canceled' => 'supprimé'
+        'canceled' => 'supprimé',
+        'Day' => 'Jour',
+        'Week' => 'Semaine',
+        'Month' => 'Mois',
+        'Two Months' => 'Deux mois',
+        'Quarter' => 'Quartier',
+        'Semester' => 'Semestre',
+        'Year' => 'Année',
+        'Every' => 'Chaque',
+        'Activate autoship frequencies' => 'Activer la fréquence de livraison automatique',
+        'A free order is offered every' => 'Commande gratuite est offerte tous les',
+        'orders' => 'commandes',
+        'Select recurring subscription type' => 'Sélectionnez le type d'abonnement récurrent',
+        'Receive this order every day' => 'Recevoir cette commande chaque jour',
+        'Receive this order every week' => 'Recevoir cette commande chaque semaine',
+        'Receive this order every month' => 'Recevoir cette commande chaque mois',
+        'Receive this order every 2 months' => 'Recevoir cette commande tous les 2 mois',
+        'Receive this order every quarter' => 'Recevoir cette commande chaque trimestre',
+        'Receive this order every semester' => 'Recevoir cette commande chaque semestre',
+        'Receive this order every year' => 'Recevoir cette commande chaque année'
 
 );?>

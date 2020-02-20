@@ -19,7 +19,7 @@
             <?php foreach ($this->activeRecurringPaymentTypes as $recurringType): ?>
                 <option
                     value="<?php echo $recurringType['name']; ?>" <?php echo ($this->currentRecurringPaymentType === $recurringType['name']) ? 'selected' : ''; ?>>
-                    <?php echo $this->translate('Receive this order every '.str_replace('Pay each', '', $recurringTypeLabels[$recurringType['name']])); ?>
+                    <?php echo $this->translate('Receive this order every '.str_replace('Pay each ', '', $recurringTypeLabels[$recurringType['name']])); ?>
                 </option>
             <?php endforeach; ?>
         </select>
