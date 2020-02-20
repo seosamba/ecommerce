@@ -26,6 +26,9 @@ class MagicSpaces_Grouponly_Grouponly extends Tools_MagicSpaces_Abstract
 
             $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
             $user = $sessionHelper->getCurrentUser();
+            if (empty($user->getId())) {
+                return '';
+            }
             $dbTable = new Zend_Db_Table();
             $select = $dbTable->getAdapter()->select()
                 ->from(array('sg' => 'shopping_group'), array('sg.groupName'))
