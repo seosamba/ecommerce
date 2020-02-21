@@ -82,7 +82,7 @@
 	            <th width="30px"><?php echo $this->formCheckbox('clients-check-all', null, array('title' => 'Check/Uncheck All'));?></th>
 	            <th class="sortable" data-sortkey="full_name"><?php echo $this->translate('Full Name');?></th>
 	            <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
-                <th class="sortable text-center" data-sortkey="subscribed"><?php echo $this->translate('Subscribed');?></th>
+                <th class="sortable text-center" data-sortkey="subscribed" width="10%"><?php echo $this->translate('Store emails notification');?></th>
 	            <th class="sortable text-center" data-sortkey="mobile_phone"><?php echo $this->translate('Mobile number');?></th>
                 <?php if (empty($this->shoppingConfigParams['hideGroupNameFromClientsTab'])) :?>
                     <th class="sortable" data-sortkey="group_id"><?php echo $this->translate('Group Name');?></th>
