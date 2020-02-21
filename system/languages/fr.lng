@@ -751,6 +751,8 @@
         'Receive this order every 2 months' => 'Recevoir cette commande tous les 2 mois',
         'Receive this order every quarter' => 'Recevoir cette commande chaque trimestre',
         'Receive this order every semester' => 'Recevoir cette commande chaque semestre',
-        'Receive this order every year' => 'Recevoir cette commande chaque année'
+        'Receive this order every year' => 'Recevoir cette commande chaque année',
+        'from ' => 'de',
+        'to ' =>'à'
 
 );?>
