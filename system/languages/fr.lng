@@ -401,7 +401,7 @@
         'edit'=>'éditer',
         'Apply'=>'Appliquer',
         'Show more' => 'Plus d&rsquo;adresse',
-        'No more products found'=>'Pas plus de produits trouvés',
+        'No more products found'=>'Plus de produits trouvés',
         'This product is disabled.'=>'Ce produit est désactivé.',
         'Edit product'=>'Editer un produit',
         'In stock'=>'En stock',
@@ -711,5 +711,15 @@
         'Sorry, some coupon codes you provided had already been used.' => 'Certains codes promos ont déjà été utilisés.',
         'Go back to swap promo codes or proceed with shipping information to checkout.' => 'Retournez à la page précédente pour essayer un autre code ou continuez la validation de votre commande.',
         'was used in purchase.' => 'a été utilisé dans l\'achat',
-        'Add to favorites' => 'Ajouter aux favoris'
+        'Add to favorites' => 'Ajouter aux favoris',
+        'show more' => 'Montrer plus',
+        'Add to notification list' => 'Ajouter à la liste des notifications',
+        'Remove notified product' => 'Enlever le produit mentionné',
+        'Added to notification list' => 'Ajouté à la liste des notifications',
+        'Product already added to notification list' => 'Le produit est déjà ajouté à la liste des notifications',
+        'Can\'t add product to notification list! Please re-login into system.' => 'Impossible d\'ajouter le produit à la liste des notifications! Veuillez vous reconnecter au système.',
+        'Direct access not allowed' => 'Accès direct non autorisé',
+        'Removed' => 'Enlevé',
+        'Can\'t remove notified product! Please re-login into system.' => 'Impossible d\'enlever le produit mentionné! Veuillez vous reconnecter au système.'
+
 );?>

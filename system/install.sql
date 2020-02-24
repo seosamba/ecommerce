@@ -155,7 +155,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('zip', '94117'),
 ('noZeroPrice', '1'),
 ('timezone', 'America/New_York'),
-('version', '2.7.0');
+('version', '2.7.3');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -934,11 +934,14 @@ CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
   `user_id` int(10) unsigned NOT NULL,
   `product_id` INT(10) unsigned NOT NULL,
   `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  `send_notification` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_NotifyObserver');
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.2' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.3' WHERE `name` = 'shopping';
 

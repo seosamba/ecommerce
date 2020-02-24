@@ -2680,4 +2680,78 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->success(array('savedCounties' => $countries));
     }
 
+    /**
+     * Added product to notification list
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function addToNotifyListAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+        }
+
+        $productId = $this->_request->getParam('pid');
+        $user = $this->_sessionHelper->getCurrentUser();
+        $userId = $user->getId();
+        $userRole = $user->getRoleId();
+
+        if(!empty($productId) && !empty($userId) && $userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+            $product = $productMapper->find($productId);
+            if($product instanceof Models_Model_Product) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+                $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+                if(!$notifiedProduct instanceof Store_Model_NotifiedProductsModel && $product->getInventory() == '0') {
+                    $notifiedProduct = new Store_Model_NotifiedProductsModel();
+                    $notifiedProduct->setUserId($userId);
+                    $notifiedProduct->setProductId($product->getId());
+                    $notifiedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
+
+                    $notifiedProduct->setSendNotification('0');
+
+                    $notifiedProductsMapper->save($notifiedProduct);
+
+                    $this->_responseHelper->success(array('addedToList' => $this->_translator->translate('Added to notification list')));
+                } else {
+                    $this->_responseHelper->success(array('alreadyNotified' => $this->_translator->translate('Product already added to notification list')));
+                }
+            }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t add product to notification list! Please re-login into system.'));
+        }
+    }
+
+    /**
+     * Remove notified product
+     */
+    public function removeNotifiedProductAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $productId = filter_var($this->_request->getParam('pid'), FILTER_SANITIZE_NUMBER_INT);
+        $currentUserModel = $this->_sessionHelper->getCurrentUser();
+        $userRole = $currentUserModel->getRoleId();
+
+        if($userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $userId = $currentUserModel->getId();
+
+            if ($userId && !empty($productId)) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+                $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                if($notifiedProduct instanceof Store_Model_NotifiedProductsModel) {
+                    $notifiedProductsMapper->delete($notifiedProduct);
+
+                    $this->_responseHelper->success($this->_translator->translate('Removed'));
+                }
+            }
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Can\'t remove notified product! Please re-login into system.'));
+    }
+
 }

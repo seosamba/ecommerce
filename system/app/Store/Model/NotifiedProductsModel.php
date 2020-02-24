@@ -11,6 +11,8 @@ class Store_Model_NotifiedProductsModel extends Application_Model_Models_Abstrac
 
     protected $_addedDate;
 
+    protected $_sendNotification;
+
     /**
      * @return mixed
      */
@@ -61,6 +63,24 @@ class Store_Model_NotifiedProductsModel extends Application_Model_Models_Abstrac
     public function setAddedDate($addedDate)
     {
         $this->_addedDate = $addedDate;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSendNotification()
+    {
+        return $this->_sendNotification;
+    }
+
+    /**
+     * @param mixed $sendNotification
+     */
+    public function setSendNotification($sendNotification)
+    {
+        $this->_sendNotification = $sendNotification;
 
         return $this;
     }

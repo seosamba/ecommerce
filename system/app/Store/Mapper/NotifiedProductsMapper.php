@@ -21,9 +21,10 @@ class Store_Mapper_NotifiedProductsMapper extends Application_Model_Mappers_Abst
         }
 
         $data = array(
-            'user_id'    => $model->getUserId(),
-            'product_id' => $model->getProductId(),
-            'added_date' => $model->getAddedDate(),
+            'user_id'           => $model->getUserId(),
+            'product_id'        => $model->getProductId(),
+            'added_date'        => $model->getAddedDate(),
+            'send_notification' => $model->getSendNotification()
         );
 
         if ($model->getId()) {
@@ -66,6 +67,34 @@ class Store_Mapper_NotifiedProductsMapper extends Application_Model_Mappers_Abst
     }
 
     /**
+     * @param $productId
+     * @return mixed
+     * @throws Exception
+     */
+    public function findCustomersByProductId($productId){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('nnp.product_id = ?', $productId);
+
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('nnp' => 'shopping_notification_notified_products'), array(
+                'nnp.id',
+                'productId'        => 'nnp.product_id',
+                'userEmail'        => 'u.email',
+                'userFullName'     => 'u.full_name',
+                'addedNotifyDate'  => 'nnp.added_date',
+                'productName'      => 'sp.name',
+                'shortDescription' => 'sp.short_description',
+                'productUrl'       => 'p.url'
+            ))
+            ->joinLeft(array('sp' => 'shopping_product'), 'nnp.product_id = sp.id', array())
+            ->joinLeft(array('p' => 'page'), 'sp.page_id = p.id', array())
+            ->joinLeft(array('u' => 'user'), 'nnp.user_id = u.id', array())
+            ->where($where);
+        $result = $this->getDbTable()->getAdapter()->fetchAll($select);
+
+        return $result;
+    }
+
+    /**
      * @param $userId
      * @return mixed
      * @throws Exception
@@ -90,25 +119,5 @@ class Store_Mapper_NotifiedProductsMapper extends Application_Model_Mappers_Abst
 
         return $result;
     }
-
-    /**
-     * Find last added under Wishlist products
-     *
-     * @param $productId
-     * @return mixed
-     * @throws Exception
-     */
-    /*public function findLastUserAdded($productId)
-    {
-        $where = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
-        $select = $this->getDbTable()->getAdapter()->select()->distinct()->from(array('wp' => 'shopping_wishlist_wished_products'), array(
-            'u.full_name'
-        ))
-            ->joinLeft(array('u' => 'user'), 'wp.user_id = u.id', array())
-            ->where($where)->order('wp.added_date DESC')->limit(1);
-
-        return $this->getDbTable()->getAdapter()->fetchRow($select);
-    }*/
-
 
 }

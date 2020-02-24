@@ -42,6 +42,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     const TRIGGER_STORE_GIFT_ORDER = 'store_giftorder';
 
+    /**
+     * Notify customer if qty of product was changed
+     */
+    const TRIGGER_CUSTOMER_NOTIFICATION = 'store_customernotification';
+
     const SHIPPING_TYPE = 'shipping';
 
     const BILLING_TYPE = 'billing';
@@ -611,6 +616,28 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         foreach($address->getAddresses() as $addressData){
            $this->_entityParser->addToDictionary(array('customer:phone'=>$addressData['phone']));
        }
+    }
+
+    /**
+     * Send notification email for customer, when product qty was changed
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendCustomernotificationMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser->addToDictionary(
+            array(
+                'notify:productname' => $this->_options['customerProductData']['productName'],
+                'notify:productdescription' => $this->_options['customerProductData']['shortDescription'],
+                'notify:productqty' => $this->_options['customerProductData']['productQty'],
+                'customer:fullname' => $this->_options['customerProductData']['userFullName'],
+                'notify:producturl' => $this->_websiteHelper->getUrl() . $this->_options['customerProductData']['productUrl']
+            )
+        );
+
+        return $this->_send();
     }
 
 }
