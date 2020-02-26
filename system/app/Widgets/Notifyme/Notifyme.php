@@ -106,7 +106,7 @@ class Widgets_Notifyme_Notifyme extends Widgets_Abstract {
                         $readyaddedToNotify = true;
                     }
 
-                    if($productQty == '0') {
+                    if($productQty == '0' || $productQty < '0') {
                         $isLogged = true;
                     }
                 }

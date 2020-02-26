@@ -1324,7 +1324,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                         $product = $productMapper->find($productId);
 
-                        if($product->getInventory() == '0') {
+                        if($product->getInventory() == '0' || $product->getInventory() < '0') {
                             $currentNotifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
 
                             if($currentNotifiedProduct instanceof Store_Model_NotifiedProductsModel && $currentNotifiedProduct->getSendNotification() == '1') {
@@ -2748,13 +2748,12 @@ class Shopping extends Tools_Plugins_Abstract {
             if($product instanceof Models_Model_Product) {
                 $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
                 $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
-                if(!$notifiedProduct instanceof Store_Model_NotifiedProductsModel && $product->getInventory() == '0') {
+
+                if(!$notifiedProduct instanceof Store_Model_NotifiedProductsModel && ($product->getInventory() == '0' || $product->getInventory() < '0')) {
                     $notifiedProduct = new Store_Model_NotifiedProductsModel();
                     $notifiedProduct->setUserId($userId);
                     $notifiedProduct->setProductId($product->getId());
                     $notifiedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
-
-
                     $notifiedProduct->setSendNotification('0');
 
                     $notifiedProductsMapper->save($notifiedProduct);
