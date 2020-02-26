@@ -1365,8 +1365,6 @@ class Shopping extends Tools_Plugins_Abstract {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
 			$cartSession->notifyObservers();
-
-
 		}
 
 
@@ -2794,6 +2792,56 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         $this->_responseHelper->fail($this->_translator->translate('Can\'t remove notified product! Please re-login into system.'));
+    }
+
+    /**
+     * This action is used to help Notify list gets an portional content
+     *
+     * @throws Exceptions_SeotoasterException
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function rendernotifiedlistproductsAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $content = '';
+        $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Notifyme_Notifyme::DEFAULT_LIMIT;
+        }
+
+        $offset = intval($nextPage) * $limit;
+
+        $productIds = $this->_request->getParam('productIds');
+        $productIds = explode(',', $productIds);
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $enabledOnly = $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1');
+        $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
+        $products = Models_Mapper_ProductMapper::getInstance()->fetchAll($enabledOnly, null, $offset, $limit,
+            null, null, null, false, false, array(), array(), null);
+
+        if (!empty($products)) {
+            $template = $this->_request->getParam('template');
+            $widget = Tools_Factory_WidgetFactory::createWidget('notifyme', array('notifylist', $template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+            unset($widget);
+        }
+        if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
+            $page = Application_Model_Mappers_PageMapper::getInstance()->find($pageId);
+            if ($page instanceof Application_Model_Models_Page && !empty($content)) {
+                $content = $this->_renderViaParser($content, $page);
+            }
+        }
+        echo $content;
     }
 
 }

@@ -1,4 +1,4 @@
-<?php $id = uniqid('wl-'); ?>
+<?php $id = uniqid('nl-'); ?>
     <div class="product-list">
         <?php echo $this->plContent; ?>
         <?php if ($this->totalCount >= $this->limit): ?>
@@ -21,7 +21,7 @@
                     }, <?php echo array(); ?>);
             showSpinner();
 
-            $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderwishlistproducts/', filters, function(response) {
+            $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/rendernotifiedlistproducts/', filters, function(response) {
                 hideSpinner();
                 if (response) {
                     $(self).before(response);

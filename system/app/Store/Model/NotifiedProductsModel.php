@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Store_Model_WishedProducts
+ * Class Store_Model_NotifiedProductsModel
  */
 class Store_Model_NotifiedProductsModel extends Application_Model_Models_Abstract {
 
