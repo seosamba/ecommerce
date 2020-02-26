@@ -753,6 +753,7 @@
         'Receive this order every semester' => 'Recevoir cette commande chaque semestre',
         'Receive this order every year' => 'Recevoir cette commande chaque année',
         'from ' => 'de',
-        'to ' =>'à'
+        'to ' =>'à',
+        'freeshipping' => 'Frais de livraison offerts'
 
 );?>
