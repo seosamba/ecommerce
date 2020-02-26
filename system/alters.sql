@@ -466,8 +466,14 @@ ALTER TABLE `shopping_customer_address` ADD COLUMN `customer_notes` TEXT COLLATE
 -- version: 2.7.1
 ALTER TABLE `shopping_cart_session` ADD `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 
--- 19/02/2020
+-- 14/02/2020
 -- version: 2.7.2
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('pickupLocationLinks', 0),
+('pickupLocationLinksLimit', 4);
+
+-- 19/02/2020
+-- version: 2.7.3
 CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
   `id` int(10) unsigned AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
@@ -488,6 +494,6 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_customernotification' AND `obs
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
