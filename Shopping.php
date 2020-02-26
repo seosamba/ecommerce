@@ -1308,6 +1308,46 @@ class Shopping extends Tools_Plugins_Abstract {
 				$customer->notifyObservers();
 			}
 			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+
+			$userId = $cartSession->getUserId();
+			$cartStatus = $cartSession->getStatus();
+            $cartContent = $cartSession->getCartContent();
+
+            if(!empty($userId) && $cartStatus == Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+
+                if(!empty($cartContent)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+
+                    foreach ($cartContent as $cContent) {
+                        $productId = $cContent['product_id'];
+
+                        $product = $productMapper->find($productId);
+
+                        if($product->getInventory() == '0') {
+                            $currentNotifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                            if($currentNotifiedProduct instanceof Store_Model_NotifiedProductsModel && $currentNotifiedProduct->getSendNotification() == '1') {
+                                $notifiedProductsMapper->delete($currentNotifiedProduct);
+                            }
+
+                            $where = $notifiedProductsMapper->getDbTable()->getAdapter()->quoteInto("product_id = ?", $productId);
+                            $allOtherNotifiedProducts = $notifiedProductsMapper->fetchAll($where);
+
+                            if(!empty($allOtherNotifiedProducts)) {
+                                foreach ($allOtherNotifiedProducts as $notifiedProduct) {
+                                    if($notifiedProduct->getSendNotification() == '1') {
+                                        $notifiedProduct->setSendNotification('0');
+
+                                        $notifiedProductsMapper->save($notifiedProduct);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
 				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
 			)));
@@ -1325,6 +1365,8 @@ class Shopping extends Tools_Plugins_Abstract {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
 			$cartSession->notifyObservers();
+
+
 		}
 
 
@@ -2711,6 +2753,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $notifiedProduct->setUserId($userId);
                     $notifiedProduct->setProductId($product->getId());
                     $notifiedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
+
 
                     $notifiedProduct->setSendNotification('0');
 
