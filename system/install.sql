@@ -636,6 +636,7 @@ CREATE TABLE IF NOT EXISTS `shopping_group` (
   `priceSign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceValue` decimal(10,2) DEFAULT NULL,
+  `nonTaxable` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -932,5 +933,5 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.3' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.4' WHERE `name` = 'shopping';
 

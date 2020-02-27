@@ -472,7 +472,11 @@ INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4);
 
+-- 27/02/2020
+-- version: 2.7.3
+ALTER TABLE `shopping_group` ADD `nonTaxable` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

@@ -13,7 +13,7 @@
         <?php echo $this->formSelect('groups-list', $this->defaultGroupId, array('id' => 'groups-list','class' => 'grid_4 alpha'), $groupList);?>
     </fieldset>
     <form id="edit-group-form" class="grid_12 alpha omega background">
-        <div class="grid_3 alpha">
+        <div class="grid_2 alpha">
             <?php echo $this->formText( 'groupName', null, array(
                 'class' => 'new-group-name', 'placeholder' => $this->translate( 'Enter group name' )
             ) ); ?>
@@ -26,7 +26,7 @@
             ) ); ?>
 
         </div>
-        <div class="grid_3 mt0px">
+        <div class="grid_2 mt0px">
             <?php echo $this->formText( 'priceValue', null, array(
                 'class' => 'new-group-price-value'
             ) ); ?>
@@ -38,6 +38,9 @@
                 'percent' => '%', 'unit' => Models_Mapper_ShoppingConfig::getInstance()->getConfigParam( 'currency' )
             ) ); ?>
 
+        </div>
+        <div class="grid_2 omega mt5px">
+            <label><?php echo $this->translate('Non taxable');?> <input id="not-taxable-group" type="checkbox" name="nonTaxable" value="1"/></label>
         </div>
 
         <button class="btn grid_4 omega mt0px ticon-plus" type="submit"><?php echo $this->translate( 'Create or update group' ); ?></button>

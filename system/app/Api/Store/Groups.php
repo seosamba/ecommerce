@@ -100,6 +100,10 @@ class Api_Store_Groups extends Api_Service_Abstract {
 
         $data['groupName'] = trim($data['groupName']);
 
+        if (empty($data['nonTaxable'])) {
+            $data['nonTaxable'] = '0';
+        }
+
 		$model = new Store_Model_Group($data);
 		if (is_array($data) && isset($data['groupName'])) {
 			foreach ($data as $key => $value) {

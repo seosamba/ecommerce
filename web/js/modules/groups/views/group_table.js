@@ -90,6 +90,11 @@ define([
                 $('#group-sign').val(responce[0].priceSign).attr('selected',true);
                 $('#priceValue').val(responce[0].priceValue);
                 $('#priceValue').focus();
+                if (responce[0].nonTaxable == '1') {
+                    $('#not-taxable-group').prop('checked', true);
+                } else {
+                    $('#not-taxable-group').prop('checked', false);
+                }
             })
         }
     });
