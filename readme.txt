@@ -203,7 +203,7 @@ Magic spaces:
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
 
- 10. Wishlist widget:
+10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
    htmlclass:class class2 class3 - added html classes, where classX is name of html class.
    btnname:sometext - where sometext is custom text for button name.
@@ -220,3 +220,27 @@ c. {$storewishlist:removeproduct:{$product:id}[htmlclass:class class2 class3[:bt
    btnname:sometext - where sometext is custom text for button name.
 
 d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name who last added product to Wishlist.
+
+11. Inventory notification widget:
+ a. {$notifyme:addTonotificationlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
+    htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+    btnname:sometext - where sometext is custom text for button name.
+    profile - redirected user on profile after add product to notification list.
+ b. {$notifyme:notifylist:_products notification list[:limit[:10]]}
+    Option "_products notification list" template - used for show product on page.
+    Into this template you can use any product and store widgets and magicspases.
+
+    Option limit - you can set custom limit before pagination "show more" for product list ex. {$notifyme:_products notification list:limit:10}
+    where 10 - is count of products. By default limit is 20.
+
+ c. {$notifyme:removeproduct:{$product:id}[htmlclass:class class2 class3[:btnname:sometext]]}
+    htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+    btnname:sometext - where sometext is custom text for button name.
+ d. {$notifyme:isnotified:{$product:id}}
+    Display if customer already have the notification by email.
+
+ e. Action emails lexems:
+    {notify:productname} - Display product name
+    {notify:productdescription} - Display product short description
+    {customer:fullname} - Display customer full name
+    {notify:producturl} - Display link to product page
