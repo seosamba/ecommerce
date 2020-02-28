@@ -1,0 +1,10 @@
+<div class="notify-list-block">
+    <?php if($this->isLogged) :?>
+        <?php if($this->readyaddedToNotify):?>
+            <a href="<?php echo $this->websiteUrl . $this->clientPage ;?>" class="notify-product <?php echo (!empty($this->htmlClass)) ? $this->htmlClass : '';?>" title="<?php echo $this->translate('Already added to notification list');?>"><?php echo $this->translate('Already added to notification list');?></a>
+        <?php else :?>
+            <a href="javascript:;" class="notify-product add-to-notify-list <?php echo (!empty($this->htmlClass)) ? $this->htmlClass : '';?> <?php echo ($this->toТotificationBtnName) ? 'already-notified' : ''?>" title="<?php echo $this->toТotificationBtnName;?>" data-pid="<?php echo $this->productId;?>" data-client-page="<?php echo $this->websiteUrl . $this->clientPage ;?>" data-to-profile="<?php echo $this->goToProgile;?>"><?php echo $this->toТotificationBtnName;?></a>
+        <?php endif;?>
+    <?php endif;?>
+    <input type="hidden" class="secureToken" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>">
+</div>

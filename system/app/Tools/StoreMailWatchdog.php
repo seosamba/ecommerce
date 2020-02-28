@@ -42,6 +42,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     const TRIGGER_STORE_GIFT_ORDER = 'store_giftorder';
 
+    /**
+     * Notify customer if qty of product was changed
+     */
+    const TRIGGER_CUSTOMER_NOTIFICATION = 'store_customernotification';
+
     const SHIPPING_TYPE = 'shipping';
 
     const BILLING_TYPE = 'billing';
@@ -429,7 +434,24 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
         $this->_entityParser->addToDictionary(array('order:currency'=>$currency));
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
-		return $this->_send();
+
+        $pluginInvoicePdf = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+        if ($pluginInvoicePdf instanceof Application_Model_Models_Plugin && $pluginInvoicePdf->getStatus() === Application_Model_Models_Plugin::ENABLED) {
+            $invoicetopdfConfig = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams('attachInvoiceActionEmail');
+            if (isset($invoicetopdfConfig['attachInvoiceActionEmail']) && $invoicetopdfConfig['attachInvoiceActionEmail'] === '1') {
+                $fileInfo = Tools_Misc::prepareInvoice(['cartId' => $this->_object->getId(), 'dwn' => 0]);
+                if (isset($fileInfo['folder']) && isset($fileInfo['fileName'])) {
+                    $attachment = new Zend_Mime_Part(file_get_contents($fileInfo['folder'] . $fileInfo['fileName']));
+                    $attachment->type = 'application/pdf';
+                    $attachment->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
+                    $attachment->encoding = Zend_Mime::ENCODING_BASE64;
+                    $attachment->filename = $fileInfo['fileName'];
+                    $this->_mailer->addAttachment($attachment);
+                }
+            }
+        }
+
+        return $this->_send();
 	}
 
     /**
@@ -611,6 +633,28 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         foreach($address->getAddresses() as $addressData){
            $this->_entityParser->addToDictionary(array('customer:phone'=>$addressData['phone']));
        }
+    }
+
+    /**
+     * Send notification email for customer, when product qty was changed
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendCustomernotificationMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser->addToDictionary(
+            array(
+                'notify:productname' => $this->_options['customerProductData']['productName'],
+                'notify:productdescription' => $this->_options['customerProductData']['shortDescription'],
+                'notify:productqty' => $this->_options['customerProductData']['productQty'],
+                'customer:fullname' => $this->_options['customerProductData']['userFullName'],
+                'notify:producturl' => $this->_websiteHelper->getUrl() . $this->_options['customerProductData']['productUrl']
+            )
+        );
+
+        return $this->_send();
     }
 
 }

@@ -132,7 +132,10 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         $coordinates = array(),
         $maxWeight = false,
         $groupByCities = false,
-        $searchBy = array()
+        $searchBy = array(),
+        $originalLatitude = '',
+        $originalLongitude = '',
+        $pickupLocationLinks = false
     ) {
         $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
         $where = $pickupLocationsZonesConfig->getAdapter()->quoteInto('shplz.pickup_location_category_id <> ?', 0);
@@ -193,9 +196,20 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
             $comparator
         ) . ' ))';
 
+        $additionalCols = array('price' => 'amount_location_category');
+
+        if($pickupLocationLinks && !empty($coordinates)) {
+            $additionalCols += array('distance' => new Zend_Db_Expr("(6371 * acos (cos ( radians($originalLatitude) )* cos( radians( `shpl`.`lat` ) )
+                    * cos( radians( `shpl`.`lng` ) - radians($originalLongitude) )
+                    + sin ( radians($originalLatitude) )
+                    * sin( radians( `shpl`.`lat` ) )
+                    )
+                )"));
+        }
+
         $select = $pickupLocationsZonesConfig->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
             ->setIntegrityCheck(false)
-            ->from(array('shplz' => 'shopping_pickup_location_zones'), array('price' => 'amount_location_category'))
+            ->from(array('shplz' => 'shopping_pickup_location_zones'), $additionalCols)
             ->joinLeft(
                 array('shpl' => 'shopping_pickup_location'),
                 'shplz.pickup_location_category_id=shpl.location_category_id'
@@ -218,6 +232,10 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
             $select->group(array('shpl.city', 'shpl.country'));
         } else {
             $select->group('shpl.id');
+        }
+
+        if($pickupLocationLinks && !empty($coordinates)) {
+            $select->order('distance');
         }
 
         $select->where($where);

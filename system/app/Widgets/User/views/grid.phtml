@@ -1,3 +1,6 @@
+<?php
+    $this->headScript()->appendFile($this->websiteUrl . "system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js");
+?>
 <div id="user-grid-part">
         <ul class="user-stats clearfix">
             <?php foreach ($this->stats as $status => $value) : ?>
@@ -15,9 +18,9 @@
             <?php endforeach; ?>
         </ul>
         <div class="user-orders-range">
-            <label><?php echo $this->translate('Date range');?></label>
+            <label><?php echo $this->translate('from ');?></label>
             <input type="text" id="user-orders-filter-fromdate" name="filter-from-date">
-            <label><?php echo $this->translate('to');?></label>
+            <label><?php echo $this->translate('to ');?></label>
             <input type="text" id="user-orders-filter-todate" name="filter-to-date">
         </div>
         <table id="user-orders-table" border="1" class="widget responsive">
@@ -88,7 +91,7 @@
         </table>
 </div>
 <script>
-    $.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
+
        $(function(){
             var oTable = $('#user-orders-table').dataTable({
                 iDisplayLength:10,

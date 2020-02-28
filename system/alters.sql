@@ -516,6 +516,33 @@ ALTER TABLE `shopping_customer_address` ADD COLUMN `customer_notes` TEXT COLLATE
 -- version: 2.7.1
 ALTER TABLE `shopping_cart_session` ADD `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 
+-- 14/02/2020
+-- version: 2.7.2
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('pickupLocationLinks', 0),
+('pickupLocationLinksLimit', 4);
+
+-- 19/02/2020
+-- version: 2.7.3
+CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+   `send_notification` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_NotifyObserver');
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_customernotification'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_customernotification' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
