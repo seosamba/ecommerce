@@ -493,7 +493,11 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_customernotification' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+-- 27/02/2020
+-- version: 2.7.4
+ALTER TABLE `shopping_group` ADD `nonTaxable` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.5' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
