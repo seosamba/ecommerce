@@ -1308,6 +1308,46 @@ class Shopping extends Tools_Plugins_Abstract {
 				$customer->notifyObservers();
 			}
 			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+
+			$userId = $cartSession->getUserId();
+			$cartStatus = $cartSession->getStatus();
+            $cartContent = $cartSession->getCartContent();
+
+            if(!empty($userId) && $cartStatus == Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+
+                if(!empty($cartContent)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+
+                    foreach ($cartContent as $cContent) {
+                        $productId = $cContent['product_id'];
+
+                        $product = $productMapper->find($productId);
+
+                        if($product->getInventory() == '0' || $product->getInventory() < '0') {
+                            $currentNotifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                            if($currentNotifiedProduct instanceof Store_Model_NotifiedProductsModel && $currentNotifiedProduct->getSendNotification() == '1') {
+                                $notifiedProductsMapper->delete($currentNotifiedProduct);
+                            }
+
+                            $where = $notifiedProductsMapper->getDbTable()->getAdapter()->quoteInto("product_id = ?", $productId);
+                            $allOtherNotifiedProducts = $notifiedProductsMapper->fetchAll($where);
+
+                            if(!empty($allOtherNotifiedProducts)) {
+                                foreach ($allOtherNotifiedProducts as $notifiedProduct) {
+                                    if($notifiedProduct->getSendNotification() == '1') {
+                                        $notifiedProduct->setSendNotification('0');
+
+                                        $notifiedProductsMapper->save($notifiedProduct);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
 				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
 			)));
@@ -2678,6 +2718,130 @@ class Shopping extends Tools_Plugins_Abstract {
         $countries = $zonesMapper->getSavedZoneCountries();
 
         $this->_responseHelper->success(array('savedCounties' => $countries));
+    }
+
+    /**
+     * Added product to notification list
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function addToNotifyListAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+        }
+
+        $productId = $this->_request->getParam('pid');
+        $user = $this->_sessionHelper->getCurrentUser();
+        $userId = $user->getId();
+        $userRole = $user->getRoleId();
+
+        if(!empty($productId) && !empty($userId) && $userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+            $product = $productMapper->find($productId);
+            if($product instanceof Models_Model_Product) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+                $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                if(!$notifiedProduct instanceof Store_Model_NotifiedProductsModel && ($product->getInventory() == '0' || $product->getInventory() < '0')) {
+                    $notifiedProduct = new Store_Model_NotifiedProductsModel();
+                    $notifiedProduct->setUserId($userId);
+                    $notifiedProduct->setProductId($product->getId());
+                    $notifiedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
+                    $notifiedProduct->setSendNotification('0');
+
+                    $notifiedProductsMapper->save($notifiedProduct);
+
+                    $this->_responseHelper->success(array('addedToList' => $this->_translator->translate('Added to notification list')));
+                } else {
+                    $this->_responseHelper->success(array('alreadyNotified' => $this->_translator->translate('Product already added to notification list')));
+                }
+            }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t add product to notification list! Please re-login into system.'));
+        }
+    }
+
+    /**
+     * Remove notified product
+     */
+    public function removeNotifiedProductAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $productId = filter_var($this->_request->getParam('pid'), FILTER_SANITIZE_NUMBER_INT);
+        $currentUserModel = $this->_sessionHelper->getCurrentUser();
+        $userRole = $currentUserModel->getRoleId();
+
+        if($userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $userId = $currentUserModel->getId();
+
+            if ($userId && !empty($productId)) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+                $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                if($notifiedProduct instanceof Store_Model_NotifiedProductsModel) {
+                    $notifiedProductsMapper->delete($notifiedProduct);
+
+                    $this->_responseHelper->success($this->_translator->translate('Removed'));
+                }
+            }
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Can\'t remove notified product! Please re-login into system.'));
+    }
+
+    /**
+     * This action is used to help Notify list gets an portional content
+     *
+     * @throws Exceptions_SeotoasterException
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function rendernotifiedlistproductsAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $content = '';
+        $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Notifyme_Notifyme::DEFAULT_LIMIT;
+        }
+
+        $offset = intval($nextPage) * $limit;
+
+        $productIds = $this->_request->getParam('productIds');
+        $productIds = explode(',', $productIds);
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $enabledOnly = $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1');
+        $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
+        $products = Models_Mapper_ProductMapper::getInstance()->fetchAll($enabledOnly, null, $offset, $limit,
+            null, null, null, false, false, array(), array(), null);
+
+        if (!empty($products)) {
+            $template = $this->_request->getParam('template');
+            $widget = Tools_Factory_WidgetFactory::createWidget('notifyme', array('notifylist', $template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+            unset($widget);
+        }
+        if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
+            $page = Application_Model_Mappers_PageMapper::getInstance()->find($pageId);
+            if ($page instanceof Application_Model_Models_Page && !empty($content)) {
+                $content = $this->_renderViaParser($content, $page);
+            }
+        }
+        echo $content;
     }
 
 }

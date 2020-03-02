@@ -401,7 +401,7 @@
         'edit'=>'éditer',
         'Apply'=>'Appliquer',
         'Show more' => 'Plus d&rsquo;adresse',
-        'No more products found'=>'Pas plus de produits trouvés',
+        'No more products found'=>'Plus de produits trouvés',
         'This product is disabled.'=>'Ce produit est désactivé.',
         'Edit product'=>'Editer un produit',
         'In stock'=>'En stock',
@@ -754,6 +754,15 @@
         'Receive this order every year' => 'Recevoir cette commande chaque année',
         'from ' => 'de',
         'to ' =>'à',
-        'freeshipping' => 'Frais de livraison offerts'
+        'freeshipping' => 'Frais de livraison offerts',
+        'show more' => 'Montrer plus',
+        'Add to notification list' => 'Ajouter à la liste des notifications',
+        'Remove notified product' => 'Enlever le produit mentionné',
+        'Added to notification list' => 'Ajouté à la liste des notifications',
+        'Product already added to notification list' => 'Le produit est déjà ajouté à la liste des notifications',
+        'Can\'t add product to notification list! Please re-login into system.' => 'Impossible d\'ajouter le produit à la liste des notifications! Veuillez vous reconnecter au système.',
+        'Direct access not allowed' => 'Accès direct non autorisé',
+        'Removed' => 'Enlevé',
+        'Can\'t remove notified product! Please re-login into system.' => 'Impossible d\'enlever le produit mentionné! Veuillez vous reconnecter au système.'
 
 );?>
