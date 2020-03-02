@@ -127,7 +127,10 @@ class Widgets_User_User extends Widgets_User_Base {
             })),
             'quote_sent' => sizeof(array_filter($orders, function ($order) {
                 return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote');
-            }))
+            })),
+            'refunded' => sizeof(array_filter($orders, function ($order) {
+                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_REFUNDED;
+        })),
 
         );
         $this->_view->orders = $orders;
