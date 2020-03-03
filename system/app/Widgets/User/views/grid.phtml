@@ -41,7 +41,8 @@
             <?php if ($this->orders): ?>
                 <?php foreach ($this->orders as $order):?>
                     <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED ||
-                     $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')):?>
+                     $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')
+                    || $order->getStatus() === Models_Model_CartSession::CART_STATUS_REFUNDED):?>
                     <tr data-role="cart" data-id="<?php echo $order->getId();?>">
                         <td><?php echo date("d-M-Y", strtotime($order->getCreatedAt()));?></td>
                         <td><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
@@ -57,7 +58,8 @@
                             <?php endif;?>
                         </td>
                         <td>
-                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
+                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED
+                                || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
                                 <?php if($order->getShippingTrackingId() != ''):?>
                                     <p class="textcentered">
                                         <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Track your parcel')?></a>
@@ -76,7 +78,8 @@
                         <?php endif;?>
                         <?php if(isset($this->invoicePlugin)):?>
                             <td>
-                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
+                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED
+                                    || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
                                     <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
                                         <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
                                     </a>

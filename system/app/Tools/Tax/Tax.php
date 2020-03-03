@@ -21,7 +21,10 @@ class Tools_Tax_Tax {
 	 * @return float|int
 	 */
 	public static function calculateProductTax(Models_Model_Product $product, $destinationAddress = null, $taxRateOnly = false) {
-		if(($taxClass = $product->getTaxClass()) != 0) {
+
+        $isTaxable = self::isTaxableGroup();
+
+	    if(($taxClass = $product->getTaxClass()) != 0 && $isTaxable === true) {
 			$rateMethodName = 'getRate' . $taxClass;
 
 			if (null !== $destinationAddress){
@@ -49,8 +52,11 @@ class Tools_Tax_Tax {
     */
 
     public static function calculateShippingTax($shippingPrice, $destinationAddress = null) {
+
+        $isTaxable = self::isTaxableGroup();
+
         $shippingTaxClass = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('shippingTaxRate');
-        if($shippingTaxClass !=  '0' && $shippingTaxClass != null) {
+        if($shippingTaxClass !=  '0' && $shippingTaxClass != null && $isTaxable === true) {
             $getRate = 'getRate'.$shippingTaxClass;
             if (null !== $destinationAddress){
                 $zoneId = self::getZone($destinationAddress);
@@ -76,7 +82,9 @@ class Tools_Tax_Tax {
      */
 
     public static function calculateDiscountTax($discountPrice, $discountTaxRate, $destinationAddress = null) {
-        if($discountTaxRate != '0') {
+
+        $isTaxable = self::isTaxableGroup();
+        if($discountTaxRate != '0' && $isTaxable === true) {
             $getRate = 'getRate'.$discountTaxRate;
             if (null !== $destinationAddress){
                 $zoneId = self::getZone($destinationAddress);
@@ -224,4 +232,31 @@ class Tools_Tax_Tax {
 		return 0;
 	}
 
+    /**
+     * Check if user in non taxable group
+     *
+     * @return bool
+     */
+    public static function isTaxableGroup()
+    {
+        $isTaxable = true;
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $user = $sessionHelper->getCurrentUser();
+        $id = $user->getId();
+        if (!empty($id)) {
+            $dbTable = new Zend_Db_Table();
+            $select = $dbTable->getAdapter()->select()
+                ->from(array('sg' => 'shopping_group'), array('sg.groupName', 'sg.nonTaxable'))
+                ->join(array('sci' => 'shopping_customer_info'), 'sg.id = sci.group_id', array())
+                ->where('sci.user_id = ' . $user->getId());
+            $userInGroup = $dbTable->getAdapter()->fetchRow($select);
+            if (!empty($userInGroup)) {
+                if (!empty($userInGroup['nonTaxable'])) {
+                    $isTaxable = false;
+                }
+            }
+        }
+
+        return $isTaxable;
+    }
 }
