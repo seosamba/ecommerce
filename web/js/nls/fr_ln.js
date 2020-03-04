@@ -105,7 +105,11 @@ define({
         'Add State' : 'Ajouter un état',
         'Postal codes' : 'Code Postal',
         'Insert list of zip/postal codes: one per line' : 'Introduire la liste des codes postaux: un par ligne',
-        'Wait a minute! this country is already part of another zone... Add anyway?' : 'Attendez une minute! Сe pays fait déjà partie d\'une autre zone... Ajouter tout de même?'
+        'Wait a minute! this country is already part of another zone... Add anyway?' : 'Attendez une minute! Сe pays fait déjà partie d\'une autre zone... Ajouter tout de même?',
+        'Line break' : 'Saut de ligne',
+        'Line break <br>' : 'Saut de ligne <br>',
+        'Paragraph' : 'Paragraphe',
+        'Paragraph <p></p>' : 'Paragraphe <p></p>'
 
     }
 });
