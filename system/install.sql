@@ -157,7 +157,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.4');
+('version', '2.7.6');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -945,6 +945,38 @@ CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
 
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_NotifyObserver');
 
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `param_type` ENUM('text', 'input', 'select') DEFAULT 'input',
+  `param_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `label` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE(`param_type`, `param_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_data` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `param_id` INT(10) UNSIGNED NOT NULL,
+  `product_id` INT(10) UNSIGNED NOT NULL,
+  `param_value` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `params_option_id` INT(10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `custom_param_id` INT UNSIGNED NOT NULL,
+  `option_value` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_shopping_product_custom_params_options_data_pr_idx` (`custom_param_id` ASC),
+  CONSTRAINT `fk_shopping_product_custom_params_options_data_pr_1`
+    FOREIGN KEY (`custom_param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`)
+    ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.5' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.6' WHERE `name` = 'shopping';
 

@@ -2844,4 +2844,14 @@ class Shopping extends Tools_Plugins_Abstract {
         echo $content;
     }
 
+    public function productCustomFieldsConfigAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            if ($this->_request->isGet()) {
+                $this->_layout->content = $this->_view->render('product-custom-fields-config.phtml');
+                echo $this->_layout->render();
+            }
+        }
+    }
+
 }
