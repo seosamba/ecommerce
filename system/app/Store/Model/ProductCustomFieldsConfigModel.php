@@ -22,6 +22,8 @@ class Store_Model_ProductCustomFieldsConfigModel extends Application_Model_Model
     public function setParamType($paramType)
     {
         $this->_paramType = $paramType;
+
+        return $this;
     }
 
     /**
@@ -38,6 +40,8 @@ class Store_Model_ProductCustomFieldsConfigModel extends Application_Model_Model
     public function setParamName($paramName)
     {
         $this->_paramName = $paramName;
+
+        return $this;
     }
 
     /**
@@ -54,6 +58,8 @@ class Store_Model_ProductCustomFieldsConfigModel extends Application_Model_Model
     public function setLabel($label)
     {
         $this->_label = $label;
+
+        return $this;
     }
 
 

@@ -76,17 +76,6 @@ class Store_Mapper_ProductCustomFieldsConfigMapper extends Application_Model_Map
     }
 
 
-    /**
-     * Get product custom params
-     *
-     * @param string $where SQL where clause
-     * @param string $order OPTIONAL An SQL ORDER clause.
-     * @param int $limit OPTIONAL An SQL LIMIT count.
-     * @param int $offset OPTIONAL An SQL LIMIT offset.
-     * @param bool $withoutCount flag to get with or without records quantity
-     * @param bool $singleRecord flag fetch single record
-     * @return array
-     */
     public function fetchAll(
         $where = null,
         $order = null,
@@ -96,19 +85,19 @@ class Store_Mapper_ProductCustomFieldsConfigMapper extends Application_Model_Map
         $singleRecord = false
     ) {
         $select = $this->getDbTable()->getAdapter()->select()
-            ->from(array('pllcpc' => 'plugin_leads_lead_custom_params_config'),
+            ->from(array('spcfc' => 'shopping_product_custom_fields_config'),
                 array(
-                    'pllcpc.id',
-                    'pllcpc.param_name',
-                    'pllcpc.param_type',
-                    'pllcpc.label',
-                    'option_values' => new Zend_Db_Expr('GROUP_CONCAT(pllcpod.option_value)'),
-                    'option_ids' => new Zend_Db_Expr('GROUP_CONCAT(pllcpod.id)')
+                    'spcfc.id',
+                    'spcfc.param_name',
+                    'spcfc.param_type',
+                    'spcfc.label',
+                    'option_values' => new Zend_Db_Expr('GROUP_CONCAT(spcpod.option_value)'),
+                    'option_ids' => new Zend_Db_Expr('GROUP_CONCAT(spcpod.id)')
                 )
             )
-            ->joinLeft(array('pllcpod' => 'plugin_leads_lead_custom_params_options_data'),
-                'pllcpod.custom_param_id = pllcpc.id', array())
-            ->group('pllcpc.id');
+            ->joinLeft(array('spcpod' => 'shopping_product_custom_params_options_data'),
+                'spcpod.custom_param_id = spcfc.id', array())
+            ->group('spcfc.id');
         if (!empty($order)) {
             $select->order($order);
         }
@@ -131,8 +120,8 @@ class Store_Mapper_ProductCustomFieldsConfigMapper extends Application_Model_Map
             $select->reset(Zend_Db_Select::LIMIT_OFFSET);
             $select->reset(Zend_Db_Select::GROUP);
 
-            $select->from(array('pllcpc' => 'plugin_leads_lead_custom_params_config'),
-                array('count' => 'COUNT(pllcpc.id)'));
+            $select->from(array('spcfc' => 'shopping_product_custom_fields_config'),
+                array('count' => 'COUNT(spcfc.id)'));
             $count = $this->getDbTable()->getAdapter()->fetchRow($select);
 
             return array(
@@ -154,7 +143,7 @@ class Store_Mapper_ProductCustomFieldsConfigMapper extends Application_Model_Map
      */
     public function getCustomParamsConfig()
     {
-        $select = $this->getDbTable()->getAdapter()->select()->from('plugin_leads_lead_custom_params_config',
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product_custom_fields_config',
             array('id', 'param_type', 'param_name', 'label'));
 
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
@@ -167,7 +156,7 @@ class Store_Mapper_ProductCustomFieldsConfigMapper extends Application_Model_Map
      */
     public function getCustomParamsPairs()
     {
-        $select = $this->getDbTable()->getAdapter()->select()->from('plugin_leads_lead_custom_params_config',
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product_custom_fields_config',
             array('id', 'label'));
 
         return $this->getDbTable()->getAdapter()->fetchPairs($select);
@@ -185,7 +174,7 @@ class Store_Mapper_ProductCustomFieldsConfigMapper extends Application_Model_Map
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $id);
 
-        return $this->getDbTable()->getAdapter()->delete('plugin_leads_lead_custom_params_config', $where);
+        return $this->getDbTable()->getAdapter()->delete('shopping_product_custom_fields_config', $where);
 
     }
 

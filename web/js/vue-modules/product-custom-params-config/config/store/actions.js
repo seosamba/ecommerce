@@ -1,18 +1,20 @@
 export const saveConfigData = ({commit, state, dispatch}, payload) => {
     showLoader();
-    /*return new Promise((resolve, reject) => {
+    //debugger;
+    return new Promise((resolve, reject) => {
         debugger;
         $.ajax({
-            'url': $('#website_url').val() + 'api/store/productcustomfields/',
+            'url': $('#website_url').val() + 'api/store/Productcustomfieldsconfig/',
             'type': 'POST',
             'dataType': 'json',
             'data': {
-                'secureToken' : $('#assign-groups-rules-config-token').val(),
-                'rule_name' :  payload.ruleName,
-                'fieldsData':payload.fieldsData,
-                'actionsData': payload.actionsData
+                'secureToken' : $('#product-custom-params-config-token').val(),
+                'param_type' :  payload.param_type,
+                'param_name' :  payload.param_name,
+                'label':payload.label
             }
         }).done(async function (response) {
+            //debugger;
             hideLoader();
             if (response.status === 'error') {
                 resolve(response);
@@ -21,22 +23,24 @@ export const saveConfigData = ({commit, state, dispatch}, payload) => {
             }
 
         }).fail(async function(response){
+            //debugger;
             hideLoader();
             resolve({ name: 'login', 'message': 'Please re-login'});
         });
-    });*/
+    });
 };
 
 export const updateConfigData = ({commit, state, dispatch}, payload) => {
     showLoader();
+    //debugger;
     /*return new Promise((resolve, reject) => {
         debugger;
         $.ajax({
-            'url': $('#website_url').val() + 'api/store/productcustomfields/',
+            'url': $('#website_url').val() + 'api/store/Productcustomfieldsconfig/',
             'type': 'PUT',
             'dataType': 'json',
             'data': JSON.stringify({
-                'secureToken' : $('#assign-groups-rules-config-token').val(),
+                'secureToken' : $('#product-custom-params-config-token').val(),
                 'rule_name' :  payload.ruleName,
                 'fieldsData':payload.fieldsData,
                 'actionsData': payload.actionsData,
@@ -59,10 +63,9 @@ export const updateConfigData = ({commit, state, dispatch}, payload) => {
 
 export const deleteConfigRecord = ({commit, state, dispatch}, payload) => {
         showLoader();
-        /*return new Promise((resolve, reject) => {
-            debugger;
+        return new Promise((resolve, reject) => {
             $.ajax({
-                'url': $('#website_url').val() + 'api/store/productcustomfields/id/' + payload.id+'/secureToken/'+ $('#assign-groups-rules-config-token').val(),
+                'url': $('#website_url').val() + 'api/store/Productcustomfieldsconfig/id/' + payload.id+'/secureToken/'+ $('#product-custom-params-config-token').val(),
                 'type': 'DELETE',
                 'dataType': 'json'
             }).done(async function (response) {
@@ -77,29 +80,27 @@ export const deleteConfigRecord = ({commit, state, dispatch}, payload) => {
                 hideLoader();
                 resolve({name: 'login', 'message': 'Please re-login'});
             });
-        });*/
+        });
 };
 
-export const getConfigSavedData = ({commit, state, dispatch}, payload) => {
+export const getProductConfigSavedData = ({commit, state, dispatch}, payload) => {
     showLoader();
-    debugger;
     return new Promise((resolve, reject) => {
-        debugger;
         $.ajax({
-            'url': $('#website_url').val()+'api/store/productcustomfields/',
+            'url': $('#website_url').val()+'api/store/Productcustomfieldsconfig/',
             'type': 'GET',
             'dataType': 'json',
             'data': {
-                'limit': state.pagination.rulesConfig.itemsPerPage,
-                'offset': (state.pagination.rulesConfig.currentPage - 1) * state.pagination.rulesConfig.itemsPerPage
+                'limit': state.pagination.customFieldsConfig.itemsPerPage,
+                'offset': (state.pagination.customFieldsConfig.currentPage - 1) * state.pagination.customFieldsConfig.itemsPerPage
             }
         }).done(async  function(response){
-            debugger;
             hideLoader();
+            //debugger;
             if (response.status !== 'error') {
-                commit('setPaginationData', {rulesConfig: {totalItems: response.rulesData.totalRecords}});
-                commit('setConfigDataInfo', response.rulesData.data);
-                commit('setConfigScreenInfo', response.rulesData.configData);
+                commit('setPaginationData', {customFieldsConfig: {totalItems: response.totalRecords}});
+                commit('setConfigDataInfo', response.data);
+                //commit('setConfigScreenInfo', response.rulesData.configData);
                 resolve(response);
             } else {
                 resolve({ name: 'login', 'message': 'Please re-login'});
@@ -115,7 +116,7 @@ export const getRuleConfig = ({commit, state, dispatch}, payload) => {
     /*return new Promise((resolve, reject) => {
         debugger;
         $.ajax({
-            'url': $('#website_url').val()+'api/store/productcustomfields/',
+            'url': $('#website_url').val()+'api/store/Productcustomfieldsconfig/',
             'type': 'GET',
             'dataType': 'json',
             'data': {

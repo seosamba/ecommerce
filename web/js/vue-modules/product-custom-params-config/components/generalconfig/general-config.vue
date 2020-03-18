@@ -1,62 +1,56 @@
 <template>
     <div v-show="loadedForm">
-        <div class="grid_12 alpha omega">
-            <form id="add-custom-tab-form" @submit.prevent="addRule" class="grid_12 alpha omega" action="" method="POST">
-                <fieldset class="background">
-                    <legend class="background p5px">{{$t('message.groupConfigLegend')}}</legend>
-                    <select @change="addProperty(chosenProperty)" class="grid_3 mt20px" name="rule" v-model="chosenProperty">
-                        <option value="0">{{$t('message.selectCustomParam')}}</option>
-                        <option  v-bind:value="name" v-for="(value, name) in configScreenInfo.customParams">{{name}}</option>
-                    </select>
-                    <div class="grid_6 mt20px">
-                        <p class="grid_12 mb10px" v-for="(propertyData, index) in propertyDataEl">
-                            <label class="grid_4 alpha mt5px">{{propertyData.label}}</label>
-                            <select class="grid_3 omega alpha"  v-model="propertyData.operator">
-                                <option v-for="(name, value) in propertyData.operators" v-bind:value="value">{{name}}</option>
-                            </select>
-                            <input class="grid_4 alpha" v-model.trim="propertyData.value"
-                                   :name="propertyData.name" :placeholder="propertyData.placeholder">
-                            <a class="text-center ticon-close error icon grid_1" @click="deletePropertyData(index)"></a>
-                        </p>
-                    </div>
-                    <div class="grid_3 mt0px">
-                        <label class="grid_12 t-grid_3 t-alpha">{{$t('message.selectGroup')}}</label>
-                        <select v-model="selectedGroup" name="form-action-assign-customer-group" class="grid_12 omega">
-                            <option value="0">{{$t('message.selectGroup')}}</option>
-                            <option v-bind:value="customerGroup[0]"  v-for="(customerGroup, index) in customerGroups">{{customerGroup[1]}}</option>
-                        </select>
-                    </div>
-                    <p class="grid_12 omega mt10px">
-                        <input class="prefix_7 grid_2 alpha mt15px omega" type="text" name="ruleName" v-model.trim="ruleName" placeholder="Rule name"/>
-                        <button id="custom-tab-form-save" class="btn grid_3 fl-right" type="submit">Add rule</button>
-                    </p>
-                </fieldset>
-            </form>
-        </div>
         <div id="tab-grid" v-show="loadedGrid">
-            <div class="grid_12 alpha omega h360px mt10px">
+            <div class="grid_12 alpha omega h360px">
                 <table class="manage-saved-config-table responsive">
                     <thead>
                     <tr>
-                        <th>Rule name</th>
-                        <th>Action taken</th>
-                        <th>Last updated</th>
-                        <th class="text-right">Action</th>
+                        <th>{{$t('message.fieldType')}}</th>
+                        <th>{{$t('message.fieldName')}}</th>
+                        <th>{{$t('message.fieldLabel')}}</th>
+                        <th class="text-right">{{$t('message.fieldAction')}}</th>
                     </tr>
                     </thead>
                     <tbody>
                         <tr v-for="configData in configDataInfo">
-                            <td><a @click="goToRuleDetailScreen(configData.id)">{{configData.rule_name}}</a></td>
-                            <td>{{configData.actionTypes}}</td>
-                            <td>{{prepareDate(configData.createdAt)}}</td>
+                            <td>{{configData.param_type}}</td>
+                            <td>{{configData.param_name}}</td>
+                            <td>{{configData.label}}</td>
                             <td class="text-right">
                                 <a @click="deleteConfigItem(configData.id)" class="ticon-remove error icon14" href="javascript:;"></a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <pagination sectionName="rulesConfig" @paginationHandler="$store.dispatch('getConfigSavedData', {})"></pagination>
+                <pagination sectionName="customFieldsConfig" @paginationHandler="$store.dispatch('getProductConfigSavedData', {})"></pagination>
             </div>
+        </div>
+        <div>
+            <form id="product-custom-params-form" @submit.prevent="addCustomField" class="grid_12 alpha omega"
+                  action="" method="POST">
+                <fieldset class="background">
+                    <legend class="background p5px">{{$t('message.addFieldToScreen')}}</legend>
+                    <p class="grid_3 alpha omega mt0px">
+                        <label>{{$t('message.customFeieldType')}}:</label>
+                        <select id="product-field-type" class="required" name="param_type" v-model="param_type">
+                            <option value="text">{{$t('message.textField')}}</option>
+                            <option value="select">{{$t('message.dropdownField')}}</option>
+                        </select>
+                    </p>
+                    <p class="grid_3 omega mt0px">
+                        <label>{{$t('message.customFieldName')}}:</label>
+                        <input class="required param_name" type="text" name="param_name" v-model.trim="param_name" value=""/>
+                    </p>
+                    <p class="grid_3 omega mt0px">
+                        <label>{{$t('message.customFieldLabel')}}:</label>
+                        <input class="required param_label" type="text" name="label" v-model.trim="label" value=""/>
+                    </p>
+                    <p class="grid_3 omega mt0px">
+                        <input id="product-custom-params-form-save" class="btn" type="submit" name="product-custom-params-form-save"
+                               value="Add custom field"/>
+                    </p>
+                </fieldset>
+            </form>
         </div>
     </div>
 </template>

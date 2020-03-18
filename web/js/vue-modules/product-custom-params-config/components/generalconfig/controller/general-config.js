@@ -8,19 +8,10 @@ export default {
             loadedForm: false,
             loadedGrid: false,
             websiteUrl: $('#website_url').val(),
-            chosenProperty: '0',
-            propertyDataEl: [],
-            selectedGroup: '0',
-            ruleName: '',
-            actionsData: [],
-            operators:{
-                'equal': "Equal",
-                'notequal': "Not equal",
-                'like' : "Like"
-            },
-            placeholders: {
-            },
-            locale: $('#system-language-rule-groups').val(),
+            param_type: 'text',
+            param_name: '',
+            label: '',
+            locale: $('#system-language-product-custom-fields').val(),
             localeMapping: {
                 'en':'en',
                 'en_US':'en',
@@ -40,10 +31,10 @@ export default {
         },
         configScreenInfo: function() {
             return this.$store.getters.getConfigScreenInfo;
-        },
+        }/*,
         customerGroups: function() {
            return this.alphabeticalSort(this.$store.getters.getConfigScreenInfo.customerGroups);
-        }
+        }*/
     },
     methods: {
         alphabeticalSort: function(obj){
@@ -63,7 +54,7 @@ export default {
             });
             return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
         },
-        addProperty: function(name)
+        /*addProperty: function(name)
         {
             if (name == "0") {
                 return false;
@@ -83,60 +74,58 @@ export default {
                     'placeholder' : this.placeholders[name]
                 })
             }
-        },
-        deletePropertyData: function(index)
+        },*/
+        /*deletePropertyData: function(index)
         {
-            this.propertyDataEl.splice(index,1)
-            this.chosenProperty = '0';
-        },
-        prepareDate: function(createdAt) {
+            this.propertyDataEl.splice(index,1);
+            this.param_type = 'text';
+        },*/
+        /*prepareDate: function(createdAt) {
             if (moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD MMMM YYYY HH:mm:ss') !== 'Invalid date') {
                 return moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD')  + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('MMM') + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
             }
             return '';
-        },
+        },*/
         resetForm: function()
         {
-            this.actionsData = [];
-            this.chosenProperty = '0';
-            this.selectedGroup = 0;
-            this.ruleName = '';
-            this.propertyDataEl = [];
+            this.param_type = 'text';
+            this.param_name = '';
+            this.label = '';
         },
-        async addRule(e){
-            if (this.propertyDataEl.length == '0') {
-                showMessage(this.$t('message.specifyPropertyAction'), true, 2000);
+        async addCustomField(e){
+            //debugger;
+
+            if (this.param_type == '') {
+                showMessage(this.$t('message.specifyParamType'), true, 2000);
                 return false;
             }
 
-            if (this.selectedGroup == '0') {
-                showMessage(this.$t('message.specifyGroup'), true, 2000);
+            if (this.param_name == '') {
+                showMessage(this.$t('message.specifyParamName'), true, 2000);
                 return false;
             }
 
-            if (this.ruleName == '') {
-                showMessage(this.$t('message.specifyRuleName'), true, 2000);
+            if (this.label == '') {
+                showMessage(this.$t('message.specifLabel'), true, 2000);
                 return false;
             }
 
-            this.actionsData.push({
-                'actionType': 'assign_group',
-                'customer_group_id' : this.selectedGroup
-            });
+            //debugger;
 
             const result = await this.$store.dispatch('saveConfigData', {
-                'ruleName':this.ruleName,
-                'fieldsData':this.propertyDataEl,
-                'actionsData': this.actionsData
+                'param_type': this.param_type,
+                'param_name':this.param_name,
+                'label':this.label
             });
 
+           // debugger;
             if (result.status === 'error') {
                 showMessage(result.message, true, 2000);
                 return false;
             } else {
                 this.resetForm();
                 showMessage(result.message, false, 2000);
-                const resultConfigData = await this.$store.dispatch('getConfigSavedData', {'router':this.$router});
+                const resultConfigData = await this.$store.dispatch('getProductConfigSavedData', {'router':this.$router});
                 if(result.status === 'error') {
 
                 } else {
@@ -149,6 +138,7 @@ export default {
             this.$router.push({ name: 'rulesdetails', params: {'id': ruleId}});
         },
         async deleteConfigItem(id){
+            //debugger;
             showConfirm(this.$t('message.actionConfirmation'), async () => {
                 const result = await this.$store.dispatch('deleteConfigRecord', {'id': id});
 
@@ -157,7 +147,7 @@ export default {
                     return false;
                 } else {
                     showMessage(result.message, false, 2000);
-                    const resultConfigData = await this.$store.dispatch('getConfigSavedData', {'router':this.$router});
+                    const resultConfigData = await this.$store.dispatch('getProductConfigSavedData', {'router':this.$router});
                     if(result.status === 'error') {
 
                     } else {
@@ -170,7 +160,7 @@ export default {
     async created(){
         this.$i18n.locale = this.localeMapping[this.locale];
 
-        const result = await this.$store.dispatch('getConfigSavedData', {'router':this.$router});
+        const result = await this.$store.dispatch('getProductConfigSavedData', {'router':this.$router});
         console.log('created', result);
         if(result.status === 'error') {
             showMessage('Please re-login', true, 3000);
