@@ -524,10 +524,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
   `custom_param_id` INT UNSIGNED NOT NULL,
   `option_value` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_shopping_product_custom_params_options_data_pr_idx` (`custom_param_id` ASC),
-  CONSTRAINT `fk_shopping_product_custom_params_options_data_pr_1`
-    FOREIGN KEY (`custom_param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`)
-    ON DELETE CASCADE ON UPDATE NO ACTION
+  FOREIGN KEY (`custom_param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
