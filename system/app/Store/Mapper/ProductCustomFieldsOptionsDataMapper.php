@@ -73,13 +73,19 @@ class Store_Mapper_ProductCustomFieldsOptionsDataMapper extends Application_Mode
     /**
      * Get all options data custom params
      *
+     * @param string $orderBy order by
+     *
      * @return array
      * @throws Exception
      */
-    public function getCustomParamsOptionsDataConfig()
+    public function getCustomParamsOptionsDataConfig($orderBy = '')
     {
         $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product_custom_params_options_data',
             array('id', 'custom_param_id', 'option_value'));
+
+        if (!empty($orderBy)) {
+            $select->order($orderBy);
+        }
 
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }

@@ -2,6 +2,11 @@
 
 class Store_Model_ProductCustomFieldsConfigModel extends Application_Model_Models_Abstract
 {
+
+    const CUSTOM_PARAM_TYPE_TEXT = 'text';
+
+    const CUSTOM_PARAM_TYPE_SELECT = 'select';
+
     protected $_paramType = '';
 
     protected $_paramName = '';

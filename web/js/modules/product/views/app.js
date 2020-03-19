@@ -578,7 +578,8 @@ define([
         },
 		saveProduct: function(){
             showSpinner();
-            var self = this;
+            var self = this,
+                productCustomParams = [];
 
             if (!this.validateProduct()) {
                 hideSpinner();
@@ -603,7 +604,18 @@ define([
                 productAllowanceDate = '';
             }
 
+            $.each(this.$el.find('.product-custom-param'), function(number, data){
+                productCustomParams.push(
+                    {
+                        'id':$(data).data('custom-param-id'),
+                        'value':$(data).val(),
+                        'paramType':$(data).data('param-type')
+                    }
+                );
+            });
+
             this.model.set({allowance: productAllowanceDate});
+            this.model.set({customParams: productCustomParams});
 
             this.model.save();
 

@@ -807,6 +807,14 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->plugins = $plugins;
 			$this->_view->websiteConfig = $this->_websiteConfig;
             $this->_view->configTabs = $configTabs;
+            $configParamsData = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance()->getCustomParamsOptionsDataConfig(array('custom_param_id ASC'));
+            if (!empty($configParamsData)) {
+                $configParamsData = Tools_CustomParamsTools::prepareCustomParamsOptions($configParamsData);
+            } else {
+                $configParamsData = array();
+            }
+            $this->_view->productCustomParamsConfig = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance()->getCustomParamsConfig();
+            $this->_view->productCustomParamsOptions = $configParamsData;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();

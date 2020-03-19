@@ -122,6 +122,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processFreebies($model);
         }
 
+        if (!empty($model->getCustomParams())) {
+            $this->_processCustomParams($model->getCustomParams());
+        }
+
         //process product parts if any
         $this->_processParts($model);
 
@@ -396,6 +400,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $entity->setAllowance($allowanceDate);
         }
 
+
+
 		return $entity;
 	}
 
@@ -488,6 +494,21 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
 
     }
+
+    private function _processCustomParams($customParams)
+    {
+        if (!empty($customParams)) {
+            $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+
+            foreach ($customParams as $customParam) {
+                $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->findById($customParam['id']);
+                if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+
+                }
+            }
+        }
+    }
+
 
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();
