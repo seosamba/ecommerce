@@ -1,5 +1,5 @@
 import { generalconfig } from '../../components/generalconfig/';
-import { rulesdetails } from '../../components/rulesdetails/';
+import { dropdowndetails } from '../../components/dropdowndetails/';
 
 const routes = [
     {
@@ -9,9 +9,9 @@ const routes = [
         meta: { requiresAuth: false }
     },
     {
-        path: 'rulesdetails/:id',
-        component: rulesdetails,
-        name: 'rulesdetails',
+        path: 'dropdowndetails/:id',
+        component: dropdowndetails,
+        name: 'dropdowndetails',
         meta: { requiresAuth: false }
     }
 ];

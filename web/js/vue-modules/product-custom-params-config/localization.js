@@ -25,6 +25,12 @@ const messages = {
             relogin: 'Please re-login',
             emptyLabel: 'label can\'t be empty',
             emptyName: 'name can\'t be empty',
+            back: 'Back',
+            title: 'Title',
+            addNewSelection: 'Add new selection',
+            provideOptionName: 'Please provide option name',
+            specifySelectionEl: 'Please add at least one selection',
+            specifyOptionName: 'Please specify option name',
 
         }
     },
@@ -54,6 +60,12 @@ const messages = {
             relogin: 'Please re-login',
             emptyLabel: 'label can\'t be empty',
             emptyName: 'name can\'t be empty',
+            back: 'Back',
+            title: 'Title',
+            addNewSelection: 'Add new selection',
+            provideOptionName: 'Please provide option name',
+            specifySelectionEl: 'Please add at least one selection',
+            specifyOptionName: 'Please specify option name',
 
         }
     },
@@ -83,6 +95,12 @@ const messages = {
             relogin: 'Please re-login',
             emptyLabel: 'label can\'t be empty',
             emptyName: 'name can\'t be empty',
+            back: 'Back',
+            title: 'Title',
+            addNewSelection: 'Add new selection',
+            provideOptionName: 'Please provide option name',
+            specifySelectionEl: 'Please add at least one selection',
+            specifyOptionName: 'Please specify option name',
 
         }
     }

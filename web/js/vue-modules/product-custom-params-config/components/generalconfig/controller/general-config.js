@@ -7,11 +7,17 @@ export default {
         return {
             loadedForm: false,
             loadedGrid: false,
+            loadedGridAddNew: false,
+            loadedDropdownForm: false,
             websiteUrl: $('#website_url').val(),
             param_type: 'text',
             param_name: '',
             label: '',
             locale: $('#system-language-product-custom-fields').val(),
+            selectionEl: [],
+            selectionName: '',
+            placeholders: {
+            },
             localeMapping: {
                 'en':'en',
                 'en_US':'en',
@@ -72,7 +78,9 @@ export default {
             const result = await this.$store.dispatch('saveConfigData', {
                 'param_type': this.param_type,
                 'param_name':this.param_name,
-                'label':this.label
+                'label':this.label,
+                'dropdownParams':[]
+
             });
 
             if (result.status === 'error') {
@@ -86,12 +94,13 @@ export default {
 
                 } else {
                     this.loadedGrid = true;
+                    this.loadedGridAddNew = true;
                 }
             }
         },
         goToRuleDetailScreen: function (ruleId)
         {
-            this.$router.push({ name: 'rulesdetails', params: {'id': ruleId}});
+            this.$router.push({ name: 'dropdowndetails', params: {'id': ruleId}});
         },
         async deleteConfigItem(id){
             showConfirm(this.$t('message.actionConfirmation'), async () => {
@@ -107,6 +116,7 @@ export default {
 
                     } else {
                         this.loadedGrid = true;
+                        this.loadedGridAddNew = true;
                     }
                 }
             });
@@ -132,7 +142,7 @@ export default {
                 event.target.value = oldLabel;
                 return false;
             } else {
-                const result = await this.$store.dispatch('updateFieldNameLabel', {'id': id, 'customFieldName': customFieldNameFiltered, 'customFieldLabel': customFieldLabelFiltered});
+                const result = await this.$store.dispatch('updateCustomFieldData', {'id': id, 'customFieldName': customFieldNameFiltered, 'customFieldLabel': customFieldLabelFiltered});
 
                 if (result.status === 'error') {
                     if(fieldRow == 'label') {
@@ -153,6 +163,87 @@ export default {
                 }
             }
         },
+        addDropdownProperty: function(name)
+        {
+            if (name == "0") {
+                return false;
+            }
+
+            if(name == 'select') {
+                this.loadedGrid = false;
+                this.loadedGridAddNew = false;
+                this.loadedDropdownForm = true;
+                //@todo editing wiil use routing with custom param id
+                //this.$router.push({ name: 'dropdowndetails', params: {'id': ruleId}});
+
+
+            }
+        },
+        backToMainGrid: function () {
+            this.resetForm();
+            this.loadedGrid = true;
+            this.loadedGridAddNew = true;
+            this.loadedDropdownForm = false;
+        },
+        addNewSelection: function () {
+            this.selectionEl.push({
+                'name': '',
+                'placeholder' : this.$t('message.provideOptionName')
+            });
+        },
+        deleteSelectionData: function(index)
+        {
+            this.selectionEl.splice(index,1);
+        },
+        async saveDropdown() {
+            if (this.selectionEl.length == '0') {
+                showMessage(this.$t('message.specifySelectionEl'), true, 2000);
+                return false;
+            } else {
+                for(let key in this.selectionEl) {
+                    let filteredOptionName = this.selectionEl[key].name.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+                    if(filteredOptionName == '') {
+                        showMessage(this.$t('message.specifyOptionName'), true, 2000);
+                        return false;
+                    } else {
+                        this.selectionEl[key].value = filteredOptionName;
+                    }
+                }
+            }
+
+            let customFieldNameFiltered = this.param_name.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+            let customFieldLabelFiltered = this.label.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+
+            if (customFieldNameFiltered == '') {
+                showMessage(this.$t('message.specifyParamName'), true, 2000);
+                return false;
+            }
+
+            if (customFieldLabelFiltered == '') {
+                showMessage(this.$t('message.specifLabel'), true, 2000);
+                return false;
+            }
+
+            const result = await this.$store.dispatch('saveConfigData', {
+                'param_type': 'select',
+                'param_name':customFieldNameFiltered,
+                'label':customFieldLabelFiltered,
+                'dropdownParams':this.selectionEl
+            });
+
+            if (result.status === 'error') {
+                showMessage(result.message, true, 2000);
+                return false;
+            } else {
+                showMessage(result.message, false, 2000);
+                const resultConfigData = await this.$store.dispatch('getProductConfigSavedData', {'router':this.$router});
+                if(result.status === 'error') {
+
+                } else {
+                    this.backToMainGrid();
+                }
+            }
+        },
     },
     async created(){
         this.$i18n.locale = this.localeMapping[this.locale];
@@ -168,6 +259,7 @@ export default {
 
         } else {
             this.loadedGrid = true;
+            this.loadedGridAddNew = true;
         }
     },
     async updated() {
