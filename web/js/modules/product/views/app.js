@@ -353,6 +353,8 @@ define([
 
             this.renderOptions();
 
+            console.log(this.model.toJSON());
+
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
