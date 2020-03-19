@@ -96,9 +96,6 @@ export default {
         },
         async updateRule()
         {
-
-
-
             if (this.propertyDataEl.length == '0') {
                 showMessage(this.$t('message.specifyPropertyAction'), true, 2000);
                 return false;

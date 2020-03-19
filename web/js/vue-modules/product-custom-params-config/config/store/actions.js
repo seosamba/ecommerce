@@ -6,10 +6,11 @@ export const saveConfigData = ({commit, state, dispatch}, payload) => {
             'type': 'POST',
             'dataType': 'json',
             'data': {
-                'secureToken': $('#product-custom-params-config-token').val(),
-                'param_type' : payload.param_type,
-                'param_name' : payload.param_name,
-                'label'      : payload.label
+                'secureToken'   : $('#product-custom-params-config-token').val(),
+                'param_type'    : payload.param_type,
+                'param_name'    : payload.param_name,
+                'label'         : payload.label,
+                'dropdownParams':payload.dropdownParams
             }
         }).done(async function (response) {
             hideLoader();
@@ -27,22 +28,24 @@ export const saveConfigData = ({commit, state, dispatch}, payload) => {
 };
 
 export const updateConfigData = ({commit, state, dispatch}, payload) => {
-    showLoader();
-    //debugger;
-    /*return new Promise((resolve, reject) => {
+    debugger;
+    /*showLoader();
+    return new Promise((resolve, reject) => {
         debugger;
         $.ajax({
             'url': $('#website_url').val() + 'api/store/Productcustomfieldsconfig/',
             'type': 'PUT',
             'dataType': 'json',
             'data': JSON.stringify({
-                'secureToken' : $('#product-custom-params-config-token').val(),
-                'rule_name' :  payload.ruleName,
-                'fieldsData':payload.fieldsData,
-                'actionsData': payload.actionsData,
+                'secureToken': $('#product-custom-params-config-token').val(),
+                'param_type' : payload.param_type,
+                'param_name' : payload.param_name,
+                'label'      : payload.label,
+                'dropdownParams':payload.selectionEl,
                 'id' : payload.ruleId
             })
         }).done(async function (response) {
+            debugger;
             hideLoader();
             if (response.status === 'error') {
                 resolve(response);
@@ -51,6 +54,7 @@ export const updateConfigData = ({commit, state, dispatch}, payload) => {
             }
 
         }).fail(async function(response){
+            debugger;
             hideLoader();
             resolve({ name: 'login', 'message': 'Please re-login'});
         });
@@ -106,7 +110,8 @@ export const getProductConfigSavedData = ({commit, state, dispatch}, payload) =>
     });
 };
 
-export const updateFieldNameLabel = ({commit, state, dispatch}, payload) => {
+export const updateCustomFieldData = ({commit, state, dispatch}, payload) => {
+    debugger;
     showLoader();
     return new Promise((resolve, reject) => {
         $.ajax({

@@ -10,6 +10,7 @@
                     <option v-bind:value="name" v-for="(value, name) in configScreenInfo.customParams">{{name}}</option>
                 </select>
                 <div class="grid_6 mt20px">
+
                     <p class="grid_12 mb10px" v-for="(propertyData, index) in propertyDataEl">
                         <label class="grid_4 alpha mt5px">{{propertyData.label}}</label>
                         <select class="grid_3 omega alpha"  v-model="propertyData.operator">
@@ -36,4 +37,4 @@
     </main>
 </template>
 
-<script src="./controller/rulesdetails.js"/>
+<script src="./controller/dropdowndetails.js"/>

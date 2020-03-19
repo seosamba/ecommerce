@@ -11,6 +11,11 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
      */
     const PRODUCT_CUSTOM_FIELDS_CONFIG_TOKEN = 'ProductcustomfieldsconfigToken';
 
+    /*
+     * Product custom field delect
+     */
+    const PRODUCT_CUSTOM_FIELD_TYPE_SELECT = 'select';
+
     /**
      * Mandatory fields
      *
@@ -88,27 +93,6 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
     {
         $data = $this->getRequest()->getParams();
         $translator = Zend_Registry::get('Zend_Translate');
-        /*$dropdownOptionValues = array();
-        $dropdownOptionIds = array();
-
-        if(!empty($data['custom_param_name'])){
-            $dropdownOptionValues = array_unique(explode(',' , $data['custom_param_name']));
-
-            if(!empty($dropdownOptionValues)) {
-                foreach ($dropdownOptionValues as $value) {
-                    $notValid = Tools_LeadTools::customParamValidate($value);
-
-                    if($notValid) {
-                        return array('status' => 'error', 'message' => $translator->translate('Invalid param name. You can use only alphabet and digits. You can also use "-".'));
-
-                    }
-                }
-            }
-        }
-
-        if(!empty($data['custom_param_options_ids'])){
-            $dropdownOptionIds = array_unique(explode(',' , $data['custom_param_options_ids']));
-        }*/
 
         $fieldDataMissing = array_filter($this->_mandatoryParams, function ($param) use ($data) {
             if (!array_key_exists($param, $data) || empty($data[$param])) {
@@ -133,60 +117,35 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
         }
 
         $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
-        if(!empty($data['custom_param_id'])){
-            /*$leadCustomParamConfigModel = $leadCustomParamConfigMapper->findById($data['custom_param_id']);
-            if (!$leadCustomParamConfigModel instanceof Leads_Model_LeadsCustomParamsConfigModel) {
-                return array('status' => 'error', 'message' => $translator->translate('Custom param with such name already exists'));
-            }*/
-        }else{
-            $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->getByName($data['param_name']);
-            if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
-                return array('status' => 'error', 'message' => $translator->translate('Custom param with such name already exists'));
-            }
-
-            $productCustomFieldsConfigModel = new Store_Model_ProductCustomFieldsConfigModel();
+        $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->getByName($data['param_name']);
+        if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+            return array('status' => 'error', 'message' => $translator->translate('Custom param with such name already exists'));
         }
+
+        $productCustomFieldsConfigModel = new Store_Model_ProductCustomFieldsConfigModel();
 
         $productCustomFieldsConfigModel->setOptions($data);
         $productCustomFieldsConfigMapper->save($productCustomFieldsConfigModel);
 
-        if ($productCustomFieldsConfigModel instanceof Leads_Model_LeadsCustomParamsConfigModel) {
-            /*$productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
+        $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
 
-            $leadCustomParamId = $productCustomFieldsConfigModel->getId();
+        $customFieldParamId = $productCustomFieldsConfigModel->getId();
 
-            if ($data['param_type'] == Tools_LeadImportTools::ATTRIBUTE_TYPE_CHECKBOX) {
-                $defCheckboxValues = array();
+        if ($data['param_type'] == self::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+            $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($customFieldParamId);
 
-                $notValid = Tools_LeadTools::customParamValidate($data['checkbox_yes']);
+            if(empty($productCustomFieldsOptionsData)) {
+                foreach ($data['dropdownParams'] as $key => $params) {
+                    $productCustomFieldsOptionsDataModel = new Store_Model_ProductCustomFieldsOptionsDataModel();
 
-                if($notValid) {
-                    return array('status' => 'error', 'message' => $translator->translate('Invalid param name. You can use only alphabet and digits. You can also use "-".'));
+                    $productCustomFieldsOptionsDataModel->setCustomParamId($customFieldParamId);
+                    $productCustomFieldsOptionsDataModel->setOptionValue($params['value']);
 
+                    $productCustomFieldsOptionsDataMapper->save($productCustomFieldsOptionsDataModel);
                 }
-
-                array_push($defCheckboxValues, $data['checkbox_yes']);
-
-                if (empty($data['checkbox_yes'])) {
-                    $defCheckboxValues[0] = 'yes';
-                }
-
-                $data = $leadCustomParamOptionsDataMapper->findByCustomParamId($leadCustomParamId);
-
-                Tools_LeadTools::processCustomParamsOptions($data, $defCheckboxValues, Leads::LEADS_TYPE, $leadCustomParamId);
-            } elseif ($data['param_type'] == Tools_LeadImportTools::ATTRIBUTE_TYPE_SELECT || $data['param_type'] == Tools_LeadImportTools::ATTRIBUTE_TYPE_RADIO) {
-                $data = $leadCustomParamOptionsDataMapper->findByCustomParamId($leadCustomParamId);
-
-                foreach ($data as $key => $customParam) {
-                    $customParamId = $customParam->getId();
-                    if(in_array($customParamId, $dropdownOptionIds)) {
-                        $optionValue = $dropdownOptionValues[$key];
-                        $data[$key]->setOptionValue($optionValue);
-                    }
-                }
-
-                Tools_LeadTools::processCustomParamsOptions($data, $dropdownOptionValues, Leads::LEADS_TYPE, $leadCustomParamId);
-            }*/
+            } else {
+                return array('status' => 'error', 'message' => $translator->translate('Custom param with such name already exists'));
+            }
         }
 
         return array('status' => 'ok', 'message' => $translator->translate('Custom param has been created'));

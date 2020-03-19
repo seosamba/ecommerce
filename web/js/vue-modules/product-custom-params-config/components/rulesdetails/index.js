@@ -1,1 +1,0 @@
-export { default as rulesdetails } from './rulesdetails.vue';
