@@ -28,17 +28,10 @@ export default {
     computed: {
         configDataInfo: function() {
             return this.$store.getters.getConfigDataInfo;
-        },
-        configScreenInfo: function() {
-            return this.$store.getters.getConfigScreenInfo;
-        }/*,
-        customerGroups: function() {
-           return this.alphabeticalSort(this.$store.getters.getConfigScreenInfo.customerGroups);
-        }*/
+        }
     },
     methods: {
         alphabeticalSort: function(obj){
-            //debugger;
             // convert object into array
             var sortable=[];
             for(var key in obj)
@@ -54,38 +47,6 @@ export default {
             });
             return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
         },
-        /*addProperty: function(name)
-        {
-            if (name == "0") {
-                return false;
-            }
-
-            let found = this.propertyDataEl.find(function(obj) {
-                return obj.name == name;
-            });
-
-            if (typeof found === 'undefined') {
-                this.propertyDataEl.push({
-                    'name': name,
-                    'operators': this.operators,
-                    'value' : '',
-                    'label' : name,
-                    'operator': 'equal',
-                    'placeholder' : this.placeholders[name]
-                })
-            }
-        },*/
-        /*deletePropertyData: function(index)
-        {
-            this.propertyDataEl.splice(index,1);
-            this.param_type = 'text';
-        },*/
-        /*prepareDate: function(createdAt) {
-            if (moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD MMMM YYYY HH:mm:ss') !== 'Invalid date') {
-                return moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD')  + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('MMM') + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
-            }
-            return '';
-        },*/
         resetForm: function()
         {
             this.param_type = 'text';
@@ -93,8 +54,6 @@ export default {
             this.label = '';
         },
         async addCustomField(e){
-            //debugger;
-
             if (this.param_type == '') {
                 showMessage(this.$t('message.specifyParamType'), true, 2000);
                 return false;
@@ -110,15 +69,12 @@ export default {
                 return false;
             }
 
-            //debugger;
-
             const result = await this.$store.dispatch('saveConfigData', {
                 'param_type': this.param_type,
                 'param_name':this.param_name,
                 'label':this.label
             });
 
-           // debugger;
             if (result.status === 'error') {
                 showMessage(result.message, true, 2000);
                 return false;
@@ -138,7 +94,6 @@ export default {
             this.$router.push({ name: 'rulesdetails', params: {'id': ruleId}});
         },
         async deleteConfigItem(id){
-            //debugger;
             showConfirm(this.$t('message.actionConfirmation'), async () => {
                 const result = await this.$store.dispatch('deleteConfigRecord', {'id': id});
 
@@ -155,7 +110,49 @@ export default {
                     }
                 }
             });
-        }
+        },
+        async updateCustomFieldNameLabel(id, oldName, oldLabel, fieldRow, event) {
+            if(fieldRow == 'label') {
+                var customFieldName = oldName;
+                var customFieldLabel = event.target.value;
+            } else {
+                var customFieldName = event.target.value;
+                var customFieldLabel = oldLabel;
+            }
+
+            let customFieldNameFiltered = customFieldName.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+            let customFieldLabelFiltered = customFieldLabel.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+
+            if(customFieldNameFiltered.length < 1) {
+                showMessage(this.$t('message.emptyName'), true, 2000);
+                event.target.value = oldName;
+                return false;
+            } else if(customFieldLabelFiltered.length < 1) {
+                showMessage(this.$t('message.emptyLabel'), true, 2000);
+                event.target.value = oldLabel;
+                return false;
+            } else {
+                const result = await this.$store.dispatch('updateFieldNameLabel', {'id': id, 'customFieldName': customFieldNameFiltered, 'customFieldLabel': customFieldLabelFiltered});
+
+                if (result.status === 'error') {
+                    if(fieldRow == 'label') {
+                        event.target.value = oldLabel;
+                    } else {
+                        event.target.value = oldName;
+                    }
+                    showMessage(result.message, true, 2000);
+                    return false;
+                } else {
+                    if(fieldRow == 'label') {
+                        event.target.value = customFieldLabelFiltered;
+                    } else {
+                        event.target.value = customFieldNameFiltered;
+                    }
+                    showMessage(result.message, false, 2000);
+                    return true;
+                }
+            }
+        },
     },
     async created(){
         this.$i18n.locale = this.localeMapping[this.locale];
@@ -163,7 +160,7 @@ export default {
         const result = await this.$store.dispatch('getProductConfigSavedData', {'router':this.$router});
         console.log('created', result);
         if(result.status === 'error') {
-            showMessage('Please re-login', true, 3000);
+            showMessage(this.$t('message.relogin'), true, 3000);
         } else {
             this.loadedForm = true;
         }

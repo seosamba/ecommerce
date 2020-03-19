@@ -84,18 +84,21 @@ export default {
             this.propertyDataEl.splice(index,1)
             this.chosenProperty = '0';
         },*/
-        prepareDate: function(createdAt) {
+        /*prepareDate: function(createdAt) {
             if (moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD MMMM YYYY HH:mm:ss') !== 'Invalid date') {
                 return moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD')  + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('MMM') + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
             }
             return '';
-        },
+        },*/
         goToRulesScreen: function()
         {
             this.$router.push({ name: 'index'});
         },
         async updateRule()
         {
+
+
+
             if (this.propertyDataEl.length == '0') {
                 showMessage(this.$t('message.specifyPropertyAction'), true, 2000);
                 return false;

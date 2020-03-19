@@ -22,6 +22,9 @@ const messages = {
             specifyParamType: 'Please select field type',
             specifyParamName: 'Please specify field name',
             specifLabel: 'Please specify label',
+            relogin: 'Please re-login',
+            emptyLabel: 'label can\'t be empty',
+            emptyName: 'name can\'t be empty',
 
         }
     },
@@ -48,6 +51,9 @@ const messages = {
             specifyParamType: 'Please select field type',
             specifyParamName: 'Please specify field name',
             specifLabel: 'Please specify label',
+            relogin: 'Please re-login',
+            emptyLabel: 'label can\'t be empty',
+            emptyName: 'name can\'t be empty',
 
         }
     },
@@ -74,6 +80,9 @@ const messages = {
             specifyParamType: 'Please select field type',
             specifyParamName: 'Please specify field name',
             specifLabel: 'Please specify label',
+            relogin: 'Please re-login',
+            emptyLabel: 'label can\'t be empty',
+            emptyName: 'name can\'t be empty',
 
         }
     }

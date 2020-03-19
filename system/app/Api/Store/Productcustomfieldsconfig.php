@@ -210,7 +210,7 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
      */
     public function putAction()
     {
-        /*$data = json_decode($this->_request->getRawBody(), true);
+        $data = json_decode($this->_request->getRawBody(), true);
         if (!empty($data['id']) && !empty($data[Tools_System_Tools::CSRF_SECURE_TOKEN])) {
             $translator = Zend_Registry::get('Zend_Translate');
             $secureToken = $data[Tools_System_Tools::CSRF_SECURE_TOKEN];
@@ -222,13 +222,15 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
 
             }
             $customParamId = filter_var($data['id'], FILTER_SANITIZE_NUMBER_INT);
-            $leadCustomParamConfigMapper = Leads_Mapper_LeadsCustomParamsConfigMapper::getInstance();
-            $leadCustomParamConfigModel = $leadCustomParamConfigMapper->find($customParamId);
-            if (!$leadCustomParamConfigModel instanceof Leads_Model_LeadsCustomParamsConfigModel) {
-                $this->_responseHelper->fail($translator->translate('Config doesn\'t exists'));
+
+            $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+            $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->find($customParamId);
+
+            if (!$productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+                return array('status' => 'error', 'message' => $translator->translate('Config doesn\'t exists'));
             }
 
-            $oldParamName = $leadCustomParamConfigModel->getParamName();
+            $oldParamName = $productCustomFieldsConfigModel->getParamName();
 
             if(preg_match('~[^\w-]~ui', $data['param_name'])) {
                 return array('status' => 'error', 'message' => $translator->translate('Invalid param name. You can use only alphabet and digits. You can also use "-". White Spaces not allowed'));
@@ -236,7 +238,7 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
             $currentParamName = $data['param_name'];
             if ($oldParamName !== $currentParamName) {
                 $validateTypeExists = new Zend_Validate_Db_RecordExists(array(
-                    'table' => 'plugin_leads_lead_custom_params_config',
+                    'table' => 'shopping_product_custom_fields_config',
                     'field' => 'param_name'
                 ));
                 if ($validateTypeExists->isValid($currentParamName)) {
@@ -244,10 +246,11 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
                 }
             }
 
-            $leadCustomParamConfigModel->setOptions($data);
-            $leadCustomParamConfigMapper->save($leadCustomParamConfigModel);
-            $this->_responseHelper->success($translator->translate('Custom param has been updated'));
-        }*/
+            $productCustomFieldsConfigModel->setOptions($data);
+            $productCustomFieldsConfigMapper->save($productCustomFieldsConfigModel);
+
+            return array('status' => 'ok', 'message' => $translator->translate('Custom param has been updated'));
+        }
 
     }
 

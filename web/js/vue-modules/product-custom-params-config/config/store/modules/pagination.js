@@ -2,7 +2,7 @@ import merge from 'lodash/merge';
 const state = {
     customFieldsConfig: {
         currentPage: 1,
-        itemsPerPage: 10,
+        itemsPerPage: 8,
         totalItems: 0,
         visiblePages: 4
     }

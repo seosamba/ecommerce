@@ -14,8 +14,11 @@
                     <tbody>
                         <tr v-for="configData in configDataInfo">
                             <td>{{configData.param_type}}</td>
-                            <td>{{configData.param_name}}</td>
-                            <td>{{configData.label}}</td>
+                            <td>
+                                <input type="text"  @change="updateCustomFieldNameLabel(configData.id, configData.param_name, configData.label, 'name', $event)" :value="configData.param_name">
+                            <td>
+                                <input type="text"  @change="updateCustomFieldNameLabel(configData.id, configData.param_name, configData.label, 'label', $event)" :value="configData.label">
+                            </td>
                             <td class="text-right">
                                 <a @click="deleteConfigItem(configData.id)" class="ticon-remove error icon14" href="javascript:;"></a>
                             </td>

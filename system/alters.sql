@@ -501,7 +501,7 @@ ALTER TABLE `shopping_group` ADD `nonTaxable` enum('0','1') COLLATE 'utf8_unicod
 -- version: 2.7.5
 CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
-  `param_type` ENUM('text', 'input', 'select') DEFAULT 'input',
+  `param_type` ENUM('text', 'select') DEFAULT 'text',
   `param_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
   `label` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY(`id`),
