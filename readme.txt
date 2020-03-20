@@ -244,3 +244,19 @@ d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name
     {notify:productdescription} - Display product short description
     {customer:fullname} - Display customer full name
     {notify:producturl} - Display link to product page
+
+12. Product custom params widget
+{$productcustomparam:[:text|select[:name[:readonly]]]} - on the product page
+{$productcustomparam:[:prodid[:text|select[:name[:readonly]]]]} - in the product list
+
+allowed types
+a) "text" - display values for text custom params
+b) "select" - display values for dropdown custom params
+
+readonly - return just a text result
+
+Example:
+
+{$productcustomparam:select:dogs:readonly} - on the product page
+{$productcustomparam:{$product:id}:select:dogs:readonly} - in the product list
+
