@@ -173,11 +173,10 @@ export default {
                 this.loadedGrid = false;
                 this.loadedGridAddNew = false;
                 this.loadedDropdownForm = true;
-                //@todo editing wiil use routing with custom param id
-                //this.$router.push({ name: 'dropdowndetails', params: {'id': ruleId}});
-
-
             }
+        },
+        async editDropdownData(id){
+            this.$router.push({ name: 'dropdowndetails', params: {'id': id}});
         },
         backToMainGrid: function () {
             this.resetForm();

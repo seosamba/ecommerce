@@ -20,6 +20,9 @@
                                 <input type="text"  @change="updateCustomFieldNameLabel(configData.id, configData.param_name, configData.label, 'label', $event)" :value="configData.label">
                             </td>
                             <td class="text-right">
+                                <span v-if="configData.param_type == 'select'">
+                                    <a @click="editDropdownData(configData.id)" class="ticon-edit icon14" href="javascript:;"></a>
+                                </span>
                                 <a @click="deleteConfigItem(configData.id)" class="ticon-remove error icon14" href="javascript:;"></a>
                             </td>
                         </tr>
@@ -84,7 +87,7 @@
                                 <input class="grid_10 alpha omega" type="text" v-model.trim="selectionData.name"
                                        :name="selectionData.name" :placeholder="selectionData.placeholder">
                                 <div class="grid_2 text-center">
-                                    <button class="item-remove btn icon link error ticon-remove mt0px" @click="deleteSelectionData(index)" title="Delete"></button>
+                                    <span class="btn item-remove btn icon link error ticon-remove mt0px" @click="deleteSelectionData(index)"></span>
                                 </div>
                             </div>
                         </div>

@@ -31,6 +31,8 @@ const messages = {
             provideOptionName: 'Please provide option name',
             specifySelectionEl: 'Please add at least one selection',
             specifyOptionName: 'Please specify option name',
+            updateError: 'Can\'t update dropdown field',
+            actionConfirmationDeleteSelect: 'This selection can used in product, Would you like to delete?'
 
         }
     },
@@ -66,6 +68,8 @@ const messages = {
             provideOptionName: 'Please provide option name',
             specifySelectionEl: 'Please add at least one selection',
             specifyOptionName: 'Please specify option name',
+            updateError: 'Can\'t update dropdown field',
+            actionConfirmationDeleteSelect: 'This selection can used in product, Would you like to delete?'
 
         }
     },
@@ -101,6 +105,8 @@ const messages = {
             provideOptionName: 'Please provide option name',
             specifySelectionEl: 'Please add at least one selection',
             specifyOptionName: 'Please specify option name',
+            updateError: 'Can\'t update dropdown field',
+            actionConfirmationDeleteSelect: 'This selection can used in product, Would you like to delete?'
 
         }
     }

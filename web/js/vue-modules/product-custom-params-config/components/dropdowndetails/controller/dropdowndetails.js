@@ -4,22 +4,15 @@ import moment from 'moment';
 export default {
     data () {
         return {
+            loadedDropdownForm: true,
+            param_type: 'select',
+            param_name: '',
+            label: '',
+            selectionEl: [],
             loaded: false,
             websiteUrl: $('#website_url').val(),
-            chosenProperty: '0',
-            propertyDataEl: [],
-            selectedGroup: '0',
-            ruleName: '',
-            actionsData: [],
-            operators:{
-                'equal': "Equal",
-                'notequal': "Not equal",
-                'like' : "Like"
-            },
-            placeholders: {
-            },
-            ruleId : '',
-            locale: $('#system-language-rule-groups').val(),
+            dropdownId : '',
+            locale: $('#system-language-product-custom-fields').val(),
             localeMapping: {
                 'en':'en',
                 'en_US':'en',
@@ -34,12 +27,6 @@ export default {
 
     },
     computed: {
-        configScreenInfo: function() {
-            return this.$store.getters.getConfigScreenInfo;
-        },
-        customerGroups: function() {
-            return this.alphabeticalSort(this.$store.getters.getConfigScreenInfo.customerGroups);
-        }
     },
     methods: {
         alphabeticalSort: function(obj){
@@ -58,122 +45,115 @@ export default {
             });
             return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
         },
-        addProperty: function(name)
-        {
-            if (name == "0") {
-                return false;
-            }
-
-            let found = this.propertyDataEl.find(function(obj) {
-                return obj.name == name;
-            });
-
-            if (typeof found === 'undefined') {
-                this.propertyDataEl.push({
-                    'name': name,
-                    'operators': this.operators,
-                    'value' : '',
-                    'label' : name,
-                    'operator': 'equal',
-                    'placeholder' : this.placeholders[name]
-                })
-            }
-        },
-        /*deletePropertyData: function(index)
-        {
-            this.propertyDataEl.splice(index,1)
-            this.chosenProperty = '0';
-        },*/
-        /*prepareDate: function(createdAt) {
-            if (moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD MMMM YYYY HH:mm:ss') !== 'Invalid date') {
-                return moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('DD')  + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('MMM') + ' ' + moment(createdAt, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
-            }
-            return '';
-        },*/
-        goToRulesScreen: function()
-        {
+        backToMainGrid: function () {
+            this.loadedDropdownForm = false;
             this.$router.push({ name: 'index'});
         },
-        async updateRule()
-        {
-            if (this.propertyDataEl.length == '0') {
-                showMessage(this.$t('message.specifyPropertyAction'), true, 2000);
+        async saveDropdown() {
+            if (this.selectionEl.length == '0') {
+                showMessage(this.$t('message.specifySelectionEl'), true, 2000);
                 return false;
-            }
-
-            if (this.selectedGroup == '0') {
-                showMessage(this.$t('message.specifyGroup'), true, 2000);
-                return false;
-            }
-
-            if (this.ruleName == '') {
-                showMessage(this.$t('message.specifyRuleName'), true, 2000);
-                return false;
-            }
-
-            this.actionsData= [];
-            this.actionsData.push({
-                'actionType': 'assign_group',
-                'customer_group_id' : this.selectedGroup
-            });
-
-            let ruleData = {
-                'router':this.$router,
-                'ruleId' : this.ruleId,
-                'ruleName':this.ruleName,
-                'fieldsData':this.propertyDataEl,
-                'actionsData': this.actionsData
-            };
-
-            const result = await this.$store.dispatch('updateConfigData', ruleData);
-            if (result.status === 'error') {
-                showMessage(result.message, true, 2000);
             } else {
-                showMessage(result.message, false, 2000);
-            }
-        }
-    },
-    async created(){
-
-        this.$i18n.locale = this.localeMapping[this.locale];
-        this.ruleId = this.$route.params.id;
-        const result = await this.$store.dispatch('getRuleConfig', {
-            'router': this.$router,
-            'ruleId': this.ruleId
-        });
-
-        if(result.status === 'error') {
-            this.$router.push({ name: 'login'});
-        } else {
-            this.loaded = true;
-
-            let fieldsData = result.rulesData.fieldsData;
-            let actionsData = result.rulesData.actionsData;
-            let self = this;
-
-            for (var key in fieldsData) {
-                self.propertyDataEl.push({
-                    'name': fieldsData[key]['field_name'],
-                    'operators': this.operators,
-                    'value' : fieldsData[key]['field_value'],
-                    'label' : fieldsData[key]['field_name'],
-                    'operator': fieldsData[key]['rule_comparison_operator'],
-                    'placeholder' : this.placeholders[fieldsData[key]['field_name']]
-                });
-            };
-
-            for (var key in actionsData) {
-                if (actionsData[key]['action_type'] === 'assign_group') {
-                    self.selectedGroup = JSON.parse(actionsData[key]['action_config'])['customer_group_id'];
+                for(let key in this.selectionEl) {
+                    let filteredOptionName = this.selectionEl[key].name.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+                    if(filteredOptionName == '') {
+                        showMessage(this.$t('message.specifyOptionName'), true, 2000);
+                        return false;
+                    } else {
+                        this.selectionEl[key].value = filteredOptionName;
+                    }
                 }
             }
 
-            self.ruleName = result.rulesData.rule_name;
+            let customFieldNameFiltered = this.param_name.replace(/[^a-zA-Z0-9'-_ ]/g, '');
+            let customFieldLabelFiltered = this.label.replace(/[^a-zA-Z0-9'-_ ]/g, '');
 
-            if (typeof flexkit !== 'undefined' && typeof flexkit.chooseBoxStyle() === "function") {
-                flexkit.chooseBoxStyle();
+            if (customFieldNameFiltered == '') {
+                showMessage(this.$t('message.specifyParamName'), true, 2000);
+                return false;
+            }
+
+            if (customFieldLabelFiltered == '') {
+                showMessage(this.$t('message.specifLabel'), true, 2000);
+                return false;
+            }
+
+            if(this.dropdownId == '') {
+                showMessage(this.$t('message.updateError'), true, 2000);
+                return false;
+            }
+
+            const result = await this.$store.dispatch('updateConfigData', {
+                'dropdownId': this.dropdownId,
+                'param_type': 'select',
+                'param_name':customFieldNameFiltered,
+                'label':customFieldLabelFiltered,
+                'dropdownParams':this.selectionEl
+            });
+
+            if (result.status === 'error') {
+                showMessage(result.message, true, 2000);
+                return false;
+            } else {
+                showMessage(result.message, false, 2000);
+                const resultConfigData = await this.$store.dispatch('getProductConfigSavedData', {'router':this.$router});
+                if(result.status === 'error') {
+
+                } else {
+                    this.backToMainGrid();
+                }
+            }
+        },
+        deleteSelectionData: function(index)
+        {
+            if(typeof this.selectionEl[index].id !== 'undefined') {
+                showConfirm(this.$t('message.actionConfirmationDeleteSelect'), async () => {
+                    this.selectionEl.splice(index,1);
+                });
+            } else {
+                this.selectionEl.splice(index,1);
+            }
+        },
+        addNewSelection: function () {
+            this.selectionEl.push({
+                'name': '',
+                'placeholder' : this.$t('message.provideOptionName')
+            });
+        }
+    },
+    async created(){
+        this.$i18n.locale = this.localeMapping[this.locale];
+        this.dropdownId = this.$route.params.id;
+        const result = await this.$store.dispatch('getSavedDropdownConfig', {
+            'router': this.$router,
+            'dropdownId': this.dropdownId
+        });
+
+        if(result.status === 'error') {
+            this.$router.push({ name: 'index'});
+        } else {
+            this.loaded = true;
+
+            let resultData = result.data;
+            let self = this;
+
+            for (var key in resultData) {
+                self.param_name = resultData[key].param_name;
+                self.label = resultData[key].label;
+
+                var optionIds = resultData[key].option_ids.split(',');
+                let optionValues = resultData[key].option_values.split(',');
+
+                if(optionValues.length) {
+                    for (var optKey in optionValues) {
+                        self.selectionEl.push({
+                            'id' : optionIds[optKey],
+                            'name': optionValues[optKey],
+                            'placeholder' : this.$t('message.provideOptionName')
+                        });
+                    }
+                }
             }
         }
-
     }
 }

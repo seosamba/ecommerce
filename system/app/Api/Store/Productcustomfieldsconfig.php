@@ -6,15 +6,15 @@
 class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
 {
 
-    /**
-     * Product custom fields secure token
-     */
-    const PRODUCT_CUSTOM_FIELDS_CONFIG_TOKEN = 'ProductcustomfieldsconfigToken';
-
     /*
-     * Product custom field delect
+     * Product custom field select
      */
     const PRODUCT_CUSTOM_FIELD_TYPE_SELECT = 'select';
+
+    /*
+     * Product custom field text
+     */
+    const PRODUCT_CUSTOM_FIELD_TYPE_TEXT = 'text';
 
     /**
      * Mandatory fields
@@ -208,6 +208,46 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
             $productCustomFieldsConfigModel->setOptions($data);
             $productCustomFieldsConfigMapper->save($productCustomFieldsConfigModel);
 
+            $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
+
+            if ($data['param_type'] == self::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                $newDropdownParams = $data['dropdownParams'];
+                $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($customParamId);
+
+                if(!empty($productCustomFieldsOptionsData) && !empty($newDropdownParams)) {
+                    foreach ($productCustomFieldsOptionsData as $key => $customFieldsOption) {
+                        foreach ($newDropdownParams as $newDropdown) {
+                            $savedDropId = $customFieldsOption->getId();
+                            if($savedDropId == $newDropdown['id']) {
+                                $customFieldsOption->setOptionValue($newDropdown['value']);
+                                $productCustomFieldsOptionsDataMapper->save($customFieldsOption);
+
+                                unset($productCustomFieldsOptionsData[$key]);
+                            }
+                        }
+                    }
+
+                    if(!empty($productCustomFieldsOptionsData)) {
+                        foreach ($productCustomFieldsOptionsData as $customFieldsOption) {
+                            $productCustomFieldsOptionsDataMapper->delete($customFieldsOption->getId());
+                        }
+                    }
+
+                    foreach ($newDropdownParams as $newDropdown) {
+                        if(empty($newDropdown['id'])) {
+                            $productCustomFieldsOptionsDataModel = new Store_Model_ProductCustomFieldsOptionsDataModel();
+                            $productCustomFieldsOptionsDataModel->setCustomParamId($customParamId);
+                            $productCustomFieldsOptionsDataModel->setOptionValue($newDropdown['value']);
+
+                            $productCustomFieldsOptionsDataMapper->save($productCustomFieldsOptionsDataModel);
+                        }
+                    }
+
+                    return array('status' => 'ok', 'message' => $translator->translate('Options were successfully updated'));
+                } else {
+                    return array('status' => 'error', 'message' => $translator->translate('Custom param with such name already exists'));
+                }
+            }
             return array('status' => 'ok', 'message' => $translator->translate('Custom param has been updated'));
         }
 
@@ -231,33 +271,20 @@ class Api_Store_Productcustomfieldsconfig extends Api_Service_Abstract
     public function deleteAction()
     {
         $translator = Zend_Registry::get('Zend_Translate');
-        $customDropdownSelectionFlag = $this->_request->getParam('customDropdownSelectionFlag');
         $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
 
         if (!$id) {
             return array('status' => 'error', 'message' => $translator->translate('error'));
         }
 
-        if(!empty($customDropdownSelectionFlag)){
-            /*$productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
-            $productCustomFieldsOptionsDataModel = $productCustomFieldsOptionsDataMapper->find($id);
-            if ($productCustomFieldsOptionsDataModel instanceof Store_Model_ProductCustomFieldsOptionsDataModel) {
-                $productCustomFieldsOptionsDataModel->delete($id);
+        $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+        $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->find($id);
+        if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+            $productCustomFieldsConfigMapper->delete($id);
 
-                return array('status' => 'ok', 'message' => $translator->translate('Product custom option field has been deleted'));
-            } else {
-                return array('status' => 'error', 'message' => $translator->translate('error'));
-            }*/
-        }else{
-            $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
-            $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->find($id);
-            if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
-                $productCustomFieldsConfigMapper->delete($id);
-
-                return array('status' => 'ok', 'message' => $translator->translate('Product custom field has been deleted'));
-            } else {
-                return array('status' => 'error', 'message' => $translator->translate('error'));
-            }
+            return array('status' => 'ok', 'message' => $translator->translate('Product custom field has been deleted'));
+        } else {
+            return array('status' => 'error', 'message' => $translator->translate('error'));
         }
     }
 

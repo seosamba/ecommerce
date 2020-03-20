@@ -28,37 +28,32 @@ export const saveConfigData = ({commit, state, dispatch}, payload) => {
 };
 
 export const updateConfigData = ({commit, state, dispatch}, payload) => {
-    debugger;
-    /*showLoader();
+    showLoader();
     return new Promise((resolve, reject) => {
-        debugger;
         $.ajax({
             'url': $('#website_url').val() + 'api/store/Productcustomfieldsconfig/',
             'type': 'PUT',
             'dataType': 'json',
             'data': JSON.stringify({
-                'secureToken': $('#product-custom-params-config-token').val(),
-                'param_type' : payload.param_type,
-                'param_name' : payload.param_name,
-                'label'      : payload.label,
-                'dropdownParams':payload.selectionEl,
-                'id' : payload.ruleId
+                'secureToken'   : $('#product-custom-params-config-token').val(),
+                'param_type'    : payload.param_type,
+                'param_name'    : payload.param_name,
+                'label'         : payload.label,
+                'dropdownParams': payload.dropdownParams,
+                'id'            : payload.dropdownId
             })
         }).done(async function (response) {
-            debugger;
             hideLoader();
             if (response.status === 'error') {
                 resolve(response);
             } else {
                 resolve(response);
             }
-
         }).fail(async function(response){
-            debugger;
             hideLoader();
             resolve({ name: 'login', 'message': 'Please re-login'});
         });
-    });*/
+    });
 };
 
 export const deleteConfigRecord = ({commit, state, dispatch}, payload) => {
@@ -75,7 +70,6 @@ export const deleteConfigRecord = ({commit, state, dispatch}, payload) => {
                 } else {
                     resolve(response);
                 }
-
             }).fail(async function (response) {
                 hideLoader();
                 resolve({name: 'login', 'message': 'Please re-login'});
@@ -99,7 +93,6 @@ export const getProductConfigSavedData = ({commit, state, dispatch}, payload) =>
             if (response.status !== 'error') {
                 commit('setPaginationData', {customFieldsConfig: {totalItems: response.totalRecords}});
                 commit('setConfigDataInfo', response.data);
-                //commit('setConfigScreenInfo', response.rulesData.configData);
                 resolve(response);
             } else {
                 resolve({ name: 'login', 'message': 'Please re-login'});
@@ -111,7 +104,6 @@ export const getProductConfigSavedData = ({commit, state, dispatch}, payload) =>
 };
 
 export const updateCustomFieldData = ({commit, state, dispatch}, payload) => {
-    debugger;
     showLoader();
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -138,21 +130,19 @@ export const updateCustomFieldData = ({commit, state, dispatch}, payload) => {
     });
 };
 
-export const getRuleConfig = ({commit, state, dispatch}, payload) => {
+export const getSavedDropdownConfig = ({commit, state, dispatch}, payload) => {
     showLoader();
-    /*return new Promise((resolve, reject) => {
-        debugger;
+    return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val()+'api/store/Productcustomfieldsconfig/',
+            'url': $('#website_url').val()+'api/store/productcustomfieldsconfig/',
             'type': 'GET',
             'dataType': 'json',
             'data': {
-                'id': payload.ruleId
+                'id': payload.dropdownId
             }
         }).done(async  function(response){
             hideLoader();
             if (response.status !== 'error') {
-                commit('setConfigScreenInfo', response.rulesData.configData);
                 resolve(response);
             } else {
                 resolve({ name: 'login', 'message': 'Please re-login'});
@@ -160,5 +150,5 @@ export const getRuleConfig = ({commit, state, dispatch}, payload) => {
         }).fail(async function(response){
             resolve({ name: 'login', 'message': 'Please re-login'});
         });
-    });*/
+    });
 };
