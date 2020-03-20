@@ -77,8 +77,10 @@ class Store_Mapper_ProductCustomParamsDataMapper extends Application_Model_Mappe
     public function findByProductId($productId)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
-        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product_custom_params_data',
-            array('id', 'param_id', 'product_id', 'param_value', 'params_option_id'));
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('spcpd' => 'shopping_product_custom_params_data'),
+            array('spcpd.id', 'spcpd.param_id', 'spcpd.product_id', 'spcpd.param_value', 'spcpd.params_option_id', 'spcfc.param_type', 'spcfc.param_name'))
+            ->join(array('spcfc' => 'shopping_product_custom_fields_config'),
+                'spcfc.id=spcpd.param_id', array());
 
         $select->where($where);
 

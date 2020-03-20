@@ -519,11 +519,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                         $productCustomParamsDataModel->setParamId($customParam['id']);
                     }
 
-                    if ($customParam['paramType'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT) {
-                        $productCustomParamsDataModel->setParamsOptionId($customParam['value']);
+                    if ($customParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT) {
+                        $productCustomParamsDataModel->setParamsOptionId($customParam['param_value']);
                         $productCustomParamsDataModel->setParamValue('');
                     } else {
-                        $productCustomParamsDataModel->setParamValue($customParam['value']);
+                        $productCustomParamsDataModel->setParamValue($customParam['param_value']);
                         $productCustomParamsDataModel->setParamsOptionId(null);
                     }
 

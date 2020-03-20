@@ -337,11 +337,27 @@ define([
             this.$('#product-brand').val(-1); //reseting brand field
 
             var self = this;
+
+            //clean product custom attributes
+
+            $('#product-custom-attributes-tab').find('input').val('');
+            $('#product-custom-attributes-tab').find('select').val(0);
+
             _.each(this.model.toJSON(), function(value, name){
                 if(name == 'brand' && value === null) {
                     self.$('#product-brand').val(-1);
                 } else {
                     self.$('[data-reflection='+name+']').val(value);
+                }
+
+                if (name == 'customParams') {
+                    _.each(value, function(attr, attrNumb){
+                        var paramVal = attr.param_value;
+                        if (attr.param_type == 'select') {
+                            paramVal = attr.params_option_id;
+                        }
+                        $('#custom-param-'+attr.param_type+'-'+attr.param_name).val(paramVal);
+                    });
                 }
             });
 
@@ -352,9 +368,6 @@ define([
 			// loading option onto frontend
 
             this.renderOptions();
-
-            console.log(this.model.toJSON());
-
 
 			//toggle enabled flag
 			if (parseInt(this.model.get('enabled'))){
@@ -607,11 +620,20 @@ define([
             }
 
             $.each(this.$el.find('.product-custom-param'), function(number, data){
+                var optionId = 0,
+                    value = $(data).val();
+
+                if ($(data).data('param-type') == 'select') {
+                    optionId = $(data).val();
+                }
+
                 productCustomParams.push(
                     {
                         'id':$(data).data('custom-param-id'),
-                        'value':$(data).val(),
-                        'paramType':$(data).data('param-type')
+                        'param_value':value,
+                        'param_type':$(data).data('param-type'),
+                        'param_name':$(data).data('custom-param-name'),
+                        'params_option_id':optionId
                     }
                 );
             });

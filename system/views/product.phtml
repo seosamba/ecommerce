@@ -349,9 +349,9 @@ $this->headLink()
                                 <div class="grid_3 alpha">
                                     <label><?php echo $productCustomParam['label'];?></label>
                                     <?php if($productCustomParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_TEXT):?>
-                                         <input data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-param-type="text" class="product-custom-param custom-param-text" type="text" name="custom-param-text-<?php echo $productCustomParam['param_name'];?>" id="custom-param-text-<?php echo $productCustomParam['param_name'];?>">
+                                         <input data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-custom-param-name="<?php echo $productCustomParam['param_name'];?>" data-param-type="text" class="product-custom-param custom-param-text" type="text" name="custom-param-text-<?php echo $productCustomParam['param_name'];?>" id="custom-param-text-<?php echo $productCustomParam['param_name'];?>">
                                     <?php elseif($productCustomParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT):?>
-                                        <select data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-param-type="select" class="product-custom-param custom-param-select" name="custom-param-select-<?php echo $productCustomParam['param_name'];?>" id="custom-param-select-<?php echo $productCustomParam['param_name'];?>">
+                                        <select data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-custom-param-name="<?php echo $productCustomParam['param_name'];?>" data-param-type="select" class="product-custom-param custom-param-select" name="custom-param-select-<?php echo $productCustomParam['param_name'];?>" id="custom-param-select-<?php echo $productCustomParam['param_name'];?>">
                                             <?php if(isset($this->productCustomParamsOptions[$productCustomParam['id']])):?>
                                                 <option value="0"><?php echo $this->translate('Select option');?></option>
                                                 <?php foreach ($this->productCustomParamsOptions[$productCustomParam['id']] as $paramData):?>
