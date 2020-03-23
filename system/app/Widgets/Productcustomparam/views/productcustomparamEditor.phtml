@@ -15,7 +15,7 @@
         </select>
     <?php endif; ?>
 <?php endif; ?>
-<input class="secureToken" type="hidden" name="secureToken" value="<?php echo $this->secureToken;?>" />
+<input class="secureToken" type="hidden" name="secureToken" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>" />
 
 <script type="text/javascript">
     $(document).ready(function() {
