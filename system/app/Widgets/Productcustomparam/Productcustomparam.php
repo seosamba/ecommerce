@@ -101,13 +101,23 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
 
             return '';
         } else {
-            if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
-                $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT;
-                $this->_view->uniqueName = $this->_options[0];
-                $this->_view->customParamData = $customParamData;
-                $this->_view->paramId = $paramId;
-                $this->_view->customParamProductId = $customParamProductId;
-                return $this->_view->render('productcustomparamEditor.phtml');
+            $customer = Tools_ShoppingCart::getInstance()->getCustomer();
+
+            if($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN ) {
+                if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
+                    $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT;
+                    $this->_view->uniqueName = $this->_options[0];
+                    $this->_view->customParamData = $customParamData;
+                    $this->_view->paramId = $paramId;
+                    $this->_view->customParamProductId = $customParamProductId;
+                    return $this->_view->render('productcustomparamEditor.phtml');
+                }
+
+                return '';
+            }
+
+            if(!empty($customParamData)) {
+                return $customParamData;
             }
 
             return '';
@@ -138,22 +148,32 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
 
             return '';
         } else {
-            if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
+            $customer = Tools_ShoppingCart::getInstance()->getCustomer();
 
-                $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
+            if($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN ) {
+                if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
 
-                $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($paramId);
+                    $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
 
-                if(!empty($productCustomFieldsOptionsData)) {
-                    $this->_view->optionsData = $productCustomFieldsOptionsData;
+                    $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($paramId);
+
+                    if(!empty($productCustomFieldsOptionsData)) {
+                        $this->_view->optionsData = $productCustomFieldsOptionsData;
+                    }
+
+                    $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT;
+                    $this->_view->uniqueName = $this->_options[0];
+                    $this->_view->customParamData = $customParamValue;
+                    $this->_view->paramId = $paramId;
+                    $this->_view->customParamProductId = $customParamProductId;
+                    return $this->_view->render('productcustomparamEditor.phtml');
                 }
 
-                $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT;
-                $this->_view->uniqueName = $this->_options[0];
-                $this->_view->customParamData = $customParamValue;
-                $this->_view->paramId = $paramId;
-                $this->_view->customParamProductId = $customParamProductId;
-                return $this->_view->render('productcustomparamEditor.phtml');
+                return '';
+            }
+
+            if(!empty($customParamValue)) {
+                return $customParamValue;
             }
 
             return '';
