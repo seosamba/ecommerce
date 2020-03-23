@@ -15,7 +15,7 @@
                                 </div>
                                 <div class="grid_6 omega">
                                     <label class="grid_5 alpha omega mt5px">{{$t('message.customFieldLabel')}}</label>
-                                    <input v-model.trim="label" class="required grid_7 alpha omega param_label" type="text" name="label" value="">
+                                    <input v-model.trim="label" class="required grid_7 alpha omega param_label" type="text" name="label" v-bind:placeholder="param_name" value="">
                                 </div>
                             </div>
                         </div>

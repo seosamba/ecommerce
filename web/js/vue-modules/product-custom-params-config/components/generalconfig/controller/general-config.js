@@ -71,8 +71,13 @@ export default {
             }
 
             if (this.label == '') {
-                showMessage(this.$t('message.specifLabel'), true, 2000);
-                return false;
+                if(this.param_name == '') {
+                    showMessage(this.$t('message.specifLabel'), true, 2000);
+                    return false;
+                } else {
+                    this.label = this.param_name;
+                }
+
             }
 
             const result = await this.$store.dispatch('saveConfigData', {
@@ -220,8 +225,12 @@ export default {
             }
 
             if (customFieldLabelFiltered == '') {
-                showMessage(this.$t('message.specifLabel'), true, 2000);
-                return false;
+                if(customFieldNameFiltered == '') {
+                    showMessage(this.$t('message.specifLabel'), true, 2000);
+                    return false;
+                } else {
+                    customFieldLabelFiltered = customFieldNameFiltered;
+                }
             }
 
             const result = await this.$store.dispatch('saveConfigData', {

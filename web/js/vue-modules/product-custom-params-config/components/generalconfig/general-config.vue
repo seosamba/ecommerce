@@ -49,7 +49,7 @@
                     </p>
                     <p class="grid_3 omega mt0px">
                         <label>{{$t('message.customFieldLabel')}}:</label>
-                        <input class="required param_label" type="text" name="label" v-model.trim="label" value=""/>
+                        <input class="required param_label" type="text" name="label" v-model.trim="label" v-bind:placeholder="param_name" value=""/>
                     </p>
                     <p class="grid_3 omega mt0px">
                         <input id="product-custom-params-form-save" class="btn" type="submit" name="product-custom-params-form-save"
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="grid_6 omega">
                                     <label class="grid_5 alpha omega mt5px">{{$t('message.customFieldLabel')}}</label>
-                                    <input v-model.trim="label" class="required grid_7 alpha omega param_label" type="text" name="label" value="">
+                                    <input v-model.trim="label" class="required grid_7 alpha omega param_label" type="text" name="label" v-bind:placeholder="param_name" value="">
                                 </div>
                             </div>
                         </div>

@@ -74,8 +74,12 @@ export default {
             }
 
             if (customFieldLabelFiltered == '') {
-                showMessage(this.$t('message.specifLabel'), true, 2000);
-                return false;
+                if(customFieldNameFiltered == '') {
+                    showMessage(this.$t('message.specifLabel'), true, 2000);
+                    return false;
+                } else {
+                    customFieldLabelFiltered = customFieldNameFiltered;
+                }
             }
 
             if(this.dropdownId == '') {
