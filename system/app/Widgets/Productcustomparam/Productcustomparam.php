@@ -56,7 +56,12 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
                 $this->_isReadOnly = true;
             }
 
-            return $this->{'_render' . ucfirst($method)}();
+            if (method_exists($this, $method)){
+                return $this->{'_render' . ucfirst($method)}();
+            }
+
+            return '<b>Method ' . $method . ' doesn\'t exist</b>';
+
         } catch (Exception $e) {
             return '<b>Method ' . $method . ' doesn\'t exist</b>';
         }
