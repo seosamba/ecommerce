@@ -15,6 +15,8 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
 
     protected $_customParamKey = '';
 
+    protected $_productId = '';
+
     protected $_websiteHelper  = null;
 
     protected function _init()
@@ -47,6 +49,7 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
             $productId = $productModel->getId();
             $registryKey = 'productCustomParamsData' . $productId;
 
+            $this->_productId = $productModel->getId();
             $this->_productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
             if (!Zend_Registry::isRegistered($registryKey)) {
                 $this->_customParamsData = $this->_productCustomParamsDataMapper->findByProductIdAggregated($productId);
@@ -84,14 +87,17 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
     {
         $customParamData = '';
         $customParamId = '';
-        $customParamProductId = '';
-        $paramId = '';
+
+        $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+        $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->getByName($this->_options[0]);
+
+        if(!$productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+            return '';
+        }
 
         if (array_key_exists($this->_customParamKey, $this->_customParamsData)) {
-            $customParamData = $this->_customParamsData[$this->_customParamKey]['param_value'];
             $customParamId = $this->_customParamsData[$this->_customParamKey]['id'];
-            $customParamProductId = $this->_customParamsData[$this->_customParamKey]['product_id'];
-            $paramId = $this->_customParamsData[$this->_customParamKey]['param_id'];
+            $customParamData = $this->_customParamsData[$this->_customParamKey]['param_value'];
         }
 
         if ($this->_isReadOnly === true) {
@@ -104,16 +110,19 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
             $customer = Tools_ShoppingCart::getInstance()->getCustomer();
 
             if($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN ) {
-                if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
-                    $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT;
-                    $this->_view->uniqueName = $this->_options[0];
-                    $this->_view->customParamData = $customParamData;
-                    $this->_view->paramId = $paramId;
-                    $this->_view->customParamProductId = $customParamProductId;
-                    return $this->_view->render('productcustomparamEditor.phtml');
+                $isNew = 1;
+                if(!empty($customParamId)) {
+                    $isNew = 0;
                 }
 
-                return '';
+                $this->_view->isNew = $isNew;
+                $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT;
+                $this->_view->uniqueName = $this->_options[0];
+                $this->_view->customParamData = $customParamData;
+                $this->_view->paramId = $productCustomFieldsConfigModel->getId();
+                $this->_view->customParamProductId = $this->_productId;
+
+                return $this->_view->render('productcustomparamEditor.phtml');
             }
 
             if(!empty($customParamData)) {
@@ -131,14 +140,17 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
     {
         $customParamValue = '';
         $customParamId = '';
-        $customParamProductId = '';
-        $paramId = '';
+
+        $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+        $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->getByName($this->_options[0]);
+
+        if(!$productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+            return '';
+        }
 
         if (array_key_exists($this->_customParamKey, $this->_customParamsData)) {
-            $customParamValue = $this->_customParamsData[$this->_customParamKey]['option_val'];
             $customParamId = $this->_customParamsData[$this->_customParamKey]['id'];
-            $customParamProductId = $this->_customParamsData[$this->_customParamKey]['product_id'];
-            $paramId = $this->_customParamsData[$this->_customParamKey]['param_id'];
+            $customParamValue = $this->_customParamsData[$this->_customParamKey]['option_val'];
         }
 
         if ($this->_isReadOnly === true) {
@@ -151,25 +163,26 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
             $customer = Tools_ShoppingCart::getInstance()->getCustomer();
 
             if($customer->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $customer->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN ) {
-                if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
-
-                    $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
-
-                    $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($paramId);
-
-                    if(!empty($productCustomFieldsOptionsData)) {
-                        $this->_view->optionsData = $productCustomFieldsOptionsData;
-                    }
-
-                    $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT;
-                    $this->_view->uniqueName = $this->_options[0];
-                    $this->_view->customParamData = $customParamValue;
-                    $this->_view->paramId = $paramId;
-                    $this->_view->customParamProductId = $customParamProductId;
-                    return $this->_view->render('productcustomparamEditor.phtml');
+                $isNew = 1;
+                if(!empty($customParamId)) {
+                    $isNew = 0;
                 }
 
-                return '';
+                $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
+                $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($productCustomFieldsConfigModel->getId());
+
+                if(!empty($productCustomFieldsOptionsData)) {
+                    $this->_view->optionsData = $productCustomFieldsOptionsData;
+                }
+
+                $this->_view->isNew = $isNew;
+                $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT;
+                $this->_view->uniqueName = $this->_options[0];
+                $this->_view->customParamData = $customParamValue;
+                $this->_view->paramId = $productCustomFieldsConfigModel->getId();
+                $this->_view->customParamProductId = $this->_productId;
+
+                return $this->_view->render('productcustomparamEditor.phtml');
             }
 
             if(!empty($customParamValue)) {

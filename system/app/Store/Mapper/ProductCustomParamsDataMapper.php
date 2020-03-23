@@ -98,9 +98,11 @@ class Store_Mapper_ProductCustomParamsDataMapper extends Application_Model_Mappe
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('product_id = ?', $productId);
         $select = $this->getDbTable()->getAdapter()->select()->from(array('spcpd' => 'shopping_product_custom_params_data'),
-            array('key' => new Zend_Db_Expr('CONCAT(spcfc.param_type,"_", spcfc.param_name)'), 'spcpd.id', 'spcpd.param_id',
-                'spcpd.product_id', 'spcpd.param_value', 'spcpd.params_option_id', 'spcfc.param_type', 'spcfc.param_name',
-            'option_val' => 'spcpod.option_value'))
+            array('key' => new Zend_Db_Expr('CONCAT(spcfc.param_type,"_", spcfc.param_name)'),
+                'spcpd.id',
+                'spcpd.param_value',
+                'option_val' => 'spcpod.option_value'
+            ))
             ->join(array('spcfc' => 'shopping_product_custom_fields_config'),
                 'spcfc.id=spcpd.param_id', array())
             ->joinLeft(array('spcpod' => 'shopping_product_custom_params_options_data'),

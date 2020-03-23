@@ -49,6 +49,11 @@ export default {
             this.loadedDropdownForm = false;
             this.$router.push({ name: 'index'});
         },
+        toLabel: function(e)
+        {
+            let currentLabel = $(e.currentTarget).val();
+            this.label = currentLabel;
+        },
         async saveDropdown() {
             if (this.selectionEl.length == '0') {
                 showMessage(this.$t('message.specifySelectionEl'), true, 2000);
@@ -74,12 +79,8 @@ export default {
             }
 
             if (customFieldLabelFiltered == '') {
-                if(customFieldNameFiltered == '') {
-                    showMessage(this.$t('message.specifLabel'), true, 2000);
-                    return false;
-                } else {
-                    customFieldLabelFiltered = customFieldNameFiltered;
-                }
+                showMessage(this.$t('message.specifLabel'), true, 2000);
+                return false;
             }
 
             if(this.dropdownId == '') {

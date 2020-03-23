@@ -11,11 +11,11 @@
                             <div class="grid_12 mt10px">
                                 <div class="grid_6 alpha">
                                     <label class="grid_5 alpha omega mt5px">{{$t('message.customFieldName')}}</label>
-                                    <input v-model.trim="param_name" class="required grid_7 alpha omega param_name" type="text" name="param_name" value="">
+                                    <input v-model.trim="param_name" class="required grid_7 alpha omega param_name" @keyup="toLabel" type="text" name="param_name" value="">
                                 </div>
                                 <div class="grid_6 omega">
                                     <label class="grid_5 alpha omega mt5px">{{$t('message.customFieldLabel')}}</label>
-                                    <input v-model.trim="label" class="required grid_7 alpha omega param_label" type="text" name="label" v-bind:placeholder="param_name" value="">
+                                    <input class="required grid_7 alpha omega param_label" @keyup="toLabel" type="text" name="label" :value="label">
                                 </div>
                             </div>
                         </div>

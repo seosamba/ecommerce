@@ -2879,29 +2879,41 @@ class Shopping extends Tools_Plugins_Abstract {
 
             $currentCustomParamValue = filter_var($this->_request->getParam('currentCustomParamValue'), FILTER_SANITIZE_STRING);
 
+            $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+
             if(!empty($customparamsData['paramId']) && !empty($customparamsData['customParamProductId'])) {
-                $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+                if($customparamsData['isNew']) {
+                    $productCustomParamsDataModel = new Store_Model_ProductCustomParamsDataModel();
 
-                $paramExists = $productCustomParamsDataMapper->checkIfParamExists($customparamsData['customParamProductId'], $customparamsData['paramId']);
+                    $productCustomParamsDataModel->setParamId($customparamsData['paramId']);
+                    $productCustomParamsDataModel->setProductId($customparamsData['customParamProductId']);
 
-                if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
-                    if($paramExists instanceof Store_Model_ProductCustomParamsDataModel) {
-                        $paramExists->setParamValue($currentCustomParamValue);
-
-                        $productCustomParamsDataMapper->save($paramExists);
-
-                        $this->_responseHelper->success('');
+                    if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                        $productCustomParamsDataModel->setParamValue($currentCustomParamValue);
+                    } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                        $productCustomParamsDataModel->setParamsOptionId($currentCustomParamValue);
                     }
-                } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
-                    if($paramExists instanceof Store_Model_ProductCustomParamsDataModel) {
-                        $paramExists->setParamsOptionId($currentCustomParamValue);
 
-                        $productCustomParamsDataMapper->save($paramExists);
+                    $productCustomParamsDataMapper->save($productCustomParamsDataModel);
 
-                        $this->_responseHelper->success('');
-                    }
+                    $this->_responseHelper->success('');
+
                 } else {
-                    $this->_responseHelper->fail($this->_translator->translate('Unknown product custom param type'));
+                    $productCustomParamsDataExists = $productCustomParamsDataMapper->checkIfParamExists($customparamsData['customParamProductId'], $customparamsData['paramId']);
+
+                    if($productCustomParamsDataExists instanceof Store_Model_ProductCustomParamsDataModel) {
+                        if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                            $productCustomParamsDataExists->setParamValue($currentCustomParamValue);
+                        } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                            $productCustomParamsDataExists->setParamsOptionId($currentCustomParamValue);
+                        }
+
+                        $productCustomParamsDataMapper->save($productCustomParamsDataExists);
+
+                        $this->_responseHelper->success('');
+                    } else{
+                        $this->_responseHelper->fail($this->_translator->translate('Unknown product custom param type'));
+                    }
                 }
             } else {
                 $this->_responseHelper->fail($this->_translator->translate('Can\'t update product custom param'));

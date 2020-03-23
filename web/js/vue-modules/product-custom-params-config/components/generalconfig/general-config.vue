@@ -45,11 +45,11 @@
                     </p>
                     <p class="grid_3 omega mt0px">
                         <label>{{$t('message.customFieldName')}}:</label>
-                        <input class="required param_name" type="text" name="param_name" v-model.trim="param_name" value=""/>
+                        <input class="required param_name" @keyup="toLabel" type="text" name="param_name" v-model.trim="param_name" value=""/>
                     </p>
                     <p class="grid_3 omega mt0px">
                         <label>{{$t('message.customFieldLabel')}}:</label>
-                        <input class="required param_label" type="text" name="label" v-model.trim="label" v-bind:placeholder="param_name" value=""/>
+                        <input class="required param_label" @keyup="toLabel" type="text" name="label" :value="label"/>
                     </p>
                     <p class="grid_3 omega mt0px">
                         <input id="product-custom-params-form-save" class="btn" type="submit" name="product-custom-params-form-save"
@@ -69,11 +69,11 @@
                             <div class="grid_12 mt10px">
                                 <div class="grid_6 alpha">
                                     <label class="grid_5 alpha omega mt5px">{{$t('message.customFieldName')}}</label>
-                                    <input v-model.trim="param_name" class="required grid_7 alpha omega param_name" type="text" name="param_name" value="">
+                                    <input v-model.trim="param_name" @keyup="toLabel" class="required grid_7 alpha omega param_name" type="text" name="param_name" value="">
                                 </div>
                                 <div class="grid_6 omega">
                                     <label class="grid_5 alpha omega mt5px">{{$t('message.customFieldLabel')}}</label>
-                                    <input v-model.trim="label" class="required grid_7 alpha omega param_label" type="text" name="label" v-bind:placeholder="param_name" value="">
+                                    <input class="required grid_7 alpha omega param_label" @keyup="toLabel" type="text" name="label" :value="label">
                                 </div>
                             </div>
                         </div>

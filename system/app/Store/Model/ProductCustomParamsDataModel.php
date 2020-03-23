@@ -9,7 +9,7 @@ class Store_Model_ProductCustomParamsDataModel extends Application_Model_Models_
 
     protected $_paramValue = '';
 
-    protected $_paramsOptionId = '';
+    protected $_paramsOptionId = null;
 
     /**
      * @return string

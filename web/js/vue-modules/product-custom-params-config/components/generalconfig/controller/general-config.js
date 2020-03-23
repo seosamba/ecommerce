@@ -59,6 +59,11 @@ export default {
             this.param_name = '';
             this.label = '';
         },
+        toLabel: function(e)
+        {
+            let currentLabel = $(e.currentTarget).val();
+            this.label = currentLabel;
+        },
         async addCustomField(e){
             if (this.param_type == '') {
                 showMessage(this.$t('message.specifyParamType'), true, 2000);
@@ -71,13 +76,8 @@ export default {
             }
 
             if (this.label == '') {
-                if(this.param_name == '') {
-                    showMessage(this.$t('message.specifLabel'), true, 2000);
-                    return false;
-                } else {
-                    this.label = this.param_name;
-                }
-
+                showMessage(this.$t('message.specifLabel'), true, 2000);
+                return false;
             }
 
             const result = await this.$store.dispatch('saveConfigData', {
@@ -225,12 +225,8 @@ export default {
             }
 
             if (customFieldLabelFiltered == '') {
-                if(customFieldNameFiltered == '') {
-                    showMessage(this.$t('message.specifLabel'), true, 2000);
-                    return false;
-                } else {
-                    customFieldLabelFiltered = customFieldNameFiltered;
-                }
+                showMessage(this.$t('message.specifLabel'), true, 2000);
+                return false;
             }
 
             const result = await this.$store.dispatch('saveConfigData', {

@@ -24,7 +24,8 @@
 
            var currentElValue = $(e.currentTarget).val(),
                paramId = '<?php echo $this->paramId;?>',
-               customParamProductId = '<?php echo $this->customParamProductId;?>';
+               customParamProductId = '<?php echo $this->customParamProductId;?>',
+               isNew = '<?php echo $this->isNew;?>';
 
             $.ajax({
                 url      : '<?php echo $this->websiteUrl;?>plugin/shopping/run/updateProductCustomParam/',
@@ -35,6 +36,7 @@
                     paramId                 : paramId,
                     customParamProductId    : customParamProductId,
                     type                    : '<?php echo $this->type;?>',
+                    isNew                   : isNew,
                     secureToken             : $('.secureToken').val()
                 }
             }).done(function(response){
