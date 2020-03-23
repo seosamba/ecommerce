@@ -170,6 +170,7 @@ export default {
             }
 
             if(name == 'select') {
+                this.selectionEl = [];
                 this.loadedGrid = false;
                 this.loadedGridAddNew = false;
                 this.loadedDropdownForm = true;

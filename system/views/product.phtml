@@ -344,7 +344,7 @@ $this->headLink()
                                 <label class="grid_4 alpha omega" for="product-depth"><?php echo $this->translate((!empty($this->generalConfig['lengthUnit']) ? $this->generalConfig['lengthUnit'] :'')); ?></label>
                             </div>
                         </div>
-                        <div id="product-custom-attributes-tab">
+                        <div id="product-custom-attributes-tab" class="scroll" style="max-height: 230px;">
                             <?php foreach ($this->productCustomParamsConfig as $productCustomParam):?>
                                 <div class="grid_3 alpha">
                                     <label><?php echo $productCustomParam['label'];?></label>

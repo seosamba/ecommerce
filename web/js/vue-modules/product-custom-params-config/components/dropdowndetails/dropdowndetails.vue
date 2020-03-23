@@ -6,7 +6,7 @@
             </div>
             <form id="product-custom-params-form-dropdown" @submit.prevent="saveDropdown" class="grid_12 alpha omega" action="" method="POST">
                 <div id="manage-product-dropdown-container" class=" grid_12 alpha omega mt0px">
-                    <div style="height: 590px;">
+                    <div>
                         <div id="options-holder" class="grid_12 alpha omega">
                             <div class="grid_12 mt10px">
                                 <div class="grid_6 alpha">
@@ -23,18 +23,18 @@
                             <div class="header-inner grid_12 alpha omega">
                                 <div class="grid_10">{{$t('message.title')}}</div>
                             </div>
-                            <div class="option-list-holder grid_12 alpha omega scroll" style="max-height: 320px;"></div>
-
-                            <div class="grid_12 alpha omega mt10px" v-for="(selectionData, index) in selectionEl">
-                                <input class="grid_10 alpha omega" type="text" v-model.trim="selectionData.name"
-                                       :name="selectionData.name" :placeholder="selectionData.placeholder">
-                                <div class="grid_2 text-center">
-                                    <span :id="selectionData.id" class="btn item-remove btn icon link error ticon-remove mt0px" @click="deleteSelectionData(index)" ></span>
+                            <div class="option-list-holder grid_12 alpha omega scroll" style="max-height: 310px;">
+                                <div class="grid_12 alpha omega mt10px" v-for="(selectionData, index) in selectionEl">
+                                    <input class="grid_10 alpha omega" type="text" v-model.trim="selectionData.name"
+                                           :name="selectionData.name" :placeholder="selectionData.placeholder">
+                                    <div class="grid_2 text-center">
+                                        <span :id="selectionData.id" class="btn item-remove btn icon link error ticon-remove mt0px" @click="deleteSelectionData(index)" ></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="grid_12">
-                            <a @click="addNewSelection" class="add-selection-btn grid_12 alpha omega mt20px btn success ticon-plus" href="javascript:;">{{$t('message.addNewSelection')}}</a>
+                            <a @click="addNewSelection" class="add-selection-btn grid_12 alpha omega mt10px btn success ticon-plus" href="javascript:;">{{$t('message.addNewSelection')}}</a>
                         </div>
                         <p class="grid_12 fl-right">
                             <input class="btn mt20px" type="submit" name="product-custom-params-form"
