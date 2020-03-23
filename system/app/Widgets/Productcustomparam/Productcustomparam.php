@@ -15,6 +15,16 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
 
     protected $_customParamKey = '';
 
+    protected $_websiteHelper  = null;
+
+    protected function _init()
+    {
+        $this->_view = new Zend_View(array('scriptPath' => __DIR__ . '/views'));
+        $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+
+        $this->_view->websiteUrl  = $this->_websiteHelper->getUrl();
+    }
+
     protected function _load()
     {
         if (empty($this->_options)) {
@@ -67,16 +77,36 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
      */
     private function _renderText()
     {
+        $customParamData = '';
+        $customParamId = '';
+        $customParamProductId = '';
+        $paramId = '';
+
+        if (array_key_exists($this->_customParamKey, $this->_customParamsData)) {
+            $customParamData = $this->_customParamsData[$this->_customParamKey]['param_value'];
+            $customParamId = $this->_customParamsData[$this->_customParamKey]['id'];
+            $customParamProductId = $this->_customParamsData[$this->_customParamKey]['product_id'];
+            $paramId = $this->_customParamsData[$this->_customParamKey]['param_id'];
+        }
 
         if ($this->_isReadOnly === true) {
-            if (array_key_exists($this->_customParamKey, $this->_customParamsData)) {
-                return $this->_customParamsData[$this->_customParamKey]['param_value'];
+            if(!empty($customParamData)) {
+                return $customParamData;
+            }
+
+            return '';
+        } else {
+            if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
+                $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT;
+                $this->_view->uniqueName = $this->_options[0];
+                $this->_view->customParamData = $customParamData;
+                $this->_view->paramId = $paramId;
+                $this->_view->customParamProductId = $customParamProductId;
+                return $this->_view->render('productcustomparamEditor.phtml');
             }
 
             return '';
         }
-
-        return 'editing hasn\'t implemented yet';
     }
 
     /**
@@ -84,14 +114,44 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
      */
     private function _renderSelect()
     {
+        $customParamValue = '';
+        $customParamId = '';
+        $customParamProductId = '';
+        $paramId = '';
+
+        if (array_key_exists($this->_customParamKey, $this->_customParamsData)) {
+            $customParamValue = $this->_customParamsData[$this->_customParamKey]['option_val'];
+            $customParamId = $this->_customParamsData[$this->_customParamKey]['id'];
+            $customParamProductId = $this->_customParamsData[$this->_customParamKey]['product_id'];
+            $paramId = $this->_customParamsData[$this->_customParamKey]['param_id'];
+        }
+
         if ($this->_isReadOnly === true) {
-            if (array_key_exists($this->_customParamKey, $this->_customParamsData)) {
-                return $this->_customParamsData[$this->_customParamKey]['option_val'];
+            if(!empty($customParamValue)) {
+                return $customParamValue;
+            }
+
+            return '';
+        } else {
+            if(!empty($customParamId) && !empty($customParamProductId) && !empty($paramId)) {
+
+                $productCustomFieldsOptionsDataMapper = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance();
+
+                $productCustomFieldsOptionsData = $productCustomFieldsOptionsDataMapper->findByCustomParamId($paramId);
+
+                if(!empty($productCustomFieldsOptionsData)) {
+                    $this->_view->optionsData = $productCustomFieldsOptionsData;
+                }
+
+                $this->_view->type = Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT;
+                $this->_view->uniqueName = $this->_options[0];
+                $this->_view->customParamData = $customParamValue;
+                $this->_view->paramId = $paramId;
+                $this->_view->customParamProductId = $customParamProductId;
+                return $this->_view->render('productcustomparamEditor.phtml');
             }
 
             return '';
         }
-
-        return 'editing hasn\'t implemented yet';
     }
 }

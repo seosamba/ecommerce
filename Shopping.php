@@ -2862,4 +2862,51 @@ class Shopping extends Tools_Plugins_Abstract {
         }
     }
 
+    /**
+     * This action is used to change custom params values for product
+     */
+    public function updateProductCustomParamAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam('secureToken', false);
+
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $customparamsData = $this->_request->getParams();
+
+            $currentCustomParamValue = filter_var($this->_request->getParam('currentCustomParamValue'), FILTER_SANITIZE_STRING);
+
+            if(!empty($customparamsData['paramId']) && !empty($customparamsData['customParamProductId'])) {
+                $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+
+                $paramExists = $productCustomParamsDataMapper->checkIfParamExists($customparamsData['customParamProductId'], $customparamsData['paramId']);
+
+                if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                    if($paramExists instanceof Store_Model_ProductCustomParamsDataModel) {
+                        $paramExists->setParamValue($currentCustomParamValue);
+
+                        $productCustomParamsDataMapper->save($paramExists);
+
+                        $this->_responseHelper->success('');
+                    }
+                } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                    if($paramExists instanceof Store_Model_ProductCustomParamsDataModel) {
+                        $paramExists->setParamsOptionId($currentCustomParamValue);
+
+                        $productCustomParamsDataMapper->save($paramExists);
+
+                        $this->_responseHelper->success('');
+                    }
+                } else {
+                    $this->_responseHelper->fail($this->_translator->translate('Unknown product custom param type'));
+                }
+            } else {
+                $this->_responseHelper->fail($this->_translator->translate('Can\'t update product custom param'));
+            }
+        }
+    }
+
 }
