@@ -46,7 +46,7 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
             }
 
             $this->_customParamKey = $this->_options[0] . '_' . $this->_options[1];
-            $method = strtolower(array_shift($this->_options));
+            $method = '_render' .ucfirst(strtolower(array_shift($this->_options)));
 
             if (empty($this->_options[0])) {
                 return $this->_translator->translate('Please specify custom param name');
@@ -57,7 +57,7 @@ class Widgets_Productcustomparam_Productcustomparam extends Widgets_Abstract
             }
 
             if (method_exists($this, $method)){
-                return $this->{'_render' . ucfirst($method)}();
+                return $this->$method();
             }
 
             return '<b>Method ' . $method . ' doesn\'t exist</b>';
