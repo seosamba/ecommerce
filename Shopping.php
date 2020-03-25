@@ -1072,6 +1072,15 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                 }))
 			);
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
+			if(!empty($orders) && !empty($shippingServiceLabels)){
+                foreach ($orders as $index => $order) {
+                    if (isset($shippingServiceLabels[$order->getShippingService()])) {
+                        $orders[$index]->setShippingService($shippingServiceLabels[$order->getShippingService()]);
+                    }
+                }
+            }
 			$this->_view->orders = $orders;
 		}
 
@@ -1168,6 +1177,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->pickupLocationData = $pickupLocationData;
             }
             $this->_view->defaultPickup = $defaultPickup;
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($order->getShippingService());
+            if (!empty($shippingServiceLabel)) {
+                $this->_view->shippingServiceLabel = $shippingServiceLabel;
+            }
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');

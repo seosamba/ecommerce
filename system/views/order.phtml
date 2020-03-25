@@ -315,7 +315,7 @@
                     <?php if ($this->order->getShippingService()) : ?>
                         <tr>
                             <td><?php echo $this->translate('Shipping service');?>:</td>
-                            <td class="text-right"><?php echo strtoupper($this->order->getShippingService()) ;?></td>
+                            <td class="text-right"><?php echo isset($this->shippingServiceLabel) ? $this->shippingServiceLabel : strtoupper($this->order->getShippingService()); ?></td>
                         </tr>
                     <?php endif; ?>
                     <?php if ($this->order->getShippingType()) : ?>
