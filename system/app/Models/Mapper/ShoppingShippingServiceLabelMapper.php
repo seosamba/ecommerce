@@ -62,12 +62,15 @@ class Models_Mapper_ShoppingShippingServiceLabelMapper extends Application_Model
 
     public function findByName($name)
     {
-        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_shipping_service_label', array(
-            'label'
-        ))
-            ->where('name = ?', $name);
+        if (!empty($name)) {
+            $select = $this->getDbTable()->getAdapter()->select()->from('shopping_shipping_service_label', array(
+                'label'
+            ))
+                ->where('name = ?', $name);
 
-        return $this->getDbTable()->getAdapter()->fetchOne($select);
+            return $this->getDbTable()->getAdapter()->fetchOne($select);
+        }
+        return array();
     }
 
     public function delete($name)
