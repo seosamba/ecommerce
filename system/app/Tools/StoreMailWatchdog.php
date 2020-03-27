@@ -345,9 +345,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
                 break;
         }
 
-        $this->_entityParser
-            ->objectToDictionary($customer)
-            ->objectToDictionary($this->_object, 'order');
+        $this->_entityParser->objectToDictionary($customer);
+        $this->_prepareShippingServiceLabel();
         $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
         if(isset($withBillingAddress)){
@@ -416,9 +415,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 				break;
 		}
 
-		$this->_entityParser
-				->objectToDictionary($customer)
-				->objectToDictionary($this->_object, 'order');
+		$this->_entityParser->objectToDictionary($customer);
+        $this->_prepareShippingServiceLabel();
         $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
         if(isset($withBillingAddress)){
@@ -463,9 +461,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
     private function _sendTrackingnumberMail()
     {
         $this->_prepareEmailToSend();
-        $this->_entityParser
-            ->objectToDictionary($this->_object, 'order')
-            ->objectToDictionary($this->_customer);
+        $this->_entityParser->objectToDictionary($this->_customer);
+        $this->_prepareShippingServiceLabel();
         $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
             self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
@@ -496,9 +493,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
     private function _sendDeliveredMail()
     {
         $this->_prepareEmailToSend();
-        $this->_entityParser
-            ->objectToDictionary($this->_object, 'order')
-            ->objectToDictionary($this->_customer);
+        $this->_entityParser->objectToDictionary($this->_customer);
+        $this->_prepareShippingServiceLabel();
         $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
             self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
@@ -655,6 +651,19 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         );
 
         return $this->_send();
+    }
+
+    private function _prepareShippingServiceLabel()
+    {
+        $order = $this->_object;
+        if ($order instanceof Models_Model_CartSession) {
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($order->getShippingService());
+            if (!empty($shippingServiceLabel)) {
+                $order->setShippingService($shippingServiceLabel);
+                $this->_entityParser->objectToDictionary($order, 'order');
+            }
+        }
     }
 
 }
