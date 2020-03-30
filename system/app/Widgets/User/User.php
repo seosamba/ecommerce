@@ -133,6 +133,15 @@ class Widgets_User_User extends Widgets_User_Base {
         })),
 
         );
+        $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+        $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
+        if(!empty($orders) && !empty($shippingServiceLabels)){
+            foreach ($orders as $index => $order) {
+                if (isset($shippingServiceLabels[$order->getShippingService()])) {
+                    $orders[$index]->setShippingService($shippingServiceLabels[$order->getShippingService()]);
+                }
+            }
+        }
         $this->_view->orders = $orders;
         return $this->_view->render('grid.phtml');
 
