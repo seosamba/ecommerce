@@ -945,6 +945,12 @@ CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
 
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_NotifyObserver');
 
+CREATE TABLE IF NOT EXISTS `shopping_shipping_service_label` (
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Name',
+  `label` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Custom Label',
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
@@ -975,5 +981,5 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.7' WHERE `name` = 'shopping';
 

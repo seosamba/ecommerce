@@ -497,8 +497,16 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 -- version: 2.7.4
 ALTER TABLE `shopping_group` ADD `nonTaxable` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0';
 
--- 17/03/2020
+-- 23/03/2020
 -- version: 2.7.5
+CREATE TABLE IF NOT EXISTS `shopping_shipping_service_label` (
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Name',
+  `label` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Custom Label',
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 17/03/2020
+-- version: 2.7.6
 CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
   `param_type` ENUM('text', 'select') DEFAULT 'text',
@@ -528,6 +536,6 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.7.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

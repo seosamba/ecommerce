@@ -348,6 +348,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $this->_entityParser
             ->objectToDictionary($customer)
             ->objectToDictionary($this->_object, 'order');
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
         $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
         if(isset($withBillingAddress)){
@@ -419,6 +423,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 				->objectToDictionary($customer)
 				->objectToDictionary($this->_object, 'order');
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
         $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
         if(isset($withBillingAddress)){
@@ -466,6 +474,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $this->_entityParser
             ->objectToDictionary($this->_object, 'order')
             ->objectToDictionary($this->_customer);
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
         $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
             self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
@@ -499,6 +511,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $this->_entityParser
             ->objectToDictionary($this->_object, 'order')
             ->objectToDictionary($this->_customer);
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
         $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
             self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
@@ -655,6 +671,15 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         );
 
         return $this->_send();
+    }
+
+    private function _prepareShippingServiceLabel()
+    {
+        if ($this->_object instanceof Models_Model_CartSession) {
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($this->_object->getShippingService());
+            return $shippingServiceLabel;
+        }
     }
 
 }

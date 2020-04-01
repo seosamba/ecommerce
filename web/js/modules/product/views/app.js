@@ -14,11 +14,12 @@ define([
     '../../groups/views/group_price',
     '../../digital-products/views/digital_product',
     'moment',
+    'tinyMCE5',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, i18n){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, tinymce, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -365,6 +366,11 @@ define([
                 _.isEmpty(this.model.get('related')) && this.$('#related-holder').find('.spinner').remove();
             }
 
+            self.initTinyMce();
+
+            var ptodFullDescription = this.model.get('fullDescription');
+            tinymce.activeEditor.setContent(ptodFullDescription);
+
 			// loading option onto frontend
 
             this.renderOptions();
@@ -470,6 +476,64 @@ define([
 
 			hideSpinner();
 		},
+        initTinyMce() {
+            var self = this;
+
+            // tinymce 5
+            tinymce.init({
+                selector: '#product-fullDescription',
+                skin: 'oxide',
+                menubar: false,
+                resize: false,
+                convert_urls: false,
+                browser_spellcheck: true,
+                relative_urls: false,
+                statusbar: false,
+                allow_script_urls: true,
+                force_p_newlines: false,
+                force_br_newlines : true,
+                forced_root_block: '',
+                remove_linebreaks : false,
+                convert_newlines_to_br: true,
+                advlist_number_styles: 'default,lower-alpha,lower-greek,lower-roman,upper-alpha,upper-roman',
+                entity_encoding: "raw",
+                plugins: [
+                    "advlist lists charmap visualblocks link code"
+                ],
+                toolbar1: 'bold italic underline linebreak paragraphbreak numlist bullist| link unlink | code |', //formatselect
+                //block_formats: "Block=div;Paragraph=p;Block Quote=blockquote;Preformatted=pre;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6",
+                extended_valid_elements: "a[*],input[*],select[*],textarea[*]",
+                image_advtab: true,
+                setup : function(ed){
+                        var keyTime = null;
+                        ed.on('change blur keyup', function(ed, e){
+                            //@see content.js for this function
+                            self.dispatchEditorKeyup(ed, e, keyTime);
+                            this.save();
+                        });
+
+                    ed.ui.registry.addButton('linebreak', {
+                        text: _.isUndefined(i18n['Line break'])?'Line break':i18n['Line break'],
+                        tooltip: _.isUndefined(i18n['Line break <br>'])?'Line break <br>':i18n['Line break <br>'],
+                        onAction: () => ed.execCommand('InsertLineBreak')
+                    });
+
+                    ed.ui.registry.addButton('paragraphbreak', {
+                        text: _.isUndefined(i18n['Paragraph'])?'Paragraph':i18n['Paragraph'],
+                        tooltip: _.isUndefined(i18n['Paragraph <p></p>'])?'Paragraph <p></p>':i18n['Paragraph <p></p>'],
+                        onAction: () =>  ed.execCommand('FormatBlock', false, 'p')
+                    });
+                }
+            });
+        },
+        dispatchEditorKeyup: function(editor, event, keyTime) {
+            var keyTimer = keyTime;
+            if(keyTimer === null) {
+                keyTimer = setTimeout(function() {
+                    keyTimer = null;
+                }, 1000)
+            }
+        },
         renderTag: function(tag, index){
             var view = new TagView({model: tag});
                 view.render();
@@ -640,6 +704,12 @@ define([
 
             this.model.set({allowance: productAllowanceDate});
             this.model.set({customParams: productCustomParams});
+
+            var ptodFullDescription = tinymce.activeEditor.getContent();
+
+            if(ptodFullDescription.length > 0) {
+                this.model.set({fullDescription: ptodFullDescription});
+            }
 
             this.model.save();
 
