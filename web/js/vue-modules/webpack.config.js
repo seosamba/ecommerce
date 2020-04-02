@@ -3,7 +3,8 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        groupassignmentconfig: __dirname + "/group-assignment-config/"
+        groupassignmentconfig: __dirname + "/group-assignment-config/",
+        productcustomparamsconfig: __dirname + "/product-custom-params-config/"
     },
     output: {
         path: __dirname,
