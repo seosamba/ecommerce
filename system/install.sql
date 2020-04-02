@@ -157,7 +157,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.3');
+('version', '2.7.7');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -636,6 +636,7 @@ CREATE TABLE IF NOT EXISTS `shopping_group` (
   `priceSign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceValue` decimal(10,2) DEFAULT NULL,
+  `nonTaxable` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -931,6 +932,54 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
   FOREIGN KEY (`rule_id`) REFERENCES `shopping_customer_rules_general_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  `send_notification` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_NotifyObserver');
+
+CREATE TABLE IF NOT EXISTS `shopping_shipping_service_label` (
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Name',
+  `label` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Custom Label',
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `param_type` ENUM('text', 'select') DEFAULT 'text',
+  `param_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `label` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE(`param_type`, `param_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_data` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `param_id` INT(10) UNSIGNED NOT NULL,
+  `product_id` INT(10) UNSIGNED NOT NULL,
+  `param_value` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `params_option_id` INT(10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `custom_param_id` INT UNSIGNED NOT NULL,
+  `option_value` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`custom_param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.3' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.7' WHERE `name` = 'shopping';
 

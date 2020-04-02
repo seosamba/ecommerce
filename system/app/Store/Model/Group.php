@@ -10,6 +10,7 @@ class Store_Model_Group extends Application_Model_Models_Abstract {
     protected $_priceType;
     protected $_priceSign;
     protected $_priceValue;
+    protected $_nonTaxable;
 
 	public function setGroupName($groupName) {
 		$this->_groupName = $groupName;
@@ -46,5 +47,26 @@ class Store_Model_Group extends Application_Model_Models_Abstract {
     public function getPriceValue() {
         return $this->_priceValue;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getNonTaxable()
+    {
+        return $this->_nonTaxable;
+    }
+
+    /**
+     * @param mixed $nonTaxable
+     * @return mixed
+     */
+    public function setNonTaxable($nonTaxable)
+    {
+        $this->_nonTaxable = $nonTaxable;
+
+        return $this;
+    }
+
+
 
 }
