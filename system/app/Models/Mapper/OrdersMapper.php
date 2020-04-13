@@ -124,7 +124,7 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             'total' => 'order.total',
             'notes' => 'order.notes',
             'additional_info' => 'order.additional_info',
-            'shipping_tracking_id' => 'order.shipping_tracking_id',
+            'shipping_tracking_code' => 'order.shipping_tracking_code',
             'brand' => 'sb.name',
             'user_prefix' => 'u.prefix',
             'user_name' => 'u.full_name',

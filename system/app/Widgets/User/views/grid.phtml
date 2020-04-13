@@ -55,9 +55,9 @@
                         </td>
                         <td>
                             <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
-                                <?php if($order->getShippingTrackingId() != ''):?>
+                                <?php if($order->getShippingTrackingCode() != ''):?>
                                     <p class="textcentered">
-                                        <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Track your parcel')?></a>
+                                        <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingCode(); ?>"><?php echo $this->translate('Track your parcel')?></a>
                                     </p>
                                 <?php else:?>
                                     <p> - </p>

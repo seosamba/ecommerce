@@ -69,7 +69,7 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
 	protected $_subTotal = 0;
 
-	protected $_shippingTrackingId = null;
+	protected $_shippingTrackingCode = null;
 
 	protected $_trackingId = null;
 
@@ -242,13 +242,13 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 		return $this->_totalTax;
 	}
 
-	public function setShippingTrackingId($shippingTrackingId) {
-		$this->_shippingTrackingId = $shippingTrackingId;
+	public function setShippingTrackingCode($shippingTrackingCode) {
+		$this->_shippingTrackingCode = $shippingTrackingCode;
 		return $this;
 	}
 
-	public function getShippingTrackingId() {
-		return $this->_shippingTrackingId;
+	public function getShippingTrackingCode() {
+		return $this->_shippingTrackingCode;
 	}
 
     public function setTrackingId($trackingId) {

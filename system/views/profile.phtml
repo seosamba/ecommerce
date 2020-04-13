@@ -166,15 +166,15 @@ $this->headScript()
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
                         <?php if(!$order->getRecurringId()):?>
                             <p>
-                                <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+                                <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-code"><?php echo $order->getShippingTrackingCode(); ?></span>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                                <a href="javascript:;" class="tracking-dialog" data-order-id="<?php echo $order->getId();?>" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+                                <a href="javascript:;" class="tracking-dialog" data-order-id="<?php echo $order->getId();?>" data-shipping-tracking-code="<?php echo $order->getShippingTrackingCode();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
                                 <?php endif;?>
                             </p>
                             <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
-                                <?php if($order->getShippingTrackingId() != ''):?>
+                                <?php if($order->getShippingTrackingCode() != ''):?>
                                 <p class="textcentered">
-                                    <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
+                                    <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingCode(); ?>"><?php echo $this->translate('Where is my order?');?></a>
                                 </p>
                                 <?php endif;?>
                             <?php endif;?>
@@ -183,7 +183,7 @@ $this->headScript()
                             <div id="dialog-block-<?php echo $order->getId();?>" class="clearfix" style="width: 110%" title="Insert tracking code for this order">
                                 <form id="tracking-code-form" method="post">
                                     <select name="choose-service" id="marketing-services-<?php echo $order->getId();?>" class="grid_5 alpha fl-left" style="float:none;"></select>
-                                    <input type="text" name="shippingTrackingId" id="shippingTrackingId-<?php echo $order->getId();?>" value="" class="grid_7 alpha fl-right">
+                                    <input type="text" name="shippingTrackingCode" id="shippingTrackingCode-<?php echo $order->getId();?>" value="" class="grid_7 alpha fl-right">
                                     <button class="btn green ticon-checkmark save-data-<?php echo $order->getId();?>" style="margin-top: 10px;" type="submit" title="save">Save</button>
                                 </form>
                             </div>
@@ -424,7 +424,7 @@ $this->headScript()
             });
 
             var trackingName = responsedata.trackingName;
-            $('#shippingTrackingId-'+id).val(trackingName);
+            $('#shippingTrackingCode-'+id).val(trackingName);
 
             var dialogBlock = $('#dialog-block-' + id);
 
@@ -436,10 +436,10 @@ $this->headScript()
                     $('.save-data-' + id).one('click', function(e){
                         e.preventDefault();
                         var  trackingUrlId =  $('#marketing-services-'+id).val(),
-                            text =  $('#shippingTrackingId-'+id).val(),
+                            text =  $('#shippingTrackingCode-'+id).val(),
                             data = {
                                 trackingUrlId: trackingUrlId,
-                                shippingTrackingId: text,
+                                shippingTrackingCode: text,
                                 id:id
                             };
 
@@ -457,12 +457,12 @@ $this->headScript()
                                 }
 
                                 if (response.hasOwnProperty('responseText')){
-                                    el.closest('td').find('.tracking-id').text(response.responseText.shippingTrackingId);
+                                    el.closest('td').find('.tracking-code').text(response.responseText.shippingTrackingCode);
                                     el.closest('td').find('.textcentered').remove();
 
-                                    if(response.responseText.shippingTrackingId != '') {
+                                    if(response.responseText.shippingTrackingCode != '') {
                                         var trackingLink = '<p class="textcentered">' +
-                                            '<a target="_blank" class="tracking-link" href="' + response.responseText.shippingTrackingId +
+                                            '<a target="_blank" class="tracking-link" href="' + response.responseText.shippingTrackingCode +
                                             '"> '+ '<?php echo $this->translate('Where is my order?');?>' + '</a></p>';
 
                                         el.closest('td').append(trackingLink);

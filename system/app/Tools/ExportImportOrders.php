@@ -208,7 +208,7 @@ class Tools_ExportImportOrders
             'discount',
             'total',
             'notes',
-            'shipping_tracking_id',
+            'shipping_tracking_code',
             'user_prefix',
             'user_name',
             'user_email',
@@ -452,7 +452,7 @@ class Tools_ExportImportOrders
                     $discount = isset($ordersHeaders[$importOrdersConfigFields['discount']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['discount']]] : 0;
                     $shippingType = isset($ordersHeaders[$importOrdersConfigFields['shipping_type']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_type']]] : '';
                     $shippingService = isset($ordersHeaders[$importOrdersConfigFields['shipping_service']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_service']]] : '';
-                    $shippingTrackingId = isset($ordersHeaders[$importOrdersConfigFields['shipping_tracking_id']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_tracking_id']]] : '';
+                    $shippingTrackingCode = isset($ordersHeaders[$importOrdersConfigFields['shipping_tracking_code']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_tracking_code']]] : '';
                     $shippingTax = isset($ordersHeaders[$importOrdersConfigFields['shipping_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['shipping_tax']]] : 0;
                     $totalTax = isset($ordersHeaders[$importOrdersConfigFields['total_tax']]) ? $orderData[$ordersHeaders[$importOrdersConfigFields['total_tax']]] : 0;
 
@@ -583,7 +583,7 @@ class Tools_ExportImportOrders
                         'shipping_price' => $shippingPrice,
                         'shipping_type' => $shippingType,
                         'shipping_service' => $shippingService,
-                        'shipping_tracking_id' => $shippingTrackingId,
+                        'shipping_tracking_code' => $shippingTrackingCode,
                         'sub_total' => $subTotal,
                         'total_tax' => is_numeric($totalTax) ? $totalTax : 0,
                         'total' => $total,
@@ -779,8 +779,8 @@ class Tools_ExportImportOrders
                 'checked' => 1,
                 'label_name' => $translator->translate('Additional info')
             ),
-            'shipping_tracking_id' => array(
-                'label' => 'shipping_tracking_id',
+            'shipping_tracking_code' => array(
+                'label' => 'shipping_tracking_code',
                 'checked' => 1,
                 'label_name' => $translator->translate('Tracking id')
             ),

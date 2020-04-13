@@ -28,7 +28,7 @@
 <td data-mobile-title="Shipping via" class="shipping-service">
     <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
     <% if(_.isNull(recurring_id)) {%>
-    <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %>
+    <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_code) ? '' : shipping_tracking_code %>
 <% if (status == 'completed' || status == 'shipped') { %>
         <% addButton = 'add' %>
         <% editButton = 'edit' %>
@@ -38,10 +38,10 @@
         <% if (!_.isUndefined(i18n['edit'])){ %>
             <% editButton = i18n['edit'] %>
         <% } %>
-        <a href="javascript:;" class="setTracking" data-tracking-id="<%= tracking_id%>">[&nbsp;<%= (_.isNull(shipping_tracking_id) || shipping_tracking_id == '') ? addButton : editButton %>&nbsp;]</a>
-        <% if(!_.isNull(shipping_tracking_id) && shipping_tracking_id != '') { %>
+        <a href="javascript:;" class="setTracking" data-tracking-id="<%= tracking_id%>">[&nbsp;<%= (_.isNull(shipping_tracking_code) || shipping_tracking_code == '') ? addButton : editButton %>&nbsp;]</a>
+        <% if(!_.isNull(shipping_tracking_code) && shipping_tracking_code != '') { %>
             <p class="textcentered">
-                <a target="_blank" class="tracking-link" href="<%= shipping_tracking_id %>"><%= _.isUndefined(i18n['Where is my order?']) ? 'Where is my order?':i18n['Where is my order?'] %></a>
+                <a target="_blank" class="tracking-link" href="<%= shipping_tracking_code %>"><%= _.isUndefined(i18n['Where is my order?']) ? 'Where is my order?':i18n['Where is my order?'] %></a>
             </p>
         <% } %>
 <% } %>

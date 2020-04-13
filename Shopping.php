@@ -590,14 +590,14 @@ class Shopping extends Tools_Plugins_Abstract {
         $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
 
         $trackingId = '';
-        $shippingTrackingId = '';
+        $shippingTrackingCode = '';
         $trackingName = '';
         if($order instanceof Models_Model_CartSession) {
             $trackingId = $order->getTrackingId();
-            $shippingTrackingId = $order->getShippingTrackingId();
+            $shippingTrackingCode = $order->getShippingTrackingCode();
 
-            if(!empty($shippingTrackingId)) {
-                $trackingName = $shippingTrackingId;
+            if(!empty($shippingTrackingCode)) {
+                $trackingName = $shippingTrackingCode;
             }
         }
 
@@ -607,7 +607,7 @@ class Shopping extends Tools_Plugins_Abstract {
         if(!empty($trackingData) && !empty($trackingurlConfig['enabled'])) {
             foreach ($trackingData as $dataValue) {
                 if($dataValue['id'] == $trackingId) {
-                    $trackingName = str_replace($dataValue['url'], '', $shippingTrackingId);
+                    $trackingName = str_replace($dataValue['url'], '', $shippingTrackingCode);
                 }
                 $arrData[$dataValue['id']] = $dataValue['name'];
             }
@@ -1135,11 +1135,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
-                if (isset($params['shippingTrackingId'])) {
+                if (isset($params['shippingTrackingCode'])) {
                     $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                     $selectedName = '';
                     $url = '';
-                    $paramData = $params['shippingTrackingId'];
+                    $paramData = $params['shippingTrackingCode'];
                     $currentData = '';
                     $shippingUrlMapper->clearDefaultStatus();
                     if (!empty($params['trackingUrlId'])) {
@@ -1155,7 +1155,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     unset($params['trackingUrlId'], $params['id']);
                     if ($currentData instanceof Models_Model_ShippingUrl) {
-                        $params['shippingTrackingId'] = trim($currentData->getUrl()) . trim($paramData);
+                        $params['shippingTrackingCode'] = trim($currentData->getUrl()) . trim($paramData);
                     }
                     $order->registerObserver(new Tools_Mail_Watchdog(array(
                         'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_TRACKING_NUMBER,

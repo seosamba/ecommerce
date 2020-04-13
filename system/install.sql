@@ -294,7 +294,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_price` decimal(10,2) DEFAULT NULL,
   `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
+  `shipping_tracking_code` tinytext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping Tracking Code',
   `tracking_id` int(10) unsigned DEFAULT NULL,
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

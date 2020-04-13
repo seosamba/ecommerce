@@ -429,10 +429,10 @@ define(['backbone',
                         $('.save-data').on('click', function(e){
                             e.preventDefault();
                             var  trackingUrlId =  $('#marketing-services').val(),
-                                text =  $('#shippingTrackingId').val(),
+                                text =  $('#shippingTrackingCode').val(),
                                 data = {
                                     trackingUrlId: trackingUrlId,
-                                    shippingTrackingId: text,
+                                    shippingTrackingCode: text,
                                     id:id
                                 };
 
@@ -451,7 +451,7 @@ define(['backbone',
                                     if (response.hasOwnProperty('responseText')){
                                         model.set({
                                             'status': response.responseText.status,
-                                            'shipping_tracking_id': response.responseText.shippingTrackingId
+                                            'shipping_tracking_code': response.responseText.shippingTrackingCode
                                         });
                                     }
                                 }
