@@ -81,7 +81,7 @@ define([
             var cid = $(e.currentTarget).data('cid'),
                 model = this.pickupLocation.get(cid);
 
-            showConfirm('Are you sure want to delete', function(){
+            showConfirmCustom(_.isUndefined(i18n['Are you sure want to delete?'])?'Are you sure want to delete?':i18n['Are you sure want to delete?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (model){
                     model.destroy();
                 }

@@ -346,8 +346,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $shippingService = 'Pickup information';
         } else {
             $shippingService = $this->_cart->getShippingService();
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($shippingService);
         }
-        return $this->_translator->translate($shippingService);
+        return !empty($shippingServiceLabel) ? $shippingServiceLabel : $this->_translator->translate($shippingService);
     }
 
     /**
@@ -739,6 +741,24 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         $photoSrc = $this->_cartContent[$sid]['photo'];
         $photoSrc = Tools_Misc::prepareProductImage($photoSrc, $folder);
         return '<img class="cart-product-image" src="' . $photoSrc . '" alt="' . $this->_cartContent[$sid]['name'] . '">';
+    }
+
+    /**
+     * Return product photo for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemPhotourl($sid)
+    {
+        if (isset($this->_options[0])) {
+            $folder = $this->_options[0];
+        } else {
+            $folder = 'product';
+        }
+        $photoSrc = $this->_cartContent[$sid]['photo'];
+        $photoSrc = Tools_Misc::prepareProductImage($photoSrc, $folder);
+        return $photoSrc;
     }
 
 

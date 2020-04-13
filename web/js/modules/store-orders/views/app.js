@@ -5,10 +5,14 @@ define(['backbone',
     'text!../templates/export_dialog.html',
     'text!../templates/tracking_code.html',
     'text!../templates/refund_dialog.html',
-    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+    'text!../templates/shipping_labels_dates_dialog.html',
+    'text!../templates/refund_shipment_dialog.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
+    'moment',
+    'accounting'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, i18n
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, RefundShipmentTmpl, i18n, moment, accounting
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -25,7 +29,9 @@ define(['backbone',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
             'change input[name="check-order[]"]': 'toggleOrder',
-            'change #filter-order-type': 'toggleRecurring'
+            'change #filter-order-type': 'toggleRecurring',
+            'click .generate-shipping-order-label' : 'generateShippingLabel',
+            'click .refund-shipping-order-label' : 'refundShippingLabel'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -157,6 +163,226 @@ define(['backbone',
                 }
             }
             $(e.currentTarget).val(0);
+        },
+        refundShippingLabel: function(e)
+        {
+            e.preventDefault();
+
+            var orderId = $(e.currentTarget).data('order-id'),
+                model = this.orders.get(orderId),
+                self = this;
+
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/getRefundShipmentScreenInfo/',
+                type: 'POST',
+                dataType: 'json',
+                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val()}
+            }).done(function(response){
+                console.log(response);
+                if (response.error == '1') {
+                    showMessage(response.responseText, true, 5000);
+                } else {
+                    var shipmentRefundButton  = _.isUndefined(i18n['Refund']) ? 'Refund':i18n['Refund'],
+                        assignShipmentRefundButtons = {};
+
+                        assignShipmentRefundButtons[shipmentRefundButton] = function() {
+                            $('.ui-button').css('zIndex',"101");
+                        };
+
+                    var dialog = _.template(RefundShipmentTmpl, {
+                            orderId: orderId,
+                            i18n:i18n,
+                            accounting: accounting,
+                            moneyFormat: self.orders.moneyFormat,
+                            shippingTaxRate : self.orders.shippingTaxRate,
+                            defaultTaxes: self.orders.defaultTaxes,
+                            order: self.orders.get(orderId),
+                            shipmentRefundButtonStatus: response.responseText.shipment_refund_button_status,
+                            shipmentRefundScreenDescription: response.responseText.shipment_refund_screen_description
+                        }),
+                        availabilityMonths = [],
+                        availableDateAndTime = [];
+
+
+                    $(dialog).dialog({
+                        dialogClass: 'seotoaster',
+                        width: '50%',
+                        resizable: false,
+                        buttons: assignShipmentRefundButtons,
+                        open: function (event, ui) {
+                            if (response.responseText.shipment_refund_button_status === false) {
+                                $(".ui-dialog-buttonset").remove();
+                            }
+                        },
+                        close: function (event, ui) {
+                            $(this).dialog('destroy');
+                        }
+                    });
+
+
+                }
+            });
+        },
+        generateShippingLabel: function(e)
+        {
+           var confirmMessage = _.isUndefined(i18n['Do you want to specify shipment date?'])?'Do you want to specify shipment date?':i18n['Do you want to specify shipment date?'],
+               confirmMessageLabel = _.isUndefined(i18n['Do you want to create a label?'])?'Do you want to create a label?':i18n['Do you want to create a label?'],
+               confirmMessageAvailabilityDate = _.isUndefined(i18n['Do you want to use this date for the shipping label?'])?'Do you want to use this date for the shipping label?':i18n['Do you want to use this date for the shipping label?'],
+               orderId = $(e.currentTarget).data('order-id'),
+               self = this,
+               model = this.orders.get(orderId),
+               assignAvailabilityDatesButtons = {},
+               availabilityButton  = _.isUndefined(i18n['Create label']) ? 'Create label':i18n['Create label'],
+               elRow = $(e.currentTarget).closest('tr');
+
+            assignAvailabilityDatesButtons[availabilityButton] = function() {
+                $('.ui-dialog').css('zIndex',"101");
+                var availabilityDate = $('#shipment-availability-result-'+orderId).data('availability-date'),
+                    availabilityTime = $('#shipment-availability-result-'+orderId).data('availability-time');
+
+                if (!$('#shipment-availability-result-'+orderId).data('availability-date')) {
+                    showMessage(_.isUndefined(i18n['Please specify shipment date'])?'Please specify shipment date':i18n['Please specify shipment date'], true, 5000);
+                    return false;
+                }
+
+                if (!$('#shipment-availability-result-'+orderId).data('availability-time')) {
+                    showMessage(_.isUndefined(i18n['Please specify shipment time'])?'Please specify shipment time':i18n['Please specify shipment time'], true, 5000);
+                    return false;
+                }
+                smoke.confirm(confirmMessageAvailabilityDate, function (e) {
+                    if (e) {
+                        self.generateShippingLabelRequest(orderId, availabilityDate, availabilityTime, elRow);
+                    }
+                }, {
+                    ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                    cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                });
+
+            };
+
+           smoke.confirm(confirmMessageLabel, function (e) {
+               if(e) {
+                   var shippingAvailabilityDays = JSON.parse(model.get('shipping_availability_days'));
+
+                    if (_.isEmpty(shippingAvailabilityDays) || _.isNull(shippingAvailabilityDays)) {
+                        showMessage(_.isUndefined(i18n['Shipping service does not support shipment label creation'])?'Shipping service does not support shipment label creation':i18n['Shipping service does not support shipment label creation'], true, 5000);
+                        return false;
+                    }
+
+                   var dialog = _.template(ShippingLabelDates, {
+                        orderId: orderId,
+                        i18n:i18n,
+                        shippingAvailabilityDays: shippingAvailabilityDays,
+                        accounting: accounting,
+                        moneyFormat: self.orders.moneyFormat,
+                        shippingTaxRate : self.orders.shippingTaxRate,
+                        defaultTaxes: self.orders.defaultTaxes,
+                        order: self.orders.get(orderId)
+                   }),
+                       availabilityMonths = [],
+                       availableDateAndTime = [];
+
+                   _.each(shippingAvailabilityDays.availabilityDates, function(time, date){
+                       if (typeof availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")] === 'undefined') {
+                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")] = [parseInt(moment(date, 'YYYY-MM-DD').format("D"))];
+                       } else {
+                           availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")].push(parseInt(moment(date, 'YYYY-MM-DD').format("D")));
+                       }
+                       if (typeof availableDateAndTime[date] === 'undefined') {
+                           availableDateAndTime[date] = [time];
+                       } else {
+                           availableDateAndTime[date].push(time);
+                       }
+                   });
+
+                   $(dialog).dialog({
+                        dialogClass: 'seotoaster',
+                        width: '75%',
+                        height: '400',
+                        resizable: false,
+                        buttons: assignAvailabilityDatesButtons,
+                        open: function (event, ui) {
+                            $('#availability-days-datepicker').datepicker({
+                                beforeShowDay: function (date) {
+                                    if (typeof availabilityMonths[date.getMonth() + 1] === 'undefined') {
+                                        return [false, ''];
+                                    }
+                                    if (_.contains(availabilityMonths[date.getMonth() + 1], parseInt(date.getDate()))) {
+                                        return [true, ''];
+                                    }
+                                    return [false, ''];
+                                },
+                                onSelect: function () {
+                                    if (typeof availableDateAndTime[$.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))] !== 'undefined') {
+                                        $('#availability-shipment-time-'+orderId).empty();
+                                        $('#shipment-availability-summary-'+orderId).find('.shipment-availability-date-summary').empty().text($.datepicker.formatDate("dd M yy", $(this).datepicker('getDate')));
+                                        $('#shipment-availability-summary-'+orderId).find('.shipment-availability-time-summary').empty().text('');
+                                        $('#shipment-availability-result-'+orderId).data('availability-date', $.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))).data('availability-time', '');
+                                        _.each(availableDateAndTime[$.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))], function(time, date) {
+                                            _.each(time, function(time){
+                                                $('#availability-shipment-time-'+orderId).append('<button class="availability-shipment-time btn">'+time+'</button>');
+                                            });
+                                        });
+                                    }
+                                }
+                            });
+
+                            $('#availability-shipment-time-'+orderId).on('click', '.availability-shipment-time', function(e){
+                                var el = $(e.currentTarget),
+                                    switchTimeBlock = el.closest('div');
+
+                                switchTimeBlock.find('.availability-shipment-time').removeClass('current');
+                                el.addClass('current');
+                                $('#shipment-availability-summary-'+orderId).find('.shipment-availability-time-summary').empty().text(el.text());
+                                $('#shipment-availability-result-'+orderId).data('availability-time', el.text());
+                            });
+                        },
+                        close: function (event, ui) {
+                            $(this).dialog('destroy');
+                        }
+                   });
+
+                   checkboxRadioStyle();
+                   return false;
+               }
+           });
+
+        },
+        generateShippingLabelRequest: function(orderId, availabilityDate, availabilityTime, elRow, regenerate)
+        {
+            var self = this,
+                model = self.orders.get(orderId);
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/shippingLabel/',
+                type: 'POST',
+                dataType: 'json',
+                data: {'orderId': orderId, 'secureToken': $('.orders-secure-token').val(), 'availabilityDate': availabilityDate, availabilityTime: availabilityTime, 'regenerate' : regenerate}
+            }).done(function(response) {
+                if (response.error == '1') {
+                    if (typeof response.responseText.regenerate !== 'undefined') {
+                        smoke.confirm(response.responseText.message, function (e) {
+                            if (e) {
+                                self.generateShippingLabelRequest(orderId, availabilityDate, availabilityTime, elRow, true);
+                            }
+                        }, {
+                            ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                            cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                        });
+                    } else {
+                        showMessage(response.responseText, true, 5000);
+                    }
+                } else {
+                    showMessage(response.responseText.message, false, 5000);
+                    if (response.responseText.shipping_label_link) {
+                        elRow.find('.shipping-label-link').removeClass('hidden').val(response.responseText.shipping_label_link);
+                        model.set({
+                            'shipping_label_link': response.responseText.shipping_label_link
+                        });
+
+                    }
+                    $('.ui-dialog-titlebar-close').trigger('click');
+                }
+            });
         },
         checkAllOrders: function(e) {
             var ordersIds = this.orders.ordersChecked;
@@ -309,7 +535,8 @@ define(['backbone',
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to change status for this order?'])?'Are you sure you want to change status for this order?':i18n['Are you sure you want to change status for this order?'],
                 status = el.data('status');
 
-            var model = this.orders.get(id);
+            var model = this.orders.get(id),
+                realRefundByDefault = this.orders.realRefundByDefault;
 
             if (status === 'refunded') {
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to refund this payment?'])?'Are you sure you want to refund this payment?':i18n['Are you sure you want to refund this payment?'];
@@ -320,7 +547,8 @@ define(['backbone',
                         i18n:i18n,
                         orderId: id,
                         gateway: model.get('gateway'),
-                        total: model.get('total')
+                        total: model.get('total'),
+                        realRefundByDefault: realRefundByDefault
                     });
 
                 assignRefundButtons[refundButton] = function() {

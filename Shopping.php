@@ -93,6 +93,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 	const SHIPPING_TOC_STATUS = 'checkoutShippingTocRequire';
 
+    const SHIPPING_SINGLE_RESULT = 'skipSingleShippingResult';
+
 	const SHIPPING_TOC_LABEL = 'checkoutShippingTocLabel';
 
     const SHIPPING_ERROR_MESSAGE = 'checkoutShippingErrorMessage';
@@ -258,6 +260,8 @@ class Shopping extends Tools_Plugins_Abstract {
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
+        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_USERS);
+
 		Zend_Registry::set('acl', $acl);
 	}
 
@@ -825,8 +829,18 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->plugins = $plugins;
 			$this->_view->websiteConfig = $this->_websiteConfig;
             $this->_view->configTabs = $configTabs;
+            $configParamsData = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance()->getCustomParamsOptionsDataConfig(array('custom_param_id ASC'));
+            if (!empty($configParamsData)) {
+                $configParamsData = Tools_CustomParamsTools::prepareCustomParamsOptions($configParamsData);
+            } else {
+                $configParamsData = array();
+            }
+            $this->_view->productCustomParamsConfig = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance()->getCustomParamsConfig();
+            $this->_view->productCustomParamsOptions = $configParamsData;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
+            $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
+            $this->_view->defaultTaxes = $defaultTaxes;
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
@@ -1011,6 +1025,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
             $this->_view->customerAttributes = $customerAttributes;
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
+            $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
 			return $this->_view->render('clients.phtml');
 		}
 	}
@@ -1087,6 +1102,15 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                 }))
 			);
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
+			if(!empty($orders) && !empty($shippingServiceLabels)){
+                foreach ($orders as $index => $order) {
+                    if (isset($shippingServiceLabels[$order->getShippingService()])) {
+                        $orders[$index]->setShippingService($shippingServiceLabels[$order->getShippingService()]);
+                    }
+                }
+            }
 			$this->_view->orders = $orders;
 		}
 
@@ -1167,6 +1191,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $params['trackingId'] = $currenttrackingUrlId;
                 }
+
+                if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED) {
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_DELIVERED
+                    )));
+                }
+
 				$order->setOptions($params);
 				$status = Models_Mapper_CartSessionMapper::getInstance()->save($order);
 
@@ -1181,6 +1212,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->pickupLocationData = $pickupLocationData;
             }
             $this->_view->defaultPickup = $defaultPickup;
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($order->getShippingService());
+            if (!empty($shippingServiceLabel)) {
+                $this->_view->shippingServiceLabel = $shippingServiceLabel;
+            }
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
@@ -1321,6 +1357,46 @@ class Shopping extends Tools_Plugins_Abstract {
 				$customer->notifyObservers();
 			}
 			$cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+
+			$userId = $cartSession->getUserId();
+			$cartStatus = $cartSession->getStatus();
+            $cartContent = $cartSession->getCartContent();
+
+            if(!empty($userId) && $cartStatus == Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+
+                if(!empty($cartContent)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+
+                    foreach ($cartContent as $cContent) {
+                        $productId = $cContent['product_id'];
+
+                        $product = $productMapper->find($productId);
+
+                        if($product->getInventory() == '0' || $product->getInventory() < '0') {
+                            $currentNotifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                            if($currentNotifiedProduct instanceof Store_Model_NotifiedProductsModel && $currentNotifiedProduct->getSendNotification() == '1') {
+                                $notifiedProductsMapper->delete($currentNotifiedProduct);
+                            }
+
+                            $where = $notifiedProductsMapper->getDbTable()->getAdapter()->quoteInto("product_id = ?", $productId);
+                            $allOtherNotifiedProducts = $notifiedProductsMapper->fetchAll($where);
+
+                            if(!empty($allOtherNotifiedProducts)) {
+                                foreach ($allOtherNotifiedProducts as $notifiedProduct) {
+                                    if($notifiedProduct->getSendNotification() == '1') {
+                                        $notifiedProduct->setSendNotification('0');
+
+                                        $notifiedProductsMapper->save($notifiedProduct);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
 				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
 			)));
@@ -2425,6 +2501,92 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
     /**
+     * Process shipping label
+     */
+    public function shippingLabelAction()
+    {
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $availabilityDate = filter_var($this->_request->getParam('availabilityDate'), FILTER_SANITIZE_STRING);
+        $availabilityTime = filter_var($this->_request->getParam('availabilityTime'), FILTER_SANITIZE_STRING);
+        $regenerateLabel = filter_var($this->_request->getParam('regenerate'), FILTER_SANITIZE_STRING);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && !empty($orderId)) {
+            $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $orderModel = $cartSessionMapper->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can create label only for completed or shipped orders'));
+                }
+            }
+
+            $data = array('orderId' => $orderId, 'availabilityDate' => $availabilityDate, 'availabilityTime' => $availabilityTime, 'regenerateLabel' => $regenerateLabel);
+            $shippingLabelInfo = Tools_System_Tools::firePluginMethodByPluginName($orderModel->getShippingService(),
+                'generateLabel', $data, false);
+            if (empty($shippingLabelInfo)) {
+                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow label generation'));
+            }
+
+            if ($shippingLabelInfo['error'] === true) {
+                if (!empty($shippingLabelInfo['regenerate'])) {
+                    $this->_responseHelper->fail(array('regenerate' => true, 'message' => $this->_translator->translate($shippingLabelInfo['message'])));
+                }
+                $this->_responseHelper->fail($this->_translator->translate($shippingLabelInfo['message']));
+            }
+
+            $this->_responseHelper->success(array(
+                'shipping_label_link' => $shippingLabelInfo['shipping_label_link'],
+                'message' => $this->_translator->translate($shippingLabelInfo['message'])
+            ));
+        }
+    }
+
+
+    /**
+     * Get refund shipment screen info
+     */
+    public function getRefundShipmentScreenInfoAction()
+    {
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $orderId = filter_var($this->_request->getParam('orderId'), FILTER_SANITIZE_NUMBER_INT);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && !empty($orderId)) {
+            $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+            $orderModel = $cartSessionMapper->find($orderId);
+            if ($orderModel instanceof Models_Model_CartSession) {
+                $orderStatus = $orderModel->getStatus();
+                if ($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $this->_responseHelper->fail($this->_translator->translate('You can do shipment refund only for the completed or shipped orders'));
+                }
+            }
+
+            $data = array('orderId' => $orderId);
+            $shipmentRefundServiceInfo = Tools_System_Tools::firePluginMethodByPluginName($orderModel->getShippingService(),
+                'shipmentRefundServiceInfo', $data, false);
+            if (empty($shipmentRefundServiceInfo)) {
+                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow shipment refund'));
+            }
+
+            if ($shipmentRefundServiceInfo['error'] === true || $shipmentRefundServiceInfo['error'] === 1) {
+                $this->_responseHelper->fail($this->_translator->translate($shipmentRefundServiceInfo['message']));
+            }
+
+            $this->_responseHelper->success(array(
+                'shipment_refund_screen_description' => $shipmentRefundServiceInfo['shipment_refund_screen_description'],
+                'shipment_refund_button_status' => $shipmentRefundServiceInfo['shipment_refund_button_status'],
+                'message' => $this->_translator->translate($shipmentRefundServiceInfo['message'])
+            ));
+        }
+    }
+
+    /*
      * @throws Exceptions_SeotoasterPluginException
      *
      * Change default user group
@@ -2595,6 +2757,209 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         $this->_responseHelper->fail($this->_translator->translate('Can\'t remove wished product! Please re-login into system.'));
+    }
+
+    /**
+     * Get saved countries by all zones
+     */
+    public function getUsedZoneCountriesAction() {
+        $zonesMapper = Models_Mapper_Zone::getInstance();
+        $countries = $zonesMapper->getSavedZoneCountries();
+
+        $this->_responseHelper->success(array('savedCounties' => $countries));
+    }
+
+    /**
+     * Added product to notification list
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function addToNotifyListAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
+        }
+
+        $productId = $this->_request->getParam('pid');
+        $user = $this->_sessionHelper->getCurrentUser();
+        $userId = $user->getId();
+        $userRole = $user->getRoleId();
+
+        if(!empty($productId) && !empty($userId) && $userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+            $product = $productMapper->find($productId);
+            if($product instanceof Models_Model_Product) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+                $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                if(!$notifiedProduct instanceof Store_Model_NotifiedProductsModel && ($product->getInventory() == '0' || $product->getInventory() < '0')) {
+                    $notifiedProduct = new Store_Model_NotifiedProductsModel();
+                    $notifiedProduct->setUserId($userId);
+                    $notifiedProduct->setProductId($product->getId());
+                    $notifiedProduct->setAddedDate(date(Tools_System_Tools::DATE_MYSQL));
+                    $notifiedProduct->setSendNotification('0');
+
+                    $notifiedProductsMapper->save($notifiedProduct);
+
+                    $this->_responseHelper->success(array('addedToList' => $this->_translator->translate('Added to notification list')));
+                } else {
+                    $this->_responseHelper->success(array('alreadyNotified' => $this->_translator->translate('Product already added to notification list')));
+                }
+            }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t add product to notification list! Please re-login into system.'));
+        }
+    }
+
+    /**
+     * Remove notified product
+     */
+    public function removeNotifiedProductAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $productId = filter_var($this->_request->getParam('pid'), FILTER_SANITIZE_NUMBER_INT);
+        $currentUserModel = $this->_sessionHelper->getCurrentUser();
+        $userRole = $currentUserModel->getRoleId();
+
+        if($userRole !== Tools_Security_Acl::ROLE_GUEST) {
+            $userId = $currentUserModel->getId();
+
+            if ($userId && !empty($productId)) {
+                $notifiedProductsMapper = Store_Mapper_NotifiedProductsMapper::getInstance();
+                $notifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
+
+                if($notifiedProduct instanceof Store_Model_NotifiedProductsModel) {
+                    $notifiedProductsMapper->delete($notifiedProduct);
+
+                    $this->_responseHelper->success($this->_translator->translate('Removed'));
+                }
+            }
+        }
+        $this->_responseHelper->fail($this->_translator->translate('Can\'t remove notified product! Please re-login into system.'));
+    }
+
+    /**
+     * This action is used to help Notify list gets an portional content
+     *
+     * @throws Exceptions_SeotoasterException
+     * @throws Exceptions_SeotoasterPluginException
+     */
+    public function rendernotifiedlistproductsAction() {
+        if (!$this->_request->isPost()) {
+            throw new Exceptions_SeotoasterPluginException($this->_translator->translate('Direct access not allowed'));
+        }
+        $content = '';
+        $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Notifyme_Notifyme::DEFAULT_LIMIT;
+        }
+
+        $offset = intval($nextPage) * $limit;
+
+        $productIds = $this->_request->getParam('productIds');
+        $productIds = explode(',', $productIds);
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $enabledOnly = $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1');
+        $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+
+        if (!empty($idsWhere)) {
+            $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+        }
+
+        $products = Models_Mapper_ProductMapper::getInstance()->fetchAll($enabledOnly, null, $offset, $limit,
+            null, null, null, false, false, array(), array(), null);
+
+        if (!empty($products)) {
+            $template = $this->_request->getParam('template');
+            $widget = Tools_Factory_WidgetFactory::createWidget('notifyme', array('notifylist', $template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))));
+
+            $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
+            unset($widget);
+        }
+        if (null !== ($pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT))) {
+            $page = Application_Model_Mappers_PageMapper::getInstance()->find($pageId);
+            if ($page instanceof Application_Model_Models_Page && !empty($content)) {
+                $content = $this->_renderViaParser($content, $page);
+            }
+        }
+        echo $content;
+    }
+
+    public function productCustomFieldsConfigAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            if ($this->_request->isGet()) {
+                $this->_layout->content = $this->_view->render('product-custom-fields-config.phtml');
+                echo $this->_layout->render();
+            }
+        }
+    }
+
+    /**
+     * This action is used to change custom params values for product
+     */
+    public function updateProductCustomParamAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam('secureToken', false);
+
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $customparamsData = $this->_request->getParams();
+
+            $currentCustomParamValue = filter_var($this->_request->getParam('currentCustomParamValue'), FILTER_SANITIZE_STRING);
+
+            $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+
+            if(!empty($customparamsData['paramId']) && !empty($customparamsData['customParamProductId'])) {
+                if($customparamsData['isNew']) {
+                    $productCustomParamsDataModel = new Store_Model_ProductCustomParamsDataModel();
+
+                    $productCustomParamsDataModel->setParamId($customparamsData['paramId']);
+                    $productCustomParamsDataModel->setProductId($customparamsData['customParamProductId']);
+
+                    if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                        $productCustomParamsDataModel->setParamValue($currentCustomParamValue);
+                    } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                        $productCustomParamsDataModel->setParamsOptionId($currentCustomParamValue);
+                    }
+
+                    $productCustomParamsDataMapper->save($productCustomParamsDataModel);
+
+                    $this->_responseHelper->success('');
+
+                } else {
+                    $productCustomParamsDataExists = $productCustomParamsDataMapper->checkIfParamExists($customparamsData['customParamProductId'], $customparamsData['paramId']);
+
+                    if($productCustomParamsDataExists instanceof Store_Model_ProductCustomParamsDataModel) {
+                        if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                            $productCustomParamsDataExists->setParamValue($currentCustomParamValue);
+                        } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                            $productCustomParamsDataExists->setParamsOptionId($currentCustomParamValue);
+                        }
+
+                        $productCustomParamsDataMapper->save($productCustomParamsDataExists);
+
+                        $this->_responseHelper->success('');
+                    } else{
+                        $this->_responseHelper->fail($this->_translator->translate('Unknown product custom param type'));
+                    }
+                }
+            } else {
+                $this->_responseHelper->fail($this->_translator->translate('Can\'t update product custom param'));
+            }
+        }
     }
 
 }

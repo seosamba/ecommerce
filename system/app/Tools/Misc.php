@@ -369,7 +369,8 @@ class Tools_Misc
             'mobilecountrycode' => '',
             'phonecountrycode' => '',
             'mobile_country_code_value' => '',
-            'phone_country_code_value' => ''
+            'phone_country_code_value' => '',
+            'customer_notes' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);
@@ -676,6 +677,139 @@ class Tools_Misc
         }
 
         return $configTabs;
+    }
+
+    /**
+     * Remove last zero number
+     * Weight format conversion by Country location
+     * ex. fr_FR = 15,35
+     * ex. en_US = 15.35
+     *
+     * @param $weight
+     * @return string
+     */
+    public static function processingWeightFormat($weight) {
+        $weight = round($weight, 3);
+        $locale = Zend_Locale::getLocaleToTerritory(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'));
+        $weightFormat = Zend_Locale_Format::toNumber($weight, array('locale' => $locale));
+
+        return $weightFormat;
+    }
+
+    public static function prepareInvoice($data)
+    {
+        if (Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf')->getStatus() === 'enabled') {
+            $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Session');
+            $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+            $websiteConfig = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig();
+            $pdfPath = $websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'invoices' . DIRECTORY_SEPARATOR;
+            if (empty($data['cartId'])) {
+                return false;
+            }
+            $cartId = $data['cartId'];
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            if (empty($cartSession)) {
+                return false;
+            }
+            $invoicetopdfSettings = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams();
+            if (isset($data['cartId']) && isset($invoicetopdfSettings['invoiceTemplate']) && isset($data['dwn'])) {
+                $cartId = $data['cartId'];
+                $templateTable = new Application_Model_DbTable_Template;
+                if (isset($data['packing'])) {
+                    $where = $templateTable->getAdapter()->quoteInto(
+                        'name = ?',
+                        $invoicetopdfSettings['packingTemplate']
+                    );
+                } else {
+                    $where = $templateTable->getAdapter()->quoteInto(
+                        'name = ?',
+                        $invoicetopdfSettings['invoiceTemplate']
+                    );
+                }
+                $invoiceTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->fetchAll($where);
+                $templateContent = $invoiceTemplate[0]->getContent();
+
+                $sessionHelper->storeCartSessionKey = $cartId;
+                $sessionHelper->storeCartSessionConversionKey = $cartId;
+                $customerDbTable = new Quote_Models_DbTable_ShoppingCustomerAddress();
+                $whereBilling = $customerDbTable->getAdapter()->quoteInto(
+                    'id = ?',
+                    $cartSession->getBillingAddressId()
+                );
+                $whereShipping = $customerDbTable->getAdapter()->quoteInto(
+                    'id = ?',
+                    $cartSession->getShippingAddressId()
+                );
+                $customerShipping = $customerDbTable->getAdapter()->fetchAll(
+                    $customerDbTable->select()->from('shopping_customer_address')->where($whereShipping)
+                );
+                $customerBilling = $customerDbTable->getAdapter()->fetchAll(
+                    $customerDbTable->select()->from('shopping_customer_address')->where($whereBilling)
+                );
+                if (!empty($customerShipping)) {
+                    $customerShipping[0]['country'] = self::prepareCountry($customerShipping[0]['country']);
+                    $sessionHelper->customerShippingInvoice = $customerShipping;
+                }
+                if (!empty($customerBilling)) {
+                    $customerBilling[0]['country'] = self::prepareCountry($customerBilling[0]['country']);
+                    $sessionHelper->customerBillingInvoice = $customerBilling;
+                }
+
+                $themeData = Zend_Registry::get('theme');
+                $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+                $parserOptions = array(
+                    'websiteUrl' => $websiteHelper->getUrl(),
+                    'websitePath' => $websiteHelper->getPath(),
+                    'currentTheme' => $websiteHelper->getConfig('currentTheme'),
+                    'themePath' => $themeData['path'],
+                );
+                $page = $pageMapper->findByUrl('index.html');
+                $page = $page->toArray();
+                $parser = new Tools_Content_Parser($templateContent, $page, $parserOptions);
+                $content = $parser->parse();
+
+                if (!defined('_MPDF_TEMP_PATH')) {
+                    define('_MPDF_TEMP_PATH', $pdfPath);
+                }
+                require_once($websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'system/library/mpdf/mpdf.php');
+
+                $pdfFile = new mPDF('utf-8', 'A4');
+                $pdfFile->WriteHTML($content);
+
+                if (isset($data['packing'])) {
+                    $pdfFileName = 'packing_slip_' . md5($cartId . microtime()) . '.pdf';
+                    if (!empty($invoicetopdfSettings['invoiceOrigName'])) {
+                        $pdfFileName = 'packing_slip_' . $cartId . '.pdf';
+                    }
+                } else {
+                    $pdfFileName = 'Invoice_' . md5($cartId . microtime()) . '.pdf';
+                    if (!empty($invoicetopdfSettings['invoiceOrigName'])) {
+                        $pdfFileName = 'Invoice_' . $cartId . '.pdf';
+                    }
+
+                }
+                $pdfFile->Output($pdfPath . $pdfFileName, 'F');
+
+                return array('fileName' => $pdfFileName, 'folder' => $pdfPath, 'cartSession' => $cartSession);
+
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return country full name
+     *
+     * @param string $country country code
+     * @return mixed
+     */
+    public static function prepareCountry($country)
+    {
+        if (!empty($country)) {
+            $countries = Tools_Geo::getCountries(true);
+            $country = $countries[$country];
+        }
+        return $country;
     }
 
 

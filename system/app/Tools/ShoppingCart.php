@@ -63,6 +63,10 @@ class Tools_ShoppingCart {
 
     protected $_giftEmail = '';
 
+    protected $_additionalInfo = '';
+
+    protected $_orderSubtype = '';
+
 	private function __construct() {
 		$this->_websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
 		$this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
@@ -678,11 +682,37 @@ class Tools_ShoppingCart {
             } else {
                 $cartSession->setShippingService(null);
             }
+
+            if (isset($shippingData['service_id'])) {
+                $cartSession->setShippingServiceId($shippingData['service_id']);
+            } else {
+                $cartSession->setShippingServiceId(null);
+            }
+
+            if (isset($shippingData['availability_days'])) {
+                $cartSession->setShippingAvailabilityDays($shippingData['availability_days']);
+            } else {
+                $cartSession->setShippingAvailabilityDays(null);
+            }
+
+            if (isset($shippingData['service_info'])) {
+                $cartSession->setShippingServiceInfo($shippingData['service_info']);
+            } else {
+                $cartSession->setShippingServiceInfo(null);
+            }
         }
 
 		if ($this->getNotes()) {
 			$cartSession->setNotes($this->getNotes());
 		}
+
+        if ($this->getAdditionalInfo()) {
+            $cartSession->setAdditionalInfo($this->getAdditionalInfo());
+        }
+
+        if ($this->getOrderSubtype()) {
+            $cartSession->setOrderSubtype($this->getOrderSubtype());
+        }
 
         $cartSession->setIsGift($this->getIsGift());
         $cartSession->setGiftEmail($this->getGiftEmail());
@@ -1003,6 +1033,41 @@ class Tools_ShoppingCart {
     {
         $this->_giftEmail = $giftEmail;
 
+        return $this;
+    }
+
+    /*
+    * @return string
+    */
+    public function getAdditionalInfo()
+    {
+        return $this->_additionalInfo;
+    }
+    /**
+     * @param string $additionalInfo
+     * @return string
+     */
+    public function setAdditionalInfo($additionalInfo)
+    {
+        $this->_additionalInfo = $additionalInfo;
+        return $this;
+    }
+
+
+    /*
+    * @return string
+    */
+    public function getOrderSubtype()
+    {
+        return $this->_orderSubtype;
+    }
+    /**
+     * @param string $orderSubtype
+     * @return string
+     */
+    public function setOrderSubtype($orderSubtype)
+    {
+        $this->_orderSubtype = $orderSubtype;
         return $this;
     }
 

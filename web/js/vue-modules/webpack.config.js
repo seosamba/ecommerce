@@ -3,7 +3,8 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        groupassignmentconfig: __dirname + "/group-assignment-config/"
+        groupassignmentconfig: __dirname + "/group-assignment-config/",
+        productcustomparamsconfig: __dirname + "/product-custom-params-config/"
     },
     output: {
         path: __dirname,
@@ -59,12 +60,6 @@ if (process.env.NODE_ENV === 'production') {
         new webpack.DefinePlugin({
             'process.env': {
                 NODE_ENV: '"production"'
-            }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            sourceMap: true,
-            compress: {
-                warnings: false
             }
         }),
         new webpack.LoaderOptionsPlugin({

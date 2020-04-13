@@ -1,0 +1,55 @@
+<?php if($this->type == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) : ?>
+    <input type="text" class="<?php echo trim(str_replace(' ', '-', $this->uniqueName)). '-'. $this->customParamProductId; ?>" name="<?php echo $this->uniqueName; ?>" value="<?php echo $this->customParamData; ?>">
+<?php elseif ($this->type == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) : ?>
+    <?php if(!empty($this->optionsData)) : ?>
+        <select class="<?php echo trim(str_replace(' ', '-', $this->uniqueName)). '-'. $this->customParamProductId; ?>" name="<?php echo $this->uniqueName; ?>">
+            <option value="0"><?php echo $this->translate('Select option')?></option>
+            <?php foreach ($this->optionsData as $option) : ?>
+                <?php $selected = ''; ?>
+
+                <?php if($this->customParamData == $option->getOptionValue()) :?>
+                    <?php $selected = 'selected="selected"'; ?>
+                <?php endif;?>
+                <option value="<?php echo $option->getId(); ?>" <?php echo $selected; ?>><?php echo $option->getOptionValue(); ?></option>
+            <?php endforeach; ?>
+        </select>
+    <?php endif; ?>
+<?php endif; ?>
+<input class="secureToken" type="hidden" name="secureToken" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>" />
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(document).on('change', '.<?php echo trim(str_replace(' ', '-', $this->uniqueName)). '-'. $this->customParamProductId;?>', function (e) {
+            e.preventDefault();
+
+           var currentElValue = $(e.currentTarget).val(),
+               paramId = '<?php echo $this->paramId;?>',
+               customParamProductId = '<?php echo $this->customParamProductId;?>',
+               isNew = '<?php echo $this->isNew;?>';
+
+            $.ajax({
+                url      : '<?php echo $this->websiteUrl;?>plugin/shopping/run/updateProductCustomParam/',
+                type     : 'POST',
+                dataType : 'json',
+                data     : {
+                    currentCustomParamValue : currentElValue,
+                    paramId                 : paramId,
+                    customParamProductId    : customParamProductId,
+                    type                    : '<?php echo $this->type;?>',
+                    isNew                   : isNew,
+                    secureToken             : $('.secureToken').val()
+                }
+            }).done(function(response){
+                hideSpinner();
+                    if(response.error == 1) {
+                        showMessage(response.responseText, true, 5000);
+                    } else {
+                        showMessage('<?php echo $this->translate('Updated')?>', false, 5000);
+                    }
+            }).fail(function(response) {
+                hideSpinner();
+            });
+
+        });
+    })
+</script>

@@ -51,7 +51,7 @@ class Forms_Checkout_Pickup extends Zend_Form {
             'id'           => 'prefix',
             'label'        => $translator->translate('Prefix'),
             'value'        => $this->_prefix,
-            'multiOptions' => array('' => $translator->translate('Select')) + array_combine(Tools_ShoppingCart::$userPrefixes, Tools_ShoppingCart::$userPrefixes)
+            'multiOptions' => array('' => $translator->translate('Select')) + Tools_System_Tools::getAllowedPrefixesList()
         )));
 
         $this->addElement(new Zend_Form_Element_Text(array(

@@ -122,6 +122,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processFreebies($model);
         }
 
+        if (!empty($model->getCustomParams())) {
+            $this->_processCustomParams($model->getCustomParams(), $model->getId());
+        }
+
         //process product parts if any
         $this->_processParts($model);
 
@@ -396,6 +400,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $entity->setAllowance($allowanceDate);
         }
 
+        $productCustomParams = Store_Mapper_ProductCustomParamsDataMapper::getInstance()->findByProductId($row->id);
+        if (!empty($productCustomParams)) {
+            $entity->setCustomParams($productCustomParams);
+        }
+
 		return $entity;
 	}
 
@@ -488,6 +497,42 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
 
     }
+
+    /**
+     * @param array $customParams custom params data
+     * @param int $productId product id
+     */
+    private function _processCustomParams($customParams, $productId)
+    {
+        if (!empty($customParams)) {
+            $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+            $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+
+            foreach ($customParams as $customParam) {
+                $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->findById($customParam['id']);
+                if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+                    $productCustomParamsDataModel = $productCustomParamsDataMapper->checkIfParamExists($productId,
+                        $customParam['id']);
+                    if (!$productCustomParamsDataModel instanceof Store_Model_ProductCustomParamsDataModel) {
+                        $productCustomParamsDataModel = new Store_Model_ProductCustomParamsDataModel();
+                        $productCustomParamsDataModel->setProductId($productId);
+                        $productCustomParamsDataModel->setParamId($customParam['id']);
+                    }
+
+                    if ($customParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT) {
+                        $productCustomParamsDataModel->setParamsOptionId($customParam['param_value']);
+                        $productCustomParamsDataModel->setParamValue('');
+                    } else {
+                        $productCustomParamsDataModel->setParamValue($customParam['param_value']);
+                        $productCustomParamsDataModel->setParamsOptionId(null);
+                    }
+
+                    $productCustomParamsDataMapper->save($productCustomParamsDataModel);
+                }
+            }
+        }
+    }
+
 
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();
@@ -704,6 +749,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $result = $this->getDbTable()->getAdapter()->fetchAssoc($select);
 
         return $result;
+    }
+
+    /**
+     * Find product model by sku
+     *
+     * @param string $sku product sku
+     * @return Models_Model_Product|null
+     * @throws Exception
+     */
+    public function findBySku($sku)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('sku = ?', $sku);
+        return $this->_findWhere($where);
     }
 
 }
