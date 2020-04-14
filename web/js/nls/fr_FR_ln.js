@@ -24,7 +24,7 @@ define({
         'add'             : 'ajouter',
         'edit'            : 'editer',
         'view'            : 'voir',
-        'Tracking ID'     : 'Numéro de suivi',
+        'Tracking code'   : 'Сode de suivi',
         'View invoice'    : 'Voir facture',
         'Download invoice': 'Télécharger facture',
         'Insert tracking code for this order' : 'Insérez le code de suivi de cette commande',

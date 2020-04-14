@@ -682,6 +682,7 @@ define(['backbone',
                                             'shipping_tracking_code': response.responseText.shippingTrackingCode
                                         });
                                     }
+                                    $('#tracking-dialog').dialog('close');
                                 }
                             });
                         });

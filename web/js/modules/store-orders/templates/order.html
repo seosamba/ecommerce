@@ -28,7 +28,7 @@
 <td data-mobile-title="Shipping via" class="shipping-service">
     <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
     <% if(_.isNull(recurring_id)) {%>
-    <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_code) ? '' : shipping_tracking_code %>
+    <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking code']) ? 'Tracking code':i18n['Tracking code'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_code) ? '' : shipping_tracking_code %>
 <% if (status == 'completed' || status == 'shipped') { %>
         <% addButton = 'add' %>
         <% editButton = 'edit' %>

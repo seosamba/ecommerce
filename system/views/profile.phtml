@@ -166,7 +166,7 @@ $this->headScript()
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
                         <?php if(!$order->getRecurringId()):?>
                             <p>
-                                <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-code"><?php echo $order->getShippingTrackingCode(); ?></span>
+                                <i><?php echo $this->translate('Tracking code');?></i>: <span class="tracking-code"><?php echo $order->getShippingTrackingCode(); ?></span>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                                 <a href="javascript:;" class="tracking-dialog" data-order-id="<?php echo $order->getId();?>" data-shipping-tracking-code="<?php echo $order->getShippingTrackingCode();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
                                 <?php endif;?>

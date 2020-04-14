@@ -789,7 +789,7 @@ class Tools_ExportImportOrders
             'shipping_tracking_code' => array(
                 'label' => 'shipping_tracking_code',
                 'checked' => 1,
-                'label_name' => $translator->translate('Tracking id')
+                'label_name' => $translator->translate('Tracking code')
             ),
             'brand' => array(
                 'label' => 'brand',
