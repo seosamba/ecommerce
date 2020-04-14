@@ -629,6 +629,7 @@ define(['backbone',
             }
         },
         changeTracking: function(e){
+
             var self    = this,
                 el      = $(e.currentTarget),
                 id      = parseInt(el.closest('tr').find('td.order-id').text()),
@@ -670,17 +671,25 @@ define(['backbone',
                                 type: 'POST',
                                 dataType: 'json',
                                 beforeSend: function(){
-                                    el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                                    el.closest('td').find('.tracking-info').hide();
+                                    el.closest('td').find('.ajax-loader').show();
                                 },
                                 success: function(response) {
                                     if (response.hasOwnProperty('error') && !response.error){
                                         showMessage(_.isUndefined(i18n['Saved'])?'Saved':i18n['Saved']);
                                     }
                                     if (response.hasOwnProperty('responseText')){
+                                        var trackingCodeText = el.closest('td').find('.tracking-code-text').text();
+
                                         model.set({
                                             'status': response.responseText.status,
                                             'shipping_tracking_code': response.responseText.shippingTrackingCode
                                         });
+                                    }
+
+                                    if(trackingCodeText == response.responseText.shippingTrackingCode) {
+                                        el.closest('td').find('.ajax-loader').hide();
+                                        el.closest('td').find('.tracking-info').show();
                                     }
                                     $('#tracking-dialog').dialog('close');
                                 }
