@@ -87,6 +87,23 @@ class Tools_InventoryObserver implements Interfaces_Observer {
             $inventory = $this->_dbTable->getAdapter()->quoteInto($sqlExpr, intval($cartItem['qty']));
 			$where = $this->_dbTable->getAdapter()->quoteInto('id = ? AND inventory IS NOT NULL', $cartItem['product_id']);
 			$this->_dbTable->update(array('inventory' => new Zend_Db_Expr($inventory)), $where);
+            $deductSetStock = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('deductSetStock');
+            if (!empty($deductSetStock)) {
+                $productHasPartDbTable = new Models_DbTable_ProductHasPart();
+                $where = $productHasPartDbTable->getAdapter()->quoteInto('product_id = ?', $cartItem['product_id']);
+                $setProducts = $productHasPartDbTable->fetchAll($where);
+                if (!empty($setProducts)) {
+                    $productsResults = $setProducts->toArray();
+                    if (!empty($productsResults)) {
+                        foreach ($productsResults as $product) {
+                            Tools_Misc::applyInventory($product['part_id'], array(), $cartItem['qty'], Tools_InventoryObserver::INVENTORY_UPDATE_STOCK);
+                            $where = $this->_dbTable->getAdapter()->quoteInto('id = ? AND inventory IS NOT NULL', $product['part_id']);
+                            $this->_dbTable->update(array('inventory' => new Zend_Db_Expr($inventory)), $where);
+                        }
+                    }
+
+                }
+            }
 		}
 
 		try {
