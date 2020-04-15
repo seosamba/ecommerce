@@ -35,6 +35,11 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
 		));
 
+        $this->addElement('checkbox', 'deductSetStock', array(
+            'label' => 'Deduct from product set inventory',
+            'class' => 'grid_6 alpha'
+        ));
+
         $this->addElement('text', 'operationalHours', array(
             'label' => 'store operational hours'
         ));
