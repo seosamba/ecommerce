@@ -36,7 +36,7 @@ class Forms_BasicsSettings extends Zend_Form {
 		));
 
         $this->addElement('checkbox', 'deductSetStock', array(
-            'label' => 'Deduct from product set inventory',
+            'label' => 'Deduct from inventory of products used in sets',
             'class' => 'grid_6 alpha'
         ));
 
