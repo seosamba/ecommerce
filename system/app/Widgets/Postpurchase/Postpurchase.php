@@ -346,8 +346,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $shippingService = 'Pickup information';
         }  else {
             $shippingService = $this->_cart->getShippingService();
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($shippingService);
         }
-        return $this->_translator->translate($shippingService);
+        return !empty($shippingServiceLabel) ? $shippingServiceLabel : $this->_translator->translate($shippingService);
     }
 
     /**

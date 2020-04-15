@@ -312,11 +312,13 @@ $this->headLink()
                             $lexemShortDescription = $this->translate('Short description');
                             $lexemFullDescription = $this->translate('Full description');
                             $lexemDimensions = $this->translate('Dimensions');
+                            $lexemCustomAttributes = $this->translate('Custom attributes');
                         ?>
                         <ul>
                             <li><a href="#short-description-tab"><?php echo $lexemShortDescription; ?></a></li>
                             <li><a href="#full-description-tab"><?php echo $lexemFullDescription; ?></a></li>
                             <li><a href="#product-dimensions-tab"><?php echo $lexemDimensions; ?></a></li>
+                            <li><a href="#product-custom-attributes-tab"><?php echo $lexemCustomAttributes; ?></a></li>
                         </ul>
                         <div id="short-description-tab">
                             <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
@@ -341,6 +343,25 @@ $this->headLink()
                                 <input class="grid_8 alpha omega" type="text" id="product-depth" data-reflection="prodDepth" placeholder="0.00">
                                 <label class="grid_4 alpha omega" for="product-depth"><?php echo $this->translate((!empty($this->generalConfig['lengthUnit']) ? $this->generalConfig['lengthUnit'] :'')); ?></label>
                             </div>
+                        </div>
+                        <div id="product-custom-attributes-tab" class="scroll" style="max-height: 230px;">
+                            <?php foreach ($this->productCustomParamsConfig as $productCustomParam):?>
+                                <div class="grid_3 alpha">
+                                    <label><?php echo $productCustomParam['label'];?></label>
+                                    <?php if($productCustomParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_TEXT):?>
+                                         <input data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-custom-param-name="<?php echo $productCustomParam['param_name'];?>" data-param-type="text" class="product-custom-param custom-param-text" type="text" name="custom-param-text-<?php echo $productCustomParam['param_name'];?>" id="custom-param-text-<?php echo $productCustomParam['param_name'];?>">
+                                    <?php elseif($productCustomParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT):?>
+                                        <select data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-custom-param-name="<?php echo $productCustomParam['param_name'];?>" data-param-type="select" class="product-custom-param custom-param-select" name="custom-param-select-<?php echo $productCustomParam['param_name'];?>" id="custom-param-select-<?php echo $productCustomParam['param_name'];?>">
+                                            <?php if(isset($this->productCustomParamsOptions[$productCustomParam['id']])):?>
+                                                <option value="0"><?php echo $this->translate('Select option');?></option>
+                                                <?php foreach ($this->productCustomParamsOptions[$productCustomParam['id']] as $paramData):?>
+                                                    <option value="<?php echo $paramData['id'];?>"><?php echo $paramData['option_value'];?></option>
+                                                <?php endforeach;?>
+                                            <?php endif;?>
+                                        </select>
+                                    <?php endif;?>
+                                </div>
+                            <?php endforeach;?>
                         </div>
                     </div>
                 </div>

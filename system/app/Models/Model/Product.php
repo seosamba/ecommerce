@@ -77,6 +77,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_wishlistQty = '';
 
+    protected $_customParams = '';
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -717,4 +719,25 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCustomParams()
+    {
+        return $this->_customParams;
+    }
+
+    /**
+     * @param string $customParams
+     * @return string
+     */
+    public function setCustomParams($customParams)
+    {
+        $this->_customParams = $customParams;
+
+        return $this;
+    }
+
+
 }

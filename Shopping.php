@@ -807,6 +807,14 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->plugins = $plugins;
 			$this->_view->websiteConfig = $this->_websiteConfig;
             $this->_view->configTabs = $configTabs;
+            $configParamsData = Store_Mapper_ProductCustomFieldsOptionsDataMapper::getInstance()->getCustomParamsOptionsDataConfig(array('custom_param_id ASC'));
+            if (!empty($configParamsData)) {
+                $configParamsData = Tools_CustomParamsTools::prepareCustomParamsOptions($configParamsData);
+            } else {
+                $configParamsData = array();
+            }
+            $this->_view->productCustomParamsConfig = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance()->getCustomParamsConfig();
+            $this->_view->productCustomParamsOptions = $configParamsData;
 
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
@@ -1072,6 +1080,15 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                 }))
 			);
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
+			if(!empty($orders) && !empty($shippingServiceLabels)){
+                foreach ($orders as $index => $order) {
+                    if (isset($shippingServiceLabels[$order->getShippingService()])) {
+                        $orders[$index]->setShippingService($shippingServiceLabels[$order->getShippingService()]);
+                    }
+                }
+            }
 			$this->_view->orders = $orders;
 		}
 
@@ -1168,6 +1185,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->pickupLocationData = $pickupLocationData;
             }
             $this->_view->defaultPickup = $defaultPickup;
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($order->getShippingService());
+            if (!empty($shippingServiceLabel)) {
+                $this->_view->shippingServiceLabel = $shippingServiceLabel;
+            }
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
@@ -2842,6 +2864,75 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
         echo $content;
+    }
+
+    public function productCustomFieldsConfigAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            if ($this->_request->isGet()) {
+                $this->_layout->content = $this->_view->render('product-custom-fields-config.phtml');
+                echo $this->_layout->render();
+            }
+        }
+    }
+
+    /**
+     * This action is used to change custom params values for product
+     */
+    public function updateProductCustomParamAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam('secureToken', false);
+
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $customparamsData = $this->_request->getParams();
+
+            $currentCustomParamValue = filter_var($this->_request->getParam('currentCustomParamValue'), FILTER_SANITIZE_STRING);
+
+            $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+
+            if(!empty($customparamsData['paramId']) && !empty($customparamsData['customParamProductId'])) {
+                if($customparamsData['isNew']) {
+                    $productCustomParamsDataModel = new Store_Model_ProductCustomParamsDataModel();
+
+                    $productCustomParamsDataModel->setParamId($customparamsData['paramId']);
+                    $productCustomParamsDataModel->setProductId($customparamsData['customParamProductId']);
+
+                    if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                        $productCustomParamsDataModel->setParamValue($currentCustomParamValue);
+                    } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                        $productCustomParamsDataModel->setParamsOptionId($currentCustomParamValue);
+                    }
+
+                    $productCustomParamsDataMapper->save($productCustomParamsDataModel);
+
+                    $this->_responseHelper->success('');
+
+                } else {
+                    $productCustomParamsDataExists = $productCustomParamsDataMapper->checkIfParamExists($customparamsData['customParamProductId'], $customparamsData['paramId']);
+
+                    if($productCustomParamsDataExists instanceof Store_Model_ProductCustomParamsDataModel) {
+                        if($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_TEXT) {
+                            $productCustomParamsDataExists->setParamValue($currentCustomParamValue);
+                        } elseif ($customparamsData['type'] == Api_Store_Productcustomfieldsconfig::PRODUCT_CUSTOM_FIELD_TYPE_SELECT) {
+                            $productCustomParamsDataExists->setParamsOptionId($currentCustomParamValue);
+                        }
+
+                        $productCustomParamsDataMapper->save($productCustomParamsDataExists);
+
+                        $this->_responseHelper->success('');
+                    } else{
+                        $this->_responseHelper->fail($this->_translator->translate('Unknown product custom param type'));
+                    }
+                }
+            } else {
+                $this->_responseHelper->fail($this->_translator->translate('Can\'t update product custom param'));
+            }
+        }
     }
 
 }
