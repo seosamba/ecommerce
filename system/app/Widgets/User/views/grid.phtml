@@ -30,7 +30,7 @@
                 <th><?php echo $this->translate('Details');?></th>
                 <th><?php echo $this->translate('Total');?></th>
                 <th><?php echo $this->translate('Shipping');?></th>
-                <th><?php echo $this->translate('Tracking code');?></th>
+                <th><?php echo $this->translate('Tracking id');?></th>
                 <th class="user-status-th"><?php echo $this->translate('Status');?></th>
                 <?php if(isset($this->invoicePlugin)):?>
                     <th><?php echo $this->translate('Invoice');?></th>
@@ -60,9 +60,9 @@
                         <td>
                             <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED
                                 || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
-                                <?php if($order->getShippingTrackingCode() != ''):?>
+                                <?php if($order->getShippingTrackingId() != ''):?>
                                     <p class="textcentered">
-                                        <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingCode(); ?>"><?php echo $this->translate('Track your parcel')?></a>
+                                        <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Track your parcel')?></a>
                                     </p>
                                 <?php else:?>
                                     <p> - </p>

@@ -652,7 +652,7 @@
         'Sub total tax' => 'Sous-total impôts',
         'Total tax' => 'Total impôts',
         'Total' => 'Total',
-        'Tracking code' => 'Code de suivi',
+        'Tracking id' => 'Code de suivi',
         'User Name' => 'Nom d\'utilisateur',
         'User Email' => 'E-mail de l\'utilisateur',
         'Shipping first name' => 'Prénom (livraison)',

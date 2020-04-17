@@ -644,7 +644,7 @@ define(['backbone',
                 var dialog = _.template(TrackingCodeTemplate, {
                     data:response.responseText.data,
                     defaultSelection: response.responseText.defaultSelection,
-                    trackingId: response.responseText.trackingId,
+                    shippingTrackingCodeId: response.responseText.shippingTrackingCodeId,
                     trackingName: response.responseText.trackingName,
                     orderId: id,
                     i18n:i18n
@@ -658,10 +658,10 @@ define(['backbone',
                         $('.save-data').on('click', function(e){
                             e.preventDefault();
                             var  trackingUrlId =  $('#marketing-services').val(),
-                                text =  $('#shippingTrackingCode').val(),
+                                text =  $('#shippingTrackingId').val(),
                                 data = {
                                     trackingUrlId: trackingUrlId,
-                                    shippingTrackingCode: text,
+                                    shippingTrackingId: text,
                                     id:id
                                 };
 
@@ -683,11 +683,11 @@ define(['backbone',
 
                                         model.set({
                                             'status': response.responseText.status,
-                                            'shipping_tracking_code': response.responseText.shippingTrackingCode
+                                            'shipping_tracking_id': response.responseText.shippingTrackingId
                                         });
                                     }
 
-                                    if(trackingCodeText == response.responseText.shippingTrackingCode) {
+                                    if(trackingCodeText == response.responseText.shippingTrackingId) {
                                         el.closest('td').find('.ajax-loader').hide();
                                         el.closest('td').find('.tracking-info').show();
                                     }

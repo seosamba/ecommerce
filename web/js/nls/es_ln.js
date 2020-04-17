@@ -28,7 +28,7 @@ define({
         'add'             : 'añadir',
         'edit'            : 'editar',
         'view'            : 'ver',
-        'Tracking code'   : 'Código envío',
+        'Tracking ID'     : 'ID Envío',
         'View invoice'    : 'Ver factura',
         'Download invoice': 'Descargar factura',
         'Insert tracking code for this order' : 'Establecer identificador de envío',

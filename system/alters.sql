@@ -537,8 +537,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
 
 -- 19/12/2019
 -- version: 2.7.7
-ALTER TABLE `shopping_cart_session` ADD `tracking_id` int(10) unsigned DEFAULT NULL AFTER `shipping_tracking_id`;
-ALTER TABLE `shopping_cart_session` CHANGE `shipping_tracking_id` `shipping_tracking_code` tinytext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping Tracking Code';
+ALTER TABLE `shopping_cart_session` ADD `shipping_tracking_code_id` int(10) unsigned DEFAULT NULL AFTER `shipping_tracking_id`;
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.7.8' WHERE `name`='shopping';
