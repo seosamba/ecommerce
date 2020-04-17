@@ -37,7 +37,7 @@ $this->headLink()
         <?php endif;?>
 	</ul>
     </div>
-	<form class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<form  style="overflow-y: auto;" class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
 	<?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">
             <?php $hoursFrom = array('0' => $this->translate('From')) + Tools_Misc::$_hoursUnits;?>
