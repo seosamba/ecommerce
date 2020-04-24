@@ -62,6 +62,7 @@
     'Coupons' => ' ',
     'STORE' => 'LISTINGS',
     'Import orders' => ' ',
-    'Manage brand logos' => ' '
+    'Manage brand logos' => ' ',
+    'Plugins' => ' '
 
 );
