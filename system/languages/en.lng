@@ -50,8 +50,13 @@
     'Attach new file to your product' => 'Attach new file to your listing',
     'All products were updated' => 'All listings were updated',
     'Product custom fields' => 'Listing custom fields',
-    'Product custom fields config' => 'Listing custom fields config'
-
+    'Product custom fields config' => 'Listing custom fields config',
+    'search by name, SKU, MPN' => 'search by name, MLS, MPN',
+    'Free shipping' => 'N/a',
+    'Weight' => 'N/a',
+    'Sku' => 'MLS',
+    'Sales count' => 'N/a',
+    'Stock' => 'N/a'
 
 
 );
