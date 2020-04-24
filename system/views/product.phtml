@@ -430,58 +430,70 @@ $this->headLink()
             </div>
         </div>
 
-        <div id="tag-tab">
-            <div class="fl-left mr-grid mt5px">
-                <a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ]</a>
-            </div>
-            <div class="paginator">
-                <!-- placeholder for pagination -->
-            </div>
-            <div class="wrap">
-                <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
-            </div>
+        <?php if(!in_array('tag-tab', $this->excludeProductTabs)) :?>
+            <div id="tag-tab">
+                <div class="fl-left mr-grid mt5px">
+                    <a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ]</a>
+                </div>
+                <div class="paginator">
+                    <!-- placeholder for pagination -->
+                </div>
+                <div class="wrap">
+                    <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
+                </div>
 
-            <ul id="product-tags-current" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width" style="display:none;"></ul>
+                <ul id="product-tags-current" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width" style="display:none;"></ul>
 
-            <ul id="product-tags-available" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width"></ul>
-        </div>
-        <!-- #tag-tab -->
+                <ul id="product-tags-available" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width"></ul>
+            </div>
+            <!-- #tag-tab -->
+        <?php endif;?>
 
-        <div id="options-tab" class="scroll">
-            <div class="grid_6 prefix_3 suffix_3">
-                <select name="option-library" id="option-library" class="grid_5 alpha omega">
-                    <option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
-                </select>
-                <span class="grid_2 alpha omega or"><?php echo $this->translate('or');?></span>
-                <button id="add-new-option-btn" class="btn grid_5 alpha omega"><?php echo $this->translate('Create new option');?></button>
+        <?php if(!in_array('options-tab', $this->excludeProductTabs)) :?>
+            <div id="options-tab" class="scroll">
+                <div class="grid_6 prefix_3 suffix_3">
+                    <select name="option-library" id="option-library" class="grid_5 alpha omega">
+                        <option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
+                    </select>
+                    <span class="grid_2 alpha omega or"><?php echo $this->translate('or');?></span>
+                    <button id="add-new-option-btn" class="btn grid_5 alpha omega"><?php echo $this->translate('Create new option');?></button>
+                </div>
+                <div id="options-holder" class="grid_12 alpha omega">
+                </div>
             </div>
-            <div id="options-holder" class="grid_12 alpha omega">
-            </div>
-        </div>
+        <?php endif;?>
         <!-- End Tab 3 -->
 
-        <div id="related-tab" class="scroll">
-            <div id="related-holder" class="column_8 full-width">
-                <a href="javascript:;" data-listtype="related" class="show-list productlisting ticon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
-                <span class="spinner"></span>
-            </div>
-        </div>
-
-        <div id="coupon-tab">
-            <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
-            <?php echo $this->partial('merchandising/coupon.phtml'); ?>
-        </div>
-        <?php if(empty($this->generalConfig['hideGroupPriceTabFromProduct'])) :?>
-            <div id="group-pricing-tab">
-                <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
-                <?php echo $this->partial('product/grouping-price.phtml'); ?>
+        <?php if(!in_array('related-tab', $this->excludeProductTabs)) :?>
+            <div id="related-tab" class="scroll">
+                <div id="related-holder" class="column_8 full-width">
+                    <a href="javascript:;" data-listtype="related" class="show-list productlisting ticon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
+                    <span class="spinner"></span>
+                </div>
             </div>
         <?php endif;?>
 
-        <div id="digital-product-tab">
-            <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
-            <?php echo $this->partial('product/digital-product.phtml'); ?>
-        </div>
+        <?php if(!in_array('coupon-tab', $this->excludeProductTabs)) :?>
+            <div id="coupon-tab">
+                <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
+                <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+            </div>
+        <?php endif;?>
+        <?php if(!in_array('group-pricing-tab', $this->excludeProductTabs)) :?>
+            <?php if(empty($this->generalConfig['hideGroupPriceTabFromProduct'])) :?>
+                <div id="group-pricing-tab">
+                    <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
+                    <?php echo $this->partial('product/grouping-price.phtml'); ?>
+                </div>
+            <?php endif;?>
+        <?php endif;?>
+
+        <?php if(!in_array('digital-product-tab', $this->excludeProductTabs)) :?>
+            <div id="digital-product-tab">
+                <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
+                <?php echo $this->partial('product/digital-product.phtml'); ?>
+            </div>
+        <?php endif;?>
 
         <div class="mt10px grid_12">
             <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>

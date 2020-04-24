@@ -789,6 +789,18 @@ class Shopping extends Tools_Plugins_Abstract {
             $plugins = array();
             $pluginsToReorder = array();
             $configTabs = Tools_Misc::$_productConfigTabs;
+            $excludeProductTabs = array();
+            if (!empty($this->_view->generalConfig['excludeProductTabs'])) {
+                $excludeProductTabs = explode(',', $this->_view->generalConfig['excludeProductTabs']);
+                foreach ($configTabs as $key => $configTab) {
+                    if (in_array($configTab['tabId'], $excludeProductTabs)) {
+                        unset($configTabs[$key]);
+                    }
+                }
+            }
+
+            $this->_view->excludeProductTabs = $excludeProductTabs;
+
             foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
 					array_push($plugins, $plugin->getName());
