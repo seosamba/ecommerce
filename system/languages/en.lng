@@ -48,7 +48,9 @@
     'Apply to all products' => 'Apply to all listings',
     'Add/edit product' => 'Add/edit listing',
     'Attach new file to your product' => 'Attach new file to your listing',
-    'All products were updated' => 'All listings were updated'
+    'All products were updated' => 'All listings were updated',
+    'Product custom fields' => 'Listing custom fields',
+    'Product custom fields config' => 'Listing custom fields config'
 
 
 
