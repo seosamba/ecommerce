@@ -60,6 +60,8 @@
     'Suppliers' => 'N/a',
     'Mpn' => 'Agency ref #',
     'Coupons' => ' ',
-    'STORE' => 'LISTINGS'
+    'STORE' => 'LISTINGS',
+    'Import orders' => ' ',
+    'Manage brand logos' => ' '
 
 );
