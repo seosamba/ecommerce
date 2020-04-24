@@ -31,7 +31,7 @@
 	'enter name of product' => 'enter name of listings',
 	'add product' => 'add listing',
     'Edit product' => 'Edit listing',
-    'by product name, SKU, MPN' => 'by listing name, Agency ref, Agent ref',
+    'by product name, SKU, MPN' => 'by listing name, MLS, Agent ref',
     'Product tags' => 'Listing tags',
     'Product' => 'Listing',
     'This product is enabled' => 'This listing is enabled',
@@ -51,12 +51,14 @@
     'All products were updated' => 'All listings were updated',
     'Product custom fields' => 'Listing custom fields',
     'Product custom fields config' => 'Listing custom fields config',
-    'search by name, SKU, MPN' => 'search by name, MLS, MPN',
+    'search by name, SKU, MPN' => 'search by name, MLS, Agent ref',
     'Free shipping' => 'N/a',
     'Weight' => 'N/a',
     'Sku' => 'MLS',
     'Sales count' => 'N/a',
-    'Stock' => 'N/a'
+    'Stock' => 'N/a',
+    'Suppliers' => 'N/a',
+    'Mpn' => 'Agency ref #',
 
 
 );
