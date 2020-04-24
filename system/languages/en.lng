@@ -59,6 +59,6 @@
     'Stock' => 'N/a',
     'Suppliers' => 'N/a',
     'Mpn' => 'Agency ref #',
-
+    'Coupons' => ''
 
 );
