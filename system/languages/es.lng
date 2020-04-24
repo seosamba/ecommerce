@@ -328,7 +328,7 @@
 'orders' => 'pedidos',
 'Addresses' => 'Direcciones',
 'View/Download invoice' => 'Ver/descargar factura',
-'Tracking ID' => 'ID Envío',
+'Tracking id' => 'Identificador de envío',
 'edit' => 'editar',
 'Where is my order?' => '¿Dónde está mi pedido?',
 'view' => 'ver',
