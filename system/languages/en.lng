@@ -63,6 +63,7 @@
     'STORE' => 'LISTINGS',
     'Import orders' => ' ',
     'Manage brand logos' => ' ',
-    'Plugins' => ' '
+    'Plugins' => ' ',
+    'Custom attributes' => 'Property data'
 
 );
