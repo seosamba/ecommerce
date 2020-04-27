@@ -64,6 +64,7 @@
     'Import orders' => ' ',
     'Manage brand logos' => ' ',
     'Plugins' => ' ',
-    'Custom attributes' => 'Property data'
+    'Custom attributes' => 'Property data',
+    'Go to Dashboard' => ' '
 
 );
