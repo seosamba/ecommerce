@@ -805,7 +805,10 @@ define([
             var type = $('#product-list-holder').data('type');
             switch (type){
                 case 'edit':
-                    this.model.clear({silent:true}).set(this.products.get(pid).toJSON());
+                    var product = this.products.get(pid).toJSON();
+                    product.price = parseFloat(product.price);
+
+                    this.model.clear({silent:true}).set(product);
                     this.model.get('options').on('add', this.renderOption, this);
                     this.render();
                     if (window.history && window.history.pushState){

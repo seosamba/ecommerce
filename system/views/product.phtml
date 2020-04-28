@@ -176,7 +176,7 @@ $this->headLink()
 		<span class="price">
             <% pricePreview = parseFloat(product.price) %>
             <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
-			<%= pricePreview.toFixed(2) + '&nbsp;' + currency %>
+			<%= pricePreview + '&nbsp;' + currency %>
 		</span>
 		<span class="info"><?php echo $this->translate('Click preview to get to product landing page');?></span>
 	</a>
