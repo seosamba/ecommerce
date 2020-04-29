@@ -815,7 +815,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     if(!empty($productPrice)) {
                         if(fmod($productPrice, 1) !== 0.00){
-                            $productPrice = (float) $productPrice;
+                            $productPrice = number_format($productPrice, 2, ".", "");
                         } else {
                             $productPrice = (int) $productPrice;
                         }
