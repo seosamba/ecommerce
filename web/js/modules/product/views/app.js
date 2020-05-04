@@ -808,6 +808,22 @@ define([
                     var product = this.products.get(pid).toJSON();
                     product.price = parseFloat(product.price);
 
+                    var productPrice = product.price;
+                    var productPriceArr = (productPrice + '').split('.');
+
+                    if(productPrice == 0) {
+                        product.price = '0.00';
+                    } else {
+                        if(typeof productPriceArr[1] !== 'undefined') {
+                            if(productPriceArr[1].length >= 1 && productPriceArr[1].length < 4) {
+                                productPriceArr[1] = productPriceArr[1] + '0';
+                                product.price = productPriceArr.join('.');
+                            }
+                        } else {
+                            product.price = product.price.toFixed(2);
+                        }
+                    }
+
                     this.model.clear({silent:true}).set(product);
                     this.model.get('options').on('add', this.renderOption, this);
                     this.render();

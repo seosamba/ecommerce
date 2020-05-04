@@ -174,7 +174,7 @@ $this->headLink()
 		<span class="image background"><img src="<%= photoUrl %>"/></span>
 		<div class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></div>
 		<span class="price">
-            <% pricePreview = parseFloat(product.price).toFixed(2) %>
+            <% pricePreview = product.price %>
             <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
 			<%= pricePreview + '&nbsp;' + currency %>
 		</span>

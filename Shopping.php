@@ -815,9 +815,22 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     if(!empty($productPrice)) {
                         if(fmod($productPrice, 1) !== 0.00){
-                            $productPrice = number_format($productPrice, 2, ".", "");
+                            $processindPrice = (float) $productPrice;
+                            $explodeDigits = explode('.', $processindPrice);
+
+                            $countNum = mb_strlen($explodeDigits[1]);
+
+                            if($countNum == 1) {
+                                $productPrice = number_format($processindPrice, 2, ".", "");
+                            } elseif ($countNum == 2) {
+                                $productPrice = number_format($processindPrice, 3, ".", "");
+                            } elseif ($countNum == 3) {
+                                $productPrice = number_format($processindPrice, 4, ".", "");
+                            } else {
+                                $productPrice = $processindPrice;
+                            }
                         } else {
-                            $productPrice = (int) $productPrice;
+                            $productPrice = number_format((int) $productPrice, 2, ".", "");
                         }
 
                         $product->setPrice($productPrice);
