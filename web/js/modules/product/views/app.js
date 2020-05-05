@@ -815,12 +815,10 @@ define([
                         product.price = '0.00';
                     } else {
                         if(typeof productPriceArr[1] !== 'undefined') {
-                            if(productPriceArr[1].length >= 1 && productPriceArr[1].length < 4) {
+                            if(productPriceArr[1].length == 1) {
                                 productPriceArr[1] = productPriceArr[1] + '0';
                                 product.price = productPriceArr.join('.');
                             }
-                        } else {
-                            product.price = product.price.toFixed(2);
                         }
                     }
 
