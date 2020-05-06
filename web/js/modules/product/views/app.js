@@ -805,7 +805,24 @@ define([
             var type = $('#product-list-holder').data('type');
             switch (type){
                 case 'edit':
-                    this.model.clear({silent:true}).set(this.products.get(pid).toJSON());
+                    var product = this.products.get(pid).toJSON();
+                    product.price = parseFloat(product.price);
+
+                    var productPrice = product.price;
+                    var productPriceArr = (productPrice + '').split('.');
+
+                    if(productPrice == 0) {
+                        product.price = '0.00';
+                    } else {
+                        if(typeof productPriceArr[1] !== 'undefined') {
+                            if(productPriceArr[1].length == 1) {
+                                productPriceArr[1] = productPriceArr[1] + '0';
+                                product.price = productPriceArr.join('.');
+                            }
+                        }
+                    }
+
+                    this.model.clear({silent:true}).set(product);
                     this.model.get('options').on('add', this.renderOption, this);
                     this.render();
                     if (window.history && window.history.pushState){

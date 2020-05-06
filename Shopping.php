@@ -810,7 +810,28 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($this->_request->has('id')) {
 				$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
 				if ($id) {
-					$this->_view->product = Models_Mapper_ProductMapper::getInstance()->find($id);
+					$product = Models_Mapper_ProductMapper::getInstance()->find($id);
+                    $productPrice = $product->getPrice();
+
+                    if(!empty($productPrice)) {
+                        if(fmod($productPrice, 1) !== 0.00){
+                            $processindPrice = (float) $productPrice;
+                            $explodeDigits = explode('.', $processindPrice);
+
+                            $countNum = mb_strlen($explodeDigits[1]);
+
+                            $productPrice = $processindPrice;
+                            if($countNum == 1) {
+                                $productPrice = number_format($processindPrice, 2, ".", "");
+                            }
+                        } else {
+                            $productPrice = (int) $productPrice;
+                        }
+
+                        $product->setPrice($productPrice);
+
+                        $this->_view->product = $product;
+                    }
 				}
 			}
 
@@ -853,6 +874,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
             $this->_view->defaultTaxes = $defaultTaxes;
+
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
