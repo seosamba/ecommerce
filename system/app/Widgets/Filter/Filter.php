@@ -220,7 +220,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->appliedFilters = $appliedFilters;
 
         // mark disabled filters
-        $this->_view->filters = array_filter(
+        $clearedFilters = array_filter(
             array_map(
                 function ($filter) use ($appliedFilters, $widgetSettings) {
                     if (isset($widgetSettings[$filter['name']]) && !is_array($widgetSettings[$filter['name']])) {
@@ -242,6 +242,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 $this->_filters
             )
         );
+
+        if(!empty($widgetSettings) && !empty($clearedFilters)) {
+            $this->_view->filters = Tools_Misc::processProductFilters($widgetSettings, $clearedFilters);
+        }
 
         if (!empty($widgetSettings['tags'])) {
             $showList = $widgetSettings['tags'];
