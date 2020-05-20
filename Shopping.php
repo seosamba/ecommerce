@@ -589,13 +589,35 @@ class Shopping extends Tools_Plugins_Abstract {
         if($defaultSelection instanceof Models_Model_ShippingUrl) {
             $arrDataDefault = array($defaultSelection->getName() => $defaultSelection->getDefaultStatus());
         }
-        if(!empty($trackingData)) {
+
+        $orderId = $this->_request->getParam('orderId');
+        $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+
+        $shippingTrackingCodeId = '';
+        $shippingTrackingId = '';
+        $trackingName = '';
+        if($order instanceof Models_Model_CartSession) {
+            $shippingTrackingCodeId = $order->getShippingTrackingCodeId();
+            $shippingTrackingId = $order->getShippingTrackingId();
+
+            if(!empty($shippingTrackingId)) {
+                $trackingName = $shippingTrackingId;
+            }
+        }
+
+        $shippingConfigMapper = Models_Mapper_ShippingConfigMapper::getInstance();
+        $trackingurlConfig = $shippingConfigMapper->find(self::SHIPPING_TRACKING_URL);
+
+        if(!empty($trackingData) && !empty($trackingurlConfig['enabled'])) {
             foreach ($trackingData as $dataValue) {
+                if($dataValue['id'] == $shippingTrackingCodeId) {
+                    $trackingName = str_replace($dataValue['url'], '', $shippingTrackingId);
+                }
                 $arrData[$dataValue['id']] = $dataValue['name'];
             }
 
         }
-        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault));
+        return  $this->_responseHelper->success(array('data' => $arrData, 'defaultSelection' => $arrDataDefault, 'shippingTrackingCodeId' => $shippingTrackingCodeId, 'trackingName' => $trackingName));
     }
 
 
@@ -767,6 +789,18 @@ class Shopping extends Tools_Plugins_Abstract {
             $plugins = array();
             $pluginsToReorder = array();
             $configTabs = Tools_Misc::$_productConfigTabs;
+            $excludeProductTabs = array();
+            if (!empty($this->_view->generalConfig['excludeProductTabs'])) {
+                $excludeProductTabs = explode(',', $this->_view->generalConfig['excludeProductTabs']);
+                foreach ($configTabs as $key => $configTab) {
+                    if (in_array($configTab['tabId'], $excludeProductTabs)) {
+                        unset($configTabs[$key]);
+                    }
+                }
+            }
+
+            $this->_view->excludeProductTabs = $excludeProductTabs;
+
             foreach (Tools_Plugins_Tools::getPluginsByTags(array('ecommerce')) as $plugin) {
 				if ($plugin->getTags() && in_array('merchandising', $plugin->getTags())) {
 					array_push($plugins, $plugin->getName());
@@ -776,7 +810,28 @@ class Shopping extends Tools_Plugins_Abstract {
 			if ($this->_request->has('id')) {
 				$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
 				if ($id) {
-					$this->_view->product = Models_Mapper_ProductMapper::getInstance()->find($id);
+					$product = Models_Mapper_ProductMapper::getInstance()->find($id);
+                    $productPrice = $product->getPrice();
+
+                    if(!empty($productPrice)) {
+                        if(fmod($productPrice, 1) !== 0.00){
+                            $processindPrice = (float) $productPrice;
+                            $explodeDigits = explode('.', $processindPrice);
+
+                            $countNum = mb_strlen($explodeDigits[1]);
+
+                            $productPrice = $processindPrice;
+                            if($countNum == 1) {
+                                $productPrice = number_format($processindPrice, 2, ".", "");
+                            }
+                        } else {
+                            $productPrice = (int) $productPrice;
+                        }
+
+                        $product->setPrice($productPrice);
+
+                        $this->_view->product = $product;
+                    }
 				}
 			}
 
@@ -819,6 +874,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
             $this->_view->defaultTaxes = $defaultTaxes;
+
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
 		}
@@ -1133,6 +1189,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			}
 
 			if ($this->_request->isPost()) {
+                $currenttrackingUrlId = '';
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
@@ -1145,11 +1202,13 @@ class Shopping extends Tools_Plugins_Abstract {
                     $shippingUrlMapper->clearDefaultStatus();
                     if (!empty($params['trackingUrlId'])) {
                         $currentData = $shippingUrlMapper->find($params['trackingUrlId']);
-                        if (!empty($currentData)) {
+                        if ($currentData instanceof Models_Model_ShippingUrl) {
                             $selectedName = $currentData->getName();
                             $url = $currentData->getUrl();
                             $currentData->setDefaultStatus(1);
-                            $shippingUrlMapper->save($currentData);
+                            $shippingUrlData = $shippingUrlMapper->save($currentData);
+
+                            $currenttrackingUrlId = $shippingUrlData->getId();
                         }
                     }
                     unset($params['trackingUrlId'], $params['id']);
@@ -1163,6 +1222,8 @@ class Shopping extends Tools_Plugins_Abstract {
                         'url' => $url
                     )));
                     $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+
+                    $params['shippingTrackingCodeId'] = $currenttrackingUrlId;
                 }
 
                 if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED) {

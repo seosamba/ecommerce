@@ -157,7 +157,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.7');
+('version', '2.7.8');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -296,7 +296,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_price` decimal(10,2) DEFAULT NULL,
   `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
+  `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping Tracking ID',
+  `shipping_tracking_code_id` int(10) unsigned DEFAULT NULL,
   `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id',
   `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format',
   `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format',
@@ -1018,4 +1019,4 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.7' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.8' WHERE `name` = 'shopping';

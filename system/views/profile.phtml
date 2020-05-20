@@ -166,19 +166,28 @@ $this->headScript()
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
                         <?php if(!$order->getRecurringId()):?>
                             <p>
-                                <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+                                <i><?php echo $this->translate('Tracking id');?></i>: <span class="tracking-code"><?php echo $order->getShippingTrackingId(); ?></span>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                                <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+                                <a href="javascript:;" class="tracking-dialog" data-order-id="<?php echo $order->getId();?>" data-shipping-tracking-code="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
                                 <?php endif;?>
                             </p>
                             <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
                                 <?php if($order->getShippingTrackingId() != ''):?>
-                                    <p class="textcentered">
+                                <p class="textcentered">
                                     <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
                                 </p>
                                 <?php endif;?>
                             <?php endif;?>
                         <?php endif;?>
+                        <div class="hidden">
+                            <div id="dialog-block-<?php echo $order->getId();?>" class="clearfix" style="width: 110%" title="Insert tracking code for this order">
+                                <form id="tracking-code-form" method="post">
+                                    <select name="choose-service" id="marketing-services-<?php echo $order->getId();?>" class="grid_5 alpha fl-left" style="float:none;"></select>
+                                    <input type="text" name="shippingTrackingId" id="shippingTrackingId-<?php echo $order->getId();?>" value="" class="grid_7 alpha fl-right">
+                                    <button class="btn green ticon-checkmark save-data-<?php echo $order->getId();?>" style="margin-top: 10px;" type="submit" title="save">Save</button>
+                                </form>
+                            </div>
+                        </div>
 					</td>
 
                     <?php $status = 'cs_'.$order->getStatus();?>
@@ -387,37 +396,89 @@ $this->headScript()
 
     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
 
-    $('a.tracking-dialog').on('click', function(e){
+    $(document).on('click', 'a.tracking-dialog', function(e){
         e.preventDefault();
         var self = this,
+            el      = $(e.currentTarget),
             id = parseInt($(this).closest('tr').data('id'));
-        smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
-            if (value === false) {
-                return value;
-            }
-            value = $.trim(value);
-            if ($(self).data('shippingTrackingId') !== value) {
-                $.ajax({
-                    url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                    data: {shippingTrackingId: value},
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function(response) {
-                        showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
-                        if (response.hasOwnProperty('responseText')){
-                            $(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
-                            $(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
-                            $(self).closest('tr').find('td.current-status').text(response.responseText.status);
-                        }
-                    }
-                });
-            }
-        },
-            {
-                ok: '<?php echo $this->translate("Ok"); ?>',
-                cancel: '<?php echo $this->translate("Cancel"); ?>'
-            }
-        );
+
+        $.ajax({
+            url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames/orderId/' + id,
+            type: 'GET',
+            dataType: 'json'
+
+        }).done(function(response) {
+            $('#marketing-services-'+id).empty();
+
+            var responsedata = response.responseText;
+
+            $.each(responsedata.data, function(key, value) {
+                var selectedOption = '';
+                if(key == responsedata.shippingTrackingCodeId) {
+                    selectedOption = 'selected';
+                }
+
+                var option = $("<option "+ selectedOption +"></option>").attr("value",key).text(value);
+
+                $('#marketing-services-'+id).append(option);
+            });
+
+            var trackingName = responsedata.trackingName;
+            $('#shippingTrackingId-'+id).val(trackingName);
+
+            var dialogBlock = $('#dialog-block-' + id);
+
+            $(dialogBlock).dialog({
+                width: 600,
+                dialogClass: 'seotoaster',
+                resizable:false,
+                open: function(event, ui) {
+                    $('.save-data-' + id).one('click', function(e){
+                        e.preventDefault();
+                        var  trackingUrlId =  $('#marketing-services-'+id).val(),
+                            text =  $('#shippingTrackingId-'+id).val(),
+                            data = {
+                                trackingUrlId: trackingUrlId,
+                                shippingTrackingId: text,
+                                id:id
+                            };
+
+                        $.ajax({
+                            url: $('#website_url').val()+'plugin/shopping/run/order',
+                            data: data,
+                            type: 'POST',
+                            dataType: 'json',
+                            beforeSend: function(){
+                                //el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                            },
+                            success: function(response) {
+                                if (response.hasOwnProperty('error') && !response.error){
+                                    showMessage("<?php echo $this->translate('Saved');?>");
+                                }
+
+                                if (response.hasOwnProperty('responseText')){
+                                    el.closest('td').find('.tracking-code').text(response.responseText.shippingTrackingId);
+                                    el.closest('td').find('.textcentered').remove();
+
+                                    if(response.responseText.shippingTrackingId != '') {
+                                        var trackingLink = '<p class="textcentered">' +
+                                            '<a target="_blank" class="tracking-link" href="' + response.responseText.shippingTrackingId +
+                                            '"> '+ '<?php echo $this->translate('Where is my order?');?>' + '</a></p>';
+
+                                        el.closest('td').append(trackingLink);
+                                    }
+                                }
+
+                                $('#dialog-block-' + id).dialog('close');
+                            }
+                        });
+                    });
+                },
+                close: function(event, ui){
+                    $('#dialog-block-' + id).dialog('destroy');
+                }
+            });
+        });
     });
 
     $('#orders-table').on('mouseenter', 'td.current-status', function(){
