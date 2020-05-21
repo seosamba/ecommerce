@@ -19,9 +19,9 @@
                         <li>
                             <label>
                                 <input type="checkbox" name="show[tags][<?php echo $tag; ?>]" value="1"
-                                    <?php if (empty($this->settings['tags']) || (is_array($this->settings['tags']) && isset($this->settings['tags'][$tag]))) { ?>
+                                    <?php if (empty($this->settings['tags']) || (is_array($this->settings['tags']) && isset($this->settings['tags'][$tag]))) : ?>
                                         checked
-                                    <?php } ?>
+                                    <?php endif; ?>
                                     />
                                 <?php echo $tag; ?>
                             </label></li>
@@ -94,19 +94,19 @@
                             />
                     <?php else : ?>
                         <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
-                            <?php if (is_array($this->settings[$filter['name']]) && !empty($this->settings[$filter['name']])) { ?>
+                            <?php if (is_array($this->settings[$filter['name']]) && !empty($this->settings[$filter['name']])) : ?>
                                 checked
-                            <?php } ?>
+                            <?php endif; ?>
                             />
 
                     <?php endif; ?>
                     <?php echo $filter['label']; ?>
                 </label>
                 <?php if (!empty($filter['values'])) : ?>
-                    <?php if (sizeof($filter['values']) > 10) { ?>
+                    <?php if (sizeof($filter['values']) > 10) : ?>
                         <span title="<?php echo $this->translate('show/hide nested elements'); ?>"
                               class="toggle-nested">&#177;</span>
-                    <?php } ?>
+                    <?php endif; ?>
                     <ul <?php if (!$show) { ?>style="display: none"<?php } ?> >
                         <?php foreach ($filter['values'] as $value => $count) : ?>
                         <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
@@ -117,9 +117,9 @@
                                            value="1"
                                            title="<?php echo $this->translate('Check to hide from users'); ?>"
                                         <?php if (!isset($this->settings[$filter['name']]) ||
-                                            (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) { ?>
+                                            (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
                                             checked
-                                        <?php } ?>
+                                        <?php endif; ?>
                                         />
                                     <?php
                                     echo $value;
