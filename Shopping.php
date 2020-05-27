@@ -943,9 +943,10 @@ class Shopping extends Tools_Plugins_Abstract {
             $sort = $this->_request->getParam('sort');
 
             $offset = intval($nextPage) * $limit;
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
         if (empty($dragListId)) {
-            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("p.enabled='1'", $order, $offset, $limit,
-                null, $tags, $brands, false, false, $attributes, $price, $sort);
+            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1'), $order, $offset, $limit, null, $tags, $brands, false, false, $attributes, $price, $sort, false, array(), true);
         } else {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($dragListId);
@@ -959,13 +960,11 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                 }
                 if (!empty($currentProductsId)) {
-                    $productMapper = Models_Mapper_ProductMapper::getInstance();
-                    $productsListData = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
-                        $currentProductsId));
+                    $productsListData = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)', $currentProductsId), null, null, null, null, null, null, false, false, array(), array(), null, false, array(), true);
                     $productsListDataResult = array();
                     for ($i = 0; $i < count($currentProductsId); $i++) {
                         foreach ($productsListData as $product) {
-                            $prodId = $product->getId();
+                            $prodId = $product['id'];
                             if ($currentProductsId[$i] == $prodId) {
                                 $productsListDataResult[$i] = $product;
                             }

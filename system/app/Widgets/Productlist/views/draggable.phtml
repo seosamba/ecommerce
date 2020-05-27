@@ -1,17 +1,17 @@
 <ul id="sortable-<?php echo $this->dragListId; ?>" style="list-style: none;">
     <?php foreach ($this->dragproducts as $product): ?>
         <?php
-        $img = $product->getPhoto();
+        $img = $product['photo'];
         $imgArr = explode('/', $img);
 
         ?>
-        <li class="sortable-product-list-row" data-sort-product-id="<?php echo $product->getId(); ?>">
+        <li class="sortable-product-list-row" data-sort-product-id="<?php echo $product['id']; ?>">
             <?php if (!empty($imgArr[1])) :?>
                 <img src="<?php echo $this->websiteUrl . 'media/' . $imgArr[0] . '/small/' . $imgArr[1]; ?>" alt="">
             <?php else:?>
                 <img src="<?php echo $this->websiteUrl . 'system/images/no_image.png';?>" alt="">
             <?php endif;?>
-            <p><?php echo $product->getName(); ?></p>
+            <p><?php echo $product['name']; ?></p>
         </li>
     <?php endforeach; ?>
 </ul>

@@ -45,6 +45,16 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	const DEFAULT_LIMIT = 50;
 
     /**
+     * @var array
+     */
+	public $draglist = array();
+
+    /**
+     * @var bool
+     */
+	public $isDraggable = false;
+
+    /**
      *  Product limit
      */
     protected  $_limit = null;
@@ -125,19 +135,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (!empty($isPreview)) {
             $this->_view->isPreview = $isPreview;
         }
-        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
-            $last = 0;
-        } elseif ((!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
-                    $this->_options))
-            || (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
-                    $this->_options) && $isPreview)
-        ) {
-            $this->last = $last;
-        }
 
         $dragListId = null;
 
         if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
+            if(empty($isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+                $this->isDraggable = true;
+            }
+
             $optionsForDragKey =  $this->_options;
             $withLimit = end($this->_options);
             if (is_numeric($withLimit)) {
@@ -170,11 +175,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
         $this->_strictTagsCount = in_array(self::OPTION_STRICT_TAGS_COUNT, $this->_options);
 
-		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
-		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
 		$content = $this->_processList();
-		//$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
-		//}
 		if ($this->_cleanListOnly) {
 			return $content;
 		}
@@ -231,8 +232,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $res = array();
             for ($i = 0; $i < count($this->draglist['data']); $i++) {
                 foreach ($this->dragproducts as $product) {
-                    $prod_id = $product->getId();
-                    if ($this->draglist['data'][$i] == $prod_id) {
+                    $prodId = $product['id'];
+                    if ($this->draglist['data'][$i] == $prodId) {
                         $res[$i] = $product;
                     }
                 }
@@ -266,19 +267,25 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
             $this->_compareProductsWithDraglist($productsToCompare);
         }
-        if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
+
+        if (!empty($this->_limit) && is_numeric($this->_limit) && !empty($this->draglist)) {
             $neededIds = array();
-            for ($i = 0; $i < $this->last; $i++) {
-                $neededIds[] = $this->draglist['data'][$i];
+
+            if(!$this->isDraggable) {
+                for ($i = 0; $i < $this->_limit; $i++) {
+                    $neededIds[] = $this->draglist['data'][$i];
+                }
+            } else {
+                $neededIds = $this->draglist['data'];
             }
+
             if (!empty($neededIds)) {
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
-                $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
-                    $neededIds));
+                $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)', $neededIds), null, null, null, null, null, null, false, false, array(), array(), null, false, array(), true);
                 $final = array();
                 for ($i = 0; $i < count($neededIds); $i++) {
                     foreach ($res as $product) {
-                        $prodId = $product->getId();
+                        $prodId = $product['id'];
                         if ($neededIds[$i] == $prodId) {
                             $final[$i] = $product;
                         }
@@ -286,13 +293,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
                 $products = $final;
             }
-
         } else {
-            $this->_view->dragproducts = $products;
             $this->dragproducts = $products;
         }
 
-        if (isset($this->draglist) && is_array($this->draglist['data']) && isset($this->dragproducts) && is_array($this->dragproducts)) {
+        $this->_view->dragproducts = $products;
+
+        if (is_array($this->draglist['data']) && is_array($this->dragproducts)) {
             $dragOrderResult = $this->_dragListNewOrder();
             if (is_array($dragOrderResult) && (count($dragOrderResult) > 0)) {
                 $products = $dragOrderResult;
@@ -332,12 +339,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		// here we go - proccessing the list
         $websiteUrl = $this->_websiteUrl;
 		array_walk($products, function ($product) use (&$renderedContent, $data, &$cacheTags, $websiteUrl) {
-			array_push($cacheTags, 'prodid_' . $product->getId());
+			array_push($cacheTags, 'prodid_' . $product['id']);
 			if (strpos($data['templateContent'], '$store:addtocart') !== false) {
-				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId()));
+				$storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product['id']));
 			}
 			if (strpos($data['templateContent'], '$store:addtocart:checkbox') !== false) {
-				$storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product->getId(), 'checkbox'));
+				$storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $product['id'], 'checkbox'));
 			}
 			//media servers (we are not using Tools_Content_Tools::applyMediaServers here because of the speed)
 //			if ($data['mediaServersAllowed']) {
@@ -347,20 +354,21 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 //				}
 //			}
 			// proccessing product photo and get some data
-			$shortDesc = $product->getShortDescription();
-			$templatePrepend = '<!--pid="' . $product->getId() . '"-->';
+			$shortDesc = $product['shortDescription'];
+			$templatePrepend = '<!--pid="' . $product['id'] . '"-->';
 
 			if (strpos($data['templateContent'], '$product:options') !== false) {
 				$view = new Zend_View(array('scriptPath' => dirname(__DIR__) . '/Product/views/'));
-				$view->taxRate = Tools_Tax_Tax::calculateProductTax($product, null, true);
-				$view->product = $product;
+				$productModel = new Models_Model_Product($product);
+				$view->taxRate = Tools_Tax_Tax::calculateProductTax($productModel, null, true);
+				$view->product = $productModel;
 				$productOptionsView = $view->render('options.phtml');
 			}
 
-            $inventoryCount = $product->getInventory();
+            $inventoryCount = $product['inventory'];
 
 			if(!is_null($inventoryCount)) {
-                $inventoryCount = trim($product->getInventory());
+                $inventoryCount = trim($product['inventory']);
             }
 
             if (is_null($inventoryCount)){
@@ -376,29 +384,30 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
 
             $dictionary = array(
-                '$product:name'                       => htmlspecialchars($product->getName(),ENT_QUOTES,'UTF-8'),
-                '$product:url'                        => $product->getPage() ? $websiteUrl . $product->getPage()->getUrl() : null,
-                '$product:brand'                      => $product->getBrand(),
-                '$product:weight'                     => $product->getWeight(),
-                '$product:mpn'                        => $product->getMpn(),
-                '$product:sku'                        => $product->getSku(),
-                '$product:id'                         => $product->getId(),
+                '$product:name'                       => htmlspecialchars($product['name'],ENT_QUOTES,'UTF-8'),
+                '$product:url'                        => $product['page'] ? $websiteUrl . $product['page']->getUrl() : null,
+                '$product:brand'                      => $product['brand'],
+                '$product:weight'                     => $product['weight'],
+                '$product:mpn'                        => $product['mpn'],
+                '$product:sku'                        => $product['sku'],
+                '$product:id'                         => $product['id'],
                 '$product:description:short'          => nl2br($shortDesc),
                 '$product:description'                => nl2br($shortDesc),
-                '$product:description:full'           => nl2br($product->getFullDescription()),
+                '$product:description:full'           => nl2br($product['fullDescription']),
                 '$store:addtocart'                    => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
-                '$store:addtocart:'.$product->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                '$store:addtocart:'.$product['id'] => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
                 '$store:addtocart:checkbox'           => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
                 '$product:options'                    => isset($productOptionsView) ? $productOptionsView : '',
                 '$product:inventory'                  => $inventoryCount,
                 '$product:qty'                        => $productQty,
-                '$product:wishlistqty'                => $product->getWishlistQty()
+                '$product:wishlistqty'                => $product['wishlistQty']
             );
 
+            $productModel = new Models_Model_Product($product);
             if (isset($data['priceFilter'])) {
                 //preparing default price with applied default options
                 $itemDefaultOptionsArray = array();
-                $productDefaultOptions   = $product->getDefaultOptions();
+                $productDefaultOptions   = $product['defaultOptions'];
                 if(is_array($productDefaultOptions) && !empty($productDefaultOptions)) {
                     foreach ($productDefaultOptions as $option) {
                         if(!isset($option['selection'])) {
@@ -412,18 +421,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     }
                 }
 
-                $price = Tools_ShoppingCart::getInstance()->calculateProductPrice(
-                    $product,
-                    $itemDefaultOptionsArray
-                );
-
+                $price = Tools_ShoppingCart::getInstance()->calculateProductPrice($productModel, $itemDefaultOptionsArray);
                 $price = round($price, 2);
 
                 if ($data['priceFilter']['min'] > $price || $data['priceFilter']['max'] < $price) {
                     return false;
                 }
             }
-            $renderedContent[] = Tools_Misc::preparingProductListing($templatePrepend.$data['templateContent'], $product, $dictionary, $data['noZeroPrice']);
+            $renderedContent[] = Tools_Misc::preparingProductListing($templatePrepend.$data['templateContent'], $productModel, $dictionary, $data['noZeroPrice']);
 		});
         if (!empty($this->_priceFilter)) {
             $this->_view->totalCount = sizeof($renderedContent);
@@ -435,8 +440,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
     protected function _compareProductsWithDraglist($products)
     {
         $productsIds = array();
-        foreach ($products as $productModel) {
-            $productsIds[] = $productModel->getId();
+        foreach ($products as $product) {
+            $productsIds[] = $product['id'];
         }
         $notInDrag = array_diff($productsIds, $this->draglist['data']);
         $notInProducts = array_diff($this->draglist['data'], $productsIds);
@@ -478,7 +483,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
 		$where = $this->_productMapper->getDbTable()->getAdapter()->quoteInto('p.id != ?', $product->getId());
 		unset($product);
-		return $this->_productMapper->fetchAll($where, null, null, null, null, $ids);
+		return $this->_productMapper->fetchAll($where, null, null, null, null, $ids, null, false, false, array(), array(), null, false, array(), true);
 	}
 
 	/**
@@ -671,11 +676,17 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $productPriceFilter = $this->_productPriceFilter;
         }
 
+        $limit = $this->_limit;
+
+        if($this->isDraggable) {
+            $limit = null;
+        }
+
 		return $this->_productMapper->fetchAll(
 		    $enabledOnly,
             $filters['order'],
             0,
-            $this->_limit,
+            $limit,
             null,
             $filters['tags'],
             $filters['brands'],
@@ -685,7 +696,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $priceFilter,
             $orderSql,
             false,
-            $productPriceFilter
+            $productPriceFilter,
+            true
         );
 	}
 

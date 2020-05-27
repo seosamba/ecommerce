@@ -173,7 +173,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $price = array(),
         $sort = null,
         $allowance = false,
-        $productPrice = array()
+        $productPrice = array(),
+        $toArray = false
 
     ) {
         $entities = array();
@@ -303,7 +304,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
 
         foreach ($resultSet as $row) {
-            array_push($entities, $this->_toModel($row));
+            array_push($entities, $this->_toModel($row, $toArray));
         }
         return $entities;
     }
@@ -336,23 +337,36 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
      * @param Zend_Db_Table_Row_Abstract $row
      * @return mixed
      */
-	private function _toModel(Zend_Db_Table_Row_Abstract $row){
+	private function _toModel(Zend_Db_Table_Row_Abstract $row, $toArray = false){
 		/**
-	      * @var Models_Model_Product $entity
+	      * @var Models_Model_Product $entity if $toArray == false
 		 */
-		$entity = new $this->_model($row->toArray());
+		if($toArray) {
+            $entity = $row->toArray();
+        } else {
+            $entity = new $this->_model($row->toArray());
+        }
 
         if ($row->brand_id){
 			$brandRow = $row->findDependentRowset('Models_DbTable_Brand');
 			if ($brandRow->count()){
-				$entity->setBrand($brandRow->current()->name);
+                if($toArray) {
+                    $entity['brand'] = $brandRow->current()->name;
+                } else {
+                    $entity->setBrand($brandRow->current()->name);
+                }
+
 			}
 		}
 
 		//fetching tags
 		$tagsSet = $row->findManyToManyRowset('Models_DbTable_Tag','Models_DbTable_ProductTag');
 		if ($tagsSet->count()){
-			$entity->setTags($tagsSet->toArray());
+            if($toArray) {
+                $entity['tags'] = $tagsSet->toArray();
+            } else {
+                $entity->setTags($tagsSet->toArray());
+            }
 		}
 
 		//fetching options
@@ -362,7 +376,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             foreach ($optionSet as $optionRow) {
                 array_push($ids, $optionRow->option_id);
             }
-			$entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->fetchAll(array('id IN (?)' => $ids), null, false));
+            if($toArray) {
+                $entity['defaultOptions'] = Models_Mapper_OptionMapper::getInstance()->fetchAll(array('id IN (?)' => $ids), null, false);
+            } else {
+                $entity->setDefaultOptions(Models_Mapper_OptionMapper::getInstance()->fetchAll(array('id IN (?)' => $ids), null, false));
+            }
             unset($ids);
 		}
 
@@ -373,7 +391,11 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			foreach ($relatedSet as $relatedRow) {
 				array_push($related, $relatedRow->related_id);
 			}
-			$entity->setRelated($related);
+            if($toArray) {
+                $entity['related'] = $related;
+            } else {
+                $entity->setRelated($related);
+            }
 		}
 
         //fetching product parts
@@ -383,26 +405,42 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             foreach($partsSet as $partsRow) {
                 array_push($parts, $partsRow->part_id);
             }
-            $entity->setParts($parts);
+            if($toArray) {
+                $entity['parts'] = $parts;
+            } else {
+                $entity->setParts($parts);
+            }
         }
 
 		//fetching product page
 		if ($row->page_id){
 			$page = Application_Model_Mappers_PageMapper::getInstance()->find($row->page_id);
 			if ($page){
-				$entity->setPage($page);
+                if($toArray) {
+                    $entity['page'] = $page;
+                } else {
+                    $entity->setPage($page);
+                }
 			}
 		}
 
         $allowanceData = Store_Mapper_AllowanceProductsMapper::getInstance()->findByProductId($row->id);
         if($allowanceData instanceof Store_Model_AllowanceProducts) {
             $allowanceDate = $allowanceData->getAllowanceDue();
-            $entity->setAllowance($allowanceDate);
+            if($toArray) {
+                $entity['allowance'] = $allowanceDate;
+            } else {
+                $entity->setAllowance($allowanceDate);
+            }
         }
 
         $productCustomParams = Store_Mapper_ProductCustomParamsDataMapper::getInstance()->findByProductId($row->id);
         if (!empty($productCustomParams)) {
-            $entity->setCustomParams($productCustomParams);
+            if($toArray) {
+                $entity['customParams'] = $productCustomParams;
+            } else {
+                $entity->setCustomParams($productCustomParams);
+            }
         }
 
 		return $entity;
