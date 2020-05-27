@@ -369,6 +369,9 @@ define([
             self.initTinyMce();
 
             var ptodFullDescription = this.model.get('fullDescription');
+            if(_.isNull(ptodFullDescription)) {
+                ptodFullDescription = '';
+            }
             tinymce.activeEditor.setContent(ptodFullDescription);
 
 			// loading option onto frontend
@@ -706,10 +709,7 @@ define([
             this.model.set({customParams: productCustomParams});
 
             var ptodFullDescription = tinymce.activeEditor.getContent();
-
-            if(ptodFullDescription.length > 0) {
-                this.model.set({fullDescription: ptodFullDescription});
-            }
+            this.model.set({fullDescription: ptodFullDescription});
 
             this.model.save();
 
