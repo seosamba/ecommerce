@@ -814,5 +814,30 @@ class Tools_Misc
         return $country;
     }
 
+    /**
+     * Prepare checked filter in config to view
+     *
+     * @param $widgetSettings
+     * @param $filters
+     * @return mixed
+     */
+    public static function processProductFilters($widgetSettings, $filters)
+    {
+        foreach ($filters as $key => $filter) {
+            $filterValues = array();
+
+            if(!empty($widgetSettings[$filter['name']]) && is_array($widgetSettings[$filter['name']])) {
+                foreach ($filter['values'] as $filterName => $value) {
+                    if(!empty($filterName) && !empty($widgetSettings[$filter['name']][$filterName])) {
+                        $filterValues[$filterName] = $value;
+                    }
+                }
+
+                $filters[$key]['values'] = $filterValues;
+            }
+        }
+
+        return $filters;
+    }
 
 }
