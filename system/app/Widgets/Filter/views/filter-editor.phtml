@@ -81,6 +81,7 @@
                 </label>
             </li>
         <?php endif;?>
+
         <?php foreach ($this->filters as $filterId => $filter) : ?>
             <?php $show = !isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]); ?>
             <li data-attributeId="<?php echo $filterId; ?>">
@@ -108,23 +109,26 @@
                               class="toggle-nested">&#177;</span>
                     <?php endif; ?>
                     <ul <?php if (!$show) { ?>style="display: none"<?php } ?> >
+
                         <?php foreach ($filter['values'] as $value => $count) : ?>
                         <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
-                            <li>
-                                <label>
-                                    <input type="checkbox"
-                                           name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
-                                           value="1"
-                                           title="<?php echo $this->translate('Check to hide from users'); ?>"
-                                        <?php if (!isset($this->settings[$filter['name']]) ||
-                                            (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
-                                            checked
-                                        <?php endif; ?>
-                                        />
-                                    <?php
-                                    echo $value;
-                                    ?></label>
-                            </li>
+                            <?php if(!empty($value)) :?>
+                                <li>
+                                    <label>
+                                        <input type="checkbox"
+                                               name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
+                                               value="1"
+                                               title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                            <?php if (!isset($this->settings[$filter['name']]) ||
+                                                (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
+                                                checked
+                                            <?php endif; ?>
+                                            />
+                                        <?php
+                                        echo $value;
+                                        ?></label>
+                                </li>
+                            <?php endif;?>
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
