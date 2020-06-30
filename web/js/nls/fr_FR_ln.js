@@ -82,7 +82,6 @@ define({
         'View packing slip' : 'Voir bon de livraison',
         'Export all orders matching filter' : 'Exporter toutes les commandes correspondant au filtre',
         'Download packing slip' : 'Télécharger bon de livraison',
-        'Wait a minute! this country is already part of another zone... Add anyway?':'Wait a minute! this country is already part of another zone... Add anyway?',
         'There are no users for export' : 'Il n\'y a pas d\'utilisateurs pour l\'exportation',
         'Export orders' : 'Exporter les commandes',
         'Your session has timed out. Please log again' : 'Votre session a expiré. Veuillez vous connecter à nouveau',
@@ -109,7 +108,8 @@ define({
         'Line break' : 'Saut de ligne',
         'Line break <br>' : 'Saut de ligne <br>',
         'Paragraph' : 'Paragraphe',
-        'Paragraph <p></p>' : 'Paragraphe <p></p>'
+        'Paragraph <p></p>' : 'Paragraphe <p></p>',
+        'Wait a minute! this state is already part of another zone... Add anyway?' : 'Attendez une minute! Сe état fait déjà partie d\'une autre zone... Ajouter tout de même?'
 
     }
 });
