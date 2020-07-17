@@ -73,6 +73,9 @@ Plugin widgets.
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
+    {$store:labelGenerationGrid:15} - Displays grid for orders label generation with shipping.
+    15 - orders limit on page.
+
 4. Add to cart widgets:
     {$store:addtocart:{$product:id}[:gotocart]} - Displays add to cart button
     gotocart - prevent automatically redirect to the cart

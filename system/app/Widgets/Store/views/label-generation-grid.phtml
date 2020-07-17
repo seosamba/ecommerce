@@ -1,0 +1,384 @@
+<?php
+    $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/moment.min.js');
+    $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/accounting.min.js');
+?>
+
+<div class="grid_6 alpha mb10px">
+    <label class="label-generation-filter-label">
+        <?php echo $this->translate('Filter by ID or Gateway'); ?>
+    </label>
+    <input type="text" name="label-generation-filter" id="label-generation-filter" autocomplete="off" value="<?php echo (!empty($this->filterBy) ? $this->filterBy : ''); ?>"/>
+</div>
+<div class="grid_3 mb10px">
+    <label class="label-generation-filter-label"><?php echo $this->translate('Date from'); ?></label>
+    <div class="labeled icon right">
+        <input type="text" id="label-generation-filter-by-date-from" name="label-generation-filter-by-date-from"
+               placeholder="<?php echo $this->translate('Period start date'); ?>" autocomplete="off"
+               value="<?php echo (!empty($this->filterByDateFrom) ? $this->filterByDateFrom : ''); ?>">
+        <i class="icon-calendar"></i>
+    </div>
+</div>
+<div class="grid_3 mb10px">
+    <label class="label-generation-filter-label"><?php echo $this->translate('Date to'); ?></label>
+    <div class="labeled icon right">
+        <input type="text" id="label-generation-filter-by-date-to" name="label-generation-filter-by-date-to"
+               placeholder="<?php echo $this->translate('Period end date'); ?>" autocomplete="off"
+               value="<?php echo (!empty($this->filterByDateTo) ? $this->filterByDateTo : ''); ?>">
+        <i class="icon-calendar"></i>
+    </div>
+</div>
+
+<div class="label-generation-filter-control">
+    <input type="button" class="btn" id="label-generation-filter-apply" value="<?php echo $this->translate('Apply filter'); ?>">
+    <input type="button" class="btn" id="label-generation-filter-reset" value="<?php echo $this->translate('Reset all filters'); ?>">
+</div>
+
+<?php if (isset($this->ordersData)): ?>
+    <input type="hidden" class="label-generation-grid-secure-code" name="label-generation-grid-secure-code"
+           value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>">
+    <table id="label-generation-list" border="1" class="widget label-generation-grid table-striped mt20px">
+        <thead>
+        <tr class="text-left">
+            <!--th class="text-center">
+                <input type="checkbox" name="checkAll" class="checkAll"/>
+            </th-->
+            <th class="text-center"><?php echo $this->translate('Id'); ?></th>
+            <th class="text-center"><?php echo $this->translate('Customer'); ?></th>
+            <th class="text-center"><?php echo $this->translate('Gateway'); ?></th>
+            <th class="text-center"><?php echo $this->translate('Total'); ?></th>
+            <th class="text-center"><?php echo $this->translate('Purchased on'); ?></th>
+            <th class="text-center"><?php echo $this->translate('View order'); ?></th>
+            <th>
+                <?php echo $this->translate('Order status'); ?>
+                <select name="order-by-status" class="order-by-status">
+                    <option value="all"><?php echo $this->translate('Select'); ?></option>
+                    <option value="completed" <?php echo ($this->orderByStatus == 'completed') ? 'selected' : ''; ?> ><?php echo $this->translate('completed'); ?></option>
+                    <option value="shipped" <?php echo ($this->orderByStatus == 'shipped') ? 'selected' : ''; ?>><?php echo $this->translate('shipped'); ?></option>
+                </select>
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($this->ordersData as $ordersInfo): ?>
+            <tr class="label-generation-row" data-order-id="<?php echo $ordersInfo['id']; ?>">
+                <!--td>
+                    <input type="checkbox" name="massLabelsGenerate" class="massLabelsGenerate"/>
+                </td-->
+                <td class="label-generation-system-id"><span><?php echo $ordersInfo['id']; ?></span></td>
+                <td><span><?php echo $ordersInfo['customer'];?></span></td>
+                <td><span><?php echo $ordersInfo['gateway'];?></span></td>
+                <td><span><?php echo $this->currency($ordersInfo['total']);?></span></td>
+                <td><?php echo date('d M, Y', strtotime($ordersInfo['purchased_on']));?></td>
+                <td class="label-generation-link-row">
+                    <a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $ordersInfo['viewUrl']; ?>"><?php echo $this->translate('view'); ?></a>
+                </td>
+                <td class="order-status-<?php echo $ordersInfo['id']; ?>"><span><?php echo $this->translate($ordersInfo['status']);?></span></td>
+                <td>
+                    <?php if(!in_array($ordersInfo['shipping_service'], Tools_Misc::$systemShippingServices)) :?>
+                        <a class="generate-label icon18 generate-label-<?php echo $ordersInfo['id']; ?>" data-shipping-service="<?php echo $ordersInfo['shipping_service'];?>" data-shipping-tax="<?php echo $ordersInfo['shipping_tax'];?>" data-shipping-price="<?php echo $ordersInfo['shipping_price'];?>" href="javascript:;">
+                            <img src="<?php echo $this->websiteUrl; ?>plugins/shopping/web/images/download-shipping-label.png" alt="<?php echo $this->translate('Generate label'); ?>" title="<?php echo $this->translate('Generate label'); ?>"/>
+                        </a>
+                    <?php endif;?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <!--div class="btn generate-selected-labels mt10px grid_2 alpha hide">< ?php echo $this->translate('Generate selected labels');?></div-->
+    <a class="hidden" id="generateLabelGet" href="javascript:;"></a>
+    <input type="hidden" id="label-generation-checked-rows" name="label-generation-checked-rows" value="">
+<?php else: ?>
+    <span class="empty-label-generation large"><?php echo $this->translate('There are no orders'); ?></span>
+<?php endif; ?>
+<?php echo $this->ordersPager; ?>
+
+<div id="generateLabelWithConfig" class="hide">
+    <div class="clearfix" style="width: 100%"
+         title="Shipment availability dates for order #orderId">
+        <input type="hidden" id="shipment-label-order-id" value="orderId" />
+        <div class="grid_3">
+            <div id="availability-days-datepicker"></div>
+            <div id="availability-shipment-time"></div>
+        </div>
+        <input type="hidden" name="shipment-availability-result" id="shipment-availability-result" value="">
+        <div id="shipment-availability-summary" class="shipment-availability-summary grid_9">
+            <h3 class="title"><?php echo $this->translate('Summary of delivery'); ?></h3>
+            <div class="grid_6 alpha"><?php echo $this->translate('Date'); ?> <span class="shipment-availability-date-summary"></span></div>
+            <div class="grid_6 omega"><?php echo $this->translate('Order'); ?> <span class="shipment-order-id"></span></div>
+            <div class="grid_6 alpha"><?php echo $this->translate('Time'); ?> <span class="shipment-availability-time-summary"></span></div>
+            <div class="grid_6 omega"><?php echo $this->translate('Shipment price'); ?> <span class="shipping-price-with-tax"></span>
+                <span class="include-tax-block hide"><?php echo $this->translate('Include Tax.'); ?><span class="include-tax"></span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#label-generation-filter-by-date-from').datepicker({
+            dateFormat: 'dd M, yy',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "c-5:c+0",
+            onSelect: function(selectedDate){
+                $('#label-generation-filter-by-date-to').datepicker("option", "minDate", selectedDate);
+            }
+        });
+        $('#label-generation-filter-by-date-to').datepicker({
+            dateFormat: 'dd M, yy',
+            defaultDate: "+1w",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "c-5:c+5",
+            onSelect: function(selectedDate){
+                $('#label-generation-filter-by-date-from').datepicker("option", "maxDate", selectedDate);
+            }
+        });
+
+        var shippingPlaginTags = {};
+        <?php foreach ($this->shippingPlaginTags as $key => $tag) :?>
+            shippingPlaginTags['<?php echo $key;?>'] = '<?php echo $tag;?>';
+        <?php endforeach;?>
+
+        var availabilityDays = {};
+        <?php foreach ($this->ordersData as $orderInfo) :?>
+            availabilityDays['<?php echo $ordersInfo['id'];?>'] = '<?php echo $orderInfo['shipping_availability_days'];?>';
+        <?php endforeach;?>
+
+        var shippingTaxRate;
+
+        var moneyFormat = JSON.parse('<?php echo json_encode(Tools_Misc::getCurrencyFormat()); ?>');
+
+        $(document).on('click', '.generate-label', function (e) {
+            e.preventDefault();
+
+            showConfirm("<?php echo $this->translate('Do you want to generate label?');?>", function() {
+                var orderId = $(e.currentTarget).closest('.label-generation-row').data('order-id'),
+                    shippingService = $(e.currentTarget).data('shipping-service'),
+                    shippingTax = $(e.currentTarget).data('shipping-tax'),
+                    shippingPrice = $(e.currentTarget).data('shipping-price');
+
+                if(typeof shippingPlaginTags[shippingService] !== 'undefined' && shippingPlaginTags[shippingService] != '') {
+                    var shippingServiceEl = $('#' +shippingPlaginTags[shippingService]);
+
+                    if(shippingServiceEl.length > 0 && shippingPlaginTags[shippingService] == 'generateLabelWithConfig') {
+
+                        var assignAvailabilityDatesButtons = {},
+                            availabilityButton  = "<?php echo $this->translate('Create label');?>",
+                            confirmMessageAvailabilityDate = "<?php echo $this->translate('Do you want to use this date for the shipping label?');?>",
+                            availabilityMonths = [],
+                            availableDateAndTime = [];
+
+                        if(availabilityDays[orderId] == '' || typeof availabilityDays[orderId] === 'undefined' || availabilityDays[orderId] === null) {
+                            showMessage("<?php echo $this->translate('Shipping service does not support shipment label creation');?>", true, 5000);
+                            return false;
+                        }
+
+                        $('.shipment-order-id').text('#' + orderId);
+
+
+                        var shippingAvailabilityDays = JSON.parse(availabilityDays[orderId]);
+
+                        $.each(shippingAvailabilityDays.availabilityDates, function(date, time){
+                            if (typeof availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")] === 'undefined') {
+                                availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")] = [parseInt(moment(date, 'YYYY-MM-DD').format("D"))];
+                            } else {
+                                availabilityMonths[moment(date, 'YYYY-MM-DD').format("M")].push(parseInt(moment(date, 'YYYY-MM-DD').format("D")));
+                            }
+                            if (typeof availableDateAndTime[date] === 'undefined') {
+                                availableDateAndTime[date] = [time];
+                            } else {
+                                availableDateAndTime[date].push(time);
+                            }
+                        });
+
+                        var shippingPriceWithTax;
+
+                        if (shippingTaxRate != 0 || typeof shippingTaxRate === 'undefined') {
+                            shippingTaxRate = ((parseFloat(parseFloat(shippingTax) + parseFloat(shippingPrice))) / parseFloat(shippingPrice))
+                            var shippingPriceWithTax = parseFloat(shippingAvailabilityDays.shippingPrice) * shippingTaxRate
+                        }
+
+                        shippingPriceWithTax = accounting.formatMoney(shippingPriceWithTax, moneyFormat);
+                        $('.shipping-price-with-tax').text(shippingPriceWithTax);
+
+                        if (shippingTaxRate != 0 || typeof shippingTaxRate === 'undefined') {
+                            var includeTax = accounting.formatMoney((parseFloat(shippingAvailabilityDays.shippingPrice) * shippingTaxRate) - parseFloat(shippingAvailabilityDays.shippingPrice), moneyFormat)
+                            $('.include-tax-block').show();
+                            $('.include-tax').text(includeTax);
+                        }
+
+                        assignAvailabilityDatesButtons[availabilityButton] = function() {
+                            $('.ui-dialog').css('zIndex',"101");
+
+                            var additionalParams = {};
+
+                            var availabilityDate = $('#shipment-availability-result').data('availability-date'),
+                                availabilityTime = $('#shipment-availability-result').data('availability-time');
+
+                            additionalParams['availabilityDate'] = availabilityDate;
+                            additionalParams['availabilityTime'] = availabilityTime;
+
+                            if (!$('#shipment-availability-result').data('availability-date')) {
+                                showMessage("<?php echo $this->translate('Please specify shipment date');?>", true, 5000);
+                                return false;
+                            }
+
+                            if (!$('#shipment-availability-result').data('availability-time')) {
+                                showMessage("<?php echo $this->translate('Please specify shipment time');?>", true, 5000);
+                                return false;
+                            }
+                            smoke.confirm(confirmMessageAvailabilityDate, function (e) {
+                                if (e) {
+                                    generateLabel(orderId, additionalParams);
+                                }
+                            }, {
+                                ok: "<?php echo $this->translate('Yes');?>",
+                                cancel: "<?php echo $this->translate('No');?>"
+                            });
+                        };
+
+                        var dialog = $(shippingServiceEl).dialog({
+                            autoOpen: false,
+                            dialogClass: 'seotoaster',
+                            width: '50%',
+                            height: '400',
+                            resizable: false,
+                            draggable: false,
+                            buttons: assignAvailabilityDatesButtons,
+                            open: function(event, ui) {
+                                $('#availability-days-datepicker').datepicker({
+                                    beforeShowDay: function (date) {
+                                        if (typeof availabilityMonths[date.getMonth() + 1] === 'undefined') {
+                                            return [false, ''];
+                                        }
+
+                                        if(availabilityMonths[date.getMonth() + 1].includes(parseInt(date.getDate()))) {
+                                            return [true, ''];
+                                        }
+                                        return [false, ''];
+                                    },
+                                    onSelect: function () {
+                                        if (typeof availableDateAndTime[$.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))] !== 'undefined') {
+                                            $('#availability-shipment-time').empty();
+                                            $('#shipment-availability-summary').find('.shipment-availability-date-summary').empty().text($.datepicker.formatDate("dd M yy", $(this).datepicker('getDate')));
+                                            $('#shipment-availability-summary').find('.shipment-availability-time-summary').empty().text('');
+                                            $('#shipment-availability-result').data('availability-date', $.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))).data('availability-time', '');
+                                            $.each(availableDateAndTime[$.datepicker.formatDate("yy-mm-dd", $(this).datepicker('getDate'))], function(date, time) {
+                                                $.each(time, function(date, time){
+                                                    $('#availability-shipment-time').append('<button class="availability-shipment-time btn">'+time+'</button>');
+                                                });
+                                            });
+                                        }
+                                    }
+                                });
+
+                                $('#availability-shipment-time').on('click', '.availability-shipment-time', function(e){
+                                    var el = $(e.currentTarget),
+                                        switchTimeBlock = el.closest('div');
+
+                                    switchTimeBlock.find('.availability-shipment-time').removeClass('current');
+                                    el.addClass('current');
+                                    $('#shipment-availability-summary').find('.shipment-availability-time-summary').empty().text(el.text());
+                                    $('#shipment-availability-result').data('availability-time', el.text());
+                                });
+                            },
+                            close: function(event, ui){
+                                $(this).dialog('destroy');
+                            }
+                        });
+
+                        $(dialog).dialog('open');
+                        return false;
+                    }
+                } else {
+                    generateLabel(orderId);
+                }
+            }, function(){
+            });
+        });
+
+    });
+
+    $('#label-generation-filter-reset').on('click', function () {
+        window.location = '<?php echo $this->websiteUrl.$this->pageUrl;?>';
+    });
+
+    $('#label-generation-filter-apply').on('click', function () {
+        var filterBy = $('#label-generation-filter').val(),
+            filterByDateFrom = $('#label-generation-filter-by-date-from').val(),
+            filterByDateFromOriginal = filterByDateFrom,
+            filterByDateTo = $('#label-generation-filter-by-date-to').val(),
+            filterByDateToOriginal = filterByDateTo,
+            orderByStatus = $('.order-by-status').val(),
+            searchUrl = '';
+
+        filterByDateFrom = (filterByDateFrom) ? $.datepicker.formatDate('yy-mm-dd', $('#label-generation-filter-by-date-from').datepicker("getDate")): '';
+        filterByDateTo = (filterByDateTo) ? $.datepicker.formatDate('yy-mm-dd', $('#label-generation-filter-by-date-to').datepicker("getDate")): '';
+
+        if (filterBy !== '') {
+            searchUrl += '&filterBy=' + filterBy;
+        }
+
+        if(filterByDateFrom !== '') {
+            searchUrl += '&filterByDateFrom=' + filterByDateFrom + '&filterByDateFromOriginal=' + filterByDateFromOriginal;
+        }
+
+        if(filterByDateTo !== '') {
+            searchUrl += '&filterByDateTo=' + filterByDateTo + '&filterByDateToOriginal=' + filterByDateToOriginal;
+        }
+
+        if(orderByStatus !== 'all') {
+            searchUrl += '&orderBy=' + orderByStatus;
+        }
+
+        window.location = '<?php echo $this->websiteUrl.$this->pageUrl;?>?gridListNum=1' + searchUrl;
+    });
+
+    function generateLabel(orderId, additionalParams, regenerate) {
+            var self = this;
+
+            $.post('<?php echo $this->websiteUrl;?>plugin/shopping/run/generateLabel/', {
+                'secureToken'      : $('.label-generation-grid-secure-code').val(),
+                'orderId'          : orderId,
+                'additionalParams' : additionalParams,
+                'regenerate'       : regenerate
+            }, function (response) {
+                if (response.error == '1') {
+                    if (typeof response.responseText.regenerate !== 'undefined') {
+                        smoke.confirm(response.responseText.message, function (e) {
+                            if (e) {
+                                self.generateLabel(orderId, additionalParams, true);
+                            }
+                        }, {
+                            ok: "<?php echo $this->translate('Yes');?>",
+                            cancel: "<?php echo $this->translate('No');?>"
+                        });
+                    } else {
+                        showMessage(response.responseText, true, 5000);
+                    }
+                } else if (response.error == 0) {
+                    $('.order-status-'+response.responseText.orderId).text('<?php echo $this->translate("shipped"); ?>');
+                    var generateLabelEl = $('.generate-label-'+response.responseText.orderId);
+
+                    generateLabelEl.closest('td').find('.generate-label').hide();
+                    generateLabelEl.show();
+
+                    var labelLink = '<a href="'+ response.responseText.fileLink +'" target="_blank">' + "<?php echo $this->translate('Click to download label'); ?>" + '</a>';
+
+                    showMessage(labelLink, true, 3000);
+                } else {
+                    showMessage(response.responseText, true, 4000);
+                }
+            }, 'json');
+    }
+
+    $('.order-by-status').on('change', function (e) {
+        e.preventDefault();
+        $('#label-generation-filter-apply').trigger('click');
+    });
+
+
+</script>

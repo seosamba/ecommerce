@@ -50,6 +50,16 @@ class Tools_Misc
      */
     const OPTION_THANKYOU = 'option_storethankyou';
 
+    /**
+     * System shipping services without label generation
+     */
+    public static $systemShippingServices = array(
+        'freeshipping',
+        'pickup',
+        'markup',
+        'flatrateshipping',
+        'flatrateship'
+    );
 
     /*
      * Changes for name inc. Tax 
