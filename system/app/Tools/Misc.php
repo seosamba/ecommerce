@@ -847,8 +847,12 @@ class Tools_Misc
         $throttleTransactionsCounterDate = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounterDate');
         $throttleTransactionsCounter = !empty(intval($throttleTransactionsCounter)) ? intval($throttleTransactionsCounter) : 0;
         $throttleTransactionsCounterDate = !empty($throttleTransactionsCounterDate) ? date('Y-m-d', strtotime($throttleTransactionsCounterDate)) : date('Y-m-d');
-
-        $throttleConfigParams['throttleTransactionsCounter'] = $throttleTransactionsCounter +1;
+        $timeDiff = abs(strtotime($throttleTransactionsCounterDate) - strtotime('now')) / 3600;
+        if ($timeDiff > 24) {
+            $throttleTransactionsCounter = 0;
+            $throttleTransactionsCounterDate = date('Y-m-d');
+        }
+        $throttleConfigParams['throttleTransactionsCounter'] = $throttleTransactionsCounter + 1;
         $throttleConfigParams['throttleTransactionsCounterDate'] = $throttleTransactionsCounterDate;
         $shoppingConfigMapper->save($throttleConfigParams);
     }
@@ -864,7 +868,7 @@ class Tools_Misc
 
         $timeDiff = abs(strtotime($throttleTransactionsCounterDate) - strtotime('now')) / 3600;
 
-        return (($timeDiff < 24) && $throttleTransactionsCounter < $throttleTransactionsLimit);
+        return ($timeDiff > 24 || (($timeDiff < 24) && $throttleTransactionsCounter < $throttleTransactionsLimit));
 
     }
 
