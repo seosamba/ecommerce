@@ -130,6 +130,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const DEFAULT_USER_GROUP = 'default_user_group';
 
+    const THROTTLE_TRANSACTIONS = 'throttleTransactions';
+
     /**
      * shipping restriction key
      */
