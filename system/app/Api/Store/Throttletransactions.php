@@ -42,6 +42,9 @@ class Api_Store_Throttletransactions extends Api_Service_Abstract
         if (isset($data['throttleTransactionsLimit'])) {
             $throttleConfigParams['throttleTransactionsLimit'] = $data['throttleTransactionsLimit'];
         }
+        if (isset($data['throttleTransactionsLimitMessage'])) {
+            $throttleConfigParams['throttleTransactionsLimitMessage'] = $data['throttleTransactionsLimitMessage'];
+        }
         if (!empty($throttleConfigParams)) {
             Models_Mapper_ShoppingConfig::getInstance()->save($throttleConfigParams);
 
