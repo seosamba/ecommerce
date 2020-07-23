@@ -17,11 +17,11 @@
     </p>
     <p class="grid_12">
         <label class="grid_1 alpha"><?php echo $this->translate('Message'); ?></label>
-        <input type="text" class="throttle-transactions grid_11 alpha" id="transactions-limit-message"
+        <textarea class="throttle-transactions grid_11 alpha" id="transactions-limit-message"
                name="transactions-limit-message"
-               value="<?php echo isset($shoppingConfig['throttleTransactionsLimitMessage']) ? $shoppingConfig['throttleTransactionsLimitMessage'] : ''; ?>"
-            <?php echo (!isset($shoppingConfig['throttleTransactions']) || $shoppingConfig['throttleTransactions'] === 'false') ? 'disabled' : ''; ?>
-        />
+               placeholder="<?php echo Tools_Misc::THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE; ?>" <?php echo (!isset($shoppingConfig['throttleTransactions']) || $shoppingConfig['throttleTransactions'] === 'false') ? 'disabled' : ''; ?>
+               rows="3"
+        ><?php echo isset($shoppingConfig['throttleTransactionsLimitMessage']) ? $shoppingConfig['throttleTransactionsLimitMessage'] : ''; ?></textarea>
     </p>
 </div>
 

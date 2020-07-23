@@ -50,6 +50,8 @@ class Tools_Misc
      */
     const OPTION_THANKYOU = 'option_storethankyou';
 
+    const THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE = 'Due to unprecedented orders volume, and in order to maintain quality of service, our online shop is open for a limited amount of time every day. We are no longer accepting orders today, please try to come back earlier tomorrow to place your order. We apologize for the inconvenience.';
+
 
     /*
      * Changes for name inc. Tax 
