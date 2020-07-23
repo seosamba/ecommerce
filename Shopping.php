@@ -3004,7 +3004,7 @@ class Shopping extends Tools_Plugins_Abstract {
             if (Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactions') === 'true' && Tools_Misc::checkThrottleTransactionsLimit() === false) {
                 $throttleTransactionsLimitMessage = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactionsLimitMessage');
                 $throttleTransactionsLimitMessage = !empty($throttleTransactionsLimitMessage) ? $throttleTransactionsLimitMessage : Tools_Misc::THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE;
-                $this->_responseHelper->fail(Tools_Misc::THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE);
+                $this->_responseHelper->fail($throttleTransactionsLimitMessage);
             };
         }
         $this->_responseHelper->success('');
