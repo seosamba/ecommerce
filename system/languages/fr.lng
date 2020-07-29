@@ -800,7 +800,7 @@
         'Please specify shipment time' => 'Veuillez préciser le temps d\'expédition',
         'Yes' => 'Oui',
         'No' => 'Non',
-        'Click to download label' => 'Cliquez pour télécharger l\'étiquette'
+        'Label has been successfully generated - Click here to download it' => 'L\'étiquette a été successivement générée – Veuillez cliquer ici pour la télécharger'
 
 
 );?>

@@ -366,7 +366,7 @@
                     generateLabelEl.closest('td').find('.generate-label').hide();
                     generateLabelEl.show();
 
-                    var labelLink = '<a href="'+ response.responseText.fileLink +'" target="_blank">' + "<?php echo $this->translate('Click to download label'); ?>" + '</a>';
+                    var labelLink = '<a href="'+ response.responseText.fileLink +'" target="_blank">' + "<?php echo $this->translate('Label has been successfully generated - Click here to download it'); ?>" + '</a>';
 
                     showMessage(labelLink, true, 3000);
                 } else {
