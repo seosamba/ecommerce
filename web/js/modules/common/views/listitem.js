@@ -44,14 +44,31 @@ define([
             var currentModel = this.model;
             var notAddExistingZone = false;
             var currentTarget = $(e.target).parent('li');
+
+            var elementCountry = $(e.target).data('element-country');
+            var elementState = $(e.target).data('element-state');
+            var attributeType = '';
+
             if(app.view.zonesCollection.length > 0){
-                $.each(app.view.zonesCollection.models, function(index, countrys){
-                    if(countrys.get('countries').length > 0){
-                        $.each(countrys.get('countries'), function(index, country){
-                           if(country.country == currentModel.country){
-                               notAddExistingZone = true;
-                           }
-                        });
+                $.each(app.view.zonesCollection.models, function(index, dataTypes){
+                    if(typeof elementCountry !== 'undefined') {
+                        if(dataTypes.get('countries').length > 0){
+                            $.each(dataTypes.get('countries'), function(index, country){
+                                if(country.country == currentModel.country){
+                                    attributeType = 'country';
+                                    notAddExistingZone = true;
+                                }
+                            });
+                        }
+                    } else if(typeof elementState !== 'undefined') {
+                        if(dataTypes.get('states').length > 0){
+                            $.each(dataTypes.get('states'), function(index, state){
+                                if(state.state == currentModel.state){
+                                    attributeType = 'state';
+                                    notAddExistingZone = true;
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -59,7 +76,7 @@ define([
                 currentZone = app.view.zonesCollection.at(index);
             var currentListName = this.$el.data('listname');
             if(notAddExistingZone){
-                smoke.confirm((_.isUndefined(i18n['Wait a minute! this country is already part of another zone... Add anyway?'])?'Wait a minute! this country is already part of another zone... Add anyway?':i18n['Wait a minute! this country is already part of another zone... Add anyway?']), function(e) {
+                smoke.confirm((_.isUndefined(i18n['Wait a minute! this '+ attributeType +' is already part of another zone... Add anyway?'])?'Wait a minute! this '+ attributeType +' is already part of another zone... Add anyway?':i18n['Wait a minute! this '+ attributeType +' is already part of another zone... Add anyway?']), function(e) {
                     if(e) {
                         currentZone.addItem(currentListName, currentModel);
                         currentTarget.hide('slide');
