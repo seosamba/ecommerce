@@ -52,6 +52,16 @@ class Tools_Misc
 
     const THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE = 'Due to unprecedented orders volume, and in order to maintain quality of service, our online shop is open for a limited amount of time every day. We are no longer accepting orders today, please try to come back earlier tomorrow to place your order. We apologize for the inconvenience.';
 
+    /**
+     * System shipping services without label generation
+     */
+    public static $systemShippingServices = array(
+        'freeshipping',
+        'pickup',
+        'markup',
+        'flatrateshipping',
+        'flatrateship'
+    );
 
     /*
      * Changes for name inc. Tax 
