@@ -130,6 +130,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const DEFAULT_USER_GROUP = 'default_user_group';
 
+    const THROTTLE_TRANSACTIONS = 'throttleTransactions';
+
     /**
      * shipping restriction key
      */
@@ -2994,6 +2996,18 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_responseHelper->fail($this->_translator->translate('Can\'t update product custom param'));
             }
         }
+    }
+
+    public function throttleCheckLimitAction()
+    {
+        if ($this->_request->isPost()) {
+            if (Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactions') === 'true' && Tools_Misc::checkThrottleTransactionsLimit() === false) {
+                $throttleTransactionsLimitMessage = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactionsLimitMessage');
+                $throttleTransactionsLimitMessage = !empty($throttleTransactionsLimitMessage) ? $throttleTransactionsLimitMessage : Tools_Misc::THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE;
+                $this->_responseHelper->fail($throttleTransactionsLimitMessage);
+            };
+        }
+        $this->_responseHelper->success('');
     }
 
 }
