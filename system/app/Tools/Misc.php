@@ -50,6 +50,8 @@ class Tools_Misc
      */
     const OPTION_THANKYOU = 'option_storethankyou';
 
+    const THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE = 'Due to unprecedented orders volume, and in order to maintain quality of service, our online shop is open for a limited amount of time every day. We are no longer accepting orders today, please try to come back earlier tomorrow to place your order. We apologize for the inconvenience.';
+
     /**
      * System shipping services without label generation
      */
@@ -118,7 +120,8 @@ class Tools_Misc
         0 => array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal'),
         1 => array('tabId' => 'recurring-payments', 'tabName' => 'Recurring payments', 'type' => 'internal'),
         2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers/Leads groups', 'type' => 'internal'),
-        3 => array('tabId' => 'user-attributes-assignment-rules', 'tabName' => 'Automated group assignment', 'type' => 'internal')
+        3 => array('tabId' => 'user-attributes-assignment-rules', 'tabName' => 'Automated group assignment', 'type' => 'internal'),
+        4 => array('tabId' => 'throttle-transactions', 'tabName' => 'Throttle transactions', 'type' => 'internal')
     );
 
 
@@ -846,6 +849,39 @@ class Tools_Misc
         }
 
         return $filters;
+    }
+
+    public static function addThrottleTransaction()
+    {
+        $throttleConfigParams = [];
+        $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $throttleTransactionsCounter = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounter');
+        $throttleTransactionsCounterDate = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounterDate');
+        $throttleTransactionsCounter = !empty(intval($throttleTransactionsCounter)) ? intval($throttleTransactionsCounter) : 0;
+        $throttleTransactionsCounterDate = !empty($throttleTransactionsCounterDate) ? date('Y-m-d', strtotime($throttleTransactionsCounterDate)) : date('Y-m-d');
+        $timeDiff = abs(strtotime($throttleTransactionsCounterDate) - strtotime('now')) / 3600;
+        if ($timeDiff > 24) {
+            $throttleTransactionsCounter = 0;
+            $throttleTransactionsCounterDate = date('Y-m-d');
+        }
+        $throttleConfigParams['throttleTransactionsCounter'] = $throttleTransactionsCounter + 1;
+        $throttleConfigParams['throttleTransactionsCounterDate'] = $throttleTransactionsCounterDate;
+        $shoppingConfigMapper->save($throttleConfigParams);
+    }
+
+    public static function checkThrottleTransactionsLimit()
+    {
+        $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $throttleTransactionsLimit = intval($shoppingConfigMapper->getConfigParam('throttleTransactionsLimit'));
+        $throttleTransactionsCounter = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounter');
+        $throttleTransactionsCounterDate = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounterDate');
+        $throttleTransactionsCounter = !empty(intval($throttleTransactionsCounter)) ? intval($throttleTransactionsCounter) : 0;
+        $throttleTransactionsCounterDate = !empty($throttleTransactionsCounterDate) ? date('Y-m-d', strtotime($throttleTransactionsCounterDate)) : date('Y-m-d');
+
+        $timeDiff = abs(strtotime($throttleTransactionsCounterDate) - strtotime('now')) / 3600;
+
+        return ($timeDiff > 24 || (($timeDiff < 24) && $throttleTransactionsCounter < $throttleTransactionsLimit));
+
     }
 
 }

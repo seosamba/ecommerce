@@ -1,0 +1,57 @@
+<?php $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams(); ?>
+
+<div class="grid_12 alpha omega background">
+    <p class="grid_12"><label><?php echo $this->translate('Activate throttle transactions'); ?></label>
+        <label><input type="checkbox" class="throttle-transactions"
+                      name="throttle-transactions" <?php echo (isset($shoppingConfig['throttleTransactions']) && $shoppingConfig['throttleTransactions'] === 'true') ? 'checked' : ''; ?>/>
+        </label>
+    </p>
+
+    <p class="grid_6">
+        <label class="grid_4 alpha"><?php echo $this->translate('Transactions limit'); ?></label>
+        <input class="throttle-transactions grid_2 alpha" maxlength="3" id="transactions-limit"
+               name="transactions-limit"
+               value="<?php echo isset($shoppingConfig['throttleTransactionsLimit']) ? $shoppingConfig['throttleTransactionsLimit'] : ''; ?>"
+            <?php echo (!isset($shoppingConfig['throttleTransactions']) || $shoppingConfig['throttleTransactions'] === 'false') ? 'disabled' : ''; ?>
+        />
+    </p>
+    <p class="grid_12">
+        <label class="grid_1 alpha"><?php echo $this->translate('Message'); ?></label>
+        <textarea class="throttle-transactions grid_11 alpha" id="transactions-limit-message"
+               name="transactions-limit-message"
+               placeholder="<?php echo Tools_Misc::THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE; ?>" <?php echo (!isset($shoppingConfig['throttleTransactions']) || $shoppingConfig['throttleTransactions'] === 'false') ? 'disabled' : ''; ?>
+               rows="3"
+        ><?php echo isset($shoppingConfig['throttleTransactionsLimitMessage']) ? $shoppingConfig['throttleTransactionsLimitMessage'] : ''; ?></textarea>
+    </p>
+</div>
+
+<input type="hidden" id="throttle-transactions-config-token" name="secureToken"
+       value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Throttletransactions::THROTTLE_TRANSACTIONS_SECURE_TOKEN); ?>"/>
+
+<script type="text/javascript">
+    $(function () {
+        $('.throttle-transactions').on('change', function () {
+            let throttleTransactions = $('input[name=throttle-transactions]').is(':checked');
+            let throttleTransactionsLimit = parseInt($('#transactions-limit').val().trim());
+            let throttleTransactionsLimitMessage = $('#transactions-limit-message').val();
+            let secureToken = $('#throttle-transactions-config-token').val();
+            if (throttleTransactions) {
+                $('#transactions-limit').prop("disabled", false);
+                $('#transactions-limit-message').prop("disabled", false);
+            } else {
+                $('#transactions-limit').prop("disabled", true);
+                $('#transactions-limit-message').prop("disabled", true);
+            }
+            if ((throttleTransactions && throttleTransactionsLimit > 0) || !throttleTransactions) {
+                $.post($('#website_url').val() + 'api/store/throttletransactions/', {
+                    'throttleTransactions': throttleTransactions,
+                    'throttleTransactionsLimit': throttleTransactionsLimit ? throttleTransactionsLimit : '',
+                    'throttleTransactionsLimitMessage': throttleTransactionsLimitMessage,
+                    'secureToken': secureToken
+                }, function (response) {
+                }, 'json');
+            }
+
+        });
+    });
+</script>
