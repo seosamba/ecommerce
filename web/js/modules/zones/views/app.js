@@ -27,7 +27,7 @@ define([
         newZone: function(){
             var model = new ZoneModel();
             this.zonesCollection.add(model);
-            var lastIndex = this.zoneHolder.find('.ui-tabs-nav li').size()-1;
+            var lastIndex = this.zoneHolder.find('.ui-tabs-nav li').length-1;
             this.zoneHolder.tabs('option', 'active', lastIndex);
         },
         deleteZone: function(){
