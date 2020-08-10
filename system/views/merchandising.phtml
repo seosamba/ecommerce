@@ -51,6 +51,9 @@ $this->headLink()
         <div id="user-attributes-assignment-rules">
             <?php echo $this->partial('merchandising/assign-user-group-rules-config.phtml', array('websiteUrl' => $this->websiteUrl)); ?>
         </div>
+        <div id="throttle-transactions">
+            <?php echo $this->partial('merchandising/throttle-transactions.phtml', array('websiteUrl' => $this->websiteUrl)); ?>
+        </div>
         <div class="message info grid_12">
             <ul class="list-count-sign column_2 full-width">
                 <li class="m0px text-overflow"><?php echo $this->translate('Set parameters for cart wide promotions from this screen.'); ?></li>

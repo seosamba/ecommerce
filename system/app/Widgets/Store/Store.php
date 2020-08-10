@@ -8,12 +8,18 @@
  */
 class Widgets_Store_Store extends Widgets_Abstract {
 
+    const COUNT_PER_PAGE = 10;
+
 	/**
 	 * @var bool
 	 */
 	protected $_cacheable      = false;
 
     protected $_sessionHelper = null;
+
+    protected $_websiteUrl = null;
+
+    protected $_websiteHelper = null;
 
 	private static $_zendRegistryKey = 'store-cart-plugin';
 
@@ -46,7 +52,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
 	protected function _init() {
 		$this->_view = new Zend_View();
-		$this->_view->websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
+        $this->_websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+		$this->_view->websiteUrl = $this->_websiteHelper->getUrl();
+        $this->_websiteUrl = $this->_websiteHelper->getUrl();
+        $this->_sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
 		$this->_view->setScriptPath(realpath(__DIR__.DIRECTORY_SEPARATOR.'views'));
         $this->_sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
 	}
@@ -387,5 +396,145 @@ class Widgets_Store_Store extends Widgets_Abstract {
             return $this->_view->render('suppliers.phtml');
         }
 
+    }
+
+    /**
+     * {$store:labelGenerationGrid}
+     *
+     * @return string
+     * @throws Zend_Paginator_Exception
+     */
+    protected function _makeOptionLabelGenerationGrid()
+    {
+        $currentUser = $this->_sessionHelper->getCurrentUser();
+        $currentUserRole = $currentUser->getRoleId();
+
+        if($currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON || $currentUserRole === Shopping::ROLE_SUPPLIER) {
+            $request = Zend_Controller_Front::getInstance()->getRequest();
+
+            $limit = self::COUNT_PER_PAGE;
+            $offset = 0;
+            if (!empty($this->_options[1])) {
+                $limit = intval($this->_options[1]);
+            }
+
+            $gridPageNumber = intval(
+                filter_var($request->getParam('gridListNum', 0), FILTER_SANITIZE_NUMBER_INT)
+            );
+
+            $filterBy = filter_var($request->getParam('filterBy', false), FILTER_SANITIZE_STRING);
+
+            $filterByDateFrom = filter_var($request->getParam('filterByDateFrom', false), FILTER_SANITIZE_STRING);
+            $filterByDateFromOriginal = filter_var($request->getParam('filterByDateFromOriginal', false), FILTER_SANITIZE_STRING);
+
+            $filterByDateTo = filter_var($request->getParam('filterByDateTo', false), FILTER_SANITIZE_STRING);
+            $filterByDateToOriginal = filter_var($request->getParam('filterByDateToOriginal', false), FILTER_SANITIZE_STRING);
+
+            $orderByStatus = filter_var($request->getParam('orderBy', false), FILTER_SANITIZE_STRING);
+
+            if ($gridPageNumber) {
+                $offset = $limit * ($gridPageNumber - 1);
+            }
+
+            $dbTable = new Models_DbTable_CartSession();
+
+            $select = $dbTable->select()->setIntegrityCheck(false)->from(
+                array('scs' => 'shopping_cart_session'),
+                array(
+                    'scs.id',
+                    'customer' => 'user.full_name',
+                    'scs.gateway',
+                    'scs.total',
+                    'scs.purchased_on',
+                    'scs.status',
+                    'scs.shipping_service',
+                    'scs.shipping_availability_days',
+                    'scs.shipping_tax',
+                    'scs.shipping_price',
+                    'viewUrl' => new Zend_Db_Expr("CONCAT('". $this->_websiteUrl ."', 'plugin/shopping/run/order/id/', scs.id)")
+                )
+            )
+                ->join(array('user' => 'user'), 'scs.user_id = user.id', null);
+
+            if(empty($orderByStatus)) {
+                $where = '(' . $dbTable->getAdapter()->quoteInto('scs.status = ?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+                $where .= ' OR ' . $dbTable->getAdapter()->quoteInto('scs.status = ?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+                $where .= ')';
+            } elseif($orderByStatus == Models_Model_CartSession::CART_STATUS_SHIPPED){
+                $where = $dbTable->getAdapter()->quoteInto('scs.status = ?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+            }  else {
+                $where = $dbTable->getAdapter()->quoteInto('scs.status = ?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+            }
+
+            if ($filterBy) {
+                $where .= ' AND (' . $dbTable->getAdapter()->quoteInto('scs.id = ?', $filterBy . '%');
+                $where .= ' OR ' . $dbTable->getAdapter()->quoteInto('scs.gateway LIKE ?', $filterBy . '%');
+                $where .= ')';
+            }
+
+            if($filterByDateFrom) {
+                $where .= ' AND ' . $dbTable->getAdapter()->quoteInto('scs.purchased_on >= ?',  $filterByDateFrom . ' 00:00:00' . '%');
+            }
+
+            if($filterByDateTo) {
+                $where .= ' AND ' . $dbTable->getAdapter()->quoteInto('scs.purchased_on <= ?',  $filterByDateTo . ' 23:59:59' . '%');
+            }
+
+            $select->where($where);
+            $select->order('scs.purchased_on DESC');
+
+            $adapter = new Zend_Paginator_Adapter_DbSelect($select);
+            $ordersData = $adapter->getItems($offset, $limit);
+
+            if (!empty($ordersData)) {
+                //pagination
+                $paginator = new Zend_Paginator($adapter);
+                $paginator->setCurrentPageNumber($gridPageNumber);
+                $paginator->setItemCountPerPage($limit);
+
+                $view = new Zend_View(array('scriptPath' => __DIR__ . '/views/'));
+                $ordersPager = $view->paginationControl(
+                    $paginator,
+                    'Sliding',
+                    'pagination.phtml',
+                    array(
+                        'filterBy' => $filterBy,
+                        'filterByDateFrom' => $filterByDateFrom,
+                        'filterByDateFromOriginal' => $filterByDateFromOriginal,
+                        'filterByDateTo' => $filterByDateTo,
+                        'filterByDateToOriginal' => $filterByDateToOriginal,
+                        'orderBy' => $orderByStatus,
+                        'url' => $this->_websiteUrl . $this->_toasterOptions['url']
+                    )
+                );
+
+                $this->_view->ordersPager = $ordersPager;
+                $this->_view->ordersData = $ordersData;
+            }
+
+            $shippingPlaginTags = Models_Mapper_ShippingConfigMapper::getInstance()->getShippingPlaginTags();
+
+            $this->_view->shippingPlaginTags = $shippingPlaginTags;
+
+            $shippingTaxRate = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('shippingTaxRate');
+
+            $this->_view->shippingTaxRate = $shippingTaxRate;
+
+            if (empty($ordersData)) {
+                $this->_view->searchErrorMessage = $this->_translator->translate('Any orders don\'t meet the search criteria.');
+            }
+
+            $this->_view->pageUrl = $this->_toasterOptions['url'];
+            $this->_view->websiteUrl = $this->_websiteUrl;
+
+            $this->_view->filterBy = $filterBy;
+            $this->_view->filterByDateFrom = $filterByDateFromOriginal;
+            $this->_view->filterByDateTo = $filterByDateToOriginal;
+            $this->_view->orderByStatus = $orderByStatus;
+
+            return $this->_view->render('label-generation-grid.phtml');
+        }
+
+        return '';
     }
 }

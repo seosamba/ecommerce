@@ -142,7 +142,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
             },
             insertList: function () {
                 var shortCode = '{$productlist:';
-                if (!$('#templates').size() || !$('#templates').val()) {
+                if (!$('#templates').length || !$('#templates').val()) {
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
@@ -153,7 +153,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     draggable = ':draggable';
                 }
 
-                if ($('#search').size() && $('#search').val()) {
+                if ($('#search').length && $('#search').val()) {
                     var ids = [];
                     var visibleProducts = $('a.currproduct');
                     if (visibleProducts.length < uiTab.step) {

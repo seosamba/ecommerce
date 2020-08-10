@@ -1018,5 +1018,17 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
   FOREIGN KEY (`custom_param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
 
+INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
+('1', 'store_neworder', 'Tools_StoreMailWatchdog'),
+('1', 'store_newcustomer', 'Tools_StoreMailWatchdog'),
+('1', 'store_trackingnumber', 'Tools_StoreMailWatchdog'),
+('1', 'store_newuseraccount', 'Tools_StoreMailWatchdog'),
+('1', 'store_refund', 'Tools_StoreMailWatchdog'),
+('1', 'store_delivered', 'Tools_StoreMailWatchdog'),
+('1', 'store_suppliercompleted', 'Tools_StoreMailWatchdog'),
+('1', 'store_suppliershipped', 'Tools_StoreMailWatchdog'),
+('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
+('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 UPDATE `plugin` SET `version` = '2.7.8' WHERE `name` = 'shopping';

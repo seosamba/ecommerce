@@ -557,7 +557,7 @@ define([
             } else {
                 $('#product-tags-available').append(view.$el);
             }
-            if ($('.tagid-'+tag.get('id'), '#product-tags-current').size()){
+            if ($('.tagid-'+tag.get('id'), '#product-tags-current').length){
                 view.$el.addClass('tag-current').find('input:checkbox').prop({
                     disabled: true,
                     checked: true
@@ -657,7 +657,7 @@ define([
             }
         },
         renderProducts: function(){
-            if (this.products.size()){
+            if (this.products.length){
                 this.$('#product-list-holder').empty();
                 this.products.each(this.renderProduct, this);
                 var paginatorData = {

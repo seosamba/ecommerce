@@ -130,6 +130,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
     const DEFAULT_USER_GROUP = 'default_user_group';
 
+    const THROTTLE_TRANSACTIONS = 'throttleTransactions';
+
     /**
      * shipping restriction key
      */
@@ -2553,7 +2555,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $orderModel = $cartSessionMapper->find($orderId);
             if ($orderModel instanceof Models_Model_CartSession) {
                 $orderStatus = $orderModel->getStatus();
-                if ($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED && $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+
+                $notMachStatus = true;
+                if($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED || $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                    $notMachStatus = false;
+                }
+
+                if ($notMachStatus) {
                     $this->_responseHelper->fail($this->_translator->translate('You can create label only for completed or shipped orders'));
                 }
             }
@@ -2565,7 +2573,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow label generation'));
             }
 
-            if ($shippingLabelInfo['error'] === true) {
+            if ($shippingLabelInfo['error']) {
                 if (!empty($shippingLabelInfo['regenerate'])) {
                     $this->_responseHelper->fail(array('regenerate' => true, 'message' => $this->_translator->translate($shippingLabelInfo['message'])));
                 }
@@ -2995,5 +3003,96 @@ class Shopping extends Tools_Plugins_Abstract {
             }
         }
     }
+
+    public function throttleCheckLimitAction()
+    {
+        if ($this->_request->isPost()) {
+            if (Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactions') === 'true' && Tools_Misc::checkThrottleTransactionsLimit() === false) {
+                $throttleTransactionsLimitMessage = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactionsLimitMessage');
+                $throttleTransactionsLimitMessage = !empty($throttleTransactionsLimitMessage) ? $throttleTransactionsLimitMessage : Tools_Misc::THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE;
+                $this->_responseHelper->fail($throttleTransactionsLimitMessage);
+            };
+        }
+        $this->_responseHelper->success('');
+    }
+
+    /**
+     * @throws Zend_Reflection_Exception
+     *
+     * {$store:labelGenerationGrid}
+     */
+    public function generateLabelAction()
+    {
+        if ($this->_request->isPost()) {
+            $currentUser = $this->_sessionHelper->getCurrentUser();
+            $currentUserRole = $currentUser->getRoleId();
+
+            if($currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON || $currentUserRole === Shopping::ROLE_SUPPLIER) {
+                $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+                $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+                if (!$tokenValid) {
+                    $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
+                }
+
+                $cartId = filter_var($this->_request->getParam('orderId', 0), FILTER_SANITIZE_NUMBER_INT);
+
+                $additionalParams = filter_var_array($this->_request->getParam('additionalParams'), FILTER_SANITIZE_STRING);
+                $regenerateLabel = filter_var($this->_request->getParam('regenerate'), FILTER_SANITIZE_STRING);
+
+                if(!empty($cartId)) {
+                    $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find(intval($cartId));
+
+                    if ($cartSession instanceof Models_Model_CartSession) {
+                        $orderStatus = $cartSession->getStatus();
+
+                        $notMachStatus = true;
+                        if($orderStatus === Models_Model_CartSession::CART_STATUS_COMPLETED || $orderStatus === Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                            $notMachStatus = false;
+                        }
+
+                        if ($notMachStatus) {
+                            $this->_responseHelper->fail($this->_translator->translate('You can create label only for completed or shipped orders'));
+                        }
+
+                        $shippingService = $cartSession->getShippingService();
+
+                        if(!empty($shippingService)) {
+                            if(in_array($shippingService, Tools_Misc::$systemShippingServices)) {
+                                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow label generation'));
+                            }
+
+                            $data = array('orderId' => $cartId, 'regenerateLabel' => $regenerateLabel);
+
+                            if(!empty($additionalParams) && is_array($additionalParams)) {
+                                $data = array_merge($data, $additionalParams);
+                            }
+
+                            $shippingLabelInfo = Tools_System_Tools::firePluginMethodByPluginName($shippingService, 'generateLabel', $data, false);
+                            if (empty($shippingLabelInfo)) {
+                                $this->_responseHelper->fail($this->_translator->translate('Service doesn\'t allow label generation'));
+                            }
+
+                            if ($shippingLabelInfo['error']) {
+                                if (!empty($shippingLabelInfo['regenerate'])) {
+                                    $this->_responseHelper->fail(array('regenerate' => true, 'message' => $this->_translator->translate($shippingLabelInfo['message'])));
+                                }
+
+                                $this->_responseHelper->fail($this->_translator->translate($shippingLabelInfo['message']));
+                            }
+                        } else {
+                            $this->_responseHelper->fail($this->_translator->translate('Shipping service is empty!'));
+                        }
+                    }
+                }
+            } else {
+                $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
+            }
+        } else {
+            $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
+        }
+    }
+
+
+
 
 }
