@@ -174,9 +174,9 @@ $this->headLink()
 		<span class="image background"><img src="<%= photoUrl %>"/></span>
 		<div class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></div>
 		<span class="price">
-            <% pricePreview = parseFloat(product.price) %>
+            <% pricePreview = product.price %>
             <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
-			<%= pricePreview.toFixed(2) + '&nbsp;' + currency %>
+			<%= pricePreview + '&nbsp;' + currency %>
 		</span>
 		<span class="info"><?php echo $this->translate('Click preview to get to product landing page');?></span>
 	</a>
@@ -235,7 +235,10 @@ $this->headLink()
             <ul class="header">
                 <?php foreach ($this->configTabs as $configTab) :?>
                     <?php if ($configTab['type'] === 'internal') :?>
-                        <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
+                        <?php if(!empty($this->generalConfig['hideGroupPriceTabFromProduct']) && $configTab['tabId'] === 'group-pricing-tab') :?>
+                        <?php else:?>
+                            <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
+                        <?php endif;?>
                     <?php else :?>
                         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $configTab['tabId'];?>/run/tab/""><?php echo $this->translate($configTab['tabName']);?></a></li>
                     <?php endif;?>
@@ -286,9 +289,9 @@ $this->headLink()
                     <p class="labeled grid_6 omega mt1-5em">
                         <input class="grid_5 omega fl-right" type="text" name="" id="new-brand"  placeholder="<?php echo $this->translate('create new'); ?>">
                         <select class="grid_5 alpha omega fl-right" name="product-brand" id="product-brand" data-reflection="brand">
-                            <option value="0"><?php echo $this->translate('select brand'); ?></option>
+                            <option value="-1"><?php echo $this->translate('select brand'); ?></option>
                             <?php foreach ($this->brands as $brand): ?>
-                                <option value="<?php echo $brand->getName(); ?>"><?php echo $brand->getName(); ?></option>
+                                <option value="<?php echo $brand; ?>"><?php echo $brand; ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label class="grid_2 alpha omega" for="product-brand"><?php echo $this->translate('Brand'); ?></label>
@@ -309,11 +312,13 @@ $this->headLink()
                             $lexemShortDescription = $this->translate('Short description');
                             $lexemFullDescription = $this->translate('Full description');
                             $lexemDimensions = $this->translate('Dimensions');
+                            $lexemCustomAttributes = $this->translate('Custom attributes');
                         ?>
                         <ul>
                             <li><a href="#short-description-tab"><?php echo $lexemShortDescription; ?></a></li>
                             <li><a href="#full-description-tab"><?php echo $lexemFullDescription; ?></a></li>
                             <li><a href="#product-dimensions-tab"><?php echo $lexemDimensions; ?></a></li>
+                            <li><a href="#product-custom-attributes-tab"><?php echo $lexemCustomAttributes; ?></a></li>
                         </ul>
                         <div id="short-description-tab">
                             <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
@@ -338,6 +343,25 @@ $this->headLink()
                                 <input class="grid_8 alpha omega" type="text" id="product-depth" data-reflection="prodDepth" placeholder="0.00">
                                 <label class="grid_4 alpha omega" for="product-depth"><?php echo $this->translate((!empty($this->generalConfig['lengthUnit']) ? $this->generalConfig['lengthUnit'] :'')); ?></label>
                             </div>
+                        </div>
+                        <div id="product-custom-attributes-tab" class="scroll" style="max-height: 230px;">
+                            <?php foreach ($this->productCustomParamsConfig as $productCustomParam):?>
+                                <div class="grid_3 alpha">
+                                    <label><?php echo $productCustomParam['label'];?></label>
+                                    <?php if($productCustomParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_TEXT):?>
+                                         <input data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-custom-param-name="<?php echo $productCustomParam['param_name'];?>" data-param-type="text" class="product-custom-param custom-param-text" type="text" name="custom-param-text-<?php echo $productCustomParam['param_name'];?>" id="custom-param-text-<?php echo $productCustomParam['param_name'];?>">
+                                    <?php elseif($productCustomParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT):?>
+                                        <select data-custom-param-id="<?php echo $productCustomParam['id'];?>" data-custom-param-name="<?php echo $productCustomParam['param_name'];?>" data-param-type="select" class="product-custom-param custom-param-select" name="custom-param-select-<?php echo $productCustomParam['param_name'];?>" id="custom-param-select-<?php echo $productCustomParam['param_name'];?>">
+                                            <?php if(isset($this->productCustomParamsOptions[$productCustomParam['id']])):?>
+                                                <option value="0"><?php echo $this->translate('Select option');?></option>
+                                                <?php foreach ($this->productCustomParamsOptions[$productCustomParam['id']] as $paramData):?>
+                                                    <option value="<?php echo $paramData['id'];?>"><?php echo $paramData['option_value'];?></option>
+                                                <?php endforeach;?>
+                                            <?php endif;?>
+                                        </select>
+                                    <?php endif;?>
+                                </div>
+                            <?php endforeach;?>
                         </div>
                     </div>
                 </div>
@@ -378,11 +402,19 @@ $this->headLink()
                     <label class="grid_6 mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
 
                     <div class="grid_12 alpha omega mt1-5em labeled">
+                        <?php $defaultTaxLabel = $this->translate('Default'); ?>
+                        <?php $alternativeTaxLabel = $this->translate('Alternative'); ?>
+                        <?php $alternative2TaxLabel = $this->translate('Alternative 2'); ?>
+                        <?php if (!empty($this->defaultTaxes)):?>
+                            <?php $defaultTaxLabel .=' '.(($this->defaultTaxes->getRate1() === '0.00') ? 0 : $this->defaultTaxes->getRate1()).' %'; ?>
+                            <?php $alternativeTaxLabel .=' '.(($this->defaultTaxes->getRate2() === '0.00') ? 0 : $this->defaultTaxes->getRate2()).' %'; ?>
+                            <?php $alternative2TaxLabel .=' '.(($this->defaultTaxes->getRate3() === '0.00') ? 0 : $this->defaultTaxes->getRate3()).' %'; ?>
+                        <?php endif;?>
                         <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
                             <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
-                            <option value="1"><?php echo $this->translate('Default'); ?></option>
-                            <option value="2"><?php echo $this->translate('Alternative'); ?></option>
-                            <option value="3"><?php echo $this->translate('Alternative 2'); ?></option>
+                            <option value="1"><?php echo $defaultTaxLabel;?></option>
+                            <option value="2"><?php echo $alternativeTaxLabel;?></option>
+                            <option value="3"><?php echo $alternative2TaxLabel;?></option>
                         </select>
                         <label class="grid_2 alpha omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
                     </div>
@@ -398,57 +430,70 @@ $this->headLink()
             </div>
         </div>
 
-        <div id="tag-tab">
-            <div class="fl-left mr-grid mt5px">
-                <a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ]</a>
-            </div>
-            <div class="paginator">
-                <!-- placeholder for pagination -->
-            </div>
-            <div class="wrap">
-                <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
-            </div>
+        <?php if(!in_array('tag-tab', $this->excludeProductTabs)) :?>
+            <div id="tag-tab">
+                <div class="fl-left mr-grid mt5px">
+                    <a href="javascript" id="toggle-current-tags">[ <?php echo $this->translate('show only selected');?> ]</a>
+                </div>
+                <div class="paginator">
+                    <!-- placeholder for pagination -->
+                </div>
+                <div class="wrap">
+                    <input type="text" id="new-tag" placeholder="<?php echo $this->translate('Add a new Tag'); ?>" data-confirmMsg="<?php echo $this->translate('Really, delete Tag &quot;%tag%&quot;? All products will be untagged.'); ?>"/>
+                </div>
 
-            <ul id="product-tags-current" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width" style="display:none;"></ul>
+                <ul id="product-tags-current" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width" style="display:none;"></ul>
 
-            <ul id="product-tags-available" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width"></ul>
-        </div>
-        <!-- #tag-tab -->
+                <ul id="product-tags-available" class="product-tags list-tags list-inline mb0px mt10px column_5 full-width"></ul>
+            </div>
+            <!-- #tag-tab -->
+        <?php endif;?>
 
-        <div id="options-tab" class="scroll">
-            <div class="grid_6 prefix_3 suffix_3">
-                <select name="option-library" id="option-library" class="grid_5 alpha omega">
-                    <option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
-                </select>
-                <span class="grid_2 alpha omega or"><?php echo $this->translate('or');?></span>
-                <button id="add-new-option-btn" class="btn grid_5 alpha omega"><?php echo $this->translate('Create new option');?></button>
+        <?php if(!in_array('options-tab', $this->excludeProductTabs)) :?>
+            <div id="options-tab" class="scroll">
+                <div class="grid_6 prefix_3 suffix_3">
+                    <select name="option-library" id="option-library" class="grid_5 alpha omega">
+                        <option value="-1" disabled="disabled"><?php echo $this->translate('select from library');?></option>
+                    </select>
+                    <span class="grid_2 alpha omega or"><?php echo $this->translate('or');?></span>
+                    <button id="add-new-option-btn" class="btn grid_5 alpha omega"><?php echo $this->translate('Create new option');?></button>
+                </div>
+                <div id="options-holder" class="grid_12 alpha omega">
+                </div>
             </div>
-            <div id="options-holder" class="grid_12 alpha omega">
-            </div>
-        </div>
+        <?php endif;?>
         <!-- End Tab 3 -->
 
-        <div id="related-tab" class="scroll">
-            <div id="related-holder" class="column_8 full-width">
-                <a href="javascript:;" data-listtype="related" class="show-list productlisting ticon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
-                <span class="spinner"></span>
+        <?php if(!in_array('related-tab', $this->excludeProductTabs)) :?>
+            <div id="related-tab" class="scroll">
+                <div id="related-holder" class="column_8 full-width">
+                    <a href="javascript:;" data-listtype="related" class="show-list productlisting ticon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
+                    <span class="spinner"></span>
+                </div>
             </div>
-        </div>
+        <?php endif;?>
 
-        <div id="coupon-tab">
-            <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
-            <?php echo $this->partial('merchandising/coupon.phtml'); ?>
-        </div>
+        <?php if(!in_array('coupon-tab', $this->excludeProductTabs)) :?>
+            <div id="coupon-tab">
+                <p class="blockquote info fs12 hide"><?php echo $this->translate('Set parameters for promotional coupons from this screen. These coupons are valid only when this specific product is part of an order.'); ?></p>
+                <?php echo $this->partial('merchandising/coupon.phtml'); ?>
+            </div>
+        <?php endif;?>
+        <?php if(!in_array('group-pricing-tab', $this->excludeProductTabs)) :?>
+            <?php if(empty($this->generalConfig['hideGroupPriceTabFromProduct'])) :?>
+                <div id="group-pricing-tab">
+                    <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
+                    <?php echo $this->partial('product/grouping-price.phtml'); ?>
+                </div>
+            <?php endif;?>
+        <?php endif;?>
 
-        <div id="group-pricing-tab">
-            <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Set your product price for each customers groups.'); ?></br><strong><?php echo $this->translate('(create groups & defaults from the merchandising menu.)'); ?></strong></p>
-            <?php echo $this->partial('product/grouping-price.phtml'); ?>
-        </div>
-
-        <div id="digital-product-tab">
-            <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
-            <?php echo $this->partial('product/digital-product.phtml'); ?>
-        </div>
+        <?php if(!in_array('digital-product-tab', $this->excludeProductTabs)) :?>
+            <div id="digital-product-tab">
+                <p class="blockquote fs12 mb10px hide"><?php echo $this->translate('Attach digital product files to product.'); ?></br></p>
+                <?php echo $this->partial('product/digital-product.phtml'); ?>
+            </div>
+        <?php endif;?>
 
         <div class="mt10px grid_12">
             <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>

@@ -179,6 +179,28 @@ class Api_Store_Products extends Api_Service_Abstract {
 			'field' => 'sku'
 		));
 
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
+        $productWeightMandatory = $configMapper->getConfigParam('productWeightMandatory');
+
+        if (!empty($productSizeMandatory)) {
+            if (empty($srcData['prodLength']) || !is_numeric($srcData['prodLength']) || $srcData['prodLength'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product length is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodWidth']) || !is_numeric($srcData['prodWidth']) || $srcData['prodWidth'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product width is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodDepth']) || !is_numeric($srcData['prodDepth']) || $srcData['prodDepth'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product depth is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+        }
+
+        if (!empty($productWeightMandatory)) {
+            if (empty($srcData['weight']) || !is_numeric($srcData['weight']) || $srcData['weight'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product weight is missing.')), self::REST_STATUS_BAD_REQUEST);
+            }
+        }
+
         if (!$validator->isValid($srcData['sku'])){
 	        $this->_error(htmlentities($this->_translator->translate('You already have a product with this SKU')), self::REST_STATUS_BAD_REQUEST);
         }
@@ -213,8 +235,46 @@ class Api_Store_Products extends Api_Service_Abstract {
 		if (empty($srcData)){
 			$this->_error('Empty data');
 		}
+
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
+        $productWeightMandatory = $configMapper->getConfigParam('productWeightMandatory');
+
+        if (!empty($productSizeMandatory)) {
+            if (empty($srcData['prodLength']) || !is_numeric($srcData['prodLength']) || $srcData['prodLength'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product length is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodWidth']) || !is_numeric($srcData['prodWidth']) || $srcData['prodWidth'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product width is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+            if (empty($srcData['prodDepth']) || !is_numeric($srcData['prodDepth']) || $srcData['prodDepth'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product depth is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
+            }
+        }
+
+        if (!empty($productWeightMandatory)) {
+            if (empty($srcData['weight']) || !is_numeric($srcData['weight']) || $srcData['weight'] <= 0) {
+                $this->_error(htmlentities($this->_translator->translate('Product weight is missing.')), self::REST_STATUS_BAD_REQUEST);
+            }
+        }
+
 		if (!empty($id)){
 			$products = $this->_productMapper->find($id);
+
+			if($products instanceof Models_Model_Product){
+                if($products->getSku() != $srcData['sku']){
+                    $validator = new Zend_Validate_Db_NoRecordExists(array(
+                        'table' => 'shopping_product',
+                        'field' => 'sku'
+                    ));
+
+                    if (!$validator->isValid($srcData['sku'])){
+                        $this->_error(htmlentities($this->_translator->translate('You already have a product with this SKU')), self::REST_STATUS_BAD_REQUEST);
+                    }
+
+                }
+            }
+
 			!is_array($products) && $products = array($products);
 			if (isset($srcData['id'])){
 				unset($srcData['id']);
@@ -248,9 +308,19 @@ class Api_Store_Products extends Api_Service_Abstract {
                 }
 
 				$product->setOptions($srcData);
-				if ($this->_productMapper->save($product)){
-					$data[] = $product->toArray();
-				}
+                $currentProductWithSkuModel = $this->_productMapper->findBySku($product->getSku());
+                if ($currentProductWithSkuModel instanceof Models_Model_Product) {
+                    if ($productId != $currentProductWithSkuModel->getId()) {
+                        $this->_error('Product with the same sku already exists');
+                    }
+                }
+                try {
+                    if ($this->_productMapper->save($product)) {
+                        $data[] = $product->toArray();
+                    }
+                } catch (Exception $e) {
+                    $this->_error('Something went wrong. Please contact support.');
+                }
 			}
 
 			if (count($data) === 1){

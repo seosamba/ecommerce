@@ -52,6 +52,26 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 	        $this->addElement($shippingTocCheckbox);
 		}
 
+        if (!empty($shoppingConfig[Shopping::SHIPPING_IS_GIFT])){
+            $buyAsGift = new Zend_Form_Element_Checkbox(array(
+                'name'          => 'isGift',
+                'label'         => 'Buy as gift',
+                'required'      => false,
+                'checkedValue'  => 1,
+                'allowEmpty'    => false,
+                'uncheckedValue'=> null
+            ));
+
+            $this->addElement(new Zend_Form_Element_Text(array(
+                'name'        => 'giftEmail',
+                'label'       => '',
+                'placeholder' => 'Gift email',
+                'class' => 'hidden'
+            )));
+
+            $this->addElement($buyAsGift);
+        }
+
         $this->addElement(new Zend_Form_Element_Textarea(array(
 			'name'     => 'notes',
 			'label'    => 'Delivery Comments',
@@ -85,6 +105,9 @@ class Forms_Checkout_Address extends Forms_Address_Abstract {
 
 		// setting required fields
 		$this->getElement('email')->setValidators(array($emailValidator));
+        if (!empty($shoppingConfig[Shopping::SHIPPING_IS_GIFT])) {
+            $this->getElement('giftEmail')->setValidators(array($emailValidator));
+        }
 
 		$this->addDisplayGroups(array(
 			'lcol' => array(

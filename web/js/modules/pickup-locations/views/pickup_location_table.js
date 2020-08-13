@@ -69,6 +69,8 @@ define([
             $('.location-weight').val(model.get('weight'));
             $('.location-country [value="'+model.get('country')+'"]').prop('selected', true);
             $('.location-phone').val(model.get('phone'));
+            $('#location-external-id').val(model.get('external_id'));
+            $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
             _.each(workingHours, function(value, name){
                 $('input[name="working-hours-'+name+'"]').val(value);
             });
@@ -79,7 +81,7 @@ define([
             var cid = $(e.currentTarget).data('cid'),
                 model = this.pickupLocation.get(cid);
 
-            showConfirm('Are you sure want to delete', function(){
+            showConfirmCustom(_.isUndefined(i18n['Are you sure want to delete?'])?'Are you sure want to delete?':i18n['Are you sure want to delete?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (model){
                     model.destroy();
                 }

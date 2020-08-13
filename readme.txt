@@ -73,6 +73,9 @@ Plugin widgets.
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
 
+    {$store:labelGenerationGrid:15} - Displays grid for orders label generation with shipping.
+    15 - orders limit on page.
+
 4. Add to cart widgets:
     {$store:addtocart:{$product:id}[:gotocart]} - Displays add to cart button
     gotocart - prevent automatically redirect to the cart
@@ -88,6 +91,8 @@ Plugin widgets.
     {$user:account} - form for editing user's data
     {$user:tabs:tab1,tab2,...,tabN} - tabs with containers
     {$user:grid} - grid with information about purchases for current logged user
+    {$user:grid:recurring} - grid with information about recurring payments(subscriptions)
+    {$user:grid:recurring:without_period_cycle} - this option allows to hide 'payment period cycle' column and to block 'next billing date' changing.
 
 7. Post purchase widgets:
     This type of widgets you can use at the post purchase page(page with option Post purchase "Thank you" page)
@@ -116,6 +121,8 @@ Plugin widgets.
     {$postpurchase:id} -> cart id
     {$postpurchase:coupon} -> if coupon was used, show coupon name.
     {$postpurchase:quotenote} -> show quote disclaimer.
+    {$postpurchase:isGift:some text here} -> Is a gift message will be returned
+    {$postpurchase:giftEmail} -> return receiver gift email
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -130,6 +137,7 @@ Plugin widgets.
     {$postpurchase:billing:phone} -> billing address phone
     {$postpurchase:billing:mobile} -> billing address mobile
     {$postpurchase:billing:email} -> billing address email
+    {$postpurchase:billing:customer_notes} -> billing customer notes
 
     ######### Shipping information #############
     {$postpurchase:shipping:prefix} -> shipping prefix
@@ -143,6 +151,7 @@ Plugin widgets.
     {$postpurchase:shipping:country} -> shipping address country
     {$postpurchase:shipping:phone} -> shipping address phone
     {$postpurchase:shipping:mobile} -> shipping address mobile
+    {$postpurchase:shipping:customer_notes} -> shipping customer notes
     {$postpurchase:shipping:email} -> shipping address email
 
     This type of widgets you can use inside 'postpurchasecartcontent' magic space
@@ -160,6 +169,7 @@ Plugin widgets.
     {$postpurchase:cartitem:total[:clean]} -> total price with tax
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:producturl} -> product url
+    {$postpurchase:cartitem:brand} -> product brand
 
 Magic spaces:
     MAGICSPACE: freebies
@@ -196,7 +206,7 @@ Magic spaces:
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
 
- 10. Wishlist widget:
+10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
    htmlclass:class class2 class3 - added html classes, where classX is name of html class.
    btnname:sometext - where sometext is custom text for button name.
@@ -213,3 +223,43 @@ c. {$storewishlist:removeproduct:{$product:id}[htmlclass:class class2 class3[:bt
    btnname:sometext - where sometext is custom text for button name.
 
 d. {$storewishlist:lastaddeduserwishlist:{$product:id}} - Display user full name who last added product to Wishlist.
+
+11. Inventory notification widget:
+ a. {$notifyme:addTonotificationlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
+    htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+    btnname:sometext - where sometext is custom text for button name.
+    profile - redirected user on profile after add product to notification list.
+ b. {$notifyme:notifylist:_products notification list[:limit[:10]]}
+    Option "_products notification list" template - used for show product on page.
+    Into this template you can use any product and store widgets and magicspases.
+
+    Option limit - you can set custom limit before pagination "show more" for product list ex. {$notifyme:_products notification list:limit:10}
+    where 10 - is count of products. By default limit is 20.
+
+ c. {$notifyme:removeproduct:{$product:id}[htmlclass:class class2 class3[:btnname:sometext]]}
+    htmlclass:class class2 class3 - added html classes, where classX is name of html class.
+    btnname:sometext - where sometext is custom text for button name.
+ d. {$notifyme:isnotified:{$product:id}}
+    Display if customer already have the notification by email.
+
+ e. Action emails lexems:
+    {notify:productname} - Display product name
+    {notify:productdescription} - Display product short description
+    {customer:fullname} - Display customer full name
+    {notify:producturl} - Display link to product page
+
+12. Product custom params widget
+{$productcustomparam:[:text|select[:name[:readonly]]]} - on the product page
+{$productcustomparam:[:prodid[:text|select[:name[:readonly]]]]} - in the product list
+
+allowed types
+a) "text" - display values for text custom params
+b) "select" - display values for dropdown custom params
+
+readonly - return just a text result
+
+Example:
+
+{$productcustomparam:select:dogs:readonly} - on the product page
+{$productcustomparam:{$product:id}:select:dogs:readonly} - in the product list
+

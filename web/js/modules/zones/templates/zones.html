@@ -1,0 +1,35 @@
+<div class="grid_6 alpha suffix_6 mb10px">
+    <label class="grid_3 alpha omega mt5px"><%= _.isUndefined(i18n['Zone Name'])?'Zone Name':i18n['Zone Name'] %>:</label>
+    <input type="text" class="zone-name grid_9 omega" value="<%= zonesModel.name %>" placeholder="<%= _.isUndefined(i18n['enter name for zone'])?'enter name for zone':i18n['enter name for zone'] %>"/>
+</div>
+<div class="countries grid_6 alpha">
+    <div class="header-inner pl2 pr2">
+        <%= _.isUndefined(i18n['Countries'])?'Countries':i18n['Countries'] %>
+    </div>
+    <ul class="zone-countries list-bordered h150px"></ul>
+    <div class="footer grid_12">
+        <a href="javascript:;" class="clearprop error grid_3 alpha" data-property="countries">[ <%= _.isUndefined(i18n['clear'])?'clear':i18n['clear'] %> ]</a>
+        <button class="btn ticon-plus add-not-saved-countries" ><%= _.isUndefined(i18n['Add all not in use'])?'Add all not in use':i18n['Add all not in use'] %></button>
+        <button class="btn ticon-plus open-dialog fl-right" data-name="add-country"><%= _.isUndefined(i18n['Add Country'])?'Add Country':i18n['Add Country'] %></button>
+    </div>
+</div>
+<div class="states grid_6 omega">
+    <div class="header-inner pl2 pr2">
+        <%= _.isUndefined(i18n['States'])?'States':i18n['States'] %>
+    </div>
+    <ul class="zone-states list-bordered h150px"></ul>
+    <div class="footer grid_12">
+        <a href="javascript:;" class="clearprop error" data-property="states">[ <%= _.isUndefined(i18n['clear'])?'clear':i18n['clear'] %> ]</a>
+        <button class="btn ticon-plus open-dialog fl-right" data-name="add-state"><%= _.isUndefined(i18n['Add State'])?'Add State':i18n['Add State'] %></button>
+    </div>
+</div>
+<div class="grid_12 alpha omega mt15px">
+    <div class="header-inner pl2 pr2 text-center">
+        <span class="fl-left"><%= _.isUndefined(i18n['Postal codes'])?'Postal codes':i18n['Postal codes'] %></span>
+        <a href="javascript:;" class="clearprop fl-right error" data-property="zip">
+            [ <%= _.isUndefined(i18n['clear'])?'clear':i18n['clear'] %> ]
+        </a>
+        <em><%= _.isUndefined(i18n['Insert list of zip/postal codes: one per line'])?'Insert list of zip/postal codes: one per line':i18n['Insert list of zip/postal codes: one per line'] %></em>
+    </div>
+    <textarea class="zone-zip"><%= zonesModel.zip.join( '\n' ) %></textarea>
+</div>

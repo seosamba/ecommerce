@@ -7,7 +7,9 @@ require.config({
         'backbone'  : '../../libs/backbone/backbone-min',
         'backbone.paginator'  : '../../libs/backbone/backbone.paginator.min',
         'text'  : '../../libs/require/text',
-        'i18n'  : '../../libs/require/i18n'
+        'i18n'  : '../../libs/require/i18n',
+        'moment': '../../libs/moment.min',
+        'accounting' : '../../libs/accounting.min'
     },
     shim: {
         underscore: { exports: '_' },
