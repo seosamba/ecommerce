@@ -415,10 +415,13 @@ $(function(){
 
     $('.footer #submit').on('click', function(e){
         showSpinner();
-        var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')'),
-            indexOfPluginTab = index + 1;
+        var tabIndex = $('#shippers').tabs("option", "active"),
+            currentPane = $('#pane-container div.ui-tabs-panel:eq('+tabIndex+')'),
+            selector = '#shippers > ul > li > a',
+            currentTab = $(selector).eq(tabIndex),
+            activeTabName = $(selector).eq(tabIndex).data('plugin');
 
-        if($('#ui-id-'+indexOfPluginTab+'').data('plugin') === '<?php echo Shopping::SHIPPING_PICKUP;?>'){
+        if(activeTabName === '<?php echo Shopping::SHIPPING_PICKUP;?>'){
             e.preventDefault();
 
             var configRows = $('.pickup-location-conf-row'),
@@ -480,8 +483,9 @@ $(function(){
                 }
             }).done(function(response) {
                 if(response.done){
-                    $('#shippers').tabs('load', index);
-                        showMessage('<?php echo $this->translate('Saved')?>', false);
+                    var tabId = currentTab.get(0).id;
+                    $('#shippers').tabs('load', '#' + tabId);
+                    showMessage('<?php echo $this->translate('Saved')?>', false);
                 }
 
             });
