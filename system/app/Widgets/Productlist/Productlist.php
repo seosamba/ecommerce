@@ -461,13 +461,19 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
             }
         }
-        if (!empty($notInDrag) || !empty($notInProducts)) {
-            $this->draglist['data'] = array_values($this->draglist['data']);
-            $mapper = Models_Mapper_DraggableMapper::getInstance();
-            $model = new Models_Model_Draggable();
-            $model->setId($this->draglist['list_id']);
-            $model->setData(serialize($this->draglist['data']));
-            $mapper->save($model);
+
+        $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+        $currentUserRole = $currentUser->getRoleId();
+
+        if ($currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON) {
+            if (!empty($notInDrag) || !empty($notInProducts)) {
+                $this->draglist['data'] = array_values($this->draglist['data']);
+                $mapper = Models_Mapper_DraggableMapper::getInstance();
+                $model = new Models_Model_Draggable();
+                $model->setId($this->draglist['list_id']);
+                $model->setData(serialize($this->draglist['data']));
+                $mapper->save($model);
+            }
         }
 
     }
