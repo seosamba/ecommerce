@@ -77,6 +77,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     private $_customer = null;
 
+    private $_entityParser  = null;
+
 	/**
 	 * @var Instance of watched object
 	 */
@@ -127,11 +129,16 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 			throw new Exceptions_SeotoasterException('Missing template for action email trigger');
 		}
 
+        $wicEmail = $this->_configHelper->getConfig('wicEmail');
+        $this->_entityParser->setDictionary(array(
+            'widcard:BizEmail' => !empty($wicEmail) ? $wicEmail : $this->_configHelper->getConfig('adminEmail')
+        ));
+
         $this->_subject = $this->_options['subject'];
 		$this->_mailer->setMailFromLabel($this->_storeConfig['company']);
 
 		if (!empty($this->_options['from'])){
-			$this->_mailer->setMailFrom($this->_options['from']);
+			$this->_mailer->setMailFrom($this->_entityParser->parse($this->_options['from']));
 		} elseif (!empty($this->_storeConfig['email'])) {
 			$this->_mailer->setMailFrom($this->_storeConfig['email']);
 		} else {
