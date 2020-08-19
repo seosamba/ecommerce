@@ -9,6 +9,7 @@ define({
 	    'cs_delivered'	  : 'Livraison effectuée',
 	    'cs_canceled'	  : 'Commande annulée',
         'cs_error'        : 'erreur',
+        'cs_partial'      : 'Partial Order',
         'New quote'       : 'Nouveau devis',
         'Quote Sent'      : 'Devis envoyé',
 	    'Mark order paid' : 'Recevoir paiement',

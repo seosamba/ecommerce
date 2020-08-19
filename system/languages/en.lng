@@ -6,5 +6,6 @@
 	'cs_delivered'  => 'Items Delivered',
 	'cs_new_quote'  => 'New quote',
 	'cs_quote_sent' => 'Quote Sent',
-	'cs_recurring_orders' => 'Recurring Orders'
+	'cs_recurring_orders' => 'Recurring Orders',
+	'cs_partial' => 'Partial Orders'
 );
