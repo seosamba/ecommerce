@@ -259,6 +259,8 @@ class Tools_GroupAssignment
             $customerModel = $customerMapper->find($userModel->getId());
             if ($customerModel instanceof Models_Model_Customer) {
                 $customerModel->setGroupId($groupId);
+                $dataGroup = array('userId' => $customerModel->getId(), 'groupId' => $groupId);
+                Tools_System_Tools::firePluginMethodByTagName('assigngroup', 'assignLeadGroup', $dataGroup, true);
                 $customerMapper->save($customerModel);
             }
         }
