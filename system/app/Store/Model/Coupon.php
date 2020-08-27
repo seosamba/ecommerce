@@ -36,6 +36,8 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 
 	protected $_zoneId;
 
+    protected $_oneTimeUse;
+
 	protected $_data = array();
 
 	public function setAllowCombination($allowCombination) {
@@ -120,6 +122,23 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getOneTimeUse()
+    {
+        return $this->_oneTimeUse;
+    }
+
+    /**
+     * @param mixed $oneTimeUse
+     */
+    public function setOneTimeUse($oneTimeUse)
+    {
+        $this->_oneTimeUse = $oneTimeUse;
+
+        return $this;
+    }
 
 	public function __call($name, $arguments) {
 		$prefix     = strtolower(substr($name, 0, 3));
@@ -148,17 +167,19 @@ class Store_Model_Coupon extends Application_Model_Models_Abstract {
 		 */
 		$currency = Zend_Registry::get('Zend_Currency');
 
+        $translator = Zend_Registry::get('Zend_Translate');
+
 		$string = '';
 		switch ($this->_type){
 			case self::COUPON_TYPE_DISCOUNT:
 				if ($this->getDiscountUnit() === self::DISCOUNT_UNITS ){
-					$string = sprintf('%s for orders over %s', $currency->toCurrency(floatval($this->getDiscountAmount())), $currency->toCurrency(floatval($this->getMinOrderAmount())));
+					$string = sprintf('%s '.$translator->translate('for orders over').' %s', $currency->toCurrency(floatval($this->getDiscountAmount())), $currency->toCurrency(floatval($this->getMinOrderAmount())));
 				} else {
-					$string = sprintf('%s for orders over %s', $this->getDiscountAmount().'%', $currency->toCurrency(floatval($this->getMinOrderAmount())));
+					$string = sprintf('%s '.$translator->translate('for orders over').' %s', $this->getDiscountAmount().'%', $currency->toCurrency(floatval($this->getMinOrderAmount())));
 				}
 				break;
 			case self::COUPON_TYPE_FREESHIPPING:
-				$string = sprintf('Free shipping for orders over %s', $currency->toCurrency(floatval($this->getMinOrderAmount())) );
+				$string = sprintf($translator->translate('Free shipping for orders over').' %s', $currency->toCurrency(floatval($this->getMinOrderAmount())) );
 				break;
 		}
 		return $string;

@@ -77,7 +77,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'prod_length'       => $model->getProdLength(),
             'prod_depth'        => $model->getProdDepth(),
             'prod_width'        => $model->getProdWidth(),
-            'gtin'              => $model->getGtin()
+            'gtin'              => $model->getGtin(),
+            'wishlist_qty'      => $model->getWishlistQty()
 		);
 
 		if ($model->getId()){
@@ -121,8 +122,18 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processFreebies($model);
         }
 
+        if (!empty($model->getCustomParams())) {
+            $this->_processCustomParams($model->getCustomParams(), $model->getId());
+        }
+
         //process product parts if any
         $this->_processParts($model);
+
+        //process product Allowance
+        $allowanceDate = $model->getAllowance();
+        if(!empty($allowanceDate)) {
+            $this->_processAllowance($model);
+        }
 
 		$model->notifyObservers();
 
@@ -160,7 +171,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $organicSearch = false,
         $attributes = array(),
         $price = array(),
-        $sort = null
+        $sort = null,
+        $allowance = false,
+        $productPrice = array()
 
     ) {
         $entities = array();
@@ -199,6 +212,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
         if(!empty($price)){
             $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
+        }
+
+        if(!empty($productPrice)) {
+            $select->joinLeft(array('sfv' => 'shopping_filtering_values'), 'sfv.product_id = p.id', array());
+            foreach ($productPrice as $pPrice) {
+                $select->where("sfv.value BETWEEN " . $pPrice['min'] ." AND ".$pPrice['max']);
+            }
         }
 
         if (!empty($tags)) {
@@ -252,6 +272,10 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             } else {
                 $select->where($likeWhere, '%' . $search . '%');
             }
+        }
+
+        if($allowance) {
+            $select->joinLeft(array('ap' => 'shopping_allowance_products'), 'ap.product_id = p.id', array('allowance' => 'ap.allowance_due'));
         }
 
         if (self::$_logSelectResultLength === false) {
@@ -369,6 +393,18 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 				$entity->setPage($page);
 			}
 		}
+
+        $allowanceData = Store_Mapper_AllowanceProductsMapper::getInstance()->findByProductId($row->id);
+        if($allowanceData instanceof Store_Model_AllowanceProducts) {
+            $allowanceDate = $allowanceData->getAllowanceDue();
+            $entity->setAllowance($allowanceDate);
+        }
+
+        $productCustomParams = Store_Mapper_ProductCustomParamsDataMapper::getInstance()->findByProductId($row->id);
+        if (!empty($productCustomParams)) {
+            $entity->setCustomParams($productCustomParams);
+        }
+
 		return $entity;
 	}
 
@@ -462,6 +498,42 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
     }
 
+    /**
+     * @param array $customParams custom params data
+     * @param int $productId product id
+     */
+    private function _processCustomParams($customParams, $productId)
+    {
+        if (!empty($customParams)) {
+            $productCustomFieldsConfigMapper = Store_Mapper_ProductCustomFieldsConfigMapper::getInstance();
+            $productCustomParamsDataMapper = Store_Mapper_ProductCustomParamsDataMapper::getInstance();
+
+            foreach ($customParams as $customParam) {
+                $productCustomFieldsConfigModel = $productCustomFieldsConfigMapper->findById($customParam['id']);
+                if ($productCustomFieldsConfigModel instanceof Store_Model_ProductCustomFieldsConfigModel) {
+                    $productCustomParamsDataModel = $productCustomParamsDataMapper->checkIfParamExists($productId,
+                        $customParam['id']);
+                    if (!$productCustomParamsDataModel instanceof Store_Model_ProductCustomParamsDataModel) {
+                        $productCustomParamsDataModel = new Store_Model_ProductCustomParamsDataModel();
+                        $productCustomParamsDataModel->setProductId($productId);
+                        $productCustomParamsDataModel->setParamId($customParam['id']);
+                    }
+
+                    if ($customParam['param_type'] === Store_Model_ProductCustomFieldsConfigModel::CUSTOM_PARAM_TYPE_SELECT) {
+                        $productCustomParamsDataModel->setParamsOptionId($customParam['param_value']);
+                        $productCustomParamsDataModel->setParamValue('');
+                    } else {
+                        $productCustomParamsDataModel->setParamValue($customParam['param_value']);
+                        $productCustomParamsDataModel->setParamsOptionId(null);
+                    }
+
+                    $productCustomParamsDataMapper->save($productCustomParamsDataModel);
+                }
+            }
+        }
+    }
+
+
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();
         $productHasPartDbTable = new Models_DbTable_ProductHasPart();
@@ -476,6 +548,35 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 'part_id'    => intval($partId)
             ));
         }
+    }
+
+    /**
+     * @param Models_Model_Product $model
+     */
+    private function _processAllowance(Models_Model_Product $model) {
+        $allowanceProductsMapper = Store_Mapper_AllowanceProductsMapper::getInstance();
+
+        $allowanceProduct = $allowanceProductsMapper->findByProductId($model->getId());
+
+        if (!$allowanceProduct instanceof Store_Model_AllowanceProducts) {
+            $allowanceProduct = new Store_Model_AllowanceProducts();
+            $allowanceProduct->setProductId($model->getId());
+        }
+
+        $allowanceProduct->setAllowanceDue($model->getAllowance());
+        $allowanceProductsMapper->save($allowanceProduct);
+    }
+
+    /**
+     * @param $productId
+     * @return mixed
+     * @throws Exception
+     */
+    public function findByProductId($productId) {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $productId);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product')->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchRow($select);
     }
 
 	/**
@@ -626,6 +727,41 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $result = $this->getDbTable()->getAdapter()->fetchAll($select);
 
         return $result[0]['count'];
+    }
+
+    /**
+     * Get products dimensions and weight
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    public function fetchDimensionsProducts()
+    {
+        $select = $this->getDbTable()->getAdapter()
+            ->select()
+            ->from('shopping_product', array(
+                'product_id' => 'id',
+                'prod_length',
+                'prod_depth',
+                'prod_width',
+                'weight'
+            ));
+        $result = $this->getDbTable()->getAdapter()->fetchAssoc($select);
+
+        return $result;
+    }
+
+    /**
+     * Find product model by sku
+     *
+     * @param string $sku product sku
+     * @return Models_Model_Product|null
+     * @throws Exception
+     */
+    public function findBySku($sku)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('sku = ?', $sku);
+        return $this->_findWhere($where);
     }
 
 }

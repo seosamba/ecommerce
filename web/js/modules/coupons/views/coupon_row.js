@@ -1,7 +1,8 @@
 define([
 	'backbone',
-    'text!../templates/coupon_row.html'
-], function(Backbone, RowTemplate){
+    'text!../templates/coupon_row.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
+], function(Backbone, RowTemplate, i18n){
 
     var CouponRowView = Backbone.View.extend({
         tagName: 'tr',
@@ -20,7 +21,7 @@ define([
         },
         deleteAction: function(){
             var model = this.model;
-            showConfirm('Are you sure?', function(){
+            showConfirmCustom(_.isUndefined(i18n['Are you sure?'])?'Are you sure?':i18n['Are you sure?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 model.destroy();
             });
         }

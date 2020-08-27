@@ -85,7 +85,7 @@ if (_.isUndefined(TFilter)) {
                 } else {
                     $el.val('');
                     var $input = this.$el.find('.product-filters-list input[name="' + attrExists.get('name') + '"]');
-                    if ($input.size()) {
+                    if ($input.length) {
                         $input.focus();
                     } else {
                         self.renderAttribute(_.extend({tags: tags}, attrExists.toJSON())).find('input:text').focus();
@@ -116,7 +116,7 @@ if (_.isUndefined(TFilter)) {
             // prevent duplicating attributes
             var $exists = this.$el.find('input[name="' + attr.name + '"]'),
                 tags = [];
-            if ($exists.size()) {
+            if ($exists.length) {
                 return $exists.closest('p.filtering-attribute-widget');
             }
             // caching list element

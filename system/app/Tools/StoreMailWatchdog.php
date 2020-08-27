@@ -13,6 +13,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
     const TRIGGER_REFUND = 'store_refund';
 
+    const TRIGGER_DELIVERED = 'store_delivered';
+
 	const RECIPIENT_SALESPERSON = 'sales person';
 
 	const RECIPIENT_CUSTOMER    = 'customer';
@@ -34,6 +36,16 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      * Send email to supplier when order marked as shipped
      */
     const TRIGGER_SUPPLIER_SHIPPED = 'store_suppliershipped';
+
+    /**
+     * Send email to supplier when order marked as shipped
+     */
+    const TRIGGER_STORE_GIFT_ORDER = 'store_giftorder';
+
+    /**
+     * Notify customer if qty of product was changed
+     */
+    const TRIGGER_CUSTOMER_NOTIFICATION = 'store_customernotification';
 
     const SHIPPING_TYPE = 'shipping';
 
@@ -225,6 +237,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
     {
         $productIds = $this->_options['productIds'];
         $productPagesUrls = $this->_options['productPagesUrls'];
+        $orderDataObject = $this->_options['orderDataObject'];
         switch ($this->_options['recipient']) {
             case self::RECIPIENT_SUPPLIER:
                 $this->_mailer->setMailToLabel($this->_object->getFullName())
@@ -241,6 +254,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             $prodUrl = $this->_websiteHelper->getUrl() . $productPagesUrls[$prodId]['url'];
             $productUrls .= '<a href="' . $prodUrl . '">' . $productPagesUrls[$prodId]['name'] . '</a>';
         }
+        $this->_entityParser->objectToDictionary($orderDataObject, 'order');
         $this->_entityParser->addToDictionary(array('product:urls' => $productUrls));
         $this->_entityParser->objectToDictionary($this->_object, 'customer');
     }
@@ -275,6 +289,86 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 		return false;
 	}
+
+    private function _sendGiftorderMail() {
+        $customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
+        $customerBccArray = array();
+        $systemConfig = $this->_configHelper->getConfig();
+        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
+        switch ($this->_options['recipient']) {
+            case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+                    ->setMailTo($adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);
+                if(!empty($adminUsers)){
+                    foreach($adminUsers as $admin){
+                        array_push($adminBccArray, $admin->getEmail());
+                    }
+                    if(!empty($adminBccArray)){
+                        $this->_mailer->setMailBcc($adminBccArray);
+                    }
+                }
+                break;
+            case self::RECIPIENT_SALESPERSON:
+                $this->_mailer->setMailToLabel('Sales person')
+                    ->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if(!empty($salesPersons)){
+                    foreach($salesPersons as $salesPerson){
+                        array_push($customerBccArray, $salesPerson->getEmail());
+                    }
+                    if(!empty($customerBccArray)){
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
+                break;
+            case self::RECIPIENT_CUSTOMER:
+                $giftEmail = $this->_object->getGiftEmail();
+                if (empty($giftEmail)) {
+                    return false;
+                }
+
+                if ($customer && $customer->getEmail()){
+                    $this->_mailer->setMailToLabel($customer->getFullName())
+                        ->setMailTo($giftEmail);
+                } else {
+                    return false;
+                }
+                break;
+            default:
+                error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+                return false;
+                break;
+        }
+
+        $this->_entityParser
+            ->objectToDictionary($customer)
+            ->objectToDictionary($this->_object, 'order');
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
+        $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
+        if(isset($withBillingAddress)){
+            $this->_entityParser->addToDictionary(array('order:billingaddress'=> $withBillingAddress));
+        }
+        if(isset($withShippingAddress)){
+            $this->_entityParser->addToDictionary(array('order:shippingaddress'=> $withShippingAddress));
+        }
+        $currency = '';
+        if(Zend_Registry::isRegistered('Zend_Currency')){
+            $currencyHelper = Zend_Registry::get('Zend_Currency');
+            $currency = $currencyHelper->getSymbol();
+        }
+        $this->_entityParser->addToDictionary(array('order:currency'=>$currency));
+        $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
+        return $this->_send();
+    }
 
 	private function _sendNeworderMail() {
 		$customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
@@ -329,6 +423,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_entityParser
 				->objectToDictionary($customer)
 				->objectToDictionary($this->_object, 'order');
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
         $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
         if(isset($withBillingAddress)){
@@ -344,7 +442,24 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
         $this->_entityParser->addToDictionary(array('order:currency'=>$currency));
         $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
-		return $this->_send();
+
+        $pluginInvoicePdf = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+        if ($pluginInvoicePdf instanceof Application_Model_Models_Plugin && $pluginInvoicePdf->getStatus() === Application_Model_Models_Plugin::ENABLED) {
+            $invoicetopdfConfig = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams('attachInvoiceActionEmail');
+            if (isset($invoicetopdfConfig['attachInvoiceActionEmail']) && $invoicetopdfConfig['attachInvoiceActionEmail'] === '1') {
+                $fileInfo = Tools_Misc::prepareInvoice(['cartId' => $this->_object->getId(), 'dwn' => 0]);
+                if (isset($fileInfo['folder']) && isset($fileInfo['fileName'])) {
+                    $attachment = new Zend_Mime_Part(file_get_contents($fileInfo['folder'] . $fileInfo['fileName']));
+                    $attachment->type = 'application/pdf';
+                    $attachment->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
+                    $attachment->encoding = Zend_Mime::ENCODING_BASE64;
+                    $attachment->filename = $fileInfo['fileName'];
+                    $this->_mailer->addAttachment($attachment);
+                }
+            }
+        }
+
+        return $this->_send();
 	}
 
     /**
@@ -359,6 +474,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $this->_entityParser
             ->objectToDictionary($this->_object, 'order')
             ->objectToDictionary($this->_customer);
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
         $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
             self::BILLING_TYPE);
         $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
@@ -375,6 +494,38 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }else{
             $this->_entityParser->addToDictionary(array('order:shippingtrackingurl' =>  ''));
         }
+        $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
+
+        return $this->_send();
+    }
+
+    /**
+     * Send delivered email
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendDeliveredMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser
+            ->objectToDictionary($this->_object, 'order')
+            ->objectToDictionary($this->_customer);
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
+        $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
+            self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
+            self::SHIPPING_TYPE);
+        if (isset($withBillingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:billingaddress' => $withBillingAddress));
+        }
+        if (isset($withShippingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
+        }
+
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
         return $this->_send();
@@ -498,6 +649,37 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         foreach($address->getAddresses() as $addressData){
            $this->_entityParser->addToDictionary(array('customer:phone'=>$addressData['phone']));
        }
+    }
+
+    /**
+     * Send notification email for customer, when product qty was changed
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendCustomernotificationMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser->addToDictionary(
+            array(
+                'notify:productname' => $this->_options['customerProductData']['productName'],
+                'notify:productdescription' => $this->_options['customerProductData']['shortDescription'],
+                'notify:productqty' => $this->_options['customerProductData']['productQty'],
+                'customer:fullname' => $this->_options['customerProductData']['userFullName'],
+                'notify:producturl' => $this->_websiteHelper->getUrl() . $this->_options['customerProductData']['productUrl']
+            )
+        );
+
+        return $this->_send();
+    }
+
+    private function _prepareShippingServiceLabel()
+    {
+        if ($this->_object instanceof Models_Model_CartSession) {
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($this->_object->getShippingService());
+            return $shippingServiceLabel;
+        }
     }
 
 }

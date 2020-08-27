@@ -78,7 +78,9 @@ class Tools_RecurringPaymentTools
         $recurringPaymentMapper = Store_Mapper_RecurringPaymentsMapper::getInstance();
         $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
         $dependentCart = $cartSessionMapper->find($dependentCartId);
-        if ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER) {
+        if ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_TWO_MONTHS) {
+            $recurrentPeriod = '+2 month';
+        } elseif ($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_QUARTER) {
             $recurrentPeriod = '+3 month';
         } elseif($paymentPeriod === Api_Store_Recurringtypes::RECURRING_PAYMENT_TYPE_SEMESTER) {
             $recurrentPeriod = '+6 month';
@@ -132,7 +134,7 @@ class Tools_RecurringPaymentTools
         if ($cart instanceof Models_Model_CartSession && !empty($paymentInfo)) {
             $recurringPluginClassName = 'Tools_RecurringPayment' . ucfirst(strtolower($cart->getGateway()));
             if (class_exists($recurringPluginClassName)) {
-                $recurringPayment = new $recurringPluginClassName();
+                $recurringPayment = new $recurringPluginClassName($params);
                 if ($recurringPayment instanceof Interfaces_RecurringPayment) {
                     switch ($changeSubscription) {
                         case Store_Model_RecurringPayments::SUSPENDED_RECURRING_PAYMENT:

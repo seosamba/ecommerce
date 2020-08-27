@@ -41,6 +41,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
      */
     private $_currency = null;
 
+    protected $_websiteUrl = '';
+
 	protected function _init(){
 		parent::_init();
 
@@ -202,7 +204,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
     }
 
     private function _renderName() {
-		return $this->_product->getName();
+		return htmlspecialchars($this->_product->getName(),ENT_QUOTES,'UTF-8');
 	}
 
 	private function _renderPhotourl() {
@@ -220,29 +222,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		} else {
 			$newSize = 'product';
 		}
-		if (preg_match('~^https?://.*~', $photoSrc)){
-			$tmp = parse_url($photoSrc);
-			$path = explode('/', trim($tmp['path'], '/'));
-			if (is_array($path)){
-				$imgName = array_pop($path);
-				$guessSize = array_pop($path);
-				if (in_array($guessSize, $photourlOptions) && $guessSize !== $newSize ){
-					$guessSize = $newSize;
-				}
-				return $tmp['scheme'] .'://'. implode('/', array(
-					$tmp['host'],
-					implode('/', $path),
-					$guessSize,
-                    rawurlencode($imgName)
-				));
-			}
-			return $photoSrc;
-		} else {
-            $photoSrc = explode('/', $photoSrc);
-            $photoSrc = $photoSrc[0].'/'.$newSize.'/'.rawurlencode(end($photoSrc));
 
-			return $websiteUrl . $websiteHelper->getMedia() . $photoSrc;
-		}
+        return Tools_Misc::prepareProductImage($photoSrc, $newSize);
 	}
 
 	private function _renderPrice() {
@@ -370,7 +351,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	}
 
     private function _renderWeight() {
-        return $this->_product->getWeight() . ' ' .self::$_shoppingConfig['weightUnit'];
+        $weight = Tools_Misc::processingWeightFormat($this->_product->getWeight());
+        return $weight . ' ' .self::$_shoppingConfig['weightUnit'];
     }
 
     private function _renderMpn() {
@@ -439,13 +421,120 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $checkoutPageUrl = $checkoutPage != null?$checkoutPage->getUrl():'';
         $imageSize = 'small';
         if ($related !== null) {
-            $this->_view->related     = ($related instanceof Models_Model_Product) ? array($related) : $related ;
-            $this->_view->imageSize   = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
-            $this->_view->noZeroPrice = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice');
-            if(isset($this->_options[1]) && $this->_options[1] == 'addtocart'){
-               $this->_view->checkoutPageUrl = $checkoutPageUrl;
+            $noZeroPrice = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('noZeroPrice');
+
+            $templateName = '';
+            foreach ($this->_options as $option) {
+                if (preg_match('/^(template)=(.*)$/u', $option, $parts)) {
+                    if(isset($parts[2]) && !empty($parts[2])) {
+                        $templateName = $parts[2];
+                    }
+                }
             }
-            return $this->_view->render('related.phtml');
+
+            if(!empty($templateName)) {
+                $template = Application_Model_Mappers_TemplateMapper::getInstance()->find($templateName);
+                if ($template !== null) {
+                    $renderedContent = array();
+
+                    foreach ($related as $relatedProduct) {
+                        if (strpos($template->getContent(), '$store:addtocart') !== false) {
+                            $storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $relatedProduct->getId()));
+                        }
+                        if (strpos($template->getContent(), '$store:addtocart:checkbox') !== false) {
+                            $storeWidgetAddToCartCheckbox = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $relatedProduct->getId(), 'checkbox'));
+                        }
+
+                        $shortDesc = $relatedProduct->getShortDescription();
+
+                        $inventoryCount = $relatedProduct->getInventory();
+
+                        if(!is_null($inventoryCount)) {
+                            $inventoryCount = trim($relatedProduct->getInventory());
+                        }
+
+                        if (is_null($inventoryCount)){
+                            $productQty = '&infin;';
+                        } else {
+                            $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
+                        }
+
+                        if(is_null($inventoryCount) || !empty($inventoryCount)) {
+                            $inventoryCount = $this->_translator->translate('In stock');
+                        } else {
+                            $inventoryCount = $this->_translator->translate('Out of stock');
+                        }
+
+                        $price = $relatedProduct->getCurrentPrice() !== null ? $relatedProduct->getCurrentPrice() : $relatedProduct->getPrice();
+
+                        if ((bool) Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('showPriceIncTax')) {
+                            $price += Tools_Tax_Tax::calculateProductTax($relatedProduct);
+                        }
+
+                        $priceNocurrency = number_format(round($price, 2), 2, '.', '');
+
+                        $photoSrc = $this->_product->getPhoto();
+                        if (empty($photoSrc)){
+                            $photoSrc = $this->_websiteUrl.Tools_Page_Tools::PLACEHOLDER_NOIMAGE;
+
+                            $photoSrcProduct = $photoSrcSmall = $photoSrcMedium = $photoSrcLarge = $photoSrcOriginal = $photoSrcCrop = $photoSrc;
+                        } else {
+                            //array('product', 'small', 'medium', 'large', 'original');
+                            $photoSrcProduct = Tools_Misc::prepareProductImage($photoSrc, 'product');
+                            $photoSrcSmall = Tools_Misc::prepareProductImage($photoSrc, 'small');
+                            $photoSrcMedium = Tools_Misc::prepareProductImage($photoSrc, 'medium');
+                            $photoSrcLarge = Tools_Misc::prepareProductImage($photoSrc, 'large');
+                            $photoSrcOriginal = Tools_Misc::prepareProductImage($photoSrc, 'original');
+                        }
+
+                        $dictionary = array(
+                            '$product:name'                              => htmlspecialchars($relatedProduct->getName(),ENT_QUOTES,'UTF-8'),
+                            '$product:url'                               => $relatedProduct->getPage() ? $this->_websiteUrl . $relatedProduct->getPage()->getUrl() : null,
+                            '$product:brand'                             => $relatedProduct->getBrand(),
+                            '$product:weight'                            => $relatedProduct->getWeight(),
+                            '$product:mpn'                               => $relatedProduct->getMpn(),
+                            '$product:sku'                               => $relatedProduct->getSku(),
+                            '$product:id'                                => $relatedProduct->getId(),
+                            '$product:description:short'                 => nl2br($shortDesc),
+                            '$product:description'                       => nl2br($shortDesc),
+                            '$product:description:full'                  => nl2br($relatedProduct->getFullDescription()),
+                            '$store:addtocart'                           => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                            '$store:addtocart:'.$relatedProduct->getId() => isset($storeWidgetAddToCart) ? $storeWidgetAddToCart->render() : '',
+                            '$store:addtocart:checkbox'                  => isset($storeWidgetAddToCartCheckbox) ? $storeWidgetAddToCartCheckbox->render() : '',
+                            '$product:inventory'                         => $inventoryCount,
+                            '$product:qty'                               => $productQty,
+                            '$product:wishlistqty'                       => $relatedProduct->getWishlistQty(),
+                            '$product:price'                             => $price,
+                            '$product:price:nocurrency'                  => $priceNocurrency,
+                            '$product:photourl'                          => $photoSrcProduct,
+                            '$product:photourl:small'                    => $photoSrcSmall,
+                            '$product:photourl:medium'                   => $photoSrcMedium,
+                            '$product:photourl:large'                    => $photoSrcLarge,
+                            '$product:photourl:original'                 => $photoSrcOriginal
+                        );
+
+                        $renderedContent[] = Tools_Misc::preparingProductListing($template->getContent(), $relatedProduct, $dictionary);
+                    }
+
+                    $this->_view->renderedContent = $renderedContent;
+
+                    if(in_array('addtocart', $this->_options)) {
+                        $this->_view->checkoutPageUrl = $checkoutPageUrl;
+                    }
+
+                    return $this->_view->render('related-partial.phtml');
+                } else {
+                    throw new Exceptions_SeotoasterWidgetException('Template doesn\'t exist');
+                }
+            } else {
+                $this->_view->related     = ($related instanceof Models_Model_Product) ? array($related) : $related ;
+                $this->_view->imageSize   = (!empty($this->_options[0])) ? $this->_options[0] : $imageSize;
+                $this->_view->noZeroPrice = $noZeroPrice;
+                if(in_array('addtocart', $this->_options)) {
+                    $this->_view->checkoutPageUrl = $checkoutPageUrl;
+                }
+                return $this->_view->render('related.phtml');
+            }
         }
         return false;
     }
@@ -479,6 +568,46 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     }
 
+    private function _renderGroupDiscount()
+    {
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+        $dbTable = new Models_DbTable_CustomerInfo();
+        $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+        $allCustomersGroups = $dbTable->getAdapter()->fetchAssoc($select);
+        if (!empty($currentUser)) {
+            if (array_key_exists($currentUser, $allCustomersGroups)) {
+                $allProductsWithGroups = Store_Mapper_GroupPriceMapper::getInstance()->fetchAssocAll();
+                $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                if (!empty($allProductsGroups[$groupId])) {
+                    $productId = $this->_product->getId();
+                    if ($productId != null) {
+                        $groupProductKey = $groupId . '_' . $productId;
+                        $priceNow = $this->_product->getPrice();
+                        $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                        $priceSign = $allProductsGroups[$groupId]['priceSign'];
+                        $priceType = $allProductsGroups[$groupId]['priceType'];
+                        if (array_key_exists($groupProductKey, $allProductsWithGroups)) {
+                            $priceValue = $allProductsWithGroups[$groupProductKey]['priceValue'];
+                            $priceSign = $allProductsWithGroups[$groupProductKey]['priceSign'];
+                            $priceType = $allProductsWithGroups[$groupProductKey]['priceType'];
+                        }
+                        if ($priceType == 'percent') {
+                            return (float) $priceValue . '%';
+                        }
+                        if ($priceType == 'unit') {
+                            return $priceValue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
     public static function getAllowedOptions() {
 		$translator = Zend_Registry::get('Zend_Translate');
 	    $allowedOptions = array();
@@ -496,5 +625,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
 	    return $allowedOptions;
 	}
+
+    private function _renderAllowance() {
+        return $this->_product->getAllowance();
+    }
+
+    private function _renderWishlistQty() {
+        return '<span data-qty="'. $this->_product->getWishlistQty() .'" class="product-wishlist-qty product-wishlist-'. $this->_product->getId() .'">' . $this->_product->getWishlistQty() . '</span>';
+    }
 
 }

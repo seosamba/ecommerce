@@ -91,10 +91,16 @@ class Tools_SupplierObserver implements Interfaces_Observer
                     $triggerName = Tools_StoreMailWatchdog::TRIGGER_SUPPLIER_SHIPPED;
                 }
 
+                $session = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+
+                $session->storeCartSessionKey = $this->_object->getId();
+                $session->storeCartSessionConversionKey = $this->_object->getId();
+
                 $userModel->registerObserver(new Tools_Mail_Watchdog(array(
                     'trigger' => $triggerName,
                     'productIds' => explode(',', $supplierProduct['productsIds']),
-                    'productPagesUrls' => $productPagesUrls
+                    'productPagesUrls' => $productPagesUrls,
+                    'orderDataObject' =>  $this->_object
                 )));
                 $userModel->notifyObservers();
             }

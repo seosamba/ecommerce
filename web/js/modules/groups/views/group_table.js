@@ -42,15 +42,21 @@ define([
         renderGroup: function(group){
             var priceType = $('.group-currency').val();
             var priceSign = '-';
+            var nonTaxable = 'no';
             if(group.get('priceType') == 'percent'){
                 priceType = '%';
             }
             if(group.get('priceSign') == 'plus'){
                 priceSign = '+';
             }
+            if(group.get('nonTaxable') == '1') {
+                nonTaxable = 'yes';
+            }
+
             this.$el.fnAddData([
                 '<span class="groupName-table">'+group.get('groupName')+'</span>',
                 '<span>'+priceSign+' '+group.get('priceValue')+' '+priceType+'</span>',
+                '<span>'+nonTaxable+'</span>',
                 '<a class="ticon-pencil icon14" data-role="edit" data-cid="'+group.get('id')+'" href="javascript:;"></a> <a class="ticon-remove error icon14" data-role="delete" data-cid="'+group.get('id')+'" href="javascript:;"></a>',
             ]);
         },
@@ -90,6 +96,11 @@ define([
                 $('#group-sign').val(responce[0].priceSign).attr('selected',true);
                 $('#priceValue').val(responce[0].priceValue);
                 $('#priceValue').focus();
+                if (responce[0].nonTaxable == '1') {
+                    $('#not-taxable-group').prop('checked', true);
+                } else {
+                    $('#not-taxable-group').prop('checked', false);
+                }
             })
         }
     });

@@ -134,6 +134,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                         $cartContent[$key]['taxRate'] = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                         $cartContent[$key]['short_description'] = $productObject->getShortDescription();
                         $cartContent[$key]['full_description'] = $productObject->getFullDescription();
+                        $cartContent[$key]['brand'] = $productObject->getBrand();
                     }
                 }
                 $this->_cart->setCartContent($cartContent);
@@ -343,8 +344,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         $shippingService = 'Shipping Address';
         if ($this->_cart->getShippingService() === Shopping::SHIPPING_PICKUP) {
             $shippingService = 'Pickup information';
+        } else {
+            $shippingService = $this->_cart->getShippingService();
+            $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
+            $shippingServiceLabel = $serviceLabelMapper->findByName($shippingService);
         }
-        return $this->_translator->translate($shippingService);
+        return !empty($shippingServiceLabel) ? $shippingServiceLabel : $this->_translator->translate($shippingService);
     }
 
     /**
@@ -403,6 +408,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderNotes()
     {
         return $this->_cart->getNotes();
+    }
+
+    /**
+     * Return cart additional info
+     *
+     * @return mixed
+     */
+
+    protected function _renderAdditionalInfo()
+    {
+        return $this->_cart->getAdditionalInfo();
     }
 
     /**
@@ -495,6 +511,40 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     {
         return intval($this->_cart->getId());
     }
+
+    /**
+     * Return is a gift message
+     *
+     * @return string
+     */
+    protected function _renderIsGift()
+    {
+       if (!empty($this->_cart->getIsGift())) {
+           if (!empty($this->_options[0])) {
+               return $this->_options[0];
+           }
+           return $this->_translator->translate('Is a gift');
+       }
+
+       return '';
+
+    }
+
+    /**
+     * Return email of the gift receiver
+     *
+     * @return string
+     */
+    protected function _renderGiftEmail()
+    {
+        if (!empty($this->_cart->getIsGift()) && !empty($this->_cart->getGiftEmail())) {
+            return $this->_cart->getGiftEmail();
+        }
+
+        return '';
+
+    }
+
 
     /**
      * Return product sku for single item in cart
@@ -693,6 +743,24 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return '<img class="cart-product-image" src="' . $photoSrc . '" alt="' . $this->_cartContent[$sid]['name'] . '">';
     }
 
+    /**
+     * Return product photo for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemPhotourl($sid)
+    {
+        if (isset($this->_options[0])) {
+            $folder = $this->_options[0];
+        } else {
+            $folder = 'product';
+        }
+        $photoSrc = $this->_cartContent[$sid]['photo'];
+        $photoSrc = Tools_Misc::prepareProductImage($photoSrc, $folder);
+        return $photoSrc;
+    }
+
 
     /**
      * Return product options for single item in cart
@@ -753,6 +821,17 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCartItemProducturl($sid)
     {
         return $this->_cartContent[$sid]['productUrl'];
+    }
+
+    /**
+     * * Return product brand for single item in cart
+     *
+     * @param $sid
+     * @return mixed
+     */
+    protected function _renderCartItemBrand($sid)
+    {
+        return $this->_cartContent[$sid]['brand'];
     }
 
     /**
