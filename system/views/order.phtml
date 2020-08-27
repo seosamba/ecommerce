@@ -287,11 +287,19 @@
                     <?php endif;?>
                     <tr>
                         <td colspan="<?php echo $colSpan + 5 ?>" rowspan="7"></td>
+                        <?php
+                            $subTotal = $this->order->getSubTotal();
+
+                            if($this->order->getRefundAmount() > 0) {
+                                $subTotal += $this->order->getRefundAmount();
+                            }
+                        ?>
+
                         <td><?php echo $this->translate('Subtotal');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <td class="text-right"><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
+                            <td class="text-right"><?php echo $this->currency($subTotal + $this->order->getSubTotalTax());?></td>
                         <?php else:?>
-                            <td class="text-right"><?php echo $this->currency($this->order->getSubTotal());?></td>
+                            <td class="text-right"><?php echo $this->currency($subTotal);?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getDiscount() > 0): ?>
