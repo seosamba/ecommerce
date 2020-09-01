@@ -74,9 +74,17 @@ class Api_Store_Customers extends Api_Service_Abstract {
             $mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
             $desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
-            $data = array_map(function($row) use ($currency, $mobileMasks, $desktopMasks){
+            $usNumericFormat = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('usNumericFormat');
+
+            $data = array_map(function($row) use ($currency, $mobileMasks, $desktopMasks, $usNumericFormat){
 				$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
-				$row['total_amount'] = $currency->toCurrency($row['total_amount']);
+
+				if(!empty($usNumericFormat)) {
+                    $currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+                    $row['total_amount'] = number_format($row['total_amount'], 2) . ' ' . $currencySymbol;
+                } else {
+                    $row['total_amount'] = $currency->toCurrency($row['total_amount']);
+                }
                 $row['mobileMasks'] = $mobileMasks;
                 $row['desktopMasks'] = $desktopMasks;
                 if (!empty($row['customer_attr'])) {
