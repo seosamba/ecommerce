@@ -460,6 +460,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     unset($this->draglist['data'][$i]);
                 }
             }
+
+            if(!empty($this->draglist['data'])) {
+                $this->draglist['data'] = array_values($this->draglist['data']);
+            }
         }
 
         $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
