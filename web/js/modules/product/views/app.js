@@ -81,13 +81,13 @@ define([
                 }
             });
             this.$el.on('tabsbeforeactivate', function(event, ui){
-                switch (ui.newPanel.selector){
-                    case '#tag-tab':
+                switch (ui.newPanel.attr('id')){
+                    case 'tag-tab':
                         self.initTags();
                     break;
-                    case '#coupon-tab':
-                    case '#group-pricing-tab':
-                    case '#digital-product-tab':
+                    case 'coupon-tab':
+                    case 'group-pricing-tab':
+                    case 'digital-product-tab':
                         if (self.model.isNew()){
                             showMessage(_.isUndefined(i18n['Please save product information first'])?'Please save product information first':i18n['Please save product information first'], true);
                             return false;
