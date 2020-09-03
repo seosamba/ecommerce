@@ -930,6 +930,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
         $dragListId = filter_var($this->_request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
+        $filterable = filter_var($this->_request->getParam('filterable'), FILTER_SANITIZE_STRING);
 		$content = '';
         $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
         if (is_numeric($this->_request->getParam('limit'))) {
@@ -977,7 +978,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (!empty($productsListDataResult)) {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
             } else {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart)));
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable));
             }
 
             $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
