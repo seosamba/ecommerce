@@ -545,6 +545,16 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_percentage` DECIMAL(10,2
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_partial` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_purchased_on` timestamp NULL;
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_partialpayment'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpayment' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_partialpaymentnotif'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentnotif' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.7.9' WHERE `name`='shopping';
