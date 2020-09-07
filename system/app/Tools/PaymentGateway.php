@@ -40,6 +40,11 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 }
             }
 
+            if ($status === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cart->setPartialPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
+            }
+
+
 			Models_Mapper_CartSessionMapper::getInstance()->save($cart);
 		}
 
