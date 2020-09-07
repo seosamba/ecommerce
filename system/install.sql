@@ -317,6 +317,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
+  `partial_purchased_on` timestamp NULL,
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',

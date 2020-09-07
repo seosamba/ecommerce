@@ -133,6 +133,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_partialPaidAmount = '';
 
+    protected $_partialPurchasedOn = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -644,6 +646,25 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setPartialPaidAmount($partialPaidAmount)
     {
         $this->_partialPaidAmount = $partialPaidAmount;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPartialPurchasedOn()
+    {
+        return $this->_partialPurchasedOn;
+    }
+
+    /**
+     * @param null $partialPurchasedOn
+     * @return null
+     */
+    public function setPartialPurchasedOn($partialPurchasedOn)
+    {
+        $this->_partialPurchasedOn = $partialPurchasedOn;
 
         return $this;
     }

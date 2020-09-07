@@ -541,9 +541,10 @@ ALTER TABLE `shopping_cart_session` ADD `shipping_tracking_code_id` int(10) unsi
 
 -- 18/08/2020
 -- version: 2.7.8
-ALTER TABLE `shopping_cart_session` ADD `partial_percentage` DECIMAL(10,2) DEFAULT '0.00';
-ALTER TABLE `shopping_cart_session` ADD `is_partial` ENUM('0', '1') DEFAULT '0';
-ALTER TABLE `shopping_cart_session` ADD `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_percentage` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `is_partial` ENUM('0', '1') DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_purchased_on` timestamp NULL;
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.7.9' WHERE `name`='shopping';
