@@ -265,6 +265,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_USERS);
 
 		Zend_Registry::set('acl', $acl);
+        Tools_System_Tools::firePluginMethodByTagName('salespermission', 'extendPermission');
 	}
 
 	public function run($requestedParams = array()) {
