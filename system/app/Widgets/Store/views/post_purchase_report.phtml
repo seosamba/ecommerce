@@ -577,9 +577,9 @@
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
             <span style="float:left;"><?php echo $this->translate('Shipping');?>: </span>
             <?php if ($this->showPriceIncTax == 1): ?>
-                <span><?php echo $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
+                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
             <?php else:?>
-                <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
+                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice());?></span>
             <?php endif;?>
         </p>
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
