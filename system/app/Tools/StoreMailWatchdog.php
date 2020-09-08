@@ -47,6 +47,16 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     const TRIGGER_CUSTOMER_NOTIFICATION = 'store_customernotification';
 
+    /**
+     * Notify customer if partial payment was made
+     */
+    const TRIGGER_STORE_PARTIALPAYMENT = 'store_partialpayment';
+
+    /**
+     * Notify users after certain period of time
+     */
+    const TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION = 'store_partialpaymentnotif';
+
     const SHIPPING_TYPE = 'shipping';
 
     const BILLING_TYPE = 'billing';
@@ -506,6 +516,70 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      * @throws Exceptions_SeotoasterException
      */
     private function _sendDeliveredMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser
+            ->objectToDictionary($this->_object, 'order')
+            ->objectToDictionary($this->_customer);
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
+        $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
+            self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
+            self::SHIPPING_TYPE);
+        if (isset($withBillingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:billingaddress' => $withBillingAddress));
+        }
+        if (isset($withShippingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
+        }
+
+        $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
+
+        return $this->_send();
+    }
+
+    /**
+     * Send partial payment
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendPartialpaymentMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser
+            ->objectToDictionary($this->_object, 'order')
+            ->objectToDictionary($this->_customer);
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
+        $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
+            self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
+            self::SHIPPING_TYPE);
+        if (isset($withBillingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:billingaddress' => $withBillingAddress));
+        }
+        if (isset($withShippingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
+        }
+
+        $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
+
+        return $this->_send();
+    }
+
+    /**
+     * Send partial payment reminder notification
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendPartialpaymentnotifMail()
     {
         $this->_prepareEmailToSend();
         $this->_entityParser

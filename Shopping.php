@@ -1433,9 +1433,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 
-			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
-				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
-			)));
+            if ($cartSession->getStatus() !== Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
+                )));
+            }
 
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -1446,8 +1448,17 @@ class Shopping extends Tools_Plugins_Abstract {
                     )));
                 }
             }
-            if (class_exists('Tools_AppsServiceWatchdog')) {
-                $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+
+            if ($cartSession->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT
+                )));
+            }
+
+            if ($cartSession->getStatus() !== Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                if (class_exists('Tools_AppsServiceWatchdog')) {
+                    $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+                }
             }
 			$cartSession->notifyObservers();
 		}
