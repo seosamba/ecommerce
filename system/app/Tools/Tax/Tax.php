@@ -95,7 +95,7 @@ class Tools_Tax_Tax {
                 $tax = Models_Mapper_Tax::getInstance()->getDefaultRule();
             }
 
-            if (isset($tax) && $tax !== null) {
+            if (isset($tax) && $tax !== null && $getRate !== 'getRate') {
                 return ($discountPrice / 100) * $tax->$getRate();
             }
         }
