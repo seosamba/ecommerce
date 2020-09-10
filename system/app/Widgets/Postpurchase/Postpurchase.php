@@ -554,6 +554,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemSku($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['sku'];
     }
 
@@ -565,6 +569,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemMpn($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['mpn'];
     }
 
@@ -576,6 +584,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemGtin($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['gtin'];
     }
 
@@ -587,6 +599,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemPrice($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         $price = (is_null($this->_cartContent[$sid]['price'])) ? 0 : $this->_cartContent[$sid]['price'];
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
             return $price;
@@ -605,6 +621,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCartItemQty($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['qty'];
     }
 
@@ -616,6 +636,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemName($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '&nbsp;';
+        }
+
         return $this->_cartContent[$sid]['name'];
     }
 
@@ -627,6 +651,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemShortdescription($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         if (!empty($this->_cartContent[$sid]['short_description'])) {
             if (in_array(self::WRAP_DESCRIPTION_LINK, $this->_options, true) && preg_match('~((http|https):\/\/(.*))~ui', $this->_cartContent[$sid]['short_description'], $matched)) {
                 if (!empty($matched) && !empty($matched['0']) && !empty($this->_options[1])) {
@@ -649,6 +677,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemFulldescription($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         if (!empty($this->_cartContent[$sid]['full_description'])) {
             if (in_array(self::WRAP_DESCRIPTION_LINK, $this->_options, true) && preg_match('~((http|https):\/\/(.*))~ui', $this->_cartContent[$sid]['full_description'], $matched)) {
                 if (!empty($matched) && !empty($matched['0']) && !empty($this->_options[1])) {
@@ -668,6 +700,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemTax($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         $productTax = $this->_cartContent[$sid]['tax'];
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
             return $productTax;
@@ -683,6 +719,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemTaxprice($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         $price = (is_null($this->_cartContent[$sid]['tax_price'])) ? 0 : $this->_cartContent[$sid]['tax_price'];
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
             return $price;
@@ -700,6 +740,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemFreebies($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['freebies'];
     }
 
@@ -711,11 +755,19 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemCartid($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cart->getId();
     }
 
     protected function _renderCartItemTotal($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         $priceWithTax = (is_null($this->_cartContent[$sid]['tax_price'])) ? 0 : $this->_cartContent[$sid]['tax_price'];
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
             return $priceWithTax * $this->_cartContent[$sid]['qty'];
@@ -733,6 +785,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemPhoto($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         if (isset($this->_options[0])) {
             $folder = $this->_options[0];
         } else {
@@ -751,6 +807,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemPhotourl($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         if (isset($this->_options[0])) {
             $folder = $this->_options[0];
         } else {
@@ -770,6 +830,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemOptions($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         $productOptions = $this->_cartContent[$sid]['options'];
         if (!empty($productOptions)) {
             $optionResult = '';
@@ -820,6 +884,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemProducturl($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['productUrl'];
     }
 
@@ -831,6 +899,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemBrand($sid)
     {
+        if($this->_cartContent[$sid]['price'] < 1 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
         return $this->_cartContent[$sid]['brand'];
     }
 

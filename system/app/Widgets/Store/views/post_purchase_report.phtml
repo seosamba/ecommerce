@@ -480,7 +480,7 @@
 		<?php foreach ($this->cartContent as $product) : ?>
 			<tr>
 				<td align="left" valign="middle">
-                    <?php if($product['isEnabled'] && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
                         <?php if (isset($product['photo']) && $product['photo'] != ''): ?>
                             <a class="page-teaser-image"
                                href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
@@ -498,7 +498,7 @@
                     <?php endif;?>
 				</td>
 				<td align="left" valign="middle">
-                    <?php if($product['isEnabled'] && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
 						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
                         <?php if (!empty($product['options'])): ?>
                             <?php foreach ($product['options'] as $optionTitle => $optData): ?>
@@ -534,7 +534,7 @@
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
 						<?php if (isset($product[$tableRow])): ?>
 							<td valign="middle" align="center">
-                            <?php if($product['isEnabled'] && $product['price'] > 0) :?>
+                            <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
                                 <?php echo $product[$tableRow]; ?>
                             <?php endif; ?>
                             </td>
@@ -542,7 +542,7 @@
 					<?php endforeach; ?>
 				<?php endif; ?>
                 <td valign="middle" align="center">
-                    <?php if($product['isEnabled'] && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
                         <?php if($product['freebies'] == 1):?>
                             <?php echo $this->translate('free'); ?>
                         <?php else:?>
@@ -551,12 +551,12 @@
                     <?php endif;?>
                 </td>
 				<td valign="middle" align="center">
-                    <?php if($product['isEnabled'] && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
                         <?php echo $product['qty']; ?>
                     <?php endif;?>
                 </td>
                 <td valign="middle" align="center">
-                    <?php if($product['isEnabled'] && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
                         <?php if($product['freebies'] == 1):?>
                             <?php echo $this->translate('free'); ?>
                         <?php else:?>

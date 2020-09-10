@@ -96,6 +96,14 @@ class MagicSpaces_Postpurchasecartcontent_Postpurchasecartcontent extends Tools_
                     $productMapper = Models_Mapper_ProductMapper::getInstance();
                     $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
+                    foreach ($cartContent as $key => $caContent) {
+                        $product = $productMapper->find($caContent['product_id']);
+
+                        if($product instanceof Models_Model_Product) {
+                            $cartContent[$key]['isEnabled'] = $product->getEnabled();
+                        }
+                    }
+
                     if(!empty($shoppingConfig['quoteDraggableProducts'])) {
                         $quoteEnabled = Tools_Plugins_Tools::findPluginByName('quote');
                         if($quoteEnabled->getStatus() == Application_Model_Models_Plugin::ENABLED) {
@@ -135,6 +143,9 @@ class MagicSpaces_Postpurchasecartcontent_Postpurchasecartcontent extends Tools_
                                         foreach ($preparedCartContent as $cContent) {
                                             $cartContent[] = $cContent;
                                         }
+
+                                        $cartSession->setCartContent($cartContent);
+                                        Zend_Registry::set('postPurchaseCart', $cartSession);
                                     }
                                 }
                             }
