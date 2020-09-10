@@ -93,6 +93,54 @@ class MagicSpaces_Postpurchasecartcontent_Postpurchasecartcontent extends Tools_
             if ($cartSession instanceof Models_Model_CartSession) {
                 $cartContent = $cartSession->getCartContent();
                 if (!empty($cartContent)) {
+                    $productMapper = Models_Mapper_ProductMapper::getInstance();
+                    $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
+                    if(!empty($shoppingConfig['quoteDraggableProducts'])) {
+                        $quoteEnabled = Tools_Plugins_Tools::findPluginByName('quote');
+                        if($quoteEnabled->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                            $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($cartSession->getId());
+
+                            if ($quote instanceof Quote_Models_Model_Quote) {
+                                $quoteId = $quote->getId();
+
+                                $quoteDraggableMapper = Quote_Models_Mapper_QuoteDraggableMapper::getInstance();
+
+                                $quoteDraggableModel = $quoteDraggableMapper->findByQuoteId($quoteId);
+
+                                if($quoteDraggableModel instanceof Quote_Models_Model_QuoteDraggableModel) {
+                                    $dragOrder = $quoteDraggableModel->getData();
+
+                                    if(!empty($dragOrder)) {
+                                        $dragOrder = explode(',', $dragOrder);
+
+                                        $prepareContentSids = array();
+                                        foreach ($cartContent as $key => $caContent) {
+                                            $product = $productMapper->find($caContent['product_id']);
+                                            $options = ($caContent['options']) ? $caContent['options'] : Quote_Tools_Tools::getProductDefaultOptions($product);
+                                            $prodSid = Quote_Tools_Tools::generateStorageKey($product, $options);
+                                            $prepareContentSids[$prodSid] = $caContent;
+                                        }
+
+                                        $sortedCartContent = array();
+                                        foreach ($dragOrder as $productSid) {
+                                            if(!empty($prepareContentSids[$productSid])) {
+                                                $sortedCartContent[$productSid] = $prepareContentSids[$productSid];
+                                            }
+                                        }
+                                        $preparedCartContent = array_merge($sortedCartContent, $prepareContentSids);
+
+                                        $cartContent = array();
+
+                                        foreach ($preparedCartContent as $cContent) {
+                                            $cartContent[] = $cContent;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     foreach ($cartContent as $sid => $cartItem) {
                         $content .= preg_replace_callback(
                             '~{\$postpurchase:(cartitem:(.+))}~uU',
