@@ -976,4 +976,43 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return Tools_Geo::getStateByParam($stateId);
     }
 
+
+    /**
+     * Return partial amount
+     *
+     * @return mixed
+     */
+    protected function _renderPartialamount(){
+        $cartId = $this->_cart->getId();
+        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($cartId);
+        if(!empty($quote)){
+            $partialAmountPaid = $this->_cart->getPartialPaidAmount();
+            if (!empty((int) $partialAmountPaid)) {
+                if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+                    return $this->_cart->getPartialPaidAmount();
+                }
+
+                return $this->_view->currency($this->_cart->getPartialPaidAmount());
+            }
+        }
+    }
+
+    /**
+     * Return partial percentage
+     *
+     * @return mixed
+     */
+    protected function _renderPartialpercentage(){
+        $cartId = $this->_cart->getId();
+        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($cartId);
+        if(!empty($quote)){
+            $partialAmountPaid = $this->_cart->getPartialPercentage();
+            if (!empty((int) $partialAmountPaid)) {
+                return $this->_cart->getPartialPercentage();
+            }
+
+            return '';
+        }
+    }
+
 }
