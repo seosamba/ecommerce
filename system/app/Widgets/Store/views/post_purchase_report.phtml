@@ -550,6 +550,7 @@
         <?php foreach ($this->cartContent as $product) : ?>
             <tr>
                 <td align="left" valign="middle">
+                <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
                     <?php if (isset($product['photo']) && $product['photo'] != ''): ?>
                         <a class="page-teaser-image"
                            href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
@@ -564,58 +565,71 @@
                         <img style="width:60px;" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
                              alt="<?php echo $product['name']; ?>"/>
                     <?php endif; ?>
+                <?php endif;?>
                 </td>
                 <td align="left" valign="middle">
-                    <span class="post-purchase-report-product-name"
-                          style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
-                    <?php if (!empty($product['options'])): ?>
-                        <?php foreach ($product['options'] as $optionTitle => $optData): ?>
-                            <?php
-                            if (is_array($optData)) {
-                                $optionStr = $optionTitle . ': ' . $optData['title'];
-                                if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-                                    if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1) {
-                                        $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate']) / 100;
-                                    } else {
-                                        $optPriceMod = $optData['priceValue'];
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <span class="post-purchase-report-product-name"
+                              style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
+                        <?php if (!empty($product['options'])): ?>
+                            <?php foreach ($product['options'] as $optionTitle => $optData): ?>
+                                <?php
+                                if (is_array($optData)) {
+                                    $optionStr = $optionTitle . ': ' . $optData['title'];
+                                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+                                        if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1) {
+                                            $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate']) / 100;
+                                        } else {
+                                            $optPriceMod = $optData['priceValue'];
+                                        }
+                                        if ($optData['priceType'] === 'percent') {
+                                            $optionStr .= ' <span>(' . $optData['priceSign'] . '%' . number_format($optPriceMod,
+                                                    2) . ')</span>';
+                                        } else {
+                                            $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) . ')</span>';
+                                        }
                                     }
-                                    if ($optData['priceType'] === 'percent') {
-                                        $optionStr .= ' <span>(' . $optData['priceSign'] . '%' . number_format($optPriceMod,
-                                                2) . ')</span>';
-                                    } else {
-                                        $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) . ')</span>';
+                                    if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+                                        $optionStr .= ' <span>(' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->weightSign . ')</span>';
                                     }
-                                }
-                                if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-                                    $optionStr .= ' <span>(' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->weightSign . ')</span>';
-                                }
-                            } else {
-                                $optionStr = $optionTitle . ': ' . $optData;
-                            } ?>
-                            <div class="options"><?php echo $optionStr; ?></div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                                } else {
+                                    $optionStr = $optionTitle . ': ' . $optData;
+                                } ?>
+                                <div class="options"><?php echo $optionStr; ?></div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    <?php endif;?>
                 </td>
                 <?php if (isset($this->additionalTableRows)): ?>
                     <?php foreach ($this->additionalTableRows as $tableRow): ?>
                         <?php if (isset($product[$tableRow])): ?>
-                            <td valign="middle" align="center"><?php echo $product[$tableRow]; ?></td>
+                            <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                                <td valign="middle" align="center"><?php echo $product[$tableRow]; ?></td>
+                            <?php endif; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
                 <td valign="middle" align="center">
-                    <?php if ($product['freebies'] == 1): ?>
-                        <?php echo $this->translate('free'); ?>
-                    <?php else: ?>
-                        <?php echo $this->currency($product['tax_price']); ?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if ($product['freebies'] == 1): ?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php else: ?>
+                            <?php echo $this->currency($product['tax_price']); ?>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </td>
-                <td valign="middle" align="center"><?php echo $product['qty']; ?></td>
                 <td valign="middle" align="center">
-                    <?php if ($product['freebies'] == 1): ?>
-                        <?php echo $this->translate('free'); ?>
-                    <?php else: ?>
-                        <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                         <?php echo $product['qty']; ?>
+                    <?php endif; ?>
+                </td>
+                <td valign="middle" align="center">
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if ($product['freebies'] == 1): ?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php else: ?>
+                            <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </td>
             </tr>

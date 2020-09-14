@@ -129,6 +129,10 @@ class Api_Store_Customers extends Api_Service_Abstract {
         }
 
         if(isset($groupId)){
+
+            $dataGroup = array('userId' => $userId, 'groupId' => $groupId);
+            Tools_System_Tools::firePluginMethodByTagName('assigngroup', 'assignLeadGroup', $dataGroup, true);
+
             $customerInfoDbTable = new Models_DbTable_CustomerInfo();
             if($groupId == 0){
                 $groupId = null;
