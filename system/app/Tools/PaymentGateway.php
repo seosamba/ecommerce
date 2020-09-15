@@ -41,6 +41,7 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
             }
 
             if ($status === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
                 $cart->setPartialPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
             }
 
