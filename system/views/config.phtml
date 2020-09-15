@@ -38,27 +38,47 @@ $this->headLink()
 	</ul>
     </div>
 	<form  style="overflow-y: auto;" class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
-	<?php foreach ($subForms as $subform) :?>
+    <?php $displayPartialPaymentNotificationClass = 'hidden';?>
+    <?php $partialNotifyAfterQuantity = '';?>
+    <?php $partialNotifyAfterType = '';?>
+    <?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">
             <?php $hoursFrom = array('0' => $this->translate('From')) + Tools_Misc::$_hoursUnits;?>
             <?php $hoursTo = array('0' => $this->translate('To')) + Tools_Misc::$_hoursUnits;?>
 			<?php foreach ($subform->getElements() as $elem):?>
 			<div>
                 <?php $elemName = $elem->getName();?>
-                <?php if ($elemName !== 'operationalHours') :?>
+                <?php if ($elemName !== 'operationalHours' && $elemName !== 'partialNotifyAfterQuantity' && $elemName !== 'partialNotifyAfterType') :?>
                     <?php $labelText = $this->translate($elem->getLabel());?>
                     <?php $elem->setLabel($labelText);?>
 				    <?php echo $elem->renderLabel();?>
                     <?php echo $elem->renderViewHelper();?>
-                <?php  else: ?>
+                    <?php if($elemName === 'enabledPartialPayment'):?>
+                        <?php if(!empty($elem->getValue())):?>
+                            <?php $displayPartialPaymentNotificationClass ='';?>
+                        <?php endif;?>
+                    <?php endif;?>
+                <?php  elseif($elemName === 'operationalHours'): ?>
                     <?php $operationalHours = $elem->getValue();?>
                     <?php if(!empty($operationalHours)) :?>
                         <?php $operationalHours = unserialize($elem->getValue());?>
                     <?php endif;?>
+                <?php  elseif($elemName === 'partialNotifyAfterQuantity'): ?>
+                    <?php $partialNotifyAfterQuantity = $elem->getValue();?>
+                <?php  elseif($elemName === 'partialNotifyAfterType'): ?>
+                    <?php $partialNotifyAfterType = $elem->getValue();?>
                 <?php endif;?>
             </div>
 			<?php endforeach; ?>
             <?php if ($subform->getId() === 'display'): ?>
+                <div id="notify-partial-payment-block" class="<?php echo $displayPartialPaymentNotificationClass;?> mb10px">
+                    <label class="grid_12"><?php echo $this->translate('Notify after');?>:</label>
+                    <input class="grid_6" type="text" name="partialNotifyAfterQuantity" id="partialNotifyAfterQuantity" value="<?php echo $partialNotifyAfterQuantity;?>" placeholder="<?php echo $this->translate('partial payment lag time');?>">
+                    <select class="grid_6 mb20px" name="partialNotifyAfterType" id="partialNotifyAfterType">
+                        <option <?php echo ($partialNotifyAfterType === "day")?'selected':'';?> value="day"><?php echo $this->translate('Days');?></option>
+                        <option <?php echo ($partialNotifyAfterType === "month")?'selected':'';?> value="month"><?php echo $this->translate('Months');?></option>
+                    </select>
+                </div>
                 <p class="grid_12 text-center mb10px mt0px">
                     <a href="javascript:;" class="text-center" id="switch-operational-hours"><?php echo $this->translate('View and edit your business operating hours');?></a>
                 </p>
@@ -199,7 +219,9 @@ $this->headLink()
     shopping.saveconfig = function(){
         var url = '<?php echo $this->form->getAction(); ?>',
             data = $('form[user-changed="true"]').serialize(),
-            operationHours = {'operationalHours' : {}};
+            operationHours = {'operationalHours' : {}},
+            partialNotifyAfterType = $('#partialNotifyAfterType').val(),
+            partialNotifyAfterQuantity = $('#partialNotifyAfterQuantity').val();
 
         $.each($('.operational-hours-row'), function(){
             operationHours['operationalHours'][$(this).data('operation-day')] = {
@@ -286,5 +308,14 @@ $this->headLink()
     $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
     });
+
+    $(document).on('change', '#enabledPartialPayment', function(e){
+        if ($(e.currentTarget).is(':checked')) {
+            $(document).find('#notify-partial-payment-block').removeClass('hidden');
+        } else {
+            $(document).find('#notify-partial-payment-block').addClass('hidden');
+        }
+    });
+
 <?php $this->jQuery()->onLoadCaptureEnd();?>
 </script>

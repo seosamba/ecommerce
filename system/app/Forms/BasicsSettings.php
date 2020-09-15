@@ -40,6 +40,8 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
         ));
 
+        $translator = Zend_Registry::get('Zend_Translate');
+
         $this->addElement('text', 'operationalHours', array(
             'label' => 'store operational hours'
         ));
@@ -47,7 +49,6 @@ class Forms_BasicsSettings extends Zend_Form {
         $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
         array_pop($timezones);
 
-        $translator = Zend_Registry::get('Zend_Translate');
         $this->addElement(new Zend_Form_Element_Select(
             array(
                 'name' => 'timezone',
@@ -57,6 +58,26 @@ class Forms_BasicsSettings extends Zend_Form {
                 'multiOptions' => array('0' => $translator->translate('Select timezone')) + array_combine($timezones, $timezones)
             )
         ));
-	}
+
+        $this->addElement('checkbox', 'enabledPartialPayment', array(
+            'label' => 'Partial payments',
+            'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('text', 'partialNotifyAfterQuantity', array(
+            'label' => 'Lag time',
+            'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('select', 'partialNotifyAfterType', array(
+            'label' => 'Length unit',
+            'class' => 'grid_6 alpha',
+            'multiOptions' => array(
+                'day' => $translator->translate('Days'),
+                'month' => $translator->translate('Months')
+            )
+        ));
+
+    }
 
 }
