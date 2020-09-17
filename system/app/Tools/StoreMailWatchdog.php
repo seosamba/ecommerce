@@ -568,6 +568,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
         }
 
+        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($this->_object->getId());
+        if ($quote instanceof Quote_Models_Model_Quote) {
+            $this->_entityParser->objectToDictionary($quote, 'quote');
+        }
+
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
         return $this->_send();
@@ -598,6 +603,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
         if (isset($withShippingAddress)) {
             $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
+        }
+
+        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($this->_object->getId());
+        if ($quote instanceof Quote_Models_Model_Quote) {
+            $this->_entityParser->objectToDictionary($quote, 'quote');
         }
 
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
