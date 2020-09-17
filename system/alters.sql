@@ -556,6 +556,13 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentnotif' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `cart_id` INT(10) UNSIGNED NOT NULL,
+  `notified_at` TIMESTAMP NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.7.9' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

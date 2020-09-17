@@ -994,6 +994,13 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
 
+CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `cart_id` INT(10) UNSIGNED NOT NULL,
+  `notified_at` TIMESTAMP NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.8' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.9' WHERE `name` = 'shopping';
 
