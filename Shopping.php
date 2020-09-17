@@ -945,28 +945,77 @@ class Shopping extends Tools_Plugins_Abstract {
         $attributes = $this->_request->getParam('attributes');
         $price = $this->_request->getParam('price');
         $sort = $this->_request->getParam('sort');
-
         $offset = intval($nextPage) * $limit;
 
-        $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("p.enabled='1'", $order, $offset, $limit,
-            null, $tags, $brands, false, false, $attributes, $price, $sort);
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
 
-        if (!empty($dragListId)) {
+        if (empty($dragListId)) {
+            $products = $productMapper->fetchAll("p.enabled='1'", $order, $offset, $limit,
+                null, $tags, $brands, false, false, $attributes, $price, $sort);
+        } else {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
             $dragModel = $dragMapper->find($dragListId);
             if ($dragModel instanceof Models_Model_Draggable) {
                 $dragList['list_id'] = $dragModel->getId();
                 $dragList['data'] = unserialize($dragModel->getData());
 
-                foreach ($products as $product) {
-                    $prodId = $product->getId();
-                    if(in_array($prodId, $dragList['data'])) {
-                        $productsListDataResult[] = $product;
+                if(!empty($attributes) || !empty($tags) || !empty($brands) || !empty($price)) {
+                    $productsToSort = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1'), null, null, null,
+                        null, $tags, $brands, false, false, $attributes, $price, null);
+
+                    if(!empty($productsToSort)) {
+                        $dragListDataSorted = array();
+
+                        foreach ($productsToSort as $key => $product) {
+                            $searchKey  = array_search($product->getId(), $dragList['data']);
+
+                            if(in_array($product->getId(), $dragList['data'])) {
+                                $dragListDataSorted[$searchKey] = $product->getId();
+                            }
+                        }
+
+                        if(!empty($dragListDataSorted)) {
+                            ksort($dragListDataSorted);
+
+                            $dragListDataSorted = array_values($dragListDataSorted);
+                            $dragList['data'] = $dragListDataSorted;
+                        }
                     }
                 }
 
-                $products = array();
-                if(!empty($productsListDataResult)) {
+                $currentProductsId = array();
+
+                for ($i = $offset; $i < ($offset + $limit); $i++) {
+                    if (count($dragList['data']) > $offset && isset($dragList['data'][$i])) {
+                        $currentProductsId[] = $dragList['data'][$i];
+                    }
+                }
+
+                if (!empty($currentProductsId)) {
+                    $where = $productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                        $currentProductsId);
+                    $where .= ' AND ' . $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1');
+
+                    $productsListData = $productMapper->fetchAll($where, $order, null, null, null, null, null, false, false, array(), array(), $sort) ;
+
+                    $productsListDataSorted = array();
+                    foreach ($productsListData as $key => $product) {
+                        $currentProductRightOrder = array_search($product->getId(), $currentProductsId);
+                        $productsListDataSorted[$currentProductRightOrder] = $product;
+                    }
+
+                    ksort($productsListDataSorted);
+
+                    $productsListData = $productsListDataSorted;
+
+                    $productsListDataResult = array();
+
+                    foreach ($productsListData as $product) {
+                        $prodId = $product->getId();
+                        if(in_array($prodId, $currentProductsId)) {
+                            $productsListDataResult[] = $product;
+                        }
+                    }
                     $products = $productsListDataResult;
                 }
             }
