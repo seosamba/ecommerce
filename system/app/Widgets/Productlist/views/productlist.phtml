@@ -37,7 +37,8 @@
 		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
                 <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
                 <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
-				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>);
+				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>,
+				<?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable): array());?>);
 
 		showSpinner();
 
