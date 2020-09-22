@@ -25,6 +25,7 @@
 <script>
 	$('#<?php echo $id; ?>').on('click', function(e){
         e.preventDefault();
+        $(this).hide();
 
         var self = this,
 	        nextpage = $(this).data('nextpage') || 1,
@@ -44,6 +45,7 @@
 
 		$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
             hideSpinner();
+            $(self).show();
             if (response) {
                 $(self).before(response);
 				$(self).data('nextpage', ++nextpage);
