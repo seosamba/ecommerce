@@ -60,7 +60,7 @@ class Forms_BasicsSettings extends Zend_Form {
         ));
 
         $this->addElement('checkbox', 'enabledPartialPayment', array(
-            'label' => 'Partial payments',
+            'label' => 'Accept partial payments for quote:  Yes/No',
             'class' => 'grid_6 alpha'
         ));
 

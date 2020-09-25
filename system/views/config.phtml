@@ -72,7 +72,7 @@ $this->headLink()
 			<?php endforeach; ?>
             <?php if ($subform->getId() === 'display'): ?>
                 <div id="notify-partial-payment-block" class="<?php echo $displayPartialPaymentNotificationClass;?> mb10px">
-                    <label class="grid_12"><?php echo $this->translate('Notify after');?>:</label>
+                    <label class="grid_12"><?php echo $this->translate('Send payment complement request automatically after');?>:<a href="javascript:;" target="_blank" class="ticon-info tooltip icon18" title="<?php echo $this->translate('Create templates from the action e-mails & SMS screens');?>"></a></label>
                     <input class="grid_6" type="text" name="partialNotifyAfterQuantity" id="partialNotifyAfterQuantity" value="<?php echo $partialNotifyAfterQuantity;?>" placeholder="<?php echo $this->translate('partial payment lag time');?>">
                     <select class="grid_6 mb20px" name="partialNotifyAfterType" id="partialNotifyAfterType">
                         <option <?php echo ($partialNotifyAfterType === "day")?'selected':'';?> value="day"><?php echo $this->translate('Days');?></option>

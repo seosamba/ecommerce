@@ -694,6 +694,20 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
                     }
                 }
                 break;
+            case self::RECIPIENT_SUPPLIER:
+                $this->_mailer->setMailToLabel('Supplier')
+                    ->setMailTo(!empty($this->_storeConfig['email']) ? $this->_storeConfig['email'] : $adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SUPPLIER);
+                $supplierPersons = $userMapper->fetchAll($where);
+                if (!empty($supplierPersons)) {
+                    foreach ($supplierPersons as $supplierPerson) {
+                        array_push($customerBccArray, $supplierPerson->getEmail());
+                    }
+                    if (!empty($customerBccArray)) {
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
+                break;
             case self::RECIPIENT_CUSTOMER:
                 if ($this->_customer && $this->_customer->getEmail()) {
                     $this->_mailer->setMailToLabel($this->_customer->getFullName())->setMailTo($this->_customer->getEmail());
