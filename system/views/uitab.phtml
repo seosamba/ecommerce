@@ -241,10 +241,13 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                                 case 'products':
                                     uiTab.parseProducts(response, filter);
                                     if (response.length >= uiTab.step) {
-                                        $('.productlisting:last-child').waypoint(function () {
-                                                $(this).waypoint('remove');
-                                                uiTab.offset += 30;
-                                                uiTab.loadStoreData('products', filter)
+                                        $('.productlisting:last-child').waypoint(
+                                            {
+                                                handler: function () {
+                                                    $(this).waypoint('remove');
+                                                    uiTab.offset += 30;
+                                                    uiTab.loadStoreData('products', filter)
+                                                }
                                             },
                                             {
                                                 context: '#product-products',
