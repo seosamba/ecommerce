@@ -23,7 +23,11 @@
 <% } %>
 
 <td data-mobile-title="Products in cart"><%= total_products %></td>
-<td data-mobile-title="Total price"><%= total %></td>
+<td data-mobile-title="Total price"><%= total %>
+    <% if(status === 'partial') { %>
+        (<%= partial_paid_amount %>)
+    <% } %>
+</td>
 <td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
 <td data-mobile-title="Shipping via" class="shipping-service">
     <div class="tracking-info">

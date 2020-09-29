@@ -132,7 +132,10 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_object = $object;
 
 		if (isset($this->_options['template']) && !empty($this->_options['template']) ){
-			$this->_template = $this->_preparseEmailTemplate();
+            if (!empty($this->_options['customInfoMessage'])) {
+                $this->_options['message'] = $this->_options['customInfoMessage'];
+            }
+		    $this->_template = $this->_preparseEmailTemplate();
 		} else {
 			throw new Exceptions_SeotoasterException('Missing template for action email trigger');
 		}

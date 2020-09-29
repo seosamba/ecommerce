@@ -7,12 +7,14 @@ define(['backbone',
     'text!../templates/refund_dialog.html',
     'text!../templates/shipping_labels_dates_dialog.html',
     'text!../templates/refund_shipment_dialog.html',
+    'text!../templates/send_payment_request_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     'moment',
-    'accounting'
+    'accounting',
+    'tinyMCE'
 ], function(Backbone,
         OrdersCollection, OrdersView,
-        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, RefundShipmentTmpl, i18n, moment, accounting
+        PaginatorTmpl, ExportTemplate, TrackingCodeTemplate, RefundTemplate, ShippingLabelDates, RefundShipmentTmpl, SendPaymentRequestTemplate,i18n, moment, accounting, tinymce
     ){
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
@@ -602,6 +604,63 @@ define(['backbone',
                         $(this).dialog('destroy');
                     }
                 });
+            } else if(status === 'partial') {
+                confirmMessage = _.isUndefined(i18n['Are you sure you want to send payment request?']) ? 'Are you sure you want to send payment request?' : i18n['Are you sure you want to send payment request?'];
+
+                var partialButton  = _.isUndefined(i18n['Send payment request']) ? 'Send payment request':i18n['Send payment request'],
+                    assignPartialButtons = {},
+                    dialog = _.template(SendPaymentRequestTemplate, {
+                        i18n:i18n,
+                        orderId: id,
+                        total: model.get('total')
+                    });
+
+                assignPartialButtons[partialButton] = function() {
+                    $('.ui-dialog').css('zIndex', "101");
+                    smoke.confirm(confirmMessage, function (e) {
+                        if (e) {
+                            $.ajax({
+                                url: $('#website_url').val() + 'plugin/shopping/run/sendPaymentInfoEmail/',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    'orderId': $('#send-notification-order-id').val(),
+                                    'secureToken': $('.orders-secure-token').val(),
+                                    'sendPaymentRequestMessage': tinymce.activeEditor.getContent()
+                                },
+                                success: function (response) {
+                                    if (response.error === 1) {
+                                        showMessage(response.responseText, true, 5000);
+                                    } else {
+                                        showMessage(response.responseText, false, 5000);
+                                        $('.ui-dialog-titlebar-close').trigger('click');
+                                    }
+                                }
+                            });
+
+                        }
+
+                    }, {
+                        ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                        cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                    });
+                };
+
+                $(dialog).dialog({
+                    dialogClass: 'seotoaster',
+                    width: '35%',
+                    height: '450',
+                    buttons: assignPartialButtons,
+                    resizable: false,
+                    open: function (event, ui) {
+                        tinymce.remove();
+                        self.initTiny(self.orders.sendPaymentInfoDefaultText);
+                    },
+                    close: function (event, ui) {
+                        tinymce.remove();
+                        $(this).dialog('destroy');
+                    }
+                });
 
             } else {
                 smoke.confirm(confirmMessage, function (e) {
@@ -750,7 +809,54 @@ define(['backbone',
                     result[decodeURIComponent(tmpData[0])] = decodeURIComponent(tmpData[1]);
                 });
             return result;
-        }
+        },
+        initTiny: function (sendPaymentInfoDefaultText){
+            var websiteUrl = $('#website_url').val(), self = this;
+            tinymce.init({
+                script_url              : websiteUrl+'system/js/external/tinymce/tinymce.gzip.php',
+                selector                : "#send-payment-notification-info",
+                skin                    : 'seotoaster',
+                menubar                 : false,
+                browser_spellcheck      : true,
+                resize                  : false,
+                convert_urls            : false,
+                relative_urls           : false,
+                statusbar               : false,
+                allow_script_urls       : true,
+                force_p_newlines        : true,
+                forced_root_block       : false,
+                entity_encoding         : "raw",
+                plugins                 : [
+                    "advlist lists link anchor image charmap visualblocks code media table paste textcolor fullscreen autolink"
+                ],
+                toolbar1                : "leadshortcode bold italic underline alignleft aligncenter alignright alignjustify | bullist numlist forecolor backcolor | link unlink image media hr | formatselect | fontsizeselect | pastetext code | fullscreen | spellcheckbtn",
+                fontsize_formats        : "8px 10px 12px 14px 16px 18px 24px 36px",
+                block_formats           : "Block=div;Paragraph=p;Block Quote=blockquote;Cite=cite;Address=address;Code=code;Preformatted=pre;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6",
+                image_advtab            : true,
+                extended_valid_elements : "a[*],input[*],select[*],textarea[*]",
+                setup                   : function(ed){
+                    var keyTime = null;
+                    ed.on('change blur keyup', function(ed, e){
+                        self.dispatchEditorKeyup(ed, e, keyTime);
+                        this.save();
+                    });
+                    ed.on('init', function (e) {
+                        //this gets executed AFTER TinyMCE is fully initialized
+                        ed.setContent(sendPaymentInfoDefaultText);
+                    });
+                }
+            });
+
+            this.tinimce = tinymce;
+        },
+        dispatchEditorKeyup: function(editor, event, keyTime) {
+            var keyTimer = keyTime;
+            if(keyTimer === null) {
+                keyTimer = setTimeout(function() {
+                    keyTimer = null;
+                }, 1000)
+            }
+        },
     });
 
     return MainView;

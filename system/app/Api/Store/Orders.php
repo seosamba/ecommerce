@@ -116,6 +116,24 @@ class Api_Store_Orders extends Api_Service_Abstract {
             }
             $orderList['defaultTaxes'] = $defaultTaxes;
             $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
+
+            $recipientName = 'customer';
+            $triggerName = Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION;
+            $trigger = Application_Model_Mappers_EmailTriggersMapper::getInstance()->findByTriggerName($triggerName)->toArray();
+            if (!empty($trigger) && !empty($recipientName)) {
+                $trigger = array_filter($trigger, function($triggerInfo) use ($recipientName){
+                    return $triggerInfo['recipient'] === $recipientName;
+                });
+
+            }
+
+            $trigger = reset($trigger);
+
+            if (empty($trigger)) {
+                $trigger['message'] = '';
+            }
+            $orderList['sendPaymentInfoDefaultText'] = $trigger['message'];
+
             if (!empty($shoppingConfig['realRefundByDefault'])) {
                 $orderList['realRefundByDefault'] = 1;
             } else {
