@@ -41,10 +41,10 @@
 				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>,
 				<?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable): array());?>);
 
-		showSpinner();
+		showSpinner('body', 'show-more-spinner');
 
 		$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
-            hideSpinner();
+            hideSpinner('.show-more-spinner');
             $(self).show();
             if (response) {
                 $(self).before(response);
