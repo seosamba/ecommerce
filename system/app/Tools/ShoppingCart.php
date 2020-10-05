@@ -788,7 +788,7 @@ class Tools_ShoppingCart {
 						}
 						$modifiers[$defaultOption['title']] = array(
 							'option_id'   => $defaultOption['id'],
-							'title'       => $textValue,
+							'title'       => strip_tags($textValue),
 							'priceSign'   => null,
 							'priceType'   => null,
 							'priceValue'  => null,
@@ -803,7 +803,7 @@ class Tools_ShoppingCart {
                         }
                         $modifiers[$defaultOption['title']] = array(
                             'option_id'   => $defaultOption['id'],
-                            'title'       => $textValue,
+                            'title'       => strip_tags($textValue),
                             'priceSign'   => null,
                             'priceType'   => null,
                             'priceValue'  => null,
