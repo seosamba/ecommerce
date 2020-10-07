@@ -367,6 +367,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `phonecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phone_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
   `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
+  `position` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `state` (`state`)
@@ -1002,5 +1003,5 @@ CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.0' WHERE `name` = 'shopping';
 
