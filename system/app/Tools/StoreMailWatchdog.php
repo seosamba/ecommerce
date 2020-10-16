@@ -130,7 +130,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		}
 
         $wicEmail = $this->_configHelper->getConfig('wicEmail');
-        $this->_entityParser->setDictionary(array(
+        $this->_entityParser->addToDictionary(array(
             'widcard:BizEmail' => !empty($wicEmail) ? $wicEmail : $this->_configHelper->getConfig('adminEmail')
         ));
 
