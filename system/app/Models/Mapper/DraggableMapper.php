@@ -15,8 +15,12 @@ class Models_Mapper_DraggableMapper extends Application_Model_Mappers_Abstract
         }
 
         $data = array(
-            'id' => $model->getId(),
-            'data' => $model->getData()
+            'id'         => $model->getId(),
+            'data'       => $model->getData(),
+            'updated_at' => $model->getUpdatedAt(),
+            'user_id'    => $model->getUserId(),
+            'ip_address' => $model->getIpAddress(),
+            'page_id'    => $model->getPageId()
         );
 
         $recordExists = $this->find($data['id']);
