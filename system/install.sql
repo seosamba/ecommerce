@@ -157,7 +157,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.8');
+('version', '2.7.9');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -891,6 +891,10 @@ CREATE TABLE IF NOT EXISTS `shopping_company_products` (
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  `updated_at` TIMESTAMP NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `page_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -1031,4 +1035,4 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.8' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.7.9' WHERE `name` = 'shopping';

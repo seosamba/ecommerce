@@ -2464,12 +2464,22 @@ class Shopping extends Tools_Plugins_Abstract {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $dragList = filter_var_array($this->_request->getParams(), FILTER_SANITIZE_STRING);
             if (!empty($dragList['list_id'])) {
+                $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+                $userId = $currentUser->getId();
+
+                $pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT);
+
                 $mapper = Models_Mapper_DraggableMapper::getInstance();
                 $listId = $dragList['list_id'];
                 $model = new Models_Model_Draggable();
                 $model->setId($listId);
                 $model->setData(serialize($dragList['list_data']));
+                $model->setUpdatedAt(Tools_System_Tools::convertDateFromTimezone('now'));
+                $model->setUserId($userId);
+                $model->setIpAddress(Tools_System_Tools::getIpAddress());
+                $model->setPageId($pageId);
                 $mapper->save($model);
+
                 $this->_responseHelper->success($this->_translator->translate('Order has been updated'));
             }
         }
