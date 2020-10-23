@@ -169,13 +169,60 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
                 $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 				$this->_view->shoppingConfig = $shoppingConfig;
-                foreach ($cartContent as $key=>$product){
+
+                if(!empty($shoppingConfig['quoteDraggableProducts'])) {
+                    $quoteEnabled = Tools_Plugins_Tools::findPluginByName('quote');
+                    if($quoteEnabled->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($cartId);
+
+                        if ($quote instanceof Quote_Models_Model_Quote) {
+                            $quoteId = $quote->getId();
+
+                            $quoteDraggableMapper = Quote_Models_Mapper_QuoteDraggableMapper::getInstance();
+
+                            $quoteDraggableModel = $quoteDraggableMapper->findByQuoteId($quoteId);
+
+                            if($quoteDraggableModel instanceof Quote_Models_Model_QuoteDraggableModel) {
+                                $dragOrder = $quoteDraggableModel->getData();
+
+                                if(!empty($dragOrder)) {
+                                    $dragOrder = explode(',', $dragOrder);
+
+                                    $prepareContentSids = array();
+                                    foreach ($cartContent as $key => $content) {
+                                        $product = $productMapper->find($content['product_id']);
+                                        $options = ($content['options']) ? $content['options'] : Quote_Tools_Tools::getProductDefaultOptions($product);
+                                        $prodSid = Quote_Tools_Tools::generateStorageKey($product, $options);
+                                        $prepareContentSids[$prodSid] = $content;
+                                    }
+
+                                    $sortedCartContent = array();
+                                    foreach ($dragOrder as $productSid) {
+                                        if(!empty($prepareContentSids[$productSid])) {
+                                            $sortedCartContent[$productSid] = $prepareContentSids[$productSid];
+                                        }
+                                    }
+                                    $preparedCartContent = array_merge($sortedCartContent, $prepareContentSids);
+
+                                    $cartContent = array();
+
+                                    foreach ($preparedCartContent as $cContent) {
+                                        $cartContent[] = $cContent;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach ($cartContent as $key => $product){
                     $productObject = $productMapper->find($product['product_id']);
                     if($productObject !== null){
-                        $cartContent[$key]['mpn']      = $productObject->getMpn();
+                        $cartContent[$key]['mpn']        = $productObject->getMpn();
                         $cartContent[$key]['photo']      = $productObject->getPhoto();
                         $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
                         $cartContent[$key]['taxRate']    = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
+                        $cartContent[$key]['isEnabled']  = $productObject->getEnabled();
                     }
                 }
 
