@@ -157,7 +157,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.9');
+('usNumericFormat', '0'),
+('version', '2.8.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -998,5 +999,5 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.0' WHERE `name` = 'shopping';
 

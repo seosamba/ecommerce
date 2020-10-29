@@ -30,6 +30,7 @@ define(['backbone', '../models/order', 'backbone.paginator'],
                     this.totalRecords = response.length;
                 }
                 this.moneyFormat = response.moneyFormat;
+                this.usNumericFormat = response.usNumericFormat;
                 this.shippingTaxRate = response.shippingTaxRate;
                 this.realRefundByDefault = response.realRefundByDefault;
                 this.defaultTaxes = response.defaultTaxes;
