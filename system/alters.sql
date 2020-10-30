@@ -551,7 +551,13 @@ ALTER TABLE `shopping_draggable` ADD COLUMN `page_id` int(10) unsigned DEFAULT N
 INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('usNumericFormat', '0');
 
+-- 29/10/2020
+-- version: 2.8.0
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('minimumOrder', '0');
+ALTER TABLE `shopping_product` ADD COLUMN `minimum_order` int(3) unsigned DEFAULT '0';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

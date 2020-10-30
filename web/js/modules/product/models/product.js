@@ -22,7 +22,8 @@ define([
                 photo: null,
                 options: new ProductOptions(),
                 inventory: null,
-                allowance: ''
+                allowance: '',
+                minimumOrder: null,
             }
         },
 		initialize: function (){
