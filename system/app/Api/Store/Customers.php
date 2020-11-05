@@ -221,6 +221,18 @@ class Api_Store_Customers extends Api_Service_Abstract {
                 $updateField = $customerInfoDbTable->getAdapter()->quoteInto('group_id =?', $groupId);
                 $customerInfoDbTable->getAdapter()->query('UPDATE `shopping_customer_info` SET '.$updateField);
             }else{
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $customersForMassGroupAssignment = $customerMapper->getCustomersForMassGroupAssignment($customersIdsArray);
+                $customersInfoToInsert = array_diff($customersIdsArray, array_keys($customersForMassGroupAssignment));
+                if (!empty($customersInfoToInsert)) {
+                    foreach ($customersInfoToInsert as $customerInfo) {
+                        $customerInfoDbTable->insert(
+                            array(
+                                'user_id'   => $customerInfo,
+                            )
+                        );
+                    }
+                }
                 $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
                 $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
             }

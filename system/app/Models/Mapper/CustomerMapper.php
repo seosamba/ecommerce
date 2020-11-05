@@ -357,4 +357,18 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
         return $users;
     }
+
+    public function getCustomersForMassGroupAssignment($customersIdsArray)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('u.id IN (?)', $customersIdsArray);
+
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('u' => 'user'), array(
+            'u.id',
+            'sci.user_id',
+        ))
+            ->join(array('sci' => 'shopping_customer_info'), 'sci.user_id=u.id', array())
+            ->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
 }
