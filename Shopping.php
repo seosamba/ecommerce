@@ -951,10 +951,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $price = $this->_request->getParam('price');
         $sort = $this->_request->getParam('sort');
         $offset = intval($nextPage) * $limit;
+        $useUserOrder = filter_var($this->_request->getParam('useUserOrder'), FILTER_VALIDATE_BOOLEAN);
 
         $productMapper = Models_Mapper_ProductMapper::getInstance();
-
-        if (empty($dragListId)) {
+        if (empty($dragListId) || $useUserOrder) {
             $products = $productMapper->fetchAll("p.enabled='1'", $order, $offset, $limit,
                 null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {

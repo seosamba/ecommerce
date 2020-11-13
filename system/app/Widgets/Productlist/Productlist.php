@@ -237,7 +237,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 'price_' . Zend_Db_Select::SQL_DESC => ['title' => 'descending', 'selected' => 0],
                 'default' => ['title' => 'default', 'selected' => 1],
             ];
-            if (!empty($this->_view->filters['order']) && isset($this->_view->filters['order'][0])) {
+            if (!empty($this->_view->filters['order']) && isset($this->_view->filters['order'][0]) && !$dragListId) {
                 if (strpos($this->_view->filters['order'][0], 'name') !== false) {
                     $userOrderOptions['name_' . $orderSql]['selected'] = 1;
                     $userOrderOptions['default']['selected'] = 0;

@@ -14,25 +14,27 @@
                 <?php endforeach; ?>
             </select>
         <?php endif; ?>
-        <?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-            <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop');?></a>
-        <?php endif;?>
+        <?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)): ?>
+            <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop'); ?></a>
+        <?php endif; ?>
         <?php echo $this->plContent; ?>
-        <input type="hidden" name="<?php echo $id;?>_filters" data-filters-default='<?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>'>
+        <input type="hidden" name="<?php echo $id; ?>_filters"
+               data-filters-default='<?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>'>
         <?php if ($this->totalCount >= $this->limit): ?>
-        <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>" data-sort="<?php echo $this->sort; ?>"><?php echo $this->translate('show more'); ?></a>
+            <a href="#<?php echo $id; ?>" class="show-more" id="<?php echo $id; ?>"
+               data-sort="<?php echo $this->sort; ?>"><?php echo $this->translate('show more'); ?></a>
         <?php endif; ?>
 <?php if(empty($this->unwrap)): ?>
     </div>
 <?php endif;?>
 <script type="application/javascript">
-    $(function() {
+    $(function () {
         $('.backToOriginal').on('click', function (e) {
             e.preventDefault();
             var pathName = window.location.pathname;
             window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>' + pathName;
         });
-        $('#user_order_<?php echo $id; ?>').on('change', function(e){
+        $('#user_order_<?php echo $id; ?>').on('change', function (e) {
             $('input[name="<?php echo $id;?>_filters"]').nextAll('span').remove();
             $(this).nextAll('div.product-item').remove();
             var self = this,
@@ -41,18 +43,19 @@
                         template: '<?php echo $this->productTemplate; ?>',
                         nextpage: 0,
                         limit: '<?php echo $this->limit; ?>',
-                        sort: $(this).val() !== 'default'? $(this).val().split('_')[1] : $('#<?php echo $id; ?>').data('sort')
+                        sort: $(this).val() !== 'default' ? $(this).val().split('_')[1] : $('#<?php echo $id; ?>').data('sort')
                     }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
                     <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
                     <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
-                    <?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>,
-                    <?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable): array());?>);
+                    <?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId) : array());?>,
+                    <?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable) : array());?>);
             showSpinner();
             if ($(self).val() !== 'default') {
                 filters.order = [];
                 filters.order.push('p.' + $(self).val().split('_')[0]);
+                filters.useUserOrder = true;
             }
-            $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
+            $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function (response) {
                 hideSpinner();
                 if (response) {
                     $(self).after(response);
@@ -76,32 +79,32 @@
 </script>
 <?php if ($this->totalCount >= $this->limit): ?>
 <script>
-	$('#<?php echo $id; ?>').on('click', function(e){
+    $('#<?php echo $id; ?>').on('click', function (e) {
         e.preventDefault();
         $(this).hide();
 
         var self = this,
-	        nextpage = $(this).data('nextpage') || 1,
+            nextpage = $(this).data('nextpage') || 1,
             filtersCurrent = $('input[name="<?php echo $id;?>_filters"]').data('filters-current') ? $('input[name="<?php echo $id;?>_filters"]').data('filters-current') : $('input[name="<?php echo $id;?>_filters"]').data('filters-default');
         filters = $.extend({
-			    pageId: '<?php echo $this->pageId; ?>',
-			    template: '<?php echo $this->productTemplate; ?>',
-			    nextpage: nextpage,
+                pageId: '<?php echo $this->pageId; ?>',
+                template: '<?php echo $this->productTemplate; ?>',
+                nextpage: nextpage,
                 limit: '<?php echo $this->limit; ?>',
                 sort: $(this).data('sort')
-		    }, filtersCurrent,
-                <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
-                <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
-				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>,
-				<?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable): array());?>);
-		showSpinner();
+            }, filtersCurrent,
+            <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
+            <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
+            <?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId) : array());?>,
+            <?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable) : array());?>);
+        showSpinner();
 
-		$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
+        $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function (response) {
             hideSpinner();
             $(self).show();
             if (response) {
                 $(self).before(response);
-				$(self).data('nextpage', ++nextpage);
+                $(self).data('nextpage', ++nextpage);
                 if ($('input[name="<?php echo $id;?>_filters"]').data('filters-current')) {
                     filtersCurrent = $('input[name="<?php echo $id;?>_filters"]').data('filters-current');
                     filtersCurrent.nextpage++;
@@ -110,8 +113,8 @@
                 $('#<?php echo $id; ?>').hide();
                 $('#<?php echo $id; ?>').after('<span><?php echo $this->translate('No more products found'); ?></span>');
             }
-		});
-	});
+        });
+    });
 
 </script>
 <?php endif; ?>
