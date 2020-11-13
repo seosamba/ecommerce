@@ -2,7 +2,7 @@
 <?php if(empty($this->unwrap)): ?>
     <div class="product-list">
 <?php endif;?>
-        <?php if (!empty($this->userOrderOptions)): ?>
+        <?php if (!empty($this->userOrderOptions) && empty($this->isPreview)): ?>
             <select class="" id="user_order_<?php echo $id; ?>" name="user-order">
                 <?php foreach ($this->userOrderOptions as $option => $data) : ?>
                     <?php $selected = ''; ?>
@@ -34,7 +34,7 @@
         });
         $('#user_order_<?php echo $id; ?>').on('change', function(e){
             $('input[name="<?php echo $id;?>_filters"]').nextAll('span').remove();
-            $(this).nextAll('div.product-item').remove(); // todo: add id
+            $(this).nextAll('div.product-item').remove();
             var self = this,
                 filters = $.extend({
                         pageId: '<?php echo $this->pageId; ?>',
@@ -52,7 +52,6 @@
                 filters.order = [];
                 filters.order.push('p.' + $(self).val().split('_')[0]);
             }
-            console.log(filters);
             $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
                 hideSpinner();
                 if (response) {
