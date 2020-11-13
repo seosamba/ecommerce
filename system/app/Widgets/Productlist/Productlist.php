@@ -35,6 +35,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
     const OPTION_DRAGGABLE = 'draggable';
 
     /**
+     * Option to create a dropdown for product list sorting
+     */
+    const OPTION_USER_ORDER = 'userorder';
+
+    /**
      * Option to apply "AND" logic for tags filtering
      */
     const OPTION_STRICT_TAGS_COUNT = 'and';
@@ -213,15 +218,35 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             return $this->_view->render('draggable.phtml');
         }
 
-        $orderSql = 'ASC';
+        $orderSql = Zend_Db_Select::SQL_ASC;
         if(in_array('desc', $this->_options)){
-            $orderSql = 'DESC';
+            $orderSql = Zend_Db_Select::SQL_DESC;
         }
 
         $this->_view->sort = $orderSql;
 
         if(in_array('unwrap', $this->_options)){
             $this->_view->unwrap = true;
+        }
+
+        if (in_array(self::OPTION_USER_ORDER, $this->_options)) {
+            $userOrderOptions = [
+                'name_' . Zend_Db_Select::SQL_ASC => ['title' => 'A-Z', 'selected' => 0],
+                'name_' . Zend_Db_Select::SQL_DESC => ['title' => 'Z-A', 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_ASC => ['title' => 'ascending', 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_DESC => ['title' => 'descending', 'selected' => 0],
+                'default' => ['title' => 'default', 'selected' => 1],
+            ];
+            if (!empty($this->_view->filters['order']) && isset($this->_view->filters['order'][0])) {
+                if (strpos($this->_view->filters['order'][0], 'name') !== false) {
+                    $userOrderOptions['name_' . $orderSql]['selected'] = 1;
+                    $userOrderOptions['default']['selected'] = 0;
+                } elseif (strpos($this->_view->filters['order'][0], 'price') !== false) {
+                    $userOrderOptions['price_' . $orderSql]['selected'] = 1;
+                    $userOrderOptions['default']['selected'] = 0;
+                }
+            }
+            $this->_view->userOrderOptions = $userOrderOptions;
         }
 
 		if (!isset($this->_options[0])) {
@@ -231,6 +256,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} else {
 			$this->_view->offset = $this->_options[0];
 		}
+
 		return $this->_view->render('productlist.phtml');
 	}
 
