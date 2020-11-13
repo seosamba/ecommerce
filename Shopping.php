@@ -1030,8 +1030,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			if (!empty($productsListDataResult)) {
+            if (!empty($productsListDataResult)) {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
+            } elseif ($useUserOrder) {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable, Widgets_Productlist_Productlist::OPTION_USER_ORDER));
             } else {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable));
             }

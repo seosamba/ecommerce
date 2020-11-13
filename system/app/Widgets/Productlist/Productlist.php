@@ -128,7 +128,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
         }
 
-        if (in_array(self::OPTION_DRAGGABLE, $this->_options) || in_array(self::OPTION_FILTERABLE, $this->_options)) {
+        if (in_array(self::OPTION_DRAGGABLE, $this->_options) || in_array(self::OPTION_FILTERABLE, $this->_options) || in_array(self::OPTION_USER_ORDER, $this->_options)) {
             $this->_cacheable = false;
         }
 	}
