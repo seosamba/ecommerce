@@ -56,7 +56,7 @@ $this->headLink()
                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
                         <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?></option>
                         <?php if(!empty($this->shoppingConfig['enabledPartialPayment'])) :?>
-                            <option value="<?php echo Models_Model_CartSession::CART_STATUS_PARTIAL; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PARTIAL); ?></option>
+                            <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PARTIAL; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PARTIAL); ?></option>
                         <?php endif;?>
                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
                         <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
