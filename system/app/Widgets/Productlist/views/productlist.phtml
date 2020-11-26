@@ -52,7 +52,7 @@
             showSpinner();
             if ($(self).val() !== 'default') {
                 filters.order = [];
-                filters.order.push('p.' + $(self).val().split('_')[0]);
+                filters.order.push($(self).val().split('_')[0] != 'date' ? 'p.' + $(self).val().split('_')[0] : 'p.created_at');
                 filters.useUserOrder = true;
             }
             $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function (response) {

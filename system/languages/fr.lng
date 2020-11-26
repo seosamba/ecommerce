@@ -810,7 +810,13 @@
         'store operational hours' => 'heures d\'ouverture du magasin',
         'View and edit your business operating hours' => 'Afficher et modifier les heures d\'ouverture de votre société',
         'Timezone' => 'Fuseau horaire',
-        'Select timezone' => 'Sélectionner le fuseau horaire'
+        'Select timezone' => 'Sélectionner le fuseau horaire',
+        'Featured' => 'Défaut',
+        'Price: Low to High' => 'Prix croissant',
+        'Price: High to Low' => 'Prix decroissant',
+        'Name: A-Z' => 'Nom: A-Z',
+        'Name: Z-A' => 'Nom: Z-A',
+        'Newest to oldest' => 'Les plus récents',
 
 
 );?>

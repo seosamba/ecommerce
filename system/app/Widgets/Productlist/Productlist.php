@@ -231,11 +231,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (in_array(self::OPTION_USER_ORDER, $this->_options)) {
             $userOrderOptions = [
-                'name_' . Zend_Db_Select::SQL_ASC => ['title' => 'A-Z', 'selected' => 0],
-                'name_' . Zend_Db_Select::SQL_DESC => ['title' => 'Z-A', 'selected' => 0],
-                'price_' . Zend_Db_Select::SQL_ASC => ['title' => 'ascending', 'selected' => 0],
-                'price_' . Zend_Db_Select::SQL_DESC => ['title' => 'descending', 'selected' => 0],
-                'default' => ['title' => 'default', 'selected' => 1],
+                'default' => ['title' => $this->_translator->translate('Featured'), 'selected' => 1],
+                'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name: A-Z'), 'selected' => 0],
+                'name_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Name: Z-A'), 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Price: Low to High'), 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Price: High to Low'), 'selected' => 0],
+                'date_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Newest to oldest'), 'selected' => 0],
+
             ];
             if (!empty($this->_view->filters['order']) && isset($this->_view->filters['order'][0]) && !$dragListId) {
                 if (strpos($this->_view->filters['order'][0], 'name') !== false) {
@@ -243,6 +245,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     $userOrderOptions['default']['selected'] = 0;
                 } elseif (strpos($this->_view->filters['order'][0], 'price') !== false) {
                     $userOrderOptions['price_' . $orderSql]['selected'] = 1;
+                    $userOrderOptions['default']['selected'] = 0;
+                } elseif (strpos($this->_view->filters['order'][0], 'created_at') !== false) {
+                    $userOrderOptions['date_' . $orderSql]['selected'] = 1;
                     $userOrderOptions['default']['selected'] = 0;
                 }
             }
