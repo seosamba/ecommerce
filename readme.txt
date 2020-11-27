@@ -170,6 +170,9 @@ Plugin widgets.
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:producturl} -> product url
     {$postpurchase:cartitem:brand} -> product brand
+    {$postpurchase:cartitem:partialamount[:clean]} -> partial amount
+    {$postpurchase:cartitem:partialpercentage} -> partial percentage
+    {$postpurchase:cartitem:outstandingamount[:clean]} -> outstanding amount
 
 Magic spaces:
     MAGICSPACE: freebies

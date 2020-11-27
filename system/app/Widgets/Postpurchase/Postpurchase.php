@@ -1087,4 +1087,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         }
     }
 
+    protected function _renderOutstandingamount()
+    {
+        if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+            return round($this->_cart->getTotal() - $this->_cart->getPartialPaidAmount(),2);
+        }
+
+        return $this->_view->currency(round($this->_cart->getTotal() - $this->_cart->getPartialPaidAmount(), 2));
+    }
+
 }

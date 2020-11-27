@@ -291,6 +291,14 @@
 			<span><?php echo $this->translate('Total');?>:</span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
 		</div>
+        <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+            <div class="post-purchase-row partially-paid-total">
+                <span><?php echo $this->translate('Deposit received');?>: </span>
+                <span><?php echo $this->currency($this->cart->getPartialPaidAmount());?></span>
+                <span><?php echo $this->translate('Outstanding amount');?>: </span>
+                <span><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></span>
+            </div>
+        <?php endif;?>
 	</div>
 	</div>
 
@@ -625,6 +633,12 @@
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
 			<span style="float:left;"><?php echo $this->translate('Total');?>: </span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
+            <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+                <span style="float:left;"><?php echo $this->translate('Deposit received');?>: </span>
+                <span><?php echo $this->currency($this->cart->getPartialPaidAmount());?></span>
+                <span style="float:left;"><?php echo $this->translate('Outstanding amount');?>: </span>
+                <span><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></span>
+            <?php endif;?>
 		</p>
 	</div>
 	</div>
