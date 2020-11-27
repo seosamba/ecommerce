@@ -1514,10 +1514,6 @@ class Shopping extends Tools_Plugins_Abstract {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
 
-            if (!empty($shoppingConfig['indiansongOrderClientsGeneration']) && class_exists('Tools_IndiansongOrderClientsGenerationWatchdog')){
-                $cartSession->registerObserver(new Tools_IndiansongOrderClientsGenerationWatchdog());
-            }
-
 			$cartSession->notifyObservers();
 		}
 
