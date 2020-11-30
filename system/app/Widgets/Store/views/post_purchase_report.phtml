@@ -633,13 +633,17 @@
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
 			<span style="float:left;"><?php echo $this->translate('Total');?>: </span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
-            <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+		</p>
+        <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
                 <span style="float:left;"><?php echo $this->translate('Deposit received');?>: </span>
                 <span><?php echo $this->currency($this->cart->getPartialPaidAmount());?></span>
+            </p>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
                 <span style="float:left;"><?php echo $this->translate('Outstanding amount');?>: </span>
                 <span><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></span>
-            <?php endif;?>
-		</p>
+            </p>
+        <?php endif;?>
 	</div>
 	</div>
 <?php endif; ?>
