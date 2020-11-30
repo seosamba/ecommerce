@@ -123,6 +123,7 @@ Plugin widgets.
     {$postpurchase:quotenote} -> show quote disclaimer.
     {$postpurchase:isGift:some text here} -> Is a gift message will be returned
     {$postpurchase:giftEmail} -> return receiver gift email
+    {$postpurchase:outstandingamount[:clean]} -> outstanding amount
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -170,6 +171,9 @@ Plugin widgets.
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:producturl} -> product url
     {$postpurchase:cartitem:brand} -> product brand
+    {$postpurchase:cartitem:partialamount[:clean]} -> partial amount
+    {$postpurchase:cartitem:partialpercentage} -> partial percentage
+
 
 Magic spaces:
     MAGICSPACE: freebies

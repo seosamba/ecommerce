@@ -401,6 +401,16 @@
                             <td class="text-right"><?php echo $this->currency($this->order->getTotal());?></td>
                         <?php endif;?>
                     </tr>
+                        <?php if($this->order->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+                            <tr>
+                                <td><?php echo $this->translate('Deposit received');?>:</td>
+                                <td class="text-right"><?php echo $this->currency($this->order->getPartialPaidAmount());?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo $this->translate('Outstanding amount');?>:</td>
+                                <td class="text-right"><?php echo $this->currency($this->order->getTotal() - $this->order->getPartialPaidAmount());?></td>
+                            </tr>
+                        <?php endif;?>
                     </tfoot>
                 </table>
             </div>
