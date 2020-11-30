@@ -22,8 +22,24 @@
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
 
+<%
+thousand = '&nbsp;'
+decimal = ','
+
+if(usNumericFormat == 1) {
+thousand = ','
+decimal = '.'
+}
+
+formatMoneyOptions = {
+symbol   : '',
+thousand : thousand,
+decimal  : decimal,
+}
+%>
+
 <td data-mobile-title="Products in cart"><%= total_products %></td>
-<td data-mobile-title="Total price"><%= total %>
+<td data-mobile-title="Total price"><%= accounting.formatMoney(total, formatMoneyOptions) + '&nbsp;' + currencySymbol %>
     <% if(status === 'partial') { %>
         (<%= partial_paid_amount %>)
     <% } %>

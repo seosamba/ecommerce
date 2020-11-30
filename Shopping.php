@@ -176,6 +176,11 @@ class Shopping extends Tools_Plugins_Abstract {
 		Tools_Security_Acl::ROLE_GUEST      => array()
 	);
 
+    /**
+     * @var null|Zend_Layout
+     */
+    protected $_layout = null;
+
 	public static $emailTriggers = array(
 		'Tools_StoreMailWatchdog'
 	);
@@ -1105,7 +1110,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->customerAttributes = $customerAttributes;
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
             $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
-			return $this->_view->render('clients.phtml');
+
+            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+            $currency = Zend_Registry::get('Zend_Currency');
+            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+
+            return $this->_view->render('clients.phtml');
 		}
 	}
 
@@ -1206,6 +1217,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
         $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
+        $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+        $currency = Zend_Registry::get('Zend_Currency');
+        $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -1300,7 +1315,13 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
+            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+            $currency = Zend_Registry::get('Zend_Currency');
+            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+
 			$this->_layout->content = $this->_view->render('order.phtml');
+
 			echo $this->_layout->render();
 		}
 	}
@@ -1503,6 +1524,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
                 }
             }
+
 			$cartSession->notifyObservers();
 		}
 
@@ -2475,12 +2497,22 @@ class Shopping extends Tools_Plugins_Abstract {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $dragList = filter_var_array($this->_request->getParams(), FILTER_SANITIZE_STRING);
             if (!empty($dragList['list_id'])) {
+                $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+                $userId = $currentUser->getId();
+
+                $pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT);
+
                 $mapper = Models_Mapper_DraggableMapper::getInstance();
                 $listId = $dragList['list_id'];
                 $model = new Models_Model_Draggable();
                 $model->setId($listId);
                 $model->setData(serialize($dragList['list_data']));
+                $model->setUpdatedAt(Tools_System_Tools::convertDateFromTimezone('now'));
+                $model->setUserId($userId);
+                $model->setIpAddress(Tools_System_Tools::getIpAddress());
+                $model->setPageId($pageId);
                 $mapper->save($model);
+
                 $this->_responseHelper->success($this->_translator->translate('Order has been updated'));
             }
         }

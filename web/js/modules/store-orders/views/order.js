@@ -5,8 +5,9 @@
 define([
     'backbone',
     'text!../templates/order.html',
-    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
-], function(Backbone, OrderTmpl, i18n){
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
+    'accounting'
+], function(Backbone, OrderTmpl, i18n, accounting){
 
     var OrderView = Backbone.View.extend({
         tagName: 'tr',
@@ -19,6 +20,10 @@ define([
             this.model.on('change', this.render, this);
         },
         render: function(){
+            this.model.set('accounting', accounting);
+            this.model.set('currencySymbol', this.model.collection.moneyFormat.symbol);
+            this.model.set('usNumericFormat', this.model.collection.usNumericFormat);
+
             this.$el.html(this.template(this.model.toJSON()));
             return this;
         },

@@ -157,7 +157,9 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.8');
+('usNumericFormat', '0'),
+('minimumOrder', '0'),
+('version', '2.8.1');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -186,6 +188,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
   `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `wishlist_qty` int(10) unsigned DEFAULT '0',
+  `minimum_order` int(3) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -856,6 +859,10 @@ CREATE TABLE IF NOT EXISTS `shopping_company_products` (
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  `updated_at` TIMESTAMP NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `page_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -1003,5 +1010,5 @@ CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.8.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.3' WHERE `name` = 'shopping';
 
