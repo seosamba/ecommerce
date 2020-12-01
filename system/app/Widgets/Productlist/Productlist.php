@@ -246,7 +246,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 } elseif (strpos($this->_view->filters['order'][0], 'price') !== false) {
                     $userOrderOptions['price_' . $orderSql]['selected'] = 1;
                     $userOrderOptions['default']['selected'] = 0;
-                } elseif (strpos($this->_view->filters['order'][0], 'created_at') !== false) {
+                } elseif (strpos($this->_view->filters['order'][0], 'created_at') !== false && $orderSql === Zend_Db_Select::SQL_DESC) {
                     $userOrderOptions['date_' . $orderSql]['selected'] = 1;
                     $userOrderOptions['default']['selected'] = 0;
                 }
