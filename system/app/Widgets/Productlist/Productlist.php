@@ -37,7 +37,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
     /**
      * Option to create a dropdown for product list sorting
      */
-    const OPTION_USER_ORDER = 'userorder';
+    const OPTION_USER_ORDER_SELECT = 'userorderselect';
+
+    /**
+     * Option to create a radio buttons for product list sorting
+     */
+    const OPTION_USER_ORDER_RADIO = 'userorderradio';
+
+    /**
+     * Option to create arrows for product list sorting
+     */
+    const OPTION_USER_ORDER_ARROW = 'userorderarrow';
+
+    const SORTING_STYLE_SELECT = 'select';
+
+    const SORTING_STYLE_RADIO = 'radio';
+
+    const SORTING_STYLE_ARROW = 'arrow';
 
     /**
      * Option to apply "AND" logic for tags filtering
@@ -58,6 +74,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      * @var bool
      */
     public $isDraggable = false;
+
+    /**
+     * @var bool
+     */
+    public $isArrowSortingStyle = false;
 
     /**
      *  Product limit
@@ -167,6 +188,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if(in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $this->_view->filterable = self::OPTION_FILTERABLE;
         }
+        if (in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
+            $this->isArrowSortingStyle = true;
+        }
 
         if (is_numeric($last)) {
             $last = abs(intval($last));
@@ -229,7 +253,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $this->_view->unwrap = true;
         }
 
-        if (in_array(self::OPTION_USER_ORDER, $this->_options)) {
+        if (in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) || in_array(self::OPTION_USER_ORDER_RADIO, $this->_options)) {
             $userOrderOptions = [
                 'default' => ['title' => $this->_translator->translate('Featured'), 'selected' => 1],
                 'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name: A-Z'), 'selected' => 0],
@@ -252,6 +276,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
             }
             $this->_view->userOrderOptions = $userOrderOptions;
+            $this->_view->sortingStyle = in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) ? self::SORTING_STYLE_SELECT : self::SORTING_STYLE_RADIO;
+        } elseif (in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
+            $userOrderOptions = [
+                'date_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Newest to oldest'), 'selected' => 0],
+                'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name'), 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Price'), 'selected' => 0],
+            ];
+            $this->_view->userOrderOptions = $userOrderOptions;
+            $this->_view->sortingStyle = self::SORTING_STYLE_ARROW;
         }
 
 		if (!isset($this->_options[0])) {
@@ -664,8 +697,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 		}
 
-		$this->_view->filters = $filters;
-
         $attributes = array();
         $priceFilter = array();
         $productPriceFilter = array();
@@ -738,6 +769,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if($this->isDraggable) {
             $limit = null;
         }
+        if ($this->isArrowSortingStyle) {
+            $filters['order'] = array('p.created_at');
+            $orderSql = Zend_Db_Select::SQL_DESC;
+        }
+        $this->_view->filters = $filters;
 
 		return $this->_productMapper->fetchAll(
 		    $enabledOnly,
