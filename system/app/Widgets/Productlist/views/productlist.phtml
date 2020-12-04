@@ -52,11 +52,17 @@
             var pathName = window.location.pathname;
             window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>' + pathName;
         });
+        <?php if(!empty($this->filterable)): ?>
+          var filterForm = $('form.filtering-form');
+        if ($(filterForm).is('form')) {
+            $(filterForm).append('<input type="hidden" name="userOrder" value=""/>');
+        }
+        <?php endif;?>
         $('#user_order_<?php echo $id; ?>').on('change', function (e) {
-            changeOrder($(this).val());
+            applyUserOrder(this);
         });
         $('input[name="radio-order-<?php echo $id;?>"]').on('change', function (e) {
-            changeOrder($(this).val());
+            applyUserOrder(this);
         });
         $('#arrow_order_<?php echo $id; ?> li').on('click', function (e) {
             var orderBy = $(this).data('order').split('_')[0],
@@ -82,6 +88,13 @@
             $(this).data('order', [orderBy, direction].join('_'));
             changeOrder($(this).data('order'));
         });
+        function applyUserOrder(el){
+            <?php if(!empty($this->filterable)): ?>
+            $('input[name="userOrder"]').val($(el).val());
+            <?php else:?>
+            changeOrder($(el).val());
+            <?php endif;?>
+        }
         function changeOrder (userOrder) {
             $('input[name="<?php echo $id;?>_filters"]').nextAll('span').remove();
             $('input[name="<?php echo $id;?>_filters"]').prevAll('div.product-item').remove();

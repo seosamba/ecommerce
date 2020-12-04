@@ -80,6 +80,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      */
     public $isArrowSortingStyle = false;
 
+    public $userOrder = null;
+
     /**
      *  Product limit
      */
@@ -246,7 +248,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if(in_array('desc', $this->_options)){
             $orderSql = Zend_Db_Select::SQL_DESC;
         }
-
+        if ($this->userOrder && $this->_view->filterable === self::OPTION_FILTERABLE) {
+            $this->_view->filters['order'] = array($this->userOrder[0]);
+            $orderSql = $this->userOrder[1];
+        }
         $this->_view->sort = $orderSql;
 
         if(in_array('unwrap', $this->_options)){
@@ -647,6 +652,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         // fetching filters from query string
         $urlFilter = Filtering_Tools::normalizeFilterQuery();
+        if($this->_view->filterable === self::OPTION_FILTERABLE && isset($urlFilter['userOrder']) && is_array($urlFilter['userOrder'])){
+            $userOrder = explode('_', $urlFilter['userOrder'][0]);
+            if(!empty($userOrder[0]) && !empty($userOrder[1])){
+                $filters['order'] = array($userOrder[0]);
+                $orderSql = $userOrder[1];
+                $this->userOrder = $userOrder;
+            }
+        }
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
             $filters['order'] = array_map(function ($field) use ($allowedColumns) {
@@ -666,7 +679,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $filters['order'] = null;
             }
 		}
-
         if (!empty($urlFilter['category'])) {
             $filters['tagnames'] = $urlFilter['category'];
             unset($urlFilter['category']);
