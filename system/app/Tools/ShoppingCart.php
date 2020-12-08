@@ -790,7 +790,7 @@ class Tools_ShoppingCart {
 						}
 						$modifiers[$defaultOption['title']] = array(
 							'option_id'   => $defaultOption['id'],
-							'title'       => $textValue,
+							'title'       => strip_tags($textValue),
 							'priceSign'   => null,
 							'priceType'   => null,
 							'priceValue'  => null,
@@ -798,6 +798,21 @@ class Tools_ShoppingCart {
 							'weightValue' => null
 						);
 						break;
+                    case Models_Model_Option::TYPE_TEXTAREA:
+                        $textValue = '';
+                        if (!empty($options[$defaultOption['id']])) {
+                            $textValue = $options[$defaultOption['id']];
+                        }
+                        $modifiers[$defaultOption['title']] = array(
+                            'option_id'   => $defaultOption['id'],
+                            'title'       => strip_tags($textValue),
+                            'priceSign'   => null,
+                            'priceType'   => null,
+                            'priceValue'  => null,
+                            'weightSign'  => null,
+                            'weightValue' => null
+                        );
+                        break;
 				}
 			}
 		}

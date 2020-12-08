@@ -159,7 +159,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('usNumericFormat', '0'),
 ('minimumOrder', '0'),
-('version', '2.8.1');
+('version', '2.8.2');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
-  `type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+  `type` enum('dropdown','radio','text','date','file','textarea') COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -900,7 +900,6 @@ CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
   FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
 SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
 NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
@@ -958,7 +957,6 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_service_label` (
   `label` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Custom Label',
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
 
 CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
@@ -1050,5 +1048,5 @@ INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.8.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.2' WHERE `name` = 'shopping';
 

@@ -65,21 +65,23 @@ unset($cur, $format);
     <div class="product-option option-<?php echo strtolower(preg_replace('/[^\w\d]/i', '', $option['title']));?>" id="product-<?php echo $this->product->getId();?>_option-<?php echo $option['id'];?>" data-type="<?php echo $option['type'];?>">
         <label><?php echo $option['title'];?></label>
         <?php if ($option['type'] === Models_Model_Option::TYPE_DROPDOWN): ?>
-        <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
+            <?php echo  $this->formSelect($uniqName, $defaultId, null, $options); ?>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_RADIO): ?>
-        <div>
-        <?php echo  $this->formRadio($uniqName, $defaultId, array('escape'=>false), $options, ''); ?>
-        </div>
+            <div>
+                <?php echo  $this->formRadio($uniqName, $defaultId, array('escape'=>false), $options, ''); ?>
+            </div>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXT): ?>
-        <input type="text" name="<?php echo  $uniqName;?>" />
+            <input type="text" name="<?php echo  $uniqName;?>" />
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_DATE): ?>
 		    <div>
 				<input type="date" class="option-datepicker" name="<?php echo  $uniqName;?>" />
 		        <span class="ticon-calendar icon16" onclick="$('input[name=<?php echo  $uniqName;?>]').focus();"></span>
 		    </div>
-	    <?php if(!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PAGE_PROTECTED)): ?>
-            <link rel="stylesheet" href="<?php echo $this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css'; ?>">
+	        <?php if(!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PAGE_PROTECTED)): ?>
+                <link rel="stylesheet" href="<?php echo $this->websiteUrl . 'system/uithemes/seotoasterui/seotoasterui.css'; ?>">
 		    <?php endif; ?>
+        <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXTAREA): ?>
+            <textarea placeholder="" name="<?php echo  $uniqName;?>"></textarea>
 	    <?php endif; ?>
     </div>
 <?php endforeach; ?>
