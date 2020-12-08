@@ -1509,6 +1509,7 @@ class Shopping extends Tools_Plugins_Abstract {
             if (class_exists('Tools_AppsServiceWatchdog')) {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
+
 			$cartSession->notifyObservers();
 		}
 

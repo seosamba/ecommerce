@@ -158,7 +158,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
 ('usNumericFormat', '0'),
-('version', '2.8.0');
+('minimumOrder', '0'),
+('version', '2.8.1');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -187,6 +188,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
   `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `wishlist_qty` int(10) unsigned DEFAULT '0',
+  `minimum_order` int(3) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -998,8 +1000,6 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
 
-UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-
 INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
 SELECT CONCAT('email'),	CONCAT('store_newcustomer'),	NULL,	CONCAT('sales person'),	CONCAT('Hi there {customer:fullname}! <br> <br>Thank you for your registration.<br>You are welcome to login to your Client Area. <br><br>Login: {customer:email}<br>Follow this <strong>{customer:passwordLink}</strong> in order to set your password.<br><br>'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('New Customer Registered') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
 WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_newcustomer') LIMIT 1;
@@ -1049,5 +1049,6 @@ SELECT CONCAT('email'),	CONCAT('store_partialpayment'),	NULL,	CONCAT('customer')
 INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
+UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
 UPDATE `plugin` SET `version` = '2.8.1' WHERE `name` = 'shopping';
 
