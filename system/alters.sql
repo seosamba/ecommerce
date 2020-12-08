@@ -539,13 +539,31 @@ CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
 -- version: 2.7.7
 ALTER TABLE `shopping_cart_session` ADD `shipping_tracking_code_id` int(10) unsigned DEFAULT NULL AFTER `shipping_tracking_id`;
 
--- 26/12/2018
+-- 09/10/2020
 -- version: 2.7.8
+ALTER TABLE `shopping_draggable` ADD COLUMN `updated_at` TIMESTAMP NOT NULL;
+ALTER TABLE `shopping_draggable` ADD COLUMN `user_id` int(10) unsigned NOT NULL;
+ALTER TABLE `shopping_draggable` ADD COLUMN `ip_address` VARCHAR(45) NOT NULL;
+ALTER TABLE `shopping_draggable` ADD COLUMN `page_id` int(10) unsigned DEFAULT NULL;
+
+-- 01/09/2020
+-- version: 2.7.9
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('usNumericFormat', '0');
+
+-- 29/10/2020
+-- version: 2.8.0
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('minimumOrder', '0');
+ALTER TABLE `shopping_product` ADD COLUMN `minimum_order` int(3) unsigned DEFAULT '0';
+
+-- 26/12/2018
+-- version: 2.8.1
 -- Add textarea option
 ALTER TABLE `shopping_product_option`
 CHANGE `type` `type` enum('dropdown','radio','text','date','file','textarea') COLLATE 'utf8_unicode_ci' NOT NULL AFTER `title`;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.9' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

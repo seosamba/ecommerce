@@ -77,6 +77,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     private $_customer = null;
 
+    private $_entityParser  = null;
+
 	/**
 	 * @var Instance of watched object
 	 */
@@ -127,11 +129,16 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 			throw new Exceptions_SeotoasterException('Missing template for action email trigger');
 		}
 
+        $wicEmail = $this->_configHelper->getConfig('wicEmail');
+        $this->_entityParser->addToDictionary(array(
+            'widcard:BizEmail' => !empty($wicEmail) ? $wicEmail : $this->_configHelper->getConfig('adminEmail')
+        ));
+
         $this->_subject = $this->_options['subject'];
 		$this->_mailer->setMailFromLabel($this->_storeConfig['company']);
 
 		if (!empty($this->_options['from'])){
-			$this->_mailer->setMailFrom($this->_options['from']);
+			$this->_mailer->setMailFrom($this->_parseMailFrom($this->_entityParser->parse($this->_options['from'])));
 		} elseif (!empty($this->_storeConfig['email'])) {
 			$this->_mailer->setMailFrom($this->_storeConfig['email']);
 		} else {
@@ -680,6 +687,21 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             $shippingServiceLabel = $serviceLabelMapper->findByName($this->_object->getShippingService());
             return $shippingServiceLabel;
         }
+    }
+
+    protected function _parseMailFrom($mailFrom)
+    {
+        $themeData = Zend_Registry::get('theme');
+        $extConfig = Zend_Registry::get('extConfig');
+        $parserOptions = array(
+            'websiteUrl' => $this->_websiteHelper->getUrl(),
+            'websitePath' => $this->_websiteHelper->getPath(),
+            'currentTheme' => $extConfig['currentTheme'],
+            'themePath' => $themeData['path'],
+        );
+        $parser = new Tools_Content_Parser($mailFrom, array(), $parserOptions);
+
+        return Tools_Content_Tools::stripEditLinks($parser->parseSimple());
     }
 
 }
