@@ -181,10 +181,6 @@ class Shopping extends Tools_Plugins_Abstract {
      */
     protected $_layout = null;
 
-	public static $emailTriggers = array(
-		'Tools_StoreMailWatchdog'
-	);
-
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
 
