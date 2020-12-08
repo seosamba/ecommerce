@@ -34,6 +34,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      */
     const OPTION_DRAGGABLE = 'draggable';
 
+    const OPTION_USER_ORDER = 'userorder';
+
     /**
      * Option to create a dropdown for product list sorting
      */
