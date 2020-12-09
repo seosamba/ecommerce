@@ -251,7 +251,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $orderSql = Zend_Db_Select::SQL_DESC;
         }
         if ($this->userOrder && $this->_view->filterable === self::OPTION_FILTERABLE) {
-            $this->_view->filters['order'] = array($this->userOrder[0]);
+            $this->_view->filters['order'] = $this->userOrder[0] != 'date' ? array($this->userOrder[0]) : array('created_at');
             $orderSql = $this->userOrder[1];
         }
         $this->_view->sort = $orderSql;
@@ -260,13 +260,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $this->_view->unwrap = true;
         }
 
-        if (in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) || in_array(self::OPTION_USER_ORDER_RADIO, $this->_options)) {
+        if (in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) || in_array(self::OPTION_USER_ORDER_RADIO, $this->_options) || in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
             $userOrderOptions = [
                 'default' => ['title' => $this->_translator->translate('Featured'), 'selected' => 1],
                 'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name: A-Z'), 'selected' => 0],
                 'name_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Name: Z-A'), 'selected' => 0],
                 'price_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Price: Low to High'), 'selected' => 0],
                 'price_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Price: High to Low'), 'selected' => 0],
+                'date_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Oldest to newest'), 'selected' => 0],
                 'date_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Newest to oldest'), 'selected' => 0],
 
             ];
@@ -277,22 +278,47 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 } elseif (strpos($this->_view->filters['order'][0], 'price') !== false) {
                     $userOrderOptions['price_' . $orderSql]['selected'] = 1;
                     $userOrderOptions['default']['selected'] = 0;
-                } elseif (strpos($this->_view->filters['order'][0], 'created_at') !== false && $orderSql === Zend_Db_Select::SQL_DESC) {
+                } elseif (strpos($this->_view->filters['order'][0], 'created_at') !== false) {
                     $userOrderOptions['date_' . $orderSql]['selected'] = 1;
                     $userOrderOptions['default']['selected'] = 0;
                 }
             }
             $this->_view->userOrderOptions = $userOrderOptions;
             $this->_view->sortingStyle = in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) ? self::SORTING_STYLE_SELECT : self::SORTING_STYLE_RADIO;
-        } elseif (in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
-            $userOrderOptions = [
-                'date_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Newest to oldest'), 'selected' => 0],
+
+
+            if (in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
+                foreach ($userOrderOptions as $key => $data) {
+                    if ($key === 'default') {
+                        continue;
+                    }
+                    if (strpos($key, 'name') !== false && !empty($userOrderOptions[$key])) {
+                        $userOrderOptions[$key]['title'] = $this->_translator->translate('Name');
+                    } elseif (strpos($key, 'price') !== false && !empty($userOrderOptions[$key])) {
+                        $userOrderOptions[$key]['title'] = $this->_translator->translate('Price');
+                    } elseif (strpos($key, 'date') !== false && !empty($userOrderOptions[$key])) {
+                        $userOrderOptions[$key]['title'] = $this->_translator->translate('Date');
+                    }
+                    if ($data['selected'] === 0 && $userOrderOptions[explode('_', $key)[0] . '_' . Zend_Db_Select::SQL_DESC]['selected'] === 1) {
+                        unset($userOrderOptions[$key]);
+                    } elseif ($userOrderOptions[explode('_', $key)[0] . '_' . Zend_Db_Select::SQL_DESC]['selected'] === 0) {
+                        unset($userOrderOptions[explode('_', $key)[0] . '_' . Zend_Db_Select::SQL_DESC]);
+                    }
+                }
+                $this->_view->userOrderOptions = $userOrderOptions;
+                $this->_view->sortingStyle = self::SORTING_STYLE_ARROW;
+            }
+
+
+        }
+           /* $userOrderOptions = [
+                'default' => ['title' => $this->_translator->translate('Featured'), 'selected' => 1],
+                'date_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Date'), 'selected' => 0],
                 'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name'), 'selected' => 0],
                 'price_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Price'), 'selected' => 0],
             ];
-            $this->_view->userOrderOptions = $userOrderOptions;
-            $this->_view->sortingStyle = self::SORTING_STYLE_ARROW;
-        }
+
+        }*/
 
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
@@ -783,10 +809,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if($this->isDraggable) {
             $limit = null;
         }
-        if ($this->isArrowSortingStyle) {
-            $filters['order'] = array('p.created_at');
-            $orderSql = Zend_Db_Select::SQL_DESC;
-        }
+
         $this->_view->filters = $filters;
 
 		return $this->_productMapper->fetchAll(
