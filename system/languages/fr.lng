@@ -800,7 +800,17 @@
         'Please specify shipment time' => 'Veuillez préciser le temps d\'expédition',
         'Yes' => 'Oui',
         'No' => 'Non',
-        'Label has been successfully generated - Click here to download it' => 'L\'étiquette a été successivement générée – Veuillez cliquer ici pour la télécharger'
+        'Label has been successfully generated - Click here to download it' => 'L\'étiquette a été successivement générée – Veuillez cliquer ici pour la télécharger',
+        'Currency' => 'Devise',
+        'Weight unit' => 'Unité de poids',
+        'Length unit' => 'Unité de longueur',
+        'Force use HTTPS for checkout page' => 'Forcer l\'utilisation de HTTPS pour la page de validation d\'achats',
+        'Deduct from inventory of products used in sets' => 'Déduire de l\'inventaire des produits utilisés dans l\'ensemble',
+        'US numeric format' => 'Format numérique américain',
+        'store operational hours' => 'heures d\'ouverture du magasin',
+        'View and edit your business operating hours' => 'Afficher et modifier les heures d\'ouverture de votre société',
+        'Timezone' => 'Fuseau horaire',
+        'Select timezone' => 'Sélectionner le fuseau horaire'
 
 
 );?>

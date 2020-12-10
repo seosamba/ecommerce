@@ -122,6 +122,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
                 $orderList['realRefundByDefault'] = 0;
             }
             $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
+            $orderList['usNumericFormat'] = $shoppingConfig['usNumericFormat'];
             $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
             $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
             if (!empty($shippingServiceLabels) && is_array($shippingServiceLabels) && !empty($orderList['data'])) {

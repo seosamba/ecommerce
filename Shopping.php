@@ -176,9 +176,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		Tools_Security_Acl::ROLE_GUEST      => array()
 	);
 
-	public static $emailTriggers = array(
-		'Tools_StoreMailWatchdog'
-	);
+    /**
+     * @var null|Zend_Layout
+     */
+    protected $_layout = null;
 
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
@@ -265,6 +266,7 @@ class Shopping extends Tools_Plugins_Abstract {
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_USERS);
 
 		Zend_Registry::set('acl', $acl);
+        Tools_System_Tools::firePluginMethodByTagName('salespermission', 'extendPermission');
 	}
 
 	public function run($requestedParams = array()) {
@@ -930,23 +932,26 @@ class Shopping extends Tools_Plugins_Abstract {
 			throw new Exceptions_SeotoasterPluginException('Direct access not allowed');
 		}
         $dragListId = filter_var($this->_request->getParam('draglist_id'), FILTER_SANITIZE_STRING);
+        $filterable = filter_var($this->_request->getParam('filterable'), FILTER_SANITIZE_STRING);
 		$content = '';
-            $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
-            if (is_numeric($this->_request->getParam('limit'))) {
-                $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
-            } else {
-                $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
-            }
-            $order = $this->_request->getParam('order');
-            $tags = $this->_request->getParam('tags');
-            $brands = $this->_request->getParam('brands');
-            $attributes = $this->_request->getParam('attributes');
-            $price = $this->_request->getParam('price');
-            $sort = $this->_request->getParam('sort');
+        $nextPage = filter_var($this->_request->getParam('nextpage'), FILTER_SANITIZE_NUMBER_INT);
+        if (is_numeric($this->_request->getParam('limit'))) {
+            $limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
+        } else {
+            $limit = Widgets_Productlist_Productlist::DEFAULT_LIMIT;
+        }
+        $order = $this->_request->getParam('order');
+        $tags = $this->_request->getParam('tags');
+        $brands = $this->_request->getParam('brands');
+        $attributes = $this->_request->getParam('attributes');
+        $price = $this->_request->getParam('price');
+        $sort = $this->_request->getParam('sort');
+        $offset = intval($nextPage) * $limit;
 
-            $offset = intval($nextPage) * $limit;
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+
         if (empty($dragListId)) {
-            $products = Models_Mapper_ProductMapper::getInstance()->fetchAll("p.enabled='1'", $order, $offset, $limit,
+            $products = $productMapper->fetchAll("p.enabled='1'", $order, $offset, $limit,
                 null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {
             $dragMapper = Models_Mapper_DraggableMapper::getInstance();
@@ -954,23 +959,62 @@ class Shopping extends Tools_Plugins_Abstract {
             if ($dragModel instanceof Models_Model_Draggable) {
                 $dragList['list_id'] = $dragModel->getId();
                 $dragList['data'] = unserialize($dragModel->getData());
+
+                if(!empty($attributes) || !empty($tags) || !empty($brands) || !empty($price)) {
+                    $productsToSort = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1'), null, null, null,
+                        null, $tags, $brands, false, false, $attributes, $price, null);
+
+                    if(!empty($productsToSort)) {
+                        $dragListDataSorted = array();
+
+                        foreach ($productsToSort as $key => $product) {
+                            $searchKey  = array_search($product->getId(), $dragList['data']);
+
+                            if(in_array($product->getId(), $dragList['data'])) {
+                                $dragListDataSorted[$searchKey] = $product->getId();
+                            }
+                        }
+
+                        if(!empty($dragListDataSorted)) {
+                            ksort($dragListDataSorted);
+
+                            $dragListDataSorted = array_values($dragListDataSorted);
+                            $dragList['data'] = $dragListDataSorted;
+                        }
+                    }
+                }
+
                 $currentProductsId = array();
+
                 for ($i = $offset; $i < ($offset + $limit); $i++) {
                     if (count($dragList['data']) > $offset && isset($dragList['data'][$i])) {
                         $currentProductsId[] = $dragList['data'][$i];
                     }
                 }
+
                 if (!empty($currentProductsId)) {
-                    $productMapper = Models_Mapper_ProductMapper::getInstance();
-                    $productsListData = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
-                        $currentProductsId));
+                    $where = $productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
+                        $currentProductsId);
+                    $where .= ' AND ' . $productMapper->getDbTable()->getAdapter()->quoteInto('p.enabled = ?', '1');
+
+                    $productsListData = $productMapper->fetchAll($where, $order, null, null, null, null, null, false, false, array(), array(), $sort) ;
+
+                    $productsListDataSorted = array();
+                    foreach ($productsListData as $key => $product) {
+                        $currentProductRightOrder = array_search($product->getId(), $currentProductsId);
+                        $productsListDataSorted[$currentProductRightOrder] = $product;
+                    }
+
+                    ksort($productsListDataSorted);
+
+                    $productsListData = $productsListDataSorted;
+
                     $productsListDataResult = array();
-                    for ($i = 0; $i < count($currentProductsId); $i++) {
-                        foreach ($productsListData as $product) {
-                            $prodId = $product->getId();
-                            if ($currentProductsId[$i] == $prodId) {
-                                $productsListDataResult[$i] = $product;
-                            }
+
+                    foreach ($productsListData as $product) {
+                        $prodId = $product->getId();
+                        if(in_array($prodId, $currentProductsId)) {
+                            $productsListDataResult[] = $product;
                         }
                     }
                     $products = $productsListDataResult;
@@ -985,7 +1029,7 @@ class Shopping extends Tools_Plugins_Abstract {
 			if (!empty($productsListDataResult)) {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
             } else {
-                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart)));
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable));
             }
 
             $content = $widget->setProducts($products)->setCleanListOnly(true)->render();
@@ -1062,7 +1106,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->customerAttributes = $customerAttributes;
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
             $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
-			return $this->_view->render('clients.phtml');
+
+            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+            $currency = Zend_Registry::get('Zend_Currency');
+            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+
+            return $this->_view->render('clients.phtml');
 		}
 	}
 
@@ -1163,6 +1213,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
         $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
+        $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+        $currency = Zend_Registry::get('Zend_Currency');
+        $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -1257,7 +1311,13 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
+            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+            $currency = Zend_Registry::get('Zend_Currency');
+            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+
 			$this->_layout->content = $this->_view->render('order.phtml');
+
 			echo $this->_layout->render();
 		}
 	}
@@ -1449,6 +1509,7 @@ class Shopping extends Tools_Plugins_Abstract {
             if (class_exists('Tools_AppsServiceWatchdog')) {
                 $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
             }
+
 			$cartSession->notifyObservers();
 		}
 
@@ -2421,12 +2482,22 @@ class Shopping extends Tools_Plugins_Abstract {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $dragList = filter_var_array($this->_request->getParams(), FILTER_SANITIZE_STRING);
             if (!empty($dragList['list_id'])) {
+                $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+                $userId = $currentUser->getId();
+
+                $pageId = filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT);
+
                 $mapper = Models_Mapper_DraggableMapper::getInstance();
                 $listId = $dragList['list_id'];
                 $model = new Models_Model_Draggable();
                 $model->setId($listId);
                 $model->setData(serialize($dragList['list_data']));
+                $model->setUpdatedAt(Tools_System_Tools::convertDateFromTimezone('now'));
+                $model->setUserId($userId);
+                $model->setIpAddress(Tools_System_Tools::getIpAddress());
+                $model->setPageId($pageId);
                 $mapper->save($model);
+
                 $this->_responseHelper->success($this->_translator->translate('Order has been updated'));
             }
         }

@@ -157,7 +157,9 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('version', '2.7.8');
+('usNumericFormat', '0'),
+('minimumOrder', '0'),
+('version', '2.8.2');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -186,6 +188,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
   `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `wishlist_qty` int(10) unsigned DEFAULT '0',
+  `minimum_order` int(3) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -222,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
-  `type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+  `type` enum('dropdown','radio','text','date','file','textarea') COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -854,6 +857,10 @@ CREATE TABLE IF NOT EXISTS `shopping_company_products` (
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  `updated_at` TIMESTAMP NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `page_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -892,7 +899,6 @@ CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
 
 INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
 SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
@@ -952,7 +958,6 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_service_label` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
 CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
   `param_type` ENUM('text', 'select') DEFAULT 'text',
@@ -993,6 +998,55 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
 
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_newcustomer'),	NULL,	CONCAT('sales person'),	CONCAT('Hi there {customer:fullname}! <br> <br>Thank you for your registration.<br>You are welcome to login to your Client Area. <br><br>Login: {customer:email}<br>Follow this <strong>{customer:passwordLink}</strong> in order to set your password.<br><br>'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('New Customer Registered') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_newcustomer') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_trackingnumber'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br> <br>Your order #{order:id} status shipping tracking code: {order:shippingtrackingid}'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Track Your Order') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_trackingnumber') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_newuseraccount'),	NULL,	CONCAT('sales person'),	CONCAT('Hello!  <br> <br> User information has been updated'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('New User Account Information') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_newuseraccount') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_refund'),	NULL,	CONCAT('sales person'),	CONCAT('Order with amount: {refund:message} has been refunded. <br>  Admin left a comment: {refund:notes}'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Order Refunded') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_refund') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_delivered'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br><br> Your order #{order:id} status shipping tracking code: {order:shippingtrackingid} is delivered.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Order Delivered') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_delivered') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_suppliercompleted'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br><br> Suppliers order {product:urls} is completed.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Supplier Order Completed') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_suppliercompleted') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_suppliershipped'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br><br> Suppliers order {product:urls} is delivered.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Supplier Order Delivered') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_suppliershipped') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_giftorder'),	NULL,	CONCAT('admin'),	CONCAT('Hi there, we have a new order from {customer:fullname}! '),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Gift Order Info') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'admin' AND `trigger` = 'store_giftorder') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_giftorder'),	NULL,	CONCAT('customer'),	CONCAT('<p>Dear {$postpurchase:shipping:firstname},</p>
+<p>{customer:fullname} is sending you the gift  from {store:name}. Look for a shipping notification from {order:shippingservice} to the email address listed here: {order:shippingaddress}. Please contact the customer cervice with any issues or questions.</p><br><p>A personal note is include:<br>"{$postpurchase:notes}"<p><br>'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Gift Order Info') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_giftorder') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_partialpayment'),	NULL,	CONCAT('customer'),	CONCAT("Hello {customer:fullname}!<br/><br/>Welcome to the family. Thanks for your trust, we will now get to work to earn it. We\'ll be in touch soon to kick start your project. For the record, you paid the following towards your project:<br><br>{$postpurchase:partialpercentage}%  ($ {$postpurchase:partialamount}) out of {order:total}<br/>Feel free to contact us should you have any questions or concerns."),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Thank you for your order - We have received your deposit payment') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpayment') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.7.8' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.2' WHERE `name` = 'shopping';
 

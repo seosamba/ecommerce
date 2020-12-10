@@ -25,6 +25,7 @@
 <script>
 	$('#<?php echo $id; ?>').on('click', function(e){
         e.preventDefault();
+        $(this).hide();
 
         var self = this,
 	        nextpage = $(this).data('nextpage') || 1,
@@ -37,12 +38,14 @@
 		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
                 <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
                 <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
-				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>);
+				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>,
+				<?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable): array());?>);
 
 		showSpinner();
 
 		$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
             hideSpinner();
+            $(self).show();
             if (response) {
                 $(self).before(response);
 				$(self).data('nextpage', ++nextpage);

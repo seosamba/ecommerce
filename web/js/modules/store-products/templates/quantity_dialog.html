@@ -1,0 +1,12 @@
+<div title="<%= _.isUndefined(i18n['Assign quantity']) ? 'Assign quantity':i18n['Assign quantity'] %>">
+    <div class="grid_12">
+        <label class="partial grid_3 alpha mt10px">
+            <input class="infinite-param partial" type="checkbox" name="infinite" id="" value="">
+            <%= _.isUndefined(i18n['infinite']) ? 'infinite':i18n['infinite'] %>
+        </label>
+        <div class="custom-quantity-block grid_9">
+            <span class="grid_2 omega mt10px"><%= _.isUndefined(i18n['OR']) ? 'OR':i18n['OR'] %></span>
+            <input class="custom-quantity grid_10 alpha omega" name="custom-quantity" type="text" title="<%= _.isUndefined(i18n['specify inventory stock level']) ? 'specify inventory stock level':i18n['specify inventory stock level'] %>" placeholder="<%= _.isUndefined(i18n['specify inventory stock level']) ? 'specify inventory stock level':i18n['specify inventory stock level'] %>" />
+        </div>
+    </div>
+</div>

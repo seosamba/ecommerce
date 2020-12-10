@@ -122,7 +122,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
         }
-        if (in_array(self::OPTION_DRAGGABLE, $this->_options) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+
+        if (in_array(self::OPTION_DRAGGABLE, $this->_options) || in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $this->_cacheable = false;
         }
 	}
@@ -156,6 +157,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $this->draglist['data'] = unserialize($dragModel->getData());
             }
             $this->_view->dragListId = $dragListId;
+        }
+
+        if(in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $this->_view->filterable = self::OPTION_FILTERABLE;
         }
 
         if (is_numeric($last)) {
@@ -203,6 +208,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
+            $this->_view->pageId = $this->_toasterOptions['id'];
+
             return $this->_view->render('draggable.phtml');
         }
 
@@ -460,10 +467,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     unset($this->draglist['data'][$i]);
                 }
             }
+
+            if(!empty($this->draglist['data'])) {
+                $this->draglist['data'] = array_values($this->draglist['data']);
+            }
         }
 
         $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
         $currentUserRole = $currentUser->getRoleId();
+        $userId = $currentUser->getId();
 
         if ($currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON) {
             if (!empty($notInDrag) || !empty($notInProducts)) {
@@ -472,6 +484,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $model = new Models_Model_Draggable();
                 $model->setId($this->draglist['list_id']);
                 $model->setData(serialize($this->draglist['data']));
+                $model->setUpdatedAt(Tools_System_Tools::convertDateFromTimezone('now'));
+                $model->setUserId($userId);
+                $model->setIpAddress(Tools_System_Tools::getIpAddress());
+                $model->setPageId($this->_toasterOptions['id']);
                 $mapper->save($model);
             }
         }
