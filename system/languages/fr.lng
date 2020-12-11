@@ -817,6 +817,5 @@
         'Name: A-Z' => 'Nom: A-Z',
         'Name: Z-A' => 'Nom: Z-A',
         'Newest to oldest' => 'Les plus récents',
-
-
+        'Oldest to newest' => 'Les plus ancien',
 );?>
