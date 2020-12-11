@@ -557,8 +557,14 @@ INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('minimumOrder', '0');
 ALTER TABLE `shopping_product` ADD COLUMN `minimum_order` int(3) unsigned DEFAULT '0';
 
--- 18/08/2020
+-- 26/12/2018
 -- version: 2.8.1
+-- Add textarea option
+ALTER TABLE `shopping_product_option`
+CHANGE `type` `type` enum('dropdown','radio','text','date','file','textarea') COLLATE 'utf8_unicode_ci' NOT NULL AFTER `title`;
+
+-- 18/08/2020
+-- version: 2.8.2
 ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_percentage` DECIMAL(10,2) DEFAULT '0.00';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_partial` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
@@ -582,11 +588,11 @@ CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- 07/10/2020
--- version: 2.8.2
+-- version: 2.8.3
 -- Add new prefix column
 ALTER TABLE `shopping_customer_address` ADD COLUMN `position` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.3' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

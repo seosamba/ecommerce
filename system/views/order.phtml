@@ -305,18 +305,26 @@
                     <?php endif;?>
                     <tr>
                         <td colspan="<?php echo $colSpan + 5 ?>" rowspan="7"></td>
+                        <?php
+                            $subTotal = $this->order->getSubTotal();
+
+                            if($this->order->getRefundAmount() > 0) {
+                                $subTotal += $this->order->getRefundAmount();
+                            }
+                        ?>
+
                         <td><?php echo $this->translate('Subtotal');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
                             <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo number_format($this->order->getSubTotal() + $this->order->getSubTotalTax(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
+                                <td class="text-right"><?php echo number_format($subTotal + $this->order->getSubTotalTax(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
                             <?php else:?>
-                                <td class="text-right"><?php echo $this->currency($this->order->getSubTotal() + $this->order->getSubTotalTax());?></td>
+                                <td class="text-right"><?php echo $this->currency($subTotal + $this->order->getSubTotalTax());?></td>
                             <?php endif;?>
                         <?php else:?>
                             <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo number_format($this->order->getSubTotal(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
+                                <td class="text-right"><?php echo number_format($subTotal, 2) . '&nbsp;' . $this->currencySymbol;?></td>
                             <?php else:?>
-                                <td class="text-right"><?php echo $this->currency($this->order->getSubTotal());?></td>
+                                <td class="text-right"><?php echo $this->currency($subTotal);?></td>
                             <?php endif;?>
                         <?php endif;?>
                     </tr>

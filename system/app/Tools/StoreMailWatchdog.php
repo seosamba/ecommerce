@@ -151,7 +151,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 		$this->_mailer->setMailFromLabel($this->_storeConfig['company']);
 
 		if (!empty($this->_options['from'])){
-			$this->_mailer->setMailFrom($this->_entityParser->parse($this->_options['from']));
+			$this->_mailer->setMailFrom($this->_parseMailFrom($this->_entityParser->parse($this->_options['from'])));
 		} elseif (!empty($this->_storeConfig['email'])) {
 			$this->_mailer->setMailFrom($this->_storeConfig['email']);
 		} else {
@@ -788,6 +788,21 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
             $shippingServiceLabel = $serviceLabelMapper->findByName($this->_object->getShippingService());
             return $shippingServiceLabel;
         }
+    }
+
+    protected function _parseMailFrom($mailFrom)
+    {
+        $themeData = Zend_Registry::get('theme');
+        $extConfig = Zend_Registry::get('extConfig');
+        $parserOptions = array(
+            'websiteUrl' => $this->_websiteHelper->getUrl(),
+            'websitePath' => $this->_websiteHelper->getPath(),
+            'currentTheme' => $extConfig['currentTheme'],
+            'themePath' => $themeData['path'],
+        );
+        $parser = new Tools_Content_Parser($mailFrom, array(), $parserOptions);
+
+        return Tools_Content_Tools::stripEditLinks($parser->parseSimple());
     }
 
 }
