@@ -1228,6 +1228,29 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	public function changeOrderStatusAction()
+    {
+        if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            throw new Exceptions_SeotoasterPluginException('Not allowed action');
+        }
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+
+        $orderId = $this->_request->getParam('orderId', false);
+        if ($orderId) {
+            $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+            if ($order instanceof Models_Model_CartSession) {
+                $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
+                Models_Mapper_CartSessionMapper::getInstance()->save($order);
+                $this->_responseHelper->success( $this->_translator->translate('Status has been changed'));
+            }
+        }
+
+    }
+
 	public function orderAction() {
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		if ($id) {

@@ -66,7 +66,7 @@ define([
                     'completed': '<button class="change-status btn small green-gradient" data-status="completed" >' + paidPaymentTranslation + '</button>',
                     'canceled': '<button class="change-status btn small red-gradient" data-status="canceled" >' + cancelOrderTranslation + '</button>',
                     'delivered': '<button class="change-status btn small orange-gradient" data-status="delivered" >' + deliveredTranslation + '</button>',
-                    'partial': '<button class="change-status btn small orange-gradient" data-status="partial" >' + sendRequestPaymentTranslation + '</button>'
+                    'partial': '<button class="change-status btn small orange-gradient" data-status="partial" >' + sendRequestPaymentTranslation + '</button><button class="change-status btn small orange-gradient" data-status="partial" data-sub-status="completed">' + paidPaymentTranslation + '</button>'
                 };
 
                 var html = '';
