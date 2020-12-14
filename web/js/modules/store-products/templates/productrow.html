@@ -21,7 +21,7 @@
 </td>
 <td class="editable" data-prop="sku"><%= sku %></td>
 <td class="editable" data-prop="mpn"><%= mpn %></td>
-<% if (freeShipping == '0' || _.isNull(freeShipping)){%>
+<% if (freeShipping == '0' || _.isNull(freeShipping) || freeShipping == ''){%>
     <td><%= _.isUndefined(i18n['no']) ? 'no':i18n['no'] %></td>
 <% } %>
 <% if (freeShipping == '1'){%>
