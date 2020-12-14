@@ -25,9 +25,9 @@
         <ul id="arrow_order_<?php echo $id; ?>" class="sort-list">
             <?php foreach ($this->userOrderOptions as $option => $data) : ?>
               <?php if ($data['selected'] && strpos($option, Zend_Db_Select::SQL_ASC)): ?>
-                <li class="icon-arrow-up2 active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
+                <li class="icon-arrow-up2 sorting-active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
                 <?php elseif ($data['selected'] && strpos($option, Zend_Db_Select::SQL_DESC)): ?>
-                    <li class="icon-arrow-down2 active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
+                    <li class="icon-arrow-down2 sorting-active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
                 <?php else: ?>
                     <li class="<?php echo($data['selected'] ? 'sorting-active' : ''); ?>" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
                <?php endif; ?>
@@ -58,7 +58,7 @@
             var pathName = window.location.pathname;
             window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>' + pathName;
         });
-        <?php if(!empty($this->filterable)): ?>
+        <?php if(!empty($this->filterable) && !empty($this->userOrderOptions)): ?>
           var filterForm = $('form.filtering-form');
         if ($(filterForm).is('form')) {
             $(filterForm).append('<input type="hidden" name="userOrder" value=""/>');

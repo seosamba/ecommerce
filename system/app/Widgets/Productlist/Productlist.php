@@ -169,7 +169,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         $dragListId = null;
 
-        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
+        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false && (strpos($_SERVER['QUERY_STRING'], 'userOrder') === false || strpos($_SERVER['QUERY_STRING'], 'userOrder=default') !== false)) {
             if(empty($isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
                 $this->isDraggable = true;
             }
