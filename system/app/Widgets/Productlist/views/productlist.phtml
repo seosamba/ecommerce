@@ -1,7 +1,7 @@
 <?php $id = uniqid('pl-'); ?>
 <?php if (!empty($this->userOrderOptions) && empty($this->isPreview)): ?>
     <?php if ($this->sortingStyle === Widgets_Productlist_Productlist::SORTING_STYLE_SELECT): ?>
-        <select class="" id="user_order_<?php echo $id; ?>" name="select-order-<?php echo $id; ?>">
+        <select class="product-list-sorting-select-list" id="user_order_<?php echo $id; ?>" name="select-order-<?php echo $id; ?>">
             <?php foreach ($this->userOrderOptions as $option => $data) : ?>
                 <?php $selected = ''; ?>
 
@@ -12,7 +12,7 @@
             <?php endforeach; ?>
         </select>
     <?php elseif ($this->sortingStyle === Widgets_Productlist_Productlist::SORTING_STYLE_RADIO): ?>
-        <ul>
+        <ul class="product-list-sorting-radio-list">
             <?php foreach ($this->userOrderOptions as $option => $data) : ?>
                 <li>
                     <input type="radio" id="<?php echo $option . '_' . $id; ?>" name="radio-order-<?php echo $id; ?>"
@@ -29,7 +29,7 @@
                 <?php elseif ($data['selected'] && strpos($option, Zend_Db_Select::SQL_DESC)): ?>
                     <li class="icon-arrow-down2 active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
                 <?php else: ?>
-                    <li class="<?php echo($data['selected'] ? 'active' : ''); ?>" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
+                    <li class="<?php echo($data['selected'] ? 'sorting-active' : ''); ?>" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
                <?php endif; ?>
             <?php endforeach; ?>
         </ul>
@@ -73,14 +73,14 @@
         $('#arrow_order_<?php echo $id; ?> li').on('click', function (e) {
             var orderBy = $(this).data('order') === 'default' ? 'default' : $(this).data('order').split('_')[0],
                 direction = $(this).data('order') === 'default' ? '' : $(this).data('order').split('_')[1];
-            if (!$(this).hasClass('active')) {
+            if (!$(this).hasClass('sorting-active')) {
                 direction = '<?php echo Zend_Db_Select::SQL_ASC; ?>';
                 $(this).data('order', [orderBy, direction].join('_'));
             }
-            $('#arrow_order_<?php echo $id; ?> li').removeClass('active');
+            $('#arrow_order_<?php echo $id; ?> li').removeClass('sorting-active');
             $('#arrow_order_<?php echo $id; ?> li').removeClass('icon-arrow-down2');
             $('#arrow_order_<?php echo $id; ?> li').removeClass('icon-arrow-up2');
-            $(this).addClass('active');
+            $(this).addClass('sorting-active');
             direction = direction === '<?php echo Zend_Db_Select::SQL_ASC; ?>' ? '<?php echo Zend_Db_Select::SQL_DESC; ?>' : '<?php echo Zend_Db_Select::SQL_ASC; ?>';
             if (orderBy != 'default') {
                 if (direction === '<?php echo Zend_Db_Select::SQL_DESC; ?>') {
@@ -195,8 +195,3 @@
 
 </script>
 <?php endif; ?>
-<style>
-    .active {
-        color: red;
-    }
-</style>
