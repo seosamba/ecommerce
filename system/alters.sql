@@ -592,7 +592,16 @@ CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
 -- Add new prefix column
 ALTER TABLE `shopping_customer_address` ADD COLUMN `position` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 
+-- 15/12/2020
+-- version: 2.8.4
+-- Add partial payment action email notification
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_partialpaymentsecond'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentsecond' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.5' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
