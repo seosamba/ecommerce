@@ -947,10 +947,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $price = $this->_request->getParam('price');
         $sort = $this->_request->getParam('sort');
         $offset = intval($nextPage) * $limit;
+        $useUserOrder = filter_var($this->_request->getParam('useUserOrder'), FILTER_VALIDATE_BOOLEAN);
 
         $productMapper = Models_Mapper_ProductMapper::getInstance();
-
-        if (empty($dragListId)) {
+        if (empty($dragListId) || $useUserOrder) {
             $products = $productMapper->fetchAll("p.enabled='1'", $order, $offset, $limit,
                 null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {
@@ -1026,8 +1026,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			if (!empty($productsListDataResult)) {
+            if (!empty($productsListDataResult)) {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
+            } elseif ($useUserOrder) {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable, Widgets_Productlist_Productlist::OPTION_USER_ORDER));
             } else {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable));
             }
