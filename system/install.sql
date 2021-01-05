@@ -159,7 +159,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('usNumericFormat', '0'),
 ('minimumOrder', '0'),
-('version', '2.8.4');
+('version', '2.8.5');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -998,7 +998,9 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_suppliercompleted', 'Tools_StoreMailWatchdog'),
 ('1', 'store_suppliershipped', 'Tools_StoreMailWatchdog'),
 ('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
-('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
+('1', 'store_customernotification', 'Tools_StoreMailWatchdog'),
+('1', 'store_partialpayment', 'Tools_StoreMailWatchdog'),
+('1', 'store_partialpaymentsecond', 'Tools_StoreMailWatchdog');
 
 CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
@@ -1057,5 +1059,5 @@ INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.8.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.5' WHERE `name` = 'shopping';
 

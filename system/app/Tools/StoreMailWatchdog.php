@@ -53,6 +53,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
     const TRIGGER_STORE_PARTIALPAYMENT = 'store_partialpayment';
 
     /**
+     * partial payment second
+     */
+    const TRIGGER_STORE_PARTIALPAYMENT_SECOND = 'store_partialpaymentsecond';
+
+    /**
      * Notify users after certain period of time
      */
     const TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION = 'store_partialpaymentnotif';
@@ -587,6 +592,106 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
         return $this->_send();
     }
+
+    /**
+     * Send second partial payment
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendPartialpaymentsecondMail()
+    {
+        $customer = Models_Mapper_CustomerMapper::getInstance()->find($this->_object->getUserId());
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $adminBccArray = array();
+        $customerBccArray = array();
+        $systemConfig = $this->_configHelper->getConfig();
+        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
+        switch ($this->_options['recipient']) {
+            case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+                    ->setMailTo($adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);
+                if(!empty($adminUsers)){
+                    foreach($adminUsers as $admin){
+                        array_push($adminBccArray, $admin->getEmail());
+                    }
+                    if(!empty($adminBccArray)){
+                        $this->_mailer->setMailBcc($adminBccArray);
+                    }
+                }
+                break;
+            case self::RECIPIENT_SALESPERSON:
+                $this->_mailer->setMailToLabel('Sales person')
+                    ->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if(!empty($salesPersons)){
+                    foreach($salesPersons as $salesPerson){
+                        array_push($customerBccArray, $salesPerson->getEmail());
+                    }
+                    if(!empty($customerBccArray)){
+                        $this->_mailer->setMailBcc($customerBccArray);
+                    }
+                }
+                break;
+            case self::RECIPIENT_CUSTOMER:
+                if ($customer && $customer->getEmail()){
+                    $this->_mailer->setMailToLabel($customer->getFullName())
+                        ->setMailTo($customer->getEmail());
+                } else {
+                    return false;
+                }
+                break;
+            default:
+                error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+                return false;
+                break;
+        }
+
+        $this->_entityParser
+            ->objectToDictionary($customer)
+            ->objectToDictionary($this->_object, 'order');
+        $shippingServiceLabel = $this->_prepareShippingServiceLabel();
+        if (!empty($shippingServiceLabel)) {
+            $this->_entityParser->addToDictionary(array('order:shippingservice' => $shippingServiceLabel));
+        }
+        $withBillingAddress = $this->_prepareAdddress($customer, $this->_object->getBillingAddressId(), self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($customer, $this->_object->getShippingAddressId(), self::SHIPPING_TYPE);
+        if(isset($withBillingAddress)){
+            $this->_entityParser->addToDictionary(array('order:billingaddress'=> $withBillingAddress));
+        }
+        if(isset($withShippingAddress)){
+            $this->_entityParser->addToDictionary(array('order:shippingaddress'=> $withShippingAddress));
+        }
+        $currency = '';
+        if(Zend_Registry::isRegistered('Zend_Currency')){
+            $currencyHelper = Zend_Registry::get('Zend_Currency');
+            $currency = $currencyHelper->getSymbol();
+        }
+        $this->_entityParser->addToDictionary(array('order:currency'=>$currency));
+        $this->_entityParser->addToDictionary(array('store:name'=>!empty($this->_storeConfig['company'])?$this->_storeConfig['company']:''));
+
+        $pluginInvoicePdf = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+        if ($pluginInvoicePdf instanceof Application_Model_Models_Plugin && $pluginInvoicePdf->getStatus() === Application_Model_Models_Plugin::ENABLED) {
+            $invoicetopdfConfig = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams('attachInvoiceActionEmail');
+            if (isset($invoicetopdfConfig['attachInvoiceActionEmail']) && $invoicetopdfConfig['attachInvoiceActionEmail'] === '1') {
+                $fileInfo = Tools_Misc::prepareInvoice(['cartId' => $this->_object->getId(), 'dwn' => 0]);
+                if (isset($fileInfo['folder']) && isset($fileInfo['fileName'])) {
+                    $attachment = new Zend_Mime_Part(file_get_contents($fileInfo['folder'] . $fileInfo['fileName']));
+                    $attachment->type = 'application/pdf';
+                    $attachment->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
+                    $attachment->encoding = Zend_Mime::ENCODING_BASE64;
+                    $attachment->filename = $fileInfo['fileName'];
+                    $this->_mailer->addAttachment($attachment);
+                }
+            }
+        }
+
+        return $this->_send();
+    }
+
 
     /**
      * Send partial payment reminder notification

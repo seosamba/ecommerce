@@ -535,7 +535,9 @@ define(['backbone',
                 el          = $(event.currentTarget),
                 id          = parseInt(el.closest('div').data('order-id')),
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to change status for this order?'])?'Are you sure you want to change status for this order?':i18n['Are you sure you want to change status for this order?'],
-                status = el.data('status');
+                status = el.data('status'),
+                subStatus = el.data('sub-status');
+
 
             var model = this.orders.get(id),
                 realRefundByDefault = this.orders.realRefundByDefault;
@@ -605,6 +607,40 @@ define(['backbone',
                     }
                 });
             } else if(status === 'partial') {
+                if (subStatus === 'completed') {
+                    confirmMessage = _.isUndefined(i18n['Are you sure you want to mark order as paid?']) ? 'Are you sure you want to mark order as paid?' : i18n['Are you sure you want to mark order as paid?'];
+                    smoke.confirm(confirmMessage, function (e) {
+                        if (e) {
+                            $.ajax({
+                                url: $('#website_url').val() + 'plugin/shopping/run/changeOrderStatus/',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    'orderId': id,
+                                    'secureToken': $('.orders-secure-token').val()
+                                },
+                                success: function (response) {
+                                    if (response.error === 1) {
+                                        showMessage(response.responseText, true, 5000);
+                                    } else {
+                                        showMessage(response.responseText, false, 5000);
+                                        model.set('status', subStatus);
+                                        $('.ui-dialog-titlebar-close').trigger('click');
+                                    }
+                                }
+                            });
+
+                        }
+
+                    }, {
+                        ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                        cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+                    });
+
+                    return '';
+                }
+
+
                 confirmMessage = _.isUndefined(i18n['Are you sure you want to send payment request?']) ? 'Are you sure you want to send payment request?' : i18n['Are you sure you want to send payment request?'];
 
                 var partialButton  = _.isUndefined(i18n['Send payment request']) ? 'Send payment request':i18n['Send payment request'],
