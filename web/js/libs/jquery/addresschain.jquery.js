@@ -62,7 +62,7 @@
                                 }
                             }
 
-                            if (defaultValues && stateSelect.children().size()){
+                            if (defaultValues && stateSelect.children().length){
                                 stateSelect.val(defaultValues.state);
                             }
                         }
@@ -70,10 +70,10 @@
                 });
             });
 
-            if (defaultValues && countrySelect.find("[selected]").size()){
+            if (defaultValues && countrySelect.find("[selected]").length){
                 countrySelect.val(defaultValues.country).change();
             } else {
-                if (stateSelect.children().size() === 0) {
+                if (stateSelect.children().length === 0) {
                     countrySelect.trigger('change');
                 }
             }

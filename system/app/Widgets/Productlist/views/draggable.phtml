@@ -32,7 +32,7 @@
             });
 
             var action = '<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/saveDragListOrder';
-            var data = {'list_data': sort_order, 'list_id': '<?php echo $this->dragListId; ?>'}
+            var data = {'list_data': sort_order, 'list_id': '<?php echo $this->dragListId; ?>', 'pageId': <?php echo $this->pageId; ?>}
             $.ajax({
                 url: action,
                 data: data,

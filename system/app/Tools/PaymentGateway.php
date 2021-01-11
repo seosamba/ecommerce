@@ -35,6 +35,9 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
 
 			if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED) {
                 $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
+                if (Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactions') === 'true') {
+                    Tools_Misc::addThrottleTransaction();
+                }
             }
 
 			Models_Mapper_CartSessionMapper::getInstance()->save($cart);

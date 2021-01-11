@@ -235,7 +235,7 @@ $this->headLink()
     $('#config').tabs({
         select : function(event, ui){
             $form = $(ui.panel).children('form');
-            if($form.attr('user-changed')===true && $form.find(':submit').size()==0){
+            if($form.attr('user-changed')===true && $form.find(':submit').length==0){
                 $form.append('<input type=submit />');
             }
         },

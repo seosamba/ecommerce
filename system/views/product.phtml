@@ -81,6 +81,7 @@ $this->headLink()
             <option value="radio"><?php echo $this->translate('Radio Switch');?></option>
             <option value="text"><?php echo $this->translate('Text Field');?></option>
             <option value="date"><?php echo $this->translate('Datepicker');?></option>
+            <option value="textarea"><?php echo $this->translate('Textarea');?></option>
         </select>
 	</div>
 	<div class="grid_4 alpha omega text-center">
@@ -92,6 +93,7 @@ $this->headLink()
         {{/if}}
 	</div>
     <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
+
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
 
@@ -174,9 +176,9 @@ $this->headLink()
 		<span class="image background"><img src="<%= photoUrl %>"/></span>
 		<div class="description"><%= product.shortDescription.length > 220 ? product.shortDescription.slice(0, 219) + '...' : product.shortDescription %></div>
 		<span class="price">
-            <% pricePreview = parseFloat(product.price) %>
+            <% pricePreview = product.price %>
             <% pricePreview = isNaN(pricePreview) ? 0.00 : pricePreview %>
-			<%= pricePreview.toFixed(2) + '&nbsp;' + currency %>
+			<%= pricePreview + '&nbsp;' + currency %>
 		</span>
 		<span class="info"><?php echo $this->translate('Click preview to get to product landing page');?></span>
 	</a>
@@ -410,13 +412,29 @@ $this->headLink()
                             <?php $alternativeTaxLabel .=' '.(($this->defaultTaxes->getRate2() === '0.00') ? 0 : $this->defaultTaxes->getRate2()).' %'; ?>
                             <?php $alternative2TaxLabel .=' '.(($this->defaultTaxes->getRate3() === '0.00') ? 0 : $this->defaultTaxes->getRate3()).' %'; ?>
                         <?php endif;?>
-                        <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
-                            <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
-                            <option value="1"><?php echo $defaultTaxLabel;?></option>
-                            <option value="2"><?php echo $alternativeTaxLabel;?></option>
-                            <option value="3"><?php echo $alternative2TaxLabel;?></option>
-                        </select>
-                        <label class="grid_2 alpha omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
+                        <?php if(!empty($this->generalConfig['minimumOrder'])) :?>
+                            <div>
+                                <div class="grid_6 alpha labeled">
+                                    <input class="grid_4 alpha omega fl-right" type="text" id="product-minimumOrder" data-reflection="minimumOrder" placeholder="0">
+                                    <label class="grid_8 alpha omega" for="minimum-order"><?php echo $this->translate('Min. order'); ?></label>
+                                </div>
+                                <select id="product-taxClass" class="grid_4 alpha omega fl-right" name="taxes" data-reflection="taxClass">
+                                    <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
+                                    <option value="1"><?php echo $defaultTaxLabel;?></option>
+                                    <option value="2"><?php echo $alternativeTaxLabel;?></option>
+                                    <option value="3"><?php echo $alternative2TaxLabel;?></option>
+                                </select>
+                                <label class="grid_2 omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
+                            </div>
+                        <?php else:?>
+                            <select id="product-taxClass" class="grid_10 alpha omega fl-right" name="taxes" data-reflection="taxClass">
+                                <option value="0"><?php echo $this->translate('Non taxable'); ?></option>
+                                <option value="1"><?php echo $defaultTaxLabel;?></option>
+                                <option value="2"><?php echo $alternativeTaxLabel;?></option>
+                                <option value="3"><?php echo $alternative2TaxLabel;?></option>
+                            </select>
+                            <label class="grid_2 alpha omega" for="product-taxClass"><?php echo $this->translate('Taxes'); ?></label>
+                        <?php endif;?>
                     </div>
                 </fieldset>
             </div>

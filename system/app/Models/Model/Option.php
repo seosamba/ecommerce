@@ -16,6 +16,8 @@ class Models_Model_Option extends Application_Model_Models_Abstract {
 	const TYPE_DATE = 'date';
 	
 	const TYPE_FILE = 'file';
+
+    const TYPE_TEXTAREA = 'textarea';
 	
 	protected $_id;
 	

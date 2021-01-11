@@ -68,10 +68,14 @@ Plugin widgets.
     order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
     unwrap - remowed the <div class="product-list"></div> HTML element
+    userorderselect, userorderradio, userorderarrow - add select, radio or arrow style ordering to the productlist
     5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
     additionalfilters-somename,somename2,.. - Special filter for {$filter... widget where somename* is unique filter name
 3. Store widgets:
     {$store:cartblock} - Displays information about the state of the cart (the amount of goods, price, etc.) and link to the shopping cart page for the current user.
+
+    {$store:labelGenerationGrid:15} - Displays grid for orders label generation with shipping.
+    15 - orders limit on page.
 
 4. Add to cart widgets:
     {$store:addtocart:{$product:id}[:gotocart]} - Displays add to cart button

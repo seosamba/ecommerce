@@ -104,6 +104,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
+            $filter['inventory']  = filter_var_array((array)$this->_request->getParam('fqty'), FILTER_SANITIZE_STRING);
 			$filter['order']     = array_filter(filter_var_array((array)$this->_request->getParam('forder'), FILTER_SANITIZE_STRING));
 
             if (empty($order) && !empty($filter['order'])) {
@@ -119,10 +120,15 @@ class Api_Store_Products extends Api_Service_Abstract {
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
-            $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']).implode(',', $filter['brands']) . implode(',', $filter['order']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
+            $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']) . implode(',', $filter['brands']) . implode(',', $filter['inventory']) . implode(',', $filter['order']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
 			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
 
-				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(null, $order, $offset, $limit, (bool)$key?$key:null,
+				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(
+				    null,
+                    $order,
+                    $offset,
+                    $limit,
+                    (bool)$key?$key:null,
 					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
 					(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
                     $strictTagsCount,
@@ -130,7 +136,9 @@ class Api_Store_Products extends Api_Service_Abstract {
                     array(),
                     array(),
                     null,
-                    true
+                    true,
+                    array(),
+                    (is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null
                 );
 
 				$data = !is_null($products) ? array_map(function($prod){
@@ -293,7 +301,12 @@ class Api_Store_Products extends Api_Service_Abstract {
 				$brands = filter_var_array($brands, FILTER_SANITIZE_STRING);
 			}
 
-			$products = $this->_productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands);
+            $inventory  = $this->_request->getParam('fqty');
+            if ($inventory){
+                $inventory = filter_var_array($inventory, FILTER_SANITIZE_STRING);
+            }
+
+			$products = $this->_productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands, false, false, array(), array(), null, false, array(), $inventory);
 		}
 
 		if (!empty($products)){
@@ -367,7 +380,8 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$key    = filter_var($this->_request->getParam('key'), FILTER_SANITIZE_STRING);
 			$tags   = filter_var_array($this->_request->getParam('ftag', array()), FILTER_SANITIZE_NUMBER_INT);
 			$brands  = filter_var_array($this->_request->getParam('fbrand', array()), FILTER_SANITIZE_STRING);
-			if (empty($key) && empty($tags) && empty($brands)){
+			$inventory  = filter_var_array($this->_request->getParam('fqty', array()), FILTER_SANITIZE_STRING);
+			if (empty($key) && empty($tags) && empty($brands) && empty($inventory)){
 				return array(
 					'error'		=> true,
 					'code'		=> 400,
@@ -376,7 +390,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 				$this->_error();
 			}
 
-			$products = $this->_productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands);
+			$products = $this->_productMapper->fetchAll(null, array(), null, null, $key, $tags, $brands, false, false, array(), array(), null, false, array(), $inventory);
 		}
 
 		if (isset($products) && !is_null($products)) {

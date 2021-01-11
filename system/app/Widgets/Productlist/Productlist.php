@@ -34,6 +34,29 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
      */
     const OPTION_DRAGGABLE = 'draggable';
 
+    const OPTION_USER_ORDER = 'userorder';
+
+    /**
+     * Option to create a dropdown for product list sorting
+     */
+    const OPTION_USER_ORDER_SELECT = 'userorderselect';
+
+    /**
+     * Option to create a radio buttons for product list sorting
+     */
+    const OPTION_USER_ORDER_RADIO = 'userorderradio';
+
+    /**
+     * Option to create arrows for product list sorting
+     */
+    const OPTION_USER_ORDER_ARROW = 'userorderarrow';
+
+    const SORTING_STYLE_SELECT = 'select';
+
+    const SORTING_STYLE_RADIO = 'radio';
+
+    const SORTING_STYLE_ARROW = 'arrow';
+
     /**
      * Option to apply "AND" logic for tags filtering
      */
@@ -43,6 +66,23 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 	 * Product list default offset (used for portional load)
 	 */
 	const DEFAULT_LIMIT = 50;
+
+    /**
+     * @var array
+     */
+    public $draglist = array();
+
+    /**
+     * @var bool
+     */
+    public $isDraggable = false;
+
+    /**
+     * @var bool
+     */
+    public $isArrowSortingStyle = false;
+
+    public $userOrder = null;
 
     /**
      *  Product limit
@@ -112,7 +152,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $this->_cacheId = 'filtered_'.md5($this->_cacheId.$_SERVER['QUERY_STRING']);
         }
-        if (in_array(self::OPTION_DRAGGABLE, $this->_options) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+
+        if (in_array(self::OPTION_DRAGGABLE, $this->_options) || in_array(self::OPTION_FILTERABLE, $this->_options) || in_array(self::OPTION_USER_ORDER, $this->_options)) {
             $this->_cacheable = false;
         }
 	}
@@ -125,19 +166,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
         if (!empty($isPreview)) {
             $this->_view->isPreview = $isPreview;
         }
-        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
-            $last = 0;
-        } elseif ((!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
-                    $this->_options))
-            || (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && in_array(self::OPTION_DRAGGABLE,
-                    $this->_options) && $isPreview)
-        ) {
-            $this->last = $last;
-        }
 
         $dragListId = null;
 
-        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false) {
+        if (array_search(self::OPTION_DRAGGABLE, $this->_options) !== false && (strpos($_SERVER['QUERY_STRING'], 'userOrder') === false || strpos($_SERVER['QUERY_STRING'], 'userOrder=default') !== false)) {
+            if(empty($isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+                $this->isDraggable = true;
+            }
+
             $optionsForDragKey =  $this->_options;
             $withLimit = end($this->_options);
             if (is_numeric($withLimit)) {
@@ -151,6 +187,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $this->draglist['data'] = unserialize($dragModel->getData());
             }
             $this->_view->dragListId = $dragListId;
+        }
+
+        if(in_array(self::OPTION_FILTERABLE, $this->_options)) {
+            $this->_view->filterable = self::OPTION_FILTERABLE;
+        }
+        if (in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
+            $this->isArrowSortingStyle = true;
         }
 
         if (is_numeric($last)) {
@@ -170,11 +213,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_productMapper = Models_Mapper_ProductMapper::getInstance();
         $this->_strictTagsCount = in_array(self::OPTION_STRICT_TAGS_COUNT, $this->_options);
 
-		//$cacheKey = Helpers_Action_Cache::PREFIX_WIDGET . '.proccessed.' . implode('.', $this->_options);
-		//if(!($content = $this->_cache->load($cacheKey, Helpers_Action_Cache::PREFIX_WIDGET))) {
 		$content = $this->_processList();
-		//$this->_cache->save($cacheKey, $content, Helpers_Action_Cache::PREFIX_WIDGET, array('productListWidget'), Helpers_Action_Cache::CACHE_NORMAL);
-		//}
+
 		if ($this->_cleanListOnly) {
 			return $content;
 		}
@@ -201,19 +241,84 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		array_push($this->_cacheTags, preg_replace('/[^\w\d_]/', '', $this->_view->productTemplate));
 
         if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && array_search(self::OPTION_DRAGGABLE, $this->_options) && !$isPreview) {
+            $this->_view->pageId = $this->_toasterOptions['id'];
+
             return $this->_view->render('draggable.phtml');
         }
 
-        $orderSql = 'ASC';
+        $orderSql = Zend_Db_Select::SQL_ASC;
         if(in_array('desc', $this->_options)){
-            $orderSql = 'DESC';
+            $orderSql = Zend_Db_Select::SQL_DESC;
         }
-
+        if ($this->userOrder && $this->_view->filterable === self::OPTION_FILTERABLE) {
+            $this->_view->filters['order'] = $this->userOrder[0] != 'date' ? array($this->userOrder[0]) : array('created_at');
+            $orderSql = $this->userOrder[1];
+        }
         $this->_view->sort = $orderSql;
 
         if(in_array('unwrap', $this->_options)){
             $this->_view->unwrap = true;
         }
+
+        if (in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) || in_array(self::OPTION_USER_ORDER_RADIO, $this->_options) || in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
+            $userOrderOptions = [
+                'default' => ['title' => $this->_translator->translate('Featured'), 'selected' => 1],
+                'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name: A-Z'), 'selected' => 0],
+                'name_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Name: Z-A'), 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Price: Low to High'), 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Price: High to Low'), 'selected' => 0],
+                'date_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Oldest to newest'), 'selected' => 0],
+                'date_' . Zend_Db_Select::SQL_DESC => ['title' => $this->_translator->translate('Newest to oldest'), 'selected' => 0],
+
+            ];
+            if (!empty($this->_view->filters['order']) && isset($this->_view->filters['order'][0]) && !$dragListId) {
+                if (strpos($this->_view->filters['order'][0], 'name') !== false) {
+                    $userOrderOptions['name_' . $orderSql]['selected'] = 1;
+                    $userOrderOptions['default']['selected'] = 0;
+                } elseif (strpos($this->_view->filters['order'][0], 'price') !== false) {
+                    $userOrderOptions['price_' . $orderSql]['selected'] = 1;
+                    $userOrderOptions['default']['selected'] = 0;
+                } elseif (strpos($this->_view->filters['order'][0], 'created_at') !== false) {
+                    $userOrderOptions['date_' . $orderSql]['selected'] = 1;
+                    $userOrderOptions['default']['selected'] = 0;
+                }
+            }
+            $this->_view->userOrderOptions = $userOrderOptions;
+            $this->_view->sortingStyle = in_array(self::OPTION_USER_ORDER_SELECT, $this->_options) ? self::SORTING_STYLE_SELECT : self::SORTING_STYLE_RADIO;
+
+
+            if (in_array(self::OPTION_USER_ORDER_ARROW, $this->_options)) {
+                foreach ($userOrderOptions as $key => $data) {
+                    if ($key === 'default') {
+                        continue;
+                    }
+                    if (strpos($key, 'name') !== false && !empty($userOrderOptions[$key])) {
+                        $userOrderOptions[$key]['title'] = $this->_translator->translate('Name');
+                    } elseif (strpos($key, 'price') !== false && !empty($userOrderOptions[$key])) {
+                        $userOrderOptions[$key]['title'] = $this->_translator->translate('Price');
+                    } elseif (strpos($key, 'date') !== false && !empty($userOrderOptions[$key])) {
+                        $userOrderOptions[$key]['title'] = $this->_translator->translate('Date');
+                    }
+                    if ($data['selected'] === 0 && $userOrderOptions[explode('_', $key)[0] . '_' . Zend_Db_Select::SQL_DESC]['selected'] === 1) {
+                        unset($userOrderOptions[$key]);
+                    } elseif ($userOrderOptions[explode('_', $key)[0] . '_' . Zend_Db_Select::SQL_DESC]['selected'] === 0) {
+                        unset($userOrderOptions[explode('_', $key)[0] . '_' . Zend_Db_Select::SQL_DESC]);
+                    }
+                }
+                $this->_view->userOrderOptions = $userOrderOptions;
+                $this->_view->sortingStyle = self::SORTING_STYLE_ARROW;
+            }
+
+
+        }
+           /* $userOrderOptions = [
+                'default' => ['title' => $this->_translator->translate('Featured'), 'selected' => 1],
+                'date_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Date'), 'selected' => 0],
+                'name_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Name'), 'selected' => 0],
+                'price_' . Zend_Db_Select::SQL_ASC => ['title' => $this->_translator->translate('Price'), 'selected' => 0],
+            ];
+
+        }*/
 
 		if (!isset($this->_options[0])) {
 			$this->_view->offset = self::DEFAULT_LIMIT;
@@ -222,6 +327,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} else {
 			$this->_view->offset = $this->_options[0];
 		}
+
 		return $this->_view->render('productlist.phtml');
 	}
 
@@ -231,8 +337,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $res = array();
             for ($i = 0; $i < count($this->draglist['data']); $i++) {
                 foreach ($this->dragproducts as $product) {
-                    $prod_id = $product->getId();
-                    if ($this->draglist['data'][$i] == $prod_id) {
+                    $prodId = $product->getId();
+                    if ($this->draglist['data'][$i] == $prodId) {
                         $res[$i] = $product;
                     }
                 }
@@ -266,11 +372,17 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
             $this->_compareProductsWithDraglist($productsToCompare);
         }
-        if (!empty($this->last) && is_numeric($this->last) && !empty($this->draglist)) {
+        if (!empty($this->_limit) && is_numeric($this->_limit) && !empty($this->draglist)) {
             $neededIds = array();
-            for ($i = 0; $i < $this->last; $i++) {
-                $neededIds[] = $this->draglist['data'][$i];
+
+            if(!$this->isDraggable) {
+                for ($i = 0; $i < $this->_limit; $i++) {
+                    $neededIds[] = $this->draglist['data'][$i];
+                }
+            }else {
+                $neededIds = $this->draglist['data'];
             }
+
             if (!empty($neededIds)) {
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
                 $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
@@ -288,11 +400,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
 
         } else {
-            $this->_view->dragproducts = $products;
             $this->dragproducts = $products;
         }
 
-        if (isset($this->draglist) && is_array($this->draglist['data']) && isset($this->dragproducts) && is_array($this->dragproducts)) {
+        $this->_view->dragproducts = $products;
+
+        if (is_array($this->draglist['data']) && is_array($this->dragproducts)) {
             $dragOrderResult = $this->_dragListNewOrder();
             if (is_array($dragOrderResult) && (count($dragOrderResult) > 0)) {
                 $products = $dragOrderResult;
@@ -451,14 +564,29 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                     unset($this->draglist['data'][$i]);
                 }
             }
+
+            if(!empty($this->draglist['data'])) {
+                $this->draglist['data'] = array_values($this->draglist['data']);
+            }
         }
-        if (!empty($notInDrag) || !empty($notInProducts)) {
-            $this->draglist['data'] = array_values($this->draglist['data']);
-            $mapper = Models_Mapper_DraggableMapper::getInstance();
-            $model = new Models_Model_Draggable();
-            $model->setId($this->draglist['list_id']);
-            $model->setData(serialize($this->draglist['data']));
-            $mapper->save($model);
+
+        $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+        $currentUserRole = $currentUser->getRoleId();
+        $userId = $currentUser->getId();
+
+        if ($currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON) {
+            if (!empty($notInDrag) || !empty($notInProducts)) {
+                $this->draglist['data'] = array_values($this->draglist['data']);
+                $mapper = Models_Mapper_DraggableMapper::getInstance();
+                $model = new Models_Model_Draggable();
+                $model->setId($this->draglist['list_id']);
+                $model->setData(serialize($this->draglist['data']));
+                $model->setUpdatedAt(Tools_System_Tools::convertDateFromTimezone('now'));
+                $model->setUserId($userId);
+                $model->setIpAddress(Tools_System_Tools::getIpAddress());
+                $model->setPageId($this->_toasterOptions['id']);
+                $mapper->save($model);
+            }
         }
 
     }
@@ -552,6 +680,14 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         // fetching filters from query string
         $urlFilter = Filtering_Tools::normalizeFilterQuery();
+        if($this->_view->filterable === self::OPTION_FILTERABLE && isset($urlFilter['userOrder']) && is_array($urlFilter['userOrder'])){
+            $userOrder = explode('_', $urlFilter['userOrder'][0]);
+            if(!empty($userOrder[0]) && !empty($userOrder[1])){
+                $filters['order'] = array($userOrder[0]);
+                $orderSql = $userOrder[1];
+                $this->userOrder = $userOrder;
+            }
+        }
 		if (is_array($filters['order']) && !empty($filters['order'])) {
 			//normalization to proper column names
             $filters['order'] = array_map(function ($field) use ($allowedColumns) {
@@ -571,7 +707,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $filters['order'] = null;
             }
 		}
-
         if (!empty($urlFilter['category'])) {
             $filters['tagnames'] = $urlFilter['category'];
             unset($urlFilter['category']);
@@ -601,8 +736,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				array_push($this->_cacheTags, 'prodbrand_' . $brand);
 			}
 		}
-
-		$this->_view->filters = $filters;
 
         $attributes = array();
         $priceFilter = array();
@@ -671,11 +804,19 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $productPriceFilter = $this->_productPriceFilter;
         }
 
+        $limit = $this->_limit;
+
+        if($this->isDraggable) {
+            $limit = null;
+        }
+
+        $this->_view->filters = $filters;
+
 		return $this->_productMapper->fetchAll(
 		    $enabledOnly,
             $filters['order'],
             0,
-            $this->_limit,
+            $limit,
             null,
             $filters['tags'],
             $filters['brands'],

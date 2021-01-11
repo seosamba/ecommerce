@@ -142,7 +142,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
             },
             insertList: function () {
                 var shortCode = '{$productlist:';
-                if (!$('#templates').size() || !$('#templates').val()) {
+                if (!$('#templates').length || !$('#templates').val()) {
                     showMessage('Product template is missing. Please select a product listing template', true);
                     return false;
                 }
@@ -153,7 +153,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     draggable = ':draggable';
                 }
 
-                if ($('#search').size() && $('#search').val()) {
+                if ($('#search').length && $('#search').val()) {
                     var ids = [];
                     var visibleProducts = $('a.currproduct');
                     if (visibleProducts.length < uiTab.step) {
@@ -181,7 +181,7 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                     }
                 } else {
                     //tags filter
-                    if ($('#tags').val()) {
+                    if ($('#tags').val() && $('#tags').val().length > 0) {
                         shortCode += ':tagnames-';
                         var tagnames = [];
                         $('#tags option:selected').each(function () {
@@ -197,9 +197,9 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
 //                        shortCode += (($('#tags').val() != null) ? ':tagnames-' + $('#tags').val() : '');
                     }
                     //brands filter
-                    shortCode += (($('#brands').val() != null) ? ':brands-' + $('#brands').val() : '');
+                    shortCode += (($('#brands').val() != null && $('#brands').val().length > 0) ? ':brands-' + $('#brands').val() : '');
                     //ordering
-                    shortCode += (($('#ordering').val() != null) ? ':order-' + $('#ordering').val() : '') + draggable + '}';
+                    shortCode += (($('#ordering').val() != null && $('#ordering').val().length > 0) ? ':order-' + $('#ordering').val() : '') + draggable + '}';
                     tinymce.activeEditor.execCommand('mceInsertContent', false, shortCode);
                 }
 
@@ -241,10 +241,13 @@ echo $this->headScript()->appendFile($this->websiteUrl . 'system/js/external/cho
                                 case 'products':
                                     uiTab.parseProducts(response, filter);
                                     if (response.length >= uiTab.step) {
-                                        $('.productlisting:last-child').waypoint(function () {
-                                                $(this).waypoint('remove');
-                                                uiTab.offset += 30;
-                                                uiTab.loadStoreData('products', filter)
+                                        $('.productlisting:last-child').waypoint(
+                                            {
+                                                handler: function () {
+                                                    $(this).waypoint('remove');
+                                                    uiTab.offset += 30;
+                                                    uiTab.loadStoreData('products', filter)
+                                                }
                                             },
                                             {
                                                 context: '#product-products',

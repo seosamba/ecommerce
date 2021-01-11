@@ -29,7 +29,7 @@ if (_.isUndefined(TFilter)) {
             this.$el.find('input.typeahead').autocomplete({
                 source: _.bind(this.autocomplete, this),
                 select: function (event, ui) {
-                    self.renderAttribute(ui.item).find('input:text').focus();
+                    self.renderAttribute(ui.item, 'getAttribute').find('input:text').focus();
                     $(this).val('').blur();
                     return false;
                 }
@@ -85,7 +85,7 @@ if (_.isUndefined(TFilter)) {
                 } else {
                     $el.val('');
                     var $input = this.$el.find('.product-filters-list input[name="' + attrExists.get('name') + '"]');
-                    if ($input.size()) {
+                    if ($input.length) {
                         $input.focus();
                     } else {
                         self.renderAttribute(_.extend({tags: tags}, attrExists.toJSON())).find('input:text').focus();
@@ -112,11 +112,11 @@ if (_.isUndefined(TFilter)) {
                 _.each(attributes, this.renderAttribute, this);
             }
         },
-        renderAttribute: function (attr, index) {
+        renderAttribute: function (attr, additionalParam) {
             // prevent duplicating attributes
             var $exists = this.$el.find('input[name="' + attr.name + '"]'),
                 tags = [];
-            if ($exists.size()) {
+            if ($exists.length) {
                 return $exists.closest('p.filtering-attribute-widget');
             }
             // caching list element
@@ -128,10 +128,16 @@ if (_.isUndefined(TFilter)) {
                 tags = attr.tags;
             }
 
+            var attributeValue = attr.value;
+
+            if(additionalParam == 'getAttribute') {
+                attributeValue = '';
+            }
+
             return $('<p>', {'class': 'filtering-attribute-widget'})
                 .append($('<label>').html(attr.label))
                 .append(
-                    $('<input>', {type: 'text', name: attr.name, value: _.unescape(attr.value)})
+                    $('<input>', {type: 'text', name: attr.name, value: _.unescape(attributeValue)})
                         .data({aid: attr.attribute_id, tags: tags})
                 )
                 .appendTo(this.list);

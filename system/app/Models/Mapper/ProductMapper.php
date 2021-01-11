@@ -78,7 +78,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'prod_depth'        => $model->getProdDepth(),
             'prod_width'        => $model->getProdWidth(),
             'gtin'              => $model->getGtin(),
-            'wishlist_qty'      => $model->getWishlistQty()
+            'wishlist_qty'      => $model->getWishlistQty(),
+            'minimum_order'     => $model->getMinimumOrder()
 		);
 
 		if ($model->getId()){
@@ -173,7 +174,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $price = array(),
         $sort = null,
         $allowance = false,
-        $productPrice = array()
+        $productPrice = array(),
+        $inventory = null
 
     ) {
         $entities = array();
@@ -234,6 +236,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             if ($strictTagsCount) {
                 $select->having('COUNT(*) = ?', sizeof($tags));
             }
+        }
+
+        if(is_array($inventory) && !empty($inventory)) {
+            if(in_array('unlimited', $inventory)){
+                $where = new Zend_Db_Expr('p.inventory IS NULL');
+                unset($inventory[0]);
+                if (!empty($inventory)) {
+                    $where .= ' OR ' . $this->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $inventory);
+                }
+            }else{
+                $where = $this->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $inventory);
+            }
+            $select->where($where);
         }
 
         if ((bool)$search) {
@@ -762,6 +777,21 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('sku = ?', $sku);
         return $this->_findWhere($where);
+    }
+
+    /**
+     * Get products Inventory
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    public function getProductsInventory()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product', array(
+            'inventory' => new Zend_Db_Expr('GROUP_CONCAT(DISTINCT(inventory))')
+        ));
+
+        return $this->getDbTable()->getAdapter()->fetchRow($select);
     }
 
 }

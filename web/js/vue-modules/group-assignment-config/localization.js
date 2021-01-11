@@ -1,8 +1,10 @@
 const messages = {
     en: {
         message: {
-            groupConfigLegend: 'Custom params/groups rules config',
+            groupConfigLegend: 'Automated group assignment',
+            conditionLabel: 'When member and/or shopper registers and specifies',
             selectCustomParam: 'Select user attribute',
+            selectGroupLabel: 'Assign Customer/Leads Group Automatically',
             selectGroup: 'Customer group',
             specifyPropertyAction: 'Please specify at least one property/action',
             specifyGroup: 'Please specify group',
@@ -13,8 +15,10 @@ const messages = {
     },
     es: {
         message: {
-            groupConfigLegend: 'Custom params/groups rules config',
+            groupConfigLegend: 'Automated group assignment',
+            conditionLabel: 'When member and/or shopper registers and specifies',
             selectCustomParam: 'Select user attribute',
+            selectGroupLabel: 'Assign Customer/Leads Group Automatically',
             selectGroup: 'Customer group',
             specifyPropertyAction: 'Please specify at least one property/action',
             specifyGroup: 'Please specify group',
@@ -25,8 +29,10 @@ const messages = {
     },
     fr: {
         message: {
-            groupConfigLegend: 'Custom params/groups rules config',
+            groupConfigLegend: 'Automated group assignment',
+            conditionLabel: 'When member and/or shopper registers and specifies',
             selectCustomParam: 'Select user attribute',
+            selectGroupLabel: 'Assign Customer/Leads Group Automatically',
             selectGroup: 'Customer group',
             specifyPropertyAction: 'Please specify at least one property/action',
             specifyGroup: 'Please specify group',

@@ -81,13 +81,13 @@ define([
                 }
             });
             this.$el.on('tabsbeforeactivate', function(event, ui){
-                switch (ui.newPanel.selector){
-                    case '#tag-tab':
+                switch (ui.newPanel.attr('id')){
+                    case 'tag-tab':
                         self.initTags();
                     break;
-                    case '#coupon-tab':
-                    case '#group-pricing-tab':
-                    case '#digital-product-tab':
+                    case 'coupon-tab':
+                    case 'group-pricing-tab':
+                    case 'digital-product-tab':
                         if (self.model.isNew()){
                             showMessage(_.isUndefined(i18n['Please save product information first'])?'Please save product information first':i18n['Please save product information first'], true);
                             return false;
@@ -369,6 +369,9 @@ define([
             self.initTinyMce();
 
             var ptodFullDescription = this.model.get('fullDescription');
+            if(_.isNull(ptodFullDescription)) {
+                ptodFullDescription = '';
+            }
             tinymce.activeEditor.setContent(ptodFullDescription);
 
 			// loading option onto frontend
@@ -542,7 +545,7 @@ define([
             } else {
                 $('#product-tags-available').append(view.$el);
             }
-            if ($('.tagid-'+tag.get('id'), '#product-tags-current').size()){
+            if ($('.tagid-'+tag.get('id'), '#product-tags-current').length){
                 view.$el.addClass('tag-current').find('input:checkbox').prop({
                     disabled: true,
                     checked: true
@@ -642,7 +645,7 @@ define([
             }
         },
         renderProducts: function(){
-            if (this.products.size()){
+            if (this.products.length){
                 this.$('#product-list-holder').empty();
                 this.products.each(this.renderProduct, this);
                 var paginatorData = {
@@ -706,10 +709,7 @@ define([
             this.model.set({customParams: productCustomParams});
 
             var ptodFullDescription = tinymce.activeEditor.getContent();
-
-            if(ptodFullDescription.length > 0) {
-                this.model.set({fullDescription: ptodFullDescription});
-            }
+            this.model.set({fullDescription: ptodFullDescription});
 
             this.model.save();
 
@@ -805,7 +805,24 @@ define([
             var type = $('#product-list-holder').data('type');
             switch (type){
                 case 'edit':
-                    this.model.clear({silent:true}).set(this.products.get(pid).toJSON());
+                    var product = this.products.get(pid).toJSON();
+                    product.price = parseFloat(product.price);
+
+                    var productPrice = product.price;
+                    var productPriceArr = (productPrice + '').split('.');
+
+                    if(productPrice == 0) {
+                        product.price = '0.00';
+                    } else {
+                        if(typeof productPriceArr[1] !== 'undefined') {
+                            if(productPriceArr[1].length == 1) {
+                                productPriceArr[1] = productPriceArr[1] + '0';
+                                product.price = productPriceArr.join('.');
+                            }
+                        }
+                    }
+
+                    this.model.clear({silent:true}).set(product);
                     this.model.get('options').on('add', this.renderOption, this);
                     this.render();
                     if (window.history && window.history.pushState){
