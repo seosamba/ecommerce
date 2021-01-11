@@ -23,9 +23,13 @@ $this->headLink()
 <div class="content-footer">
     <form id="general-config" class="grid_12">
         <div class="grid_10 alpha omega">
-            <label class="pointer" for="config-checkoutShippingTocRequire">
+            <label class="pointer grid_7 alpha" for="config-checkoutShippingTocRequire">
                 <?php echo $this->formCheckbox('config[' . Shopping::SHIPPING_TOC_STATUS . ']', null, array('checked' => isset($this->shoppingConfig[Shopping::SHIPPING_TOC_STATUS]) ? $this->shoppingConfig[Shopping::SHIPPING_TOC_STATUS] : false)); ?>
                 <?php echo $this->translate('Require Shipping TOC on checkout. Use label (HTML ok):'); ?>
+            </label>
+            <label class="pointer grid_5 alpha" for="config-skipSingleShippingResult">
+                <?php echo $this->formCheckbox('config[' . Shopping::SHIPPING_SINGLE_RESULT . ']', null, array('checked' => isset($this->shoppingConfig[Shopping::SHIPPING_SINGLE_RESULT]) ? $this->shoppingConfig[Shopping::SHIPPING_SINGLE_RESULT] : false)); ?>
+                <?php echo $this->translate('skip single shipping result:'); ?>
             </label>
             <?php echo $this->formText(
                 'config[' . Shopping::SHIPPING_TOC_LABEL . ']',
@@ -368,7 +372,7 @@ $(function(){
         if(selectName === '0'){
             return false;
         }
-        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+        showConfirmCustom('<?php echo $this->translate('Are you sure want to delete?');?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>', function() {
             var selectId = row.data('current');
             row.removeClass( "add-new-config" );
             row.hide();
@@ -411,10 +415,13 @@ $(function(){
 
     $('.footer #submit').on('click', function(e){
         showSpinner();
-        var index = $('#shippers').tabs("option", "active"), currentPane = $('#pane-container div.ui-tabs-panel:eq('+index+')'),
-            indexOfPluginTab = index + 1;
+        var tabIndex = $('#shippers').tabs("option", "active"),
+            currentPane = $('#pane-container div.ui-tabs-panel:eq('+tabIndex+')'),
+            selector = '#shippers > ul > li > a',
+            currentTab = $(selector).eq(tabIndex),
+            activeTabName = $(selector).eq(tabIndex).data('plugin');
 
-        if($('#ui-id-'+indexOfPluginTab+'').data('plugin') === '<?php echo Shopping::SHIPPING_PICKUP;?>'){
+        if(activeTabName === '<?php echo Shopping::SHIPPING_PICKUP;?>'){
             e.preventDefault();
 
             var configRows = $('.pickup-location-conf-row'),
@@ -476,8 +483,9 @@ $(function(){
                 }
             }).done(function(response) {
                 if(response.done){
-                    $('#shippers').tabs('load', index);
-                        showMessage('<?php echo $this->translate('Saved')?>', false);
+                    var tabId = currentTab.get(0).id;
+                    $('#shippers').tabs('load', '#' + tabId);
+                    showMessage('<?php echo $this->translate('Saved')?>', false);
                 }
 
             });
@@ -513,7 +521,7 @@ $(function(){
         var locationRow = $(this).closest('.pickup-location-conf-row'),
             locationId = locationRow.data('pickup-location-row');
 
-        showConfirm('<?php echo $this->translate('Are you sure want to delete?');?>', function() {
+        showConfirmCustom('<?php echo $this->translate('Are you sure want to delete?');?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>', function() {
             $.ajax({
                url: $('#website_url').val()+'plugin/shopping/run/deletePickupLocation/locationId/'+locationId,
                type: 'DELETE',

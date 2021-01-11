@@ -32,18 +32,20 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             $model = new $this->_model($model);
         }
         $data = array(
-            'address1' => $model->getAddress1(),
-            'address2' => $model->getAddress2(),
-            'zip' => $model->getZip(),
-            'country' => $model->getCountry(),
-            'city' => $model->getCity(),
-            'working_hours' => $model->getWorkingHours(),
-            'phone' => $model->getPhone(),
+            'address1'             => $model->getAddress1(),
+            'address2'             => $model->getAddress2(),
+            'zip'                  => $model->getZip(),
+            'country'              => $model->getCountry(),
+            'city'                 => $model->getCity(),
+            'working_hours'        => $model->getWorkingHours(),
+            'phone'                => $model->getPhone(),
             'location_category_id' => $model->getLocationCategoryId(),
-            'name' => $model->getName(),
-            'lat' => $model->getLat(),
-            'lng' => $model->getLng(),
-            'weight' => $model->getWeight()
+            'name'                 => $model->getName(),
+            'lat'                  => $model->getLat(),
+            'lng'                  => $model->getLng(),
+            'weight'               => $model->getWeight(),
+            'external_id'          => $model->getExternalId(),
+            'allowed_to_delete'    => $model->getAllowedToDelete()
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);
@@ -105,5 +107,42 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             $result[$row->id] = $row->delete();
         }
         return $result;
+    }
+
+    /**
+     * @param $countries
+     * @return int
+     */
+    public function deleteLocationsBeforeProcess($countries) {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('country IN (?)', $countries);
+        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('allowed_to_delete = ?', '1');
+
+        return $this->getDbTable()->delete($where);
+    }
+
+    public function findLocationByExternalId($id, $withAlloowedToDelete = false) {
+        if(!empty($id)) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('external_id = ?', $id);
+            if($withAlloowedToDelete) {
+                $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('allowed_to_delete = ?', '1');
+            }
+            return $this->_findWhere($where);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUniqueCountries()
+    {
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
+            ->setIntegrityCheck(false)
+            ->from(array('shopping_pickup_location'), array('country'));
+
+        $select->group('country');
+
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
     }
 }

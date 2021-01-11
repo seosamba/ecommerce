@@ -13,20 +13,30 @@
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
     <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>
     <div class="search-line clearfix">
-        <input type="text" class="pfilter grid_3 alpha mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, sku, mpn') ?>" >
+        <input type="text" class="pfilter grid_3 alpha omega mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, SKU, MPN') ?>" >
         <div class="grid_9 omega">
-            <div class="grid_6 alpha mb20px">
+            <div class="grid_4 alpha t-grid_3 t-alpha mb20px">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
                     <?php foreach($this->brands as $brand):?>
                         <option value="<?php echo $brand->getName();?>"><?php echo $brand->getName();?></option>
                     <?php endforeach;?>
                 </select>
             </div>
-            <div class="grid_6 omega mb20px">
+            <div class="grid_4 alpha omega t-grid_3 mb20px">
                 <select class="pfilter" multiple name="filter-tag" data-placeholder="<?php echo $this->translate('Filter by tag..');?>">
                     <?php foreach($this->tags as $tag):?>
                         <option value="<?php echo $tag->getId();?>"><?php echo $tag->getName();?></option>
                     <?php endforeach;?>
+                </select>
+            </div>
+            <div class="grid_4 omega t-grid_3 t-omega mb20px">
+                <select class="pfilter" multiple name="filter-inventory" data-placeholder="<?php echo $this->translate('Filter by stock..');?>">
+                    <option value="<?php echo 'unlimited';?>"><?php echo $this->translate('unlimited');?></option>
+                    <?php if(!empty($this->inventory)) :?>
+                        <?php foreach($this->inventory as $qty):?>
+                            <option value="<?php echo $qty;?>"><?php echo $qty;?></option>
+                        <?php endforeach;?>
+                    <?php endif;?>
                 </select>
             </div>
         </div>
@@ -36,7 +46,9 @@
 			<tr>
 				<th><input type="checkbox" name="check-all" title="<?php echo $this->translate('Select all');?>"></th>
 				<th><?php echo $this->translate('Name');?></th>
+                <th><?php echo $this->translate('Stock');?></th>
 				<th><?php echo $this->translate('Brand');?></th>
+                <th><?php echo $this->translate('Suppliers');?></th>
 				<th><?php echo $this->translate('Sku');?></th>
 				<th><?php echo $this->translate('Mpn');?></th>
                 <th><?php echo $this->translate('Free shipping');?></th>
@@ -50,14 +62,14 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td colspan="9" class="text-center">
+				<td colspan="11" class="text-center">
 					<img src="<?php echo $this->websiteUrl;?>system/images/spinner-small.gif" alt="Loading..." />
 				</td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="9">
+				<td colspan="11">
                     <div class="grid_3 alpha">
                         <?php echo $this->translate('with selected');?>:&nbsp;
                         <select name="product-mass-action" id="">
@@ -67,8 +79,10 @@
                             <option value="tax"><?php echo $this->translate('assign tax');?></option>
                             <option value="freeshipping"><?php echo $this->translate('assign free shipping');?></option>
                             <option value="tag"><?php echo $this->translate('assign/remove tag');?></option>
+                            <option value="company"><?php echo $this->translate('assign suppliers');?></option>
                             <option value="delete"><?php echo $this->translate('delete (nonreversible)');?></option>
                             <option value="toggle"><?php echo $this->translate('enable/disable');?></option>
+                            <option value="quantity"><?php echo $this->translate('assign quantity');?></option>
                         </select>
                     </div>
                     <div id="paginator" class="paginator text-right grid_9 omega mt10px"></div>

@@ -20,7 +20,7 @@ class Api_Store_Tags extends Api_Service_Abstract {
 			'allow' => array('get', 'post', 'put', 'delete')
 		),
 		Shopping::ROLE_SALESPERSON      => array(
-			'allow' => array('get')
+			'allow' => array('get', 'post', 'put', 'delete')
 		)
 	);
 

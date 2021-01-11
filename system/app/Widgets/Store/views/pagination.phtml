@@ -1,0 +1,51 @@
+<?php if ($this->pageCount && $this->pageCount > 1): ?>
+    <nav class="label-generation-pagination mt20px dataTables_paginate">
+        <?php $filterUrl = ''; ?>
+        <?php if ($this->filterBy): ?>
+            <?php $filterUrl .= '&filterBy=' . $this->filterBy; ?>
+        <?php endif; ?>
+        <?php if ($this->filterByDateFrom): ?>
+            <?php $filterUrl .= '&filterByDateFrom=' . $this->filterByDateFrom; ?>
+        <?php endif; ?>
+        <?php if ($this->filterByDateFromOriginal): ?>
+            <?php $filterUrl .= '&filterByDateFromOriginal=' . $this->filterByDateFromOriginal; ?>
+        <?php endif; ?>
+        <?php if ($this->filterByDateTo): ?>
+            <?php $filterUrl .= '&filterByDateTo=' . $this->filterByDateTo; ?>
+        <?php endif; ?>
+        <?php if ($this->filterByDateToOriginal): ?>
+            <?php $filterUrl .= '&filterByDateToOriginal=' . $this->filterByDateToOriginal; ?>
+        <?php endif; ?>
+        <?php if ($this->orderBy): ?>
+            <?php $filterUrl .= '&orderBy=' . $this->orderBy; ?>
+        <?php endif; ?>
+        <?php if ($this->current !== $this->first) : ?>
+            <a href="<?php echo $this->url ?>?gridListNum=<?php echo $this->first . $filterUrl; ?>"><?php echo $this->translate('First'); ?></a>
+        <?php endif; ?>
+
+        <?php if (isset($this->previous)): ?>
+            <a href="<?php echo $this->url ?>?gridListNum=<?php echo $this->previous . $filterUrl; ?>"><?php echo $this->translate('Previous'); ?></a>
+        <?php else: ?>
+            <span class="disabled"><?php echo $this->translate('Previous'); ?></span>
+        <?php endif; ?>
+
+        <?php foreach ($this->pagesInRange as $page): ?>
+            <?php if ($page != $this->current): ?>
+                <a href="<?php echo $this->url ?>?gridListNum=<?php echo $page . $filterUrl; ?>"><?php echo $page; ?></a>
+            <?php else: ?>
+                <span class='current'><?php echo $page; ?></span>
+            <?php endif; ?>
+        <?php endforeach; ?>
+
+        <?php if (isset($this->next)): ?>
+            <a href="<?php echo $this->url ?>?gridListNum=<?php echo $this->next . $filterUrl; ?>"><?php echo $this->translate('Next'); ?></a>
+        <?php else: ?>
+            <span class="disabled"><?php echo $this->translate('Next'); ?></span>
+        <?php endif; ?>
+
+        <?php if ($this->current !== $this->last) : ?>
+            <a href="<?php echo $this->url ?>?gridListNum=<?php echo $this->last . $filterUrl; ?>"><?php echo $this->translate('Last'); ?></a>
+        <?php endif; ?>
+    </nav>
+<?php endif; ?>
+

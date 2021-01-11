@@ -1,0 +1,18 @@
+<div id="product-custom-params-config-block" class="seotoaster container">
+    <?php echo $this->partial(
+        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+        array(
+            'headerText' => $this->translate('Product custom fields config'),
+        )
+    ); ?>
+    <div id="product-custom-params-config"></div>
+    <input type="hidden" id="product-custom-params-config-token" name="secureToken"
+           value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
+</div>
+
+<input id="system-language-product-custom-fields" type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
+<script>
+    $(function () {
+        $.getScript('<?php echo $this->websiteUrl . "plugins/shopping/web/js/vue-modules/productcustomparamsconfig.js"?>', function(result){});
+    });
+</script>

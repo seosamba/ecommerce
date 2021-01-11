@@ -18,6 +18,10 @@ class Filtering_Tools
         'weight'
     );
 
+    public static $allowedAdditionalOptions = array(
+        'productsqft'
+    );
+
     /**
      * Parse URL query string to array of filter params
      * @param string $queryString
@@ -36,6 +40,11 @@ class Filtering_Tools
             foreach (explode('&', $queryString) as $queryParam) {
                 $queryParam = explode('=', $queryParam);
                 $filter = $queryParam[0];
+
+                if(in_array($filter, self::$allowedAdditionalOptions)) {
+                    array_push(self::$_rangeFilters, $filter);
+                }
+
                 $value = isset($queryParam[1]) ? urldecode($queryParam[1]) : null;
                 if (!isset($urlFilters[$filter])) {
                     $urlFilters[$filter] = array();

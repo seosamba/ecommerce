@@ -43,6 +43,14 @@ class Forms_Signup extends Zend_Form {
             'value'      => $this->_subscribed
         )));
 
+        $this->addElement(new Zend_Form_Element_Select(array(
+            'name'         => 'prefix',
+            'id'           => 'prefix',
+            'label'        => $translator->translate('Prefix'),
+            'value'        => $this->_prefix,
+            'multiOptions' => array('' => $translator->translate('Select')) +  Tools_System_Tools::getAllowedPrefixesList()
+        )));
+
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'firstname',
             'label'    => 'First Name',

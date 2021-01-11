@@ -14,7 +14,7 @@ $(function () {
         }
     }
 
-    if ($('.option-datepicker').size()) {
+    if ($('.option-datepicker').length) {
         var datepickers = $('.option-datepicker');
         if (datepickers[0].type !== 'date') {
             if (window.jQuery && jQuery.ui) {
@@ -45,7 +45,7 @@ $(function () {
             newOriginalPrice = eval(newOriginalPrice);
             newCurrentPrice = eval(newCurrentPrice);
 
-            var $contextProductList = $(this).closest('.product-list').size() ? $(this).closest('.product-list') : 'body';
+            var $contextProductList = $(this).closest('.product-list').length ? $(this).closest('.product-list') : 'body';
 
             $('.price-lifereload-' + productId + '.original-price', $contextProductList).text(accounting.formatMoney(newOriginalPrice, prices.format));
             $('.price-lifereload-' + productId + ':not(.original-price)', $contextProductList).text(accounting.formatMoney(newCurrentPrice, prices.format));

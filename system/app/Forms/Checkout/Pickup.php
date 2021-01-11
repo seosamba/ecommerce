@@ -35,6 +35,8 @@ class Forms_Checkout_Pickup extends Zend_Form {
 	public function init(){
 		parent::init();
 
+        $translator =  Zend_Registry::get('Zend_Translate');
+
 		$this->setLegend('Enter pick up information')
             ->setAttribs(array(
             'id'     => 'checkout-pickup',
@@ -43,6 +45,14 @@ class Forms_Checkout_Pickup extends Zend_Form {
         ));
 
         $this->setDecorators(array('FormElements', 'Form'));
+
+        $this->addElement(new Zend_Form_Element_Select(array(
+            'name'         => 'prefix',
+            'id'           => 'prefix',
+            'label'        => $translator->translate('Prefix'),
+            'value'        => $this->_prefix,
+            'multiOptions' => array('' => $translator->translate('Select')) + Tools_System_Tools::getAllowedPrefixesList()
+        )));
 
         $this->addElement(new Zend_Form_Element_Text(array(
             'name'     => 'firstname',

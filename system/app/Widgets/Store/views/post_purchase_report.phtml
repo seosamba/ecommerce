@@ -37,6 +37,10 @@
 					<span><?php echo $this->translate('Email');?>: <?php echo $billingAddress['email'];?></span>
 					<br/>
 				<?php endif; ?>
+                <?php if (isset($billingAddress['customer_notes']) && $billingAddress['customer_notes'] != ''): ?>
+                    <span><?php echo $billingAddress['customer_notes'];?></span>
+                    <br/>
+                <?php endif; ?>
 				<span><?php echo $this->translate('Payment Method');?>
 					: <?php echo $this->cart->getGateway();?></span>
 			<?php else: ?>
@@ -130,6 +134,10 @@
 					<span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
 					<br/>
 				<?php endif; ?>
+                <?php if (isset($shippingAddress['customer_notes']) && $shippingAddress['customer_notes'] != ''): ?>
+                    <span><?php echo $shippingAddress['customer_notes'];?></span>
+                    <br/>
+                <?php endif; ?>
 			<?php endif;?>
 			<?php else: ?>
 				<span><?php echo $this->translate('not provided');?></span>
@@ -317,6 +325,10 @@
 					<span><?php echo $this->translate('Mobile');?>: <?php echo $billingAddress['mobile_country_code_value'].$billingAddress['mobile'];?></span>
 					<br/>
 				<?php endif; ?>
+                <?php if (isset($billingAddress['customer_notes']) && $billingAddress['customer_notes'] != ''): ?>
+                    <span><?php echo $billingAddress['customer_notes'];?></span>
+                    <br/>
+                <?php endif; ?>
 				<?php if (isset($billingAddress['email']) && $billingAddress['email'] != ''): ?>
 					<span><?php echo $this->translate('Email');?>: <?php echo $billingAddress['email'];?></span>
 					<br/>
@@ -423,6 +435,17 @@
                             <span><?php echo $this->translate('Mobile');?>: <?php echo $shippingAddress['mobile_country_code_value'].$shippingAddress['mobile'];?></span>
                             <br/>
                         <?php endif; ?>
+                        <?php if (isset($shippingAddress['customer_notes']) && $shippingAddress['customer_notes'] != ''): ?>
+                            <span><?php echo $shippingAddress['customer_notes'];?></span>
+                            <br/>
+                        <?php endif; ?>
+                <?php endif;?>
+                <?php if(!empty($this->cart->getIsGift())):?>
+                    <br/>
+                    <br/>
+                    <?php echo $this->translate('Is a gift');?>
+                    <br/>
+                    <?php echo $this->translate('Recipient\'s email');?>: <?php echo $this->cart->getGiftEmail();?>
                 <?php endif;?>
 
 			<?php else: ?>
@@ -457,71 +480,89 @@
 		<?php foreach ($this->cartContent as $product) : ?>
 			<tr>
 				<td align="left" valign="middle">
-					<?php if (isset($product['photo']) && $product['photo'] != ''): ?>
-						<a class="page-teaser-image"
-						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
-						   title="<?php echo $product['name']; ?>" target="_blank">
-							<img style="width:60px; vertical-align:middle"
-                                <?php $src = mb_eregi_replace(' ', "%20", $product['photo']); ?>
-                                <?php $src = Tools_Misc::prepareProductImage($src); ?>
-							    src="<?php echo Tools_Misc::prepareProductImage($src); ?>"
-							    alt="<?php echo $product['name']; ?>"/>
-						</a>
-					<?php else: ?>
-						<img style="width:60px;" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
-						     alt="<?php echo $product['name']; ?>"/>
-					<?php endif;?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if (isset($product['photo']) && $product['photo'] != ''): ?>
+                            <a class="page-teaser-image"
+                               href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
+                               title="<?php echo $product['name']; ?>" target="_blank">
+                                <img style="width:60px; vertical-align:middle"
+                                    <?php $src = mb_eregi_replace(' ', "%20", $product['photo']); ?>
+                                    <?php $src = Tools_Misc::prepareProductImage($src); ?>
+                                    src="<?php echo Tools_Misc::prepareProductImage($src); ?>"
+                                    alt="<?php echo $product['name']; ?>"/>
+                            </a>
+                        <?php else: ?>
+                            <img style="width:60px;" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
+                                 alt="<?php echo $product['name']; ?>"/>
+                        <?php endif;?>
+                    <?php endif;?>
 				</td>
 				<td align="left" valign="middle">
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
 						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
-					<?php if (!empty($product['options'])): ?>
-						<?php foreach ($product['options'] as $optionTitle => $optData): ?>
-							<?php
-							if (is_array($optData)) {
-								$optionStr = $optionTitle . ': ' . $optData['title'];
-								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
-										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
-									} else {
-										$optPriceMod = $optData['priceValue'];
-									}
-                                    if ($optData['priceType'] === 'percent') {
-									    $optionStr .= ' <span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
-                                    } else {
-                                        $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                        <?php if (!empty($product['options'])): ?>
+                            <?php foreach ($product['options'] as $optionTitle => $optData): ?>
+                                <?php
+                                if (is_array($optData)) {
+                                    $optionStr = $optionTitle . ': ' . $optData['title'];
+                                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+                                        if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
+                                            $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
+                                        } else {
+                                            $optPriceMod = $optData['priceValue'];
+                                        }
+                                        if ($optData['priceType'] === 'percent') {
+                                            $optionStr .= ' <span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                        } else {
+                                            $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                        }
                                     }
-								}
-								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-									$optionStr .= ' <span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>';
-								}
-							} else {
-								$optionStr = $optionTitle . ': ' . $optData;
-							} ?>
-							<div class="options"><?php echo $optionStr; ?></div>
-						<?php endforeach; ?>
-					<?php endif;?>
+                                    if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+                                        $optionStr .= ' <span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>';
+                                    }
+                                } else {
+                                    $optionStr = $optionTitle . ': ' . $optData;
+                                } ?>
+                                <div class="options"><?php echo $optionStr; ?></div>
+                            <?php endforeach; ?>
+                        <?php endif;?>
+                    <?php else:?>
+                        <span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;">&nbsp;</span>
+                    <?php endif;?>
 				</td>
 				<?php if (isset($this->additionalTableRows)): ?>
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
 						<?php if (isset($product[$tableRow])): ?>
-							<td valign="middle" align="center"><?php echo $product[$tableRow]; ?></td>
+							<td valign="middle" align="center">
+                            <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                                <?php echo $product[$tableRow]; ?>
+                            <?php endif; ?>
+                            </td>
 						<?php endif; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
                 <td valign="middle" align="center">
-                <?php if($product['freebies'] == 1):?>
-                    <?php echo $this->translate('free'); ?>
-                <?php else:?>
-                    <?php echo $this->currency($product['tax_price']); ?>
-                <?php endif;?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if($product['freebies'] == 1):?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php else:?>
+                            <?php echo $this->currency($product['tax_price']); ?>
+                        <?php endif;?>
+                    <?php endif;?>
                 </td>
-				<td valign="middle" align="center"><?php echo $product['qty']; ?></td>
+				<td valign="middle" align="center">
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php echo $product['qty']; ?>
+                    <?php endif;?>
+                </td>
                 <td valign="middle" align="center">
-                <?php if($product['freebies'] == 1):?>
-                    <?php echo $this->translate('free'); ?>
-                <?php else:?>
-				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
-                <?php endif;?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if($product['freebies'] == 1):?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php else:?>
+                            <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                        <?php endif;?>
+                    <?php endif;?>
                 </td>
 			</tr>
 		<?php endforeach; ?>

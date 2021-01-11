@@ -173,9 +173,11 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 array('userattr' => 'user_attributes'),
                 $joinConditionCustomer,
                 array('customer_attr'=>'(GROUP_CONCAT(DISTINCT(userattr.attribute), \'||\', userattr.value))'))
+            ->joinLeft(array('scs' => 'shopping_company_suppliers'), 'scs.supplier_id=user.id', array())
+            ->joinLeft(array('sc' => 'shopping_companies'), 'scs.company_id=sc.id', array('company_name' => 'sc.company_name', 'company_id' => 'scs.company_id'))
             ->group('user.id');
 
-		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_USERS)) {
+		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
 			$select->where('user.role_id NOT IN (?)', array(
 				Tools_Security_Acl::ROLE_SUPERADMIN,
 				Tools_Security_Acl::ROLE_ADMIN
@@ -211,6 +213,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'id',
                 'user_id',
                 'address_type',
+                'prefix',
                 'firstname',
                 'lastname',
                 'company',
@@ -247,6 +250,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
             'c.id' ,
             'c.user_id',
             'c.address_type',
+            'c.prefix',
             'c.firstname',
             'c.lastname',
             'c.company',
@@ -280,6 +284,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 'c_adr.id',
                 'c_adr.user_id',
                 'c_adr.address_type',
+                'c_adr.prefix',
                 'c_adr.firstname',
                 'c_adr.lastname',
                 'c_adr.company',
@@ -318,6 +323,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         $columns = array(
             'u.email',
             'u.role_id',
+            'u.prefix',
             'u.full_name',
             'u.last_login',
             'u.reg_date',
@@ -350,5 +356,19 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
         $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
         return $users;
+    }
+
+    public function getCustomersForMassGroupAssignment($customersIdsArray)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('u.id IN (?)', $customersIdsArray);
+
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('u' => 'user'), array(
+            'u.id',
+            'sci.user_id',
+        ))
+            ->join(array('sci' => 'shopping_customer_info'), 'sci.user_id=u.id', array())
+            ->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 }

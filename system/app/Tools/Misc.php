@@ -50,6 +50,18 @@ class Tools_Misc
      */
     const OPTION_THANKYOU = 'option_storethankyou';
 
+    const THROTTLE_TRANSACTIONS_DEFAULT_MESSAGE = 'Due to unprecedented orders volume, and in order to maintain quality of service, our online shop is open for a limited amount of time every day. We are no longer accepting orders today, please try to come back earlier tomorrow to place your order. We apologize for the inconvenience.';
+
+    /**
+     * System shipping services without label generation
+     */
+    public static $systemShippingServices = array(
+        'freeshipping',
+        'pickup',
+        'markup',
+        'flatrateshipping',
+        'flatrateship'
+    );
 
     /*
      * Changes for name inc. Tax 
@@ -107,7 +119,9 @@ class Tools_Misc
     public static $_merchandisingConfigTabs = array(
         0 => array('tabId' => 'coupons', 'tabName' => 'Coupons', 'type' => 'internal'),
         1 => array('tabId' => 'recurring-payments', 'tabName' => 'Recurring payments', 'type' => 'internal'),
-        2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers groups', 'type' => 'internal')
+        2 => array('tabId' => 'group-pricing', 'tabName' => 'Customers/Leads groups', 'type' => 'internal'),
+        3 => array('tabId' => 'user-attributes-assignment-rules', 'tabName' => 'Automated group assignment', 'type' => 'internal'),
+        4 => array('tabId' => 'throttle-transactions', 'tabName' => 'Throttle transactions', 'type' => 'internal')
     );
 
 
@@ -352,6 +366,7 @@ class Tools_Misc
     {
         $_addressTmpl = array(
             'address_type' => '',
+            'prefix' => '',
             'firstname' => '',
             'lastname' => '',
             'company' => '',
@@ -367,7 +382,8 @@ class Tools_Misc
             'mobilecountrycode' => '',
             'phonecountrycode' => '',
             'mobile_country_code_value' => '',
-            'phone_country_code_value' => ''
+            'phone_country_code_value' => '',
+            'customer_notes' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);
@@ -536,7 +552,7 @@ class Tools_Misc
 
         // fetching $product:price and $product:freeshipping widgets and rendering them via native widget
         if (preg_match_all(
-            '~{\$product:((?:price|freeshipping|photourl):?[^}]*)}~',
+            '~{\$product:((?:price|freeshipping|photourl|wishlistqty):?[^}]*)}~',
             $templateContent,
             $productPriceWidgets
         )
@@ -676,5 +692,196 @@ class Tools_Misc
         return $configTabs;
     }
 
+    /**
+     * Remove last zero number
+     * Weight format conversion by Country location
+     * ex. fr_FR = 15,35
+     * ex. en_US = 15.35
+     *
+     * @param $weight
+     * @return string
+     */
+    public static function processingWeightFormat($weight) {
+        $weight = round($weight, 3);
+        $locale = Zend_Locale::getLocaleToTerritory(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('country'));
+        $weightFormat = Zend_Locale_Format::toNumber($weight, array('locale' => $locale));
+
+        return $weightFormat;
+    }
+
+    public static function prepareInvoice($data)
+    {
+        if (Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf')->getStatus() === 'enabled') {
+            $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('Session');
+            $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+            $websiteConfig = Zend_Controller_Action_HelperBroker::getStaticHelper('config')->getConfig();
+            $pdfPath = $websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'invoices' . DIRECTORY_SEPARATOR;
+            if (empty($data['cartId'])) {
+                return false;
+            }
+            $cartId = $data['cartId'];
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            if (empty($cartSession)) {
+                return false;
+            }
+            $invoicetopdfSettings = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams();
+            if (isset($data['cartId']) && isset($invoicetopdfSettings['invoiceTemplate']) && isset($data['dwn'])) {
+                $cartId = $data['cartId'];
+                $templateTable = new Application_Model_DbTable_Template;
+                if (isset($data['packing'])) {
+                    $where = $templateTable->getAdapter()->quoteInto(
+                        'name = ?',
+                        $invoicetopdfSettings['packingTemplate']
+                    );
+                } else {
+                    $where = $templateTable->getAdapter()->quoteInto(
+                        'name = ?',
+                        $invoicetopdfSettings['invoiceTemplate']
+                    );
+                }
+                $invoiceTemplate = Application_Model_Mappers_TemplateMapper::getInstance()->fetchAll($where);
+                $templateContent = $invoiceTemplate[0]->getContent();
+
+                $sessionHelper->storeCartSessionKey = $cartId;
+                $sessionHelper->storeCartSessionConversionKey = $cartId;
+                $customerDbTable = new Quote_Models_DbTable_ShoppingCustomerAddress();
+                $whereBilling = $customerDbTable->getAdapter()->quoteInto(
+                    'id = ?',
+                    $cartSession->getBillingAddressId()
+                );
+                $whereShipping = $customerDbTable->getAdapter()->quoteInto(
+                    'id = ?',
+                    $cartSession->getShippingAddressId()
+                );
+                $customerShipping = $customerDbTable->getAdapter()->fetchAll(
+                    $customerDbTable->select()->from('shopping_customer_address')->where($whereShipping)
+                );
+                $customerBilling = $customerDbTable->getAdapter()->fetchAll(
+                    $customerDbTable->select()->from('shopping_customer_address')->where($whereBilling)
+                );
+                if (!empty($customerShipping)) {
+                    $customerShipping[0]['country'] = self::prepareCountry($customerShipping[0]['country']);
+                    $sessionHelper->customerShippingInvoice = $customerShipping;
+                }
+                if (!empty($customerBilling)) {
+                    $customerBilling[0]['country'] = self::prepareCountry($customerBilling[0]['country']);
+                    $sessionHelper->customerBillingInvoice = $customerBilling;
+                }
+
+                $themeData = Zend_Registry::get('theme');
+                $pageMapper = Application_Model_Mappers_PageMapper::getInstance();
+                $parserOptions = array(
+                    'websiteUrl' => $websiteHelper->getUrl(),
+                    'websitePath' => $websiteHelper->getPath(),
+                    'currentTheme' => $websiteHelper->getConfig('currentTheme'),
+                    'themePath' => $themeData['path'],
+                );
+                $page = $pageMapper->findByUrl('index.html');
+                $page = $page->toArray();
+                $parser = new Tools_Content_Parser($templateContent, $page, $parserOptions);
+                $content = $parser->parse();
+
+                if (!defined('_MPDF_TEMP_PATH')) {
+                    define('_MPDF_TEMP_PATH', $pdfPath);
+                }
+                require_once($websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'system/library/mpdf/mpdf.php');
+
+                $pdfFile = new mPDF('utf-8', 'A4');
+                $pdfFile->WriteHTML($content);
+
+                if (isset($data['packing'])) {
+                    $pdfFileName = 'packing_slip_' . md5($cartId . microtime()) . '.pdf';
+                    if (!empty($invoicetopdfSettings['invoiceOrigName'])) {
+                        $pdfFileName = 'packing_slip_' . $cartId . '.pdf';
+                    }
+                } else {
+                    $pdfFileName = 'Invoice_' . md5($cartId . microtime()) . '.pdf';
+                    if (!empty($invoicetopdfSettings['invoiceOrigName'])) {
+                        $pdfFileName = 'Invoice_' . $cartId . '.pdf';
+                    }
+
+                }
+                $pdfFile->Output($pdfPath . $pdfFileName, 'F');
+
+                return array('fileName' => $pdfFileName, 'folder' => $pdfPath, 'cartSession' => $cartSession);
+
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return country full name
+     *
+     * @param string $country country code
+     * @return mixed
+     */
+    public static function prepareCountry($country)
+    {
+        if (!empty($country)) {
+            $countries = Tools_Geo::getCountries(true);
+            $country = $countries[$country];
+        }
+        return $country;
+    }
+
+    /**
+     * Prepare checked filter in config to view
+     *
+     * @param $widgetSettings
+     * @param $filters
+     * @return mixed
+     */
+    public static function processProductFilters($widgetSettings, $filters)
+    {
+        foreach ($filters as $key => $filter) {
+            $filterValues = array();
+
+            if(!empty($widgetSettings[$filter['name']]) && is_array($widgetSettings[$filter['name']])) {
+                foreach ($filter['values'] as $filterName => $value) {
+                    if(!empty($filterName) && !empty($widgetSettings[$filter['name']][$filterName])) {
+                        $filterValues[$filterName] = $value;
+                    }
+                }
+
+                $filters[$key]['values'] = $filterValues;
+            }
+        }
+
+        return $filters;
+    }
+
+    public static function addThrottleTransaction()
+    {
+        $throttleConfigParams = [];
+        $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $throttleTransactionsCounter = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounter');
+        $throttleTransactionsCounterDate = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounterDate');
+        $throttleTransactionsCounter = !empty(intval($throttleTransactionsCounter)) ? intval($throttleTransactionsCounter) : 0;
+        $throttleTransactionsCounterDate = !empty($throttleTransactionsCounterDate) ? date('Y-m-d', strtotime($throttleTransactionsCounterDate)) : date('Y-m-d');
+        $timeDiff = abs(strtotime($throttleTransactionsCounterDate) - strtotime('now')) / 3600;
+        if ($timeDiff > 24) {
+            $throttleTransactionsCounter = 0;
+            $throttleTransactionsCounterDate = date('Y-m-d');
+        }
+        $throttleConfigParams['throttleTransactionsCounter'] = $throttleTransactionsCounter + 1;
+        $throttleConfigParams['throttleTransactionsCounterDate'] = $throttleTransactionsCounterDate;
+        $shoppingConfigMapper->save($throttleConfigParams);
+    }
+
+    public static function checkThrottleTransactionsLimit()
+    {
+        $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $throttleTransactionsLimit = intval($shoppingConfigMapper->getConfigParam('throttleTransactionsLimit'));
+        $throttleTransactionsCounter = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounter');
+        $throttleTransactionsCounterDate = $shoppingConfigMapper->getConfigParam('throttleTransactionsCounterDate');
+        $throttleTransactionsCounter = !empty(intval($throttleTransactionsCounter)) ? intval($throttleTransactionsCounter) : 0;
+        $throttleTransactionsCounterDate = !empty($throttleTransactionsCounterDate) ? date('Y-m-d', strtotime($throttleTransactionsCounterDate)) : date('Y-m-d');
+
+        $timeDiff = abs(strtotime($throttleTransactionsCounterDate) - strtotime('now')) / 3600;
+
+        return ($timeDiff > 24 || (($timeDiff < 24) && $throttleTransactionsCounter < $throttleTransactionsLimit));
+
+    }
 
 }

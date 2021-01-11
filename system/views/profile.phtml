@@ -10,26 +10,54 @@ $this->headScript()
 
 ?>
 <div class="clearfix profile-header">
-	<div class="grid_5">
-		<div class="grid_4 text-center profile-picture">
+	<div class="grid_5 wrap block-wrap alpha omega t-grid_2">
+		<div class="grid_2 alpha text-center profile-picture">
 			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
 		</div>
-		<div class="grid_8 profile-main-info vcard">
-			<h2 class="client-fullname client-info"><span class="inline-data"><?php echo $this->customer->getFullName();?></span>
+		<div class="grid_10 omega profile-main-info vcard">
+            <div class="grid_12 alpha client-prefix client-info">
+                <b class="grid_3 mt10px"><?php echo $this->translate('Prefix');?>:</b>
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                    <input class="edit-client-fullname edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname" />
-                    <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <select class="edit-client-prefix grid_5" data-client-param="prefix" name="edit-client-prefix" >
+                        <option value=""><?php echo $this->translate('Select'); ?></option>
+                        <?php $prefix = $this->customer->getPrefix();?>
+                        <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
+                            <option <?php if ($prefix == $userPrefixVal): ?> selected="selected" <?php endif; ?>
+                                    value="<?php echo $userPrefixVal; ?>"><?php echo $this->translate($userPrefixVal); ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 <?php endif;?>
-            </h2>
-         	<h4 class="client-email client-info"><a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data"><?php echo $this->customer->getEmail();?></span></a>
-                <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                    <input class="edit-client-email edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
-                    <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
-                    <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
-                <?php endif;?>
-            </h4>
-			<p class="client-info">  <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?></p>
-			<p class="client-info"><?php
+            </div>
+			<div class="grid_12 alpha client-fullname client-info">
+                <b class="grid_3"><?php echo $this->translate('Full name');?>:</b>
+                <div class="grid_9">
+                    <span class="edit-client-fullname inline-data"><?php echo $this->customer->getFullName();?></span>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <input class="edit-client-fullname-input edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname-input" />
+                        <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    <?php endif;?>
+                </div>
+            </div>
+         	<div class="grid_12 alpha client-email client-info">
+                <b class="grid_3"><?php echo $this->translate('Email');?>:</b>
+                <div class="grid_9">
+                    <a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data edit-client-email"><?php echo $this->customer->getEmail();?></span></a>
+                    <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
+                        <input class="edit-client-email-input edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
+                        <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
+                    <?php endif;?>
+                </div>
+            </div>
+			<div class="grid_12 alpha client-info">
+                <b class="grid_3"><?php echo $this->translate('Info');?>:</b>
+                <div class="grid_9">
+                    <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?>
+                </div>
+            </div>
+			<div class="grid_12 alpha client-info">
+                <b class="grid_3"><?php echo $this->translate('Last seen:');?></b>
+                <?php
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
@@ -41,17 +69,21 @@ $this->headScript()
 				} else {
 					$lastSeenStamp = date('jS F, Y', strtotime($this->customer->getRegDate()));
 				}
-				echo $this->translate("Last seen:") . ' ' . $lastSeenStamp;
-				?></p>
+				echo $lastSeenStamp;
+				?></div>
             <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                <h4 class="client-info client-notes grid_12">
-                    <label class="grid_8 ml0px" for="client-notes"><?php echo $this->translate('Account notes');?>:</label>
-
-                        <img data-client-param="client-notes" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
-
-                    <span class="grid_8 mt5px ml0px inline-data"><?php echo $this->customer->getNotes();?></span>
-                    <textarea id="client-notes" class="edit-client-profile edit-client-notes" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
-                </h4>
+                <div class="grid_12 alpha client-info client-notes">
+                    <b class="grid_3 omega" for="client-notes"><?php echo $this->translate('Account notes');?>:</b>
+                    <div class="grid_9">
+                        <img data-client-param="client-notes" class="edit-inline-profile ml0px" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                    </div>
+                    <span class="grid_12 mt5px inline-data edit-client-notes"><?php echo $this->customer->getNotes();?></span>
+                    <textarea id="client-notes" class="grid_12 edit-client-profile edit-client-notes-input" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
+                </div>
+            <?php endif;?>
+            <?php if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)):?>
+                <b class="grid_3 omega" for="client-notes"><?php echo $this->translate('Signature');?>:</b>
+                <textarea id="signature"><?php echo $this->customer->getSignature();?></textarea>
             <?php endif;?>
             <input type="hidden" name="userId" id="userId" value="<?php echo $this->customer->getId();?>"/>
 			<?php if ($billingAddressDefault = $this->customer->getDefaultAddress('billing')) : ?>
@@ -82,8 +114,8 @@ $this->headScript()
 			<?php endif;?>
 		</div>
 	</div>
-
-	<div class="grid_7 profile-actions">
+    <?php if(empty($this->supplier)):?>
+	<div class="grid_7 omega profile-actions t-grid_4">
 		<p class="title textcentered ui-state-default">
 			<img style="width: 16px; vertical-align: text-bottom;" src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAYAAAAv3j5gAAAA/UlEQVR42r2VvQ3CMBBGswEjMIJHyASeIUV6qChSISRKpLR0jEDBABmBkpIRIk8QPks+3ekkfkzOsfSUxIm+p/PFSYUxRTAqAsPPvN6BEUzpWJcSBcolWSnRpJGT3oolK3ooSWMuwtinzCtwNG8qisEpL4CVfMa2R7xkBzlvWpFYskHfny1KG3FUjV+bi1jCInnfqketkhAt8PN6xMt14+DMinSwWv8AtuAuQp+gVx/PJl/EAZoBnNTzHZ1n9+iN5Ah8Lt8q0pLx3332SXRWkgAaU1EMFM11oP4lOLdHG/Ev6YC3QIscvWn6rbKtiPdID3wZEXOJk8VEpVlU9AI9gR1AIgkvUwAAAABJRU5ErkJggg==">
 			<?php echo $this->translate('Orders summary');?>
@@ -94,9 +126,10 @@ $this->headScript()
 			<?php endforeach; ?>
 		</ul>
 	</div>
+    <?php endif;?>
 </div>
 
-
+<?php if(empty($this->supplier)):?>
 <div id="profile-content" class="mt30px">
 	<ul class="profile-nav">
 		<li><a href="#profile-orders-list"><?php echo $this->translate('Orders');?></a></li>
@@ -127,25 +160,46 @@ $this->headScript()
 					<td><?php echo $order->getId();?></td>
 					<td><?php echo date('d M, Y', strtotime($order->getCreatedAt()));?></td>
 					<td><?php echo sizeof($order->getCartContent());?></td>
-					<td><?php echo $this->currency(floatval($order->getTotal()));?></td>
-					<td><?php echo $this->currency(floatval($order->getShippingPrice()));?></td>
+					<td>
+                        <?php if(!empty($this->usNumericFormat)) :?>
+                            <?php echo number_format(floatval($order->getTotal()), 2) . '&nbsp;' . $this->currencySymbol;?>
+                        <?php else:?>
+                            <?php echo $this->currency(floatval($order->getTotal()));?>
+                        <?php endif;?>
+                    </td>
+					<td>
+                        <?php if(!empty($this->usNumericFormat)) :?>
+                            <?php echo number_format(floatval($order->getShippingPrice()), 2) . '&nbsp;' . $this->currencySymbol;?>
+                        <?php else:?>
+                            <?php echo $this->currency(floatval($order->getShippingPrice()));?>
+                        <?php endif;?>
+                    </td>
 					<td class="shipping-data">
 						<p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
                         <?php if(!$order->getRecurringId()):?>
                             <p>
-                                <i><?php echo $this->translate('Tracking ID');?></i>: <span class="tracking-id"><?php echo $order->getShippingTrackingId(); ?></span>
+                                <i><?php echo $this->translate('Tracking id');?></i>: <span class="tracking-code"><?php echo $order->getShippingTrackingId(); ?></span>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                                <a href="javascript:;" class="tracking-dialog" data-shipping-tracking-id="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
+                                <a href="javascript:;" class="tracking-dialog" data-order-id="<?php echo $order->getId();?>" data-shipping-tracking-code="<?php echo $order->getShippingTrackingId();?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
                                 <?php endif;?>
                             </p>
                             <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
                                 <?php if($order->getShippingTrackingId() != ''):?>
-                                    <p class="textcentered">
+                                <p class="textcentered">
                                     <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Where is my order?');?></a>
                                 </p>
                                 <?php endif;?>
                             <?php endif;?>
                         <?php endif;?>
+                        <div class="hidden">
+                            <div id="dialog-block-<?php echo $order->getId();?>" class="clearfix" style="width: 110%" title="Insert tracking code for this order">
+                                <form id="tracking-code-form" method="post">
+                                    <select name="choose-service" id="marketing-services-<?php echo $order->getId();?>" class="grid_5 alpha fl-left" style="float:none;"></select>
+                                    <input type="text" name="shippingTrackingId" id="shippingTrackingId-<?php echo $order->getId();?>" value="" class="grid_7 alpha fl-right">
+                                    <button class="btn green ticon-checkmark save-data-<?php echo $order->getId();?>" style="margin-top: 10px;" type="submit" title="save">Save</button>
+                                </form>
+                            </div>
+                        </div>
 					</td>
 
                     <?php $status = 'cs_'.$order->getStatus();?>
@@ -249,7 +303,7 @@ $this->headScript()
                                data-old-value="<?php echo $val; ?>" data-field-name="<?php echo $key; ?>"
                                value="<?php echo $country; ?>"/>
                     <?php elseif ($key == 'mobile'): ?>
-                        <select class="mt10px omega client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> mobile-country-code grid_4 alpha"
+                        <select class="mt10px client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> mobile-country-code grid_4 alpha"
                                 data-current-row="<?php echo $key . '-' . $id; ?>"
                                 data-old-value="<?php echo $billingAddress['mobilecountrycode']; ?>"
                                 name="mobile-country-code" data-type="mobile">
@@ -263,7 +317,7 @@ $this->headScript()
                                name="<?php echo $key; ?>"
                                value="<?php echo $val; ?>"/>
                     <?php elseif ($key == 'phone'): ?>
-                        <select class="mt10px omega client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> phone-country-code grid_4 alpha"
+                        <select class="mt10px client-code-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> phone-country-code grid_4 alpha"
                                 data-current-row="<?php echo $key . '-' . $id; ?>"
                                 data-old-value="<?php echo $billingAddress['phonecountrycode']; ?>"
                                 name="phone-country-code" data-type="phone">
@@ -276,6 +330,17 @@ $this->headScript()
                                class="grid_6 mt10px client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order mask-<?php echo $key . '-' . $id; ?>"
                                name="<?php echo $key; ?>"
                                value="<?php echo $val; ?>"/>
+                    <?php elseif ($key == 'prefix'): ?>
+                        <select class="mt10px grid_10 alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-prefix"
+                                data-current-row="<?php echo $key . '-' . $id; ?>"
+                                data-old-value="<?php echo $val; ?>"
+                                name="prefix" data-type="prefix" data-field-name="<?php echo $key; ?>">
+                            <option value=""><?php echo $this->translate('Select'); ?></option>
+                            <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
+                                <option <?php if ($billingAddress['prefix'] == $userPrefixVal): ?> selected="selected" <?php endif; ?>
+                                        value="<?php echo $userPrefixVal; ?>"><?php echo $this->translate($userPrefixVal); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     <?php else: ?>
                         <input class="grid_10 mt10px alpha client-<?php echo $key; ?>-<?php echo $addressType . '-' . $id; ?> client-info-order"
                                data-field-name="<?php echo $key; ?>" data-old-value="<?php echo $val; ?>"
@@ -314,6 +379,7 @@ $this->headScript()
     <?php endif;?>
     </div>
 </div>
+<?php endif;?>
 <script>
     $('#profile-content').tabs();
     $('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
@@ -342,31 +408,88 @@ $this->headScript()
 
     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
 
-    $('a.tracking-dialog').on('click', function(e){
+    $(document).on('click', 'a.tracking-dialog', function(e){
         e.preventDefault();
         var self = this,
+            el      = $(e.currentTarget),
             id = parseInt($(this).closest('tr').data('id'));
-        smoke.prompt('<?php echo $this->translate('Insert tracking code for this order');?>', function(value){
-            if (value === false) {
-                return value;
-            }
-            value = $.trim(value);
-            if ($(self).data('shippingTrackingId') !== value) {
-                $.ajax({
-                    url: $('#website_url').val()+'plugin/shopping/run/order?id='+id,
-                    data: {shippingTrackingId: value},
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function(response) {
-                        showMessage('<?php echo $this->translate('Saved');?>', response.hasOwnProperty('error') && response.error);
-                        if (response.hasOwnProperty('responseText')){
-                            $(self).data('shippingTrackingId', response.responseText.shippingTrackingId);
-                            $(self).closest('p').find('span.tracking-id').text(response.responseText.shippingTrackingId);
-                            $(self).closest('tr').find('td.current-status').text(response.responseText.status);
-                        }
-                    }
-                });
-            }
+
+        $.ajax({
+            url: $('#website_url').val()+'plugin/shopping/run/fetchShippingUrlNames/orderId/' + id,
+            type: 'GET',
+            dataType: 'json'
+
+        }).done(function(response) {
+            $('#marketing-services-'+id).empty();
+
+            var responsedata = response.responseText;
+
+            $.each(responsedata.data, function(key, value) {
+                var selectedOption = '';
+                if(key == responsedata.shippingTrackingCodeId) {
+                    selectedOption = 'selected';
+                }
+
+                var option = $("<option "+ selectedOption +"></option>").attr("value",key).text(value);
+
+                $('#marketing-services-'+id).append(option);
+            });
+
+            var trackingName = responsedata.trackingName;
+            $('#shippingTrackingId-'+id).val(trackingName);
+
+            var dialogBlock = $('#dialog-block-' + id);
+
+            $(dialogBlock).dialog({
+                width: 600,
+                dialogClass: 'seotoaster',
+                resizable:false,
+                open: function(event, ui) {
+                    $('.save-data-' + id).one('click', function(e){
+                        e.preventDefault();
+                        var  trackingUrlId =  $('#marketing-services-'+id).val(),
+                            text =  $('#shippingTrackingId-'+id).val(),
+                            data = {
+                                trackingUrlId: trackingUrlId,
+                                shippingTrackingId: text,
+                                id:id
+                            };
+
+                        $.ajax({
+                            url: $('#website_url').val()+'plugin/shopping/run/order',
+                            data: data,
+                            type: 'POST',
+                            dataType: 'json',
+                            beforeSend: function(){
+                                //el.closest('td').html('<img src="'+$('#website_url').val()+'system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;">');
+                            },
+                            success: function(response) {
+                                if (response.hasOwnProperty('error') && !response.error){
+                                    showMessage("<?php echo $this->translate('Saved');?>");
+                                }
+
+                                if (response.hasOwnProperty('responseText')){
+                                    el.closest('td').find('.tracking-code').text(response.responseText.shippingTrackingId);
+                                    el.closest('td').find('.textcentered').remove();
+
+                                    if(response.responseText.shippingTrackingId != '') {
+                                        var trackingLink = '<p class="textcentered">' +
+                                            '<a target="_blank" class="tracking-link" href="' + response.responseText.shippingTrackingId +
+                                            '"> '+ '<?php echo $this->translate('Where is my order?');?>' + '</a></p>';
+
+                                        el.closest('td').append(trackingLink);
+                                    }
+                                }
+
+                                $('#dialog-block-' + id).dialog('close');
+                            }
+                        });
+                    });
+                },
+                close: function(event, ui){
+                    $('#dialog-block-' + id).dialog('destroy');
+                }
+            });
         });
     });
 
@@ -404,9 +527,8 @@ $this->headScript()
                 .html(html);
             $(this).html(popup);
         }
-
-
     });
+
     $('#orders-table').on('mouseleave', 'td.current-status', function(){
         var oldStatus = $(this).data('currentStatus');
         if (oldStatus) $(this).text(oldStatus);
@@ -433,39 +555,55 @@ $this->headScript()
         });
     });
 
-    $('.edit-inline-profile').on('click', function(){
-        $(this).hide();
-        var editClientElement = $(this).data('client-param');
-        var clientElementData = $(this).closest('.client-info').find('span').text();
-        $('.'+editClientElement+' span').hide();
-        $('.edit-'+editClientElement).val(clientElementData).show().focus();
-        $('.'+editClientElement).show();
+    $('.edit-inline-profile').on('click', function(e){
+        e.preventDefault();
+        var self = $(this);
+        showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+            function (){
+                self.hide();
+                var editClientElement = self.data('client-param');
+                var clientElementData = self.closest('.client-info').find('span').text();
+                $('.'+editClientElement+' span').hide();
+                $('.edit-'+editClientElement+'-input').val(clientElementData).show().focus();
+                $('.'+editClientElement).show();
+            }, function () {});
     });
-
-    $('.edit-client-profile').on('blur', function(){
+    $('.edit-client-prefix').on('change', function(e) {
+        e.preventDefault();
         var clientEditParam = $(this).data('client-param');
         var editedValue     = $(this).val();
-        $.ajax({
-            type: "POST",
-            url: $('#website_url').val()+'plugin/shopping/run/editUserProfile/',
-            dataType: "json",
-            data: {
-                profileElement:clientEditParam,
-                profileValue:editedValue,
-                userId:$('#userId').val(),
-                secureToken:$('.secure-token-user').val()
-            }
-        }).done(function(response) {
-            if(response.error == 1){
-                smoke.alert(response.responseText,{'classname':'errors'});
-            }else{
-                $('[data-client-param="client-'+clientEditParam+'"]').show();
-                $('.edit-client-'+clientEditParam).hide();
-                $('.client-'+clientEditParam).find('.inline-data').text(editedValue).show();
-                smoke.signal('<?php echo $this->translate('Saved');?>');
-            }
-        });
-        return false;
+
+        editUserProfileSendAjax(clientEditParam, editedValue);
+    });
+
+    $('.edit-client-profile').on('blur', function(e){
+        e.preventDefault();
+        var clientEditParam = $(this).data('client-param');
+        var editedValue     = $(this).val();
+
+        editUserProfileSendAjax(clientEditParam, editedValue);
+    });
+    $('.client-info-prefix').on('change', function(e) {
+        e.preventDefault();
+        var thisEl      = $(this),
+            fieldName   = thisEl.data('field-name'),
+            fieldValue  = thisEl.val(),
+            addrRow     = thisEl.closest('.addr'),
+            addrType    = addrRow.data('client-type'),
+            clientToken = addrRow.data('client-token'),
+            oldToken    = addrRow.data('old-token'),
+            oldValue    = thisEl.data('old-value'),
+            countryCode = '';
+
+        if(fieldValue != oldValue){
+            showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+                function (){
+                    sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, countryCode, thisEl);
+                }, function () {
+                    var oldVal = thisEl.data('old-value');
+                    thisEl.val(oldVal);
+                });
+        }
     });
 
     $('.client-info-order').on('change', function(e){
@@ -486,7 +624,7 @@ $this->headScript()
         }
 
         if(fieldValue != oldValue){
-            showConfirm('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>',
+            showConfirmCustom('<?php echo $this->translate("Are you sure you would like to change the profile data?"); ?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>',
                 function (){
                     sendAjax(fieldName, fieldValue, addrType, clientToken, oldToken, countryCode, thisEl);
                 }, function () {
@@ -495,8 +633,6 @@ $this->headScript()
             });
         }
     });
-
-
 
     $(function() {
         var mobileMasks = JSON.parse('<?php echo json_encode($this->mobileMasks);?>'),
@@ -599,6 +735,32 @@ $this->headScript()
                 showMessage('<?php echo $this->translate('Saved');?>', false, 5000);
             }
         });
+    }
+
+    function editUserProfileSendAjax(clientEditParam, editedValue) {
+        $.ajax({
+            type: "POST",
+            url: $('#website_url').val()+'plugin/shopping/run/editUserProfile/',
+            dataType: "json",
+            data: {
+                profileElement:clientEditParam,
+                profileValue:editedValue,
+                userId:$('#userId').val(),
+                secureToken:$('.secure-token-user').val()
+            }
+        }).done(function(response) {
+            if(response.error == 1){
+                smoke.alert(response.responseText,{'classname':'errors'});
+            }else{
+                if(clientEditParam != 'prefix') {
+                    $('[data-client-param="client-'+clientEditParam+'"]').show();
+                    $('.edit-client-'+clientEditParam+'-input').hide();
+                    $('.client-'+clientEditParam).find('.inline-data').text(editedValue).show();
+                }
+                smoke.signal('<?php echo $this->translate('Saved');?>');
+            }
+        });
+        return false;
     }
 
     <?php endif;?>

@@ -1,8 +1,8 @@
 <td class="check-order textcentered"><input type="checkbox" name="check-order[]" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> title=""/></td>
-<td class="order-id"><%= id %></td>
-<td><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
-<td><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
-<td><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
+<td data-mobile-title="#" class="order-id"><%= id %></td>
+<td data-mobile-title="Customer name"><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
+<td data-mobile-title="Email"><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
+<td data-mobile-title="Purchased on"><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
 <% translatedStatus = 'cs_'+status %>
 
 <% if (gateway == 'Quote' && status == 'pending'){ %>
@@ -17,58 +17,110 @@
     <% translatedStatus = 'Lost opportunity' %>
 <% } %>
 <% if (status === 'refunded') { %>
-    <td class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : originalTotal %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+    <td data-mobile-title="Status" class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : (parseFloat(total) + parseFloat((parseFloat(refund_amount).toFixed(2)))) %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } else {%>
-    <td class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+    <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
 
-<td><%= total_products %></td>
-<td><%= total %></td>
-<td><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
-<td class="shipping-service">
-    <p><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
-    <% if(_.isNull(recurring_id)) {%>
-    <p><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %>
-<% if (status == 'completed' || status == 'shipped') { %>
-        <% addButton = 'add' %>
-        <% editButton = 'edit' %>
-        <% if (!_.isUndefined(i18n['add'])){ %>
-            <% addButton = i18n['add'] %>
+<td data-mobile-title="Products in cart"><%= total_products %></td>
+
+<%
+    thousand = '&nbsp;'
+    decimal = ','
+
+    if(usNumericFormat == 1) {
+        thousand = ','
+        decimal = '.'
+    }
+
+    formatMoneyOptions = {
+        symbol   : '',
+        thousand : thousand,
+        decimal  : decimal,
+    }
+%>
+
+<td data-mobile-title="Total price"><%= accounting.formatMoney(total, formatMoneyOptions) + '&nbsp;' + currencySymbol %></td>
+<td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
+<td data-mobile-title="Shipping via" class="shipping-service">
+    <div class="tracking-info">
+        <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
+        <% if(_.isNull(recurring_id)) {%>
+        <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<span class="tracking-code-text"><%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %></span>
+            <% if (status == 'completed' || status == 'shipped') { %>
+                <% addButton = 'add' %>
+                <% editButton = 'edit' %>
+                <% if (!_.isUndefined(i18n['add'])){ %>
+                    <% addButton = i18n['add'] %>
+                <% } %>
+                <% if (!_.isUndefined(i18n['edit'])){ %>
+                    <% editButton = i18n['edit'] %>
+                <% } %>
+                <a href="javascript:;" class="setTracking" data-tracking-id="<%= shipping_tracking_code_id%>">[&nbsp;<%= (_.isNull(shipping_tracking_id) || shipping_tracking_id == '') ? addButton : editButton %>&nbsp;]</a>
+                <% if(!_.isNull(shipping_tracking_id) && shipping_tracking_id != '') { %>
+                    <p class="textcentered">
+                        <a target="_blank" class="tracking-link" href="<%= shipping_tracking_id %>"><%= _.isUndefined(i18n['Where is my order?']) ? 'Where is my order?':i18n['Where is my order?'] %></a>
+                    </p>
+                <% } %>
+            <% } %>
+            </p>
         <% } %>
-        <% if (!_.isUndefined(i18n['edit'])){ %>
-            <% editButton = i18n['edit'] %>
-        <% } %>
-        <a href="javascript:;" class="setTracking">[&nbsp;<%= _.isNull(shipping_tracking_id) ? addButton : editButton %>&nbsp;]</a>
-<% } %>
-    </p>
-    <% } %>
+    </div>
+    <div class="ajax-loader hide"><img src="<%= $('#website_url').val() %>system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;"></div>
 </td>
-<td class="text-center">
+<td data-mobile-title="Details" class="text-center">
     <a href="javascript:;" class="tpopup" data-pheight="560" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a>
 </td>
 <% if(useInvoice == 'enabled') { %>
-    <td class="text-center">
+    <td data-mobile-title="Invoice & packing slip" class="text-center">
     <% if(_.isNull(recurring_id)) { %>
-        <a href="javascript:;" class="ticon-email4 icon16 sendInvoice" title="Send invoice to user via email">Send</a> /
+        <a href="javascript:;" class="sendInvoice" title="<%= _.isUndefined(i18n['Send invoice to user via email']) ? 'Send invoice to user via email':i18n['Send invoice to user via email'] %>">
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/send-invoice.png" />
+        </a>
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/">
-            <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
-        </a>/
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/view-invoice.png" alt="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>" title="<%= _.isUndefined(i18n['View invoice']) ? 'View invoice':i18n['View invoice'] %>"/>
+        </a>
         <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/">
-            <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-invoice.png" alt="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>" title="<%= _.isUndefined(i18n['Download invoice']) ? 'Download invoice':i18n['Download invoice'] %>"/>
         </a>
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/0/packing/1/">
-            <img src="<%= $('#website_url').val() %>system/images/widgets/search.png" alt="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>" title="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>"/>
-        </a>/
-        <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
-            <img src="<%= $('#website_url').val() %>system/images/download.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/view-packing-slip.png" alt="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>" title="<%= _.isUndefined(i18n['View packing slip']) ? 'View packing slip':i18n['View packing slip'] %>"/>
         </a>
+        <a href="<%= $('#website_url').val() %>plugin/invoicetopdf/run/createPdfInvoice/cartId/<%= id %>/dwn/1/packing/1/">
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-packing-slip.png" alt="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>" title="<%= _.isUndefined(i18n['Download packing slip']) ? 'Download packing slip':i18n['Download packing slip'] %>"/>
+        </a>
+            <% if((status == 'completed' || status == 'shipped') && !_.isNull(shipping_availability_days) && !_.isEmpty(shipping_availability_days)) { %>
+                <a title="<%= _.isUndefined(i18n['Generate shipping label']) ? 'Generate shipping label':i18n['Generate shipping label'] %>" class="generate-shipping-order-label" data-order-id="<%= id %>" href="javascript:;">
+                    <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/generate-shipping-label.png" />
+                </a>
+            <% } %>
+        <% if(!_.isNull(shipping_label_link) || !_.isEmpty(shipping_label_link)) { %>
+            <% shippingLabelEl = '' %>
+            <% shippingLabelLink = shipping_label_link %>
+        <%  } else { %>
+            <% shippingLabelEl = 'hidden' %>
+            <% shippingLabelLink = 'javascript:;' %>
+        <% } %>
+        <a class="shipping-label-link <%= shippingLabelEl %>" target="_blank" href="<%= shippingLabelLink %>">
+            <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/download-shipping-label.png" alt="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>" title="<%= _.isUndefined(i18n['Download shipping label']) ? 'Download shipping label':i18n['Download shipping label'] %>"/>
+        </a>
+        <% if((status == 'completed' || status == 'shipped') && !_.isNull(shipping_service_info)) { %>
+            <% shipmentServiceInfo = JSON.parse(shipping_service_info) %>
+            <% if (typeof shipmentServiceInfo.shipment_reference !== 'undefined') { %>
+                <a title="<%= _.isUndefined(i18n['Refund shipment order']) ? 'Refund shipment order':i18n['Refund shipment order'] %>" class="refund-shipping-order-label" data-order-id="<%= id %>" href="javascript:;">
+                    <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/shipment-refund.png" />
+                </a>
+            <% } %>
+        <% } %>
     <% } %>
     </td>
 <% } %>
-  <td><% if(!_.isNull(real_order_id)) { %>
+  <td data-mobile-title="Order type"><% if(!_.isNull(real_order_id)) { %>
         <%= _.isUndefined(i18n['Imported']) ? 'Imported':i18n['Imported'] %>
       <% } else if(!_.isNull(recurring_id)) { %>
         <%= _.isUndefined(i18n['Recurring']) ? 'Recurring':i18n['Recurring'] %>
+      <% } else if(!_.isNull(order_subtype) && order_subtype !== '') { %>
+            <%= _.isUndefined(i18n[order_subtype]) ? order_subtype :i18n[order_subtype] %>
       <% } else { %>
         <%= _.isUndefined(i18n['Regular']) ? 'Regular':i18n['Regular'] %>
       <% } %>

@@ -55,19 +55,36 @@ class Api_Store_Customers extends Api_Service_Abstract {
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
 			$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
 
+            $roleId = filter_var($this->_request->getParam('roleId'), FILTER_SANITIZE_STRING);
+
 			$currency = Zend_Registry::get('Zend_Currency');
-			$where = null;
+            $where = null;
             if (!empty($id)) {
                 $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('user.id = ?', $id);
+            }
+            if (!empty($roleId)) {
+                if (!empty($where)) {
+                    $where .= ' AND '. $customerMapper->getDbTable()->getAdapter()->quoteInto('role_id = ?', $roleId);
+                } else {
+                    $where = $customerMapper->getDbTable()->getAdapter()->quoteInto('role_id = ?', $roleId);
+                }
             }
 
             $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
             $mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
             $desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
-            $data = array_map(function($row) use ($currency, $mobileMasks, $desktopMasks){
+            $usNumericFormat = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('usNumericFormat');
+
+            $data = array_map(function($row) use ($currency, $mobileMasks, $desktopMasks, $usNumericFormat){
 				$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
-				$row['total_amount'] = $currency->toCurrency($row['total_amount']);
+
+				if(!empty($usNumericFormat)) {
+                    $currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+                    $row['total_amount'] = number_format($row['total_amount'], 2) . ' ' . $currencySymbol;
+                } else {
+                    $row['total_amount'] = $currency->toCurrency($row['total_amount']);
+                }
                 $row['mobileMasks'] = $mobileMasks;
                 $row['desktopMasks'] = $desktopMasks;
                 if (!empty($row['customer_attr'])) {
@@ -120,6 +137,10 @@ class Api_Store_Customers extends Api_Service_Abstract {
         }
 
         if(isset($groupId)){
+
+            $dataGroup = array('userId' => $userId, 'groupId' => $groupId);
+            Tools_System_Tools::firePluginMethodByTagName('assigngroup', 'assignLeadGroup', $dataGroup, true);
+
             $customerInfoDbTable = new Models_DbTable_CustomerInfo();
             if($groupId == 0){
                 $groupId = null;
@@ -200,6 +221,18 @@ class Api_Store_Customers extends Api_Service_Abstract {
                 $updateField = $customerInfoDbTable->getAdapter()->quoteInto('group_id =?', $groupId);
                 $customerInfoDbTable->getAdapter()->query('UPDATE `shopping_customer_info` SET '.$updateField);
             }else{
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $customersForMassGroupAssignment = $customerMapper->getCustomersForMassGroupAssignment($customersIdsArray);
+                $customersInfoToInsert = array_diff($customersIdsArray, array_keys($customersForMassGroupAssignment));
+                if (!empty($customersInfoToInsert)) {
+                    foreach ($customersInfoToInsert as $customerInfo) {
+                        $customerInfoDbTable->insert(
+                            array(
+                                'user_id'   => $customerInfo,
+                            )
+                        );
+                    }
+                }
                 $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
                 $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
             }

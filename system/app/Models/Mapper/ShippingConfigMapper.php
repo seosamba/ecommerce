@@ -75,4 +75,20 @@ class Models_Mapper_ShippingConfigMapper extends Application_Model_Mappers_Abstr
 		return $row;
 	}
 
+    public function getShippingPlaginTags(){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('plugin.status = ?', 'enabled');
+
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('shipConfig' => 'shopping_shipping_config'),
+            array(
+                'shipConfig.name',
+                'plugin.tags'
+            ))
+            ->join(array('plugin' => 'plugin'), 'plugin.name = shipConfig.name', null)
+            ->where($where);
+
+        $result = $this->getDbTable()->getAdapter()->fetchPairs($select);
+
+        return $result;
+    }
+
 }

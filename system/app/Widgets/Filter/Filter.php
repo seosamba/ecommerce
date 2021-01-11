@@ -16,6 +16,11 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
     const FILTER_READONLY = 'readonly';
 
+    /**
+     * Show all filter values without All others group
+     */
+    const FILTER_ALLITEMS = 'allitems';
+
     private $_allowedOptions = array(
         'builder', 'product', 'attribute'
     );
@@ -100,6 +105,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $options = array();
         $priceTax = '';
+        $useProduct = false;
+        $additionalAttributeName = '';
+        $additionalAttributeLabel = '';
+        $showAllItems = false;
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
@@ -109,6 +118,19 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 if($priceTax !== null){
                    $priceTax = $priceTax[0]['rate1'];
                 }
+            }
+
+            if(in_array($option, Filtering_Tools::$allowedAdditionalOptions)) {
+                $additionalAttributeData = Filtering_Mappers_Eav::getInstance()->findAttributeDataByName(strtolower($option));
+                if(!empty($additionalAttributeData)) {
+                    $additionalAttributeName = $additionalAttributeData['name'];
+                    $additionalAttributeLabel =  $additionalAttributeData['label'];
+                    $useProduct = true;
+                }
+            }
+
+            if(in_array(self::FILTER_ALLITEMS, $this->_options)) {
+                $showAllItems = true;
             }
         }
 
@@ -140,9 +162,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
         $this->_widgetSettings = $widgetSettings;
 
+        // fetch list filters by given tags
         $eavMapper = Filtering_Mappers_Eav::getInstance();
 
-        // fetch list filters by given tags
         $listFilters = $eavMapper->findListFiltersByTags($tagIds, $widgetSettings);
         $rangeFilters = $eavMapper->findRangeFiltersByTags($tagIds, $widgetSettings);
 
@@ -156,7 +178,36 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_priceRange['name'] = 'price';
         $this->_priceRange['label'] = 'Price';
 
-        $this->_brands = $eavMapper->getBrands($tagIds);
+        $productPriceRange = array();
+        $this->_view->useProduct = false;
+        if($useProduct) {
+            $this->_view->useProduct = true;
+            $this->_view->additionalAttributeName = $additionalAttributeName;
+            $this->_view->additionalAttributeLabel = $additionalAttributeLabel;
+
+            $productPriceData = $eavMapper->getPriceRangeForProduct($tagIds, $additionalAttributeName);
+            if(!empty($productPriceData)) {
+                $productPriceRange['min'] = floor(min($productPriceData));
+                $productPriceRange['max'] = ceil(max($productPriceData));
+            }
+
+            $productPriceRange['name'] = $additionalAttributeName;
+            $productPriceRange['label'] = ucfirst($additionalAttributeLabel);
+        }
+
+        $this->productPriceRange = $productPriceRange;
+
+        $brands = $eavMapper->getBrands($tagIds);
+
+        $tmpBrandsArr = array();
+        if(!empty($brands)) {
+            foreach ($brands as $pId => $brandName) {
+                $tmpBrandsArr[$brandName] += 1;
+            }
+            arsort($tmpBrandsArr);
+        }
+
+        $this->_brands = $tmpBrandsArr;
 
         // if this user allowed to manage content
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && !$request->has('filter_preview')) {
@@ -169,7 +220,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->appliedFilters = $appliedFilters;
 
         // mark disabled filters
-        $this->_view->filters = array_filter(
+        $clearedFilters = array_filter(
             array_map(
                 function ($filter) use ($appliedFilters, $widgetSettings) {
                     if (isset($widgetSettings[$filter['name']]) && !is_array($widgetSettings[$filter['name']])) {
@@ -191,6 +242,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
                 $this->_filters
             )
         );
+
+        if(!empty($widgetSettings) && !empty($clearedFilters)) {
+            $this->_view->filters = Tools_Misc::processProductFilters($widgetSettings, $clearedFilters);
+        }
 
         if (!empty($widgetSettings['tags'])) {
             $showList = $widgetSettings['tags'];
@@ -249,6 +304,18 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             $this->_view->priceRange = $this->_priceRange;
         }
 
+        if (!empty($appliedFilters['productsqft'])) {
+            $this->productPriceRange = array_merge($this->productPriceRange, $appliedFilters['productsqft']);
+            unset($appliedFilters['productsqft'], $price);
+        }
+
+        if (!isset($widgetSettings['productsqft']) || !empty($widgetSettings['productsqft'])) {
+            $this->_view->productPriceRange = $this->productPriceRange;
+        }
+
+        if($showAllItems) {
+            $this->_view->showAllItems = $showAllItems;
+        }
 
         return $this->_view->render('filter-widget.phtml');
     }

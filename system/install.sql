@@ -155,7 +155,11 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('zip', '94117'),
 ('noZeroPrice', '1'),
 ('timezone', 'America/New_York'),
-('version', '2.5.4');
+('pickupLocationLinks', 0),
+('pickupLocationLinksLimit', 4),
+('usNumericFormat', '0'),
+('minimumOrder', '0'),
+('version', '2.8.2');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -182,7 +186,9 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `prod_length` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_depth` DECIMAL(10,2) NULL DEFAULT NULL,
   `prod_width` DECIMAL(10,2) NULL DEFAULT NULL,
-  `gtin` BIGINT(10) UNSIGNED DEFAULT NULL,
+  `gtin` VARCHAR (255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `wishlist_qty` int(10) unsigned DEFAULT '0',
+  `minimum_order` int(3) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -219,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
-  `type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+  `type` enum('dropdown','radio','text','date','file','textarea') COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -293,7 +299,12 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `shipping_price` decimal(10,2) DEFAULT NULL,
   `shipping_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `shipping_service` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci COMMENT 'Shipping Tracking ID',
+  `shipping_tracking_id` tinytext COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping Tracking ID',
+  `shipping_tracking_code_id` int(10) unsigned DEFAULT NULL,
+  `shipping_service_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping service external id',
+  `shipping_availability_days` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Availability dates. Json format',
+  `shipping_service_info` TEXT COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Additional shipping service info. Json format',
+  `shipping_label_link` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Shipping label link url',
   `status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `discount_tax_rate` enum('0','1','2','3') COLLATE utf8_unicode_ci DEFAULT '0',
@@ -309,6 +320,10 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
+  `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
+  `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
+  `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -336,6 +351,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `id` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   `address_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `prefix` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   `firstname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `company` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -352,6 +368,7 @@ CREATE TABLE IF NOT EXISTS `shopping_customer_address` (
   `mobile_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phonecountrycode` CHAR(2) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phone_country_code_value` VARCHAR(16) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `customer_notes` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `state` (`state`)
@@ -521,7 +538,8 @@ INSERT INTO `shopping_zone_state` (`zone_id`, `state_id`) VALUES
 
 INSERT INTO `email_triggers_recipient` (`recipient`) VALUES
 ('customer'),
-('sales person');
+('sales person'),
+('supplier');
 
 DROP TABLE IF EXISTS `shopping_coupon`;
 CREATE TABLE IF NOT EXISTS `shopping_coupon` (
@@ -532,6 +550,8 @@ CREATE TABLE IF NOT EXISTS `shopping_coupon` (
   `startDate` date DEFAULT NULL COMMENT 'Coupon start date',
   `endDate` date DEFAULT NULL COMMENT 'Coupon expire date',
   `allowCombination` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'Allow combination with other coupons',
+  `zoneId` int(10) unsigned DEFAULT NULL,
+  `oneTimeUse` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT 'One time use coupon',
   PRIMARY KEY (`id`),
   KEY `code` (`code`),
   KEY `type` (`type`)
@@ -620,6 +640,7 @@ CREATE TABLE IF NOT EXISTS `shopping_group` (
   `priceSign` enum('plus','minus') COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
   `priceValue` decimal(10,2) DEFAULT NULL,
+  `nonTaxable` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -716,6 +737,8 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `lng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `notes` text 	COLLATE utf8_unicode_ci DEFAULT NULL,
   `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   PRIMARY KEY (`id`),
   INDEX `country` (`country`),
   INDEX `city` (`city`),
@@ -808,9 +831,36 @@ CREATE TABLE IF NOT EXISTS `shopping_shipping_url` (
 
 INSERT INTO `page_types` (`page_type_id`, `page_type_name`) VALUES ('2', 'product');
 
+CREATE TABLE IF NOT EXISTS `shopping_companies`(
+  `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE (`company_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_suppliers` (
+  `supplier_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`supplier_id`, `company_id`),
+  FOREIGN KEY (`supplier_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_company_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `company_id` INT(10) unsigned NOT NULL,
+  PRIMARY KEY (`product_id`, `company_id`),
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`company_id`) REFERENCES `shopping_companies`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_draggable` (
   `id` CHAR(32) COLLATE 'utf8_unicode_ci' NOT NULL,
   `data` TEXT COLLATE 'utf8_unicode_ci' NOT NULL,
+  `updated_at` TIMESTAMP NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `page_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -832,6 +882,171 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
+  `product_id` INT(10) unsigned NOT NULL,
+  `allowance_due` date DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_AllowanceObserver');
+
+CREATE TABLE IF NOT EXISTS `shopping_wishlist_wished_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`)
+SELECT CONCAT('Models_Model_Product'), CONCAT('Tools_GroupPriceObserver') FROM observers_queue WHERE
+NOT EXISTS (SELECT `observable`, `observer` FROM `observers_queue`
+WHERE `observable` = 'Models_Model_Product' AND `observer` = 'Tools_GroupPriceObserver')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_rules_general_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `rule_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` TIMESTAMP NOT NULL,
+  `creator_id` INT(10) UNSIGNED DEFAULT NULL,
+  `updated_at` TIMESTAMP NOT NULL,
+  `editor_id` INT(10) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY(`id`),
+  FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  FOREIGN KEY (`editor_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  UNIQUE (`rule_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_rules_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `rule_id` INT(10) UNSIGNED NOT NULL,
+  `field_name` VARCHAR (255) COLLATE utf8_unicode_ci NOT NULL,
+  `rule_comparison_operator` ENUM('equal', 'notequal', 'like', 'in', 'greaterthan', 'lessthan') DEFAULT 'equal',
+  `field_value` MEDIUMTEXT COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  FOREIGN KEY (`rule_id`) REFERENCES `shopping_customer_rules_general_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_customer_rules_actions` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `rule_id` INT(10) UNSIGNED NOT NULL,
+  `action_type` ENUM ('assign_group') DEFAULT 'assign_group',
+  `action_config` TEXT COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE(`rule_id`, `action_type`),
+  FOREIGN KEY (`rule_id`) REFERENCES `shopping_customer_rules_general_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_notification_notified_products` (
+  `id` int(10) unsigned AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `product_id` INT(10) unsigned NOT NULL,
+  `added_date` TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+  `send_notification` enum('0','1') COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY  (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `observers_queue` (`observable`, `observer`) VALUES ('Models_Model_Product', 'Tools_NotifyObserver');
+
+CREATE TABLE IF NOT EXISTS `shopping_shipping_service_label` (
+  `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Name',
+  `label` varchar(200) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Service Custom Label',
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_fields_config` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `param_type` ENUM('text', 'select') DEFAULT 'text',
+  `param_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `label` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE(`param_type`, `param_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_data` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `param_id` INT(10) UNSIGNED NOT NULL,
+  `product_id` INT(10) UNSIGNED NOT NULL,
+  `param_value` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  `params_option_id` INT(10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_product_custom_params_options_data` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `custom_param_id` INT UNSIGNED NOT NULL,
+  `option_value` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`custom_param_id`) REFERENCES `shopping_product_custom_fields_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;
+
+INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALUES
+('1', 'store_neworder', 'Tools_StoreMailWatchdog'),
+('1', 'store_newcustomer', 'Tools_StoreMailWatchdog'),
+('1', 'store_trackingnumber', 'Tools_StoreMailWatchdog'),
+('1', 'store_newuseraccount', 'Tools_StoreMailWatchdog'),
+('1', 'store_refund', 'Tools_StoreMailWatchdog'),
+('1', 'store_delivered', 'Tools_StoreMailWatchdog'),
+('1', 'store_suppliercompleted', 'Tools_StoreMailWatchdog'),
+('1', 'store_suppliershipped', 'Tools_StoreMailWatchdog'),
+('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
+('1', 'store_customernotification', 'Tools_StoreMailWatchdog');
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_newcustomer'),	NULL,	CONCAT('sales person'),	CONCAT('Hi there {customer:fullname}! <br> <br>Thank you for your registration.<br>You are welcome to login to your Client Area. <br><br>Login: {customer:email}<br>Follow this <strong>{customer:passwordLink}</strong> in order to set your password.<br><br>'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('New Customer Registered') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_newcustomer') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_trackingnumber'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br> <br>Your order #{order:id} status shipping tracking code: {order:shippingtrackingid}'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Track Your Order') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_trackingnumber') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_newuseraccount'),	NULL,	CONCAT('sales person'),	CONCAT('Hello!  <br> <br> User information has been updated'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('New User Account Information') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_newuseraccount') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_refund'),	NULL,	CONCAT('sales person'),	CONCAT('Order with amount: {refund:message} has been refunded. <br>  Admin left a comment: {refund:notes}'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Order Refunded') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_refund') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_delivered'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br><br> Your order #{order:id} status shipping tracking code: {order:shippingtrackingid} is delivered.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Order Delivered') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_delivered') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_suppliercompleted'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br><br> Suppliers order {product:urls} is completed.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Supplier Order Completed') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_suppliercompleted') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_suppliershipped'),	NULL,	CONCAT('sales person'),	CONCAT('Hello! <br><br> Suppliers order {product:urls} is delivered.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Supplier Order Delivered') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'sales person' AND `trigger` = 'store_suppliershipped') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_giftorder'),	NULL,	CONCAT('admin'),	CONCAT('Hi there, we have a new order from {customer:fullname}! '),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Gift Order Info') FROM email_triggers
+WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions`
+WHERE `service` = 'email' AND `recipient` = 'admin' AND `trigger` = 'store_giftorder') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_giftorder'),	NULL,	CONCAT('customer'),	CONCAT('<p>Dear {$postpurchase:shipping:firstname},</p>
+<p>{customer:fullname} is sending you the gift  from {store:name}. Look for a shipping notification from {order:shippingservice} to the email address listed here: {order:shippingaddress}. Please contact the customer cervice with any issues or questions.</p><br><p>A personal note is include:<br>"{$postpurchase:notes}"<p><br>'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Gift Order Info') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_giftorder') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'),	CONCAT('store_partialpayment'),	NULL,	CONCAT('customer'),	CONCAT("Hello {customer:fullname}!<br/><br/>Welcome to the family. Thanks for your trust, we will now get to work to earn it. We\'ll be in touch soon to kick start your project. For the record, you paid the following towards your project:<br><br>{$postpurchase:partialpercentage}%  ($ {$postpurchase:partialamount}) out of {order:total}<br/>Feel free to contact us should you have any questions or concerns."),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Thank you for your order - We have received your deposit payment') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpayment') LIMIT 1;
+
+INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
+SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.5.8' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.2' WHERE `name` = 'shopping';
 

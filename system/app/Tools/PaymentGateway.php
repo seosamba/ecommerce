@@ -11,10 +11,11 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
      *
      * @param int $cartId cart id
      * @param string $status new status (completed, shipped, etc..)
+     * @param bool $skipSupplierNotification skip suppliers notification flag
      * @return Tools_PaymentGateway
      * @throws Exceptions_SeotoasterPluginException
      */
-	public function updateCartStatus($cartId, $status) {
+	public function updateCartStatus($cartId, $status, $skipSupplierNotification = false) {
 		$gateway = get_called_class();
 
 		$cart = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
@@ -23,11 +24,20 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 new Tools_InventoryObserver($cart->getStatus())
             );
 
+            if ($skipSupplierNotification === false) {
+                $cart->registerObserver(
+                    new Tools_SupplierObserver($cart->getStatus())
+                );
+            }
+
 			$cart->setStatus($status);
 			$cart->setGateway($gateway);
 
 			if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED) {
                 $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
+                if (Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactions') === 'true') {
+                    Tools_Misc::addThrottleTransaction();
+                }
             }
 
 			Models_Mapper_CartSessionMapper::getInstance()->save($cart);

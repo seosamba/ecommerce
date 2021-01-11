@@ -5,7 +5,7 @@
 
     <?php echo $this->formHidden('data[products]', isset($this->productId) ? $this->productId : null); ?>
 
-    <div class="grid_2 alpha mt0px">
+    <div class="grid_3 alpha mt0px">
     <?php $generalConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();?>
         <label><?php echo $this->translate('Discount Tax Rate'); ?></label>
         <select name="coupon-discount-tax-rate" id="coupon-discount-tax-rate">
@@ -16,15 +16,34 @@
         </select>
     </div>
 
-	<div class="grid_4 alpha mt0px">
+    <div class="grid_3 alpha mt0px">
+        <?php $zones = Models_Mapper_Zone::getInstance()->fetchAll();?>
+        <label><?php echo $this->translate('Restricted by zone'); ?></label>
+        <select name="zoneId" id="coupon-zone">
+            <option value="0"><?php echo $this->translate('Select');?></option>
+            <?php foreach ($zones as $zone):?>
+                <option value="<?php echo $zone->getId();?>" <?php echo (isset($generalConfig[Shopping::COUPON_ZONE]) && $generalConfig[Shopping::COUPON_ZONE] === $zone->getId()) ? 'selected' : '';?>><?php echo $zone->getName();?></option>
+            <?php endforeach;?>
+        </select>
+    </div>
+
+	<div class="grid_3 alpha mt0px">
         <label><?php echo $this->translate('Type');?></label>
+        <?php $couponsTypes = Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true);
+           if(!empty($couponsTypes)){
+               foreach ($couponsTypes as $key => $couponsType) {
+                   $couponsTypes[$key] = $this->translate($couponsType);
+               }
+           }
+        ?>
+
 		<?php echo $this->formSelect('type', null, array(
 				'data-action'   => 'render',
 				'id'            => 'coupon-type'
-			), Store_Mapper_CouponMapper::getInstance()->getCouponTypes(true) ); ?>
+			), $couponsTypes ); ?>
 	</div>
 
-    <div class="grid_2 alpha omega mt0px">
+    <div class="grid_3 alpha omega mt0px">
         <label class="grid_4 alpha"><?php echo $this->translate('Code');?></label>
         <a id="genCoupon" class="grid_8 alpha omega text-right"><?php echo $this->translate('Generate'); ?> <span class="ticon-refresh"></span></a>
         <?php echo $this->formText('code', null, array(
@@ -33,18 +52,17 @@
         )); ?>
     </div>
 
-    <div class="grid_4 omega mt0px">
+    <div class="grid_10 alpha mt0px">
 		<label class="mb0-5em mt0-5em pointer" for="allowCombination">
             <?php echo $this->formCheckbox('allowCombination'); ?>
             <?php echo $this->translate('Allow in combination with other coupons');?>
         </label>
-		<label class="mb0px pointer" for="scope">
-			<?php echo $this->formCheckbox('scope', 'client', null, array(
-                'checked' => 'client',
-                'unChecked' => ''
-            )); ?>
-            <?php echo $this->translate('One use per client');?>
-		</label>
+
+        <div class="triple-switch grid_8 alpha omega">
+            <input id="scope" name="couponUsage" type="radio" checked="checked" class="processed processed-success" data-title="<?php echo $this->translate('One use per client'); ?>" value="client">
+            <input id="notUsed" name="couponUsage" type="radio" class="processed" data-title="<?php echo $this->translate('Unlimited use'); ?>" value="0">
+            <input id="oneUse" name="couponUsage" type="radio" class="processed processed-success" data-title="<?php echo $this->translate('One time use'); ?>" value="oneTimeUse">
+        </div>
     </div>
 
 	<div class="grid_4 alpha cl-both">
@@ -69,7 +87,7 @@
 	<button class="btn grid_2 omega mt2-25em ticon-plus" type="submit"/><?php echo $this->translate('Create'); ?></button>
 </form>
 
-<div class="mt15px grid_12 alpha omega">
+<div class="mt15px grid_12 alpha omega" style="overflow-x: auto;">
     <table id="coupon-table" class="table-striped table-hover small mb10px">
         <thead class="header-inner">
         <tr>
@@ -79,8 +97,9 @@
             <th><?php echo $this->translate('Start');?></th>
             <th><?php echo $this->translate('End');?></th>
             <th><?php echo $this->translate('Combine?');?></th>
-            <th><?php echo $this->translate('One use');?></th>
+            <th><?php echo $this->translate('Usage');?></th>
             <th><?php echo $this->translate('Target');?></th>
+            <th><?php echo $this->translate('Zone name');?></th>
             <th><?php echo $this->translate('Action');?></th>
             <th>&nbsp;</th>
         </tr>

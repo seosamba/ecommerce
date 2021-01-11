@@ -1,9 +1,12 @@
+<?php
+    $this->headScript()->appendFile($this->websiteUrl . "system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js");
+?>
 <div id="user-grid-part">
         <ul class="user-stats clearfix">
             <?php foreach ($this->stats as $status => $value) : ?>
                 <?php if($status != Models_Model_CartSession::CART_STATUS_NEW):?>
                     <?php if($status == 'all'):?>
-                        <li class="<?php echo $status;?> active" data-status="all" data-sort="<?php echo $status;?>"><?php echo $this->translate($status);?></li>
+                        <li class="<?php echo $status;?> active" data-status="all" data-sort="<?php echo $status;?>"><?php echo ucfirst($this->translate($status));?></li>
                     <?php else:?>
                         <?php if($status == 'quote_sent'):?>
                             <li class="quote_sent" data-status="quote_sent" data-sort="<?php echo $this->translate('Open Quotes');?>"><?php echo $this->translate('Open Quotes');?></li>
@@ -15,9 +18,9 @@
             <?php endforeach; ?>
         </ul>
         <div class="user-orders-range">
-            <label><?php echo $this->translate('Date range');?></label>
+            <label><?php echo $this->translate('from ');?></label>
             <input type="text" id="user-orders-filter-fromdate" name="filter-from-date">
-            <label><?php echo $this->translate('to');?></label>
+            <label><?php echo $this->translate('to ');?></label>
             <input type="text" id="user-orders-filter-todate" name="filter-to-date">
         </div>
         <table id="user-orders-table" border="1" class="widget responsive">
@@ -27,7 +30,7 @@
                 <th><?php echo $this->translate('Details');?></th>
                 <th><?php echo $this->translate('Total');?></th>
                 <th><?php echo $this->translate('Shipping');?></th>
-                <th><?php echo $this->translate('Tracking ID');?></th>
+                <th><?php echo $this->translate('Tracking id');?></th>
                 <th class="user-status-th"><?php echo $this->translate('Status');?></th>
                 <?php if(isset($this->invoicePlugin)):?>
                     <th><?php echo $this->translate('Invoice');?></th>
@@ -38,7 +41,8 @@
             <?php if ($this->orders): ?>
                 <?php foreach ($this->orders as $order):?>
                     <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED ||
-                     $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')):?>
+                     $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')
+                    || $order->getStatus() === Models_Model_CartSession::CART_STATUS_REFUNDED):?>
                     <tr data-role="cart" data-id="<?php echo $order->getId();?>">
                         <td><?php echo date("d-M-Y", strtotime($order->getCreatedAt()));?></td>
                         <td><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
@@ -54,7 +58,8 @@
                             <?php endif;?>
                         </td>
                         <td>
-                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED):?>
+                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED
+                                || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
                                 <?php if($order->getShippingTrackingId() != ''):?>
                                     <p class="textcentered">
                                         <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Track your parcel')?></a>
@@ -73,7 +78,8 @@
                         <?php endif;?>
                         <?php if(isset($this->invoicePlugin)):?>
                             <td>
-                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
+                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED
+                                    || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
                                     <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
                                         <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
                                     </a>
@@ -88,13 +94,13 @@
         </table>
 </div>
 <script>
-    $.fn.dataTable || $('head script:last').after(unescape("%3Cscript async='false' src='/system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'%3E%3C/script%3E"));
+
        $(function(){
             var oTable = $('#user-orders-table').dataTable({
                 iDisplayLength:10,
                 "sPaginationType": "full_numbers",
                 sDom: 't,p',
-                aaSorting: [[ 1, "desc" ]],
+                aaSorting: [[ 0, "desc" ], [1,'desc']],
                 aoColumnDefs: [
                     {bSortable: false, aTargets: [-1]}
                 ],

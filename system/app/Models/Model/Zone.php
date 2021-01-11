@@ -81,12 +81,20 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 		} else {
 			throw new Exception('Wrong parameter given');
 		}
-		if (!array_key_exists($country, $this->_countries)){
-			array_push($this->_countries, array(
-				'country'	=> $country,
-				'name'		=>	Zend_Locale::getTranslation($country, 'Country')
-			));
-		}
+
+        $addToList = true;
+        foreach ($this->_countries as $savedCountry) {
+            if($country == $savedCountry['country']) {
+                $addToList = false;
+            }
+        }
+
+        if($addToList) {
+            array_push($this->_countries, array(
+                'country'	=> $country,
+                'name'		=>	Zend_Locale::getTranslation($country, 'Country')
+            ));
+        }
 		return $this;
 	}
 	
@@ -98,9 +106,17 @@ class Models_Model_Zone extends Application_Model_Models_Abstract {
 					throw new Exception("Given element doesn't have required entry: $key");
 				}
 			}
-			if (!array_key_exists($state['id'], $this->_states)){
-				array_push($this->_states, $state);
-			}
+
+			$addToList = true;
+			foreach ($this->_states as $savedState) {
+			    if($state['id'] == $savedState['id']) {
+                    $addToList = false;
+                }
+            }
+
+			if($addToList) {
+                array_push($this->_states, $state);
+            }
 		} else {
 			throw new Exception('Wrong parameter given');
 		}

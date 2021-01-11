@@ -21,7 +21,9 @@ define([
                 related: [],
                 photo: null,
                 options: new ProductOptions(),
-                inventory: null
+                inventory: null,
+                allowance: '',
+                minimumOrder: null,
             }
         },
 		initialize: function (){

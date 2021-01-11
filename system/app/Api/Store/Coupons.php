@@ -35,9 +35,26 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 			} else {
 				$data = Store_Mapper_CouponMapper::getInstance()->fetchAll();
 			}
-			return array_map(function ($coupon) {
+			$data = array_map(function ($coupon) {
 				return $coupon->toArray();
 			}, $data);
+
+			if (!empty($data)) {
+                $zoneMapper = Models_Mapper_Zone::getInstance();
+                $zones = $zoneMapper->getZoneNames();
+			    foreach ($data as $key => $couponData) {
+                    if (!empty($couponData['zoneId'])) {
+                        if (!empty($zones) && !empty($zones[$couponData['zoneId']])) {
+                            $data[$key]['zoneName'] = $zones[$couponData['zoneId']];
+                        }
+                    } else {
+                        $data[$key]['zoneName'] = '';
+                    }
+
+                }
+            }
+
+			return $data;
 		}
 	}
 
@@ -88,9 +105,14 @@ class Api_Store_Coupons extends Api_Service_Abstract {
 			$this->_error($translator->translate('Coupon end date should be specified'));
 		}
 
-		if (isset($data['scope']) && empty($data['scope'])) {
-			unset($data['scope']);
-		}
+        $data['oneTimeUse'] = '0';
+        if ($data['couponUsage'] == Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT) { //One use per client
+            $data['scope'] = $data['couponUsage'];
+        } elseif ($data['couponUsage'] == 'oneTimeUse') { //One time use
+            $data['oneTimeUse'] = '1';
+            $data['scope'] = Store_Model_Coupon::DISCOUNT_SCOPE_CLIENT;
+        }
+        unset($data['couponUsage']);
 
 		$model = new Store_Model_Coupon($data);
 		if (isset($data['data']) && is_array($data['data'])) {
