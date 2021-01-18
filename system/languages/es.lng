@@ -75,6 +75,7 @@
 'cs_new_quote' => 'nuevo presupuesto',
 'cs_quote_sent' => 'presupuesto enviado',
 'cs_lost_opportunity' => 'oportunidad perdida',
+'cs_partial' => 'Partial Orders',
 'Imported' => 'Importado',
 'Recurring' => 'Periódico',
 'Regular' => 'Regular',

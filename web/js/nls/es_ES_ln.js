@@ -13,6 +13,7 @@ define({
         'cs_delivered'	  : 'Productos entregados',
         'cs_canceled'	  : 'Cancelado',
         'cs_error'        : 'Error',
+        'cs_partial'      : 'Partial Order',
         'New quote'       : 'Nuevo presupuesto',
         'Quote Sent'      : 'Presupuesto enviado',
         'Mark order paid' : 'Marcar presupuesto como pagado',
