@@ -1309,14 +1309,15 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCompletionpaymentamount()
     {
-        if ($this->_cart->getIsPartial()) {
-            if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-                return round($this->_cart->getTotal() - round(($this->_cart->getTotal()*$this->_cart->getPartialPercentage())/100, 2),2);
-            }
 
-            return $this->_view->currency(round($this->_cart->getTotal() - round(($this->_cart->getTotal()*$this->_cart->getPartialPercentage())/100, 2),2));
-
+        if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+            return round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
+                    2), 2);
         }
+
+        return $this->_view->currency(round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
+                2), 2));
+
 
         return '';
     }
