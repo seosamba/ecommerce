@@ -383,7 +383,8 @@ class Tools_Misc
             'phonecountrycode' => '',
             'mobile_country_code_value' => '',
             'phone_country_code_value' => '',
-            'customer_notes' => ''
+            'customer_notes' => '',
+            'position' => ''
         );
 
         $address = array_intersect_key($address, $_addressTmpl);

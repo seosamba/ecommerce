@@ -1238,6 +1238,29 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+	public function changeOrderStatusAction()
+    {
+        if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            throw new Exceptions_SeotoasterPluginException('Not allowed action');
+        }
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+
+        $orderId = $this->_request->getParam('orderId', false);
+        if ($orderId) {
+            $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+            if ($order instanceof Models_Model_CartSession) {
+                $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
+                Models_Mapper_CartSessionMapper::getInstance()->save($order);
+                $this->_responseHelper->success( $this->_translator->translate('Status has been changed'));
+            }
+        }
+
+    }
+
 	public function orderAction() {
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		if ($id) {
@@ -1503,9 +1526,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 
-			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
-				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
-			)));
+            if ($cartSession->getStatus() !== Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
+                )));
+            }
 
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -1516,8 +1541,17 @@ class Shopping extends Tools_Plugins_Abstract {
                     )));
                 }
             }
-            if (class_exists('Tools_AppsServiceWatchdog')) {
-                $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+
+            if ($cartSession->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT
+                )));
+            }
+
+            if ($cartSession->getStatus() !== Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                if (class_exists('Tools_AppsServiceWatchdog')) {
+                    $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+                }
             }
 
 			$cartSession->notifyObservers();
@@ -3171,6 +3205,53 @@ class Shopping extends Tools_Plugins_Abstract {
         } else {
             $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
         }
+    }
+
+
+    public function sendPaymentInfoEmailAction()
+    {
+        if ($this->_request->isPost()) {
+            $currentUser = $this->_sessionHelper->getCurrentUser();
+            $currentUserRole = $currentUser->getRoleId();
+
+            if ($currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON) {
+                $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+                $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+                if (!$tokenValid) {
+                    $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
+                }
+
+                $paymentInfoMessage = $this->_request->getParam('sendPaymentRequestMessage');
+                $orderId = $this->_request->getParam('orderId');
+                $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                $cartSessionModel = $cartSessionMapper->find($orderId);
+                $partialNotificationMapper = Store_Mapper_PartialNotificationLogMapper::getInstance();
+                if ($cartSessionModel instanceof Models_Model_CartSession) {
+                    $partialNotificationLogModel = $partialNotificationMapper->findByCartId($orderId);
+                    if (!$partialNotificationLogModel instanceof Store_Model_PartialNotificationLog) {
+                        $partialNotificationLogModel = new Store_Model_PartialNotificationLog();
+                    }
+                    $cartSession = $cartSessionMapper->find($orderId);
+                    $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION,
+                        'customInfoMessage' => $paymentInfoMessage
+                    )));
+
+                    $cartSession->notifyObservers();
+
+                    $partialNotificationLogModel->setCartId($orderId);
+                    $partialNotificationLogModel->setNotifiedAt(date(Tools_System_Tools::DATE_MYSQL));
+                    $partialNotificationMapper->save($partialNotificationLogModel);
+
+                }
+
+                $this->_responseHelper->success($this->_translator->translate('Payment request has been sent'));
+
+            }
+
+            $this->_responseHelper->fail('');
+        }
+
     }
 
 

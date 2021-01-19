@@ -9,7 +9,8 @@ require.config({
         'text'  : '../../libs/require/text',
         'i18n'  : '../../libs/require/i18n',
         'moment': '../../libs/moment.min',
-        'accounting' : '../../libs/accounting.min'
+        'accounting' : '../../libs/accounting.min',
+        'tinyMCE':'../../../../../../system/js/external/tinymce/tinymce.min'
     },
     shim: {
         underscore: { exports: '_' },
@@ -17,7 +18,8 @@ require.config({
             deps: ['underscore'],
             exports: 'Backbone'
         },
-        'backbone.paginator': ['backbone']
+        'backbone.paginator': ['backbone'],
+        'tinyMCE': { exports: 'tinyMCE'}
     }
 });
 

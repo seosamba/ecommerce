@@ -9,6 +9,7 @@ define({
 	    'cs_delivered'	  : 'Items delivered',
 	    'cs_canceled'	  : 'canceled',
         'cs_error'        : 'error',
+        'cs_partial'      : 'Partial Order',
         'Mark order paid' : 'Mark order paid',
 	    'Refund payment'  : 'Refund payment',
 	    'Cancel order'	  : 'Cancel order',

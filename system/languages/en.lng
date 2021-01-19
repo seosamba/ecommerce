@@ -65,6 +65,6 @@
     'Manage brand logos' => ' ',
     'Plugins' => ' ',
     'Custom attributes' => 'Property data',
-    'Go to Dashboard' => ' '
-
+    'Go to Dashboard' => ' ',
+	'cs_partial' => 'Partial Orders'
 );

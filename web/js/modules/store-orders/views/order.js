@@ -56,6 +56,7 @@ define([
                 }
 
                 var refundPaymentTranslation = _.isUndefined(i18n['Refund payment']) ? 'Refund payment' : i18n['Refund payment'];
+                var sendRequestPaymentTranslation = _.isUndefined(i18n['Send payment request']) ? 'Send payment request' : i18n['Send payment request'];
                 var paidPaymentTranslation = _.isUndefined(i18n['Mark order paid']) ? 'Mark order paid' : i18n['Mark order paid'];
                 var cancelOrderTranslation = _.isUndefined(i18n['Cancel order']) ? 'Cancel order' : i18n['Cancel order'];
                 var deliveredTranslation = _.isUndefined(i18n['Delivered']) ? 'Delivered' : i18n['Delivered'];
@@ -64,7 +65,8 @@ define([
                     'refunded': '<button class="change-status btn small blue-gradient" data-status="refunded" >' + refundPaymentTranslation + '</button>',
                     'completed': '<button class="change-status btn small green-gradient" data-status="completed" >' + paidPaymentTranslation + '</button>',
                     'canceled': '<button class="change-status btn small red-gradient" data-status="canceled" >' + cancelOrderTranslation + '</button>',
-                    'delivered': '<button class="change-status btn small orange-gradient" data-status="delivered" >' + deliveredTranslation + '</button>'
+                    'delivered': '<button class="change-status btn small orange-gradient" data-status="delivered" >' + deliveredTranslation + '</button>',
+                    'partial': '<button class="change-status btn small orange-gradient" data-status="partial" >' + sendRequestPaymentTranslation + '</button><button class="change-status btn small orange-gradient" data-status="partial" data-sub-status="completed">' + paidPaymentTranslation + '</button>'
                 };
 
                 var html = '';
@@ -82,6 +84,9 @@ define([
                         break;
                     case 'delivered':
                         html += buttons['refunded'];
+                        break;
+                    case 'partial':
+                        html += buttons['partial'];
                         break;
                     default:
                         return false;
