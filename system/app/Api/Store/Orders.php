@@ -76,6 +76,10 @@ class Api_Store_Orders extends Api_Service_Abstract {
 					$this->_error(null, self::REST_STATUS_FORBIDDEN);
 				}
 			}
+
+            $order['moneyFormat'] = Tools_Misc::getCurrencyFormat();
+            $order['usNumericFormat'] = $shoppingConfig['usNumericFormat'];
+
 			return $order;
 		} else {
 			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
