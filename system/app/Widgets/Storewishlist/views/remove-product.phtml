@@ -1,9 +1,35 @@
 <div class="wish-list-remove-product-block">
     <?php if(!empty($this->useBtn)) :?>
-        <a href="javascript:;" class="remove-wished-product <?php echo (!empty($this->htmlClass)) ? $this->htmlClass : '';?>" title="<?php echo $this->btnName;?>" data-pid="<?php echo $this->productId;?>"><?php echo $this->btnName;?></a>
+        <a href="javascript:;" class="remove-wished-product remove-wished-product-<?php echo $this->productId;?> <?php echo (!empty($this->htmlClass)) ? $this->htmlClass : '';?>" title="<?php echo $this->btnName;?>" data-pid="<?php echo $this->productId;?>"><?php echo $this->btnName;?></a>
     <?php else :?>
-        <a href="javascript:;" class="<?php echo (!empty($this->htmlClass)) ? $this->htmlClass : 'ticon-close error' ?> remove-wished-product" title="<?php echo $this->btnName;?>" data-pid="<?php echo $this->productId;?>"></a>
+        <a href="javascript:;" class="<?php echo (!empty($this->htmlClass)) ? $this->htmlClass : 'ticon-close error' ?> remove-wished-product remove-wished-product-<?php echo $this->productId;?>" title="<?php echo $this->btnName;?>" data-pid="<?php echo $this->productId;?>"></a>
     <?php endif;?>
 </div>
+
+<script type="text/javascript">
+    $(document).on('click', 'a.remove-wished-product-<?php echo $this->productId;?>', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var self = $(e.currentTarget),
+            pid  = self.data('pid');
+
+        showConfirm('<?php echo $this->translator->translate("Are you sure you would like to remove this item from your Wish List?"); ?>', function(){
+            $.ajax({
+                url: $('#website_url').val()+'plugin/shopping/run/removeWishedProduct/',
+                type: 'POST',
+                dataType: 'json',
+                data: {pid : pid},
+                success: function(response){
+                    if(response.error != 1) {
+                        showMessage(response.responseText, false, 3000);
+                        window.location.reload();
+                    } else {
+                        showMessage(response.responseText, true, 3000);
+                    }
+                }
+            });
+        });
+    });
+</script>
 
 
