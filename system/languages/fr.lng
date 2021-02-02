@@ -819,4 +819,9 @@
         'Name: Z-A' => 'Nom: Z-A',
         'Newest to oldest' => 'Les plus récents',
         'Oldest to newest' => 'Les plus ancien',
+        'Are you sure you would like to remove this item from your Wish List?' => 'Êtes-vous sûr(e) de vouloir supprimer ce produit de votre liste de souhaits?',
+        'Added to Wishlist' => 'Ajouté à la liste de souhaits',
+        'Product already added to Wishlist' => 'Le produit est déjà ajouté à la liste de souhaits',
+        'Can\'t add product to Wishlist! Please re-login into system.' => 'Impossible d\'ajouter à la liste de souhaits! Veuillez vous reconnecter au système.',
+        'Remove wished product' => 'Supprimer le produit souhaité'
 );?>
