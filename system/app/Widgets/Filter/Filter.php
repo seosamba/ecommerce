@@ -171,6 +171,58 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_filters = array_merge($rangeFilters, $listFilters);
         // fetch price range for filters
         $this->_priceRange = $eavMapper->getPriceRange($tagIds);
+
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+        $dbTable = new Models_DbTable_CustomerInfo();
+        $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+        $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
+
+        if(!empty($allCustomersGroups)) {
+            if(array_key_exists($currentUser, $allCustomersGroups)){
+                $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                if(isset($allProductsGroups[$groupId])){
+                    if(!empty($this->_priceRange)) {
+                        foreach ($this->_priceRange as $key => $range) {
+                            $priceNow = $range;
+                            $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                            $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                            $priceType  = $allProductsGroups[$groupId]['priceType'];
+                            $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
+
+                            if($priceType == 'percent'){
+                                $priceModificationValue = ($priceNow*$priceValue)/100;
+                            }
+                            if($priceType == 'unit'){
+                                $priceModificationValue = $priceValue;
+                            }
+
+                            if($priceSign == 'minus'){
+                                $resultPrice = $priceNow - $priceModificationValue;
+                            }
+                            if($priceSign == 'plus'){
+                                $resultPrice = $priceNow + $priceModificationValue;
+                            }
+
+                            if(empty($nonTaxable)) {
+                                $tax = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+                                if($tax !== null){
+                                    $tax = $tax[0]['rate1'];
+
+                                    $resultPriceParam = ($resultPrice*$tax)/100;
+                                    $resultPrice = $resultPrice + $resultPriceParam;
+                                }
+                            }
+
+                            $this->_priceRange['group'][$key] = $resultPrice;
+                        }
+                    }
+                }
+            }
+        }
+
         if(!isset($priceTax) || empty($priceTax)){
             $this->_priceRange['min'] = floor($this->_priceRange['min']);
             $this->_priceRange['max'] = ceil($this->_priceRange['max']);

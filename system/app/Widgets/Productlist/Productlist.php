@@ -433,7 +433,18 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 
         if (!empty($this->_priceFilter)) {
-            if(!empty($this->_priceFilter['tax'])){
+            if(!empty($this->_priceFilter['additionalPrice'])) {
+                if($this->_priceFilter['priceSign'] == 'minus') {
+                    $this->_priceFilter['min'] -= $this->_priceFilter['additionalPrice']['min'];
+                    $this->_priceFilter['max'] -= $this->_priceFilter['additionalPrice']['max'];
+                }
+                if($this->_priceFilter['priceSign'] == 'plus') {
+                    $this->_priceFilter['min'] += $this->_priceFilter['additionalPrice']['min'];
+                    $this->_priceFilter['max'] += $this->_priceFilter['additionalPrice']['max'];
+                }
+            }
+
+            if(!empty($this->_priceFilter['tax']) && empty($this->_priceFilter['nonTaxable'])){
                 $tax = $this->_priceFilter['tax'];
                 $this->_priceFilter['min'] = $this->_priceFilter['min'] * "1.$tax";
                 $this->_priceFilter['max'] = $this->_priceFilter['max'] * "1.$tax";
@@ -755,7 +766,80 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                         $urlFilter['price']['from'] = floor($percentMin);
                     }
                 }
-                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to'], 'tax' => $tax);
+
+                if (!empty($filters['tags'])) {
+                    $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+                    $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+                    $dbTable = new Models_DbTable_CustomerInfo();
+                    $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+                    $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
+
+                    if(!empty($allCustomersGroups)) {
+                        if(array_key_exists($currentUser, $allCustomersGroups)){
+                            $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                            $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                            if(isset($allProductsGroups[$groupId])){
+
+                                $additionalPrice = array();
+                                foreach ($urlFilter['price'] as $key => $range) {
+                                    $priceNow = $range;
+                                    $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                                    $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                                    $priceType  = $allProductsGroups[$groupId]['priceType'];
+                                    $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
+
+                                    if(!empty($tax) && !empty($nonTaxable)) {
+                                        $priceNow = $priceNow * "1.$tax";
+                                    }
+
+                                    if($priceType == 'percent'){
+                                        if($priceSign == 'minus') {
+                                            $priceModificationValue = $priceNow/$priceValue*100;
+                                            $rangeParam = $priceNow;
+                                        }
+                                        if($priceSign == 'plus') {
+                                            $priceModificationValue = $priceNow / "1.$priceValue";
+                                            $rangeParam = $priceModificationValue*$priceValue/100;
+                                        }
+
+                                        $dataParam = $rangeParam;
+                                    }
+                                    if($priceType == 'unit'){
+                                        if($priceSign == 'minus') {
+                                            $priceModificationValue = $priceNow + $priceValue;
+                                        }
+                                        if($priceSign == 'plus') {
+                                            $priceModificationValue = $priceNow - $priceValue;
+                                        }
+
+                                        $dataParam = $priceValue;
+                                    }
+                                    $urlFilter['price']['priceSign'] = $priceSign;
+                                    $urlFilter['price']['nonTaxable'] = $nonTaxable;
+
+                                    if($key == 'from') {
+                                        $urlFilter['price']['from'] = $priceModificationValue;
+                                        $additionalPrice['min'] = $dataParam;
+                                    }
+                                    if($key == 'to') {
+                                        $urlFilter['price']['to'] = $priceModificationValue;
+                                        $additionalPrice['max'] = $dataParam;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $this->_priceFilter = array(
+                    'min'   => $urlFilter['price']['from'],
+                    'max'   => $urlFilter['price']['to'],
+                    'additionalPrice' => $additionalPrice,
+                    'priceSign'  => $urlFilter['price']['priceSign'],
+                    'nonTaxable' => $urlFilter['price']['nonTaxable'],
+                    'tax'   => $tax
+                );
                 unset($urlFilter['price']);
             }
 
@@ -812,7 +896,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         $this->_view->filters = $filters;
 
-		return $this->_productMapper->fetchAll(
+		$data = $this->_productMapper->fetchAll(
 		    $enabledOnly,
             $filters['order'],
             0,
@@ -828,6 +912,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             false,
             $productPriceFilter
         );
+        return $data;
 	}
 
 	/**
