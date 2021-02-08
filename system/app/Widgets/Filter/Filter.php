@@ -156,10 +156,46 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && $request->isPost()) {
             $data = $request->getParam('show', array());
 
+            $useSortData = $request->getParam('useSortData', array());
+            $sortedFiltersAttributes = array();
+
+            if(!empty($useSortData)) {
+                $countParams = count($useSortData);
+                asort($useSortData, SORT_STRING);
+
+                $i = 1;
+                foreach ($useSortData as $key => $param) {
+                    if(empty($param)) {
+                        $sortedFiltersAttributes[$key] = $countParams+$i;
+                        //return 'Please fill all sorted inputs!';
+                    } else {
+                        $sortedFiltersAttributes[$key] = $param;
+                    }
+                    $i++;
+                }
+
+                asort($sortedFiltersAttributes, SORT_NUMERIC);
+
+                $data['useSortData'] = $sortedFiltersAttributes;
+            }
+
             Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
         }
 
         $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
+
+        $usesort = false;
+        $usesortData = array();
+        if(in_array('usesort', $this->_options)) {
+            if(!empty($widgetSettings['useSortData'])) {
+                $usesort = true;
+                $usesortData = $widgetSettings['useSortData'];
+            }
+        }
+
+        $this->_view->usesort = $usesort;
+        $this->_view->usesortData = $usesortData;
+
         $this->_widgetSettings = $widgetSettings;
 
         // fetch list filters by given tags
@@ -385,6 +421,19 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->tags = $this->_tags;
 
         $this->_view->brands = $this->_brands;
+
+        $usesort = false;
+        $usesortData = array();
+        if(in_array('usesort', $this->_options)) {
+            $usesort = true;
+            if(!empty($widgetSettings['useSortData'])) {
+                $usesortData = $widgetSettings['useSortData'];
+                unset($widgetSettings['useSortData']);
+            }
+        }
+
+        $this->_view->usesort = $usesort;
+        $this->_view->usesortData = $usesortData;
 
         $this->_view->filters = array_map(
             function ($filter) use ($widgetSettings) {

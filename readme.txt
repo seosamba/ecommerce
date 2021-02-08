@@ -204,12 +204,13 @@ Magic spaces:
 
 
 9. Product filters widget:
-{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft]]]}
+{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft[:allitems[:usesort]]]]]}
  tagnames-tag1,tag2,...,tagN - filtering by product tags
  brands-brand1,brand2,...,brandN - filtering by product brands
  order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
+ usesort - enable the ability to sort custom filters list
 
 10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
