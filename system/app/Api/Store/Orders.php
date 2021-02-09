@@ -76,6 +76,10 @@ class Api_Store_Orders extends Api_Service_Abstract {
 					$this->_error(null, self::REST_STATUS_FORBIDDEN);
 				}
 			}
+
+            $order['moneyFormat'] = Tools_Misc::getCurrencyFormat();
+            $order['usNumericFormat'] = $shoppingConfig['usNumericFormat'];
+
 			return $order;
 		} else {
 			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
@@ -116,12 +120,31 @@ class Api_Store_Orders extends Api_Service_Abstract {
             }
             $orderList['defaultTaxes'] = $defaultTaxes;
             $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
+
+            $recipientName = 'customer';
+            $triggerName = Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION;
+            $trigger = Application_Model_Mappers_EmailTriggersMapper::getInstance()->findByTriggerName($triggerName)->toArray();
+            if (!empty($trigger) && !empty($recipientName)) {
+                $trigger = array_filter($trigger, function($triggerInfo) use ($recipientName){
+                    return $triggerInfo['recipient'] === $recipientName;
+                });
+
+            }
+
+            $trigger = reset($trigger);
+
+            if (empty($trigger)) {
+                $trigger['message'] = '';
+            }
+            $orderList['sendPaymentInfoDefaultText'] = $trigger['message'];
+
             if (!empty($shoppingConfig['realRefundByDefault'])) {
                 $orderList['realRefundByDefault'] = 1;
             } else {
                 $orderList['realRefundByDefault'] = 0;
             }
             $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
+            $orderList['usNumericFormat'] = $shoppingConfig['usNumericFormat'];
             $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
             $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
             if (!empty($shippingServiceLabels) && is_array($shippingServiceLabels) && !empty($orderList['data'])) {

@@ -27,7 +27,7 @@ return array(
 	'Taxes'										=> 'Steuern',
 	'Select Template'							=> 'Template auswählen',
 	'Main'										=> 'Allgemein',
-	'Product tags'								=> 'Artikel Stichwörter',
+	'Product Tags'								=> 'Artikel Stichwörter',
 	'Add a new Tag'								=> 'neues Stichwort hinzufügen',
 	'New product'								=> 'Neuer Artikel',
 	'Edit product'								=> 'Artikel bearbeiten',

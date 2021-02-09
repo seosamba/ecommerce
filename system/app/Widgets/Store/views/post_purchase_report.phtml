@@ -291,6 +291,14 @@
 			<span><?php echo $this->translate('Total');?>:</span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
 		</div>
+        <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+            <div class="post-purchase-row partially-paid-total">
+                <span><?php echo $this->translate('Deposit received');?>: </span>
+                <span><?php echo $this->currency($this->cart->getPartialPaidAmount());?></span>
+                <span><?php echo $this->translate('Outstanding amount');?>: </span>
+                <span><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></span>
+            </div>
+        <?php endif;?>
 	</div>
 	</div>
 
@@ -480,22 +488,25 @@
 		<?php foreach ($this->cartContent as $product) : ?>
 			<tr>
 				<td align="left" valign="middle">
-					<?php if (isset($product['photo']) && $product['photo'] != ''): ?>
-						<a class="page-teaser-image"
-						   href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
-						   title="<?php echo $product['name']; ?>" target="_blank">
-							<img style="width:60px; vertical-align:middle"
-                                <?php $src = mb_eregi_replace(' ', "%20", $product['photo']); ?>
-                                <?php $src = Tools_Misc::prepareProductImage($src); ?>
-							    src="<?php echo Tools_Misc::prepareProductImage($src); ?>"
-							    alt="<?php echo $product['name']; ?>"/>
-						</a>
-					<?php else: ?>
-						<img style="width:60px;" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
-						     alt="<?php echo $product['name']; ?>"/>
-					<?php endif;?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if (isset($product['photo']) && $product['photo'] != ''): ?>
+                            <a class="page-teaser-image"
+                               href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
+                               title="<?php echo $product['name']; ?>" target="_blank">
+                                <img style="width:60px; vertical-align:middle"
+                                    <?php $src = mb_eregi_replace(' ', "%20", $product['photo']); ?>
+                                    <?php $src = Tools_Misc::prepareProductImage($src); ?>
+                                    src="<?php echo Tools_Misc::prepareProductImage($src); ?>"
+                                    alt="<?php echo $product['name']; ?>"/>
+                            </a>
+                        <?php else: ?>
+                            <img style="width:60px;" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png"
+                                 alt="<?php echo $product['name']; ?>"/>
+                        <?php endif;?>
+                    <?php endif;?>
 				</td>
 				<td align="left" valign="middle">
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
 						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
                         <?php if (empty($product['archiveOptions'])):?>
@@ -508,48 +519,64 @@
 							if (is_array($optData)) {
 								$optionStr = $optionTitle . ': ' . $optData['title'];
 								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
-										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
-									} else {
-										$optPriceMod = $optData['priceValue'];
-									}
-                                    if ($optData['priceType'] === 'percent') {
-									    $optionStr .= ' <span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                    if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1) {
+                                        $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate']) / 100;
                                     } else {
-                                        $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                        $optPriceMod = $optData['priceValue'];
                                     }
-								}
-								if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
-									$optionStr .= ' <span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>';
-								}
-							} else {
-								$optionStr = $optionTitle . ': ' . $optData;
-							} ?>
-							<div class="options"><?php echo $optionStr; ?></div>
-						<?php endforeach; ?>
-					<?php endif;?>
+                                    if ($optData['priceType'] === 'percent') {
+                                        $optionStr .= ' <span>(' . $optData['priceSign'] . '%' . number_format($optPriceMod,
+                                                2) . ')</span>';
+                                    } else {
+                                        $optionStr .= ' <span>(' . $optData['priceSign'] . $this->currency($optPriceMod) . ')</span>';
+                                    }
+                                }
+                                    if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+                                        $optionStr .= ' <span>(' . $optData['weightSign'] .' '. $optData['weightValue'] .' '. $this->weightSign . ')</span>';
+                                    }
+                                } else {
+                                    $optionStr = $optionTitle . ': ' . $optData;
+                                } ?>
+                                <div class="options"><?php echo $optionStr; ?></div>
+                            <?php endforeach; ?>
+                        <?php endif;?>
+                    <?php else:?>
+                        <span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;">&nbsp;</span>
+                    <?php endif;?>
 				</td>
 				<?php if (isset($this->additionalTableRows)): ?>
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
 						<?php if (isset($product[$tableRow])): ?>
-							<td valign="middle" align="center"><?php echo $product[$tableRow]; ?></td>
+							<td valign="middle" align="center">
+                            <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                                <?php echo $product[$tableRow]; ?>
+                            <?php endif; ?>
+                            </td>
 						<?php endif; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
                 <td valign="middle" align="center">
-                <?php if($product['freebies'] == 1):?>
-                    <?php echo $this->translate('free'); ?>
-                <?php else:?>
-                    <?php echo $this->currency($product['tax_price']); ?>
-                <?php endif;?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if($product['freebies'] == 1):?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php else:?>
+                            <?php echo $this->currency($product['tax_price']); ?>
+                        <?php endif;?>
+                    <?php endif;?>
                 </td>
-				<td valign="middle" align="center"><?php echo $product['qty']; ?></td>
+				<td valign="middle" align="center">
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php echo $product['qty']; ?>
+                    <?php endif;?>
+                </td>
                 <td valign="middle" align="center">
-                <?php if($product['freebies'] == 1):?>
-                    <?php echo $this->translate('free'); ?>
-                <?php else:?>
-				    <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
-                <?php endif;?>
+                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                        <?php if($product['freebies'] == 1):?>
+                            <?php echo $this->translate('free'); ?>
+                        <?php else:?>
+                            <?php echo $this->currency($product['tax_price'] * $product['qty']); ?>
+                        <?php endif;?>
+                    <?php endif;?>
                 </td>
 			</tr>
 		<?php endforeach; ?>
@@ -582,9 +609,9 @@
         <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
             <span style="float:left;"><?php echo $this->translate('Shipping');?>: </span>
             <?php if ($this->showPriceIncTax == 1): ?>
-                <span><?php echo $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
+                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice() + $this->cart->getShippingTax());?></span>
             <?php else:?>
-                <span><?php echo $this->currency($this->cart->getShippingPrice());?></span>
+                <span><?php echo $this->cart->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->cart->getShippingPrice());?></span>
             <?php endif;?>
         </p>
 		<p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; color:#444444; text-align:right; overflow: hidden;">
@@ -613,6 +640,16 @@
 			<span style="float:left;"><?php echo $this->translate('Total');?>: </span>
 			<span><?php echo $this->currency($this->cart->getTotal());?></span>
 		</p>
+        <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
+                <span style="float:left;"><?php echo $this->translate('Deposit received');?>: </span>
+                <span><?php echo $this->currency($this->cart->getPartialPaidAmount());?></span>
+            </p>
+            <p style="padding:5px 0; border-bottom:1px solid #ddd; margin:0; font-size:14px; color:#222222; font-weight:bold; text-align:right; overflow: hidden;">
+                <span style="float:left;"><?php echo $this->translate('Outstanding amount');?>: </span>
+                <span><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></span>
+            </p>
+        <?php endif;?>
 	</div>
 	</div>
 <?php endif; ?>

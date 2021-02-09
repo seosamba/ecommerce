@@ -52,7 +52,11 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'additional_info'            => $model->getAdditionalInfo(),
             'is_gift'                    => $model->getIsGift(),
             'gift_email'                 => $model->getGiftEmail(),
-            'order_subtype'              => $model->getOrderSubtype()
+            'order_subtype'              => $model->getOrderSubtype(),
+            'partial_percentage'         => $model->getPartialPercentage(),
+            'is_partial'                 => $model->getIsPartial(),
+            'partial_paid_amount'        => $model->getPartialPaidAmount(),
+            'partial_purchased_on'        => $model->getPartialPurchasedOn()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {
@@ -364,6 +368,17 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 						'weightValue' => null
 					);
 					break;
+                case Models_Model_Option::TYPE_TEXTAREA:
+                    $result[$option->getTitle()] = array(
+                        'option_id'   => $option->getId(),
+                        'title'       => $value,
+                        'priceSign'   => null,
+                        'priceType'   => null,
+                        'priceValue'  => null,
+                        'weightSign'  => null,
+                        'weightValue' => null
+                    );
+                    break;
 				default:
 					$selections = $option->getSelection();
 					if (empty($selections)){

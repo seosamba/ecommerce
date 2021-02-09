@@ -1,0 +1,15 @@
+<div class="clearfix" style="width: 100%"
+     title="<%= _.isUndefined(i18n['Send payment request']) ? 'Send payment request':i18n['Send payment request'] %> #<%= orderId %>">
+    <h3 class="text-center"><%= _.isUndefined(i18n['Payment request info']) ? 'Payment request info':i18n['Payment request info'] %></h3>
+
+    <form class="mt20px" id="send-payment-notification-order-screen-form" action=""
+          method="post">
+        <p class="grid_12">
+            <label class="grid_12 fl-left mt20px pointer"><%= _.isUndefined(i18n['Add a payment request info message']) ? 'Add a payment request info message': i18n['Add a payment request info message']  %>:
+                <textarea id="send-payment-notification-info" class="send-payment-notification-info grid_12 mt10px"></textarea>
+            </label>
+        </p>
+        <input type="hidden" id="send-notification-order-id" value="<%= orderId %>" />
+    </form>
+</div>
+
