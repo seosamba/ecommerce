@@ -96,6 +96,7 @@
                 $(this).data('order', [orderBy, direction].join('_'));
                 $('input[name="userOrder"]').val($(this).data('order'));
             }
+            $('.apply-filters').trigger('click');
             <?php else:?>
             if (orderBy === 'default') {
                 changeOrder(orderBy);
@@ -107,9 +108,10 @@
         });
         function applyUserOrder(el){
             <?php if(!empty($this->filterable)): ?>
-            $('input[name="userOrder"]').val($(el).val());
+                $('input[name="userOrder"]').val($(el).val());
+                $('.apply-filters').trigger('click');
             <?php else:?>
-            changeOrder($(el).val());
+                changeOrder($(el).val());
             <?php endif;?>
         }
         function changeOrder (userOrder) {
