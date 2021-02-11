@@ -106,15 +106,14 @@
                                 <?php echo $filter['label']; ?>
                             </label>
                             <?php if(!empty($this->usesort)) :?>
-                                <input type="text" name="useSortData[<?php echo $filter['name']; ?>]" value="<?php echo $sortKey;?>" />
+                                <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter filter position number'); ?>" type="text" placeholder="<?php echo $this->translate('Enter filter position number'); ?>" name="useSortData[<?php echo $filter['name']; ?>]" value="<?php echo $sortKey;?>" />
                             <?php endif;?>
                             <?php if (!empty($filter['values'])) : ?>
                                 <?php if (sizeof($filter['values']) > 10) : ?>
                                     <span title="<?php echo $this->translate('show/hide nested elements'); ?>"
                                           class="toggle-nested">&#177;</span>
                                 <?php endif; ?>
-                                <ul <?php if (!$show) { ?>style="display: none"<?php } ?> >
-
+                                <ul class="grid_12 alpha omega" <?php if (!$show) { ?>style="display: none"<?php } ?> >
                                     <?php foreach ($filter['values'] as $value => $count) : ?>
                                         <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
                                         <?php if(!empty($value)) :?>
@@ -163,9 +162,6 @@
                         <?php endif; ?>
                         <?php echo $filter['label']; ?>
                     </label>
-                    <?php if(!empty($this->usesort)) :?>
-                        <input type="text" name="useSortData[<?php echo $filter['name']; ?>]" value="" />
-                    <?php endif;?>
                     <?php if (!empty($filter['values'])) : ?>
                         <?php if (sizeof($filter['values']) > 10) : ?>
                             <span title="<?php echo $this->translate('show/hide nested elements'); ?>"
