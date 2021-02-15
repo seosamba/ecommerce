@@ -38,7 +38,8 @@ class Tools_Tax_Tax {
 
 			if (isset($tax) && $tax !== null) {
 				$productPrice = is_null($product->getCurrentPrice()) ? $product->getPrice() : $product->getCurrentPrice();
-                return $taxRateOnly ? $tax->$rateMethodName() : ($productPrice / 100) * $tax->$rateMethodName();
+                $data = $taxRateOnly ? $tax->$rateMethodName() : ($productPrice / 100) * $tax->$rateMethodName();
+                return $data;
 			}
 		}
 		return 0;

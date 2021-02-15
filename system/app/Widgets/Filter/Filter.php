@@ -156,10 +156,46 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && $request->isPost()) {
             $data = $request->getParam('show', array());
 
+            $useSortData = $request->getParam('useSortData', array());
+            $sortedFiltersAttributes = array();
+
+            if(!empty($useSortData)) {
+                $countParams = count($useSortData);
+                asort($useSortData, SORT_STRING);
+
+                $i = 1;
+                foreach ($useSortData as $key => $param) {
+                    if(empty($param)) {
+                        $sortedFiltersAttributes[$key] = $countParams+$i;
+                        //return 'Please fill all sorted inputs!';
+                    } else {
+                        $sortedFiltersAttributes[$key] = $param;
+                    }
+                    $i++;
+                }
+
+                asort($sortedFiltersAttributes, SORT_NUMERIC);
+
+                $data['useSortData'] = $sortedFiltersAttributes;
+            }
+
             Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
         }
 
         $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
+
+        $usesort = false;
+        $usesortData = array();
+        if(in_array('usesort', $this->_options)) {
+            if(!empty($widgetSettings['useSortData'])) {
+                $usesort = true;
+                $usesortData = $widgetSettings['useSortData'];
+            }
+        }
+
+        $this->_view->usesort = $usesort;
+        $this->_view->usesortData = $usesortData;
+
         $this->_widgetSettings = $widgetSettings;
 
         // fetch list filters by given tags
@@ -171,6 +207,58 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_filters = array_merge($rangeFilters, $listFilters);
         // fetch price range for filters
         $this->_priceRange = $eavMapper->getPriceRange($tagIds);
+
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+        $dbTable = new Models_DbTable_CustomerInfo();
+        $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+        $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
+
+        if(!empty($allCustomersGroups)) {
+            if(array_key_exists($currentUser, $allCustomersGroups)){
+                $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                if(isset($allProductsGroups[$groupId])){
+                    if(!empty($this->_priceRange)) {
+                        foreach ($this->_priceRange as $key => $range) {
+                            $priceNow = $range;
+                            $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                            $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                            $priceType  = $allProductsGroups[$groupId]['priceType'];
+                            $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
+
+                            if($priceType == 'percent'){
+                                $priceModificationValue = ($priceNow*$priceValue)/100;
+                            }
+                            if($priceType == 'unit'){
+                                $priceModificationValue = $priceValue;
+                            }
+
+                            if($priceSign == 'minus'){
+                                $resultPrice = $priceNow - $priceModificationValue;
+                            }
+                            if($priceSign == 'plus'){
+                                $resultPrice = $priceNow + $priceModificationValue;
+                            }
+
+                            if(empty($nonTaxable)) {
+                                $tax = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+                                if($tax !== null){
+                                    $tax = $tax[0]['rate1'];
+
+                                    $resultPriceParam = ($resultPrice*$tax)/100;
+                                    $resultPrice = $resultPrice + $resultPriceParam;
+                                }
+                            }
+
+                            $this->_priceRange['group'][$key] = $resultPrice;
+                        }
+                    }
+                }
+            }
+        }
+
         if(!isset($priceTax) || empty($priceTax)){
             $this->_priceRange['min'] = floor($this->_priceRange['min']);
             $this->_priceRange['max'] = ceil($this->_priceRange['max']);
@@ -333,6 +421,19 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->tags = $this->_tags;
 
         $this->_view->brands = $this->_brands;
+
+        $usesort = false;
+        $usesortData = array();
+        if(in_array('usesort', $this->_options)) {
+            $usesort = true;
+            if(!empty($widgetSettings['useSortData'])) {
+                $usesortData = $widgetSettings['useSortData'];
+                unset($widgetSettings['useSortData']);
+            }
+        }
+
+        $this->_view->usesort = $usesort;
+        $this->_view->usesortData = $usesortData;
 
         $this->_view->filters = array_map(
             function ($filter) use ($widgetSettings) {

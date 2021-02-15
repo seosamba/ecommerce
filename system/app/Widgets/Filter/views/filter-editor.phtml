@@ -81,59 +81,119 @@
                 </label>
             </li>
         <?php endif;?>
+        <?php if(!empty($this->usesort) && !empty($this->usesortData)) :?>
+            <?php foreach ($this->usesortData as $param => $sortKey) :?>
+                <?php foreach ($this->filters as $filterId => $filter) : ?>
+                    <?php if($param == $filter['name']) :?>
+                        <?php $show = !isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]); ?>
+                        <li data-attributeId="<?php echo $filterId; ?>">
+                            <label class="filter-label">
+                                <input type="hidden" name="show[<?php echo $filter['name']; ?>]" value="none" />
+                                <?php if (!isset($filter['values'])) : ?>
+                                    <input type="checkbox" name="show[<?php echo $filter['name']; ?>]" value="1"
+                                        <?php if (!isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]) && sizeof($this->settings['name'])): ?>
+                                            checked
+                                        <?php endif; ?>
+                                    />
+                                <?php else : ?>
+                                    <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
+                                        <?php if (is_array($this->settings[$filter['name']]) && !empty($this->settings[$filter['name']])) : ?>
+                                            checked
+                                        <?php endif; ?>
+                                    />
 
-        <?php foreach ($this->filters as $filterId => $filter) : ?>
-            <?php $show = !isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]); ?>
-            <li data-attributeId="<?php echo $filterId; ?>">
-                <label class="filter-label">
-                    <input type="hidden" name="show[<?php echo $filter['name']; ?>]" value="none" />
-                    <?php if (!isset($filter['values'])) : ?>
-                        <input type="checkbox" name="show[<?php echo $filter['name']; ?>]" value="1"
-                            <?php if (!isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]) && sizeof($this->settings['name'])): ?>
-                                checked
-                            <?php endif; ?>
-                            />
-                    <?php else : ?>
-                        <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
-                            <?php if (is_array($this->settings[$filter['name']]) && !empty($this->settings[$filter['name']])) : ?>
-                                checked
-                            <?php endif; ?>
-                            />
-
-                    <?php endif; ?>
-                    <?php echo $filter['label']; ?>
-                </label>
-                <?php if (!empty($filter['values'])) : ?>
-                    <?php if (sizeof($filter['values']) > 10) : ?>
-                        <span title="<?php echo $this->translate('show/hide nested elements'); ?>"
-                              class="toggle-nested">&#177;</span>
-                    <?php endif; ?>
-                    <ul <?php if (!$show) { ?>style="display: none"<?php } ?> >
-
-                        <?php foreach ($filter['values'] as $value => $count) : ?>
-                        <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
-                            <?php if(!empty($value)) :?>
-                                <li>
-                                    <label>
-                                        <input type="checkbox"
-                                               name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
-                                               value="1"
-                                               title="<?php echo $this->translate('Check to hide from users'); ?>"
-                                            <?php if (!isset($this->settings[$filter['name']]) ||
-                                                (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
-                                                checked
-                                            <?php endif; ?>
-                                            />
-                                        <?php
-                                        echo $value;
-                                        ?></label>
-                                </li>
+                                <?php endif; ?>
+                                <?php echo $filter['label']; ?>
+                            </label>
+                            <?php if(!empty($this->usesort)) :?>
+                                <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter filter position number'); ?>" type="text" placeholder="<?php echo $this->translate('Enter filter position number'); ?>" name="useSortData[<?php echo $filter['name']; ?>]" value="<?php echo $sortKey;?>" />
                             <?php endif;?>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php endif; ?>
-            </li>
-        <?php endforeach; ?>
+                            <?php if (!empty($filter['values'])) : ?>
+                                <?php if (sizeof($filter['values']) > 10) : ?>
+                                    <span title="<?php echo $this->translate('show/hide nested elements'); ?>"
+                                          class="toggle-nested">&#177;</span>
+                                <?php endif; ?>
+                                <ul class="grid_12 alpha omega" <?php if (!$show) { ?>style="display: none"<?php } ?> >
+                                    <?php foreach ($filter['values'] as $value => $count) : ?>
+                                        <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
+                                        <?php if(!empty($value)) :?>
+                                            <li>
+                                                <label>
+                                                    <input type="checkbox"
+                                                           name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
+                                                           value="1"
+                                                           title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                                        <?php if (!isset($this->settings[$filter['name']]) ||
+                                                            (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
+                                                            checked
+                                                        <?php endif; ?>
+                                                    />
+                                                    <?php
+                                                    echo $value;
+                                                    ?></label>
+                                            </li>
+                                        <?php endif;?>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                        </li>
+                    <?php endif;?>
+                <?php endforeach; ?>
+            <?php endforeach;?>
+        <?php else:?>
+            <?php foreach ($this->filters as $filterId => $filter) : ?>
+                <?php $show = !isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]); ?>
+                <li data-attributeId="<?php echo $filterId; ?>">
+                    <label class="filter-label">
+                        <input type="hidden" name="show[<?php echo $filter['name']; ?>]" value="none" />
+                        <?php if (!isset($filter['values'])) : ?>
+                            <input type="checkbox" name="show[<?php echo $filter['name']; ?>]" value="1"
+                                <?php if (!isset($this->settings[$filter['name']]) || !empty($this->settings[$filter['name']]) && sizeof($this->settings['name'])): ?>
+                                    checked
+                                <?php endif; ?>
+                            />
+                        <?php else : ?>
+                            <input type="checkbox" class="mass-change" title="<?php echo $this->translate('toggle all'); ?>"
+                                <?php if (is_array($this->settings[$filter['name']]) && !empty($this->settings[$filter['name']])) : ?>
+                                    checked
+                                <?php endif; ?>
+                            />
+
+                        <?php endif; ?>
+                        <?php echo $filter['label']; ?>
+                    </label>
+                    <?php if (!empty($filter['values'])) : ?>
+                        <?php if (sizeof($filter['values']) > 10) : ?>
+                            <span title="<?php echo $this->translate('show/hide nested elements'); ?>"
+                                  class="toggle-nested">&#177;</span>
+                        <?php endif; ?>
+                        <ul <?php if (!$show) { ?>style="display: none"<?php } ?> >
+
+                            <?php foreach ($filter['values'] as $value => $count) : ?>
+                                <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
+                                <?php if(!empty($value)) :?>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox"
+                                                   name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
+                                                   value="1"
+                                                   title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                                <?php if (!isset($this->settings[$filter['name']]) ||
+                                                    (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
+                                                    checked
+                                                <?php endif; ?>
+                                            />
+                                            <?php
+                                            echo $value;
+                                            ?></label>
+                                    </li>
+                                <?php endif;?>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        <?php endif;?>
     </ul>
     <div class="footer">
         <p class="msg"><?php echo $this->translate('Log out from your admin account in order to view final navigation layer.'); ?></p>

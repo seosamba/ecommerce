@@ -331,7 +331,7 @@
         'Code'=>'Code',
         'Enter coupon code'=>'Entrez le code promo',
         'new]'=>'nouveau]',
-        'From'=>'À partir de',
+        'From'=>'De',
         'to'=>'à',
         'Allow in combination with other coupons'=>'Authoriser l\'utilisation en combinaison avec d&rsquo;autres coupons',
         'One use per client'=>'Une utilisation par client',
@@ -591,8 +591,8 @@
         'shipping country' => 'Pays de destination',
         'shipping state' => 'Etat de destination',
         'shipping carrier' => 'Livreur',
-        'from' => 'De',
-        'to' =>'A',
+        'from' => 'de',
+        'To' =>'À',
         'by order ID'=>'par numéro de commande',
         'Order #' => 'N ° de commande',
         'by product name, SKU, MPN' =>  'par nom de produit, MPN, SKU',
@@ -823,5 +823,6 @@
         'Added to Wishlist' => 'Ajouté à la liste de souhaits',
         'Product already added to Wishlist' => 'Le produit est déjà ajouté à la liste de souhaits',
         'Can\'t add product to Wishlist! Please re-login into system.' => 'Impossible d\'ajouter à la liste de souhaits! Veuillez vous reconnecter au système.',
-        'Remove wished product' => 'Supprimer le produit souhaité'
+        'Remove wished product' => 'Supprimer le produit souhaité',
+        'Enter filter position number' => 'Ajouter numéro du filtre'
 );?>

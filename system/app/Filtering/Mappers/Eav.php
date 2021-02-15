@@ -282,6 +282,7 @@ class Filtering_Mappers_Eav
             )
             ->from(array('t' => 'shopping_product_has_tag'), null)
             ->where('p.id = t.product_id')
+            ->where('p.enabled = ?', '1')
             ->where('t.tag_id IN (?)', $productTags);
 
         $result = $dbAdapter->fetchRow($select);
