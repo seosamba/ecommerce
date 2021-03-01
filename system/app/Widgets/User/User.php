@@ -125,6 +125,9 @@ class Widgets_User_User extends Widgets_User_Base {
             'delivered' => sizeof(array_filter($orders, function ($order) {
                 return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
             })),
+            'partial' => sizeof(array_filter($orders, function ($order) {
+                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL;
+            })),
             'quote_sent' => sizeof(array_filter($orders, function ($order) {
                 return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote');
             })),
