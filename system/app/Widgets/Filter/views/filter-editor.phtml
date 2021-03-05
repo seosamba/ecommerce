@@ -165,7 +165,7 @@
                     <?php $gridUseSort = '';?>
                     <?php if(!empty($this->usesort)) :?>
                         <?php $gridUseSort = 'grid_12 alpha omega';?>
-                        <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter filter position number'); ?>" type="text" placeholder="<?php echo $this->translate('Enter filter position number'); ?>" name="useSortData[<?php echo $filter['name']; ?>]" value="<?php echo $sortKey;?>" />
+                        <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter filter position number'); ?>" type="text" placeholder="<?php echo $this->translate('Enter filter position number'); ?>" name="useSortData[<?php echo $filter['name']; ?>]" value="" />
                     <?php endif;?>
                     <?php if (!empty($filter['values'])) : ?>
                         <?php if (sizeof($filter['values']) > 10) : ?>
