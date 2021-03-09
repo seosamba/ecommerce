@@ -137,6 +137,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $orderSubtypes = $ordersMapper->getUniqueSubtypes();
             $orderSubtypes = array_filter($orderSubtypes);
             $this->_view->orderSubtypes = $orderSubtypes;
+
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            $this->_view->shoppingConfig = $shoppingConfig;
+
 			return $this->_view->render('orders.phtml');
 		}
 	}

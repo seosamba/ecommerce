@@ -74,7 +74,7 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
 
     public function fetchAssocAll(){
         $dbTable = new Store_DbTable_Group();
-        $select = $dbTable->select()->from('shopping_group', array('id', 'groupName', 'priceSign', 'priceType', 'priceValue'));
+        $select = $dbTable->select()->from('shopping_group', array('id', 'groupName', 'priceSign', 'priceType', 'priceValue', 'nonTaxable'));
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 

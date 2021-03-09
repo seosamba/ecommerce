@@ -166,6 +166,7 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
                     }
                     $this->_view->useBtn = $useBtn;
                     $this->_view->btnName = $btnOptionName;
+                    $this->_view->translator = $translator;
 
                     return $this->_view->render('remove-product.phtml');
                 }

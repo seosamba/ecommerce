@@ -68,6 +68,7 @@ Plugin widgets.
     order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
     unwrap - remowed the <div class="product-list"></div> HTML element
+    userorderselect, userorderradio, userorderarrow - add select, radio or arrow style ordering to the productlist
     5 - add limit for productlist, where 5 is count of products limit. By default is 50 (must be last option in "product list" widget)
     additionalfilters-somename,somename2,.. - Special filter for {$filter... widget where somename* is unique filter name
 3. Store widgets:
@@ -123,6 +124,7 @@ Plugin widgets.
     {$postpurchase:quotenote} -> show quote disclaimer.
     {$postpurchase:isGift:some text here} -> Is a gift message will be returned
     {$postpurchase:giftEmail} -> return receiver gift email
+    {$postpurchase:outstandingamount[:clean]} -> outstanding amount
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -170,6 +172,9 @@ Plugin widgets.
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:producturl} -> product url
     {$postpurchase:cartitem:brand} -> product brand
+    {$postpurchase:cartitem:partialamount[:clean]} -> partial amount
+    {$postpurchase:cartitem:partialpercentage} -> partial percentage
+
 
 Magic spaces:
     MAGICSPACE: freebies
@@ -199,12 +204,13 @@ Magic spaces:
 
 
 9. Product filters widget:
-{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft]]]}
+{$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft[:allitems[:usesort]]]]]}
  tagnames-tag1,tag2,...,tagN - filtering by product tags
  brands-brand1,brand2,...,brandN - filtering by product brands
  order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
+ usesort - enable the ability to sort custom filters list
 
 10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}

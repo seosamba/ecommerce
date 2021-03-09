@@ -79,6 +79,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_customParams = '';
 
+    protected $_minimumOrder = 0;
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -735,6 +737,25 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
     public function setCustomParams($customParams)
     {
         $this->_customParams = $customParams;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMinimumOrder()
+    {
+        return $this->_minimumOrder;
+    }
+
+    /**
+     * @param string $minimumOrder
+     * @return string
+     */
+    public function setMinimumOrder($minimumOrder)
+    {
+        $this->_minimumOrder = $minimumOrder;
 
         return $this;
     }

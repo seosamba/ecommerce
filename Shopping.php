@@ -176,9 +176,10 @@ class Shopping extends Tools_Plugins_Abstract {
 		Tools_Security_Acl::ROLE_GUEST      => array()
 	);
 
-	public static $emailTriggers = array(
-		'Tools_StoreMailWatchdog'
-	);
+    /**
+     * @var null|Zend_Layout
+     */
+    protected $_layout = null;
 
 	public function  __construct($options, $seotoasterData) {
 		parent::__construct($options, $seotoasterData);
@@ -946,10 +947,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $price = $this->_request->getParam('price');
         $sort = $this->_request->getParam('sort');
         $offset = intval($nextPage) * $limit;
+        $useUserOrder = filter_var($this->_request->getParam('useUserOrder'), FILTER_VALIDATE_BOOLEAN);
 
         $productMapper = Models_Mapper_ProductMapper::getInstance();
-
-        if (empty($dragListId)) {
+        if (empty($dragListId) || $useUserOrder) {
             $products = $productMapper->fetchAll("p.enabled='1'", $order, $offset, $limit,
                 null, $tags, $brands, false, false, $attributes, $price, $sort);
         } else {
@@ -1025,8 +1026,10 @@ class Shopping extends Tools_Plugins_Abstract {
 
         if (!empty($products)) {
 			$template = $this->_request->getParam('template');
-			if (!empty($productsListDataResult)) {
+            if (!empty($productsListDataResult)) {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), Widgets_Productlist_Productlist::OPTION_DRAGGABLE));
+            } elseif ($useUserOrder) {
+                $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable, Widgets_Productlist_Productlist::OPTION_USER_ORDER));
             } else {
                 $widget = Tools_Factory_WidgetFactory::createWidget('productlist', array($template, $offset + $limit, md5(filter_var($this->_request->getParam('pageId'), FILTER_SANITIZE_NUMBER_INT) . $tagsPart), $filterable));
             }
@@ -1105,7 +1108,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->customerAttributes = $customerAttributes;
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
             $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
-			return $this->_view->render('clients.phtml');
+
+            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+            $currency = Zend_Registry::get('Zend_Currency');
+            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+
+            return $this->_view->render('clients.phtml');
 		}
 	}
 
@@ -1119,6 +1128,14 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
+            $productsData = Models_Mapper_ProductMapper::getInstance()->getProductsInventory();
+
+            if(!empty($productsData['inventory'])){
+                $inventory =  explode(',' , $productsData['inventory']);
+                sort($inventory, SORT_NUMERIC);
+                $this->_view->inventory = $inventory;
+            }
+
 			return $this->_view->render('manage_products.phtml');
 		}
 	}
@@ -1206,6 +1223,10 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
         $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
+        $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+        $currency = Zend_Registry::get('Zend_Currency');
+        $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -1216,6 +1237,29 @@ class Shopping extends Tools_Plugins_Abstract {
 			echo $this->_layout->render();
 		}
 	}
+
+	public function changeOrderStatusAction()
+    {
+        if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            throw new Exceptions_SeotoasterPluginException('Not allowed action');
+        }
+        $tokenToValidate = $this->_request->getParam('secureToken', false);
+        $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+        if (!$valid) {
+            exit;
+        }
+
+        $orderId = $this->_request->getParam('orderId', false);
+        if ($orderId) {
+            $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
+            if ($order instanceof Models_Model_CartSession) {
+                $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
+                Models_Mapper_CartSessionMapper::getInstance()->save($order);
+                $this->_responseHelper->success( $this->_translator->translate('Status has been changed'));
+            }
+        }
+
+    }
 
 	public function orderAction() {
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
@@ -1300,7 +1344,13 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
+            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
+
+            $currency = Zend_Registry::get('Zend_Currency');
+            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+
 			$this->_layout->content = $this->_view->render('order.phtml');
+
 			echo $this->_layout->render();
 		}
 	}
@@ -1476,9 +1526,11 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 
-			$cartSession->registerObserver(new Tools_Mail_Watchdog(array(
-				'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
-			)));
+            if ($cartSession->getStatus() !== Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_NEW_ORDER
+                )));
+            }
 
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -1489,9 +1541,19 @@ class Shopping extends Tools_Plugins_Abstract {
                     )));
                 }
             }
-            if (class_exists('Tools_AppsServiceWatchdog')) {
-                $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+
+            if ($cartSession->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                    'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT
+                )));
             }
+
+            if ($cartSession->getStatus() !== Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                if (class_exists('Tools_AppsServiceWatchdog')) {
+                    $cartSession->registerObserver(new Tools_AppsServiceWatchdog());
+                }
+            }
+
 			$cartSession->notifyObservers();
 		}
 
@@ -3143,6 +3205,53 @@ class Shopping extends Tools_Plugins_Abstract {
         } else {
             $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
         }
+    }
+
+
+    public function sendPaymentInfoEmailAction()
+    {
+        if ($this->_request->isPost()) {
+            $currentUser = $this->_sessionHelper->getCurrentUser();
+            $currentUserRole = $currentUser->getRoleId();
+
+            if ($currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN || $currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Shopping::ROLE_SALESPERSON) {
+                $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+                $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+                if (!$tokenValid) {
+                    $this->_responseHelper->fail($this->_translator->translate('Can\'t generate label'));
+                }
+
+                $paymentInfoMessage = $this->_request->getParam('sendPaymentRequestMessage');
+                $orderId = $this->_request->getParam('orderId');
+                $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                $cartSessionModel = $cartSessionMapper->find($orderId);
+                $partialNotificationMapper = Store_Mapper_PartialNotificationLogMapper::getInstance();
+                if ($cartSessionModel instanceof Models_Model_CartSession) {
+                    $partialNotificationLogModel = $partialNotificationMapper->findByCartId($orderId);
+                    if (!$partialNotificationLogModel instanceof Store_Model_PartialNotificationLog) {
+                        $partialNotificationLogModel = new Store_Model_PartialNotificationLog();
+                    }
+                    $cartSession = $cartSessionMapper->find($orderId);
+                    $cartSession->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION,
+                        'customInfoMessage' => $paymentInfoMessage
+                    )));
+
+                    $cartSession->notifyObservers();
+
+                    $partialNotificationLogModel->setCartId($orderId);
+                    $partialNotificationLogModel->setNotifiedAt(date(Tools_System_Tools::DATE_MYSQL));
+                    $partialNotificationMapper->save($partialNotificationLogModel);
+
+                }
+
+                $this->_responseHelper->success($this->_translator->translate('Payment request has been sent'));
+
+            }
+
+            $this->_responseHelper->fail('');
+        }
+
     }
 
 

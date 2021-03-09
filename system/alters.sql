@@ -596,6 +596,61 @@ ALTER TABLE `shopping_draggable` ADD COLUMN `user_id` int(10) unsigned NOT NULL;
 ALTER TABLE `shopping_draggable` ADD COLUMN `ip_address` VARCHAR(45) NOT NULL;
 ALTER TABLE `shopping_draggable` ADD COLUMN `page_id` int(10) unsigned DEFAULT NULL;
 
+-- 01/09/2020
+-- version: 2.7.9
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('usNumericFormat', '0');
+
+-- 29/10/2020
+-- version: 2.8.0
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('minimumOrder', '0');
+ALTER TABLE `shopping_product` ADD COLUMN `minimum_order` int(3) unsigned DEFAULT '0';
+
+-- 26/12/2018
+-- version: 2.8.1
+-- Add textarea option
+ALTER TABLE `shopping_product_option`
+CHANGE `type` `type` enum('dropdown','radio','text','date','file','textarea') COLLATE 'utf8_unicode_ci' NOT NULL AFTER `title`;
+
+-- 18/08/2020
+-- version: 2.8.2
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_percentage` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `is_partial` ENUM('0', '1') DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_purchased_on` timestamp NULL;
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_partialpayment'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpayment' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_partialpaymentnotif'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentnotif' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
+  `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `cart_id` INT(10) UNSIGNED NOT NULL,
+  `notified_at` TIMESTAMP NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 07/10/2020
+-- version: 2.8.3
+-- Add new prefix column
+ALTER TABLE `shopping_customer_address` ADD COLUMN `position` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+
+-- 15/12/2020
+-- version: 2.8.4
+-- Add partial payment action email notification
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_partialpaymentsecond'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentsecond' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.7.9' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.5' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

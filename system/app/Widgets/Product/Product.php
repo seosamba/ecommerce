@@ -326,10 +326,21 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        $lifeReload = false;    // life reload is not allowed
         }
 
+        $usNumericFormat = self::$_shoppingConfig['usNumericFormat'];
+
 		if(!$noCurrency) {
-			$price = $this->_currency->toCurrency($price);
+		    if(!empty($usNumericFormat)) {
+                $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
+                $price = number_format($price, 2) . ' ' . $currencySymbol;
+            } else {
+                $price = $this->_currency->toCurrency($price);
+            }
 		} else {
-			$price = number_format(round($price, 2), 2, '.', '');
+            if(!empty($usNumericFormat)) {
+                $price = number_format(round($price, 2), 2);
+            } else {
+                $price = number_format(round($price, 2), 2, '.', '');
+            }
 		}
 
         if($lifeReload){

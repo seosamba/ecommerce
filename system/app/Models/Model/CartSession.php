@@ -47,6 +47,12 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 	 */
 	const CART_STATUS_REFUNDED      = 'refunded';
 
+    /**
+     * Order partially paid
+     */
+	const CART_STATUS_PARTIAL = 'partial';
+
+
 	protected $_cartContent = null;
 
 	protected $_ipAddress   = '';
@@ -123,6 +129,14 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_giftEmail = '';
 
     protected $_orderSubtype = '';
+
+    protected $_partialPercentage = '';
+
+    protected $_isPartial = '';
+
+    protected $_partialPaidAmount = '';
+
+    protected $_partialPurchasedOn = null;
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -593,6 +607,81 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getPartialPercentage()
+    {
+        return $this->_partialPercentage;
+    }
+
+    /**
+     * @param string $partialPercentage
+     * @return string
+     */
+    public function setPartialPercentage($partialPercentage)
+    {
+        $this->_partialPercentage = $partialPercentage;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsPartial()
+    {
+        return $this->_isPartial;
+    }
+
+    /**
+     * @param string $isPartial
+     * @return string
+     */
+    public function setIsPartial($isPartial)
+    {
+        $this->_isPartial = $isPartial;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPartialPaidAmount()
+    {
+        return $this->_partialPaidAmount;
+    }
+
+    /**
+     * @param string $partialPaidAmount
+     * @return string
+     */
+    public function setPartialPaidAmount($partialPaidAmount)
+    {
+        $this->_partialPaidAmount = $partialPaidAmount;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPartialPurchasedOn()
+    {
+        return $this->_partialPurchasedOn;
+    }
+
+    /**
+     * @param null $partialPurchasedOn
+     * @return null
+     */
+    public function setPartialPurchasedOn($partialPurchasedOn)
+    {
+        $this->_partialPurchasedOn = $partialPurchasedOn;
+
+        return $this;
+    }
 
 
 }

@@ -341,6 +341,14 @@
                 <span><?php echo $this->translate('Total'); ?>:</span>
                 <span><?php echo $this->currency($this->cart->getTotal()); ?></span>
             </div>
+            <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+                <div class="post-purchase-row partially-paid-total">
+                    <span><?php echo $this->translate('Deposit received');?>: </span>
+                    <span><?php echo $this->currency($this->cart->getPartialPaidAmount());?></span>
+                    <span><?php echo $this->translate('Outstanding amount');?>: </span>
+                    <span><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></span>
+                </div>
+            <?php endif;?>
         </div>
     </div>
 
@@ -701,6 +709,16 @@
                         <td align="left"><?php echo $this->translate('Total'); ?> :</td>
                         <td align="right"><?php echo $this->currency($this->cart->getTotal()); ?></td>
                     </tr>
+                    <?php if($this->cart->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+                        <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
+                             <td align="left"><?php echo $this->translate('Deposit received');?>: </td>
+                             <td align="right"><?php echo $this->currency($this->cart->getPartialPaidAmount());?></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd; color: #444444; font-family: arial;">
+                            <td align="left"><?php echo $this->translate('Outstanding amount');?>: </td>
+                            <td align="right"><?php echo $this->currency($this->cart->getTotal() - $this->cart->getPartialPaidAmount());?></td>
+                        </tr>
+                    <?php endif;?>
                     </tbody>
                 </table>
             </td>

@@ -30,8 +30,10 @@ define(['backbone', '../models/order', 'backbone.paginator'],
                     this.totalRecords = response.length;
                 }
                 this.moneyFormat = response.moneyFormat;
+                this.usNumericFormat = response.usNumericFormat;
                 this.shippingTaxRate = response.shippingTaxRate;
                 this.realRefundByDefault = response.realRefundByDefault;
+                this.sendPaymentInfoDefaultText = response.sendPaymentInfoDefaultText;
                 this.defaultTaxes = response.defaultTaxes;
                 this.totalPages = Math.floor(this.totalRecords / this.perPage);
                 return this.server_api.count ? response.data : response;

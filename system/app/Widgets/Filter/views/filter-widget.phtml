@@ -28,69 +28,135 @@
             <?php echo $this->partial('_range-slider.phtml', $this->productPriceRange); ?>
         </li>
     <?php endif;?>
-    <?php foreach ($this->filters as $filter) : ?>
-        <li class="filter-<?php echo filter_var($filter['label'], FILTER_SANITIZE_STRING); ?>">
-            <p class="filter-header"><?php echo $filter['label']; ?></p>
-        <?php if (!isset($filter['values'])) : ?>
-            <?php echo $this->partial('_range-slider.phtml', $filter); ?>
-        <?php else : ?>
-            <ul class="filter_attr_<?php echo filter_var(preg_replace("/[^A-Za-z0-9]/", '_',$filter['label']), FILTER_SANITIZE_STRING); ?>">
-                <?php
-                $others = array();
-                ksort($filter['values']);
-                foreach ($filter['values'] as $value => $count) : ?>
-                    <?php if (!$this->showAllItems && intval($count) === 1) {
-                        array_push($others, $value);
-                        continue;
-                    }
-                    ?>
-                    <?php $checked = in_array($value, $filter['checked']); ?>
-                    <li>
-                        <label>
-                            <input type="checkbox"
-                                   name="<?php echo $filter['name']; ?>"
-                                   value="<?php echo $value; ?>"
-                                   <?php if ($checked) { ?> checked <?php }; ?>
-                                />
-                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
-                                <?php echo $value . '&nbsp;[' . $count . ']'; ?>
-                            </a>
-                        </label>
-                    </li>
-                <?php endforeach; ?>
-                <?php if (!empty($others) && !$this->showAllItems) : ?>
-                    <?php
-                    Zend_Controller_Action_HelperBroker::getExistingHelper('cache')->save(
-                        md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $filter['name']),
-                        $others,
-                        '',
-                        array(),
-                        Helpers_Action_Cache::CACHE_LONG
-                    );
-                    ?>
-                    <li>
-                        <label>
-                            <input type="checkbox"
-                                   name="<?php echo $filter['name']; ?>"
-                                   value="<?php echo Widgets_Filter_Filter::FILTER_OTHERS; ?>"
-                                   <?php if (!empty($this->appliedFilters[$filter['name']])
-                                   && in_array(Widgets_Filter_Filter::FILTER_OTHERS, $this->appliedFilters[$filter['name']])) { ?>
-                                   checked
-                                   <?php }; ?>
-                                />
-                            <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
-                                <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
-                            </a>
-                        </label>
-                    </li>
-                <?php endif; ?>
-            </ul>
-        <?php endif; ?>
-        </li>
-    <?php endforeach; ?>
+        <?php if(!empty($this->usesort) && !empty($this->usesortData)) :?>
+            <?php foreach ($this->usesortData as $param => $sortKey) :?>
+                <?php foreach ($this->filters as $filter) : ?>
+                    <?php if($param == $filter['name']) :?>
+                        <li class="filter-<?php echo filter_var($filter['label'], FILTER_SANITIZE_STRING); ?>">
+                            <p class="filter-header"><?php echo $filter['label']; ?></p>
+                            <?php if (!isset($filter['values'])) : ?>
+                                <?php echo $this->partial('_range-slider.phtml', $filter); ?>
+                            <?php else : ?>
+                                <ul>
+                                    <?php
+                                    $others = array();
+                                    ksort($filter['values']);
+                                    foreach ($filter['values'] as $value => $count) : ?>
+                                        <?php if (!$this->showAllItems && intval($count) === 1) {
+                                            array_push($others, $value);
+                                            continue;
+                                        }
+                                        ?>
+                                        <?php $checked = in_array($value, $filter['checked']); ?>
+                                        <li>
+                                            <label>
+                                                <input type="checkbox"
+                                                       name="<?php echo $filter['name']; ?>"
+                                                       value="<?php echo $value; ?>"
+                                                    <?php if ($checked) { ?> checked <?php }; ?>
+                                                />
+                                                <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
+                                                    <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                                </a>
+                                            </label>
+                                        </li>
+                                    <?php endforeach; ?>
+                                    <?php if (!empty($others) && !$this->showAllItems) : ?>
+                                        <?php
+                                        Zend_Controller_Action_HelperBroker::getExistingHelper('cache')->save(
+                                            md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $filter['name']),
+                                            $others,
+                                            '',
+                                            array(),
+                                            Helpers_Action_Cache::CACHE_LONG
+                                        );
+                                        ?>
+                                        <li>
+                                            <label>
+                                                <input type="checkbox"
+                                                       name="<?php echo $filter['name']; ?>"
+                                                       value="<?php echo Widgets_Filter_Filter::FILTER_OTHERS; ?>"
+                                                    <?php if (!empty($this->appliedFilters[$filter['name']])
+                                                        && in_array(Widgets_Filter_Filter::FILTER_OTHERS, $this->appliedFilters[$filter['name']])) { ?>
+                                                        checked
+                                                    <?php }; ?>
+                                                />
+                                                <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
+                                                    <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                                </a>
+                                            </label>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            <?php endif; ?>
+                        </li>
+                    <?php endif;?>
+                <?php endforeach;?>
+            <?php endforeach;?>
+        <?php else:?>
+            <?php foreach ($this->filters as $filter) : ?>
+                <li class="filter-<?php echo filter_var($filter['label'], FILTER_SANITIZE_STRING); ?>">
+                    <p class="filter-header"><?php echo $filter['label']; ?></p>
+                    <?php if (!isset($filter['values'])) : ?>
+                        <?php echo $this->partial('_range-slider.phtml', $filter); ?>
+                    <?php else : ?>
+                        <ul>
+                            <?php
+                            $others = array();
+                            ksort($filter['values']);
+                            foreach ($filter['values'] as $value => $count) : ?>
+                                <?php if (!$this->showAllItems && intval($count) === 1) {
+                                    array_push($others, $value);
+                                    continue;
+                                }
+                                ?>
+                                <?php $checked = in_array($value, $filter['checked']); ?>
+                                <li>
+                                    <label>
+                                        <input type="checkbox"
+                                               name="<?php echo $filter['name']; ?>"
+                                               value="<?php echo $value; ?>"
+                                            <?php if ($checked) { ?> checked <?php }; ?>
+                                        />
+                                        <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
+                                            <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                        </a>
+                                    </label>
+                                </li>
+                            <?php endforeach; ?>
+                            <?php if (!empty($others) && !$this->showAllItems) : ?>
+                                <?php
+                                Zend_Controller_Action_HelperBroker::getExistingHelper('cache')->save(
+                                    md5(Widgets_Filter_Filter::CACHE_KEY_OTHERS_ARRAY . $filter['name']),
+                                    $others,
+                                    '',
+                                    array(),
+                                    Helpers_Action_Cache::CACHE_LONG
+                                ); ?>
+                                <li>
+                                    <label>
+                                        <input type="checkbox"
+                                               name="<?php echo $filter['name']; ?>"
+                                               value="<?php echo Widgets_Filter_Filter::FILTER_OTHERS; ?>"
+                                            <?php if (!empty($this->appliedFilters[$filter['name']])
+                                                && in_array(Widgets_Filter_Filter::FILTER_OTHERS, $this->appliedFilters[$filter['name']])) { ?>
+                                                checked
+                                            <?php }; ?>
+                                        />
+                                        <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
+                                            <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                        </a>
+                                    </label>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        <?php endif;?>
     </ul>
     <a class="reset" href="<?php echo $this->url(); ?>"><?php echo $this->translate('Reset filters'); ?></a>
-    <button class="btn" type="submit"><?php echo $this->translate('Apply filters');?></button>
+    <button class="btn apply-filters" type="submit"><?php echo $this->translate('Apply filters');?></button>
 </form>
 <script>
     $(function () {

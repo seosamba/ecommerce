@@ -1,59 +1,199 @@
 <?php $id = uniqid('pl-'); ?>
+<?php if (!empty($this->userOrderOptions) && empty($this->isPreview)): ?>
+    <?php if ($this->sortingStyle === Widgets_Productlist_Productlist::SORTING_STYLE_SELECT): ?>
+        <select class="product-list-sorting-select-list" id="user_order_<?php echo $id; ?>" name="select-order-<?php echo $id; ?>">
+            <?php foreach ($this->userOrderOptions as $option => $data) : ?>
+                <?php $selected = ''; ?>
+
+                <?php if ($data['selected']) : ?>
+                    <?php $selected = 'selected="selected"'; ?>
+                <?php endif; ?>
+                <option value="<?php echo $option; ?>" <?php echo $selected; ?>><?php echo $data['title']; ?></option>
+            <?php endforeach; ?>
+        </select>
+    <?php elseif ($this->sortingStyle === Widgets_Productlist_Productlist::SORTING_STYLE_RADIO): ?>
+        <ul class="product-list-sorting-radio-list">
+            <?php foreach ($this->userOrderOptions as $option => $data) : ?>
+                <li>
+                    <input type="radio" id="<?php echo $option . '_' . $id; ?>" name="radio-order-<?php echo $id; ?>"
+                           value="<?php echo $option; ?>" <?php echo($data['selected'] ? 'checked' : ''); ?>>
+                    <label for="<?php echo $option . '_' . $id; ?>"><?php echo $data['title']; ?></label>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php elseif ($this->sortingStyle === Widgets_Productlist_Productlist::SORTING_STYLE_ARROW): ?>
+        <ul id="arrow_order_<?php echo $id; ?>" class="sort-list">
+            <?php foreach ($this->userOrderOptions as $option => $data) : ?>
+              <?php if ($data['selected'] && strpos($option, Zend_Db_Select::SQL_ASC)): ?>
+                <li class="icon-arrow-up2 sorting-active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
+                <?php elseif ($data['selected'] && strpos($option, Zend_Db_Select::SQL_DESC)): ?>
+                    <li class="icon-arrow-down2 sorting-active" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
+                <?php else: ?>
+                    <li class="<?php echo($data['selected'] ? 'sorting-active' : ''); ?>" data-order="<?php echo $option; ?>"><?php echo $data['title']; ?><li>
+               <?php endif; ?>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+<?php endif; ?>
 <?php if(empty($this->unwrap)): ?>
     <div class="product-list">
 <?php endif;?>
-        <?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-            <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop');?></a>
-        <?php endif;?>
+        <?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)): ?>
+            <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop'); ?></a>
+        <?php endif; ?>
         <?php echo $this->plContent; ?>
+        <input type="hidden" name="<?php echo $id; ?>_filters"
+               data-filters-default='<?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>'>
         <?php if ($this->totalCount >= $this->limit): ?>
-        <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
+            <a href="#<?php echo $id; ?>" class="show-more" id="<?php echo $id; ?>"
+               data-sort="<?php echo $this->sort; ?>"><?php echo $this->translate('show more'); ?></a>
         <?php endif; ?>
 <?php if(empty($this->unwrap)): ?>
     </div>
 <?php endif;?>
 <script type="application/javascript">
-    $(function() {
+    $(function () {
         $('.backToOriginal').on('click', function (e) {
             e.preventDefault();
             var pathName = window.location.pathname;
             window.location.href = '<?php echo rtrim($this->websiteUrl, '/'); ?>' + pathName;
         });
+        <?php if(!empty($this->filterable) && !empty($this->userOrderOptions)): ?>
+          var filterForm = $('form.filtering-form');
+        if ($(filterForm).is('form')) {
+            $(filterForm).append('<input type="hidden" name="userOrder" value=""/>');
+        }
+        <?php endif;?>
+        $('#user_order_<?php echo $id; ?>').on('change', function (e) {
+            applyUserOrder(this);
+        });
+        $('input[name="radio-order-<?php echo $id;?>"]').on('change', function (e) {
+            applyUserOrder(this);
+        });
+        $('#arrow_order_<?php echo $id; ?> li').on('click', function (e) {
+            var orderBy = $(this).data('order') === 'default' ? 'default' : $(this).data('order').split('_')[0],
+                direction = $(this).data('order') === 'default' ? '' : $(this).data('order').split('_')[1];
+            if (!$(this).hasClass('sorting-active')) {
+                direction = '<?php echo Zend_Db_Select::SQL_ASC; ?>';
+                $(this).data('order', [orderBy, direction].join('_'));
+            }
+            $('#arrow_order_<?php echo $id; ?> li').removeClass('sorting-active');
+            $('#arrow_order_<?php echo $id; ?> li').removeClass('icon-arrow-down2');
+            $('#arrow_order_<?php echo $id; ?> li').removeClass('icon-arrow-up2');
+            $(this).addClass('sorting-active');
+            direction = direction === '<?php echo Zend_Db_Select::SQL_ASC; ?>' ? '<?php echo Zend_Db_Select::SQL_DESC; ?>' : '<?php echo Zend_Db_Select::SQL_ASC; ?>';
+            if (orderBy != 'default') {
+                if (direction === '<?php echo Zend_Db_Select::SQL_DESC; ?>') {
+                    $(this).addClass('icon-arrow-down2');
+                } else if (direction === '<?php echo Zend_Db_Select::SQL_ASC; ?>') {
+                    $(this).addClass('icon-arrow-up2');
+                }
+            }
+            <?php if(!empty($this->filterable)): ?>
+            if (orderBy === 'default') {
+                $('input[name="userOrder"]').val(orderBy);
+            } else {
+                $(this).data('order', [orderBy, direction].join('_'));
+                $('input[name="userOrder"]').val($(this).data('order'));
+            }
+            $('.apply-filters').trigger('click');
+            <?php else:?>
+            if (orderBy === 'default') {
+                changeOrder(orderBy);
+            } else {
+                $(this).data('order', [orderBy, direction].join('_'));
+                changeOrder($(this).data('order'));
+            }
+            <?php endif;?>
+        });
+        function applyUserOrder(el){
+            <?php if(!empty($this->filterable)): ?>
+                $('input[name="userOrder"]').val($(el).val());
+                $('.apply-filters').trigger('click');
+            <?php else:?>
+                changeOrder($(el).val());
+            <?php endif;?>
+        }
+        function changeOrder (userOrder) {
+            $('input[name="<?php echo $id;?>_filters"]').nextAll('span').remove();
+            $('input[name="<?php echo $id;?>_filters"]').prevAll('div.product-item').remove();
+            var filters = $.extend({
+                        pageId: '<?php echo $this->pageId; ?>',
+                        template: '<?php echo $this->productTemplate; ?>',
+                        nextpage: 0,
+                        limit: '<?php echo $this->limit; ?>',
+                        sort: userOrder !== 'default' ? userOrder.split('_')[1] : $('#<?php echo $id; ?>').data('sort')
+                    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
+                    <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
+                    <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
+                    <?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId) : array());?>,
+                    <?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable) : array());?>);
+            showSpinner();
+            if (userOrder !== 'default') {
+                filters.order = [];
+                filters.order.push(userOrder.split('_')[0] != 'date' ? 'p.' + userOrder.split('_')[0] : 'p.created_at');
+                filters.useUserOrder = true;
+            }
+            $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function (response) {
+                hideSpinner();
+                if (response) {
+                    $('input[name="<?php echo $id;?>_filters"]').before(response);
+                    $('#<?php echo $id; ?>').show();
+                    $('#<?php echo $id; ?>').next().remove();
+                    filters.nextpage++;
+                    if (userOrder !== 'default') {
+                        $('input[name="<?php echo $id;?>_filters"]').data('filters-current', filters);
+                    } else {
+                        $('input[name="<?php echo $id;?>_filters"]').data('filters-current', '');
+                        $('#<?php echo $id; ?>').data('nextpage', 0);
+                    }
+                } else {
+                    $('#<?php echo $id; ?>').hide();
+                    $('#<?php echo $id; ?>').after('<span><?php echo $this->translate('No more products found'); ?></span>');
+                }
+            });
+
+        };
     });
 </script>
 <?php if ($this->totalCount >= $this->limit): ?>
 <script>
-	$('#<?php echo $id; ?>').on('click', function(e){
+    $('#<?php echo $id; ?>').on('click', function (e) {
         e.preventDefault();
         $(this).hide();
 
         var self = this,
-	        nextpage = $(this).data('nextpage') || 1,
-		    filters = $.extend({
-			    pageId: '<?php echo $this->pageId; ?>',
-			    template: '<?php echo $this->productTemplate; ?>',
-			    nextpage: nextpage,
+            nextpage = $(this).data('nextpage') || 1,
+            filtersCurrent = $('input[name="<?php echo $id;?>_filters"]').data('filters-current') ? $('input[name="<?php echo $id;?>_filters"]').data('filters-current') : $('input[name="<?php echo $id;?>_filters"]').data('filters-default');
+        filters = $.extend({
+                pageId: '<?php echo $this->pageId; ?>',
+                template: '<?php echo $this->productTemplate; ?>',
+                nextpage: nextpage,
                 limit: '<?php echo $this->limit; ?>',
-                sort: '<?php echo $this->sort; ?>'
-		    }, <?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>,
-                <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
-                <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
-				<?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId): array());?>,
-				<?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable): array());?>);
+                sort: $(this).data('sort')
+            }, filtersCurrent,
+            <?php echo json_encode(!empty($this->filterAttributes) ? array_filter($this->filterAttributes) : array()); ?>,
+            <?php echo json_encode(!empty($this->price) ? array_filter(array('price' => $this->price)) : array()); ?>,
+            <?php echo json_encode(!empty($this->dragListId) ? array('draglist_id' => $this->dragListId) : array());?>,
+            <?php echo json_encode(!empty($this->filterable) ? array('filterable' => $this->filterable) : array());?>);
+        showSpinner();
 
-		showSpinner('body', 'show-more-spinner');
-
-		$.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function(response) {
-            hideSpinner('.show-more-spinner');
+        $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function (response) {
+            hideSpinner();
             $(self).show();
             if (response) {
-                $(self).before(response);
-				$(self).data('nextpage', ++nextpage);
+                $('input[name="<?php echo $id;?>_filters"]').before(response);
+                $(self).data('nextpage', ++nextpage);
+                if ($('input[name="<?php echo $id;?>_filters"]').data('filters-current')) {
+                    filtersCurrent = $('input[name="<?php echo $id;?>_filters"]').data('filters-current');
+                    filtersCurrent.nextpage++;
+                }
             } else {
-	            $(self).replaceWith('<span><?php echo $this->translate('No more products found'); ?></span>');
+                $('#<?php echo $id; ?>').hide();
+                $('#<?php echo $id; ?>').after('<span><?php echo $this->translate('No more products found'); ?></span>');
             }
-		});
-	});
+        });
+    });
 
 </script>
 <?php endif; ?>

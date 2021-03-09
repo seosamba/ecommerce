@@ -15,11 +15,12 @@ define([
     'text!../templates/delete_dialog.html',
     'text!../templates/freeShipping_dialog.html',
     'text!../templates/company_product_dialog.html',
+    'text!../templates/quantity_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone, ProductsCollection, BrandsCollection, CompaniesCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
             PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl,
-            FreeShippingDialogTmpl, CompanyProductDialogTmpl, i18n){
+            FreeShippingDialogTmpl, CompanyProductDialogTmpl, QuantityDialogTmpl, i18n){
     var MainView = Backbone.View.extend({
         el: $('#store-products'),
         events: {
@@ -397,6 +398,54 @@ define([
             });
             return false;
 
+        },
+        quantityAction: function(products){
+            var self = this,
+                applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'],
+                quantityButtons = {};
+
+            quantityButtons[applyButton] = function() {
+                var productQuantity = $('.custom-quantity').val();
+
+                if($('input.infinite-param').is(':checked')){
+                    $('.custom-quantity').val('');
+                    $('.custom-quantity-block').hide();
+
+                    productQuantity = '';
+                }else{
+                    $('.custom-quantity-block').show();
+                }
+                var positivNumber = Math.sign(productQuantity);
+
+                if(positivNumber == -1) {
+                    showMessage(_.isUndefined(i18n['Please enter valid number']) ? 'Please enter valid number':i18n['Please enter valid number'], true, 5000);
+                    return false;
+                }
+
+                self.products.batch('PUT', {'inventory': productQuantity});
+                $(this).dialog('close');
+            };
+
+            var dialog = _.template(QuantityDialogTmpl, {
+                i18n:i18n
+            });
+
+            $(dialog).dialog({
+                dialogClass: 'seotoaster',
+                buttons: quantityButtons,
+                open: function(event, ui) {
+                    $('.infinite-param').on('change',  function(e){
+                        e.preventDefault();
+
+                        if($('input.infinite-param').is(':checked')){
+                            $('.custom-quantity-block').hide();
+                        }else{
+                            $('.custom-quantity-block').show();
+                        }
+                    });
+                }
+            });
+            return false;
         },
         loadStats: function(){
             var self = this;
