@@ -587,7 +587,7 @@
         'cs_processing'	=> 'Processus en cours - Carte non débitée',
         'cs_delivered'	=> 'Livraison effectuée',
         'cs_canceled'	=> 'Commande annulée',
-       	'cs_partial' => 'Partial Orders',
+       	'cs_partial' => 'Commandes partielles',
         'shipping country' => 'Pays de destination',
         'shipping state' => 'Etat de destination',
         'shipping carrier' => 'Livreur',
@@ -824,5 +824,6 @@
         'Product already added to Wishlist' => 'Le produit est déjà ajouté à la liste de souhaits',
         'Can\'t add product to Wishlist! Please re-login into system.' => 'Impossible d\'ajouter à la liste de souhaits! Veuillez vous reconnecter au système.',
         'Remove wished product' => 'Supprimer le produit souhaité',
-        'Enter filter position number' => 'Ajouter numéro du filtre'
+        'Enter filter position number' => 'Ajouter numéro du filtre',
+        'Cart content has been changed' => 'Le contenu du panier a été modifié'
 );?>

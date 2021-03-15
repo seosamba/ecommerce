@@ -1088,6 +1088,30 @@ class Tools_ShoppingCart {
         return $this;
     }
 
+    /**
+     * Verify if payment already payed
+     *
+     * @return bool
+     */
+    public static function verifyIfAlreadyPayed()
+    {
+        $isPayed = false;
+        $cartSession = Tools_ShoppingCart::getInstance();
+        $cartId = $cartSession->getCartId();
+        if (!empty($cartId)) {
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            if ($cartSession instanceof Models_Model_CartSession) {
+                $statuses = array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_PARTIAL);
+                $status = $cartSession->getStatus();
+                if (in_array($status, $statuses)) {
+                    $isPayed = true;
+                }
+            }
+        }
+
+        return $isPayed;
+
+    }
 
 
 }
