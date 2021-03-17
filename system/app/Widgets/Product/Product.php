@@ -316,18 +316,9 @@ class Widgets_Product_Product extends Widgets_Abstract {
         $usNumericFormat = self::$_shoppingConfig['usNumericFormat'];
 
 		if(!$noCurrency) {
-		    if(!empty($usNumericFormat)) {
-                $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-                $price = number_format($price, 2) . ' ' . $currencySymbol;
-            } else {
-                $price = $this->_currency->toCurrency($price);
-            }
+            $price = $this->_currency->toCurrency($price);
 		} else {
-            if(!empty($usNumericFormat)) {
-                $price = number_format(round($price, 2), 2);
-            } else {
-                $price = number_format(round($price, 2), 2, '.', '');
-            }
+            $price = number_format(round($price, 2), 2, '.', '');
 		}
 
         if($lifeReload){

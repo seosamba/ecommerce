@@ -19,6 +19,13 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha',
 			'multiOptions' => Tools_Misc::getCurrencyList()
 		));
+
+        $this->addElement('select', 'currencyCountry', array(
+            'label' => $translator->translate('Currency country'),
+            'disableTranslator' => 'true',
+            'class' => 'grid_6 alpha',
+            'multiOptions' => array('0' => $translator->translate('Select country')) + Tools_Geo::getCountries(true)
+        ));
 		
 		$this->addElement('select', 'weightUnit', array(
 			'label'	=> $translator->translate('Weight unit'),
@@ -39,11 +46,6 @@ class Forms_BasicsSettings extends Zend_Form {
 
         $this->addElement('checkbox', 'deductSetStock', array(
             'label' => $translator->translate('Deduct from inventory of products used in sets'),
-            'class' => 'grid_6 alpha'
-        ));
-
-        $this->addElement('checkbox', 'usNumericFormat', array(
-            'label' => $translator->translate('US numeric format'),
             'class' => 'grid_6 alpha'
         ));
 
