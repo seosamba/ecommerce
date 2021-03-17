@@ -223,18 +223,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->productTemplate = $this->_productTemplate->getName();
 
         if(!empty($this->_priceFilter)){
-            if(in_array('tax', $this->_options)) {
-                $tax = $this->getTax();
-                if(!empty($tax)) {
-                    $tax = (int)$tax;
-                    $percentMax = $this->_priceFilter['max'] / "1.$tax";
-                    $percentMin = $this->_priceFilter['min'] / "1.$tax";
-                    $this->_priceFilter['max'] = $percentMax;
-                    $this->_priceFilter['min'] = $percentMin;
-                }
-            }
-
-
             $this->_view->price = $this->_priceFilter;
         }
 
@@ -434,20 +422,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (!empty($this->_priceFilter)) {
             if(!empty($this->_priceFilter['additionalPrice'])) {
-                if($this->_priceFilter['priceSign'] == 'minus') {
-                    $this->_priceFilter['min'] -= $this->_priceFilter['additionalPrice']['min'];
-                    $this->_priceFilter['max'] -= $this->_priceFilter['additionalPrice']['max'];
-                }
-                if($this->_priceFilter['priceSign'] == 'plus') {
-                    $this->_priceFilter['min'] += $this->_priceFilter['additionalPrice']['min'];
-                    $this->_priceFilter['max'] += $this->_priceFilter['additionalPrice']['max'];
-                }
-            }
-
-            if(!empty($this->_priceFilter['tax']) && empty($this->_priceFilter['nonTaxable'])){
-                $tax = $this->_priceFilter['tax'];
-                $this->_priceFilter['min'] = $this->_priceFilter['min'] * "1.$tax";
-                $this->_priceFilter['max'] = $this->_priceFilter['max'] * "1.$tax";
+                $this->_priceFilter['min'] = $this->_priceFilter['additionalPrice']['min'];
+                $this->_priceFilter['max'] = $this->_priceFilter['additionalPrice']['max'];
             }
             $data['priceFilter'] = $this->_priceFilter;
         }
@@ -756,15 +732,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
             if (!empty($urlFilter['price'])) {
                 if(in_array('tax', $this->_options)) {
-
                     $tax = $this->getTax();
-                    if(!empty($tax)) {
-                        $tax = (int)$tax;
-                        $percentMax = $urlFilter['price']['to'] / "1.$tax";
-                        $percentMin = $urlFilter['price']['from'] / "1.$tax";
-                        $urlFilter['price']['to'] = ceil($percentMax);
-                        $urlFilter['price']['from'] = floor($percentMin);
-                    }
                 }
 
                 if (!empty($filters['tags'])) {
@@ -789,44 +757,62 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                                     $priceType  = $allProductsGroups[$groupId]['priceType'];
                                     $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
 
-                                    if(!empty($tax) && !empty($nonTaxable)) {
-                                        $priceNow = $priceNow * "1.$tax";
-                                    }
-
                                     if($priceType == 'percent'){
                                         if($priceSign == 'minus') {
-                                            $priceModificationValue = $priceNow/$priceValue*100;
-                                            $rangeParam = $priceNow;
+                                            $remainder = 1 - ($priceValue / 100);
                                         }
                                         if($priceSign == 'plus') {
-                                            $priceModificationValue = $priceNow / "1.$priceValue";
-                                            $rangeParam = $priceModificationValue*$priceValue/100;
+                                            $remainder = 1 + ($priceValue / 100);
                                         }
 
-                                        $dataParam = $rangeParam;
+                                        if(!empty($tax) && empty($nonTaxable)) {
+                                            if($tax < 10) {
+                                                $tax = '0'. $tax;
+                                            }
+
+                                            $priceNow = $priceNow / "1.$tax";
+                                        }
+
+                                        $resultPrice = $priceNow / $remainder;
                                     }
                                     if($priceType == 'unit'){
+                                        if(!empty($tax) && empty($nonTaxable)) {
+                                            if($tax < 10) {
+                                                $tax = '0'. $tax;
+                                            }
+
+                                            $priceNow = $priceNow / "1.$tax";
+                                        }
+
                                         if($priceSign == 'minus') {
-                                            $priceModificationValue = $priceNow + $priceValue;
+                                            $resultPrice = $priceNow + $priceValue;
                                         }
                                         if($priceSign == 'plus') {
-                                            $priceModificationValue = $priceNow - $priceValue;
+                                            $resultPrice = $priceNow - $priceValue;
                                         }
-
-                                        $dataParam = $priceValue;
                                     }
-                                    $urlFilter['price']['priceSign'] = $priceSign;
-                                    $urlFilter['price']['nonTaxable'] = $nonTaxable;
+
+                                    $urlFilter['price'][$key] = $resultPrice;
 
                                     if($key == 'from') {
-                                        $urlFilter['price']['from'] = $priceModificationValue;
-                                        $additionalPrice['min'] = $dataParam;
+                                        $additionalPrice['min'] = $range;
                                     }
                                     if($key == 'to') {
-                                        $urlFilter['price']['to'] = $priceModificationValue;
-                                        $additionalPrice['max'] = $dataParam;
+                                        $additionalPrice['max'] = $range;
                                     }
                                 }
+                            }
+                        } else {
+                            if(!empty($tax)) {
+                                if($tax < 10) {
+                                    $tax = '0'. $tax;
+                                }
+
+                                $additionalPrice['min'] = $urlFilter['price']['from'];
+                                $additionalPrice['max'] = $urlFilter['price']['to'];
+
+                                $urlFilter['price']['from'] = $urlFilter['price']['from'] / "1.$tax";
+                                $urlFilter['price']['to'] = $urlFilter['price']['to'] / "1.$tax";
                             }
                         }
                     }
@@ -835,10 +821,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $this->_priceFilter = array(
                     'min'   => $urlFilter['price']['from'],
                     'max'   => $urlFilter['price']['to'],
-                    'additionalPrice' => $additionalPrice,
-                    'priceSign'  => $urlFilter['price']['priceSign'],
-                    'nonTaxable' => $urlFilter['price']['nonTaxable'],
-                    'tax'   => $tax
+                    'additionalPrice' => $additionalPrice
                 );
                 unset($urlFilter['price']);
             }

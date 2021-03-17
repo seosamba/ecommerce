@@ -439,6 +439,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
                 if ($template !== null) {
                     $renderedContent = array();
 
+                    if ($related instanceof Models_Model_Product) {
+                        $related = array('0' => $related);
+                    }
+
                     foreach ($related as $relatedProduct) {
                         if (strpos($template->getContent(), '$store:addtocart') !== false) {
                             $storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $relatedProduct->getId()));
