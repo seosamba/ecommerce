@@ -28,7 +28,7 @@
         (<%= partial_paid_amount %>)
     <% } %>
 </td>
-<td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
+<td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : accounting.formatMoney(shipping_price, moneyFormat)  %></td>
 <td data-mobile-title="Shipping via" class="shipping-service">
     <div class="tracking-info">
         <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
