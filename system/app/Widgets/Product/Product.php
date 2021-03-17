@@ -313,8 +313,6 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        $lifeReload = false;    // life reload is not allowed
         }
 
-        $usNumericFormat = self::$_shoppingConfig['usNumericFormat'];
-
 		if(!$noCurrency) {
             $price = $this->_currency->toCurrency($price);
 		} else {
