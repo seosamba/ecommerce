@@ -59,6 +59,7 @@ Plugin widgets.
         sometext - custom text inside span element
     {$product:allowance} - Displays the product allowance end date.
     {$product:wishlistqty} - Displays the product Wishlist qty.
+    {$product:minimumorder} - Displays the product minimum order qty.
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
