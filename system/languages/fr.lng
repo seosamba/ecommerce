@@ -825,5 +825,7 @@
         'Can\'t add product to Wishlist! Please re-login into system.' => 'Impossible d\'ajouter à la liste de souhaits! Veuillez vous reconnecter au système.',
         'Remove wished product' => 'Supprimer le produit souhaité',
         'Enter filter position number' => 'Ajouter numéro du filtre',
-        'Cart content has been changed' => 'Le contenu du panier a été modifié'
+        'Cart content has been changed' => 'Le contenu du panier a été modifié',
+        'Deposit received' => 'Acompte reçu',
+        'Outstanding amount' => 'Montant impayé'
 );?>
