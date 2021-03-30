@@ -826,6 +826,8 @@
         'Remove wished product' => 'Supprimer le produit souhaité',
         'Enter filter position number' => 'Ajouter numéro du filtre',
         'Cart content has been changed' => 'Le contenu du panier a été modifié',
+        'Deposit received' => 'Acompte reçu',
+        'Outstanding amount' => 'Montant impayé',
         'Select country' => 'Sélectionner pays',
         'Currency country' => 'Devise pays'
 );?>

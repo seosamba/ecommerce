@@ -514,7 +514,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
                             '$product:photourl:small'                    => $photoSrcSmall,
                             '$product:photourl:medium'                   => $photoSrcMedium,
                             '$product:photourl:large'                    => $photoSrcLarge,
-                            '$product:photourl:original'                 => $photoSrcOriginal
+                            '$product:photourl:original'                 => $photoSrcOriginal,
+                            '$product:minimumorder'                      => $relatedProduct->getMinimumOrder()
                         );
 
                         $renderedContent[] = Tools_Misc::preparingProductListing($template->getContent(), $relatedProduct, $dictionary);
@@ -636,6 +637,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderWishlistQty() {
         return '<span data-qty="'. $this->_product->getWishlistQty() .'" class="product-wishlist-qty product-wishlist-'. $this->_product->getId() .'">' . $this->_product->getWishlistQty() . '</span>';
+    }
+
+    private function _renderMinimumOrder() {
+        return $this->_product->getMinimumOrder();
     }
 
 }

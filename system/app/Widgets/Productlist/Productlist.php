@@ -492,7 +492,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:options'                    => isset($productOptionsView) ? $productOptionsView : '',
                 '$product:inventory'                  => $inventoryCount,
                 '$product:qty'                        => $productQty,
-                '$product:wishlistqty'                => $product->getWishlistQty()
+                '$product:wishlistqty'                => $product->getWishlistQty(),
+                '$product:minimumorder'               => $product->getMinimumOrder()
             );
 
             if (isset($data['priceFilter'])) {
