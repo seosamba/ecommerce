@@ -502,4 +502,65 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
         return '';
     }
+
+    protected function _makeOptionCheckoutbreacrumb()
+    {
+        $translator = Zend_Registry::get('Zend_Translate');
+        $defaultLabelsNames = array(
+            $translator->translate('Start'),
+            $translator->translate('Shipping address'),
+            $translator->translate('Shipping carrier'),
+            $translator->translate('Merchandising'),
+            $translator->translate('Payment')
+        );
+
+        $stepLabels = array();
+        if (isset($this->_options[1])) {
+            $stepLabels = explode(',', $this->_options[1]);
+            if(count($stepLabels) < count($defaultLabelsNames)){
+                $stepLabels = $defaultLabelsNames;
+            }
+        }
+        $this->_view->steplabels = $stepLabels;
+        $currentUser = $this->_sessionHelper->getCurrentUser()->getRoleId();
+        $this->_getCheckoutPage();
+        $cart = Tools_ShoppingCart::getInstance();
+        $freeShipping = Models_Mapper_ShippingConfigMapper::getInstance()->find(Shopping::SHIPPING_FREESHIPPING);
+        if (!empty($freeShipping['enabled']) && !empty($freeShipping['config'])) {
+            if ($freeShipping['config']['cartamount'] < $cart->getTotal()) {
+                $this->_view->freeShipping = true;
+            }
+        }
+        $request = $cart->_websiteHelper->getActionController()->getRequest();
+        $merchandisingStep = $this->_sessionHelper->merchandisingZoneTmpl;
+        if(!empty($merchandisingStep) && $request->getParam('step') == 'method'){
+            $this->_view->merchandising = true;
+        }
+        $cartContent = $cart->getContent();
+        if (!empty($cartContent)) {
+            $step = '';
+            if ($cart->_websiteHelper->getActionController()->getRequest()->has('step')) {
+                $step = strtolower($request->getParam('step'));
+                if ($request->getParam('stepBack')) {
+                    $step = 'address';
+                }
+                if ($request->getParam('stepBackMerchandising')) {
+                    $this->_view->merchandisingBack = true;
+                }
+                if($merchandisingStep && $this->_view->freeShipping){
+                    $this->_view->merchandising = true;
+                }
+            }
+            if(!empty($merchandisingStep)){
+                $this->_view->merchandising = true;
+            }
+            $this->_view->currentUser = $currentUser;
+            $this->_view->step = $step;
+
+            return $this->_view->render('checkoutbreacrumb.phtml');
+        }
+
+        return '';
+
+    }
 }
