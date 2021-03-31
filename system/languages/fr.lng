@@ -829,5 +829,6 @@
         'Deposit received' => 'Acompte reçu',
         'Outstanding amount' => 'Montant impayé',
         'Select country' => 'Sélectionner pays',
-        'Currency country' => 'Devise pays'
+        'Currency country' => 'Devise pays',
+        'Complete your order' => 'Completer votre commande'
 );?>
