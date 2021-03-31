@@ -157,7 +157,6 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('usNumericFormat', '0'),
 ('minimumOrder', '0'),
 ('version', '2.8.5');
 
@@ -320,6 +319,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
+  `partial_percentage` DECIMAL(10,2) DEFAULT '0.00',
+  `is_partial` ENUM('0', '1') DEFAULT '0',
+  `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
   `partial_purchased_on` timestamp NULL,
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',

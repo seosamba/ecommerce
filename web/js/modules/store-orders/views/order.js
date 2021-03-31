@@ -21,8 +21,7 @@ define([
         },
         render: function(){
             this.model.set('accounting', accounting);
-            this.model.set('currencySymbol', this.model.collection.moneyFormat.symbol);
-            this.model.set('usNumericFormat', this.model.collection.usNumericFormat);
+            this.model.set('moneyFormat', this.model.collection.moneyFormat);
 
             this.$el.html(this.template(this.model.toJSON()));
             return this;

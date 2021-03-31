@@ -113,23 +113,31 @@ class Widgets_User_User extends Widgets_User_Base {
             return $this->_digitalProductsGrid($userId);
         }
 
-        $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrders($userId, true);
+        $enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('quote');
+        if (!$enabledInvoicePlugin instanceof Application_Model_Models_Plugin) {
+            return $this->_translator->translate('Please enable quote plugin to use user grid feature');
+        }
+
+        $orders = Models_Mapper_CartSessionMapper::getInstance()->fetchOrdersWithQuotes($userId);
         $this->_view->stats = array(
             'all'     => sizeof($orders),
             'completed' => sizeof(array_filter($orders, function ($order) {
-                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED;
+                return $order['status'] === Models_Model_CartSession::CART_STATUS_COMPLETED;
             })),
             'shipped'   => sizeof(array_filter($orders, function ($order) {
-                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED;
+                return $$order['status'] === Models_Model_CartSession::CART_STATUS_SHIPPED;
             })),
             'delivered' => sizeof(array_filter($orders, function ($order) {
-                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED;
+                return $order['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED;
+            })),
+            'partial' => sizeof(array_filter($orders, function ($order) {
+                return $order['status'] === Models_Model_CartSession::CART_STATUS_PARTIAL;
             })),
             'quote_sent' => sizeof(array_filter($orders, function ($order) {
-                return ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote');
+                return ($order['status'] === Models_Model_CartSession::CART_STATUS_PROCESSING && $order['status'] === 'Quote');
             })),
             'refunded' => sizeof(array_filter($orders, function ($order) {
-                return $order->getStatus() === Models_Model_CartSession::CART_STATUS_REFUNDED;
+                return $order['status'] === Models_Model_CartSession::CART_STATUS_REFUNDED;
         })),
 
         );

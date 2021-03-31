@@ -326,21 +326,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	        $lifeReload = false;    // life reload is not allowed
         }
 
-        $usNumericFormat = self::$_shoppingConfig['usNumericFormat'];
-
 		if(!$noCurrency) {
-		    if(!empty($usNumericFormat)) {
-                $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-                $price = number_format($price, 2) . ' ' . $currencySymbol;
-            } else {
-                $price = $this->_currency->toCurrency($price);
-            }
+            $price = $this->_currency->toCurrency($price);
 		} else {
-            if(!empty($usNumericFormat)) {
-                $price = number_format(round($price, 2), 2);
-            } else {
-                $price = number_format(round($price, 2), 2, '.', '');
-            }
+            $price = number_format(round($price, 2), 2, '.', '');
 		}
 
         if($lifeReload){
@@ -492,6 +481,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
                 if ($template !== null) {
                     $renderedContent = array();
 
+                    if ($related instanceof Models_Model_Product) {
+                        $related = array('0' => $related);
+                    }
+
                     foreach ($related as $relatedProduct) {
                         if (strpos($template->getContent(), '$store:addtocart') !== false) {
                             $storeWidgetAddToCart = Tools_Factory_WidgetFactory::createWidget('store', array('addtocart', $relatedProduct->getId()));
@@ -565,7 +558,8 @@ class Widgets_Product_Product extends Widgets_Abstract {
                             '$product:photourl:small'                    => $photoSrcSmall,
                             '$product:photourl:medium'                   => $photoSrcMedium,
                             '$product:photourl:large'                    => $photoSrcLarge,
-                            '$product:photourl:original'                 => $photoSrcOriginal
+                            '$product:photourl:original'                 => $photoSrcOriginal,
+                            '$product:minimumorder'                      => $relatedProduct->getMinimumOrder()
                         );
 
                         $renderedContent[] = Tools_Misc::preparingProductListing($template->getContent(), $relatedProduct, $dictionary);
@@ -687,6 +681,10 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderWishlistQty() {
         return '<span data-qty="'. $this->_product->getWishlistQty() .'" class="product-wishlist-qty product-wishlist-'. $this->_product->getId() .'">' . $this->_product->getWishlistQty() . '</span>';
+    }
+
+    private function _renderMinimumOrder() {
+        return $this->_product->getMinimumOrder();
     }
 
 }
