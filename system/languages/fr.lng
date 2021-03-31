@@ -827,5 +827,6 @@
         'Enter filter position number' => 'Ajouter numéro du filtre',
         'Cart content has been changed' => 'Le contenu du panier a été modifié',
         'Deposit received' => 'Acompte reçu',
-        'Outstanding amount' => 'Montant impayé'
+        'Outstanding amount' => 'Montant impayé',
+        'Complete your order' => 'Completer votre commande'
 );?>
