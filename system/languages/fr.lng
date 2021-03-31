@@ -828,5 +828,7 @@
         'Cart content has been changed' => 'Le contenu du panier a été modifié',
         'Deposit received' => 'Acompte reçu',
         'Outstanding amount' => 'Montant impayé',
+        'Select country' => 'Sélectionner pays',
+        'Currency country' => 'Devise pays',
         'Complete your order' => 'Completer votre commande'
 );?>

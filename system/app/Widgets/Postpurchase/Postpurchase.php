@@ -231,22 +231,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     {
         $total = $this->_cart->getTotal();
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $total = number_format($total, 2);
-            }
-
             return $total;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $total = number_format($total, 2) . ' ' . $currencySymbol;
-        } else {
-            $total = $this->_currency->toCurrency($total);
-        }
+        $total = $this->_currency->toCurrency($total);
 
         return $total;
     }
@@ -267,21 +256,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $subTotal = $subTotal + $this->_cart->getSubTotalTax();
         }
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $subTotal = number_format($subTotal, 2);
-            }
             return $subTotal;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $subTotal = number_format($subTotal, 2) . ' ' . $currencySymbol;
-        } else {
-            $subTotal = $this->_currency->toCurrency($subTotal);
-        }
+        $subTotal = $this->_currency->toCurrency($subTotal);
 
         return $subTotal;
     }
@@ -293,23 +272,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderTotaltax()
     {
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         $totalTax = $this->_cart->getTotalTax();
 
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $totalTax = number_format($totalTax, 2);
-            }
             return $totalTax;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $totalTax = number_format($totalTax, 2) . ' ' . $currencySymbol;
-        } else {
-            $totalTax = $this->_currency->toCurrency($totalTax);
-        }
+        $totalTax = $this->_currency->toCurrency($totalTax);
 
         return $totalTax;
     }
@@ -364,22 +333,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $shippingPrice != 0 && !in_array(self::WITHOUT_TAX, $this->_options)) {
             $shippingPrice = $shippingPrice + $this->_cart->getShippingTax();
         }
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
 
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $shippingPrice = number_format($shippingPrice, 2);
-            }
-
             return $shippingPrice;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $shippingPrice = number_format($shippingPrice, 2) . ' ' . $currencySymbol;
-        } else {
-            $shippingPrice = $this->_currency->toCurrency($shippingPrice);
-        }
+        $shippingPrice = $this->_currency->toCurrency($shippingPrice);
 
         return $shippingPrice;
     }
@@ -501,22 +460,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if (intval($this->_shoppingConfig['showPriceIncTax']) === 1 && $discount != 0 && !in_array(self::WITHOUT_TAX, $this->_options)) {
             $discount = $discount + $this->_cart->getDiscountTax();
         }
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
 
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $discount = number_format($discount, 2);
-            }
-
             return $discount;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $discount = number_format($discount, 2) . ' ' . $currencySymbol;
-        } else {
-            $discount = $this->_currency->toCurrency($discount);
-        }
+        $discount = $this->_currency->toCurrency($discount);
 
         return $discount;
     }
@@ -532,22 +481,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     {
         $shippingTax = $this->_cart->getShippingTax();
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $shippingTax = number_format($shippingTax, 2);
-            }
-
             return $shippingTax;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $shippingTax = number_format($shippingTax, 2) . ' ' . $currencySymbol;
-        } else {
-            $shippingTax = $this->_currency->toCurrency($shippingTax);
-        }
+        $shippingTax = $this->_currency->toCurrency($shippingTax);
 
         return $shippingTax;
 
@@ -562,22 +500,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     {
         $discountTax = $this->_cart->getDiscountTax();
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $discountTax = number_format($discountTax, 2);
-            }
-
             return $discountTax;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $discountTax = number_format($discountTax, 2) . ' ' . $currencySymbol;
-        } else {
-            $discountTax = $this->_currency->toCurrency($discountTax);
-        }
+        $discountTax = $this->_currency->toCurrency($discountTax);
 
         return $discountTax;
     }
@@ -592,21 +519,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     {
         $subTotalTax = $this->_cart->getSubTotalTax();
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $subTotalTax = number_format($subTotalTax, 2);
-            }
             return $subTotalTax;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $subTotalTax = number_format($subTotalTax, 2) . ' ' . $currencySymbol;
-        } else {
-            $subTotalTax = $this->_currency->toCurrency($subTotalTax);
-        }
+        $subTotalTax = $this->_currency->toCurrency($subTotalTax);
 
         return $subTotalTax;
 
@@ -620,21 +537,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
         $refundAmount = $this->_cart->getRefundAmount();
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $refundAmount = number_format($refundAmount, 2);
-            }
             return $refundAmount;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $refundAmount = number_format($refundAmount, 2) . ' ' . $currencySymbol;
-        } else {
-            $refundAmount = $this->_currency->toCurrency($refundAmount);
-        }
+        $refundAmount = $this->_currency->toCurrency($refundAmount);
 
         return $refundAmount;
     }
@@ -750,24 +657,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
         $price = (is_null($this->_cartContent[$sid]['price'])) ? 0 : $this->_cartContent[$sid]['price'];
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $price = number_format($price, 2);
-            }
-
             return $price;
         } elseif (intval($this->_cartContent[$sid]['freebies']) === 1) {
             return $this->_translator->translate('free');
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $price = number_format($price, 2) . ' ' . $currencySymbol;
-        } else {
-            $price = $this->_currency->toCurrency($price);
-        }
+        $price = $this->_currency->toCurrency($price);
 
         return $price;
     }
@@ -866,21 +762,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
         $productTax = $this->_cartContent[$sid]['tax'];
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $productTax = number_format($productTax, 2);
-            }
             return $productTax;
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $productTax = number_format($productTax, 2) . ' ' . $currencySymbol;
-        } else {
-            $productTax = $this->_currency->toCurrency($productTax);
-        }
+        $productTax = $this->_currency->toCurrency($productTax);
 
         return $productTax;
     }
@@ -899,23 +785,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
         $price = (is_null($this->_cartContent[$sid]['tax_price'])) ? 0 : $this->_cartContent[$sid]['tax_price'];
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $price = number_format($price, 2);
-            }
             return $price;
         } elseif (intval($this->_cartContent[$sid]['freebies']) === 1) {
             return $this->_translator->translate('free');
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $price = number_format($price, 2) . ' ' . $currencySymbol;
-        } else {
-            $price = $this->_currency->toCurrency($price);
-        }
+        $price = $this->_currency->toCurrency($price);
 
         return $price;
     }
@@ -959,23 +835,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         $priceWithTax = (is_null($this->_cartContent[$sid]['tax_price'])) ? 0 : $this->_cartContent[$sid]['tax_price'];
         $priceWithTax = $priceWithTax * $this->_cartContent[$sid]['qty'];
 
-        $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            if(!empty($usNumericFormat)) {
-                $priceWithTax = number_format($priceWithTax, 2);
-            }
             return $priceWithTax;
         } elseif (intval($this->_cartContent[$sid]['freebies']) === 1) {
             return $this->_translator->translate('free');
         }
 
-        if(!empty($usNumericFormat)) {
-            $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-            $priceWithTax = number_format($priceWithTax, 2) . ' ' . $currencySymbol;
-        } else {
-            $priceWithTax = $this->_currency->toCurrency($priceWithTax);
-        }
+        $priceWithTax = $this->_currency->toCurrency($priceWithTax);
 
         return $priceWithTax;
     }
@@ -1058,13 +924,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                             if ($optData['priceType'] === 'percent') {
                                 $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
                             } else {
-                                $usNumericFormat = $this->_shoppingConfig['usNumericFormat'];
-                                if(!empty($usNumericFormat)) {
-                                    $currencySymbol = preg_replace('~[\w]~', '', $this->_currency->getSymbol());
-                                    $optPriceMod = number_format($optPriceMod, 2) . ' ' . $currencySymbol;
-                                } else {
-                                    $optPriceMod = $this->_currency->toCurrency($optPriceMod);
-                                }
+                                $optPriceMod = $this->_currency->toCurrency($optPriceMod);
 
                                 $optionStr .= '<span>(' . $optData['priceSign'] . $optPriceMod .')</span>';
                             }

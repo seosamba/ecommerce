@@ -157,7 +157,6 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('usNumericFormat', '0'),
 ('minimumOrder', '0'),
 ('version', '2.8.5');
 

@@ -218,7 +218,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		if (!Zend_Registry::isRegistered('Zend_Currency')) {
 			$shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
-			$locale = Zend_Locale::getLocaleToTerritory($shoppingConfig['country']);
+
+			$country = $shoppingConfig['country'];
+			if(!empty($shoppingConfig['currencyCountry'])) {
+                $country = $shoppingConfig['currencyCountry'];
+            }
+
+			$locale = Zend_Locale::getLocaleToTerritory($country);
 			try {
 				$currency = new Zend_Currency(
 					$shoppingConfig['currency'],
@@ -1109,11 +1115,6 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->superAdmin = Tools_ShoppingCart::getInstance()->getCustomer()->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN;
             $this->_view->shoppingConfigParams = $this->_configMapper->getConfigParams();
 
-            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
-
-            $currency = Zend_Registry::get('Zend_Currency');
-            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
-
             return $this->_view->render('clients.phtml');
 		}
 	}
@@ -1222,11 +1223,6 @@ class Shopping extends Tools_Plugins_Abstract {
         $listMasksMapper = Application_Model_Mappers_MasksListMapper::getInstance();
         $this->_view->mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
         $this->_view->desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
-
-        $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
-
-        $currency = Zend_Registry::get('Zend_Currency');
-        $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
 
 		$content = $this->_view->render('profile.phtml');
 
@@ -1344,10 +1340,6 @@ class Shopping extends Tools_Plugins_Abstract {
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
-            $this->_view->usNumericFormat = $this->_configMapper->getConfigParam('usNumericFormat');
-
-            $currency = Zend_Registry::get('Zend_Currency');
-            $this->_view->currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
 
 			$this->_layout->content = $this->_view->render('order.phtml');
 
