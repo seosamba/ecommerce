@@ -31,7 +31,7 @@ define([
             var currentCategoryId = $('.ui-state-active').find('a').data('category-id');
 
             // Set img
-            if(!_.isNull(currentCategoryId)){
+            if(!_.isNull(currentCategoryId) && !_.isUndefined(currentCategoryId)){
                 var currentCategory   = this.categories.get(currentCategoryId),
                     websiteUrl        = $('#website_url').val(),
                     src               = websiteUrl+'system/images/noimage.png',
