@@ -14,7 +14,7 @@
     $addressPlus = '<li><span>' . $shippingCarrierName . '</span></li>';
     $shipping = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . Cart::STEP_SHIPPING_METHOD . '&stepBack=address">' . $shippingCarrierName . '</a></li>';
     $shippingPlus = '<li><span>' . $paymentName . '</span></li>';
-    $merchandising = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . Cart::STEP_MERCHANDISING . '&stepBackMerchandising=merchandisingBack">' . $merchandisingName . '</a></li>';
+    $merchandising = '<li><a href="' . $this->websiteUrl . $this->checkoutPage->getUrl() . '?step=' . 'merchandising' . '&stepBackMerchandising=merchandisingBack">' . $merchandisingName . '</a></li>';
     $merchandisingCurrent = '<li><span>' . $merchandisingName . '</span></li>';
     $merchandisingPlus = '<li><span>' . $paymentName . '</span></li>';
 
