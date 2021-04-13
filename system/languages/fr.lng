@@ -830,5 +830,6 @@
         'Outstanding amount' => 'Montant impayé',
         'Select country' => 'Sélectionner pays',
         'Currency country' => 'Devise pays',
-        'Complete your order' => 'Completer votre commande'
+        'Complete your order' => 'Completer votre commande',
+        'Manage your web store and shopping cart settings.' => 'Gérer les paramètres de votre boutique en ligne et votre panier.'
 );?>
