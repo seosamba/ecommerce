@@ -601,7 +601,11 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentsecond' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+-- 14/04/2021
+-- version: 2.8.5
+ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(10,6) DEFAULT '0.00';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.5' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
