@@ -1151,7 +1151,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if(!empty($quote)){
             $partialAmountPaid = $this->_cart->getPartialPercentage();
             if (!empty((int) $partialAmountPaid)) {
-                return round($this->_cart->getPartialPercentage(), 2);
+                return round($this->_cart->getPartialPercentage(), 1);
             }
 
             return '';
