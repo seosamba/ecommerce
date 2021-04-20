@@ -73,6 +73,11 @@ class Forms_BasicsSettings extends Zend_Form {
             )
         ));
 
+        $this->addElement('checkbox', 'smartFilter', array(
+            'label' => 'Smart product list filter',
+            'class' => 'grid_6 alpha'
+        ));
+
         $this->addElement('checkbox', 'enabledPartialPayment', array(
             'label' => 'Accept partial payments for quote:  Yes/No',
             'class' => 'grid_6 alpha'
