@@ -323,6 +323,177 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         return $entities;
     }
 
+    /**
+     * Returned products array
+     */
+    public function fetchAllProductByParams (
+        $where = null,
+        $order = null,
+        $offset = null,
+        $limit = null,
+        $search = null,
+        $tags = null,
+        $brands = null,
+        $strictTagsCount = false,
+        $organicSearch = false,
+        $attributes = array(),
+        $price = array(),
+        $sort = null,
+        $allowance = false,
+        $productPrice = array(),
+        $inventory = null
+    ) {
+        $entities = array();
+
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+            ->from(array('p' => 'shopping_product'))
+            ->join(array('b' => 'shopping_brands'), 'b.id = p.brand_id', null)
+            ->group('p.id');
+
+        if ((!is_null($order)) && (is_array($order)) && (!is_null($sort))) {
+            foreach ($order as $key => $ord){
+                $order[$key] = $ord . ' ' . $sort;
+            }
+            $select->order($order);
+        }
+
+        if (!empty($where)) {
+            $select->where($where);
+        }
+
+        if (!empty($brands)) {
+            if (!is_array($brands)) {
+                $brands = (array)$brands;
+            }
+            $select->where('b.name in (?)', $brands);
+        }
+
+        if (!empty($attributes)) {
+            $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($attributes);
+            if (!empty($productIds)) {
+                $select->where('p.id IN (?)', $productIds);
+            } else {
+                return null;
+            }
+        }
+
+        if(!empty($price)){
+            $select->where("p.price BETWEEN " . $price['min'] ." AND ".$price['max']);
+        }
+
+        if(!empty($productPrice)) {
+            $select->joinLeft(array('sfv' => 'shopping_filtering_values'), 'sfv.product_id = p.id', array());
+            foreach ($productPrice as $pPrice) {
+                $select->where("sfv.value BETWEEN " . $pPrice['min'] ." AND ".$pPrice['max']);
+            }
+        }
+
+        if (!empty($tags)) {
+            if (!is_array($tags)) {
+                $tags = (array)$tags;
+            }
+
+            $select->from(array('t' => 'shopping_tags'), null)
+                ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null)
+                ->where('pt.tag_id IN (?)', $tags);
+
+            // we need product with all the tags at the same time ('AND' logic)
+            if ($strictTagsCount) {
+                $select->having('COUNT(*) = ?', sizeof($tags));
+            }
+        }
+
+        if(is_array($inventory) && !empty($inventory)) {
+            if(in_array('unlimited', $inventory)){
+                $where = new Zend_Db_Expr('p.inventory IS NULL');
+                unset($inventory[0]);
+                if (!empty($inventory)) {
+                    $where .= ' OR ' . $this->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $inventory);
+                }
+            }else{
+                $where = $this->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $inventory);
+            }
+            $select->where($where);
+        }
+
+        if ((bool)$search) {
+            $likeWhere = array(
+                'p.name LIKE ?',
+                'p.sku LIKE ?',
+                'p.mpn LIKE ?',
+                'b.name LIKE ?',
+                't.name LIKE ?'
+            );
+
+            $likeWhere = implode(' OR ', $likeWhere);
+
+            if (empty($tags)) {
+                $select
+                    ->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = p.id', array())
+                    ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
+            }
+
+            if ($organicSearch) {
+                if (is_array($search)) {
+                    $subWhere = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(
+                        false
+                    );
+                    foreach ($search as $term) {
+                        $subWhere->where($likeWhere, '%' . $term . '%');
+                    }
+
+                    $subWhere = implode(' ', $subWhere->getPart('WHERE'));
+                    $select->where($subWhere);
+                } else {
+                    $select->orWhere($likeWhere, '%' . $search . '%');
+                }
+
+            } else {
+                $select->where($likeWhere, '%' . $search . '%');
+            }
+        }
+
+        if($allowance) {
+            $select->joinLeft(array('ap' => 'shopping_allowance_products'), 'ap.product_id = p.id', array('allowance' => 'ap.allowance_due'));
+        }
+
+        if (self::$_logSelectResultLength === false) {
+            $select->limit($limit, $offset);
+        }
+
+        Tools_System_Tools::debugMode() && error_log($select->__toString());
+        $resultSet = $this->getDbTable()->fetchAll($select);
+
+        if (count($resultSet) === 0) {
+            return null;
+        }
+
+        if (self::$_logSelectResultLength === true) {
+            self::$_lastSelectResultLength = sizeof($resultSet);
+            $tmp = array();
+            $maxOffset = (sizeof($resultSet) < ($offset + $limit)) ? sizeof($resultSet) : $offset + $limit;
+            for ($offset; $offset < $maxOffset; $offset++) {
+                if ($resultSet->offsetExists($offset)) {
+                    $resultSet->seek($offset);
+                    array_push($tmp, $resultSet->current());
+                }
+            }
+            $resultSet = $tmp;
+        }
+
+        foreach ($resultSet as $row) {
+            $product = $row->toArray();
+            //fetching tags
+            $tagsSet = $row->findManyToManyRowset('Models_DbTable_Tag','Models_DbTable_ProductTag');
+            if ($tagsSet->count()){
+                $product['tags'] = $tagsSet->toArray();
+            }
+
+            array_push($entities, $product);
+        }
+        return $entities;
+    }
+
 	public function find($id) {
 		$result = $this->getDbTable()->find($id);
 		if(0 == count($result)) {

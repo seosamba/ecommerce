@@ -731,99 +731,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
+
+            if(in_array('tax', $this->_options)) {
+                $tax = $this->getTax();
+            }
+
             if (!empty($urlFilter['price'])) {
-                if(in_array('tax', $this->_options)) {
-                    $tax = $this->getTax();
-                }
+                $priceFilter = Tools_GroupPriceTools::reduceFilterPrice($urlFilter['price'], $tax, $filters['tags']);
 
-                if (!empty($filters['tags'])) {
-                    $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
-                    $currentUser = $sessionHelper->getCurrentUser()->getId();
-
-                    $dbTable = new Models_DbTable_CustomerInfo();
-                    $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
-                    $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
-
-                    if(!empty($allCustomersGroups)) {
-                        if(array_key_exists($currentUser, $allCustomersGroups)){
-                            $groupId = $allCustomersGroups[$currentUser]['group_id'];
-                            $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
-                            if(isset($allProductsGroups[$groupId])){
-
-                                $additionalPrice = array();
-                                foreach ($urlFilter['price'] as $key => $range) {
-                                    $priceNow = $range;
-                                    $priceValue = $allProductsGroups[$groupId]['priceValue'];
-                                    $priceSign  = $allProductsGroups[$groupId]['priceSign'];
-                                    $priceType  = $allProductsGroups[$groupId]['priceType'];
-                                    $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
-
-                                    if($priceType == 'percent'){
-                                        if($priceSign == 'minus') {
-                                            $remainder = 1 - ($priceValue / 100);
-                                        }
-                                        if($priceSign == 'plus') {
-                                            $remainder = 1 + ($priceValue / 100);
-                                        }
-
-                                        if(!empty($tax) && empty($nonTaxable)) {
-                                            if($tax < 10) {
-                                                $tax = '0'. $tax;
-                                            }
-
-                                            $priceNow = $priceNow / "1.$tax";
-                                        }
-
-                                        $resultPrice = $priceNow / $remainder;
-                                    }
-                                    if($priceType == 'unit'){
-                                        if(!empty($tax) && empty($nonTaxable)) {
-                                            if($tax < 10) {
-                                                $tax = '0'. $tax;
-                                            }
-
-                                            $priceNow = $priceNow / "1.$tax";
-                                        }
-
-                                        if($priceSign == 'minus') {
-                                            $resultPrice = $priceNow + $priceValue;
-                                        }
-                                        if($priceSign == 'plus') {
-                                            $resultPrice = $priceNow - $priceValue;
-                                        }
-                                    }
-
-                                    $urlFilter['price'][$key] = $resultPrice;
-
-                                    if($key == 'from') {
-                                        $additionalPrice['min'] = $range;
-                                    }
-                                    if($key == 'to') {
-                                        $additionalPrice['max'] = $range;
-                                    }
-                                }
-                            }
-                        } else {
-                            if(!empty($tax)) {
-                                if($tax < 10) {
-                                    $tax = '0'. $tax;
-                                }
-
-                                $additionalPrice['min'] = $urlFilter['price']['from'];
-                                $additionalPrice['max'] = $urlFilter['price']['to'];
-
-                                $urlFilter['price']['from'] = $urlFilter['price']['from'] / "1.$tax";
-                                $urlFilter['price']['to'] = $urlFilter['price']['to'] / "1.$tax";
-                            }
-                        }
-                    }
-                }
-
-                $this->_priceFilter = array(
-                    'min'   => $urlFilter['price']['from'],
-                    'max'   => $urlFilter['price']['to'],
-                    'additionalPrice' => $additionalPrice
-                );
+                $this->_priceFilter = $priceFilter;
                 unset($urlFilter['price']);
             }
 
