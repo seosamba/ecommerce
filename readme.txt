@@ -171,6 +171,7 @@ Plugin widgets.
     {$postpurchase:cartitem:cartId} -> cart id
     {$postpurchase:cartitem:total[:clean]} -> total price with tax
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
+    {$postpurchase:cartitem:option:optionName}
     {$postpurchase:cartitem:producturl} -> product url
     {$postpurchase:cartitem:brand} -> product brand
     {$postpurchase:cartitem:partialamount[:clean]} -> partial amount
