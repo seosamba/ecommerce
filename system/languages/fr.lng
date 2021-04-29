@@ -831,5 +831,15 @@
         'Select country' => 'Sélectionner pays',
         'Currency country' => 'Devise pays',
         'Complete your order' => 'Completer votre commande',
-        'Additional price field' => 'Champ de prix supplémentaire'
+        'Additional price field' => 'Champ de prix supplémentaire',
+        'Enter position' => 'Indiquer une position',
+        'Minimum order' => 'Commande minimum',
+        'Smart product list filter' => 'Smart filtre de liste des produits',
+        'Accept partial payments for quote: Yes/No' => 'Accepter les paiements partiels pour devis: Oui/Non',
+        'Lag time' => 'Indiquer le temps',
+        'Days' => 'Jours',
+        'Months' => 'Mois',
+        'Send payment complement request automatically after' => 'Envoyer automatiquement la demande de complément de paiement après',
+        'Create templates from the action e-mails & SMS screens' => 'Сréer des mises en page à partir de la section d\'e-mails d\'action & SMS',
+        'partial payment lag time' => 'temps de paiement partiel'
 );?>
