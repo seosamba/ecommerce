@@ -819,6 +819,7 @@ class Tools_ShoppingCart {
                             $textValue = $options[$defaultOption['id']];
                         }
                         $modifiers[$defaultOption['title']] = array(
+                            'optionType'  => Models_Model_Option::TYPE_ADDITIONALPRICEFIELD,
                             'option_id'   => $defaultOption['id'],
                             'title'       => preg_replace("/[^0-9.]/", '', $textValue),
                             'priceSign'   => '+',

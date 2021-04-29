@@ -1023,7 +1023,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                             } else {
                                 $optPriceMod = $this->_currency->toCurrency($optPriceMod);
 
-                                $optionStr .= '<span>(' . $optData['priceSign'] . $optPriceMod .')</span>';
+                                if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                    $optionStr .= '<span>' . $optPriceMod .'</span>';
+                                } else {
+                                    $optionStr .= '<span>(' . $optData['priceSign'] . $optPriceMod .')</span>';
+                                }
                             }
                         }
                     }

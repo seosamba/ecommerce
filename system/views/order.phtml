@@ -222,7 +222,7 @@
                                                 $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
 
                                                 if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
-                                                    $optionStr = '<span>'.$optionTitle.':</span>';
+                                                    $optionStr = '<span>'.$optionTitle.' </span>';
                                                 }
 
                                                 if (!empty($optData['priceValue']) && intval($optData['priceValue'])) {
@@ -234,7 +234,11 @@
                                                     if ($optData['priceType'] === 'percent') {
                                                         $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
                                                     } else {
-                                                        $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                                        if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                                            $optionStr .= '<span>'.$this->currency($optPriceMod).'</span>';
+                                                        } else {
+                                                            $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                                        }
                                                     }
                                                 }
                                                 if (!empty($optData['weightValue']) && intval($optData['weightValue'])) {

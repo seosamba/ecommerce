@@ -6,7 +6,7 @@ define([
 			return {
 				title: '',
 				priceSign: '+',
-				priceType: 'unit',
+				priceType: 'percent',
 				priceValue: null,
 				weightSign: '+',
 				weightValue: null,
