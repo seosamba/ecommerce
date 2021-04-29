@@ -54,8 +54,6 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
         ));
 
-        $translator = Zend_Registry::get('Zend_Translate');
-
         $this->addElement('text', 'operationalHours', array(
             'label' => $translator->translate('store operational hours')
         ));
@@ -73,18 +71,23 @@ class Forms_BasicsSettings extends Zend_Form {
             )
         ));
 
+        $this->addElement('checkbox', 'smartFilter', array(
+            'label' => $translator->translate('Smart product list filter'),
+            'class' => 'grid_6 alpha'
+        ));
+
         $this->addElement('checkbox', 'enabledPartialPayment', array(
-            'label' => 'Accept partial payments for quote:  Yes/No',
+            'label' => $translator->translate('Accept partial payments for quote: Yes/No'),
             'class' => 'grid_6 alpha'
         ));
 
         $this->addElement('text', 'partialNotifyAfterQuantity', array(
-            'label' => 'Lag time',
+            'label' => $translator->translate('Lag time'),
             'class' => 'grid_6 alpha'
         ));
 
         $this->addElement('select', 'partialNotifyAfterType', array(
-            'label' => 'Length unit',
+            'label' => $translator->translate('Length unit'),
             'class' => 'grid_6 alpha',
             'multiOptions' => array(
                 'day' => $translator->translate('Days'),
