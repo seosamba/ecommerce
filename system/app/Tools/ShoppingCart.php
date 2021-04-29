@@ -820,10 +820,10 @@ class Tools_ShoppingCart {
                         }
                         $modifiers[$defaultOption['title']] = array(
                             'option_id'   => $defaultOption['id'],
-                            'title'       => preg_replace("/[^0-9]/", '', $textValue),
+                            'title'       => preg_replace("/[^0-9.]/", '', $textValue),
                             'priceSign'   => '+',
                             'priceType'   => 'unit',
-                            'priceValue'  => preg_replace("/[^0-9]/", '', $textValue),
+                            'priceValue'  => preg_replace("/[^0-9.]/", '', $textValue),
                             'weightSign'  => '+',
                             'weightValue' => '0.000'
                         );
