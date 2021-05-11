@@ -849,5 +849,6 @@
         'Zoom range (6-18)' => 'Plage de zoom (6-18)',
         'total amount' => 'montant total',
         'order weight' => 'poids de commande',
-        'Units' => 'Unités'
+        'Units' => 'Unités',
+        'Please check your Google Maps API key!' => 'Veuillez vérifier la clé Google Maps API'
 );?>
