@@ -194,8 +194,11 @@ $this->headScript()
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PROCESSING):?>
                          <?php $status = 'Quote Sent';?>
                     <?php endif;?>
-                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PENDING):?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_NEW):?>
                         <?php $status = 'New quote';?>
+                    <?php endif;?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PENDING):?>
+                        <?php $status = 'Quote Signed (Signature only quote)';?>
                     <?php endif;?>
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_CANCELED):?>
                         <?php $status = 'Lost opportunity';?>

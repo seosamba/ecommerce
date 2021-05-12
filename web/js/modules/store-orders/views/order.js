@@ -35,12 +35,16 @@ define([
                     var translatedGateway = this.model.get('gateway');
                     var translatedStatus = 'cs_' + status;
 
-                    if (translatedGateway == 'Quote' && status == 'pending') {
+                    if (translatedGateway == 'Quote' && status == 'new') {
                         translatedStatus = 'New quote';
                     }
 
                     if (translatedGateway == 'Quote' && status == 'processing') {
                         translatedStatus = 'Quote Sent';
+                    }
+
+                    if (translatedGateway == 'Quote' && status == 'pending') {
+                        translatedStatus = 'Quote Signed (Signature only quote)';
                     }
 
                     if (translatedGateway == 'Quote' && status == 'canceled') {

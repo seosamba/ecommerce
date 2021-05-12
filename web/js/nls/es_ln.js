@@ -149,6 +149,7 @@ define({
         'Your session has timed out. Please log again' : 'Su sesión ha cadicado. Inicie sesión de nuevo',
         'here' : 'aquí',
         'A coupon name can\'t contain gaps' : 'El nombre de cupón no puede contener espacios',
-        'Wait a minute! this state is already part of another zone... Add anyway?':'Atención, este estado ya forma parte de otra zona. ¿Añadir de todas formas?'
+        'Wait a minute! this state is already part of another zone... Add anyway?':'Atención, este estado ya forma parte de otra zona. ¿Añadir de todas formas?',
+        'Quote Signed (Signature only quote)':'Quote Signed (Signature only quote)'
     }
 });
