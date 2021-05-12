@@ -831,6 +831,7 @@
         'Select country' => 'Sélectionner pays',
         'Currency country' => 'Devise pays',
         'Complete your order' => 'Completer votre commande',
+        'Additional price field' => 'Champ de prix supplémentaire',
         'Enter position' => 'Indiquer une position',
         'Minimum order' => 'Commande minimum',
         'Smart product list filter' => 'Smart filtre de liste des produits',
