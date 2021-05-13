@@ -89,8 +89,16 @@ $this->headLink()
         {{if id}}
         &nbsp;
         {{else}}
-        <label class="block mt5px grid_5 alpha"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
-        <input class="hide grid_7 alpha omega" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+            {{if libraryOption}}
+                <label class="block mt0px grid_5 alpha">
+                    <span class="btn remove-from-library-btn" data-option-id="${parentId}"><?php echo $this->translate('Remove from library?'); ?></span>
+                </label>
+            {{else}}
+                <label class="block mt5px grid_5 alpha">
+                    <?php echo $this->translate('Add to library?'); ?><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
+                </label>
+                <input class="hide grid_7 alpha omega" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+            {{/if}}
         {{/if}}
 	</div>
     <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
