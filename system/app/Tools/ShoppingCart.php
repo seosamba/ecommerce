@@ -813,6 +813,22 @@ class Tools_ShoppingCart {
                             'weightValue' => null
                         );
                         break;
+                    case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
+                        $textValue = '';
+                        if (!empty($options[$defaultOption['id']])) {
+                            $textValue = $options[$defaultOption['id']];
+                        }
+                        $modifiers[$defaultOption['title']] = array(
+                            'optionType'  => Models_Model_Option::TYPE_ADDITIONALPRICEFIELD,
+                            'option_id'   => $defaultOption['id'],
+                            'title'       => preg_replace("/[^0-9.]/", '', $textValue),
+                            'priceSign'   => '+',
+                            'priceType'   => 'unit',
+                            'priceValue'  => preg_replace("/[^0-9.]/", '', $textValue),
+                            'weightSign'  => '+',
+                            'weightValue' => '0.000'
+                        );
+                        break;
 				}
 			}
 		}
