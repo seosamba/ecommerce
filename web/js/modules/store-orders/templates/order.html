@@ -5,11 +5,11 @@
 <td data-mobile-title="Purchased on"><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
 <% translatedStatus = 'cs_'+status %>
 
-<% if (gateway == 'Quote' && status == 'new'){ %>
+<% if (gateway == 'Quote' && status == 'pending'){ %>
     <% translatedStatus = 'New quote' %>
 <% } %>
 
-<% if (gateway == 'Quote' && status == 'pending'){ %>
+<% if (gateway == 'Quote' && status == 'not_verified'){ %>
     <% translatedStatus = 'Quote Signed (Signature only quote)' %>
 <% } %>
 

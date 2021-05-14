@@ -65,6 +65,7 @@ $this->headLink()
                         <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?></option>
                         <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?></option>
                         <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?></option>
+                        <option selected value="<?php echo Tools_Misc::CS_ALIAS_QUOTE_SIGNED; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_QUOTE_SIGNED); ?></option>
                         <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?></option>
                     </select>
                 </p>

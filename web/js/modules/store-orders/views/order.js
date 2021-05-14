@@ -35,7 +35,7 @@ define([
                     var translatedGateway = this.model.get('gateway');
                     var translatedStatus = 'cs_' + status;
 
-                    if (translatedGateway == 'Quote' && status == 'new') {
+                    if (translatedGateway == 'Quote' && status == 'pending') {
                         translatedStatus = 'New quote';
                     }
 
@@ -43,7 +43,7 @@ define([
                         translatedStatus = 'Quote Sent';
                     }
 
-                    if (translatedGateway == 'Quote' && status == 'pending') {
+                    if (translatedGateway == 'Quote' && status == 'not_verified') {
                         translatedStatus = 'Quote Signed (Signature only quote)';
                     }
 
@@ -78,6 +78,10 @@ define([
                         html += buttons['refunded'];
                         break;
                     case 'pending':
+                        html += buttons['completed'];
+                        html += buttons['canceled'];
+                        break;
+                    case 'not_verified':
                         html += buttons['completed'];
                         html += buttons['canceled'];
                         break;
