@@ -40,7 +40,7 @@ class Tools_FilterOrders {
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
                     $statuses[$k]['alliasOnlyQuote'] = true;
                 }
-                if ($v === Models_Model_CartSession::CART_STATUS_SHIPPED || $v === Models_Model_CartSession::CART_STATUS_COMPLETED || $v === Models_Model_CartSession::CART_STATUS_DELIVERED) {
+                if ($v === Models_Model_CartSession::CART_STATUS_SHIPPED || $v === Models_Model_CartSession::CART_STATUS_COMPLETED || $v === Models_Model_CartSession::CART_STATUS_DELIVERED || $v === Models_Model_CartSession::CART_STATUS_PARTIAL) {
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
                 }
             }
