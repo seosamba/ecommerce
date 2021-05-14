@@ -1398,6 +1398,7 @@ class Shopping extends Tools_Plugins_Abstract {
                             'config' => array(
                                 'title' => $pickupLocationConfig['title'],
                                 'units' => $pickupLocationConfig['units'],
+                                'gmapsZoom' => $pickupLocationConfig['gmapsZoom'],
                                 'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig'],
                                 'searchEnabled' => $pickupLocationConfig['searchEnabled']
                             )

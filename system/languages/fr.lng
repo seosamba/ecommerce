@@ -841,5 +841,15 @@
         'Months' => 'Mois',
         'Send payment complement request automatically after' => 'Envoyer automatiquement la demande de complément de paiement après',
         'Create templates from the action e-mails & SMS screens' => 'Сréer des mises en page à partir de la section d\'e-mails d\'action & SMS',
-        'partial payment lag time' => 'temps de paiement partiel'
+        'partial payment lag time' => 'temps de paiement partiel',
+        'Weight limit' => 'Limite de poids',
+        'Custom title' => 'Titre personnalisé',
+        'Default pickup behaviour' => 'Comportement de ramassage par défaut',
+        'Display location search on checkout' => 'Montrer la location lors du paiement',
+        'Map zoom' => 'Zoom de carte',
+        'Zoom range (6-18)' => 'Plage de zoom (6-18)',
+        'total amount' => 'montant total',
+        'order weight' => 'poids de commande',
+        'Units' => 'Unités',
+        'Please check your Google Maps API key!' => 'Veuillez vérifier la clé Google Maps API'
 );?>
