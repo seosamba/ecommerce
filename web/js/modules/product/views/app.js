@@ -52,7 +52,8 @@ define([
                 $('#product-tags-current, #product-tags-available, .paginator', '#tag-tab').toggle();
             },
             'click .paginator a.page': 'paginatorAction',
-            'change #automated-set-price': 'toggleSetPriceConfig'
+            'change #automated-set-price': 'toggleSetPriceConfig',
+            'click .remove-from-library-btn': 'removeOption'
 		},
         products: null,
         tags: null,
@@ -268,13 +269,32 @@ define([
                 var newOption = new ProductOption({
                     title: option.get('title'),
                     parentId: option.get('id'),
-                    type: option.get('type')
+                    type: option.get('type'),
+                    libraryOption: true
                 });
                 newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 this.model.get('options').add(newOption);
                 this.model.trigger('change');
             }
             $('#option-library').val('-1');
+        },
+        removeOption: function (e) {
+		    var optionId = $(e.target).data('option-id'),
+                self = this;
+
+            showConfirmCustom(_.isUndefined(i18n['Do you want to delete option from the library?'])?'Do you want to delete option from the library?':i18n['Do you want to delete option from the library?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
+                $.ajax({
+                    url: $('#website_url').val()+'api/store/options/optionId/'+optionId+'',
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function(response){
+                        showMessage(_.isUndefined(i18n['Deleted'])?'Deleted':i18n['Deleted'], false);
+                        self.fetchOptionLibrary();
+                        $(e.target).closest('.option-wrapper').find('.remove-option').trigger('click');
+                    },
+                    error: function(response){}
+                });
+            });
         },
 		imageChange: function(e){
             //$('#image-select-dialog').show("slide", { direction: "left"});
@@ -948,13 +968,13 @@ define([
             this.model.get('options').each(this.renderOption, this);
         },
         fetchOptionLibrary: function(){
-            if (!_.has(this, 'optionLibrary')){
+            //if (!_.has(this, 'optionLibrary')){
                 this.optionLibrary = new OptionsCollection();
                 this.optionLibrary.on('reset', function(collection){
                     $('#option-library').html(_.template($('#optionLibraryTemplate').html(), {items: collection.toJSON()}));
                 }, this);
                 this.optionLibrary.fetch();
-            }
+            //}
         },
         formSubmit: function(e) {
             var $form = $(e.target);
