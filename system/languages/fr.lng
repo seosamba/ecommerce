@@ -835,8 +835,6 @@
         'Enter position' => 'Indiquer une position',
         'Minimum order' => 'Commande minimum',
         'Smart product list filter' => 'Smart filtre de liste des produits',
-        'Send payment complement request automatically after' => 'Envoyer automatiquement la demande de complément de paiement après',
-        'partial payment lag time' => 'temps de paiement partiel',
         'Weight limit' => 'Limite de poids',
         'Custom title' => 'Titre personnalisé',
         'Default pickup behaviour' => 'Comportement de ramassage par défaut',
