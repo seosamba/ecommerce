@@ -76,25 +76,6 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
         ));
 
-        $this->addElement('checkbox', 'enabledPartialPayment', array(
-            'label' => $translator->translate('Accept partial payments for quote: Yes/No'),
-            'class' => 'grid_6 alpha'
-        ));
-
-        $this->addElement('text', 'partialNotifyAfterQuantity', array(
-            'label' => $translator->translate('Lag time'),
-            'class' => 'grid_6 alpha'
-        ));
-
-        $this->addElement('select', 'partialNotifyAfterType', array(
-            'label' => $translator->translate('Length unit'),
-            'class' => 'grid_6 alpha',
-            'multiOptions' => array(
-                'day' => $translator->translate('Days'),
-                'month' => $translator->translate('Months')
-            )
-        ));
-
     }
 
 }
