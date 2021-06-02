@@ -43,6 +43,10 @@ define([
                         translatedStatus = 'Quote Sent';
                     }
 
+                    if (translatedGateway == 'Quote' && status == 'not_verified') {
+                        translatedStatus = 'Quote Signed (Signature only quote)';
+                    }
+
                     if (translatedGateway == 'Quote' && status == 'canceled') {
                         translatedStatus = 'Lost opportunity';
                     }
@@ -74,6 +78,10 @@ define([
                         html += buttons['refunded'];
                         break;
                     case 'pending':
+                        html += buttons['completed'];
+                        html += buttons['canceled'];
+                        break;
+                    case 'not_verified':
                         html += buttons['completed'];
                         html += buttons['canceled'];
                         break;

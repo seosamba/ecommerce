@@ -9,6 +9,10 @@
     <% translatedStatus = 'New quote' %>
 <% } %>
 
+<% if (gateway == 'Quote' && status == 'not_verified'){ %>
+    <% translatedStatus = 'Quote Signed (Signature only quote)' %>
+<% } %>
+
 <% if (gateway == 'Quote' && status == 'processing'){ %>
     <% translatedStatus = 'Quote Sent' %>
 <% } %>
