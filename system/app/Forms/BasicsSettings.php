@@ -71,6 +71,27 @@ class Forms_BasicsSettings extends Zend_Form {
             )
         ));
 
+        $fiscalYearMonths = array(
+            '1' => 'January',
+            '2' => 'February',
+            '3' => 'March',
+            '4' => 'April',
+            '5' => 'May',
+            '6' => 'June',
+            '7' => 'July',
+            '8' => 'August',
+            '9' => 'September',
+            '10' => 'October',
+            '11' => 'November',
+            '12' => 'December'
+        );
+
+        $this->addElement('select', 'fiscalYearStart', array(
+            'label'	=> $translator->translate('Fiscal year start month'),
+            'class' => 'grid_6 alpha',
+            'multiOptions' => $fiscalYearMonths
+        ));
+
         $this->addElement('checkbox', 'smartFilter', array(
             'label' => $translator->translate('Smart product list filter'),
             'class' => 'grid_6 alpha'
