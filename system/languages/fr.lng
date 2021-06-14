@@ -845,5 +845,6 @@
         'order weight' => 'poids de commande',
         'Units' => 'Unités',
         'Please check your Google Maps API key!' => 'Veuillez vérifier la clé Google Maps API',
-        'Remove from library?' => 'Supprimer de bibliothèque?'
+        'Remove from library?' => 'Supprimer de bibliothèque?',
+        'Go to CRM Record' => 'Voir l\'enregistrement GRC'
 );?>
