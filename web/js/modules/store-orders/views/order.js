@@ -14,7 +14,8 @@ define([
         template: _.template(OrderTmpl),
         events: {
             'mouseenter td.status-change': 'statusChange',
-            'mouseleave td.status-change': 'statusChange'
+            'mouseleave td.status-change': 'statusChange',
+            'click a.go-to-client': 'goToClient'
         },
         initialize: function(){
             this.model.on('change', this.render, this);
@@ -102,6 +103,12 @@ define([
 
                 el.html($('<div></div>').html(html).data('order-id', this.model.get('id')));
             }
+        },
+        goToClient: function(){
+            var self = this,
+                goToClientProfile = $('#website_url').val() + 'dashboard/clients/#client/'+self.model.get('user_id');
+
+            window.open(goToClientProfile, '_blank');
         }
     });
 
