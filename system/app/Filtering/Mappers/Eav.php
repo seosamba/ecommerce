@@ -127,7 +127,7 @@ class Filtering_Mappers_Eav
      * @param array $tags    List of tags
      * @return array
      */
-    public function findListFiltersByTags($tags)
+    public function findListFiltersByTags($tags, array $prodIds = array())
     {
         if (!is_array($tags)) {
             $tags = (array)$tags;
@@ -145,16 +145,20 @@ class Filtering_Mappers_Eav
             );
             $data = array();
             if(!empty($productIds)){
+                if(!empty($prodIds)) {
+                    $productIds = array_intersect($productIds, $prodIds);
+                }
+
                 $select = $dbAdapter->select()->from(
-                    array('eav' => $this->_valuesTable),
+                    array('eav' => $this->_valuesTable), //shopping_filtering_values
                     array('eav.attribute_id', 'eav.value', 'count' => 'COUNT(DISTINCT(eav.product_id))')
                 )
                     ->join(
-                        array('tha' => $this->_tagsRelationTable),
+                        array('tha' => $this->_tagsRelationTable), //shopping_filtering_tags_has_attributes
                         'tha.attribute_id = eav.attribute_id',
                         null
                     )
-                    ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label'))
+                    ->join(array('a' => $this->_attributesTable), 'a.id = eav.attribute_id', array('a.name', 'a.label')) //shopping_filtering_attributes
                     ->where('tha.tag_id IN (?)', $tags)
                     ->where('a.name NOT IN (?)', Filtering_Tools::$_rangeFilters)
                     ->where('eav.product_id IN (?)', $productIds)
@@ -266,11 +270,16 @@ class Filtering_Mappers_Eav
         return $dbAdapter->fetchCol($select);
     }
 
-    public function getPriceRange($productTags)
+    public function getPriceRange($productTags, array $productsIds = array())
     {
-        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+        $where = $this->_dbAdapter->quoteInto('p.enabled = ?', '1');
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('t.tag_id IN (?)', $productTags);
 
-        $select = $dbAdapter->select()
+        if(!empty($productsIds)) {
+            $where .= ' AND ' . $this->_dbAdapter->quoteInto('p.id IN (?)', $productsIds);
+        }
+
+        $select = $this->_dbAdapter->select()
             ->from(
                 array(
                     'p' => 'shopping_product'
@@ -282,9 +291,9 @@ class Filtering_Mappers_Eav
             )
             ->from(array('t' => 'shopping_product_has_tag'), null)
             ->where('p.id = t.product_id')
-            ->where('t.tag_id IN (?)', $productTags);
+            ->where($where);
 
-        $result = $dbAdapter->fetchRow($select);
+        $result = $this->_dbAdapter->fetchRow($select);
 
         return $result;
     }
@@ -318,8 +327,15 @@ class Filtering_Mappers_Eav
      * @param $filterByNames null|array List of allowed brand names
      * @return array
      */
-    public function getBrands($productTags)
+    public function getBrands($productTags, array $productsIds = array())
     {
+        $where = $this->_dbAdapter->quoteInto('pt.tag_id IN (?)', $productTags);
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('p.enabled = ?', '1');
+
+        if(!empty($productsIds)) {
+            $where .= ' AND ' . $this->_dbAdapter->quoteInto('p.id IN (?)', $productsIds);
+        }
+
         $select = $this->_dbAdapter->select()->from(array('p' => 'shopping_product'),
                 array(
                     'p.id',
@@ -328,8 +344,7 @@ class Filtering_Mappers_Eav
                 ->joinInner(array('b' => 'shopping_brands'), 'b.id = p.brand_id', array())
                 ->joinInner(array('t' => 'shopping_tags'), '', array())
                 ->joinInner(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', array())
-                ->where('pt.tag_id IN (?)', $productTags)
-                ->where('p.enabled = ?', '1')
+                ->where($where)
                 ->group('p.id');
 
         $result = $this->_dbAdapter->fetchPairs($select);

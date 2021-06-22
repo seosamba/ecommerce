@@ -1,12 +1,17 @@
 <?php
+$min = floor(floatval($this->min));
+$max = ceil(floatval($this->max));
+
 if(isset($this->priceTax) && !empty($this->priceTax)){
     $percentMin = ($this->min / 100) * $this->priceTax;
     $percentMax = ($this->max / 100) * $this->priceTax;
     $min = floor($this->min + $percentMin);
     $max = round($this->max + $percentMax);
-}else{
-    $min = floor(floatval($this->min));
-    $max = ceil(floatval($this->max));
+
+    if(!empty($this->group)) {
+        $min = floor($this->group['min']);
+        $max = ceil($this->group['max']);
+    }
 }
 $sliderType = $this->name;
 ?>

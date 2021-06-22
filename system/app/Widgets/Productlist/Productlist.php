@@ -223,18 +223,6 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		$this->_view->productTemplate = $this->_productTemplate->getName();
 
         if(!empty($this->_priceFilter)){
-            if(in_array('tax', $this->_options)) {
-                $tax = $this->getTax();
-                if(!empty($tax)) {
-                    $tax = (int)$tax;
-                    $percentMax = $this->_priceFilter['max'] / "1.$tax";
-                    $percentMin = $this->_priceFilter['min'] / "1.$tax";
-                    $this->_priceFilter['max'] = $percentMax;
-                    $this->_priceFilter['min'] = $percentMin;
-                }
-            }
-
-
             $this->_view->price = $this->_priceFilter;
         }
 
@@ -433,10 +421,9 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		}
 
         if (!empty($this->_priceFilter)) {
-            if(!empty($this->_priceFilter['tax'])){
-                $tax = $this->_priceFilter['tax'];
-                $this->_priceFilter['min'] = $this->_priceFilter['min'] * "1.$tax";
-                $this->_priceFilter['max'] = $this->_priceFilter['max'] * "1.$tax";
+            if(!empty($this->_priceFilter['additionalPrice'])) {
+                $this->_priceFilter['min'] = $this->_priceFilter['additionalPrice']['min'];
+                $this->_priceFilter['max'] = $this->_priceFilter['additionalPrice']['max'];
             }
             $data['priceFilter'] = $this->_priceFilter;
         }
@@ -505,7 +492,8 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:options'                    => isset($productOptionsView) ? $productOptionsView : '',
                 '$product:inventory'                  => $inventoryCount,
                 '$product:qty'                        => $productQty,
-                '$product:wishlistqty'                => $product->getWishlistQty()
+                '$product:wishlistqty'                => $product->getWishlistQty(),
+                '$product:minimumorder'               => $product->getMinimumOrder()
             );
 
             if (isset($data['priceFilter'])) {
@@ -743,19 +731,15 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         if (!empty($urlFilter) && in_array(self::OPTION_FILTERABLE, $this->_options)) {
             $attr = array_flip(Filtering_Mappers_Eav::getInstance()->getAttributeNames());
-            if (!empty($urlFilter['price'])) {
-                if(in_array('tax', $this->_options)) {
 
-                    $tax = $this->getTax();
-                    if(!empty($tax)) {
-                        $tax = (int)$tax;
-                        $percentMax = $urlFilter['price']['to'] / "1.$tax";
-                        $percentMin = $urlFilter['price']['from'] / "1.$tax";
-                        $urlFilter['price']['to'] = ceil($percentMax);
-                        $urlFilter['price']['from'] = floor($percentMin);
-                    }
-                }
-                $this->_priceFilter = array('min' => $urlFilter['price']['from'], 'max' => $urlFilter['price']['to'], 'tax' => $tax);
+            if(in_array('tax', $this->_options)) {
+                $tax = $this->getTax();
+            }
+
+            if (!empty($urlFilter['price'])) {
+                $priceFilter = Tools_GroupPriceTools::reduceFilterPrice($urlFilter['price'], $tax, $filters['tags']);
+
+                $this->_priceFilter = $priceFilter;
                 unset($urlFilter['price']);
             }
 
@@ -812,7 +796,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         $this->_view->filters = $filters;
 
-		return $this->_productMapper->fetchAll(
+		$data = $this->_productMapper->fetchAll(
 		    $enabledOnly,
             $filters['order'],
             0,
@@ -828,6 +812,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             false,
             $productPriceFilter
         );
+        return $data;
 	}
 
 	/**

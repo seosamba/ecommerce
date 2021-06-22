@@ -37,6 +37,8 @@ class Tools_Misc
 
     const CS_ALIAS_LOST_OPPORTUNITY = 'lost_opportunity';
 
+    const CS_ALIAS_QUOTE_SIGNED = 'quote_signed';
+
     const EXCHANGE_PATH = 'https://query.yahooapis.com/v1/public/yql?q=';
 
     const EXCHANGE_ADDITIONAL_PARAMS = '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';

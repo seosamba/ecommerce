@@ -601,8 +601,19 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentsecond' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
--- 23/08/2018
+
+-- 14/04/2021
 -- version: 2.8.5
+ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(10,6) DEFAULT '0.00';
+
+-- 23/04/2021
+-- version: 2.8.6
+-- Add additionalpricefield option
+ALTER TABLE `shopping_product_option`
+    CHANGE `type` `type` enum('dropdown','radio','text','date','file','textarea', 'additionalpricefield') COLLATE 'utf8_unicode_ci' NOT NULL AFTER `title`;
+
+-- 23/08/2018
+-- version: 2.8.7
 -- Add historical cart session option
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `id` INT(10) unsigned AUTO_INCREMENT,
@@ -625,6 +636,6 @@ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.8' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

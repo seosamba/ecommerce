@@ -345,6 +345,25 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
         return $preparedOptions;
     }
 
+    /*
+     * Fetch orders  with quotes by user id including recurring payments data
+     *
+     * @param int $userId user Id
+     * @return array
+     *
+     */
+    public function fetchOrdersWithQuotes($userId){
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart.user_id = ?', $userId);
+
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+            ->from(array('cart' => 'shopping_cart_session'))
+            ->joinLeft(array('recurrent' => 'shopping_recurring_payment'), 'recurrent.cart_id = cart.id', array('recurring_id' => 'recurrent.cart_id'))
+            ->joinLeft(array('sq' => 'shopping_quote'), 'sq.cart_id = cart.id', array('quote_id' => 'sq.id'))
+            ->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
+
 	protected function _restoreOptionsForCartSession($mapping){
 		if (!is_array($mapping) || empty($mapping)) {
 			throw new Exceptions_SeotoasterException('Wrong parameters passed');
@@ -377,6 +396,18 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
                         'priceValue'  => null,
                         'weightSign'  => null,
                         'weightValue' => null
+                    );
+                    break;
+                case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
+                    $result[$option->getTitle()] = array(
+                        'optionType'  => Models_Model_Option::TYPE_ADDITIONALPRICEFIELD,
+                        'option_id'   => $option->getId(),
+                        'title'       => $value,
+                        'priceSign'   => '+',
+                        'priceType'   => 'unit',
+                        'priceValue'  => $value,
+                        'weightSign'  => '+',
+                        'weightValue' => '0.000'
                     );
                     break;
 				default:

@@ -164,5 +164,19 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 	    return $data;
     }
 
+    /**
+     * Delete library option by Id
+     *
+     * @param $optionId
+     * @throws Exception
+     */
+    public function deleteLibraryOption($optionId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $optionId);
+        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('parentId = ?', '0');
+
+        return (bool) $this->getDbTable()->delete($where);
+    }
+
 
 }

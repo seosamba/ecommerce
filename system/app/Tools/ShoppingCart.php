@@ -813,6 +813,22 @@ class Tools_ShoppingCart {
                             'weightValue' => null
                         );
                         break;
+                    case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
+                        $textValue = '';
+                        if (!empty($options[$defaultOption['id']])) {
+                            $textValue = $options[$defaultOption['id']];
+                        }
+                        $modifiers[$defaultOption['title']] = array(
+                            'optionType'  => Models_Model_Option::TYPE_ADDITIONALPRICEFIELD,
+                            'option_id'   => $defaultOption['id'],
+                            'title'       => preg_replace("/[^0-9.]/", '', $textValue),
+                            'priceSign'   => '+',
+                            'priceType'   => 'unit',
+                            'priceValue'  => preg_replace("/[^0-9.]/", '', $textValue),
+                            'weightSign'  => '+',
+                            'weightValue' => '0.000'
+                        );
+                        break;
 				}
 			}
 		}
@@ -1103,6 +1119,7 @@ class Tools_ShoppingCart {
     }
 
     /**
+
      * Generate cart item key
      *
      * @param int $cartId cart id
@@ -1113,6 +1130,31 @@ class Tools_ShoppingCart {
     public static function generateCartItemKey($cartId, $productId, $options)
     {
         return md5($cartId . '_' . $productId . '_' . $options);
+    }
+
+    /*
+     * Verify if payment already payed
+     *
+     * @return bool
+     */
+    public static function verifyIfAlreadyPayed()
+    {
+        $isPayed = false;
+        $cartSession = Tools_ShoppingCart::getInstance();
+        $cartId = $cartSession->getCartId();
+        if (!empty($cartId)) {
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            if ($cartSession instanceof Models_Model_CartSession) {
+                $statuses = array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_PARTIAL);
+                $status = $cartSession->getStatus();
+                if (in_array($status, $statuses)) {
+                    $isPayed = true;
+                }
+            }
+        }
+
+        return $isPayed;
+
     }
 
 }

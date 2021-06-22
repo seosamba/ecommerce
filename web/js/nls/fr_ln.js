@@ -110,7 +110,9 @@ define({
         'Line break <br>' : 'Saut de ligne <br>',
         'Paragraph' : 'Paragraphe',
         'Paragraph <p></p>' : 'Paragraphe <p></p>',
-        'Wait a minute! this state is already part of another zone... Add anyway?' : 'Attendez une minute! Сe état fait déjà partie d\'une autre zone... Ajouter tout de même?'
-
+        'Wait a minute! this state is already part of another zone... Add anyway?' : 'Attendez une minute! Сe état fait déjà partie d\'une autre zone... Ajouter tout de même?',
+        'Quote Signed (Signature only quote)':'Quote Signed (Signature only quote)',
+        'Do you want to delete option from the library?' : 'Voulez-vous supprimer cette option de bibliothèque?',
+        'Deleted' : 'Supprimé'
     }
 });

@@ -225,6 +225,11 @@
                                             <?php
                                             if (is_array($optData)) {
                                                 $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
+
+                                                if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                                    $optionStr = '<span>'.$optionTitle.' </span>';
+                                                }
+
                                                 if (!empty($optData['priceValue']) && intval($optData['priceValue'])) {
                                                     if ((bool)$item['taxRate'] && $this->showPriceIncTax == 1){
                                                         $optPriceMod = $optData['priceValue'] * (100 + $item['taxRate'])/100;
@@ -234,8 +239,8 @@
                                                     if ($optData['priceType'] === 'percent') {
                                                         $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
                                                     } else {
-                                                        if(!empty($this->usNumericFormat)) {
-                                                            $optionStr = number_format($optPriceMod, 2) . '&nbsp;' . $this->currencySymbol;
+                                                        if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                                            $optionStr .= '<span>'.$this->currency($optPriceMod).'</span>';
                                                         } else {
                                                             $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
                                                         }
@@ -253,21 +258,13 @@
                                 </td>
                                 <td class="text-center"><?php echo $product->getMpn();?></td>
                                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                                    <?php if(!empty($this->usNumericFormat)) :?>
-                                        <td class="text-center"><?php echo number_format($item['original_price'], 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                                    <?php else:?>
-                                        <td class="text-center"><?php echo $this->currency($item['original_price']);?></td>
-                                    <?php endif;?>
+                                    <td class="text-center"><?php echo $this->currency($item['original_price']);?></td>
                                 <?php endif;?>
                                 <td class="text-center">
                                 <?php if($item['freebies'] == 1):?>
                                     <?php echo $this->translate('free');?>
                                 <?php else:?>
-                                    <?php if(!empty($this->usNumericFormat)) :?>
-                                        <?php echo number_format($item['price'], 2) . '&nbsp;' . $this->currencySymbol;?>
-                                    <?php else :?>
-                                        <?php echo $this->currency($item['price']);?>
-                                    <?php endif;?>
+                                    <?php echo $this->currency($item['price']);?>
                                 <?php endif;?>
                                 </td>
                                 <td class="text-center"><?php echo $item['qty'];?></td>
@@ -276,15 +273,9 @@
                                     <td class="text-center"><?php echo $this->translate('free');?></td>
                                     <td class="text-center"><?php echo $this->translate('free');?></td>
                                 <?php else:?>
-                                    <?php if(!empty($this->usNumericFormat)) :?>
-                                        <td class="text-center"><?php echo number_format($item['qty'] * $item['price'], 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                                        <td class="text-center"><?php echo number_format($item['qty'] * $item['tax'], 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                                        <td class="text-center"><?php echo number_format($item['qty'] * $item['tax_price'], 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                                    <?php else:?>
-                                        <td class="text-center"><?php echo $this->currency($item['qty'] * $item['price']);?></td>
-                                        <td class="text-center"><?php echo $this->currency($item['qty'] * $item['tax']);?></td>
-                                        <td class="text-center"><?php echo $this->currency($item['qty'] * $item['tax_price']);?></td>
-                                    <?php endif;?>
+                                    <td class="text-center"><?php echo $this->currency($item['qty'] * $item['price']);?></td>
+                                    <td class="text-center"><?php echo $this->currency($item['qty'] * $item['tax']);?></td>
+                                    <td class="text-center"><?php echo $this->currency($item['qty'] * $item['tax_price']);?></td>
                                 <?php endif;?>
                             </tr>
                         <?php endforeach; ?>
@@ -320,51 +311,27 @@
 
                         <td><?php echo $this->translate('Subtotal');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo number_format($subTotal + $this->order->getSubTotalTax(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                            <?php else:?>
-                                <td class="text-right"><?php echo $this->currency($subTotal + $this->order->getSubTotalTax());?></td>
-                            <?php endif;?>
+                            <td class="text-right"><?php echo $this->currency($subTotal + $this->order->getSubTotalTax());?></td>
                         <?php else:?>
-                            <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo number_format($subTotal, 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                            <?php else:?>
-                                <td class="text-right"><?php echo $this->currency($subTotal);?></td>
-                            <?php endif;?>
+                            <td class="text-right"><?php echo $this->currency($subTotal);?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getDiscount() > 0): ?>
                         <tr>
                             <td><?php echo $this->translate('Discount');?>:</td>
                             <?php if ($this->showPriceIncTax == 1): ?>
-                                <?php if(!empty($this->usNumericFormat)) :?>
-                                    <td class="text-right"><?php echo number_format($this->order->getDiscount() + $this->order->getDiscountTax(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                                <?php else:?>
-                                    <td class="text-right"><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
-                                <?php endif;?>
+                                <td class="text-right"><?php echo $this->currency($this->order->getDiscount() + $this->order->getDiscountTax());?></td>
                             <?php else: ?>
-                                <?php if(!empty($this->usNumericFormat)) :?>
-                                    <td class="text-right"><?php echo number_format($this->order->getDiscount(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                                <?php else:?>
-                                    <td class="text-right"><?php echo $this->currency($this->order->getDiscount());?></td>
-                                <?php endif;?>
+                                <td class="text-right"><?php echo $this->currency($this->order->getDiscount());?></td>
                             <?php endif;?>
                         </tr>
                     <?php endif; ?>
                     <tr>
                         <td><?php echo $this->translate('Shipping');?>:</td>
                         <?php if ($this->showPriceIncTax == 1): ?>
-                            <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : number_format($this->order->getShippingPrice() + $this->order->getShippingTax(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                            <?php else:?>
-                                <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
-                            <?php endif;?>
+                            <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice() + $this->order->getShippingTax());?></td>
                         <?php else:?>
-                            <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : number_format($this->order->getShippingPrice(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                            <?php else:?>
-                                <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
-                            <?php endif;?>
+                            <td class="text-right"><?php echo $this->order->getShippingPrice() === null ? $this->currency(0) : $this->currency($this->order->getShippingPrice());?></td>
                         <?php endif;?>
                     </tr>
                     <?php if ($this->order->getShippingService()) : ?>
@@ -390,29 +357,17 @@
                         <?php else: ?>
                             <td><?php echo $this->translate('Total') . ' ' . $taxName;?>:</td>
                         <?php endif;?>
-                            <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo number_format($this->order->getTotalTax(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                            <?php else:?>
-                                <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
-                            <?php endif;?>
+                        <td class="text-right"><?php echo $this->currency($this->order->getTotalTax());?></td>
                     </tr>
                     <?php if ($this->order->getRefundAmount() > 0): ?>
                         <tr>
                             <td><?php echo $this->translate('Refund');?>:</td>
-                            <?php if(!empty($this->usNumericFormat)) :?>
-                                <td class="text-right"><?php echo number_format($this->order->getRefundAmount(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                            <?php else:?>
-                                <td class="text-right"><?php echo $this->currency($this->order->getRefundAmount());?></td>
-                            <?php endif;?>
+                            <td class="text-right"><?php echo $this->currency($this->order->getRefundAmount());?></td>
                         </tr>
                     <?php endif; ?>
                     <tr>
                         <td><?php echo $this->translate('Grand Total');?>:</td>
-                        <?php if(!empty($this->usNumericFormat)) :?>
-                            <td class="text-right"><?php echo number_format($this->order->getTotal(), 2) . '&nbsp;' . $this->currencySymbol;?></td>
-                        <?php else:?>
-                            <td class="text-right"><?php echo $this->currency($this->order->getTotal());?></td>
-                        <?php endif;?>
+                        <td class="text-right"><?php echo $this->currency($this->order->getTotal());?></td>
                     </tr>
                         <?php if($this->order->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL):?>
                             <tr>

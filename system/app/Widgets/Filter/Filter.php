@@ -147,30 +147,269 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
 
         $tagIds = array_keys($this->_tags);
+        $filtersBrands = array();
+        $productBrandTags = array();
+        $priceFilter = array();
+        $productsIds = array();
 
         // generating filter id
         $filterId = implode('_', array_merge(array($this->_toasterOptions['id']), $options['tagnames']));
         $filterId = substr(md5($filterId), 0, 16);
         $this->_view->filterId = $filterId;
 
+
+
         if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT) && $request->isPost()) {
             $data = $request->getParam('show', array());
+
+            $useSortData = $request->getParam('useSortData', array());
+            $sortedFiltersAttributes = array();
+
+            if(!empty($useSortData)) {
+                $countParams = count($useSortData);
+                asort($useSortData, SORT_STRING);
+
+                $i = 1;
+                foreach ($useSortData as $key => $param) {
+                    if(empty($param)) {
+                        $sortedFiltersAttributes[$key] = $countParams+$i;
+                        //return 'Please fill all sorted inputs!';
+                    } else {
+                        $sortedFiltersAttributes[$key] = $param;
+                    }
+                    $i++;
+                }
+
+                asort($sortedFiltersAttributes, SORT_NUMERIC);
+
+                $data['useSortData'] = $sortedFiltersAttributes;
+            }
+
+            $usesortValuesData = $request->getParam('usesortValuesData', array());
+            $sortedFiltersAttributes = array();
+
+            if(!empty($usesortValuesData)) {
+                foreach ($usesortValuesData as $key => $params) {
+                    $countParams = count($params);
+                    asort($params, SORT_STRING);
+
+                    $i = 1;
+                    foreach ($params as $pKey => $param) {
+                        if(empty($param)) {
+                            $sortedFiltersAttributes[$key][$pKey] = $countParams+$i;
+                        } else {
+                            $sortedFiltersAttributes[$key][$pKey] = (int) $param;
+                        }
+                        $i++;
+                    }
+                }
+
+                asort($sortedFiltersAttributes, SORT_NUMERIC);
+
+                foreach ($sortedFiltersAttributes as $filterName => $filterValues) {
+                    asort($filterValues, SORT_NUMERIC);
+                    $sortedFiltersAttributes[$filterName] = $filterValues;
+                }
+
+                $data['usesortValuesData'] = $sortedFiltersAttributes;
+            }
 
             Filtering_Mappers_Filter::getInstance()->saveSettings($filterId, $data);
         }
 
         $widgetSettings = Filtering_Mappers_Filter::getInstance()->getSettings($filterId);
+
+        $usesort = false;
+        $usesortData = array();
+        $usesortvalues = false;
+        $usesortValuesData = array();
+        if(in_array('usesort', $this->_options)) {
+            if(!empty($widgetSettings['useSortData'])) {
+                $usesort = true;
+                $usesortData = $widgetSettings['useSortData'];
+            }
+
+            if(in_array('usesortvalues', $this->_options)) {
+                $usesortvalues = true;
+                if(!empty($widgetSettings['usesortValuesData'])) {
+                    $usesortValuesData = $widgetSettings['usesortValuesData'];
+                }
+            }
+        }
+
+        $this->_view->usesort = $usesort;
+        $this->_view->usesortData = $usesortData;
+        $this->_view->usesortvalues = $usesortvalues;
+        $this->_view->usesortValuesData = $usesortValuesData;
+
         $this->_widgetSettings = $widgetSettings;
 
         // fetch list filters by given tags
         $eavMapper = Filtering_Mappers_Eav::getInstance();
 
-        $listFilters = $eavMapper->findListFiltersByTags($tagIds, $widgetSettings);
+        $listFilters = $eavMapper->findListFiltersByTags($tagIds);
+
+        $smartProductlistFilter = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('smartFilter');
+
+        if(!empty($smartProductlistFilter)) {
+            $urlFilter = Filtering_Tools::normalizeFilterQuery();
+
+            if(!empty($urlFilter['category']) && !empty($this->_tags)) {
+                foreach ($this->_tags as $tagId => $tagName) {
+                    if(!in_array($tagName, $urlFilter['category'])) {
+                        unset($this->_tags[$tagId]);
+                    } else {
+                        array_push($this->_cacheTags, 'prodtag_' . $tagId);
+                    }
+                }
+
+                $tagIds = array_keys($this->_tags);
+            }
+
+            if (!empty($urlFilter['brand'])) {
+                $filtersBrands = $urlFilter['brand'];
+                unset($urlFilter['brand']);
+            }
+
+            if (!empty($filtersBrands)) {
+                foreach ($filtersBrands as $brand) {
+                    array_push($this->_cacheTags, 'prodbrand_' . $brand);
+                }
+            }
+
+            if(!empty($urlFilter['price'])) {
+                $tax = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+                if($tax !== null){
+                    $tax = $tax[0]['rate1'];
+                }
+
+                $priceFilter = Tools_GroupPriceTools::reduceFilterPrice($urlFilter['price'], $tax, $tagIds);
+            }
+
+            $productIds = Filtering_Mappers_Eav::getInstance()->findProductIdsByAttributes($urlFilter);
+
+            $idsWhere = Zend_Db_Table_Abstract::getDefaultAdapter()->quoteInto('p.id IN (?)', $productIds);
+
+            $enabledOnly = Models_Mapper_ProductMapper::getInstance()->getDbTable()->getAdapter()->quoteInto('p.enabled=?', '1');
+
+            if(!empty($productIds)) {
+                $enabledOnly = $idsWhere . ' AND ' . $enabledOnly;
+            }
+
+            $filters = array(
+                'tags'   => $tagIds,
+                'brands' => $filtersBrands,
+                'order'  => null
+            );
+
+            $tagIdsToFind = array();
+            $tagIdsTmp = array();
+
+            $data = Models_Mapper_ProductMapper::getInstance()->fetchAllProductByParams(
+                $enabledOnly,
+                $filters['order'],
+                0,
+                null,//$limit
+                null,
+                $filters['tags'],
+                $filtersBrands,
+                false,
+                false,
+                array(),
+                $priceFilter,
+                'DESC',//$orderSql
+                false,
+                array()//$productPriceFilter
+            );
+
+            if(!empty($data)) {
+                foreach ($data as $product) {
+                    $productsIds[] = $product['id'];
+
+                    $tags = $product['tags'];
+                    if(!empty($tags)) {
+                        foreach ($tags as $tag) {
+                            $productBrandTags[] = $tag['id'];
+                            if(!in_array($tag['id'] , $tagIdsTmp)) {
+                                array_push($tagIdsTmp, $tag['id']);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!empty($tagIdsTmp) && !empty($tagIds)) {
+                $tagIdsToFind = $tagIds;
+                foreach ($tagIdsToFind as $key => $tagId) {
+                    if(!in_array($tagId, $tagIdsTmp)) {
+                        unset($tagIdsToFind[$key]);
+                    }
+                }
+                $tagIds = $tagIdsToFind;
+            }
+
+            if(!empty($tagIdsToFind)) {
+                $listFilters = $eavMapper->findListFiltersByTags($tagIdsToFind, $productsIds);
+            }
+        }
+
         $rangeFilters = $eavMapper->findRangeFiltersByTags($tagIds, $widgetSettings);
 
         $this->_filters = array_merge($rangeFilters, $listFilters);
         // fetch price range for filters
-        $this->_priceRange = $eavMapper->getPriceRange($tagIds);
+        $this->_priceRange = $eavMapper->getPriceRange($tagIds, $productsIds);
+
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+        $dbTable = new Models_DbTable_CustomerInfo();
+        $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+        $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
+
+        if(!empty($allCustomersGroups)) {
+            if(array_key_exists($currentUser, $allCustomersGroups)){
+                $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                if(isset($allProductsGroups[$groupId])){
+                    if(!empty($this->_priceRange)) {
+                        foreach ($this->_priceRange as $key => $range) {
+                            $priceNow = $range;
+                            $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                            $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                            $priceType  = $allProductsGroups[$groupId]['priceType'];
+                            $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
+
+                            if($priceType == 'percent'){
+                                $priceModificationValue = ($priceNow*$priceValue)/100;
+                            }
+                            if($priceType == 'unit'){
+                                $priceModificationValue = $priceValue;
+                            }
+
+                            if($priceSign == 'minus'){
+                                $resultPrice = $priceNow - $priceModificationValue;
+                            }
+                            if($priceSign == 'plus'){
+                                $resultPrice = $priceNow + $priceModificationValue;
+                            }
+
+                            if(empty($nonTaxable)) {
+                                $tax = Filtering_Mappers_Filter::getInstance()->getTaxRate();
+                                if($tax !== null){
+                                    $tax = $tax[0]['rate1'];
+
+                                    $resultPriceParam = ($resultPrice*$tax)/100;
+                                    $resultPrice = $resultPrice + $resultPriceParam;
+                                }
+                            }
+
+                            $this->_priceRange['group'][$key] = $resultPrice;
+                        }
+                    }
+                }
+            }
+        }
+
         if(!isset($priceTax) || empty($priceTax)){
             $this->_priceRange['min'] = floor($this->_priceRange['min']);
             $this->_priceRange['max'] = ceil($this->_priceRange['max']);
@@ -197,7 +436,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         $this->productPriceRange = $productPriceRange;
 
-        $brands = $eavMapper->getBrands($tagIds);
+        $brands = $eavMapper->getBrands($tagIds, $productsIds);
 
         $tmpBrandsArr = array();
         if(!empty($brands)) {
@@ -245,6 +484,14 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
         if(!empty($widgetSettings) && !empty($clearedFilters)) {
             $this->_view->filters = Tools_Misc::processProductFilters($widgetSettings, $clearedFilters);
+        }
+
+        if(!empty($this->_tags) && !empty($productBrandTags)) {
+            foreach ($this->_tags as $tagId => $tagValue) {
+                if(!in_array($tagId, $productBrandTags)) {
+                    unset($this->_tags[$tagId]);
+                }
+            }
         }
 
         if (!empty($widgetSettings['tags'])) {
@@ -333,6 +580,32 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->tags = $this->_tags;
 
         $this->_view->brands = $this->_brands;
+
+        $usesort = false;
+        $usesortData = array();
+        $usesortvalues = false;
+        $usesortValuesData = array();
+        if(in_array('usesort', $this->_options)) {
+            $usesort = true;
+            if(!empty($widgetSettings['useSortData'])) {
+                $usesortData = $widgetSettings['useSortData'];
+                unset($widgetSettings['useSortData']);
+            }
+
+            if(in_array('usesortvalues', $this->_options)) {
+                $usesortvalues = true;
+                if(!empty($widgetSettings['usesortValuesData'])) {
+                    $usesortValuesData = $widgetSettings['usesortValuesData'];
+                    unset($widgetSettings['usesortValuesData']);
+                }
+            }
+
+        }
+
+        $this->_view->usesort = $usesort;
+        $this->_view->usesortData = $usesortData;
+        $this->_view->usesortvalues = $usesortvalues;
+        $this->_view->usesortValuesData = $usesortValuesData;
 
         $this->_view->filters = array_map(
             function ($filter) use ($widgetSettings) {

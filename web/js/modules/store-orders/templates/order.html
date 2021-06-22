@@ -1,12 +1,16 @@
 <td class="check-order textcentered"><input type="checkbox" name="check-order[]" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> title=""/></td>
 <td data-mobile-title="#" class="order-id"><%= id %></td>
-<td data-mobile-title="Customer name"><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
+<td data-mobile-title="Customer name"><a href="javascript:;" class="go-to-client"><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></a></td>
 <td data-mobile-title="Email"><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
 <td data-mobile-title="Purchased on"><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
 <% translatedStatus = 'cs_'+status %>
 
 <% if (gateway == 'Quote' && status == 'pending'){ %>
     <% translatedStatus = 'New quote' %>
+<% } %>
+
+<% if (gateway == 'Quote' && status == 'not_verified'){ %>
+    <% translatedStatus = 'Quote Signed (Signature only quote)' %>
 <% } %>
 
 <% if (gateway == 'Quote' && status == 'processing'){ %>
@@ -22,29 +26,13 @@
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
 
-<%
-thousand = '&nbsp;'
-decimal = ','
-
-if(usNumericFormat == 1) {
-thousand = ','
-decimal = '.'
-}
-
-formatMoneyOptions = {
-symbol   : '',
-thousand : thousand,
-decimal  : decimal,
-}
-%>
-
 <td data-mobile-title="Products in cart"><%= total_products %></td>
-<td data-mobile-title="Total price"><%= accounting.formatMoney(total, formatMoneyOptions) + '&nbsp;' + currencySymbol %>
+<td data-mobile-title="Total price"><%= accounting.formatMoney(total, moneyFormat) %>
     <% if(status === 'partial') { %>
         (<%= partial_paid_amount %>)
     <% } %>
 </td>
-<td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : shipping_price  %></td>
+<td data-mobile-title="Shipping price"><%= _.isNull(shipping_price) ? '--' : accounting.formatMoney(shipping_price, moneyFormat)  %></td>
 <td data-mobile-title="Shipping via" class="shipping-service">
     <div class="tracking-info">
         <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>

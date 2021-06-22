@@ -35,34 +35,35 @@
                 <?php if(isset($this->invoicePlugin)):?>
                     <th><?php echo $this->translate('Invoice');?></th>
                 <?php endif;?>
+                <th><?php echo $this->translate('Quote');?></th>
             </tr>
             </thead>
             <tbody>
             <?php if ($this->orders): ?>
                 <?php foreach ($this->orders as $order):?>
-                    <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED ||
-                     $order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote')
-                    || $order->getStatus() === Models_Model_CartSession::CART_STATUS_REFUNDED):?>
-                    <tr data-role="cart" data-id="<?php echo $order->getId();?>">
-                        <td><?php echo date("d-M-Y", strtotime($order->getCreatedAt()));?></td>
-                        <td><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order->getId();?>"> # <?php echo $order->getId();?></a></td>
-                        <td><?php echo $this->currency(floatval($order->getTotal()));?></td>
+                    <?php if($order['status'] === Models_Model_CartSession::CART_STATUS_COMPLETED || $order['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED || $order['status'] == Models_Model_CartSession::CART_STATUS_PARTIAL ||
+                        $order['status'] === Models_Model_CartSession::CART_STATUS_SHIPPED || ($order['status'] === Models_Model_CartSession::CART_STATUS_PROCESSING && $order['gateway'] === 'Quote')
+                    || $order['status'] === Models_Model_CartSession::CART_STATUS_REFUNDED):?>
+                    <tr data-role="cart" data-id="<?php echo $order['id'];?>">
+                        <td><?php echo date("d-M-Y", strtotime($order['created_at']));?></td>
+                        <td><a href="javascript:;" class="tpopup" data-pheight="560" data-url="<?php echo $this->websiteUrl;?>plugin/shopping/run/order/id/<?php echo $order['id'];?>"> # <?php echo $order['id'];?></a></td>
+                        <td><?php echo $this->currency(floatval($order['total']));?></td>
                         <td class="user-orders-shipping-data">
-                            <?php if($order->getShippingPrice() != 0):?>
-                               <p><?php echo $this->currency(floatval($order->getShippingPrice()));?></p>
+                            <?php if($order['shipping_price'] != 0):?>
+                               <p><?php echo $this->currency(floatval($order['shipping_price']));?></p>
                             <?php endif;?>
-                            <?php if($order->getShippingType() != ''):?>
-                                <p><?php echo $order->getShippingService().' - '.$order->getShippingType() ;?></p>
+                            <?php if($order['shipping_type'] != ''):?>
+                                <p><?php echo $order['shipping_service'].' - '.$order['shipping_type'] ;?></p>
                             <?php else:?>
-                                <p><?php echo $order->getShippingService();?></p>
+                                <p><?php echo $order['shipping_service'];?></p>
                             <?php endif;?>
                         </td>
                         <td>
-                            <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED
-                                || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
-                                <?php if($order->getShippingTrackingId() != ''):?>
+                            <?php if($order['status'] == Models_Model_CartSession::CART_STATUS_COMPLETED || $order['status'] == Models_Model_CartSession::CART_STATUS_DELIVERED || $order['status'] == Models_Model_CartSession::CART_STATUS_SHIPPED
+                                || $order['status'] == Models_Model_CartSession::CART_STATUS_REFUNDED || $order['status'] == Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+                                <?php if($order['shipping_tracking_id'] != ''):?>
                                     <p class="textcentered">
-                                        <a target="_blank" class="tracking-link" href="<?php echo $order->getShippingTrackingId(); ?>"><?php echo $this->translate('Track your parcel')?></a>
+                                        <a target="_blank" class="tracking-link" href="<?php echo $order['shipping_tracking_id']; ?>"><?php echo $this->translate('Track your parcel')?></a>
                                     </p>
                                 <?php else:?>
                                     <p> - </p>
@@ -71,21 +72,26 @@
                                 <p> - </p>
                              <?php endif;?>
                         </td>
-                        <?php if($order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING && $order->getGateway() === 'Quote'):?>
+                        <?php if($order['status'] === Models_Model_CartSession::CART_STATUS_PROCESSING && $order['gateway'] === 'Quote'):?>
                             <td class="user-order-current-status"><?php echo $this->translate('Open Quotes');?></td>
                         <?php else:?>
-                            <td class="user-order-current-status"><?php echo $this->translate('cs_'.$order->getStatus());?></td>
+                            <td class="user-order-current-status"><?php echo $this->translate('cs_'.$order['status']);?></td>
                         <?php endif;?>
                         <?php if(isset($this->invoicePlugin)):?>
                             <td>
-                                <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED
-                                    || $order->getStatus() == Models_Model_CartSession::CART_STATUS_REFUNDED):?>
-                                    <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
+                                <?php if($order['status'] == Models_Model_CartSession::CART_STATUS_COMPLETED || $order['status'] == Models_Model_CartSession::CART_STATUS_SHIPPED || $order['status'] == Models_Model_CartSession::CART_STATUS_DELIVERED
+                                    || $order['status'] == Models_Model_CartSession::CART_STATUS_REFUNDED || $order['status'] == Models_Model_CartSession::CART_STATUS_PARTIAL):?>
+                                    <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order['id'];?>/dwn/0/">
                                         <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
                                     </a>
                                 <?php endif;?>
                             </td>
                         <?php endif;?>
+                        <td class="user-order-current-status">
+                          <?php if (!empty($order['quote_id'])) :?>
+                            <a href="<?php echo $this->websiteUrl.$order['quote_id'].'.html';?>"><?php echo $this->translate('Complete your order');?>
+                          <?php endif;?>
+                        </td>
                     </tr>
                     <?php endif;?>
                 <?php endforeach; ?>
