@@ -190,7 +190,7 @@
 							<?php
 							if (is_array($optData)) {
 								$optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
-								if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+								if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
 									if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
 										$optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
 									} else {
@@ -513,7 +513,7 @@
                                 <?php
                                 if (is_array($optData)) {
                                     $optionStr = $optionTitle . ': ' . $optData['title'];
-                                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+                                    if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
                                         if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
                                             $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
                                         } else {
