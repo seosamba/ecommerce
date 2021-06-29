@@ -225,7 +225,7 @@
                                                     $optionStr = '<span>'.$optionTitle.' </span>';
                                                 }
 
-                                                if (!empty($optData['priceValue']) && intval($optData['priceValue'])) {
+                                                if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
                                                     if ((bool)$item['taxRate'] && $this->showPriceIncTax == 1){
                                                         $optPriceMod = $optData['priceValue'] * (100 + $item['taxRate'])/100;
                                                     } else {
