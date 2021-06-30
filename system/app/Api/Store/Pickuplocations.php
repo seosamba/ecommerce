@@ -73,6 +73,7 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         if (empty($data)) {
             $this->_error();
         }
+        $translator = Zend_Registry::get('Zend_Translate');
         $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
         $valid = Tools_System_Tools::validateToken($tokenToValidate, Api_Store_Pickuplocationcategories::PICKUPLOCATIONS_SECURE_TOKEN);
         if (!$valid) {
@@ -97,6 +98,11 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $coordinates = Tools_Geo::getMapCoordinates(
             $data['country'] . ' ' . $data['city'] . ' ' . $data['address1'] . ' ' . $data['zip']
         );
+
+        if(empty($coordinates['lat']) || empty($coordinates['lng'])) {
+            $this->_error($translator->translate('Please check your Google Maps API key!'));
+        }
+
         $pickupLocationModel->setLat($coordinates['lat']);
         $pickupLocationModel->setLng($coordinates['lng']);
         $pickupLocationModel->setWorkingHours(serialize($workingHours));
@@ -115,6 +121,7 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         if (!$id) {
             $this->_error();
         }
+        $translator = Zend_Registry::get('Zend_Translate');
         $workingHours = array(
             'sunday' => $data['working-hours-sunday'],
             'monday' => $data['working-hours-monday'],
@@ -140,6 +147,11 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             $coordinates = Tools_Geo::getMapCoordinates(
                 $data['country'] . ' ' . $data['city'] . ' ' . $data['address1'] . ' ' . $data['zip']
             );
+
+            if(empty($coordinates['lat']) || empty($coordinates['lng'])) {
+                $this->_error($translator->translate('Please check your Google Maps API key!'));
+            }
+
             $pickupLocationModel->setLat($coordinates['lat']);
             $pickupLocationModel->setLng($coordinates['lng']);
             $pickupLocationModel->setExternalId($data['locationExternalId']);

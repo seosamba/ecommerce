@@ -36,6 +36,9 @@ $this->headScript()
                         <input class="edit-client-fullname-input edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname-input" />
                         <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                     <?php endif;?>
+                    <?php if(!empty($this->leadLink)) :?>
+                        <div class="fl-right"><a target="_blank" class="lead-link btn" title="<?php echo $this->translate('Go to CRM Record'); ?>" href="<?php echo $this->leadLink;?>"><?php echo $this->translate('Go to CRM Record'); ?></a></div>
+                    <?php endif;?>
                 </div>
             </div>
          	<div class="grid_12 alpha client-email client-info">
@@ -194,8 +197,11 @@ $this->headScript()
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PROCESSING):?>
                          <?php $status = 'Quote Sent';?>
                     <?php endif;?>
-                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PENDING):?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_NEW):?>
                         <?php $status = 'New quote';?>
+                    <?php endif;?>
+                    <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_PENDING):?>
+                        <?php $status = 'Quote Signed (Signature only quote)';?>
                     <?php endif;?>
                     <?php if($order->getGateway() == Shopping::GATEWAY_QUOTE && $order->getStatus() == Models_Model_CartSession::CART_STATUS_CANCELED):?>
                         <?php $status = 'Lost opportunity';?>

@@ -1,12 +1,16 @@
 <td class="check-order textcentered"><input type="checkbox" name="check-order[]" value="<%= id %>" <% if (this.model.get('checked')) {%>checked="checked"<% }%> title=""/></td>
 <td data-mobile-title="#" class="order-id"><%= id %></td>
-<td data-mobile-title="Customer name"><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></td>
+<td data-mobile-title="Customer name"><a href="javascript:;" class="go-to-client"><%= _.isNull(billing_address_id) ? shipping_firstname+' '+shipping_lastname : billing_firstname+' '+billing_lastname %></a></td>
 <td data-mobile-title="Email"><%= _.isNull(billing_address_id) ? shipping_email : billing_email%></td>
 <td data-mobile-title="Purchased on"><%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(aggregatedPurchasedOn.replace(/\-/g, '/')))) %></td>
 <% translatedStatus = 'cs_'+status %>
 
 <% if (gateway == 'Quote' && status == 'pending'){ %>
     <% translatedStatus = 'New quote' %>
+<% } %>
+
+<% if (gateway == 'Quote' && status == 'not_verified'){ %>
+    <% translatedStatus = 'Quote Signed (Signature only quote)' %>
 <% } %>
 
 <% if (gateway == 'Quote' && status == 'processing'){ %>

@@ -1166,6 +1166,27 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_responseHelper->fail('customer doesn\'t exist');
         }
 
+        $userEmail = $customer->getEmail();
+
+        $leadsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('leads');
+        if ($leadsPlugin instanceof Application_Model_Models_Plugin) {
+            $leadsPluginStatus = $leadsPlugin->getStatus();
+
+            if ($leadsPluginStatus === 'enabled') {
+                $leadMapper = Leads_Mapper_LeadsMapper::getInstance();
+                $leadModel = $leadMapper->findByEmail($userEmail);
+
+                if($leadModel instanceof Leads_Model_LeadsModel) {
+                    $websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+                    $websiteUrl = $websiteHelper->getUrl();
+
+                    $leadLink = $websiteUrl.'dashboard/leads/#lead/'.$leadModel->getId();
+
+                    $this->_view->leadLink = $leadLink;
+                }
+            }
+        }
+
 		if ($customer) {
 			$this->_view->customer = $customer;
             $userRole = filter_var($this->_request->getParam('userRole'), FILTER_SANITIZE_STRING);
@@ -1398,6 +1419,7 @@ class Shopping extends Tools_Plugins_Abstract {
                             'config' => array(
                                 'title' => $pickupLocationConfig['title'],
                                 'units' => $pickupLocationConfig['units'],
+                                'gmapsZoom' => $pickupLocationConfig['gmapsZoom'],
                                 'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig'],
                                 'searchEnabled' => $pickupLocationConfig['searchEnabled']
                             )

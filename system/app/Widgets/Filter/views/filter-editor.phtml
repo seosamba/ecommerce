@@ -114,26 +114,63 @@
                                           class="toggle-nested">&#177;</span>
                                 <?php endif; ?>
                                 <ul class="grid_12 alpha omega" <?php if (!$show) { ?>style="display: none"<?php } ?> >
-                                    <?php foreach ($filter['values'] as $value => $count) : ?>
-                                        <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
-                                        <?php if(!empty($value)) :?>
-                                            <li>
-                                                <label>
-                                                    <input type="checkbox"
-                                                           name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
-                                                           value="1"
-                                                           title="<?php echo $this->translate('Check to hide from users'); ?>"
-                                                        <?php if (!isset($this->settings[$filter['name']]) ||
-                                                            (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
-                                                            checked
-                                                        <?php endif; ?>
-                                                    />
-                                                    <?php
-                                                    echo $value;
-                                                    ?></label>
-                                            </li>
-                                        <?php endif;?>
-                                    <?php endforeach; ?>
+                                    <?php if(!empty($this->usesortvalues) && !empty($this->usesortValuesData)) :?>
+                                        <?php foreach ($this->usesortValuesData as $svparam => $svsortKey):?>
+                                            <?php if($svparam == $filter['name']):?>
+                                                <?php foreach ($svsortKey as $name => $position):?>
+                                                    <?php foreach ($filter['values'] as $value => $count) : ?>
+                                                        <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
+                                                        <?php if(!empty($value)) :?>
+                                                            <?php if($name == $value):?>
+                                                                <li>
+                                                                    <label>
+                                                                        <input type="checkbox"
+                                                                               name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
+                                                                               value="1"
+                                                                               title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                                                            <?php if (!isset($this->settings[$filter['name']]) ||
+                                                                                (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
+                                                                                checked
+                                                                            <?php endif; ?>
+                                                                        />
+                                                                        <?php
+                                                                        echo $value;
+                                                                        ?></label>
+                                                                    <?php if(!empty($this->usesortvalues)) :?>
+                                                                        <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter position'); ?>" type="text" placeholder="<?php echo $this->translate('Enter position'); ?>" name="usesortValuesData[<?php echo $filter['name']; ?>][<?php echo $value; ?>]" value="<?php echo $position;?>" />
+                                                                    <?php endif;?>
+                                                                </li>
+                                                            <?php endif;?>
+                                                        <?php endif;?>
+                                                    <?php endforeach; ?>
+                                                <?php endforeach;?>
+                                            <?php endif;?>
+                                        <?php endforeach;?>
+                                    <?php else:?>
+                                        <?php foreach ($filter['values'] as $value => $count) : ?>
+                                            <?php $value = htmlspecialchars_decode($value, ENT_COMPAT);?>
+                                            <?php if(!empty($value)) :?>
+                                                <li>
+                                                    <label>
+                                                        <input type="checkbox"
+                                                               name="show[<?php echo $filter['name']; ?>][<?php echo $value; ?>]"
+                                                               value="1"
+                                                               title="<?php echo $this->translate('Check to hide from users'); ?>"
+                                                            <?php if (!isset($this->settings[$filter['name']]) ||
+                                                                (is_array($this->settings[$filter['name']]) && isset($this->settings[$filter['name']][$value])) ) : ?>
+                                                                checked
+                                                            <?php endif; ?>
+                                                        />
+                                                        <?php
+                                                        echo $value;
+                                                        ?></label>
+                                                    <?php if(!empty($this->usesortvalues)) :?>
+                                                        <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter position'); ?>" type="text" placeholder="<?php echo $this->translate('Enter position'); ?>" name="usesortValuesData[<?php echo $filter['name']; ?>][<?php echo $value; ?>]" value="" />
+                                                    <?php endif;?>
+                                                </li>
+                                            <?php endif;?>
+                                        <?php endforeach; ?>
+                                    <?php endif;?>
                                 </ul>
                             <?php endif; ?>
                         </li>
@@ -190,6 +227,9 @@
                                             <?php
                                             echo $value;
                                             ?></label>
+                                            <?php if(!empty($this->usesort) && !empty($this->usesortvalues)) :?>
+                                                <input class="grid_9 alpha omega" title="<?php echo $this->translate('Enter position'); ?>" type="text" placeholder="<?php echo $this->translate('Enter position'); ?>" name="usesortValuesData[<?php echo $filter['name']; ?>][<?php echo $value; ?>]" value="" />
+                                            <?php endif;?>
                                     </li>
                                 <?php endif;?>
                             <?php endforeach; ?>

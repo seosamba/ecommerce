@@ -7,6 +7,7 @@
         <li>
             <label>
                 <input type="checkbox"
+                       id="<?php echo preg_replace('/[^a-zA-Z0-9]/', '', $value);?>"
                        name="<?php echo $this->name; ?>"
                        value="<?php echo $value; ?>"
                     <?php if (in_array($value, $this->checked)) { ?>
