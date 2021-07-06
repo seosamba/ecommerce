@@ -846,5 +846,7 @@
         'Units' => 'Unités',
         'Please check your Google Maps API key!' => 'Veuillez vérifier la clé Google Maps API',
         'Remove from library?' => 'Supprimer de bibliothèque?',
-        'Go to CRM Record' => 'Voir l\'enregistrement GRC'
+        'Go to CRM Record' => 'Voir l\'enregistrement GRC',
+        'You can\'t save product with negative qty, please enter positive qty of product or enable "Negative stock" checkbox' => 'Impossible de sauvegarder un produit ayant la quantité négative, veuillez entrer celle positive ou cocher "N\'est pas disponible"',
+        'assign negative stock' => 'assigner le statut \'pas disponible\''
 );?>
