@@ -28,8 +28,10 @@ class MagicSpaces_Postpurchaseoptionincart_Postpurchaseoptionincart extends Tool
                         if (!empty($content['options'])) {
                             foreach ($optionNames as $optionName) {
                                 if (array_key_exists($optionName, $content['options'])) {
-                                    $matched = true;
-                                    break;
+                                    if (!empty($content['options'][$optionName]['title'])) {
+                                        $matched = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
