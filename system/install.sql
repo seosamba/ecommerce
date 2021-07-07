@@ -157,7 +157,6 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('timezone', 'America/New_York'),
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
-('usNumericFormat', '0'),
 ('minimumOrder', '0'),
 ('version', '2.8.5');
 
@@ -225,7 +224,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
-  `type` enum('dropdown','radio','text','date','file','textarea') COLLATE utf8_unicode_ci NOT NULL,
+  `type` enum('dropdown','radio','text','date','file','textarea', 'additionalpricefield') COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -320,6 +319,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
+  `partial_percentage` DECIMAL(10,6) DEFAULT '0.00',
+  `is_partial` ENUM('0', '1') DEFAULT '0',
+  `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
   `partial_purchased_on` timestamp NULL,
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
@@ -1059,5 +1061,5 @@ INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.8.5' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.8.7' WHERE `name` = 'shopping';
 

@@ -19,6 +19,13 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha',
 			'multiOptions' => Tools_Misc::getCurrencyList()
 		));
+
+        $this->addElement('select', 'currencyCountry', array(
+            'label' => $translator->translate('Currency country'),
+            'disableTranslator' => 'true',
+            'class' => 'grid_6 alpha',
+            'multiOptions' => array('0' => $translator->translate('Select country')) + Tools_Geo::getCountries(true)
+        ));
 		
 		$this->addElement('select', 'weightUnit', array(
 			'label'	=> $translator->translate('Weight unit'),
@@ -42,17 +49,10 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
         ));
 
-        $this->addElement('checkbox', 'usNumericFormat', array(
-            'label' => $translator->translate('US numeric format'),
-            'class' => 'grid_6 alpha'
-        ));
-
         $this->addElement('checkbox', 'minimumOrder', array(
             'label' => $translator->translate('Minimum order'),
             'class' => 'grid_6 alpha'
         ));
-
-        $translator = Zend_Registry::get('Zend_Translate');
 
         $this->addElement('text', 'operationalHours', array(
             'label' => $translator->translate('store operational hours')
@@ -71,23 +71,30 @@ class Forms_BasicsSettings extends Zend_Form {
             )
         ));
 
-        $this->addElement('checkbox', 'enabledPartialPayment', array(
-            'label' => 'Accept partial payments for quote:  Yes/No',
-            'class' => 'grid_6 alpha'
-        ));
+        $fiscalYearMonths = array(
+            '1' => 'January',
+            '2' => 'February',
+            '3' => 'March',
+            '4' => 'April',
+            '5' => 'May',
+            '6' => 'June',
+            '7' => 'July',
+            '8' => 'August',
+            '9' => 'September',
+            '10' => 'October',
+            '11' => 'November',
+            '12' => 'December'
+        );
 
-        $this->addElement('text', 'partialNotifyAfterQuantity', array(
-            'label' => 'Lag time',
-            'class' => 'grid_6 alpha'
-        ));
-
-        $this->addElement('select', 'partialNotifyAfterType', array(
-            'label' => 'Length unit',
+        $this->addElement('select', 'fiscalYearStart', array(
+            'label'	=> $translator->translate('Fiscal year start month'),
             'class' => 'grid_6 alpha',
-            'multiOptions' => array(
-                'day' => $translator->translate('Days'),
-                'month' => $translator->translate('Months')
-            )
+            'multiOptions' => $fiscalYearMonths
+        ));
+
+        $this->addElement('checkbox', 'smartFilter', array(
+            'label' => $translator->translate('Smart product list filter'),
+            'class' => 'grid_6 alpha'
         ));
 
     }

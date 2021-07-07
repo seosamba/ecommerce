@@ -29,7 +29,8 @@ class Tools_FilterOrders {
             $aliases = array(
                 Tools_Misc::CS_ALIAS_PENDING => Models_Model_CartSession::CART_STATUS_PENDING,
                 Tools_Misc::CS_ALIAS_PROCESSING => Models_Model_CartSession::CART_STATUS_PROCESSING,
-                Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => Models_Model_CartSession::CART_STATUS_CANCELED
+                Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => Models_Model_CartSession::CART_STATUS_CANCELED,
+                Tools_Misc::CS_ALIAS_QUOTE_SIGNED => Models_Model_CartSession::CART_STATUS_NOT_VERIFIED
             );
             foreach ($filter['status'] as $k => $v) {
                 $statuses[$k]['name'] = $v;
@@ -40,7 +41,7 @@ class Tools_FilterOrders {
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
                     $statuses[$k]['alliasOnlyQuote'] = true;
                 }
-                if ($v === Models_Model_CartSession::CART_STATUS_SHIPPED || $v === Models_Model_CartSession::CART_STATUS_COMPLETED || $v === Models_Model_CartSession::CART_STATUS_DELIVERED) {
+                if ($v === Models_Model_CartSession::CART_STATUS_SHIPPED || $v === Models_Model_CartSession::CART_STATUS_COMPLETED || $v === Models_Model_CartSession::CART_STATUS_DELIVERED || $v === Models_Model_CartSession::CART_STATUS_PARTIAL) {
                     $statuses[$k][self::GATEWAY_QUOTE] = true;
                 }
             }

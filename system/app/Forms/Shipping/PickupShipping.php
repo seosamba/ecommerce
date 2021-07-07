@@ -11,6 +11,7 @@ class Forms_Shipping_PickupShipping extends Zend_Form
 
     public function init()
     {
+        $translator = Zend_Registry::get('Zend_Translate');
 
         $this->addElement(
             'hidden',
@@ -33,7 +34,7 @@ class Forms_Shipping_PickupShipping extends Zend_Form
             'text',
             'title',
             array(
-                'label' => 'Custom title'
+                'label' => $translator->translate('Custom title')
             )
         );
 
@@ -41,7 +42,7 @@ class Forms_Shipping_PickupShipping extends Zend_Form
             'checkbox',
             'defaultPickupConfig',
             array(
-                'label' => 'Default pickup behaviour'
+                'label' => $translator->translate('Default pickup behaviour')
             )
         );
 
@@ -49,7 +50,16 @@ class Forms_Shipping_PickupShipping extends Zend_Form
             'checkbox',
             'searchEnabled',
             array(
-                'label' => 'Display location search on checkout'
+                'label' => $translator->translate('Display location search on checkout')
+            )
+        );
+
+        $this->addElement(
+            'text',
+            'gmapsZoom',
+            array(
+                'label' => $translator->translate('Map zoom'),
+                'placeholder' => $translator->translate('Zoom range (6-18)')
             )
         );
 
@@ -57,11 +67,11 @@ class Forms_Shipping_PickupShipping extends Zend_Form
             'select',
             'units',
             array(
-                'label' => 'Units',
+                'label' => $translator->translate('Units'),
                 'value' => 'amount',
                 'multiOptions' => array(
-                    self::COMPARE_BY_AMOUNT => 'total amount',
-                    self::COMPARE_BY_WEIGHT => 'order weight'
+                    self::COMPARE_BY_AMOUNT => $translator->translate('total amount'),
+                    self::COMPARE_BY_WEIGHT => $translator->translate('order weight')
                 )
             )
         );
