@@ -458,6 +458,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 			}
 
             $inventoryCount = $product->getInventory();
+            $productNegativeStock = $product->getNegativeStock();
 
 			if(!is_null($inventoryCount)) {
                 $inventoryCount = trim($product->getInventory());
@@ -467,12 +468,20 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $productQty = '&infin;';
             } else {
                 $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
+
+                if(!empty($productNegativeStock)) {
+                    $productQty = $inventoryCount;
+                }
             }
 
 			if(is_null($inventoryCount) || !empty($productQty)) {
                 $inventoryCount = $this->_translator->translate('In stock');
             } else {
                 $inventoryCount = $this->_translator->translate('Out of stock');
+
+                if(!empty($productNegativeStock)) {
+                    $inventoryCount = $this->_translator->translate('In stock');
+                }
             }
 
             $dictionary = array(

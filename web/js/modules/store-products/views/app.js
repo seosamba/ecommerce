@@ -16,11 +16,12 @@ define([
     'text!../templates/freeShipping_dialog.html',
     'text!../templates/company_product_dialog.html',
     'text!../templates/quantity_dialog.html',
+    'text!../templates/negative-stock_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone, ProductsCollection, BrandsCollection, CompaniesCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
             PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl,
-            FreeShippingDialogTmpl, CompanyProductDialogTmpl, QuantityDialogTmpl, i18n){
+            FreeShippingDialogTmpl, CompanyProductDialogTmpl, QuantityDialogTmpl, NegativeStockDialogTmpl, i18n){
     var MainView = Backbone.View.extend({
         el: $('#store-products'),
         events: {
@@ -444,6 +445,33 @@ define([
                         }
                     });
                 }
+            });
+            return false;
+        },
+        negativeStockAction:function (products){
+            var self = this;
+
+            var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
+            var negativeStockButtons = {};
+
+            negativeStockButtons[applyButton] = function() {
+                var negativeStock = $(this).find($("select option:selected")).val();
+                if(negativeStock == -1){
+                    return false;
+                }
+
+                self.products.batch('PUT', {'negativeStock': negativeStock}, $(this).find('input[name="applyToAll"]').attr('checked') );
+                $(this).dialog('close');
+            };
+
+            var dialog = _.template(NegativeStockDialogTmpl, {
+                totalProducts: this.products.totalRecords,
+                i18n:i18n
+            });
+
+            $(dialog).dialog({
+                dialogClass: 'seotoaster',
+                buttons: negativeStockButtons
             });
             return false;
         },

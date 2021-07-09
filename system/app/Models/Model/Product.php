@@ -79,6 +79,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_minimumOrder = 0;
 
+    protected $_negativeStock = 0;
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -746,6 +748,26 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getNegativeStock()
+    {
+        return $this->_negativeStock;
+    }
+
+    /**
+     * @param string $negativeStock
+     * @return string
+     */
+    public function setNegativeStock($negativeStock)
+    {
+        $this->_negativeStock = $negativeStock;
+
+        return $this;
+    }
+
 
 
 }
