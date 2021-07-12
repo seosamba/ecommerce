@@ -53,7 +53,8 @@ define([
             },
             'click .paginator a.page': 'paginatorAction',
             'change #automated-set-price': 'toggleSetPriceConfig',
-            'click .remove-from-library-btn': 'removeOption'
+            'click .remove-from-library-btn': 'removeOption',
+            'click #negative-stock': 'negativeProductStock'
 		},
         products: null,
         tags: null,
@@ -481,6 +482,14 @@ define([
             } else {
                 this.$('#product-pageTemplate').val('-1');
 			}
+
+            //toggle negative-stock flag
+            if (parseInt(this.model.get('negativeStock'))){
+                this.$('#negative-stock').prop('checked',true);
+            } else {
+                this.$('#negative-stock').prop('checked', false);
+            }
+
             if(this.model.isNew()){
                 this.$('#product-price').val('');
                 this.$('#product-weight').val('');
@@ -764,6 +773,21 @@ define([
                 });
 			});
 		},
+        negativeProductStock: function(e){
+		    var self = this;
+
+            if (e.currentTarget.checked){
+                showConfirmCustom(_.isUndefined(i18n['This checkbox will permit to use of the negative stock of product, enable this ability?'])?'This checkbox will permit to use of the negative stock of product, enable this ability?':i18n['This checkbox will permit to use of the negative stock of product, enable this ability?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
+                    $(e.currentTarget).prop('checked', true);
+                    self.model.set({negativeStock: 1});
+                }, function(){
+                    $(e.currentTarget).prop('checked', false);
+                    self.model.set({negativeStock: 0});
+                });
+            } else {
+                self.model.set({negativeStock: 0});
+            }
+        },
         validateProduct: function(){
             var error   = false;
             if (!this.$('#product-pageTemplate').val()){

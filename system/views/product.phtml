@@ -408,9 +408,10 @@ $this->headLink()
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                         <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
                     </div>
-                    <label class="grid_6 mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
+                    <label class="grid_6 mt10px pointer"><input id="negative-stock" type="checkbox"/> <?php echo $this->translate('Negative stock'); ?></label>
+                    <label class="grid_6 mt5px pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
 
-                    <div class="grid_12 alpha omega mt1-5em labeled">
+                    <div class="grid_12 alpha omega mt10px labeled">
                         <?php $defaultTaxLabel = $this->translate('Default'); ?>
                         <?php $alternativeTaxLabel = $this->translate('Alternative'); ?>
                         <?php $alternative2TaxLabel = $this->translate('Alternative 2'); ?>
