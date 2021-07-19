@@ -1253,7 +1253,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if(!empty($quote)){
             $partialAmountPaid = $this->_cart->getPartialPercentage();
             if (!empty((int) $partialAmountPaid)) {
-                return round($this->_cart->getPartialPercentage(), 1);
+                $partialPaymentType = $this->_cart->getPartialType();
+                if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_PERCENTAGE) {
+                    return round($this->_cart->getPartialPercentage(), 1);
+                }
             }
 
             return '';
