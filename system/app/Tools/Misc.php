@@ -37,6 +37,8 @@ class Tools_Misc
 
     const CS_ALIAS_LOST_OPPORTUNITY = 'lost_opportunity';
 
+    const CS_ALIAS_QUOTE_SIGNED = 'quote_signed';
+
     const EXCHANGE_PATH = 'https://query.yahooapis.com/v1/public/yql?q=';
 
     const EXCHANGE_ADDITIONAL_PARAMS = '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
@@ -796,9 +798,14 @@ class Tools_Misc
                         $pdfFileName = 'packing_slip_' . $cartId . '.pdf';
                     }
                 } else {
-                    $pdfFileName = 'Invoice_' . md5($cartId . microtime()) . '.pdf';
+                    $invoicePrefixLabel = 'Invoice';
+                    if (!empty($invoicetopdfSettings['invoicePrefix'])) {
+                        $invoicePrefixLabel = $invoicetopdfSettings['invoicePrefix'];
+                    }
+
+                    $pdfFileName = $invoicePrefixLabel.'_' . md5($cartId . microtime()) . '.pdf';
                     if (!empty($invoicetopdfSettings['invoiceOrigName'])) {
-                        $pdfFileName = 'Invoice_' . $cartId . '.pdf';
+                        $pdfFileName = $invoicePrefixLabel.'_' . $cartId . '.pdf';
                     }
 
                 }

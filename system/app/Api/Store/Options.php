@@ -13,13 +13,13 @@ class Api_Store_Options extends Api_Service_Abstract {
 	 */
 	protected $_accessList = array(
 		Tools_Security_Acl::ROLE_SUPERADMIN => array(
-			'allow' => array('get', 'post')
+			'allow' => array('get', 'post', 'delete')
 		),
 		Tools_Security_Acl::ROLE_ADMIN => array(
-			'allow' => array('get')
+			'allow' => array('get', 'post', 'delete')
 		),
 		Shopping::ROLE_SALESPERSON => array(
-			'allow' => array('get')
+			'allow' => array('get', 'post', 'delete')
 		)
 	);
 
@@ -52,11 +52,22 @@ class Api_Store_Options extends Api_Service_Abstract {
 		// TODO: Implement putAction() method.
 	}
 
-	/**
-	 * Reserved for future usage
-	 */
+    /**
+     * Delete product option from library
+     *
+     * @return bool
+     * @throws Exception
+     */
 	public function deleteAction() {
-		// TODO: Implement deleteAction() method.
+	    if(Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $optionId = filter_var($this->_request->getParam('optionId'), FILTER_SANITIZE_NUMBER_INT);
+
+            if(!empty($optionId)) {
+                return Models_Mapper_OptionMapper::getInstance()->deleteLibraryOption($optionId);
+            }
+        }
+
+        return false;
 	}
 
 }

@@ -82,14 +82,23 @@ $this->headLink()
             <option value="text"><?php echo $this->translate('Text Field');?></option>
             <option value="date"><?php echo $this->translate('Datepicker');?></option>
             <option value="textarea"><?php echo $this->translate('Textarea');?></option>
+            <option value="additionalpricefield"><?php echo $this->translate('Additional price field');?></option>
         </select>
 	</div>
 	<div class="grid_4 alpha omega text-center">
         {{if id}}
         &nbsp;
         {{else}}
-        <label class="block mt5px grid_5 alpha"><?php echo $this->translate('Add to library?'); ?> <input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} /></label>
-        <input class="hide grid_7 alpha omega" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+            {{if libraryOption}}
+                <label class="block mt0px grid_5 alpha">
+                    <span class="btn remove-from-library-btn" data-option-id="${parentId}"><?php echo $this->translate('Remove from library?'); ?></span>
+                </label>
+            {{else}}
+                <label class="block mt5px grid_5 alpha">
+                    <?php echo $this->translate('Add to library?'); ?><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
+                </label>
+                <input class="hide grid_7 alpha omega" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
+            {{/if}}
         {{/if}}
 	</div>
     <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
@@ -120,10 +129,8 @@ $this->headLink()
         </select>
         <input class="option-modifier-select grid_5 alpha omega" type="text" name="priceModifierValue" value="${priceValue}" placeholder="0"/>
         <select class="option-modifier-select grid_4 omega" name="priceModifierType">
-            <option value="percent"
-            {{if priceType == 'percent'}}selected{{/if}} >%</option>
-            <option value="unit"
-            {{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
+            <option value="percent" {{if priceType == 'percent'}}selected{{/if}} >%</option>
+            <option value="unit"{{if priceType == 'unit'}}selected{{/if}} ><?php echo $this->generalConfig['currency']; ?></option>
         </select>
     </div>
 	<div class="grid_3 omega">
@@ -401,9 +408,10 @@ $this->headLink()
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
                         <label class="grid_4 alpha omega" for="product-weight"><?php echo $this->translate($this->generalConfig['weightUnit']); ?></label>
                     </div>
-                    <label class="grid_6 mt1-75em text-right pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
+                    <label class="grid_6 mt10px pointer"><input id="negative-stock" type="checkbox"/> <?php echo $this->translate('Negative stock'); ?></label>
+                    <label class="grid_6 mt5px pointer"><input id="free-shipping" type="checkbox"/> <?php echo $this->translate('Free Shipping'); ?></label>
 
-                    <div class="grid_12 alpha omega mt1-5em labeled">
+                    <div class="grid_12 alpha omega mt10px labeled">
                         <?php $defaultTaxLabel = $this->translate('Default'); ?>
                         <?php $alternativeTaxLabel = $this->translate('Alternative'); ?>
                         <?php $alternative2TaxLabel = $this->translate('Alternative 2'); ?>

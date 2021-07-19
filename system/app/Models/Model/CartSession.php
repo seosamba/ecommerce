@@ -52,6 +52,11 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
      */
 	const CART_STATUS_PARTIAL = 'partial';
 
+    /**
+     * Order not verified
+     */
+	const CART_STATUS_NOT_VERIFIED = 'not_verified';
+
 
 	protected $_cartContent = null;
 

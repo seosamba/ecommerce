@@ -166,6 +166,7 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
                     }
                     $this->_view->useBtn = $useBtn;
                     $this->_view->btnName = $btnOptionName;
+                    $this->_view->translator = $translator;
 
                     return $this->_view->render('remove-product.phtml');
                 }
@@ -292,6 +293,7 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
             }
 
             $inventoryCount = $product->getInventory();
+            $productNegativeStock = $product->getNegativeStock();
 
             if(!is_null($inventoryCount)) {
                 $inventoryCount = trim($product->getInventory());
@@ -301,12 +303,20 @@ class Widgets_Storewishlist_Storewishlist extends Widgets_Abstract {
                 $productQty = '&infin;';
             } else {
                 $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
+
+                if(!empty($productNegativeStock)) {
+                    $productQty = $inventoryCount;
+                }
             }
 
             if(is_null($inventoryCount) || !empty($inventoryCount)) {
                 $inventoryCount = $this->_translator->translate('In stock');
             } else {
                 $inventoryCount = $this->_translator->translate('Out of stock');
+
+                if(!empty($productNegativeStock)) {
+                    $inventoryCount = $this->_translator->translate('In stock');
+                }
             }
 
             $dictionary = array(

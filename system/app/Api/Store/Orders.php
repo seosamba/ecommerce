@@ -76,6 +76,9 @@ class Api_Store_Orders extends Api_Service_Abstract {
 					$this->_error(null, self::REST_STATUS_FORBIDDEN);
 				}
 			}
+
+            $order['moneyFormat'] = Tools_Misc::getCurrencyFormat();
+
 			return $order;
 		} else {
 			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
@@ -140,7 +143,6 @@ class Api_Store_Orders extends Api_Service_Abstract {
                 $orderList['realRefundByDefault'] = 0;
             }
             $orderList['moneyFormat'] = Tools_Misc::getCurrencyFormat();
-            $orderList['usNumericFormat'] = $shoppingConfig['usNumericFormat'];
             $serviceLabelMapper = Models_Mapper_ShoppingShippingServiceLabelMapper::getInstance();
             $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
             if (!empty($shippingServiceLabels) && is_array($shippingServiceLabels) && !empty($orderList['data'])) {

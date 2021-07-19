@@ -66,5 +66,6 @@
     'Plugins' => ' ',
     'Custom attributes' => 'Property data',
     'Go to Dashboard' => ' ',
-	'cs_partial' => 'Partial Orders'
+	'cs_partial' => 'Partial Orders',
+	'cs_quote_signed' => 'Quote Signed (Signature only quote)'
 );

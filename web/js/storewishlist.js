@@ -1,28 +1,4 @@
 $(function() {
-    $(document).on('click', 'a.remove-wished-product[data-pid]', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var self = $(this),
-            pid  = self.data('pid');
-
-        showConfirm('Are you sure you would like to remove this item from your Wish List?', function(){
-            $.ajax({
-                url: $('#website_url').val()+'plugin/shopping/run/removeWishedProduct/',
-                type: 'POST',
-                dataType: 'json',
-                data: {pid : pid},
-                success: function(response){
-                    if(response.error != 1) {
-                        showMessage(response.responseText, false, 3000);
-                        window.location.reload();
-                    } else {
-                        showMessage(response.responseText, true, 3000);
-                    }
-                }
-            });
-        });
-    });
-
     $(document).on('click', 'a.add-to-wish-list[data-pid]', function(e) {
         e.preventDefault();
         e.stopPropagation();
