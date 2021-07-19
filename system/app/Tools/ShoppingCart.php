@@ -265,7 +265,8 @@ class Tools_ShoppingCart {
                 'prodDepth'        => $item->getProdDepth(),
                 'brand'            => $item->getBrand(),
                 'inventory'        => $item->getInventory(),
-                'minimumOrder'     => $item->getMinimumOrder()
+                'minimumOrder'     => $item->getMinimumOrder(),
+                'negativeStock'    => $item->getNegativeStock()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;

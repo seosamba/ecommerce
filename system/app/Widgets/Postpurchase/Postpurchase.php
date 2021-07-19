@@ -413,6 +413,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCreated()
     {
+        if (!empty($this->_options[0])) {
+            return date($this->_options[0], strtotime($this->_cart->getCreatedAt()));
+        }
+
         return date("d-M-Y", strtotime($this->_cart->getCreatedAt()));
     }
 
@@ -927,7 +931,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                             $optionStr = '';
                         }
 
-                        if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+                        if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
                             if ((bool)$this->_cartContent[$sid]['taxRate'] && (bool)$this->_shoppingConfig['showPriceIncTax'] === true) {
                                 $optPriceMod = $optData['priceValue'] * (100 + $this->_cartContent[$sid]['taxRate']) / 100;
                             } else {
@@ -1015,7 +1019,8 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                     } else {
                         $optionStr = '';
                     }
-                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+
+                    if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
                         if ((bool)$this->_cartContent[$sid]['taxRate'] && (bool)$this->_shoppingConfig['showPriceIncTax'] === true) {
                             $optPriceMod = $optData['priceValue'] * (100 + $this->_cartContent[$sid]['taxRate']) / 100;
                         } else {

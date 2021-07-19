@@ -24,6 +24,7 @@ define([
                 inventory: null,
                 allowance: '',
                 minimumOrder: null,
+                negativeStock: null,
             }
         },
 		initialize: function (){

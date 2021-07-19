@@ -79,7 +79,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'prod_width'        => $model->getProdWidth(),
             'gtin'              => $model->getGtin(),
             'wishlist_qty'      => $model->getWishlistQty(),
-            'minimum_order'     => $model->getMinimumOrder()
+            'minimum_order'     => $model->getMinimumOrder(),
+            'negative_stock'    => $model->getNegativeStock()
 		);
 
 		if ($model->getId()){

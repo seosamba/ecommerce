@@ -798,9 +798,14 @@ class Tools_Misc
                         $pdfFileName = 'packing_slip_' . $cartId . '.pdf';
                     }
                 } else {
-                    $pdfFileName = 'Invoice_' . md5($cartId . microtime()) . '.pdf';
+                    $invoicePrefixLabel = 'Invoice';
+                    if (!empty($invoicetopdfSettings['invoicePrefix'])) {
+                        $invoicePrefixLabel = $invoicetopdfSettings['invoicePrefix'];
+                    }
+
+                    $pdfFileName = $invoicePrefixLabel.'_' . md5($cartId . microtime()) . '.pdf';
                     if (!empty($invoicetopdfSettings['invoiceOrigName'])) {
-                        $pdfFileName = 'Invoice_' . $cartId . '.pdf';
+                        $pdfFileName = $invoicePrefixLabel.'_' . $cartId . '.pdf';
                     }
 
                 }

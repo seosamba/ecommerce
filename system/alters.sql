@@ -612,8 +612,12 @@ ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(1
 ALTER TABLE `shopping_product_option`
     CHANGE `type` `type` enum('dropdown','radio','text','date','file','textarea', 'additionalpricefield') COLLATE 'utf8_unicode_ci' NOT NULL AFTER `title`;
 
--- 23/08/2018
+-- 02/07/2021
 -- version: 2.8.7
+ALTER TABLE `shopping_product` ADD COLUMN `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
+
+-- 23/08/2018
+-- version: 2.8.8
 -- Add historical cart session option
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `id` INT(10) unsigned AUTO_INCREMENT,
@@ -636,6 +640,6 @@ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.8' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.8.9' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

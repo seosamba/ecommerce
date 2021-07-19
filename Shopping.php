@@ -1515,8 +1515,9 @@ class Shopping extends Tools_Plugins_Abstract {
                         $productId = $cContent['product_id'];
 
                         $product = $productMapper->find($productId);
+                        $productNegativeStock = $product->getNegativeStock();
 
-                        if($product->getInventory() == '0' || $product->getInventory() < '0') {
+                        if(($product->getInventory() == '0' || $product->getInventory() < '0') && empty($productNegativeStock)) {
                             $currentNotifiedProduct = $notifiedProductsMapper->findByUserIdProductId($userId, $productId);
 
                             if($currentNotifiedProduct instanceof Store_Model_NotifiedProductsModel && $currentNotifiedProduct->getSendNotification() == '1') {

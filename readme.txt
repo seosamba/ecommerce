@@ -112,7 +112,7 @@ Plugin widgets.
     {$postpurchase:totalTax[:clean]} -> total tax
     {$postpurchase:total[:clean]} ->  cart total
     {$postpurchase:referer} -> referer link
-    {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
+    {$postpurchase:createdAt[:d/M/Y]} -> date when purchase created in d-M-Y format. You can set your own date format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:additionalInfo} -> additional info of purchase
