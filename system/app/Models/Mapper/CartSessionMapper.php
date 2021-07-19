@@ -317,6 +317,18 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
                         'weightValue' => null
                     );
                     break;
+                case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
+                    $result[$option->getTitle()] = array(
+                        'optionType'  => Models_Model_Option::TYPE_ADDITIONALPRICEFIELD,
+                        'option_id'   => $option->getId(),
+                        'title'       => $value,
+                        'priceSign'   => '+',
+                        'priceType'   => 'unit',
+                        'priceValue'  => $value,
+                        'weightSign'  => '+',
+                        'weightValue' => '0.000'
+                    );
+                    break;
 				default:
 					$selections = $option->getSelection();
 					if (empty($selections)){

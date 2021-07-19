@@ -220,7 +220,12 @@
                                             <?php
                                             if (is_array($optData)) {
                                                 $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
-                                                if (!empty($optData['priceValue']) && intval($optData['priceValue'])) {
+
+                                                if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                                    $optionStr = '<span>'.$optionTitle.' </span>';
+                                                }
+
+                                                if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
                                                     if ((bool)$item['taxRate'] && $this->showPriceIncTax == 1){
                                                         $optPriceMod = $optData['priceValue'] * (100 + $item['taxRate'])/100;
                                                     } else {
@@ -229,7 +234,11 @@
                                                     if ($optData['priceType'] === 'percent') {
                                                         $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
                                                     } else {
-                                                        $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                                        if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                                            $optionStr .= '<span>'.$this->currency($optPriceMod).'</span>';
+                                                        } else {
+                                                            $optionStr .= '<span>(' . $optData['priceSign'] . $this->currency($optPriceMod) .')</span>';
+                                                        }
                                                     }
                                                 }
                                                 if (!empty($optData['weightValue']) && intval($optData['weightValue'])) {

@@ -69,5 +69,101 @@ class Tools_GroupPriceTools extends Tools_DiscountRulesTools {
 
 	}
 
+	public static function reduceFilterPrice ($price, $tax, $tags = array())
+    {
+        if (!empty($price)) {//$urlFilter['price']
+            if (!empty($tags)) {//$filters['tags']
+                $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+                $currentUser = $sessionHelper->getCurrentUser()->getId();
+
+                $dbTable = new Models_DbTable_CustomerInfo();
+                $select = $dbTable->select()->from('shopping_customer_info', array('user_id', 'group_id'));
+                $allCustomersGroups =  $dbTable->getAdapter()->fetchAssoc($select);
+
+                if(!empty($allCustomersGroups)) {
+                    if(array_key_exists($currentUser, $allCustomersGroups)){
+                        $groupId = $allCustomersGroups[$currentUser]['group_id'];
+                        $allProductsGroups = Store_Mapper_GroupMapper::getInstance()->fetchAssocAll();
+                        if(isset($allProductsGroups[$groupId])){
+
+                            $additionalPrice = array();
+                            foreach ($price as $key => $range) {
+                                $priceNow = $range;
+                                $priceValue = $allProductsGroups[$groupId]['priceValue'];
+                                $priceSign  = $allProductsGroups[$groupId]['priceSign'];
+                                $priceType  = $allProductsGroups[$groupId]['priceType'];
+                                $nonTaxable = $allProductsGroups[$groupId]['nonTaxable'];
+
+                                if($priceType == 'percent'){
+                                    if($priceSign == 'minus') {
+                                        $remainder = 1 - ($priceValue / 100);
+                                    }
+                                    if($priceSign == 'plus') {
+                                        $remainder = 1 + ($priceValue / 100);
+                                    }
+
+                                    if(!empty($tax) && empty($nonTaxable)) {
+                                        if($tax < 10) {
+                                            $tax = '0'. $tax;
+                                        }
+
+                                        $priceNow = $priceNow / "1.$tax";
+                                    }
+
+                                    $resultPrice = $priceNow / $remainder;
+                                }
+                                if($priceType == 'unit'){
+                                    if(!empty($tax) && empty($nonTaxable)) {
+                                        if($tax < 10) {
+                                            $tax = '0'. $tax;
+                                        }
+
+                                        $priceNow = $priceNow / "1.$tax";
+                                    }
+
+                                    if($priceSign == 'minus') {
+                                        $resultPrice = $priceNow + $priceValue;
+                                    }
+                                    if($priceSign == 'plus') {
+                                        $resultPrice = $priceNow - $priceValue;
+                                    }
+                                }
+
+                                $price[$key] = $resultPrice;
+
+                                if($key == 'from') {
+                                    $additionalPrice['min'] = $range;
+                                }
+                                if($key == 'to') {
+                                    $additionalPrice['max'] = $range;
+                                }
+                            }
+                        }
+                    } else {
+                        if(!empty($tax)) {
+                            if($tax < 10) {
+                                $tax = '0'. $tax;
+                            }
+
+                            $additionalPrice['min'] = $price['from'];
+                            $additionalPrice['max'] = $price['to'];
+
+                            $price['from'] = $price['from'] / "1.$tax";
+                            $price['to'] = $price['to'] / "1.$tax";
+                        }
+                    }
+                }
+            }
+
+            $priceFilter = array(
+                'min'   => $price['from'],
+                'max'   => $price['to'],
+                'additionalPrice' => $additionalPrice
+            );
+
+            return $priceFilter;
+        }
+    }
+
 
 }

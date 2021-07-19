@@ -93,7 +93,9 @@ unset($cur, $format);
 		    <?php endif; ?>
         <?php elseif ($option['type'] === Models_Model_Option::TYPE_TEXTAREA): ?>
             <textarea placeholder="" name="<?php echo  $uniqName;?>"></textarea>
-	    <?php endif; ?>
+        <?php elseif ($option['type'] === Models_Model_Option::TYPE_ADDITIONALPRICEFIELD): ?>
+            <input type="text" name="<?php echo  $uniqName;?>" />
+        <?php endif; ?>
     </div>
 <?php endforeach; ?>
 </div>

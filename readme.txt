@@ -112,7 +112,7 @@ Plugin widgets.
     {$postpurchase:totalTax[:clean]} -> total tax
     {$postpurchase:total[:clean]} ->  cart total
     {$postpurchase:referer} -> referer link
-    {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
+    {$postpurchase:createdAt[:d/M/Y]} -> date when purchase created in d-M-Y format. You can set your own date format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:additionalInfo} -> additional info of purchase
@@ -171,6 +171,7 @@ Plugin widgets.
     {$postpurchase:cartitem:cartId} -> cart id
     {$postpurchase:cartitem:total[:clean]} -> total price with tax
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
+    {$postpurchase:cartitem:option:optionName}
     {$postpurchase:cartitem:producturl} -> product url
     {$postpurchase:cartitem:brand} -> product brand
     {$postpurchase:cartitem:partialamount[:clean]} -> partial amount
@@ -212,6 +213,7 @@ Magic spaces:
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group
  usesort - enable the ability to sort custom filters list
+ usesortvalues - enable the ability to sort custom filters values list. May use with "usesort" option only
 
 10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}

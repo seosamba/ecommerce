@@ -269,7 +269,8 @@ class Tools_ShoppingCart {
                 'prodDepth'        => $item->getProdDepth(),
                 'brand'            => $item->getBrand(),
                 'inventory'        => $item->getInventory(),
-                'minimumOrder'     => $item->getMinimumOrder()
+                'minimumOrder'     => $item->getMinimumOrder(),
+                'negativeStock'    => $item->getNegativeStock()
 			);
 		} else {
 			$this->_content[$itemKey]['qty'] += $qty;
@@ -792,6 +793,22 @@ class Tools_ShoppingCart {
                             'priceValue'  => null,
                             'weightSign'  => null,
                             'weightValue' => null
+                        );
+                        break;
+                    case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
+                        $textValue = '';
+                        if (!empty($options[$defaultOption['id']])) {
+                            $textValue = $options[$defaultOption['id']];
+                        }
+                        $modifiers[$defaultOption['title']] = array(
+                            'optionType'  => Models_Model_Option::TYPE_ADDITIONALPRICEFIELD,
+                            'option_id'   => $defaultOption['id'],
+                            'title'       => preg_replace("/[^0-9.]/", '', $textValue),
+                            'priceSign'   => '+',
+                            'priceType'   => 'unit',
+                            'priceValue'  => preg_replace("/[^0-9.]/", '', $textValue),
+                            'weightSign'  => '+',
+                            'weightValue' => '0.000'
                         );
                         break;
 				}

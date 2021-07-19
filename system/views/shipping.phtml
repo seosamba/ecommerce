@@ -135,10 +135,14 @@ $this->headLink()
 
                     <fieldset class="config-fields-pickup-config mt10px background hidden">
                         <legend class="background large p5px"><?php echo $this->translate('Shipping pickup configuration'); ?></legend>
-                        <label>
+                        <label class="grid_6 alpha">
                             <?php echo $this->pickupForm->getElement('searchEnabled')->renderViewHelper(); ?>
                             <?php echo $this->translate('Display location search on checkout');?>
                         </label>
+                        <p class="grid_6 omega labeled icon right mt0px">
+                            <?php echo $this->pickupForm->getElement('gmapsZoom')->setAttrib('class', 'grid_7 alpha omega fl-right')->renderViewHelper();?>
+                            <?php echo $this->pickupForm->getElement('gmapsZoom')->addDecorator('Label', array('class' => 'grid_5 alpha omega'))->renderLabel();?>
+                        </p>
                         <p class="grid_6 alpha labeled icon right">
                             <?php echo $this->pickupForm->getElement('title')->setAttrib('class', 'grid_8 alpha omega fl-right')->renderViewHelper();?>
                             <i class="tooltip info ticon-info-sign icon16" title="<?php echo $this->translate('custom title');?>"></i>
@@ -477,6 +481,7 @@ $(function(){
                     configData:configData,
                     title:$('#title').val(),
                     units:$('#units option:selected').val(),
+                    gmapsZoom:$('#gmapsZoom').val(),
                     shipper:'<?php echo Shopping::SHIPPING_PICKUP;?>',
                     defaultPickupConfig:defaultPickupConfig,
                     searchEnabled:searchEnabled

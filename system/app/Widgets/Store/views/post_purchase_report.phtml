@@ -584,9 +584,10 @@
                                 <?php
                                 if (is_array($optData)) {
                                     $optionStr = $optionTitle . ': ' . $optData['title'];
-                                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
-                                        if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1) {
-                                            $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate']) / 100;
+
+                                    if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
+                                        if ((bool)$product['taxRate'] && $this->showPriceIncTax == 1){
+                                            $optPriceMod = $optData['priceValue'] * (100 + $product['taxRate'])/100;
                                         } else {
                                             $optPriceMod = $optData['priceValue'];
                                         }

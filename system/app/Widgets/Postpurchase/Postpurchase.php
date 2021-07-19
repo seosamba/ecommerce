@@ -413,6 +413,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCreated()
     {
+        if (!empty($this->_options[0])) {
+            return date($this->_options[0], strtotime($this->_cart->getCreatedAt()));
+        }
+
         return date("d-M-Y", strtotime($this->_cart->getCreatedAt()));
     }
 
@@ -897,8 +901,98 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $photoSrc;
     }
 
-
     /**
+     * Return signle product options for single item in cart
+     *
+     * @param $sid
+     * @return string
+     */
+    protected function _renderCartItemOption($sid)
+    {
+        if ($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
+        $productOptions = $this->_cartContent[$sid]['options'];
+        if (!empty($productOptions)) {
+            if (!empty($this->_options[0])) {
+                $singleOptionName = $this->_options[0];
+                $withTitle = false;
+                if (!empty($this->_options[1]) && $this->_options[1] === 'title') {
+                    $withTitle = true;
+                }
+                if (empty($productOptions[$singleOptionName])) {
+                    return '';
+                }
+                $singleOpt = $productOptions[$singleOptionName];
+                $options = array();
+                $options[$singleOptionName] = $singleOpt;
+                $productOptions = $options;
+
+                $optionStr = '';
+                foreach ($productOptions as $optionTitle => $optData) {
+                    if (is_array($optData)) {
+                        if (!empty($optData['title']) && $withTitle === true) {
+                            $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
+                        } else {
+                            $optionStr = '';
+                        }
+
+                        if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
+                            if ((bool)$this->_cartContent[$sid]['taxRate'] && (bool)$this->_shoppingConfig['showPriceIncTax'] === true) {
+                                $optPriceMod = $optData['priceValue'] * (100 + $this->_cartContent[$sid]['taxRate']) / 100;
+                            } else {
+                                $optPriceMod = $optData['priceValue'];
+                            }
+                            if (!in_array(self::CLEAN_OPTIONS_PRICE, $this->_options)) {
+                                if ($withTitle === true) {
+                                    if ($optData['priceType'] === 'percent') {
+                                        $optionStr .= '<span>(' . $optData['priceSign'] . '%'. number_format($optPriceMod, 2) .')</span>';
+                                    } else {
+                                        $optPriceMod = $this->_currency->toCurrency($optPriceMod);
+
+                                        $optionStr .= '<span>(' . $optData['priceSign'] . $optPriceMod .')</span>';
+                                    }
+                                } else {
+                                    if ($optData['priceType'] === 'percent') {
+                                        $optionStr .= $optData['priceSign'] . '%' . number_format($optPriceMod, 2);
+                                    } else {
+                                        $optPriceMod = $this->_currency->toCurrency($optPriceMod);
+
+                                        $optionStr .= $optData['priceSign'] . $optPriceMod;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (isset($optData['weightValue']) && intval($optData['weightValue'])) {
+                            if ($withTitle === true) {
+                                $optionStr .= '<span>(' . $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'] . ')</span>';
+                            } else {
+                                $optionStr .= $optData['weightSign'] . ' ' . $optData['weightValue'] . ' ' . $this->_shoppingConfig['weightUnit'];
+                            }
+                        }
+
+                        if (!isset($optData['priceValue']) && !isset($optData['weightValue'])) {
+                            return $optData['title'];
+                        }
+
+                    } else {
+                        $optData = trim($optData);
+                        if (!empty($optData)) {
+                            return $optData;
+                        }
+                    }
+                }
+
+                return $optionStr;
+            }
+        }
+    }
+
+
+
+            /**
      * Return product options for single item in cart
      *
      * @param $sid
@@ -918,10 +1012,18 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                     $optDataTitle = trim($optData['title']);
                     if (!empty($optDataTitle)) {
                         $optionStr = '<span>'.$optionTitle. ':</span> <span>'.$optData['title'].'</span> ';
+
+                        if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                            $optionStr = '<span>'.$optionTitle. ':</span>';
+                            if (in_array(self::CLEAN_OPTIONS_PRICE, $this->_options)) {
+                                $optionStr .= '<span>'.$optData['title'].'</span> ';
+                            }
+                        }
                     } else {
                         $optionStr = '';
                     }
-                    if (isset($optData['priceValue']) && intval($optData['priceValue'])) {
+
+                    if (isset($optData['priceValue']) && is_numeric($optData['priceValue']) && !empty((float) $optData['priceValue'])) {
                         if ((bool)$this->_cartContent[$sid]['taxRate'] && (bool)$this->_shoppingConfig['showPriceIncTax'] === true) {
                             $optPriceMod = $optData['priceValue'] * (100 + $this->_cartContent[$sid]['taxRate']) / 100;
                         } else {
@@ -933,7 +1035,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                             } else {
                                 $optPriceMod = $this->_currency->toCurrency($optPriceMod);
 
-                                $optionStr .= '<span>(' . $optData['priceSign'] . $optPriceMod .')</span>';
+                                if(!empty($optData['optionType']) && $optData['optionType'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
+                                    $optionStr .= '<span>' . $optPriceMod .'</span>';
+                                } else {
+                                    $optionStr .= '<span>(' . $optData['priceSign'] . $optPriceMod .')</span>';
+                                }
                             }
                         }
                     }
@@ -1158,7 +1264,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if(!empty($quote)){
             $partialAmountPaid = $this->_cart->getPartialPercentage();
             if (!empty((int) $partialAmountPaid)) {
-                return $this->_cart->getPartialPercentage();
+                return round($this->_cart->getPartialPercentage(), 1);
             }
 
             return '';
