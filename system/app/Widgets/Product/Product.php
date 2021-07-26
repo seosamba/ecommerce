@@ -463,10 +463,11 @@ class Widgets_Product_Product extends Widgets_Abstract {
                             $productQty = $inventoryCount > 0 ? $inventoryCount : '0';
                         }
 
+                        $productNegativeStock = $relatedProduct->getNegativeStock();
+
+                        $inventoryCount = $this->_translator->translate('Out of stock');
                         if(is_null($inventoryCount) || !empty($inventoryCount)) {
                             $inventoryCount = $this->_translator->translate('In stock');
-                        } else {
-                            $inventoryCount = $this->_translator->translate('Out of stock');
                         }
 
                         $price = $relatedProduct->getCurrentPrice() !== null ? $relatedProduct->getCurrentPrice() : $relatedProduct->getPrice();
@@ -549,6 +550,12 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		if (is_null($inventoryCount)){
 			return $this->_translator->translate('In stock');
 		}
+        $productNegativeStock = $this->_product->getNegativeStock();
+
+		if(!empty($productNegativeStock)) {
+            return $inventoryCount;
+        }
+
 		return $inventoryCount > 0 ? $inventoryCount : $this->_translator->translate('Out of stock');
 	}
 
@@ -557,6 +564,13 @@ class Widgets_Product_Product extends Widgets_Abstract {
         if (is_null($inventoryCount)){
             return '&infin;';
         }
+
+        $productNegativeStock = $this->_product->getNegativeStock();
+
+        if(!empty($productNegativeStock)) {
+            return $inventoryCount;
+        }
+
         return $inventoryCount > 0 ? $inventoryCount : '0';
     }
 

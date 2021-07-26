@@ -413,6 +413,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCreated()
     {
+        if (!empty($this->_options[0])) {
+            return date($this->_options[0], strtotime($this->_cart->getCreatedAt()));
+        }
+
         return date("d-M-Y", strtotime($this->_cart->getCreatedAt()));
     }
 
