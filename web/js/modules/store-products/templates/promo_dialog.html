@@ -1,0 +1,42 @@
+<div title="<%= _.isUndefined(i18n['Assign promo']) ? 'Assign promo':i18n['Assign promo'] %>">
+    <form class="grid_12 mt10px" method="POST" name="promo-form" id="assign-promo-dialog" action="">
+        <fieldset class="background">
+            <legend class="large background"><%= _.isUndefined(i18n['Set selected products on sale']) ? 'Set selected products on sale':i18n['Set selected products on sale'] %>:</legend>
+            <p>
+                <label class="mt5px grid_5 alpha" for="promo-price"><%= _.isUndefined(i18n['Sale price']) ? 'Sale price':i18n['Sale price'] %> (<span id="promo-price-unit"><%= currencyUnit %></span>):</label>
+                <input id="promo-price" autocomplete="off" class="grid_4 omega"  name="promo-price" type="text" >
+                <label class="mt5px labeled grid_3 text-center omega">
+                    <span><%= _.isUndefined(i18n['Time']) ? 'Time':i18n['Time'] %></span><i class="tooltip info ticon-question-sign icon16 mb5px ml3"
+                                                                          title="<%= _.isUndefined(i18n['Sales time depends on your local server time settings']) ? 'Sales time depends on your local server time settings':i18n['Sales time depends on your local server time settings'] %>"></i>
+                </label>
+            </p>
+            <p>
+                <label class="mt5px grid_5 alpha"><%= _.isUndefined(i18n['Starting date']) ? 'Starting date':i18n['Starting date'] %>:</label>
+                <label class="labeled icon right grid_4 omega">
+                    <input id="promo-from" autocomplete="off" class="promo-from" name="promo-from" type="text" value="">
+                    <i class="ticon-calendar icon16"></i>
+                </label>
+                <label class="mt5px labeled text-center grid_3">
+                    <span>00.00</span>
+                </label>
+            </p>
+            <p>
+                <label class="mt5px grid_5 alpha"><%= _.isUndefined(i18n['Expiry date']) ? 'Expiry date':i18n['Expiry date'] %>:</label>
+                <label class="labeled icon right grid_4 omega">
+                    <input id="promo-due" autocomplete="off" class="promo-due" name="promo-due" type="text" value="">
+                    <i class="ticon-calendar icon16"></i>
+                </label>
+                <label class="mt5px labeled text-center grid_3">
+                    <span>23.59</span>
+                </label>
+            </p>
+        </fieldset>
+        <div id="check-all-for-remarketing" class="hidden">
+            <label class="grid_7 mt20px pointer">
+
+            </label>
+        </div>
+        <button class="btn grid_6" type="submit"><%= _.isUndefined(i18n['Apply']) ? 'Apply' : i18n['Apply'] %></button>
+    </form>
+</div>
+

@@ -1126,9 +1126,12 @@ class Shopping extends Tools_Plugins_Abstract {
 	 */
 	protected function _makeOptionProducts() {
 		if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
 			$this->_view->brands = Models_Mapper_Brand::getInstance()->fetchAll();
 			$this->_view->tags = Models_Mapper_Tag::getInstance()->fetchAll();
 			$this->_view->currency = Zend_Registry::isRegistered('Zend_Currency') ? Zend_Registry::get('Zend_Currency') : new Zend_Currency();
+			$this->_view->currencyUnit = $shoppingConfig['currency'];
             $productsData = Models_Mapper_ProductMapper::getInstance()->getProductsInventory();
 
             if(!empty($productsData['inventory'])){
