@@ -9,8 +9,8 @@
 	$this->headLink()
 			->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
 ?>
-<input type="hidden" id="promo-token" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>"
-       value="<?php echo Tools_System_Tools::initSecureToken(Promo::PROMO_SECURE_TOKEN); ?>"/>
+<input type="hidden" id="shopping-token" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>"
+       value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
 <div id="store-products" class="toaster-widget store-widget">
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
     <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>

@@ -537,7 +537,7 @@ define([
                                 'promo-from'  : promoFrom,
                                 'promo-due'   : promoDue,
                                 'productIds'  : productIds,
-                                'secureToken' : $('#promo-token').val()
+                                'secureToken' : $('#shopping-token').val()
                             }
                         }).done(function (response) {
                             if(response.error == 1) {
