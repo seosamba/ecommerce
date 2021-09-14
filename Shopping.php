@@ -1140,6 +1140,18 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->inventory = $inventory;
             }
 
+            $enablePromoPlugin = false;
+
+            $enabledPromoPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('promo');
+            if ($enabledPromoPlugin != null) {
+                if ($enabledPromoPlugin->getStatus() == 'enabled') {
+                    $enablePromoPlugin = true;
+                }
+            }
+
+            $this->_view->promoPlugin = $enablePromoPlugin;
+
+
 			return $this->_view->render('manage_products.phtml');
 		}
 	}
