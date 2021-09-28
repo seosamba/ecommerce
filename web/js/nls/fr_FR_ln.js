@@ -117,7 +117,16 @@ define({
         'This checkbox will permit to use of the negative stock of product, enable this ability?' : 'Cette case à cocher permettra  d\'utiliser un produit qui n\'est pas disponible, voulez-vous activer cette option?',
         'Assign negative stock' : 'Assigner le statut \'pas disponible\'',
         'disable negative stock' : 'désactiver le statut \'pas disponible\'',
-        'enable negative stock' : 'activer le statut \'pas disponible\''
+        'enable negative stock' : 'activer le statut \'pas disponible\'',
+        'Assign promo' : 'Attribuer une promotion',
+        'Set selected products on sale' : 'Mettre les produits sélectionnés en vente',
+        'Sale price' : 'Prix de vente',
+        'Time' : 'Temps',
+        'Sales time depends on your local server time settings' : 'L\'heure de vente dépend des paramètres d\'heure de votre serveur local',
+        'Starting date' : 'Date de début',
+        'Expiry date' : 'Date d\'expiration',
+        'Wrong date format' : 'Format de date incorrect',
+        'Please select product' : 'Veuillez sélectionner un produit'
 
     }
 });
