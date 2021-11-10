@@ -79,7 +79,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             ->appendFile(
                 $this->_websiteUrl . 'plugins/shopping/web/js/modules/filtering/filtering-builder' . (APPLICATION_ENV === 'production' ? '.min' : '') . '.js'
             );
-        $layout->headLink()->appendStylesheet($this->_websiteUrl . 'system/css/seotoaster-ui.css');
+        $layout->headLink()
+            ->appendStylesheet($this->_websiteUrl . 'system/css/seotoaster-ui.css')
+            ->appendStylesheet($this->_websiteUrl . 'system/css/icons.css');
 
         $mapper = Filtering_Mappers_Eav::getInstance();
 

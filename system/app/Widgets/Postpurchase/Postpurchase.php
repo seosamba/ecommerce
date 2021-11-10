@@ -135,7 +135,11 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                     if ($productObject instanceof Models_Model_Product) {
                         $cartContent[$key]['mpn'] = $productObject->getMpn();
                         $cartContent[$key]['photo'] = $productObject->getPhoto();
-                        $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
+                        if (!empty($productObject->getPage())) {
+                            $cartContent[$key]['productUrl'] = $productObject->getPage()->getUrl();
+                        } else {
+                            $cartContent[$key]['productUrl'] = '';
+                        }
                         $cartContent[$key]['taxRate'] = Tools_Tax_Tax::calculateProductTax($productObject, null, true);
                         $cartContent[$key]['short_description'] = $productObject->getShortDescription();
                         $cartContent[$key]['full_description'] = $productObject->getFullDescription();
@@ -1257,7 +1261,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         if(!empty($quote)){
             $partialAmountPaid = $this->_cart->getPartialPercentage();
             if (!empty((int) $partialAmountPaid)) {
-                return round($this->_cart->getPartialPercentage(), 1);
+                $partialPaymentType = $this->_cart->getPartialType();
+                if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_PERCENTAGE) {
+                    return round($this->_cart->getPartialPercentage(), 1).' %';
+                }
             }
 
             return '';

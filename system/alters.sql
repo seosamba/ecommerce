@@ -615,7 +615,17 @@ ALTER TABLE `shopping_product_option`
 -- version: 2.8.7
 ALTER TABLE `shopping_product` ADD COLUMN `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
 
+-- 14/07/2021
+-- version: 2.8.8
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_type` ENUM('amount', 'percentage') DEFAULT NULL AFTER `purchased_on`;
+UPDATE `shopping_cart_session` SET `partial_type` = 'percentage' WHERE `shopping_cart_session`.`is_partial`='1';
+
+-- 24/09/2021
+-- version: 2.8.9
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
+('fiscalYearStart', '1');
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.8.8' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
