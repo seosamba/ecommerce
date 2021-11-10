@@ -850,5 +850,6 @@
         'Remove from library?' => 'Supprimer de bibliothèque?',
         'Go to CRM Record' => 'Voir l\'enregistrement GRC',
         'You can\'t save product with negative qty, please enter positive qty of product or enable "Negative stock" checkbox' => 'Impossible de sauvegarder un produit ayant la quantité négative, veuillez entrer celle positive ou cocher "N\'est pas disponible"',
-        'assign negative stock' => 'assigner le statut \'pas disponible\''
+        'assign negative stock' => 'assigner le statut \'pas disponible\'',
+        'assign promo' => 'attribuer une promotion'
 );?>
