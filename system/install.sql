@@ -158,7 +158,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinks', 0),
 ('pickupLocationLinksLimit', 4),
 ('minimumOrder', '0'),
-('version', '2.8.8');
+('fiscalYearStart', '1'),
+('version', '2.9.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -320,6 +321,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_amount` DECIMAL(10,2) DEFAULT NULL COMMENT 'Partial or full refund amount',
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
+  `partial_type` ENUM('amount', 'percentage') DEFAULT NULL,
   `partial_percentage` DECIMAL(10,6) DEFAULT '0.00',
   `is_partial` ENUM('0', '1') DEFAULT '0',
   `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
@@ -1082,5 +1084,5 @@ INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.8.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.1' WHERE `name` = 'shopping';
 

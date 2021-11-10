@@ -9,9 +9,12 @@
 	$this->headLink()
 			->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
 ?>
+<input type="hidden" id="shopping-token" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>"
+       value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
 <div id="store-products" class="toaster-widget store-widget">
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
     <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>
+    <input type="hidden" name="currency-unit" value="<?php echo $this->currencyUnit ;?>"/>
     <div class="search-line clearfix">
         <input type="text" class="pfilter grid_3 alpha omega mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, SKU, MPN') ?>" >
         <div class="grid_9 omega">
@@ -84,6 +87,9 @@
                             <option value="toggle"><?php echo $this->translate('enable/disable');?></option>
                             <option value="quantity"><?php echo $this->translate('assign quantity');?></option>
                             <option value="negativeStock"><?php echo $this->translate('assign negative stock');?></option>
+                            <?php if($this->promoPlugin):?>
+                                <option value="promo"><?php echo $this->translate('assign promo');?></option>
+                            <?php endif;?>
                         </select>
                     </div>
                     <div id="paginator" class="paginator text-right grid_9 omega mt10px"></div>

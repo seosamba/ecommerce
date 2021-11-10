@@ -56,7 +56,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'partial_percentage'         => $model->getPartialPercentage(),
             'is_partial'                 => $model->getIsPartial(),
             'partial_paid_amount'        => $model->getPartialPaidAmount(),
-            'partial_purchased_on'        => $model->getPartialPurchasedOn()
+            'partial_purchased_on'       => $model->getPartialPurchasedOn(),
+            'partial_type'               => $model->getPartialType()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

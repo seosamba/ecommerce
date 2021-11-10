@@ -57,6 +57,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
      */
 	const CART_STATUS_NOT_VERIFIED = 'not_verified';
 
+	const CART_PARTIAL_PAYMENT_TYPE_AMOUNT = 'amount';
+
+	const CART_PARTIAL_PAYMENT_TYPE_PERCENTAGE = 'percentage';
+
 
 	protected $_cartContent = null;
 
@@ -139,6 +143,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_partialPaidAmount = '';
 
     protected $_partialPurchasedOn = null;
+
+    protected $_partialType = null;
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -670,6 +676,25 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setPartialPurchasedOn($partialPurchasedOn)
     {
         $this->_partialPurchasedOn = $partialPurchasedOn;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPartialType()
+    {
+        return $this->_partialType;
+    }
+
+    /**
+     * @param null $partialType
+     * @return null
+     */
+    public function setPartialType($partialType)
+    {
+        $this->_partialType = $partialType;
 
         return $this;
     }
