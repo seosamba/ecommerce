@@ -12,10 +12,11 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
      * @param int $cartId cart id
      * @param string $status new status (completed, shipped, etc..)
      * @param bool $skipSupplierNotification skip suppliers notification flag
+     * @param string $message some text message
      * @return Tools_PaymentGateway
      * @throws Exceptions_SeotoasterPluginException
      */
-	public function updateCartStatus($cartId, $status, $skipSupplierNotification = false) {
+	public function updateCartStatus($cartId, $status, $skipSupplierNotification = false, $message = '') {
 		$gateway = get_called_class();
 
 		$cart = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
@@ -47,6 +48,10 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
             if ($status === Models_Model_CartSession::CART_STATUS_PARTIAL) {
                 $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
                 $cart->setPartialPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
+            }
+
+            if ($status === Models_Model_CartSession::CART_STATUS_ERROR) {
+                $cart->setPurchaseErrorMessage($message);
             }
 
 

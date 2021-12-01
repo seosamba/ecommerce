@@ -625,7 +625,11 @@ UPDATE `shopping_cart_session` SET `partial_type` = 'percentage' WHERE `shopping
 INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('fiscalYearStart', '1');
 
+-- 14/07/2021
+-- version: 2.9.0
+ALTER TABLE `shopping_cart_session` ADD COLUMN `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL AFTER `partial_purchased_on`;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
