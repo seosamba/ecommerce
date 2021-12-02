@@ -330,6 +330,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
   `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `partial_notification_date` TIMESTAMP NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -1064,5 +1065,5 @@ INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.1' WHERE `name` = 'shopping';
 

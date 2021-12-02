@@ -22,6 +22,15 @@
 <% } %>
 <% if (status === 'refunded') { %>
     <td data-mobile-title="Status" class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : (parseFloat(total) + parseFloat((parseFloat(refund_amount).toFixed(2)))) %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+<% } else if(status === 'partial') {%>
+    <td data-mobile-title="Status" class="status-change">
+        <%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %>
+        <% if (typeof partial_notification_date !== 'undefined' && partial_notification_date && partial_notification_date !== null) { %>
+            <p class="mt5px">
+                <%= !_.isUndefined(i18n['Last request sent on'])?i18n['Last request sent on']:'Last request sent on' %>: <%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(partial_notification_date.replace(/\-/g, '/')))) %>
+            </p>
+        <% } %>
+    </td>
 <% } else {%>
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
