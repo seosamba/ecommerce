@@ -59,6 +59,19 @@ define([
                     if (typeof i18n['' + translatedStatus + ''] !== "undefined") {
                         translatedStatus = i18n['' + translatedStatus + ''];
                     }
+
+                    if (status === 'partial' && this.model.get('partial_notification_date')) {
+                        if (this.model.get('partial_notification_date') !== null && this.model.get('partial_notification_date')) {
+                            var partialWrapperText = !_.isUndefined(i18n['Last request sent on'])?i18n['Last request sent on']:'Last request sent on',
+                            partialWrapperDate = $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(this.model.get('partial_notification_date').replace(/\-/g, '/')))),
+                            partialWrapper = '<p class="mt5px">'+partialWrapperText+' :'+' '+partialWrapperDate+'</p>';
+
+                            translatedStatus = translatedStatus+partialWrapper;
+                            el.html(translatedStatus);
+                            return true;
+                        }
+                    }
+
                     el.text(translatedStatus);
                     return true;
                 }

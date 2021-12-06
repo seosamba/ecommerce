@@ -670,6 +670,7 @@ define(['backbone',
                                     } else {
                                         showMessage(response.responseText, false, 5000);
                                         $('.ui-dialog-titlebar-close').trigger('click');
+                                        self.applyFilter();
                                     }
                                 }
                             });

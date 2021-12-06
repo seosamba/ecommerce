@@ -3269,8 +3269,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $cartSession->notifyObservers();
 
+                    $date = date(Tools_System_Tools::DATE_MYSQL);
+
                     $partialNotificationLogModel->setCartId($orderId);
-                    $partialNotificationLogModel->setNotifiedAt(date(Tools_System_Tools::DATE_MYSQL));
+                    $partialNotificationLogModel->setNotifiedAt($date);
+                    $cartSessionModel->setPartialNotificationDate($date);
+                    $cartSessionMapper->save($cartSessionModel);
                     $partialNotificationMapper->save($partialNotificationLogModel);
 
                 }

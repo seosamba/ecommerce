@@ -146,6 +146,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_partialType = null;
 
+    protected $_partialNotificationDate = null;
+
     protected $_purchaseErrorMessage = '';
 
 	public function setCartContent($cartContent) {
@@ -699,6 +701,24 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         $this->_partialType = $partialType;
 
         return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPartialNotificationDate()
+    {
+        return $this->_partialNotificationDate;
+    }
+
+    /**
+     * @param null $partialNotificationDate
+     * @return null
+     */
+    public function setPartialNotificationDate($partialNotificationDate)
+    {
+        $this->_partialNotificationDate = $partialNotificationDate;
+
     }
 
     /**
