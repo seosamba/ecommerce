@@ -629,7 +629,11 @@ INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 -- version: 2.9.0
 ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_notification_date` TIMESTAMP NULL;
 
+-- 14/07/2021
+-- version: 2.9.1
+ALTER TABLE `shopping_cart_session` ADD COLUMN `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL AFTER `partial_purchased_on`;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.2' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

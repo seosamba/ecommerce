@@ -52,6 +52,10 @@ define([
                         translatedStatus = 'Lost opportunity';
                     }
 
+                    if (status === 'error') {
+                        return false;
+                    }
+
                     if (typeof i18n['' + translatedStatus + ''] !== "undefined") {
                         translatedStatus = i18n['' + translatedStatus + ''];
                     }

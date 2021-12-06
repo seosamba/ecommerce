@@ -31,6 +31,8 @@
             </p>
         <% } %>
     </td>
+<% } else if(status === 'error') {%>
+    <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %><i class="info-block tooltip fl-center ticon-info icon16" title="<%= _.isNull(purchase_error_message) ? '' : purchase_error_message %>"></i></td>
 <% } else {%>
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
