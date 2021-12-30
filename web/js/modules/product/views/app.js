@@ -158,7 +158,7 @@ define([
 
             this.model.get('options').on('add', this.renderOption, this);
             this.model.get('options').on('reset', this.renderOptions, this);
-
+            $('#product-supplier').chosen();
 
             return this;
 		},
@@ -380,6 +380,19 @@ define([
                         }
                         $('#custom-param-'+attr.param_type+'-'+attr.param_name).val(paramVal);
                     });
+                }
+
+                if(name == 'companyProducts') {
+                    if (!_.isUndefined(value) && !_.isEmpty(value) && value !== null) {
+                        var companiesP = value;
+
+                        if(!_.isArray(companiesP)) {
+                            companiesP = value.split(',');
+                        }
+                        $('#product-supplier').val(companiesP).trigger("chosen:updated");
+                    } else {
+                        $('#product-supplier').val(0).trigger("chosen:updated");
+                    }
                 }
             });
 
@@ -736,6 +749,11 @@ define([
 
             this.model.set({allowance: productAllowanceDate});
             this.model.set({customParams: productCustomParams});
+
+            var companyProducts = $('#product-supplier').val();
+            if(companyProducts) {
+                this.model.set({companyProducts: companyProducts});
+            }
 
             var ptodFullDescription = tinymce.activeEditor.getContent();
             this.model.set({fullDescription: ptodFullDescription});
