@@ -31,6 +31,23 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 );
             }
 
+            if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                $currentStatus = $cart->getStatus();
+                if ($currentStatus === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                    $cart->setSecondPaymentGateway($gateway);
+                    if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {
+                        $cart->setIsSecondPaymentManuallyPaid('1');
+                        $isFirstPaymentManuallyPaid = $cart->getIsFirstPaymentManuallyPaid();
+                        if (!empty($isFirstPaymentManuallyPaid)) {
+                            $cart->setIsFullOrderManuallyPaid('1');
+                        }
+                    } else {
+                        $cart->setIsSecondPaymentManuallyPaid('0');
+                    }
+                }
+
+            }
+
 			$cart->setStatus($status);
 			$cart->setGateway($gateway);
 
@@ -48,6 +65,12 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
             if ($status === Models_Model_CartSession::CART_STATUS_PARTIAL) {
                 $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
                 $cart->setPartialPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
+                $cart->setFirstPaymentGateway($gateway);
+                if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {
+                    $cart->setIsFirstPaymentManuallyPaid('1');
+                } else {
+                    $cart->setIsFirstPaymentManuallyPaid('0');
+                }
             }
 
             if ($status === Models_Model_CartSession::CART_STATUS_ERROR) {

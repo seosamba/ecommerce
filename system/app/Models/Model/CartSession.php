@@ -52,6 +52,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
      */
 	const CART_STATUS_PARTIAL = 'partial';
 
+	const MANUALLY_PAYED_GATEWAY_QUOTE = 'Quote';
+
+	const MANUALLY_PAYED_GATEWAY_MANUALL = 'Manual';
+
     /**
      * Order not verified
      */
@@ -149,6 +153,16 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     protected $_partialNotificationDate = null;
 
     protected $_purchaseErrorMessage = '';
+
+    protected $_isFirstPaymentManuallyPaid = '0';
+
+    protected $_isFullOrderManuallyPaid = '0';
+
+    protected $_isSecondPaymentManuallyPaid = '0';
+
+    protected $_firstPaymentGateway = '';
+
+    protected $_secondPaymentGateway = '';
 
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
@@ -739,6 +753,102 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getIsFirstPaymentManuallyPaid()
+    {
+        return $this->_isFirstPaymentManuallyPaid;
+    }
+
+    /**
+     * @param string $isFirstPaymentManuallyPaid
+     * @return string
+     */
+    public function setIsFirstPaymentManuallyPaid($isFirstPaymentManuallyPaid)
+    {
+        $this->_isFirstPaymentManuallyPaid = $isFirstPaymentManuallyPaid;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsFullOrderManuallyPaid()
+    {
+        return $this->_isFullOrderManuallyPaid;
+    }
+
+    /**
+     * @param string $isFullOrderManuallyPaid
+     * @return string
+     */
+    public function setIsFullOrderManuallyPaid($isFullOrderManuallyPaid)
+    {
+        $this->_isFullOrderManuallyPaid = $isFullOrderManuallyPaid;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsSecondPaymentManuallyPaid()
+    {
+        return $this->_isSecondPaymentManuallyPaid;
+    }
+
+    /**
+     * @param string $isSecondPaymentManuallyPaid
+     * @return string
+     */
+    public function setIsSecondPaymentManuallyPaid($isSecondPaymentManuallyPaid)
+    {
+        $this->_isSecondPaymentManuallyPaid = $isSecondPaymentManuallyPaid;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstPaymentGateway()
+    {
+        return $this->_firstPaymentGateway;
+    }
+
+    /**
+     * @param string $firstPaymentGateway
+     * @return string
+     */
+    public function setFirstPaymentGateway($firstPaymentGateway)
+    {
+        $this->_firstPaymentGateway = $firstPaymentGateway;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecondPaymentGateway()
+    {
+        return $this->_secondPaymentGateway;
+    }
+
+    /**
+     * @param string $secondPaymentGateway
+     * @return string
+     */
+    public function setSecondPaymentGateway($secondPaymentGateway)
+    {
+        $this->_secondPaymentGateway = $secondPaymentGateway;
+
+        return $this;
+    }
+
 
 
 }
