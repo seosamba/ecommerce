@@ -891,6 +891,26 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
+`id` INT(10) unsigned AUTO_INCREMENT,
+`cart_id` int(10) unsigned NOT NULL,
+`product_id` int(10) unsigned NOT NULL,
+`option_id` int(10) unsigned NOT NULL,
+`cart_content_id` int (10) unsigned NOT NULL,
+`option_title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+`option_type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+`option_selection_id` int(10) unsigned NULL,
+`title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceValue` decimal(10,4) DEFAULT NULL,
+`priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightValue` decimal(8,3) DEFAULT NULL,
+`cart_item_key` CHAR(32) NOT NULL,
+`cart_item_option_key` CHAR(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
   `product_id` INT(10) unsigned NOT NULL,
   `allowance_due` date DEFAULT NULL,
@@ -1066,5 +1086,5 @@ INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.2' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.3' WHERE `name` = 'shopping';
 

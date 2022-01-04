@@ -1296,7 +1296,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	public function orderAction() {
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		if ($id) {
-			$order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
+			$order = Models_Mapper_CartSessionMapper::getInstance()->find($id, true);
 			$customer = Tools_ShoppingCart::getInstance()->getInstance()->getCustomer();
 			if (!$order) {
 				throw new Exceptions_SeotoasterPluginException('Order not found');
