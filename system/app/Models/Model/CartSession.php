@@ -149,6 +149,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_partialType = null;
 
+    protected $_partialNotificationDate = null;
+
+    protected $_purchaseErrorMessage = '';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -709,6 +713,43 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setPartialType($partialType)
     {
         $this->_partialType = $partialType;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPartialNotificationDate()
+    {
+        return $this->_partialNotificationDate;
+    }
+
+    /**
+     * @param null $partialNotificationDate
+     * @return null
+     */
+    public function setPartialNotificationDate($partialNotificationDate)
+    {
+        $this->_partialNotificationDate = $partialNotificationDate;
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getPurchaseErrorMessage()
+    {
+        return $this->_purchaseErrorMessage;
+    }
+
+    /**
+     * @param string $purchaseErrorMessage
+     * @return string
+     */
+    public function setPurchaseErrorMessage($purchaseErrorMessage)
+    {
+        $this->_purchaseErrorMessage = $purchaseErrorMessage;
 
         return $this;
     }

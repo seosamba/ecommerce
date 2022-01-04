@@ -1290,16 +1290,25 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCompletionpaymentamount()
     {
 
+        $partialPaymentType = $this->_cart->getPartialType();
+        $partialPercent = $this->_cart->getPartialPercentage();
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            return round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
-                    2), 2);
+            if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_AMOUNT) {
+                return round($this->_cart->getTotal() - $partialPercent, 2);
+            } else {
+                return round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
+                        2), 2);
+            }
+
         }
 
-        return $this->_view->currency(round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
-                2), 2));
+        if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_AMOUNT) {
+            return $this->_view->currency(round($this->_cart->getTotal() - $partialPercent, 2));
+        } else {
+            return $this->_view->currency(round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
+                    2), 2));
+        }
 
-
-        return '';
     }
 
 }
