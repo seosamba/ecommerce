@@ -197,7 +197,12 @@
                     <td class="product-info">
                         <span class="post-purchase-report-product-name"><?php echo $product['name']; ?></span>
                         <?php if (!empty($product['options'])): ?>
-                            <?php foreach ($product['options'] as $optionTitle => $optData): ?>
+                            <?php if (empty($product['archiveOptions'])):?>
+                                <?php $options = $product['options']; ?>
+                            <?php else :?>
+                                <?php $options = $product['archiveOptions']; ?>
+                            <?php endif;?>
+                            <?php foreach ($options as $optionTitle => $optData): ?>
                                 <?php
                                 if (is_array($optData)) {
                                     $optionStr = '<span>' . $optionTitle . ':</span> <span>' . $optData['title'] . '</span> ';
@@ -580,7 +585,12 @@
                         <span class="post-purchase-report-product-name"
                               style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
                         <?php if (!empty($product['options'])): ?>
-                            <?php foreach ($product['options'] as $optionTitle => $optData): ?>
+                            <?php if (empty($product['archiveOptions'])):?>
+                                <?php $options = $product['options']; ?>
+                            <?php else :?>
+                                <?php $options = $product['archiveOptions']; ?>
+                            <?php endif;?>
+                            <?php foreach ($options as $optionTitle => $optData): ?>
                                 <?php
                                 if (is_array($optData)) {
                                     $optionStr = $optionTitle . ': ' . $optData['title'];

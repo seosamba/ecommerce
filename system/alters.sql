@@ -651,6 +651,7 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentsecond' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+
 -- 14/04/2021
 -- version: 2.8.5
 ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(10,6) DEFAULT '0.00';
@@ -664,6 +665,7 @@ ALTER TABLE `shopping_product_option`
 -- 02/07/2021
 -- version: 2.8.7
 ALTER TABLE `shopping_product` ADD COLUMN `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
+
 
 -- 14/07/2021
 -- version: 2.8.8
@@ -683,6 +685,29 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_notification_date` TIMES
 -- version: 2.9.1
 ALTER TABLE `shopping_cart_session` ADD COLUMN `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL AFTER `partial_purchased_on`;
 
+-- 23/08/2018
+-- version: 2.9.2
+-- Add historical cart session option
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
+`id` INT(10) unsigned AUTO_INCREMENT,
+`cart_id` int(10) unsigned NOT NULL,
+`product_id` int(10) unsigned NOT NULL,
+`option_id` int(10) unsigned NOT NULL,
+`cart_content_id` int (10) unsigned NOT NULL,
+`option_title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+`option_type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+`option_selection_id` int(10) unsigned NULL,
+`title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceValue` decimal(10,4) DEFAULT NULL,
+`priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightValue` decimal(8,3) DEFAULT NULL,
+`cart_item_key` CHAR(32) NOT NULL,
+`cart_item_option_key` CHAR(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

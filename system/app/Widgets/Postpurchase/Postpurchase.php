@@ -125,7 +125,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $this->_cart = Zend_Registry::get('postPurchaseCart');
         } elseif (isset($this->_session->storeCartSessionConversionKey)) {
             $this->_cart = Models_Mapper_CartSessionMapper::getInstance()->find(
-                intval($this->_session->storeCartSessionConversionKey)
+                intval($this->_session->storeCartSessionConversionKey), true
             );
             if ($this->_cart instanceof Models_Model_CartSession) {
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
@@ -1009,6 +1009,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         }
 
         $productOptions = $this->_cartContent[$sid]['options'];
+        $archiveProductOptions = $this->_cartContent[$sid]['archiveOptions'];
+        if (!empty($archiveProductOptions)) {
+            $productOptions = $archiveProductOptions;
+        }
         if (!empty($productOptions)) {
             $optionResult = '';
             foreach ($productOptions as $optionTitle => $optData) {

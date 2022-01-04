@@ -1030,6 +1030,20 @@ class Tools_ShoppingCart {
     }
 
     /**
+     * Generate cart item option key
+     *
+     * @param int $cartId cart id
+     * @param int $productId product id
+     * @param int $optionId option id
+     * @param int $optionsSelectionId option selection id
+     * @return string
+     */
+    public static function generateCartItemOptionKey($cartId, $productId, $optionId, $optionsSelectionId)
+    {
+        return md5($cartId . '_' . $productId . '_' . $optionId . '_' . $optionsSelectionId);
+    }
+
+    /*
      * @return string
      */
     public function getIsGift()
@@ -1105,6 +1119,20 @@ class Tools_ShoppingCart {
     }
 
     /**
+
+     * Generate cart item key
+     *
+     * @param int $cartId cart id
+     * @param int $productId product id
+     * @param string $options all cart item options Ex: 29=29&30=30&784=834&785=835
+     * @return string
+     */
+    public static function generateCartItemKey($cartId, $productId, $options)
+    {
+        return md5($cartId . '_' . $productId . '_' . $options);
+    }
+
+    /*
      * Verify if payment already payed
      *
      * @return bool
