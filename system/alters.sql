@@ -627,8 +627,16 @@ UPDATE `shopping_cart_session` SET `partial_type` = 'percentage' WHERE `shopping
 INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('fiscalYearStart', '1');
 
--- 23/08/2018
+-- 02/12/2021
 -- version: 2.9.0
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_notification_date` TIMESTAMP NULL;
+
+-- 14/07/2021
+-- version: 2.9.1
+ALTER TABLE `shopping_cart_session` ADD COLUMN `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL AFTER `partial_purchased_on`;
+
+-- 23/08/2018
+-- version: 2.9.2
 -- Add historical cart session option
 CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `id` INT(10) unsigned AUTO_INCREMENT,
@@ -651,6 +659,6 @@ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.1' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.3' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
