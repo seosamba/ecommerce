@@ -140,6 +140,57 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
             $this->_view->shoppingConfig = $shoppingConfig;
 
+            $currentUser = $this->_sessionHelper->getCurrentUser();
+            $userId = $currentUser->getId();
+
+            $filterPresetMapper = Models_Mapper_FilterPresetMapper::getInstance();
+            $filtersPreset = $filterPresetMapper->fetchAll(null, array('filter_preset_name'));
+            $this->_view->filtersPreset = $filtersPreset;
+
+            $defaultPreset = $filterPresetMapper->getDefaultPreset($userId);
+            if ($defaultPreset instanceof Models_Model_FilterPresetModel) {
+                $presetData = $defaultPreset->getFilterPresetData();
+                if (!empty($presetData)) {
+                    $presetData = json_decode($presetData, true);
+                    $this->_view->presetConfig = $presetData;
+
+                    if(!empty($presetData['filter_country'])) {
+                        $states = Tools_Geo::getState($presetData['filter_country'], 'pairs');
+
+                        $this->_view->states = $states;
+                    }
+                }
+                $this->_view->presetDefaultId = $defaultPreset->getId();
+                $this->_view->presetDefaultName = $defaultPreset->getFilterPresetName();
+                $this->_view->presetDefault = $defaultPreset->getIsDefault();
+            }
+
+            $orderStatuses = array(
+                Models_Model_CartSession::CART_STATUS_NEW => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW),
+                Models_Model_CartSession::CART_STATUS_PENDING => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING),
+                Models_Model_CartSession::CART_STATUS_PROCESSING => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING)
+            );
+
+            if(!empty($shoppingConfig['enabledPartialPayment'])) {
+                $orderStatuses[Models_Model_CartSession::CART_STATUS_PARTIAL] = $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_PARTIAL);
+            }
+
+            $orderStatuses += array(
+                Models_Model_CartSession::CART_STATUS_COMPLETED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED),
+                Models_Model_CartSession::CART_STATUS_SHIPPED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED),
+                Models_Model_CartSession::CART_STATUS_DELIVERED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
+                Models_Model_CartSession::CART_STATUS_CANCELED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED),
+                Models_Model_CartSession::CART_STATUS_REFUNDED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED),
+                Tools_Misc::CS_ALIAS_PENDING => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING),
+                Tools_Misc::CS_ALIAS_PROCESSING => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING),
+                Tools_Misc::CS_ALIAS_QUOTE_SIGNED => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_QUOTE_SIGNED),
+                Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY)
+            );
+
+            $this->_view->orderStatuses = $orderStatuses;
+
+            $this->_view->countriesList = Tools_Geo::getCountries(true);
+
 			return $this->_view->render('orders.phtml');
 		}
 	}
