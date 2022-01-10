@@ -142,12 +142,26 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
             $currentUser = $this->_sessionHelper->getCurrentUser();
             $userId = $currentUser->getId();
+            $userRole = $currentUser->getRoleId();
+            $this->_view->userRole = $userRole;
 
             $filterPresetMapper = Models_Mapper_FilterPresetMapper::getInstance();
-            $filtersPreset = $filterPresetMapper->fetchAll(null, array('filter_preset_name'));
+            $where = null;
+
+            if ($userRole !== Tools_Security_Acl::ROLE_SUPERADMIN && $userRole !== Tools_Security_Acl::ROLE_ADMIN) {
+                $where = '('.$filterPresetMapper->getDbTable()->getAdapter()->quoteInto('creator_id = ?', $userId);
+                $where .= ' OR '.$filterPresetMapper->getDbTable()->getAdapter()->quoteInto('access = ?', 'all').')';
+            }
+
+            $filtersPreset = $filterPresetMapper->fetchAll($where, array('filter_preset_name'));
             $this->_view->filtersPreset = $filtersPreset;
 
             $defaultPreset = $filterPresetMapper->getDefaultPreset($userId);
+
+            if ($userRole === Tools_Security_Acl::ROLE_ADMIN && !$defaultPreset instanceof Models_Model_FilterPresetModel) {
+                $defaultPreset = $filterPresetMapper->getDefaultAndAllAccessPreset('1', 'all');
+            }
+
             if ($defaultPreset instanceof Models_Model_FilterPresetModel) {
                 $presetData = $defaultPreset->getFilterPresetData();
                 if (!empty($presetData)) {
@@ -163,6 +177,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 $this->_view->presetDefaultId = $defaultPreset->getId();
                 $this->_view->presetDefaultName = $defaultPreset->getFilterPresetName();
                 $this->_view->presetDefault = $defaultPreset->getIsDefault();
+                $this->_view->presetDefaultAccess = $defaultPreset->getAccess();
             }
 
             $orderStatuses = array(

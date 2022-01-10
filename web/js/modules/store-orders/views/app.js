@@ -162,6 +162,7 @@ define(['backbone',
             e.preventDefault();
             var filterPresetName = $('#filter-preset-name').val(),
                 filterPresetDefault = 0,
+                filterAllowPreset = 'individual',
                 requestType = 'POST',
                 presetId = $('#preset-id').val(),
                 filterPresetData = {},
@@ -181,6 +182,11 @@ define(['backbone',
                 if ($('#filter-preset-default').is(':checked')) {
                     filterPresetDefault = 1;
                 }
+
+                if ($('#filter-preset-allow').is(':checked')) {
+                    filterAllowPreset = 'all';
+                }
+
                 if (!_.isEmpty(presetId)) {
                     requestType = 'PUT';
                 }
@@ -202,7 +208,7 @@ define(['backbone',
                 };
 
                 var formParams = {'filter_preset_name':filterPresetName,'is_default': filterPresetDefault,
-                    'filter_preset_data': filterPresetData, 'secureToken': $('#orders-secure-token').val()
+                    'access': filterAllowPreset, 'filter_preset_data': filterPresetData, 'secureToken': $('#orders-secure-token').val()
                 };
                 if (requestType === 'PUT') {
                     formParams.id = presetId;
@@ -217,6 +223,7 @@ define(['backbone',
                 }).done(function(response){
                     $('#preset-id').val('');
                     $('#filter-preset-default').prop('checked', false);
+                    $('#filter-preset-allow').prop('checked', false);
                     $('#filter-preset-name').val('');
                     if (requestType === 'POST') {
                         $('#predefined-filter-list').append('<option value="' + response.responseText.id + '">' + filterPresetName + '</option>');
@@ -248,6 +255,8 @@ define(['backbone',
                 $('#switch-search-filter-label').text((_.isUndefined(i18n['OR'])?'OR':i18n['OR']));
                 $('#delete-filter-preset').hide();
                 $('.recurring-filters').addClass('hidden');
+                $('#filter-preset-default').prop('checked', false);
+                $('#filter-preset-allow').prop('checked', false);
                 return false;
             }
 
@@ -263,6 +272,12 @@ define(['backbone',
                     $('#filter-preset-default').prop('checked', true);
                 } else {
                     $('#filter-preset-default').prop('checked', false);
+                }
+
+                if (typeof responseData.access !=='undefined' && responseData.access === 'individual') {
+                    $('#filter-preset-allow').prop('checked', false);
+                } else {
+                    $('#filter-preset-allow').prop('checked', true);
                 }
 
                 var filtersData = JSON.parse(responseData.filterPresetData),

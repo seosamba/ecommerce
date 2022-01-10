@@ -11,6 +11,8 @@ class Models_Model_FilterPresetModel extends Application_Model_Models_Abstract
 
     protected $_isDefault = '';
 
+    protected $_access = '';
+
     /**
      * @return string
      */
@@ -82,6 +84,26 @@ class Models_Model_FilterPresetModel extends Application_Model_Models_Abstract
         $this->_isDefault = $isDefault;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getAccess()
+    {
+        return $this->_access;
+    }
+
+    /**
+     * @param string $access
+     * @return Models_Model_FilterPresetModel
+     */
+    public function setAccess($access)
+    {
+        $this->_access = $access;
+        return $this;
+    }
+
+
 
 
 

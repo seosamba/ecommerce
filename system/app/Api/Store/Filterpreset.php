@@ -121,7 +121,7 @@ class Api_Store_Filterpreset extends Api_Service_Abstract
         }
         $filterPresetModel->setOptions($data);
 
-        $presetExistingModel = $filterPresetMapper->getByNameAndType($data['filter_preset_name']);
+        $presetExistingModel = $filterPresetMapper->getByName($data['filter_preset_name']);
         if (!empty($presetExistingModel)) {
             $this->_error($translator->translate('Filter preset with such name already exists'));
         }
@@ -188,15 +188,17 @@ class Api_Store_Filterpreset extends Api_Service_Abstract
             $data['filter_preset_name'] = preg_replace('~[^\w\s\_]~ui', '', $data['filter_preset_name']);
             $newFilterPresetName = $data['filter_preset_name'];
             if ($oldFilterPresetName !== $newFilterPresetName) {
-                $presetExistingModel = $filterPresetMapper->getByNameAndType($data['filter_preset_name']);
+                $presetExistingModel = $filterPresetMapper->getByName($data['filter_preset_name']);
                 if (!empty($presetExistingModel)) {
                     $this->_error($translator->translate('Filter preset with such name already exists'));
                 }
             }
 
-            $userId = $this->_sessionHelper->getCurrentUser()->getId();
+            //$userId = $this->_sessionHelper->getCurrentUser()->getId();
             if (!empty($data['is_default'])) {
-                $filterPresetMapper->resetDefaultByCreatorId($userId);
+                $creatorId = $filterPresetModel->getCreatorId();
+
+                $filterPresetMapper->resetDefaultByCreatorId($creatorId);
             }
 
             if (!empty($data['filter_preset_data'])) {

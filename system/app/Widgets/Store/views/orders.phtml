@@ -71,6 +71,13 @@ $this->headLink()
                         </div>
                         <input type="hidden" name="presetId" id="preset-id"
                                value="<?php echo (!empty($this->presetDefaultId)) ? $this->presetDefaultId : ''; ?>"/>
+                        <?php if (Tools_Security_Acl::ROLE_SUPERADMIN === $this->userRole || Tools_Security_Acl::ROLE_ADMIN === $this->userRole): ?>
+                            <div class="inline-block prefix_1 t-grid_3">
+                                <label><input type="checkbox" id="filter-preset-allow"
+                                              name="filterPresetAllow" <?php echo (!empty($this->presetDefaultAccess) && $this->presetDefaultAccess === 'all') ? 'checked="checked"' : ''; ?>/><?php echo $this->translate('Show to all users'); ?>
+                                </label>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <button class="btn red prefix_1 grid_1 omega" name="deleteFilterPreset"
                             id="delete-filter-preset" style="display: none;"><?php echo $this->translate('Delete'); ?></button>

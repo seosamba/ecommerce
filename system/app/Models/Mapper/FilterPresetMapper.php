@@ -23,7 +23,8 @@ class Models_Mapper_FilterPresetMapper extends Application_Model_Mappers_Abstrac
             'creator_id' => $model->getCreatorId(),
             'filter_preset_name' => $model->getFilterPresetName(),
             'filter_preset_data' => $model->getFilterPresetData(),
-            'is_default' => $model->getIsDefault()
+            'is_default' => $model->getIsDefault(),
+            'access' => $model->getAccess()
         );
 
         $id = $model->getId();
@@ -85,12 +86,27 @@ class Models_Mapper_FilterPresetMapper extends Application_Model_Mappers_Abstrac
     }
 
     /**
+     * @param $creatorId
+     * @param $access
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function getDefaultAndAllAccessPreset($creatorId, $access = 'all')
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('creator_id = ?', $creatorId);
+        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('access = ?', 'all');
+        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('is_default = ?', '1');
+
+        return $this->_findWhere($where);
+    }
+
+    /**
      * Find preset by name using preset type
      *
      * @param string $presetName filter preset name
      * @return null
      */
-    public function getByNameAndType($presetName)
+    public function getByName($presetName)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('filter_preset_name = ?', $presetName);
 

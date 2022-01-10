@@ -641,12 +641,13 @@ CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
     `filter_preset_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `filter_preset_data` TEXT NOT NULL,
     `is_default` ENUM('0', '1') DEFAULT '0',
+    `access` ENUM('all', 'individual') DEFAULT 'individual',
     PRIMARY KEY (`id`),
     FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`) VALUES
-    (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1');
+INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
+    (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.9.3' WHERE `name`='shopping';
