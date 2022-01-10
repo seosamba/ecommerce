@@ -78,21 +78,21 @@
                                 <br/>
                                 <?php if(!empty($this->order->getIsFirstPaymentManuallyPaid())):?>
                                     <span><?php echo $this->translate('First payment');?>: <?php echo $this->translate('Manually paid');?>
-                                    - <?php echo date('d M, Y', strtotime($this->order->getPartialPurchasedOn()));?>
+                                    (<?php echo $this->currency($this->order->getPartialPaidAmount());?>) - <?php echo date('d M, Y', strtotime($this->order->getPartialPurchasedOn()));?>
                                     </span>
                                 <?php else :?>
                                     <span><?php echo $this->translate('First payment');?>: <?php echo $firstPaymentGateway;?>
-                                        - <?php echo date('d M, Y', strtotime($this->order->getPartialPurchasedOn()));?>
+                                        (<?php echo $this->currency($this->order->getPartialPaidAmount());?>) - <?php echo date('d M, Y', strtotime($this->order->getPartialPurchasedOn()));?>
                                     </span>
                                 <?php endif;?>
                                 <br/>
                                 <?php if(!empty($this->order->getIsSecondPaymentManuallyPaid())):?>
                                     <span><?php echo $this->translate('Second payment');?>: <?php echo $this->translate('Manually paid');?>
-                                        - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                        (<?php echo $this->currency($this->order->getTotal() - $this->order->getPartialPaidAmount());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
                                     </span>
                                 <?php else :?>
                                     <span><?php echo $this->translate('Second payment');?>: <?php echo $secondPaymentGateway;?>
-                                        - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                        (<?php echo $this->currency($this->order->getTotal() - $this->order->getPartialPaidAmount());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
                                     </span>
                                 <?php endif;?>
                             <?php else :?>
