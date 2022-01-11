@@ -94,7 +94,7 @@ class Models_Mapper_FilterPresetMapper extends Application_Model_Mappers_Abstrac
     public function getDefaultAndAllAccessPreset($creatorId, $access = 'all')
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('creator_id = ?', $creatorId);
-        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('access = ?', 'all');
+        $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('access = ?', $access);
         $where .= ' AND ' . $this->getDbTable()->getAdapter()->quoteInto('is_default = ?', '1');
 
         return $this->_findWhere($where);

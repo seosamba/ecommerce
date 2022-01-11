@@ -158,7 +158,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
             $defaultPreset = $filterPresetMapper->getDefaultPreset($userId);
 
-            if ($userRole === Tools_Security_Acl::ROLE_ADMIN && !$defaultPreset instanceof Models_Model_FilterPresetModel) {
+            if (($userRole === Tools_Security_Acl::ROLE_ADMIN || $userRole === Shopping::ROLE_SALESPERSON) && !$defaultPreset instanceof Models_Model_FilterPresetModel) {
                 $defaultPreset = $filterPresetMapper->getDefaultAndAllAccessPreset('1', 'all');
             }
 
