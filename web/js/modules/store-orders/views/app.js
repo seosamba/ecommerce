@@ -284,17 +284,9 @@ define(['backbone',
                     ordersFilterFromdate = '',
                     ordersFilterTodate = '';
 
-                if (filtersData.filter_from_amount !== '' && !_.isUndefined(filtersData.filter_from_amount)) {
-                    $('#filter-from-amount').val(filtersData.filter_from_amount);
-                }
-
-                if (filtersData.filter_to_amount !== '' && !_.isUndefined(filtersData.filter_to_amount)) {
-                    $('#filter-to-amount').val(filtersData.filter_to_amount);
-                }
-
-                if (filtersData.filter_by_coupon_code !== '' && !_.isUndefined(filtersData.filter_by_coupon_code)) {
-                    $('#filter-by-coupon-code').val(filtersData.filter_by_coupon_code);
-                }
+                $('#filter-from-amount').val(filtersData.filter_from_amount);
+                $('#filter-to-amount').val(filtersData.filter_to_amount);
+                $('#filter-by-coupon-code').val(filtersData.filter_by_coupon_code);
 
                 if (filtersData.orders_filter_fromdate !== '' && !_.isUndefined(filtersData.orders_filter_fromdate)) {
                     ordersFilterFromdate = $.datepicker.formatDate('d-M-yy', new Date(filtersData.orders_filter_fromdate));
@@ -353,10 +345,14 @@ define(['backbone',
 
                 if (filtersData.exclude_quotes_from_search !== '' && !_.isUndefined(filtersData.exclude_quotes_from_search)) {
                     $('#exclude-quotes-from-search').prop('checked', true);
+                } else {
+                    $('#exclude-quotes-from-search').prop('checked', false);
                 }
 
                 if (filtersData.is_a_gift !== '' && !_.isUndefined(filtersData.is_a_gift)) {
                     $('#is-a-gift').prop('checked', true);
+                } else {
+                    $('#is-a-gift').prop('checked', false);
                 }
 
                 $('#filter-preset-name').val(responseData.filterPresetName);
