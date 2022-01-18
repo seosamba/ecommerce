@@ -58,6 +58,17 @@ class Forms_BasicsSettings extends Zend_Form {
             'label' => $translator->translate('store operational hours')
         ));
 
+        $this->addElement('checkbox', 'useOperationalHoursForOrders', array(
+            'label' => $translator->translate('Use operational hours for online orders'),
+            'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('text', 'useOperationalHoursForOrdersMessage', array(
+            'label' => $translator->translate('Use operational hours for online orders message'),
+            'class' => 'grid_6 alpha'
+        ));
+
+
         $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
         array_pop($timezones);
 
