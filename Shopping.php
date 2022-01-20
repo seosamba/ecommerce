@@ -319,6 +319,11 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
+
+            if (empty($this->_requestedParams['useOperationalHoursForOrders'])){
+                $this->_requestedParams['useOperationalHoursForOrders'] = '0';
+            }
+
             if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
                     if (!empty($subFormValues['operationalHours'])) {
