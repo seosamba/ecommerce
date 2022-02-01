@@ -227,6 +227,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `type` enum('dropdown','radio','text','date','file','textarea', 'additionalpricefield') COLLATE utf8_unicode_ci NOT NULL,
+  `hideDefaultOption` ENUM('0', '1') DEFAULT '0' NOT NULL,
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -1101,5 +1102,5 @@ INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_
 
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.5' WHERE `name` = 'shopping';
 

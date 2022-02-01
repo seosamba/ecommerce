@@ -15,6 +15,7 @@ define([
 			'click .add-selection-btn': 'addSelection',
 			'change select.option-type-select': 'typeChange',
 			'change input.option-title': 'titleChange',
+			'change input.hide-default-value': 'hideDefaultValueChange',
 			'change input[name=isTemplate]': 'toggleIsTemplate',
 			'change input[name=templateName]': 'templateNameChange'
 		},
@@ -32,6 +33,13 @@ define([
 		render: function(){
 			$(this.el).html($.tmpl(this.template, this.model.toJSON()));
             $(this.el).find('select.option-type-select').val(this.model.get('type'));
+
+            if (this.model.get('hideDefaultOption') == '1') {
+                $(this.el).find('input.hide-default-value').attr('checked', 'checked');
+            } else {
+                $(this.el).find('input.hide-default-value').removeAttr('checked');
+			}
+
             if (this.model.get('type') == 'dropdown' || this.model.get('type') == 'radio'){
                 $(this.el).find('.option-content').html($.tmpl(this.optionListTemplate, this.model));
                 this.renderAllSelections();
@@ -53,6 +61,13 @@ define([
 		titleChange: function(e){
 			this.model.set({title: $(e.target).val()});
 		},
+        hideDefaultValueChange: function(e){
+			if ($(e.target).is(':checked')) {
+                this.model.set({hideDefaultOption: '1'});
+            } else {
+                this.model.set({hideDefaultOption: '0'});
+			}
+        },
 		addSelection: function(){
 			var data = {}
 			if (!this.model.get('selection').hasDefault()){

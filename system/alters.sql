@@ -672,7 +672,11 @@ CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
 INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
     (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
 
+-- 02/02/2022
+-- version: 2.9.4
+ALTER TABLE `shopping_product_option` ADD COLUMN `hideDefaultOption` ENUM('0', '1') DEFAULT '0' NOT NULL;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.5' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
