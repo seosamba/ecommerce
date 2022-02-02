@@ -674,7 +674,7 @@ INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_
 
 -- 02/02/2022
 -- version: 2.9.4
-ALTER TABLE `shopping_product_option` ADD COLUMN `hideDefaultOption` ENUM('0', '1') DEFAULT '0' NOT NULL;
+ALTER TABLE `shopping_product_option` ADD COLUMN `hideDefaultOption` ENUM('0', '1') DEFAULT '0';
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.9.5' WHERE `name`='shopping';

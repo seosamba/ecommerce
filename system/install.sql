@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `type` enum('dropdown','radio','text','date','file','textarea', 'additionalpricefield') COLLATE utf8_unicode_ci NOT NULL,
-  `hideDefaultOption` ENUM('0', '1') DEFAULT '0' NOT NULL,
+  `hideDefaultOption` ENUM('0', '1') DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
