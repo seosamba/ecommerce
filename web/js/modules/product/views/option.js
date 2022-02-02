@@ -55,8 +55,14 @@ define([
             return this;
 		},
 		typeChange: function(e){
-			var type = e.target.value;
-			this.model.set({type: type});
+			var type = e.target.value,
+                showHiddenValue = false;
+
+			if (type === 'radio' || type === 'dropdown') {
+                showHiddenValue = true;
+			}
+
+			this.model.set({type: type, 'showHiddenValue':showHiddenValue});
 		},
 		titleChange: function(e){
 			this.model.set({title: $(e.target).val()});

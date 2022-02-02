@@ -85,13 +85,19 @@ $this->headLink()
             <option value="additionalpricefield"><?php echo $this->translate('Additional price field');?></option>
         </select>
 	</div>
-	<div class="grid_3 alpha">
-        <label class="grid_12 alpha omega text-center mt5px">
-            <?php echo $this->translate('Hide default value'); ?>
-            <input class="hide-default-value" name="hide-default-value" type="checkbox" />
-        </label>
-	</div>
-	<div class="grid_3 alpha omega text-center">
+	{{if showHiddenValue}}
+        <div class="grid_3 alpha">
+            <label class="grid_12 alpha omega text-center mt5px">
+                <?php echo $this->translate('Hide default value'); ?>
+                <input class="hide-default-value" name="hide-default-value" type="checkbox" />
+            </label>
+        </div>
+	 {{/if}}
+	 	{{if showHiddenValue}}
+            <div class="grid_3 alpha omega text-center">
+            {{else}}
+             <div class="grid_6 alpha omega text-center">
+		 {{/if}}
         {{if id}}
         &nbsp;
         {{else}}
