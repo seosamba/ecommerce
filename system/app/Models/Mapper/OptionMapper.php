@@ -122,6 +122,21 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
     }
 
     /**
+     * get options
+     *
+     * @param array $options option ids
+     * @return mixed
+     * @throws Exception
+     */
+    public function getOptions($options)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id IN (?)', $options);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product_option')->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
+    }
+
+    /**
      * @param $productId
      * @param $optionParam
      * @return mixed

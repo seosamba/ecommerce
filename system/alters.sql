@@ -633,7 +633,46 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_notification_date` TIMES
 -- version: 2.9.1
 ALTER TABLE `shopping_cart_session` ADD COLUMN `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL AFTER `partial_purchased_on`;
 
+-- 23/08/2018
+-- version: 2.9.2
+-- Add historical cart session option
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
+`id` INT(10) unsigned AUTO_INCREMENT,
+`cart_id` int(10) unsigned NOT NULL,
+`product_id` int(10) unsigned NOT NULL,
+`option_id` int(10) unsigned NOT NULL,
+`cart_content_id` int (10) unsigned NOT NULL,
+`option_title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+`option_type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+`option_selection_id` int(10) unsigned NULL,
+`title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceValue` decimal(10,4) DEFAULT NULL,
+`priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightValue` decimal(8,3) DEFAULT NULL,
+`cart_item_key` CHAR(32) NOT NULL,
+`cart_item_option_key` CHAR(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 04/01/2022
+-- version: 2.9.3
+CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `creator_id` INT(10) UNSIGNED NOT NULL,
+    `filter_preset_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `filter_preset_data` TEXT NOT NULL,
+    `is_default` ENUM('0', '1') DEFAULT '0',
+    `access` ENUM('all', 'individual') DEFAULT 'individual',
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
+    (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
