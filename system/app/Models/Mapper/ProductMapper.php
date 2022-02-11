@@ -128,6 +128,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processCustomParams($model->getCustomParams(), $model->getId());
         }
 
+        $this->_processCompanyProducts($model->getCompanyProducts(), $model->getId());
+
         //process product parts if any
         $this->_processParts($model);
 
@@ -293,6 +295,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         if($allowance) {
             $select->joinLeft(array('ap' => 'shopping_allowance_products'), 'ap.product_id = p.id', array('allowance' => 'ap.allowance_due'));
         }
+
+        $select->joinLeft(array('scp' => 'shopping_company_products'), 'scp.product_id = p.id', array('companyProducts' => new Zend_Db_Expr('GROUP_CONCAT(DISTINCT(scp.company_id))')));
 
         if (self::$_logSelectResultLength === false) {
             $select->limit($limit, $offset);
@@ -734,6 +738,22 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
     }
 
+    /**
+     * @param $companyProducts
+     * @param $productId
+     * @return void
+     */
+    private function _processCompanyProducts($companyProducts, $productId)
+    {
+        $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+
+        if(!empty($productId)) {
+            $companyProductsMapper->deleteByProductId($productId);
+            if (!empty($companyProducts)) {
+                $companyProductsMapper->processData($productId, $companyProducts);
+            }
+        }
+    }
 
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();

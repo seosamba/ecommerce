@@ -7,10 +7,12 @@ $this->headScript()
     ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/require.min.js',
         null,
         array('data-main' => $this->websiteUrl . 'plugins/shopping/web/js/modules/product/config')
-    );
+    )
+    ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js');
 
 $this->headLink()
-    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
+    ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css')
+    ->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
 ?>
 
 <?php
@@ -286,9 +288,18 @@ $this->headLink()
                             <?php echo $this->formText('product-allowance', isset($this->data['allowance_due']) ? date('d-M-Y', strtotime($this->data['allowance_due'])) : null, array('placeholder'=> $this->translate('product always on'), 'class' => 'grid_11 alpha omega fl-right')); ?>
                             <i class="ticon-calendar icon16"></i>
                         </div>
-                        <div class="grid_12 alpha omega labeled mt1em">
+                        <div class="grid_8 alpha labeled mt1em">
                             <input class="grid_9 alpha omega fl-right" type="text" id="product-name" data-reflection="name" placeholder="<?php echo $this->translate('enter name of product'); ?>" autofocus="autofocus"/>
                             <label class="grid_3 alpha omega" for="product-name"><?php echo $this->translate('Product Name'); ?></label>
+                        </div>
+                        <div class="grid_4 alpha omega labeled mt1em">
+                            <select id="product-supplier" class="supplier" multiple name="product-supplier" data-placeholder="<?php echo $this->translate('Suppliers');?>">
+                                <?php if(!empty($this->companies)) :?>
+                                    <?php foreach($this->companies as $company):?>
+                                        <option value="<?php echo $company->getId();?>"><?php echo $company->getCompanyName();?></option>
+                                    <?php endforeach;?>
+                                <?php endif;?>
+                            </select>
                         </div>
                     </div>
                     <div class="grid_3 alpha omega labeled mt1-5em">
