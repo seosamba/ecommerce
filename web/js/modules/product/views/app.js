@@ -960,7 +960,7 @@ define([
 
             if (e.keyCode === 13 && newBrand !== '') {
                 if(brandValidation.test(newBrand)){
-                    showMessage(_.isUndefined(i18n['Brand name should contain only letters, digits and spaces'])?'Brand name should contain only letters, digits and spaces':i18n['Brand name should contain only letters, digits and spaces'], true, 3000);
+                    showMessage(_.isUndefined(i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash), and space.'])?'Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash), and space.':i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash), and space.'], true, 3000);
                     $(e.currentTarget).blur();
                     return false;
                 } else {
