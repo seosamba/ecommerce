@@ -38,7 +38,7 @@ define([
             'change #digital-product': 'toggleDigitalProduct',
 			'change #product-tags-available .tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
-            'keypress input#new-brand': 'newBrand',
+            'keyup input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
             'click a[href="#options-tab"]': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
@@ -664,16 +664,15 @@ define([
             }
         },
         renderBrands: function(brands){
-            var tmpl = _.template("<% _.each(brands, function(brand){ %><option value='<%= brand %>'><%= brand %></option><% }); %>");
-
-            $('#product-brand').html('<option value="-1" disabled="disable">'+ _.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand'] +'</option>' +
-                tmpl({brands: _.sortBy(brands, function(v){ return v.toLowerCase();}) })
-            );
+            $('#product-brand').empty().append('<option value="-1" disabled="disable">'+ (_.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand']) +'</option>');
+            _.each(brands, function(brand){
+                $('#product-brand').append('<option value="'+ brand +'">'+brand+'</option>');
+            });
 
             if (this.model && this.model.has('brand')){
-                this.$('#product-brand').val(this.model.get('brand'));
+                $('#product-brand').val(this.model.get('brand'));
             } else {
-                this.$('#product-brand').val(-1);
+                $('#product-brand').val(-1);
             }
         },
         renderProduct: function(product){
@@ -956,11 +955,19 @@ define([
             return false;
         },
         newBrand: function(e){
-            var newBrand = $.trim(this.$('#new-brand').val());
+            var newBrand = $.trim(this.$('#new-brand').val()),
+                brandValidation = new RegExp(/[^\u0080-\uFFFF\w\s-]+/gi);
+
             if (e.keyCode === 13 && newBrand !== '') {
-                this.addNewBrand(newBrand)
-                    .$('#new-brand').val('');
-                this.$('#product-brand').focus();
+                if(brandValidation.test(newBrand)){
+                    showMessage(_.isUndefined(i18n['Brand name should contain only letters, digits and spaces'])?'Brand name should contain only letters, digits and spaces':i18n['Brand name should contain only letters, digits and spaces'], true, 3000);
+                    $(e.currentTarget).blur();
+                    return false;
+                } else {
+                    this.addNewBrand(newBrand)
+                        .$('#new-brand').val('');
+                    this.$('#product-brand').focus();
+                }
             }
             return this;
         },
