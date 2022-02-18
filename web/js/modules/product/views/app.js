@@ -258,7 +258,7 @@ define([
             }
 		},
 		newOption: function(){
-			var newOption = new ProductOption();
+			var newOption = new ProductOption({'showHiddenValue': true});
             newOption.get('selection').add({isDefault: 1});
 			this.model.get('options').add(newOption);
             this.renderOptions();
@@ -266,12 +266,19 @@ define([
         addOption: function(){
             var optId = this.$('#option-library').val();
             if (optId > 0 ){
-                var option = this.optionLibrary.get(optId);
+                var option = this.optionLibrary.get(optId),
+                    showHiddenValue = false;
+
+                if (option.get('type') === 'radio' || option.get('type') === 'dropdown') {
+                    showHiddenValue = true;
+                }
+
                 var newOption = new ProductOption({
                     title: option.get('title'),
                     parentId: option.get('id'),
                     type: option.get('type'),
-                    libraryOption: true
+                    libraryOption: true,
+                    showHiddenValue:showHiddenValue
                 });
                 newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 this.model.get('options').add(newOption);
@@ -1000,6 +1007,9 @@ define([
             }
         },
         renderOption: function(option){
+		    if (typeof option !== 'undefined' && (option.get('type') === 'radio' || option.get('type') === 'dropdown')) {
+                option.set('showHiddenValue', true);
+            }
             var optWidget = new ProductOptionView({model: option});
             optWidget.render().$el.appendTo('#options-holder');
             checkboxRadioStyle();

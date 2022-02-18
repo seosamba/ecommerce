@@ -630,7 +630,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                         'title'     => isset($option['templateName']) && !empty($option['templateName']) ? $option['templateName'] : 'template-'.$option['title'],
                         'type'      => $option['type'],
                         'parentId'  => '0',
-                        'selection' => $option['selection']
+                        'selection' => $option['selection'],
+                        'hideDefaultOption' => $option['hideDefaultOption']
                     ) );
                     $option['parentId'] = $template->getId();
                     unset($template);

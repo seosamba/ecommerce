@@ -72,9 +72,9 @@ $this->headLink()
 </script>
 
 <script id="optionMainTemplate" type="text/x-jquery-tmpl">
-	<div class="grid_4 alpha omega">
-        <label class="grid_4 alpha omega mt5px"><?php echo $this->translate('Option name'); ?></label>
-        <input class="grid_8 alpha omega option-title" type="text" value="${title}"/>
+	<div class="grid_3 alpha omega">
+        <label class="grid_5 alpha omega mt5px"><?php echo $this->translate('Option name'); ?></label>
+        <input class="grid_7 alpha omega option-title" type="text" value="${title}"/>
 	</div>
 	<div class="grid_3 alpha">
         <label class="grid_4 alpha omega text-center mt5px"><?php echo $this->translate('Type'); ?></label>
@@ -87,7 +87,19 @@ $this->headLink()
             <option value="additionalpricefield"><?php echo $this->translate('Additional price field');?></option>
         </select>
 	</div>
-	<div class="grid_4 alpha omega text-center">
+	{{if showHiddenValue}}
+        <div class="grid_3 alpha">
+            <label class="grid_12 alpha omega text-center mt5px">
+                <?php echo $this->translate('Hide default value'); ?>
+                <input class="hide-default-value" name="hide-default-value" type="checkbox" />
+            </label>
+        </div>
+	 {{/if}}
+	 	{{if showHiddenValue}}
+            <div class="grid_3 alpha omega text-center">
+            {{else}}
+             <div class="grid_6 alpha omega text-center">
+		 {{/if}}
         {{if id}}
         &nbsp;
         {{else}}
@@ -96,14 +108,14 @@ $this->headLink()
                     <span class="btn remove-from-library-btn" data-option-id="${parentId}"><?php echo $this->translate('Remove from library?'); ?></span>
                 </label>
             {{else}}
-                <label class="block mt5px grid_5 alpha">
+                <label class="block mt5px grid_8 alpha">
                     <?php echo $this->translate('Add to library?'); ?><input type="checkbox" title="<?php echo $this->translate('Add to library?'); ?>" name="isTemplate" {{if isTemplate}}checked="checked"{{/if}} />
                 </label>
                 <input class="hide grid_7 alpha omega" type="text" name="templateName" placeholder="<?php echo $this->translate('Enter label'); ?>"/>
             {{/if}}
         {{/if}}
+            <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
 	</div>
-    <a href="javascript:;" class="fl-right remove-option btn icon link error ticon-close" title="<?php echo $this->translate('Delete option'); ?>"></a>
 
 	<div class="option-content grid_12 alpha omega"></div>
 </script>
