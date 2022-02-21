@@ -38,7 +38,8 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                     if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {
                         $cart->setIsSecondPaymentManuallyPaid('1');
                         $isFirstPaymentManuallyPaid = $cart->getIsFirstPaymentManuallyPaid();
-                        if (!empty($isFirstPaymentManuallyPaid)) {
+                        $isSecondPaymentManuallyPaid = $cart->getIsSecondPaymentManuallyPaid();
+                        if (!empty($isFirstPaymentManuallyPaid) && !empty($isSecondPaymentManuallyPaid)) {
                             $cart->setIsFullOrderManuallyPaid('1');
                         }
                     } else {
