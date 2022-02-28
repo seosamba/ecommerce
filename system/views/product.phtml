@@ -321,7 +321,7 @@ $this->headLink()
                     <p class="labeled grid_6 omega mt1-5em">
                         <input class="grid_5 omega fl-right" type="text" name="" id="new-brand"  placeholder="<?php echo $this->translate('create new'); ?>">
                         <select class="grid_5 alpha omega fl-right" name="product-brand" id="product-brand" data-reflection="brand">
-                            <option value="-1"><?php echo $this->translate('select brand'); ?></option>
+                            <option value="-1" disabled="disabled"><?php echo $this->translate('select brand'); ?></option>
                             <?php foreach ($this->brands as $brand): ?>
                                 <option value="<?php echo $brand; ?>"><?php echo $brand; ?></option>
                             <?php endforeach; ?>
