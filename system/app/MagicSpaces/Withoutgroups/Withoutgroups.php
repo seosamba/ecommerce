@@ -1,7 +1,7 @@
 <?php
 
 /**
- * MAGICSPACE: grouponly
+ * MAGICSPACE: withoutgroups
  * {withoutgroups} ... {/withoutgroups} - Withoutgroups magicspace displays content when customer without a group
  *
  * Class MagicSpaces_Withoutgroups_Withoutgroups
