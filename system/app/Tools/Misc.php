@@ -957,4 +957,15 @@ class Tools_Misc
         return $translator->translate('Online ordering unavailable');
     }
 
+    public static function isStoreDisabled()
+    {
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $config = $configMapper->getConfigParams();
+        if (!empty($config['disabledStore'])) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
