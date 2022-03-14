@@ -54,6 +54,17 @@ class Forms_BasicsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
         ));
 
+        $this->addElement('checkbox', 'disabledStore', array(
+            'label' => $translator->translate('Disabled store'),
+            'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('text', 'disabledStoreMessage', array(
+            'label' => $translator->translate('Disabled store message'),
+            'class' => 'grid_6 alpha hidden',
+            'placeholder' => $translator->translate('Online ordering unavailable')
+        ));
+
         $this->addElement('text', 'operationalHours', array(
             'label' => $translator->translate('store operational hours')
         ));

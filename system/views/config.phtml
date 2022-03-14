@@ -216,6 +216,16 @@ $this->headLink()
 <?php $this->jQuery()->onLoadCaptureStart();?>
     //	$('div.seotoaster > div.ui-widget-header:first').remove();
 
+    if($('#disabledStore').is(':checked')) {
+        $('#disabledStoreMessage').removeClass('hidden');
+        $('#disabledStoreMessage').closest('div').removeClass('hidden');
+    } else {
+        $('#disabledStoreMessage').closest('div').addClass('hidden');
+        $('#disabledStoreMessage').addClass('hidden');
+    }
+
+    $('#disabledStoreMessage').closest('div').find('label').addClass('mt5px');
+
     var shopping = {};
     shopping.saveconfig = function(){
         var url = '<?php echo $this->form->getAction(); ?>',
@@ -296,6 +306,16 @@ $this->headLink()
             $form.attr('user-changed', true);
             var currentTab = $('#config').tabs('option', 'selected');
             $('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+        }
+    });
+
+    $('#disabledStore').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#disabledStoreMessage').removeClass('hidden');
+            $('#disabledStoreMessage').closest('div').removeClass('hidden');
+        } else {
+            $('#disabledStoreMessage').addClass('hidden');
+            $('#disabledStoreMessage').closest('div').addClass('hidden');
         }
     });
 
