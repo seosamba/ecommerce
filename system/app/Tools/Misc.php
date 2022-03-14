@@ -944,4 +944,17 @@ class Tools_Misc
         return $translator->translate('Online ordering unavailable');
     }
 
+    public static function getStoreIsDisabledMessage()
+    {
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $config = $configMapper->getConfigParams();
+        if (!empty($config['disabledStoreMessage'])) {
+            return $config['disabledStoreMessage'];
+        }
+
+        $translator = Zend_Registry::get('Zend_Translate');
+
+        return $translator->translate('Online ordering unavailable');
+    }
+
 }
