@@ -38,7 +38,7 @@ define([
             'change #digital-product': 'toggleDigitalProduct',
 			'change #product-tags-available .tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
-            'keypress input#new-brand': 'newBrand',
+            'keyup input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
             'click a[href="#options-tab"]': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
@@ -158,7 +158,7 @@ define([
 
             this.model.get('options').on('add', this.renderOption, this);
             this.model.get('options').on('reset', this.renderOptions, this);
-
+            $('#product-supplier').chosen();
 
             return this;
 		},
@@ -258,7 +258,7 @@ define([
             }
 		},
 		newOption: function(){
-			var newOption = new ProductOption();
+			var newOption = new ProductOption({'showHiddenValue': true});
             newOption.get('selection').add({isDefault: 1});
 			this.model.get('options').add(newOption);
             this.renderOptions();
@@ -266,12 +266,19 @@ define([
         addOption: function(){
             var optId = this.$('#option-library').val();
             if (optId > 0 ){
-                var option = this.optionLibrary.get(optId);
+                var option = this.optionLibrary.get(optId),
+                    showHiddenValue = false;
+
+                if (option.get('type') === 'radio' || option.get('type') === 'dropdown') {
+                    showHiddenValue = true;
+                }
+
                 var newOption = new ProductOption({
                     title: option.get('title'),
                     parentId: option.get('id'),
                     type: option.get('type'),
-                    libraryOption: true
+                    libraryOption: true,
+                    showHiddenValue:showHiddenValue
                 });
                 newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 this.model.get('options').add(newOption);
@@ -380,6 +387,19 @@ define([
                         }
                         $('#custom-param-'+attr.param_type+'-'+attr.param_name).val(paramVal);
                     });
+                }
+
+                if(name == 'companyProducts') {
+                    if (!_.isUndefined(value) && !_.isEmpty(value) && value !== null) {
+                        var companiesP = value;
+
+                        if(!_.isArray(companiesP)) {
+                            companiesP = value.split(',');
+                        }
+                        $('#product-supplier').val(companiesP).trigger("chosen:updated");
+                    } else {
+                        $('#product-supplier').val(0).trigger("chosen:updated");
+                    }
                 }
             });
 
@@ -651,16 +671,15 @@ define([
             }
         },
         renderBrands: function(brands){
-            var tmpl = _.template("<% _.each(brands, function(brand){ %><option value='<%= brand %>'><%= brand %></option><% }); %>");
-
-            $('#product-brand').html('<option value="-1" disabled="disable">'+ _.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand'] +'</option>' +
-                tmpl({brands: _.sortBy(brands, function(v){ return v.toLowerCase();}) })
-            );
+            $('#product-brand').empty().append('<option value="-1" disabled="disable">'+ (_.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand']) +'</option>');
+            _.each(brands, function(brand){
+                $('#product-brand').append('<option value="'+ brand +'">'+brand+'</option>');
+            });
 
             if (this.model && this.model.has('brand')){
-                this.$('#product-brand').val(this.model.get('brand'));
+                $('#product-brand').val(this.model.get('brand'));
             } else {
-                this.$('#product-brand').val(-1);
+                $('#product-brand').val(-1);
             }
         },
         renderProduct: function(product){
@@ -736,6 +755,11 @@ define([
 
             this.model.set({allowance: productAllowanceDate});
             this.model.set({customParams: productCustomParams});
+
+            var companyProducts = $('#product-supplier').val();
+            if(companyProducts) {
+                this.model.set({companyProducts: companyProducts});
+            }
 
             var ptodFullDescription = tinymce.activeEditor.getContent();
             this.model.set({fullDescription: ptodFullDescription});
@@ -938,11 +962,19 @@ define([
             return false;
         },
         newBrand: function(e){
-            var newBrand = $.trim(this.$('#new-brand').val());
+            var newBrand = $.trim(this.$('#new-brand').val()),
+                brandValidation = new RegExp(/[^\u0080-\uFFFF\w\s-]+/gi);
+
             if (e.keyCode === 13 && newBrand !== '') {
-                this.addNewBrand(newBrand)
-                    .$('#new-brand').val('');
-                this.$('#product-brand').focus();
+                if(brandValidation.test(newBrand)){
+                    showMessage(_.isUndefined(i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash) and space.'])?'Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash) and space.':i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash) and space.'], true, 3000);
+                    $(e.currentTarget).blur();
+                    return false;
+                } else {
+                    this.addNewBrand(newBrand)
+                        .$('#new-brand').val('');
+                    this.$('#product-brand').focus();
+                }
             }
             return this;
         },
@@ -982,6 +1014,9 @@ define([
             }
         },
         renderOption: function(option){
+		    if (typeof option !== 'undefined' && (option.get('type') === 'radio' || option.get('type') === 'dropdown')) {
+                option.set('showHiddenValue', true);
+            }
             var optWidget = new ProductOptionView({model: option});
             optWidget.render().$el.appendTo('#options-holder');
             checkboxRadioStyle();

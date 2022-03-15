@@ -601,7 +601,6 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_partialpaymentsecond' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
-
 -- 14/04/2021
 -- version: 2.8.5
 ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(10,6) DEFAULT '0.00';
@@ -615,7 +614,6 @@ ALTER TABLE `shopping_product_option`
 -- 02/07/2021
 -- version: 2.8.7
 ALTER TABLE `shopping_product` ADD COLUMN `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0';
-
 
 -- 14/07/2021
 -- version: 2.8.8
@@ -658,8 +656,28 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- 30/12/2021
+-- 04/01/2022
 -- version: 2.9.3
+CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `creator_id` INT(10) UNSIGNED NOT NULL,
+    `filter_preset_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `filter_preset_data` TEXT NOT NULL,
+    `is_default` ENUM('0', '1') DEFAULT '0',
+    `access` ENUM('all', 'individual') DEFAULT 'individual',
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
+    (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
+
+-- 02/02/2022
+-- version: 2.9.4
+ALTER TABLE `shopping_product_option` ADD COLUMN `hideDefaultOption` ENUM('0', '1') DEFAULT '0';
+
+-- 30/12/2021
+-- version: 2.9.5
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_first_payment_manually_paid` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_second_payment_manually_paid` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_full_order_manually_paid` ENUM('0', '1') DEFAULT '0';
@@ -667,6 +685,6 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `first_payment_gateway` varchar(2
 ALTER TABLE `shopping_cart_session` ADD COLUMN `second_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

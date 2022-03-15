@@ -33,45 +33,84 @@ $this->headLink()
                 <input type="text" class="filter grid_3 omega t-grid_2 t-omega" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
                 <div id="extra-filters-switch" class="fl-right"><a class="btn icon-arrow-down2" href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
             </div>
-            <div id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
+            <fieldset id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
+                <fieldset id="filter-settings-preset-block" class="grid_12 alpha omega">
+                    <legend><?php echo $this->translate('Filter settings'); ?></legend>
+                    <div class="grid_5 alpha">
+                        <?php $presetApplied = false;?>
+                        <select id="predefined-filter-list" name="predefinedFilterList" class="grid_4 alpha t-grid_2" data-placeholder="<?php echo $this->translate('show all'); ?>">
+                            <option value="0"><?php echo $this->translate('Select filter preset'); ?></option>
+                            <?php if (!empty($this->filtersPreset)) : ?>
+                                <?php foreach ($this->filtersPreset as $filterPreset): ?>
+                                    <option value="<?php echo $filterPreset->getId(); ?>"<?php echo (!empty($this->presetDefaultId) && $this->presetDefaultId == $filterPreset->getId()) ? 'selected' : ''; ?>><?php echo $filterPreset->getFilterPresetName(); ?></option>
+                                    <?php if(!empty($this->presetDefaultId) && $this->presetDefaultId == $filterPreset->getId()):?>
+                                        <?php $presetApplied = true;?>
+                                    <?php endif;?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+
+                        <div class="grid_3 text-center switch-search-filter space-vert t-grid_2">
+                            <?php if($presetApplied === true):?>
+                                <span id="switch-search-filter-label"><?php echo $this->translate('Modify preset name'); ?></span>
+                            <?php else: ?>
+                                <span id="switch-search-filter-label"><?php echo $this->translate('OR'); ?></span>
+                            <?php endif;?>
+                        </div>
+                        <input class="grid_4 omega t-grid_2" type="text" id="filter-preset-name" autocomplete="off"
+                               name="filters-preset-name"
+                               value="<?php echo (!empty($this->presetDefaultName)) ? $this->presetDefaultName : ''; ?>"
+                               placeholder="<?php echo $this->translate('Set new filter preset'); ?>"/>
+                    </div>
+                    <div class="grid_4 space-vert">
+                        <div class="inline-block t-grid_3">
+                            <label><input type="checkbox" id="filter-preset-default"
+                                          name="filterPresetDefault" <?php echo (!empty($this->presetDefault)) ? 'checked="checked"' : ''; ?>/><?php echo $this->translate('Mark as default'); ?>
+                            </label>
+
+                        </div>
+                        <input type="hidden" name="presetId" id="preset-id"
+                               value="<?php echo (!empty($this->presetDefaultId)) ? $this->presetDefaultId : ''; ?>"/>
+                        <?php if (Tools_Security_Acl::ROLE_SUPERADMIN === $this->userRole || Tools_Security_Acl::ROLE_ADMIN === $this->userRole): ?>
+                            <div class="inline-block prefix_1 t-grid_3">
+                                <label><input type="checkbox" id="filter-preset-allow"
+                                              name="filterPresetAllow" <?php echo (!empty($this->presetDefaultAccess) && $this->presetDefaultAccess === 'all') ? 'checked="checked"' : ''; ?>/><?php echo $this->translate('Show to all users'); ?>
+                                </label>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <span class="btn red prefix_1 grid_1 omega" name="deleteFilterPreset"
+                            id="delete-filter-preset" style="display: none;"><?php echo $this->translate('Delete'); ?></span>
+                    <span class="btn green grid_1 omega fl-right" name="saveFilterPreset"
+                            id="save-filter-preset"><?php echo $this->translate('Save filter'); ?></span>
+                </fieldset>
                 <p class="grid_3 alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order amount');?></label>
-                    <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>">
-                    <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>">
+                    <input id="filter-from-amount" class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>" value="<?php echo (!empty($this->presetConfig['filter_from_amount'])) ? $this->presetConfig['filter_from_amount'] : ''; ?>">
+                    <input id="filter-to-amount" class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>" value="<?php echo (!empty($this->presetConfig['filter_to_amount'])) ? $this->presetConfig['filter_to_amount'] : ''; ?>">
                 </p>
                 <p class="grid_3 alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By coupon');?></label>
-                    <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>">
+                    <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>" value="<?php echo (!empty($this->presetConfig['filter_by_coupon_code'])) ? $this->presetConfig['filter_by_coupon_code'] : ''; ?>">
                 </p>
                 <p class="grid_3 alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By date');?></label>
-                    <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>">
-                    <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>">
+                    <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" autocomplete="off" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>" value="<?php echo(!empty($this->presetConfig['orders_filter_fromdate']) ? date('d-M-y', strtotime($this->presetConfig['orders_filter_fromdate'])) : ''); ?>">
+                    <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" autocomplete="off" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>" value="<?php echo(!empty($this->presetConfig['orders_filter_todate']) ? date('d-M-y', strtotime($this->presetConfig['orders_filter_todate'])) : ''); ?>">
                 </p>
                 <p class="grid_3 alpha omega t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order status');?></label>
-                    <?php $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW);?>
                     <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
-                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_NEW ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW); ?></option>
-                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PENDING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING); ?></option>
-                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING); ?></option>
-                        <?php if(!empty($this->shoppingConfig['enabledPartialPayment'])) :?>
-                            <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_PARTIAL; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_PARTIAL); ?></option>
-                        <?php endif;?>
-                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_COMPLETED ; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED); ?></option>
-                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_SHIPPED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED); ?></option>
-                        <option selected value="<?php echo Models_Model_CartSession::CART_STATUS_DELIVERED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED); ?></option>
-                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_CANCELED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED); ?></option>
-                        <option value="<?php echo Models_Model_CartSession::CART_STATUS_REFUNDED; ?>"><?php echo $this->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED); ?></option>
-                        <option value="<?php echo Tools_Misc::CS_ALIAS_PENDING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING); ?></option>
-                        <option value="<?php echo Tools_Misc::CS_ALIAS_PROCESSING; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING); ?></option>
-                        <option selected value="<?php echo Tools_Misc::CS_ALIAS_QUOTE_SIGNED; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_QUOTE_SIGNED); ?></option>
-                        <option value="<?php echo Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY; ?>"><?php echo $this->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY); ?></option>
+                        <?php if (!empty($this->orderStatuses)) : ?>
+                            <?php foreach ($this->orderStatuses as $statusType => $statusName): ?>
+                                <option value="<?php echo $statusType; ?>" <?php echo (!empty($this->presetConfig['filter_status']) && in_array($statusType, $this->presetConfig['filter_status'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($statusName);?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </select>
                 </p>
-                <p class="grid_2 alpha hidden recurring-filters t-grid_3">
+                <p class="grid_2 alpha <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?> recurring-filters t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
-                    <?php echo $this->formSelect('filter-recurring-order-type', null, array(
+                    <?php echo $this->formSelect('filter-recurring-order-type', (!empty($this->presetConfig['filter_recurring_order_type'])) ? $this->presetConfig['filter_recurring_order_type'] : null, array(
                         'class' => 'filter',
                         'data-placeholder' => $this->translate('show all')
                     ), array(
@@ -97,7 +136,7 @@ $this->headLink()
                             <?php $orderTypes[$orderSubtype] = $this->translate(ucfirst($orderSubtype));?>
                         <?php endforeach;?>
                     <?php endif;?>
-                    <?php echo $this->formSelect('filter-order-type', null, array(
+                    <?php echo $this->formSelect('filter-order-type', (!empty($this->presetConfig['filter_order_type'])) ? $this->presetConfig['filter_order_type'] : null, array(
                         'class' => 'filter',
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
@@ -107,18 +146,30 @@ $this->headLink()
                     <?php
                     $countryList = Tools_Geo::getCountries(true);
                     $countryList = array_merge(array('_' => ''), $countryList);
-                    echo '<div class="grid_4 alpha t-grid_2 t-alpha">' . $this->formSelect('filter-country', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
-                    echo '<div class="grid_4 t-grid_2">' . $this->formSelect('filter-state', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), array('') ) . '</div>';
+                    echo '<div class="grid_4 alpha t-grid_2 t-alpha">' . $this->formSelect('filter-country', (!empty($this->presetConfig['filter_country'])) ? $this->presetConfig['filter_country'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
 
+                    $stateList = array('' => '');
+                    if(!empty($this->states) && !empty($this->presetConfig['filter_country']) && ($this->presetConfig['filter_country'] == 'US' || $this->presetConfig['filter_country'] == 'CA' || $this->presetConfig['filter_country'] == 'AU')){
+                        $stateList = array('' => '') + $this->states;
+                    }
 
+                    echo '<div class="grid_4 t-grid_2">' . $this->formSelect('filter-state', (!empty($this->presetConfig['filter_state'])) ? $this->presetConfig['filter_state'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), $stateList) . '</div>';
 
                 $shippingServices = array_merge(array(''), $this->shippingServices);
-                echo '<div class="grid_4 omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
+                echo '<div class="grid_4 omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', (!empty($this->presetConfig['filter_carrier'])) ? $this->presetConfig['filter_carrier'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
                 ?>
+
+                <?php $countriesWithStates = array(); ?>
+                <?php foreach ($this->countriesList as $countryAbbr => $countryFullName) : ?>
+                    <?php if (!empty($countryStates = Tools_Geo::getState($countryAbbr, true))) {
+                        $countriesWithStates[$countryAbbr] = $countryStates;
+                    } ?>
+                <?php endforeach;?>
+                <input type="hidden" id="countries-with-states" value='<?php echo json_encode($countriesWithStates); ?>'/>
             </div>
             <div class="grid_2 mt20px">
-                <label><input type="checkbox" id="exclude-quotes-from-search" name="exclude-quotes-from-search"> <?php echo $this->translate('Exclude quotes');?></label>
-                <label><input type="checkbox" id="is-a-gift" name="is-a-gift"> <?php echo $this->translate('Is a gift');?></label>
+                <label><input type="checkbox" id="exclude-quotes-from-search" name="exclude-quotes-from-search" <?php echo ((!empty($this->presetConfig['exclude_quotes_from_search']))) ? "checked" : ''; ?>> <?php echo $this->translate('Exclude quotes');?></label>
+                <label><input type="checkbox" id="is-a-gift" name="is-a-gift" <?php echo ((!empty($this->presetConfig['is_a_gift']))) ? "checked" : ''; ?>> <?php echo $this->translate('Is a gift');?></label>
             </div>
             <div class="grid_12 alpha omega text-right">
                 <button class="btn green ticon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
@@ -171,7 +222,7 @@ $this->headLink()
                 <?php endif;?>
             </tfoot>
         </table>
-        <input type="hidden" name="orders-secure-token" class="orders-secure-token" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>" />
+        <input type="hidden" id="orders-secure-token" name="orders-secure-token" class="orders-secure-token" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>" />
         <?php if(isset($this->invoicePlugin)):?>
             <input type="hidden" value="enabled" name="invoiceEnable" id="invoiceEnable"/>
         <?php endif;?>
@@ -206,7 +257,7 @@ $(function(){
         }
     });
 	$('#filter-state').on('addressChain:updated', function(){
-		$(this).prepend('<option value="0"></option>').trigger('chosen:updated');
+		$(this).prepend('<option value=""></option>').trigger('chosen:updated');
 	});
 	$('#extra-filters').addressChain({
 		countrySelector: $('#filter-country'),

@@ -892,4 +892,80 @@ class Tools_Misc
 
     }
 
+
+    public static function isStoreClosed()
+    {
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $config = $configMapper->getConfigParams();
+        if (!empty($config['useOperationalHoursForOrders'])) {
+            $operationalHoursStoreConfig = $config['operationalHours'];
+            if (empty($operationalHoursStoreConfig)) {
+                return false;
+            }
+
+            $operationalHoursStoreConfig = unserialize($operationalHoursStoreConfig);
+
+            $storeTimezone = $config['timezone'];
+            $serverTimezone = date_default_timezone_get();
+            if (empty($serverTimezone)) {
+                $serverTimezone = 'UTC';
+            }
+
+            $preparedDate = Tools_System_Tools::convertDateFromTimezone('now', $serverTimezone, 'UTC');
+            $preparedDate = date(Tools_System_Tools::DATE_MYSQL, strtotime($preparedDate .'+'.Tools_EmailSequenceTools::getTimezoneShift('UTC', $storeTimezone).'hours'));
+
+            $currentDayOfTheWeek = strtolower(date('l', strtotime($preparedDate)));
+            $currentHourOfTheWeek = intval(strtolower(date('H', strtotime($preparedDate))));
+
+            if (isset($operationalHoursStoreConfig[$currentDayOfTheWeek]) && !empty($operationalHoursStoreConfig[$currentDayOfTheWeek])) {
+                $operationHoursInfo = $operationalHoursStoreConfig[$currentDayOfTheWeek];
+                if ($operationHoursInfo['from'] <= $currentHourOfTheWeek && $operationHoursInfo['to'] > $currentHourOfTheWeek) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    public static function getStoreIsClosedMessage()
+    {
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $config = $configMapper->getConfigParams();
+        if (!empty($config['useOperationalHoursForOrdersMessage'])) {
+            return $config['useOperationalHoursForOrdersMessage'];
+        }
+
+        $translator = Zend_Registry::get('Zend_Translate');
+
+        return $translator->translate('Online ordering unavailable');
+    }
+
+    public static function getStoreIsDisabledMessage()
+    {
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $config = $configMapper->getConfigParams();
+        if (!empty($config['disabledStoreMessage'])) {
+            return $config['disabledStoreMessage'];
+        }
+
+        $translator = Zend_Registry::get('Zend_Translate');
+
+        return $translator->translate('Online ordering unavailable');
+    }
+
+    public static function isStoreDisabled()
+    {
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $config = $configMapper->getConfigParams();
+        if (!empty($config['disabledStore'])) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

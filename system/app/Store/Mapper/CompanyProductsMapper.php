@@ -55,6 +55,19 @@ class Store_Mapper_CompanyProductsMapper extends Application_Model_Mappers_Abstr
     }
 
     /**
+     * @param array $productIds
+     * @return array
+     */
+    public function getColByProductIds(array $productIds)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('product_id IN (?)', $productIds);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_company_products',
+            array('company_id'))->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
+
+    /**
      * Get product ids grouped by supplier id
      *
      * @param array $productIds product ids

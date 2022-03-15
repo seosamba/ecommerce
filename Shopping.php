@@ -319,6 +319,11 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
+
+            if (empty($this->_requestedParams['useOperationalHoursForOrders'])){
+                $this->_requestedParams['useOperationalHoursForOrders'] = '0';
+            }
+
             if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
                     if (!empty($subFormValues['operationalHours'])) {
@@ -840,6 +845,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
                         $product->setPrice($productPrice);
 
+                        $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+                        $savedCompanies = $companyProductsMapper->getColByProductIds(array($product->getId()));
+
+                        if(!empty($savedCompanies)) {
+                            $product->setCompanyProducts($savedCompanies);
+                        }
+
                         $this->_view->product = $product;
                     }
 				}
@@ -884,6 +896,9 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
             $this->_view->defaultTaxes = $defaultTaxes;
+
+            $companyMapper = Store_Mapper_CompaniesMapper::getInstance();
+            $this->_view->companies = $companyMapper->fetchAll();
 
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();

@@ -392,7 +392,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 						'priceType'   => null,
 						'priceValue'  => null,
 						'weightSign'  => null,
-						'weightValue' => null
+						'weightValue' => null,
+                        'hideDefaultOption' => $option->getHideDefaultOption()
 					);
 					break;
                 case Models_Model_Option::TYPE_TEXTAREA:
@@ -403,7 +404,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
                         'priceType'   => null,
                         'priceValue'  => null,
                         'weightSign'  => null,
-                        'weightValue' => null
+                        'weightValue' => null,
+                        'hideDefaultOption' => $option->getHideDefaultOption()
                     );
                     break;
                 case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
@@ -426,6 +428,9 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 					$result[$option->getTitle()] = current(array_filter($selections, function($sel) use ($value) {
 						return $sel['id'] === $value;
 					}));
+
+                    $result[$option->getTitle()]['hideDefaultOption'] = $option->getHideDefaultOption();
+
 					break;
 			}
 		}
