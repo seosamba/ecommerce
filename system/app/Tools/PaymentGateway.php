@@ -35,6 +35,7 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 $currentStatus = $cart->getStatus();
                 if ($currentStatus === Models_Model_CartSession::CART_STATUS_PARTIAL) {
                     $cart->setSecondPaymentGateway($gateway);
+                    $cart->setSecondPartialPaidAmount(round($cart->getTotal() - $cart->getFirstPartialPaidAmount(), 2));
                     if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {
                         $cart->setIsSecondPaymentManuallyPaid('1');
                         $isFirstPaymentManuallyPaid = $cart->getIsFirstPaymentManuallyPaid();
@@ -72,6 +73,17 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 } else {
                     $cart->setIsFirstPaymentManuallyPaid('0');
                 }
+
+                $partialPercentage = $cart->getPartialPercentage();
+                $partialPaymentType = $cart->getPartialType();
+
+                if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_AMOUNT) {
+                    $amountToPayPartial = round($partialPercentage, 2);
+                } else {
+                    $amountToPayPartial = round(($cart->getTotal() * $cart->getPartialPercentage()) / 100, 2);
+                }
+
+                $cart->setFirstPartialPaidAmount($amountToPayPartial);
             }
 
             if ($status === Models_Model_CartSession::CART_STATUS_ERROR) {

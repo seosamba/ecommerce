@@ -1306,6 +1306,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
                 $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
                 $order->setGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setSecondPartialPaidAmount(round($order->getTotal() - $order->getFirstPartialPaidAmount(), 2));
                 $order->setSecondPaymentGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
                 $order->setIsSecondPaymentManuallyPaid('1');
                 Models_Mapper_CartSessionMapper::getInstance()->save($order);

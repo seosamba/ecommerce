@@ -685,6 +685,10 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `first_payment_gateway` varchar(2
 ALTER TABLE `shopping_cart_session` ADD COLUMN `second_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `second_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+UPDATE `shopping_cart_session` SET `first_partial_paid_amount` = ROUND(`partial_percentage`*`total`/100, 2) WHERE `is_partial` = '1' AND `status` IN ('partial', 'completed', 'shipped', 'delivered') AND `partial_type` = 'percentage';
+UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = `total` - ROUND(`partial_percentage`*`total`/100, 2) WHERE `is_partial` = '1' AND `status` IN ('completed', 'shipped', 'delivered') AND `partial_type` = 'percentage';
+UPDATE `shopping_cart_session` SET `first_partial_paid_amount` = `partial_percentage` WHERE `is_partial` = '1' AND `status` IN ('partial', 'completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
+UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = (`total` - `partial_percentage`) WHERE `is_partial` = '1' AND `status` IN ('completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.9.6' WHERE `name`='shopping';
