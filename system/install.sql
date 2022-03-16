@@ -326,6 +326,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `partial_percentage` DECIMAL(10,6) DEFAULT '0.00',
   `is_partial` ENUM('0', '1') DEFAULT '0',
   `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
+  `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
+  `second_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
   `partial_purchased_on` timestamp NULL,
   `is_first_payment_manually_paid` ENUM('0', '1') DEFAULT '0',
   `is_second_payment_manually_paid` ENUM('0', '1') DEFAULT '0',

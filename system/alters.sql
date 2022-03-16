@@ -683,6 +683,8 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `is_second_payment_manually_paid`
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_full_order_manually_paid` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `first_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `second_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `second_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
 
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='2.9.6' WHERE `name`='shopping';

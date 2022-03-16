@@ -164,6 +164,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_secondPaymentGateway = '';
 
+    protected $_firstPartialPaidAmount = '';
+
+    protected $_secondPartialPaidAmount = '';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -847,6 +851,38 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         $this->_secondPaymentGateway = $secondPaymentGateway;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstPartialPaidAmount()
+    {
+        return $this->_firstPartialPaidAmount;
+    }
+
+    /**
+     * @param string $firstPartialPaidAmount
+     */
+    public function setFirstPartialPaidAmount($firstPartialPaidAmount)
+    {
+        $this->_firstPartialPaidAmount = $firstPartialPaidAmount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecondPartialPaidAmount()
+    {
+        return $this->_secondPartialPaidAmount;
+    }
+
+    /**
+     * @param string $secondPartialPaidAmount
+     */
+    public function setSecondPartialPaidAmount($secondPartialPaidAmount)
+    {
+        $this->_secondPartialPaidAmount = $secondPartialPaidAmount;
     }
 
 
