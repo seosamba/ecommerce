@@ -55,12 +55,12 @@ class Forms_BasicsSettings extends Zend_Form {
         ));
 
         $this->addElement('checkbox', 'disabledStore', array(
-            'label' => $translator->translate('Disabled store'),
+            'label' => $translator->translate('Stop taking online orders'),
             'class' => 'grid_6 alpha'
         ));
 
         $this->addElement('text', 'disabledStoreMessage', array(
-            'label' => $translator->translate('Disabled store message'),
+            'label' => $translator->translate('Stop taking online orders message'),
             'class' => 'grid_6 alpha hidden',
             'placeholder' => $translator->translate('Online ordering unavailable')
         ));
