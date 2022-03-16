@@ -144,13 +144,13 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 	 * @param null $search
 	 * @return array
 	 */
-	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null) {
+	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null, $clientsFilter = null) {
 		$userDbTable = new Application_Model_DbTable_User();
         $joinCondition = '(cart.user_id = user.id)';
-        $joinCondition .= ' AND ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
-        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
-        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
-        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        //$joinCondition .= ' AND ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+        //$joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
+        //$joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+        //$joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
         $joinConditionCustomer = ('userattr.user_id = user.id').' AND '.$userDbTable->getAdapter()->quoteInto('userattr.attribute LIKE ?', 'customer_%');
 
         $select = $userDbTable->select()
@@ -183,6 +183,19 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 				Tools_Security_Acl::ROLE_ADMIN
 			));
 		}
+
+        if($clientsFilter == 'clients-only') {
+            if(!empty($where)) {
+                $where .= ' AND ';
+            }
+
+            $where .= ' ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Tools_Misc::CS_ALIAS_QUOTE_SIGNED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PARTIAL);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        }
 
 		if ($where) {
 			$select->where($where);
