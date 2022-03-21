@@ -31,6 +31,25 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 );
             }
 
+            if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                $currentStatus = $cart->getStatus();
+                if ($currentStatus === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                    $cart->setSecondPaymentGateway($gateway);
+                    $cart->setSecondPartialPaidAmount(round($cart->getTotal() - $cart->getFirstPartialPaidAmount(), 2));
+                    if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {
+                        $cart->setIsSecondPaymentManuallyPaid('1');
+                        $isFirstPaymentManuallyPaid = $cart->getIsFirstPaymentManuallyPaid();
+                        $isSecondPaymentManuallyPaid = $cart->getIsSecondPaymentManuallyPaid();
+                        if (!empty($isFirstPaymentManuallyPaid) && !empty($isSecondPaymentManuallyPaid)) {
+                            $cart->setIsFullOrderManuallyPaid('1');
+                        }
+                    } else {
+                        $cart->setIsSecondPaymentManuallyPaid('0');
+                    }
+                }
+
+            }
+
 			$cart->setStatus($status);
 			$cart->setGateway($gateway);
 
@@ -48,6 +67,23 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
             if ($status === Models_Model_CartSession::CART_STATUS_PARTIAL) {
                 $cart->setPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
                 $cart->setPartialPurchasedOn(date(Tools_System_Tools::DATE_MYSQL));
+                $cart->setFirstPaymentGateway($gateway);
+                if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {
+                    $cart->setIsFirstPaymentManuallyPaid('1');
+                } else {
+                    $cart->setIsFirstPaymentManuallyPaid('0');
+                }
+
+                $partialPercentage = $cart->getPartialPercentage();
+                $partialPaymentType = $cart->getPartialType();
+
+                if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_AMOUNT) {
+                    $amountToPayPartial = round($partialPercentage, 2);
+                } else {
+                    $amountToPayPartial = round(($cart->getTotal() * $cart->getPartialPercentage()) / 100, 2);
+                }
+
+                $cart->setFirstPartialPaidAmount($amountToPayPartial);
             }
 
             if ($status === Models_Model_CartSession::CART_STATUS_ERROR) {

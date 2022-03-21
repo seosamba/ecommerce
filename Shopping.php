@@ -1300,7 +1300,15 @@ class Shopping extends Tools_Plugins_Abstract {
         if ($orderId) {
             $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
             if ($order instanceof Models_Model_CartSession) {
+                $isFirstPaymentManuallyPaid = $order->getIsFirstPaymentManuallyPaid();
+                if (!empty($isFirstPaymentManuallyPaid)) {
+                    $order->setIsFullOrderManuallyPaid('1');
+                }
                 $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
+                $order->setGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setSecondPartialPaidAmount(round($order->getTotal() - $order->getFirstPartialPaidAmount(), 2));
+                $order->setSecondPaymentGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setIsSecondPaymentManuallyPaid('1');
                 Models_Mapper_CartSessionMapper::getInstance()->save($order);
                 $this->_responseHelper->success( $this->_translator->translate('Status has been changed'));
             }
