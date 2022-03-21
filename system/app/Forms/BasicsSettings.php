@@ -70,7 +70,7 @@ class Forms_BasicsSettings extends Zend_Form {
         ));
 
         $this->addElement('checkbox', 'useOperationalHoursForOrders', array(
-            'label' => $translator->translate('Use operational hours for online orders'),
+            'label' => $translator->translate('Limit online orders taking to store hours above'),
             'class' => 'grid_6 alpha'
         ));
 

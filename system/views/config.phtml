@@ -172,7 +172,7 @@ $this->headLink()
                     </p>
                     <p class="grid_12 mt10px">
                         <label for="use-operational-hours-for-orders">
-                            <?php echo $this->translate('Use operational hours for online orders');?>
+                            <?php echo $this->translate('Limit online orders taking to store hours above');?>
                             <input <?php echo (!empty($useOperationalHoursForOrders) ? 'checked' : '');?> id="use-operational-hours-for-orders" type="checkbox" name="useOperationalHoursForOrders" value="1">
                         </label>
                         <label id="use-operational-hours-for-orders-message" class="mt10px <?php echo (!empty($useOperationalHoursForOrders) ? '' : 'hidden');?>">

@@ -56,10 +56,17 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'partial_percentage'         => $model->getPartialPercentage(),
             'is_partial'                 => $model->getIsPartial(),
             'partial_paid_amount'        => $model->getPartialPaidAmount(),
+            'first_partial_paid_amount'  => $model->getFirstPartialPaidAmount(),
+            'second_partial_paid_amount' => $model->getSecondPartialPaidAmount(),
             'partial_purchased_on'       => $model->getPartialPurchasedOn(),
             'partial_type'               => $model->getPartialType(),
             'partial_notification_date'  => $model->getPartialNotificationDate(),
-            'purchase_error_message'     => $model->getPurchaseErrorMessage()
+            'purchase_error_message'     => $model->getPurchaseErrorMessage(),
+            'is_first_payment_manually_paid'  => $model->getIsFirstPaymentManuallyPaid(),
+            'is_second_payment_manually_paid' => $model->getIsSecondPaymentManuallyPaid(),
+            'is_full_order_manually_paid'     => $model->getIsFullOrderManuallyPaid(),
+            'first_payment_gateway'           => $model->getFirstPaymentGateway(),
+            'second_payment_gateway'          => $model->getSecondPaymentGateway()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

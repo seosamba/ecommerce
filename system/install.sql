@@ -326,7 +326,14 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `partial_percentage` DECIMAL(10,6) DEFAULT '0.00',
   `is_partial` ENUM('0', '1') DEFAULT '0',
   `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
+  `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
+  `second_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
   `partial_purchased_on` timestamp NULL,
+  `is_first_payment_manually_paid` ENUM('0', '1') DEFAULT '0',
+  `is_second_payment_manually_paid` ENUM('0', '1') DEFAULT '0',
+  `is_full_order_manually_paid` ENUM('0', '1') DEFAULT '0',
+  `first_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `second_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
@@ -1102,5 +1109,5 @@ INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_
 
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.5' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.6' WHERE `name` = 'shopping';
 
