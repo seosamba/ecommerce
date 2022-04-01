@@ -727,6 +727,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
+        $this->_addToLeadsLog();
+
         return $this->_send();
     }
 
@@ -908,6 +910,58 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         $parser = new Tools_Content_Parser($mailFrom, array(), $parserOptions);
 
         return Tools_Content_Tools::stripEditLinks($parser->parseSimple());
+    }
+
+    /**
+     * Add to log emailsequence
+     *
+     * @throws Zend_Reflection_Exception
+     */
+    private function _addToLeadsLog()
+    {
+        $emailData = $this->_object->toArray();
+        $emailData['observableModel'] = $this->_object;
+        $emailData['dictionary'] = $this->_entityParser->getDictionary();
+        $emailData['emailContent'] = $this->_entityParser->parse($this->_template);
+        $trackingLinkData = $this->_getTrackingLink();
+        if (!empty($trackingLinkData)) {
+            $this->_template = $this->_template . ' ' . $trackingLinkData['trackingLink'];
+            $emailData['trackingCodeHash'] = $trackingLinkData['trackingCodeHash'];
+        } else {
+            $emailData['trackingCodeHash'] = '';
+        }
+
+        if ($this->_options['recipient'] !== Tools_Security_Acl::ROLE_ADMIN && $this->_options['recipient'] !== Tools_Security_Acl::ROLE_SUPERADMIN && $this->_options['recipient'] !== Shopping::ROLE_SALESPERSON) {
+
+            $cartId = $this->_object->getId();
+            $leadsPurchaseLogMapper = Leads_Mapper_LeadsPurchaseLogMapper::getInstance();
+            $leadsPurchaseLogModel = $leadsPurchaseLogMapper->findByCartId($cartId, 'partial');
+            if ($leadsPurchaseLogModel instanceof Leads_Model_LeadsPurchaseLogModel) {
+                $emailData['leadId'] = $leadsPurchaseLogModel->getLeadId();
+                $emailData['emailTo'] = $this->_mailer->getMailTo();
+                $emailData['emailFrom'] = $this->_mailer->getMailFrom();
+                $emailData['emailSubject'] = $this->_mailer->getSubject();
+                $emailData['emailMessage'] = $emailData['emailContent'];
+                $logResult = Tools_System_Tools::firePluginMethodByPluginName('leads', 'addToEmailLog', $emailData);
+            }
+
+        }
+
+    }
+
+    /**
+     * Get email tracking link
+     *
+     * @throws Zend_Reflection_Exception
+     */
+    private function _getTrackingLink()
+    {
+        $emailTrackingLinkData = Tools_System_Tools::firePluginMethodByPluginName('leads', 'getEmailTrackingLink');
+        if (empty($emailTrackingLinkData['error']) && !empty($emailTrackingLinkData['trackingLink'])) {
+            return $emailTrackingLinkData;
+        }
+
+        return '';
     }
 
 }
