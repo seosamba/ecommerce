@@ -20,7 +20,7 @@ class Forms_Shipping_OrderConfig extends Zend_Form {
 		));
 
         $this->addElement('text', 'minimumAmount', array(
-            'label' => 'Products amount in cart'
+            'label' => 'Min order amount in cart'
         ));
 
         $this->addElement('checkbox', 'shippingRestrictionDeliveryOnly', array(
