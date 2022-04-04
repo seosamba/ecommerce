@@ -940,7 +940,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
                 $emailData['leadId'] = $leadsPurchaseLogModel->getLeadId();
                 $emailData['emailTo'] = $this->_mailer->getMailTo();
                 $emailData['emailFrom'] = $this->_mailer->getMailFrom();
-                $emailData['emailSubject'] = $this->_mailer->getSubject();
+                $emailData['emailSubject'] = $this->_entityParser->parse($this->_subject);
                 $emailData['emailMessage'] = $emailData['emailContent'];
                 $logResult = Tools_System_Tools::firePluginMethodByPluginName('leads', 'addToEmailLog', $emailData);
             }
