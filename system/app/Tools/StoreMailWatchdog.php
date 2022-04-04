@@ -727,7 +727,9 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
-        $this->_addToLeadsLog();
+        if (empty($this->_options['excludeNotify'])) {
+            $this->_addToLeadsLog();
+        }
 
         return $this->_send();
     }
