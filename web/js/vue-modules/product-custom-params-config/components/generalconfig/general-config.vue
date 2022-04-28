@@ -51,7 +51,7 @@
                         <label>{{$t('message.customFieldLabel')}}:</label>
                         <input class="required param_label" @keyup="toLabel" type="text" name="label" :value="label"/>
                     </p>
-                    <p class="grid_3 omega mt0px">
+                    <p class="grid_3 omega mt10px">
                         <input id="product-custom-params-form-save" class="btn" type="submit" name="product-custom-params-form-save"
                                :value="[$t('message.quoteCustomParamsFormAdd')]"/>
                     </p>
