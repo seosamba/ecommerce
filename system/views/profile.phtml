@@ -786,7 +786,7 @@ $this->headScript()
         return false;
     }
 
-    $(document).on('change', '.user-custom-attribute', function(e) {
+    $('.user-custom-attribute').on('change', function(e){
         e.preventDefault();
         var attributeEl = $(e.currentTarget),
             attributeParam = $(attributeEl).data('attribute-param'),
@@ -795,9 +795,9 @@ $this->headScript()
             attributeBelonging = $(this).closest('.attribute-block').find('.user-custom-attribute-name').data('attribute-oldvalue'),
             existAttribute = false;
 
-        var attributeLabel = 'value';
+        var attributeLabel = "<?php echo $this->translate('Are you sure want to change the value?');?>";
         if(attributeParam == 'attribute-name') {
-            attributeLabel = 'name';
+            attributeLabel = "<?php echo $this->translate('Are you sure want to change Attribute name?');?>";
 
             if(changedValue == '') {
                 showMessage("<?php echo $this->translate('Empty attribute name. Please provide name.');?>", true, 3000);
@@ -818,7 +818,7 @@ $this->headScript()
         }
 
         if(!existAttribute) {
-            showConfirm("<?php echo $this->translate('Are you sure want to rename');?>"+ ' ' + attributeLabel,  function (){
+            showConfirm(attributeLabel,  function (){
                 $.ajax({
                     type: "POST",
                     url: $('#website_url').val() + 'plugin/shopping/run/updateUserAttribute/',
@@ -846,7 +846,7 @@ $this->headScript()
         }
     });
 
-    $(document).on('change', '.user-groups', function(e) {
+    $('.user-groups').on('change', function(e){
         e.preventDefault();
         var selectedGroupId = $(this).val(),
             userId = $('#userId').val();
