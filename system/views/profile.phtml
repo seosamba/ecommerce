@@ -799,6 +799,12 @@ $this->headScript()
         if(attributeParam == 'attribute-name') {
             attributeLabel = 'name';
 
+            if(changedValue == '') {
+                showMessage("<?php echo $this->translate('Empty attribute name. Please provide name.');?>", true, 3000);
+                attributeEl.val(oldAttributeValue);
+                return false;
+            }
+
             var existedAttributesNames = $('.user-custom-attribute-name');
 
             $.each(existedAttributesNames, function(key, val) {
