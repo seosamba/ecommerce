@@ -1260,6 +1260,22 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 			$this->_view->orders = $orders;
+
+            $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+
+            $currentUserModel = $userMapper->find($customer->getId());
+
+            $userAttributes = array();
+            if($currentUserModel instanceof Application_Model_Models_User) {
+                $userMapper->loadUserAttributes($currentUserModel);
+
+                $userAttributes = $currentUserModel->getAttributes();
+            }
+
+            $this->_view->userAttributes = $userAttributes;
+
+            $allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
+            $this->_view->allGroups = $allGroups;
 		}
 
 		$enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
@@ -3309,6 +3325,74 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_responseHelper->fail('');
         }
 
+    }
+
+    /**
+     * Update user attributes on Dashboard clients grid
+     *
+     * @return void
+     */
+    public function updateUserAttributeAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam('secureToken', false);
+
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $attributeParamsData = $this->_request->getParams();
+
+            $userId = $attributeParamsData['userId'];
+            $attributeType = $attributeParamsData['attributeType'];
+            $oldFieldValue = $attributeParamsData['oldFieldValue'];
+            $fieldValue = $attributeParamsData['fieldValue'];
+
+            if(!empty($userId)) {
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $currentUserModel = $userMapper->find($userId);
+
+                $userAttributes = array();
+                if($currentUserModel instanceof Application_Model_Models_User) {
+                    $userMapper->loadUserAttributes($currentUserModel);
+
+                    $userAttributes = $currentUserModel->getAttributes();
+                }
+
+                $dbTable = new Zend_Db_Table('user_attributes');
+
+                if(!empty($userAttributes)) {
+                    $dbTable->delete(array('user_id = ?' => $userId));
+
+                    $attributeBelonging = $attributeParamsData['attributeBelonging'];
+
+                    foreach ($userAttributes as $attribute => $value) {
+                        if($attributeType == 'attribute-name') {
+                            if($attribute == $oldFieldValue) {
+                                $attribute = $fieldValue;
+                            }
+                        } elseif ($attributeType == 'attribute-value') {
+                            if($value == $oldFieldValue && $attributeBelonging == $attribute) {
+                                $value = $fieldValue;
+                            }
+                        }
+
+                        $dbTable->insert(array(
+                            'user_id' => $userId,
+                            'attribute' => $attribute,
+                            'value' => $value
+                        ));
+                    }
+
+                    $this->_responseHelper->success($this->_translator->translate('Updated'));
+                }
+
+                $this->_responseHelper->fail($this->_translator->translate('Nothing to delete'));
+            }
+
+            $this->_responseHelper->fail($this->_translator->translate('Empty userId'));
+        }
     }
 
 
