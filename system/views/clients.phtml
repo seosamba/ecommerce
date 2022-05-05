@@ -21,7 +21,7 @@
     <?php if (empty($this->shoppingConfigParams['hideGroupNameFromClientsTab'])) :?>
         <td class="group">
             <?php if(!empty($this->allGroups)):?>
-                <select name="groups">
+                <select class="user-group-${id}" name="groups">
                     <option value="0"><?php echo $this->translate('select');?></option>
                     <?php foreach($this->allGroups as $group): ?>
                         <option {{if group_id == <?php echo $group->getId();?>}} selected="selected" {{/if}} value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
