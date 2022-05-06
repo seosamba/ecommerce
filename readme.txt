@@ -272,3 +272,10 @@ Example:
 {$productcustomparam:select:dogs:readonly} - on the product page
 {$productcustomparam:{$product:id}:select:dogs:readonly} - in the product list
 
+                                Freeshipment
+===========================================================================================================
+ {freeshipment} ... {/freeshipment} - displays content if user eligible for free shipment
+ {freeshipment:not} ... {/freeshipment} -  displays content if user not eligible for free shipment
+
+{$store:freeshippinggoal} - it will return amount required to get free shipment
+
