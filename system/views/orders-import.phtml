@@ -19,8 +19,8 @@ $this->headLink()
         )
     );
 ?>
-    <div class="f-content">
-        <div class="clearfix">
+    <div class="f-content flex-column">
+        <div class="grid_12 alpha omega">
             <label class="grid_4 mt5px text-bold"><?php echo $this->translate('Please choose default order status');?></label>
             <select class="grid_4" name="order-status" id="order-status">
                 <option value="0"><?php echo $this->translate('Choose default order status');?></option>
@@ -35,7 +35,7 @@ $this->headLink()
             </select>
         </div>
         <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
-        <div id="import-orders-templates" class="grid_12 mt15px">
+        <div id="import-orders-templates" class="f-scroll grid_12 mt15px">
             <ul>
                 <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
                     <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
