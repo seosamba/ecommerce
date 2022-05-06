@@ -665,7 +665,13 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
             }
 
+            if (empty($cart->getShippingAddressKey())){
+                return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+            }
+
             $shippingAddress = $cart->getAddressById($cart->getShippingAddressKey());
+
+
             $cartAmount = $cart->calculateCartPrice();
             if (empty($cartAmount)) {
                 return $currency->toCurrency($freeShippingConfig['config']['cartamount']);

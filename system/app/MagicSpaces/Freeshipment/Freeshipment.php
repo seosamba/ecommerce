@@ -29,6 +29,14 @@ class MagicSpaces_Freeshipment_Freeshipment extends Tools_MagicSpaces_Abstract {
                 }
             }
 
+            if (empty($cart->getShippingAddressKey())){
+                if ($eligible === true) {
+                    return '';
+                } else {
+                    return $this->_spaceContent;
+                }
+            }
+
             $shippingAddress = $cart->getAddressById($cart->getShippingAddressKey());
             $cartAmount = $cart->calculateCartPrice();
             if (empty($cartAmount)) {
