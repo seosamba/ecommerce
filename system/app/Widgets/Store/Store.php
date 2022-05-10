@@ -649,4 +649,73 @@ class Widgets_Store_Store extends Widgets_Abstract {
         return $checkoutPage;
     }
 
+    /**
+     * Generates number left to get free shipping
+     */
+    protected function _makeOptionfreeshippinggoal()
+    {
+        $shippingConfigMapper = Models_Mapper_ShippingConfigMapper::getInstance();
+        $freeShippingConfig = $shippingConfigMapper->find(Shopping::SHIPPING_FREESHIPPING);
+        if (!empty($freeShippingConfig['config']) && !empty($freeShippingConfig['enabled'])) {
+
+            $currency = Zend_Registry::get('Zend_Currency');
+
+            $cart = Tools_ShoppingCart::getInstance();
+            if (empty($cart)) {
+                return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+            }
+
+            $cartAmount = $cart->calculateCartPrice();
+
+            if (empty($cart->getShippingAddressKey())){
+                return $currency->toCurrency(round($freeShippingConfig['config']['cartamount'] - $cartAmount, 2));
+            }
+
+            $shippingAddress = $cart->getAddressById($cart->getShippingAddressKey());
+
+            if (empty($cartAmount)) {
+                return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+            }
+
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            $cartContent = $cart->getContent();
+            $quantityOfCartProducts = count($cartContent);
+            $freeShippingProductsQuantity = 0;
+            if (is_array($cartContent) && !empty($cartContent)) {
+                foreach ($cartContent as $cartItem) {
+                    if ($cartItem['freeShipping'] == 1) {
+                        $freeShippingProductsQuantity += 1;
+                    }
+                }
+            }
+
+            if ($freeShippingProductsQuantity == $quantityOfCartProducts) {
+                return 0;
+            }
+
+            $deliveryType = $shoppingConfig['country'] == $shippingAddress['country'] ? Forms_Shipping_FreeShipping::DESTINATION_NATIONAL : Forms_Shipping_FreeShipping::DESTINATION_INTERNATIONAL;
+
+            if ($freeShippingConfig['config']['destination'] === Forms_Shipping_FreeShipping::DESTINATION_BOTH
+                || $freeShippingConfig['config']['destination'] === $deliveryType
+            ) {
+                if ($cartAmount > $freeShippingConfig['config']['cartamount']) {
+                    return 0;
+                }
+
+                return $currency->toCurrency(round($freeShippingConfig['config']['cartamount'] - $cartAmount, 2));
+            } elseif ($freeShippingConfig['config']['destination'] > 0) {
+                $zoneId = Tools_Tax_Tax::getZone($shippingAddress, false);
+                if ($zoneId == $freeShippingConfig['config']['destination']) {
+                    if ($cartAmount > $freeShippingConfig['config']['cartamount']) {
+                        return 0;
+                    }
+
+                    return $currency->toCurrency(round($freeShippingConfig['config']['cartamount'] - $cartAmount, 2));
+                }
+            }
+
+            return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+
+        }
+    }
 }
