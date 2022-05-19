@@ -899,7 +899,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
-     * Return signle product options for single item in cart
+     * Return single product options for single item in cart
      *
      * @param $sid
      * @return string
@@ -918,7 +918,16 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                 if (!empty($this->_options[1]) && $this->_options[1] === 'title') {
                     $withTitle = true;
                 }
+
+                $textInsteadOfResult = false;
+                if (!empty($this->_options[1]) && $this->_options[1] !== 'title') {
+                    $textInsteadOfResult = true;
+                }
+
                 if (empty($productOptions[$singleOptionName])) {
+                    if ($textInsteadOfResult === true) {
+                        return $this->_options[1];
+                    }
                     return '';
                 }
                 $singleOpt = $productOptions[$singleOptionName];
