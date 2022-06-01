@@ -129,6 +129,7 @@ Plugin widgets.
     {$postpurchase:quoteid} -> show quote id.
     {$postpurchase:quotetitle} -> show quote title.
     {$postpurchase:quotecreatedat[:Y-m-d]} -> show quote created at.
+    {$postpurchase:signatureinfo} -> show signature info
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix

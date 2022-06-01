@@ -1163,6 +1163,18 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     }
 
     /**
+     * Return quote signature info field
+     *
+     * @return string
+     */
+    protected function _renderSignatureinfo()
+    {
+        if (!empty($this->_quote)) {
+            return $this->_cart->getSignatureInfoField();
+        }
+    }
+
+    /**
      * Return text if this order is recurring payment
      *
      * @return string
