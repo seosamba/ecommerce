@@ -1170,7 +1170,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderSignatureinfo()
     {
         if (!empty($this->_quote)) {
-            return $this->_cart->getSignatureInfoField();
+            return $this->_quote->getSignatureInfoField();
         }
     }
 
