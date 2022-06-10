@@ -144,13 +144,13 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 	 * @param null $search
 	 * @return array
 	 */
-	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null) {
+	public function listAll($where = null, $order = null, $limit = null, $offset = null, $search = null, $clientsFilter = null) {
 		$userDbTable = new Application_Model_DbTable_User();
         $joinCondition = '(cart.user_id = user.id)';
-        $joinCondition .= ' AND ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
-        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
-        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
-        $joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        //$joinCondition .= ' AND ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+        //$joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
+        //$joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+        //$joinCondition .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
         $joinConditionCustomer = ('userattr.user_id = user.id').' AND '.$userDbTable->getAdapter()->quoteInto('userattr.attribute LIKE ?', 'customer_%');
 
         $select = $userDbTable->select()
@@ -175,6 +175,7 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
                 array('customer_attr'=>'(GROUP_CONCAT(DISTINCT(userattr.attribute), \'||\', userattr.value))'))
             ->joinLeft(array('scs' => 'shopping_company_suppliers'), 'scs.supplier_id=user.id', array())
             ->joinLeft(array('sc' => 'shopping_companies'), 'scs.company_id=sc.id', array('company_name' => 'sc.company_name', 'company_id' => 'scs.company_id'))
+            ->joinLeft(array('sq' => 'shopping_quote'), 'sq.cart_id=cart.id', array())
             ->group('user.id');
 
 		if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
@@ -183,6 +184,19 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 				Tools_Security_Acl::ROLE_ADMIN
 			));
 		}
+
+        if($clientsFilter == 'clients-only') {
+            if(!empty($where)) {
+                $where .= ' AND ';
+            }
+
+            $where .= ' ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('sq.status=?', Quote_Models_Model_Quote::STATUS_SIGNATURE_ONLY_SIGNED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PARTIAL);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        }
 
 		if ($where) {
 			$select->where($where);

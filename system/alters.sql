@@ -625,7 +625,72 @@ UPDATE `shopping_cart_session` SET `partial_type` = 'percentage' WHERE `shopping
 INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES
 ('fiscalYearStart', '1');
 
+-- 02/12/2021
+-- version: 2.9.0
+ALTER TABLE `shopping_cart_session` ADD COLUMN `partial_notification_date` TIMESTAMP NULL;
+
+-- 14/07/2021
+-- version: 2.9.1
+ALTER TABLE `shopping_cart_session` ADD COLUMN `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL AFTER `partial_purchased_on`;
+
+-- 23/08/2018
+-- version: 2.9.2
+-- Add historical cart session option
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
+`id` INT(10) unsigned AUTO_INCREMENT,
+`cart_id` int(10) unsigned NOT NULL,
+`product_id` int(10) unsigned NOT NULL,
+`option_id` int(10) unsigned NOT NULL,
+`cart_content_id` int (10) unsigned NOT NULL,
+`option_title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+`option_type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+`option_selection_id` int(10) unsigned NULL,
+`title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceValue` decimal(10,4) DEFAULT NULL,
+`priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightValue` decimal(8,3) DEFAULT NULL,
+`cart_item_key` CHAR(32) NOT NULL,
+`cart_item_option_key` CHAR(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 04/01/2022
+-- version: 2.9.3
+CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `creator_id` INT(10) UNSIGNED NOT NULL,
+    `filter_preset_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `filter_preset_data` TEXT NOT NULL,
+    `is_default` ENUM('0', '1') DEFAULT '0',
+    `access` ENUM('all', 'individual') DEFAULT 'individual',
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
+    (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
+
+-- 02/02/2022
+-- version: 2.9.4
+ALTER TABLE `shopping_product_option` ADD COLUMN `hideDefaultOption` ENUM('0', '1') DEFAULT '0';
+
+-- 30/12/2021
+-- version: 2.9.5
+ALTER TABLE `shopping_cart_session` ADD COLUMN `is_first_payment_manually_paid` ENUM('0', '1') DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `is_second_payment_manually_paid` ENUM('0', '1') DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `is_full_order_manually_paid` ENUM('0', '1') DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `first_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `second_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `second_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00';
+UPDATE `shopping_cart_session` SET `first_partial_paid_amount` = ROUND(`partial_percentage`*`total`/100, 2) WHERE `is_partial` = '1' AND `status` IN ('partial', 'completed', 'shipped', 'delivered') AND `partial_type` = 'percentage';
+UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = `total` - ROUND(`partial_percentage`*`total`/100, 2) WHERE `is_partial` = '1' AND `status` IN ('completed', 'shipped', 'delivered') AND `partial_type` = 'percentage';
+UPDATE `shopping_cart_session` SET `first_partial_paid_amount` = `partial_percentage` WHERE `is_partial` = '1' AND `status` IN ('partial', 'completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
+UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = (`total` - `partial_percentage`) WHERE `is_partial` = '1' AND `status` IN ('completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

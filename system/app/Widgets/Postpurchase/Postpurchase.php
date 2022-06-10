@@ -78,6 +78,13 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected $_cart = null;
 
     /**
+     * Cart quote
+     *
+     * @var null
+     */
+    protected $_quote = null;
+
+    /**
      * Cart content (products)
      *
      * @var null
@@ -125,7 +132,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
             $this->_cart = Zend_Registry::get('postPurchaseCart');
         } elseif (isset($this->_session->storeCartSessionConversionKey)) {
             $this->_cart = Models_Mapper_CartSessionMapper::getInstance()->find(
-                intval($this->_session->storeCartSessionConversionKey)
+                intval($this->_session->storeCartSessionConversionKey), true
             );
             if ($this->_cart instanceof Models_Model_CartSession) {
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
@@ -182,6 +189,16 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         }
         if ($this->_cart instanceof Models_Model_CartSession) {
             $this->_cartContent = $this->_cart->getCartContent();
+            $quotePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('quote');
+            if ($quotePlugin instanceof Application_Model_Models_Plugin) {
+                $quotePluginStatus = $quotePlugin->getStatus();
+                if ($quotePluginStatus === 'enabled') {
+                   $quoteModel = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($this->_cart->getId());
+                   if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                       $this->_quote = $quoteModel;
+                   }
+                }
+            }
         }
         $this->_shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
 
@@ -1002,6 +1019,10 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         }
 
         $productOptions = $this->_cartContent[$sid]['options'];
+        $archiveProductOptions = $this->_cartContent[$sid]['archiveOptions'];
+        if (!empty($archiveProductOptions)) {
+            $productOptions = $archiveProductOptions;
+        }
         if (!empty($productOptions)) {
             $optionResult = '';
             foreach ($productOptions as $optionTitle => $optData) {
@@ -1092,11 +1113,64 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      *
      * @return mixed
      */
-    protected function _renderQuoteNote(){
-        $cartId = $this->_cart->getId();
-        $quote = Quote_Models_Mapper_QuoteMapper::getInstance()->findByCartId($cartId);
-        if(!empty($quote)){
-            return $quote->getDisclaimer();
+    protected function _renderQuoteNote()
+    {
+        if (!empty($this->_quote)) {
+            return $this->_quote->getDisclaimer();
+        }
+    }
+
+    /**
+     * Return Quote id
+     *
+     * @return mixed
+     */
+    protected function _renderQuoteid()
+    {
+        if (!empty($this->_quote)) {
+            return $this->_quote->getId();
+        }
+    }
+
+    /**
+     * Return Quote id
+     *
+     * @return mixed
+     */
+    protected function _renderQuotetitle()
+    {
+        if (!empty($this->_quote)) {
+            return $this->_quote->getTitle();
+        }
+    }
+
+    /**
+     * Return quote created date in d-M-Y format
+     *
+     * @return string
+     */
+    protected function _renderQuotecreatedat()
+    {
+        if (!empty($this->_quote)) {
+            $createdAt =  $this->_quote->getCreatedAt();
+
+            if (!empty($this->_options[0])) {
+                return date($this->_options[0], strtotime($createdAt));
+            }
+
+            return date("d-M-Y", strtotime($this->_cart->getCreatedAt()));
+        }
+    }
+
+    /**
+     * Return quote signature info field
+     *
+     * @return string
+     */
+    protected function _renderSignatureinfo()
+    {
+        if (!empty($this->_quote)) {
+            return $this->_quote->getSignatureInfoField();
         }
     }
 
@@ -1283,16 +1357,25 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
     protected function _renderCompletionpaymentamount()
     {
 
+        $partialPaymentType = $this->_cart->getPartialType();
+        $partialPercent = $this->_cart->getPartialPercentage();
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
-            return round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
-                    2), 2);
+            if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_AMOUNT) {
+                return round($this->_cart->getTotal() - $partialPercent, 2);
+            } else {
+                return round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
+                        2), 2);
+            }
+
         }
 
-        return $this->_view->currency(round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
-                2), 2));
+        if ($partialPaymentType === Models_Model_CartSession::CART_PARTIAL_PAYMENT_TYPE_AMOUNT) {
+            return $this->_view->currency(round($this->_cart->getTotal() - $partialPercent, 2));
+        } else {
+            return $this->_view->currency(round($this->_cart->getTotal() - round(($this->_cart->getTotal() * $this->_cart->getPartialPercentage()) / 100,
+                    2), 2));
+        }
 
-
-        return '';
     }
 
 }

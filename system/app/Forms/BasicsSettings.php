@@ -45,18 +45,40 @@ class Forms_BasicsSettings extends Zend_Form {
 		));
 
         $this->addElement('checkbox', 'deductSetStock', array(
-            'label' => $translator->translate('Deduct from inventory of products used in sets'),
+            'label' => $translator->translate('Deduct products used in sets from inventory'),
             'class' => 'grid_6 alpha'
         ));
 
         $this->addElement('checkbox', 'minimumOrder', array(
-            'label' => $translator->translate('Minimum order'),
+            'label' => $translator->translate('Enable individual product minimum order handling (set values in product screen)'),
             'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('checkbox', 'disabledStore', array(
+            'label' => $translator->translate('Stop taking online orders'),
+            'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('text', 'disabledStoreMessage', array(
+            'label' => $translator->translate('Stop taking online orders message'),
+            'class' => 'grid_6 alpha hidden',
+            'placeholder' => $translator->translate('Online ordering unavailable')
         ));
 
         $this->addElement('text', 'operationalHours', array(
             'label' => $translator->translate('store operational hours')
         ));
+
+        $this->addElement('checkbox', 'useOperationalHoursForOrders', array(
+            'label' => $translator->translate('Limit online orders taking to store hours above'),
+            'class' => 'grid_6 alpha'
+        ));
+
+        $this->addElement('text', 'useOperationalHoursForOrdersMessage', array(
+            'label' => $translator->translate('Use operational hours for online orders message'),
+            'class' => 'grid_6 alpha'
+        ));
+
 
         $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
         array_pop($timezones);

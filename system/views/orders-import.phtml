@@ -8,7 +8,7 @@ $this->inlineScript()
 $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
-<div id="uploadContainer" class="seotoaster container">
+<div id="uploadContainer" class="seotoaster f-container">
 <?php
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -19,8 +19,8 @@ $this->headLink()
         )
     );
 ?>
-    <div class="content-auto">
-        <div class="clearfix">
+    <div class="f-content flex-column">
+        <div class="grid_12 alpha omega">
             <label class="grid_4 mt5px text-bold"><?php echo $this->translate('Please choose default order status');?></label>
             <select class="grid_4" name="order-status" id="order-status">
                 <option value="0"><?php echo $this->translate('Choose default order status');?></option>
@@ -35,14 +35,14 @@ $this->headLink()
             </select>
         </div>
         <?php $importFieldNames = Tools_ExportImportOrders::getOrderImportFieldsNames(); ?>
-        <div id="import-orders-templates" class="grid_12 mt15px">
+        <div id="import-orders-templates" class="f-scroll grid_12 mt15px">
             <ul>
                 <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
                     <li><a href="#<?php echo $orderTemplateName;?>"><?php echo $orderTemplateLabel;?></a></li>
                 <?php endforeach;?>
             </ul>
             <?php foreach($this->ordersImportTemplates as $orderTemplateName => $orderTemplateLabel):?>
-                <div id="<?php echo $orderTemplateName;?>" class="clearfix pl0 pr0 scroll" style="height: 370px;">
+                <div id="<?php echo $orderTemplateName;?>" class="f-scroll">
                     <?php foreach ($this->defaultImportsFileds as $importFields): ?>
                         <?php if (in_array($importFields['label'], $importFieldNames)): ?>
                             <label class="grid_3 mb10px">
@@ -60,15 +60,18 @@ $this->headLink()
                 </div>
             <?php endforeach;?>
         </div>
-        <footer class="grid_12 text-right">
+    </div>
+    <div class="f-footer">
+        <div class="grid_6">
             <a class="btn ticon-box-add success" title="" href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/getOrdersImportSampleData/">
                 <?php echo $this->translate('Get sample data file'); ?>
             </a>
-
-            <a id="pickOrders" class="btn ticon-box-remove" href="javascript:;">
+        </div>
+        <div class="grid_6">
+            <a id="pickOrders" class="btn fl-right ticon-box-remove" href="javascript:;">
                 <?php echo $this->translator->translate('Upload orders csv'); ?>
             </a>
-        </footer>
+        </div>
     </div>
 </div>
 
@@ -136,4 +139,3 @@ $this->headLink()
 
 
 
-			

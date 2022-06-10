@@ -228,6 +228,14 @@ $this->headLink()
                                 <?php echo $this->orderConfigForm->getElement('quantity')->setAttrib('class', 'grid_2 alpha fl-right')->renderViewHelper(); ?>
                                 <label class="grid_4 omega" for="cartamount"><?php echo $this->orderConfigForm->getElement('quantity')->getLabel(); ?></label>
                             </p>
+                            <p class="labeled">
+                                <?php echo $this->orderConfigForm->getElement('minimumAmount')->setAttrib('class', 'grid_2 alpha fl-right')->renderViewHelper(); ?>
+                                <label class="grid_4 omega" for="cartamount"><?php echo $this->orderConfigForm->getElement('minimumAmount')->getLabel(); ?></label>
+                            </p>
+                            <p>
+                                <?php echo $this->orderConfigForm->getElement('shippingRestrictionDeliveryOnly')->setAttrib('class', 'grid_2 alpha fl-right')->renderViewHelper(); ?>
+                                <label class="grid_4 omega" for="cartamount"><?php echo $this->orderConfigForm->getElement('shippingRestrictionDeliveryOnly')->getLabel(); ?>:</label>
+                            </p>
                         </fieldset>
                     </form>
             </div>

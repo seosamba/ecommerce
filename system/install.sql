@@ -227,6 +227,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product_option` (
   `parentId` int(10) unsigned DEFAULT NULL,
   `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
   `type` enum('dropdown','radio','text','date','file','textarea', 'additionalpricefield') COLLATE utf8_unicode_ci NOT NULL,
+  `hideDefaultOption` ENUM('0', '1') DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `indTitle` (`title`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -325,11 +326,20 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `partial_percentage` DECIMAL(10,6) DEFAULT '0.00',
   `is_partial` ENUM('0', '1') DEFAULT '0',
   `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
+  `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
+  `second_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
   `partial_purchased_on` timestamp NULL,
+  `is_first_payment_manually_paid` ENUM('0', '1') DEFAULT '0',
+  `is_second_payment_manually_paid` ENUM('0', '1') DEFAULT '0',
+  `is_full_order_manually_paid` ENUM('0', '1') DEFAULT '0',
+  `first_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `second_payment_gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `additional_info` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_gift` enum('0','1') COLLATE 'utf8_unicode_ci' DEFAULT '0',
   `gift_email` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Gift purchase email',
   `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `partial_notification_date` TIMESTAMP NULL,
+  `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -889,6 +899,26 @@ CREATE TABLE IF NOT EXISTS `shopping_product_digital_goods` (
    CONSTRAINT `shopping_product_digital_goods_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
+`id` INT(10) unsigned AUTO_INCREMENT,
+`cart_id` int(10) unsigned NOT NULL,
+`product_id` int(10) unsigned NOT NULL,
+`option_id` int(10) unsigned NOT NULL,
+`cart_content_id` int (10) unsigned NOT NULL,
+`option_title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+`option_type` enum('dropdown','radio','text','date','file') COLLATE utf8_unicode_ci NOT NULL,
+`option_selection_id` int(10) unsigned NULL,
+`title` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`priceValue` decimal(10,4) DEFAULT NULL,
+`priceType` enum('percent','unit') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightSign` enum('+','-') COLLATE utf8_unicode_ci DEFAULT NULL,
+`weightValue` decimal(8,3) DEFAULT NULL,
+`cart_item_key` CHAR(32) NOT NULL,
+`cart_item_option_key` CHAR(32) NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `shopping_allowance_products` (
   `product_id` INT(10) unsigned NOT NULL,
   `allowance_due` date DEFAULT NULL,
@@ -1063,6 +1093,21 @@ SELECT CONCAT('email'),	CONCAT('store_partialpayment'),	NULL,	CONCAT('customer')
 INSERT IGNORE INTO `email_triggers_actions` (`service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject`)
 SELECT CONCAT('email'), CONCAT('store_partialpaymentnotif'),	NULL,	CONCAT('customer'),	CONCAT('Hello {customer:fullname}!<br/><br/>Great news. We have completed another important step in this process, and you have reached the next milestone towards success. Please follow this link and use your credit card <a href=\"{$website:url}{quote:id}.html\"> to securely complete your order</a><br/><br/>Thank you for your business. We appreciate it very much.<br/><br/>Feel free to contact us should you have any questions or concerns.'),	CONCAT('no-reply@{$website:domain}'),	CONCAT('Payment completion stage') FROM email_triggers WHERE NOT EXISTS (SELECT `service`, `trigger`, `template`, `recipient`, `message`, `from`, `subject` FROM `email_triggers_actions` WHERE `service` = 'email' AND `recipient` = 'customer' AND `trigger` = 'store_partialpaymentnotif') LIMIT 1;
 
+CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `creator_id` INT(10) UNSIGNED NOT NULL,
+    `filter_preset_name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+    `filter_preset_data` TEXT NOT NULL,
+    `is_default` ENUM('0', '1') DEFAULT '0',
+    `access` ENUM('all', 'individual') DEFAULT 'individual',
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
+    (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
+
+
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.6' WHERE `name` = 'shopping';
 

@@ -5,7 +5,7 @@
         <option value="<%= brand.name %>" ><%= brand.name %></option>
         <% }); %>
     </select>
-    <input name="newbrand" type="text" placeholder="<%= _.isUndefined(i18n['or create new']) ? 'or create new':i18n['or create new'] %>" />
+    <input id="newbrand" name="newbrand" type="text" placeholder="<%= _.isUndefined(i18n['or create new']) ? 'or create new':i18n['or create new'] %>" />
     <% if (totalProducts) { %>
     <!--<hr />-->
     <!--<label>-->
