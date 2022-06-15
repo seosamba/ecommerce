@@ -19,6 +19,9 @@
                     <div><?php echo $this->translate("Purchased on").' '.date('d M, Y', strtotime($this->order->getPurchasedOn()));?></div>
                 <?php endif;?>
                 <div><?php echo $this->translate("Placed from IP").' '. $this->order->getIpAddress();?></div>
+                <?php if (!empty($this->quoteId)):?>
+                    <div class="mt10px"><?php echo $this->translate("Quote");?>: <a target="_blank" href="<?php echo $this->websiteUrl.$this->quoteId.'.html';?>"><?php echo $this->quoteTitle;?></a></div>
+                <?php endif;?>
             </div>
 
             <div class="grid_6">

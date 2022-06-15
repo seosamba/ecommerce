@@ -1412,6 +1412,22 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->shippingServiceLabel = $shippingServiceLabel;
             }
 
+            $quoteId = '';
+            $quoteTitle = '';
+            $orderId = $order->getId();
+            $quoteEnabled = Tools_Plugins_Tools::findPluginByName('quote');
+            if ($quoteEnabled->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                $quoteMapper = Quote_Models_Mapper_QuoteMapper::getInstance();
+                $quoteModel = $quoteMapper->findByCartId($orderId);
+                if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                    $quoteId = $quoteModel->getId();
+                    $quoteTitle = $quoteModel->getTitle();
+                }
+            }
+
+            $this->_view->quoteId = $quoteId;
+            $this->_view->quoteTitle = $quoteTitle;
+
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
