@@ -941,12 +941,22 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
                     $textInsteadOfResult = true;
                 }
 
-                if (empty($productOptions[$singleOptionName])) {
+                if (isset($productOptions[$singleOptionName]['priceValue']) && $productOptions[$singleOptionName]['priceValue'] == '0.000') {
                     if ($textInsteadOfResult === true) {
                         return $this->_options[1];
                     }
+                }
+
+                if (isset($productOptions[$singleOptionName]) && $productOptions[$singleOptionName]['title'] == '') {
+                    if ($textInsteadOfResult === true) {
+                        return $this->_options[1];
+                    }
+                }
+
+                if (empty($productOptions[$singleOptionName])) {
                     return '';
                 }
+                
                 $singleOpt = $productOptions[$singleOptionName];
                 $options = array();
                 $options[$singleOptionName] = $singleOpt;
