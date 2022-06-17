@@ -919,7 +919,12 @@ class Tools_Misc
 
             if (isset($operationalHoursStoreConfig[$currentDayOfTheWeek]) && !empty($operationalHoursStoreConfig[$currentDayOfTheWeek])) {
                 $operationHoursInfo = $operationalHoursStoreConfig[$currentDayOfTheWeek];
-                if ($operationHoursInfo['from'] <= $currentHourOfTheWeek && $operationHoursInfo['to'] > $currentHourOfTheWeek) {
+                $operationHoursInfoTo = $operationHoursInfo['to'] - 1;
+                if (empty($operationHoursInfoTo)) {
+                    $operationHoursInfoTo = 24;
+                }
+
+                if (($operationHoursInfo['from']-1) <= $currentHourOfTheWeek && $operationHoursInfoTo > $currentHourOfTheWeek) {
                     return false;
                 } else {
                     return true;
