@@ -319,6 +319,11 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
+
+            if (empty($this->_requestedParams['useOperationalHoursForOrders'])){
+                $this->_requestedParams['useOperationalHoursForOrders'] = '0';
+            }
+
             if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
                     if (!empty($subFormValues['operationalHours'])) {
@@ -840,6 +845,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
                         $product->setPrice($productPrice);
 
+                        $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+                        $savedCompanies = $companyProductsMapper->getColByProductIds(array($product->getId()));
+
+                        if(!empty($savedCompanies)) {
+                            $product->setCompanyProducts($savedCompanies);
+                        }
+
                         $this->_view->product = $product;
                     }
 				}
@@ -884,6 +896,9 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
             $this->_view->defaultTaxes = $defaultTaxes;
+
+            $companyMapper = Store_Mapper_CompaniesMapper::getInstance();
+            $this->_view->companies = $companyMapper->fetchAll();
 
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
@@ -1245,6 +1260,22 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 			$this->_view->orders = $orders;
+
+            $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+
+            $currentUserModel = $userMapper->find($customer->getId());
+
+            $userAttributes = array();
+            if($currentUserModel instanceof Application_Model_Models_User) {
+                $userMapper->loadUserAttributes($currentUserModel);
+
+                $userAttributes = $currentUserModel->getAttributes();
+            }
+
+            $this->_view->userAttributes = $userAttributes;
+
+            $allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
+            $this->_view->allGroups = $allGroups;
 		}
 
 		$enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
@@ -1285,7 +1316,15 @@ class Shopping extends Tools_Plugins_Abstract {
         if ($orderId) {
             $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
             if ($order instanceof Models_Model_CartSession) {
+                $isFirstPaymentManuallyPaid = $order->getIsFirstPaymentManuallyPaid();
+                if (!empty($isFirstPaymentManuallyPaid)) {
+                    $order->setIsFullOrderManuallyPaid('1');
+                }
                 $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
+                $order->setGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setSecondPartialPaidAmount(round($order->getTotal() - $order->getFirstPartialPaidAmount(), 2));
+                $order->setSecondPaymentGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setIsSecondPaymentManuallyPaid('1');
                 Models_Mapper_CartSessionMapper::getInstance()->save($order);
                 $this->_responseHelper->success( $this->_translator->translate('Status has been changed'));
             }
@@ -1372,6 +1411,22 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!empty($shippingServiceLabel)) {
                 $this->_view->shippingServiceLabel = $shippingServiceLabel;
             }
+
+            $quoteId = '';
+            $quoteTitle = '';
+            $orderId = $order->getId();
+            $quoteEnabled = Tools_Plugins_Tools::findPluginByName('quote');
+            if ($quoteEnabled->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                $quoteMapper = Quote_Models_Mapper_QuoteMapper::getInstance();
+                $quoteModel = $quoteMapper->findByCartId($orderId);
+                if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                    $quoteId = $quoteModel->getId();
+                    $quoteTitle = $quoteModel->getTitle();
+                }
+            }
+
+            $this->_view->quoteId = $quoteId;
+            $this->_view->quoteTitle = $quoteTitle;
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
@@ -3286,6 +3341,74 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_responseHelper->fail('');
         }
 
+    }
+
+    /**
+     * Update user attributes on Dashboard clients grid
+     *
+     * @return void
+     */
+    public function updateUserAttributeAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam('secureToken', false);
+
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $attributeParamsData = $this->_request->getParams();
+
+            $userId = $attributeParamsData['userId'];
+            $attributeType = $attributeParamsData['attributeType'];
+            $oldFieldValue = $attributeParamsData['oldFieldValue'];
+            $fieldValue = $attributeParamsData['fieldValue'];
+
+            if(!empty($userId)) {
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $currentUserModel = $userMapper->find($userId);
+
+                $userAttributes = array();
+                if($currentUserModel instanceof Application_Model_Models_User) {
+                    $userMapper->loadUserAttributes($currentUserModel);
+
+                    $userAttributes = $currentUserModel->getAttributes();
+                }
+
+                $dbTable = new Zend_Db_Table('user_attributes');
+
+                if(!empty($userAttributes)) {
+                    $dbTable->delete(array('user_id = ?' => $userId));
+
+                    $attributeBelonging = $attributeParamsData['attributeBelonging'];
+
+                    foreach ($userAttributes as $attribute => $value) {
+                        if($attributeType == 'attribute-name') {
+                            if($attribute == $oldFieldValue) {
+                                $attribute = $fieldValue;
+                            }
+                        } elseif ($attributeType == 'attribute-value') {
+                            if($value == $oldFieldValue && $attributeBelonging == $attribute) {
+                                $value = $fieldValue;
+                            }
+                        }
+
+                        $dbTable->insert(array(
+                            'user_id' => $userId,
+                            'attribute' => $attribute,
+                            'value' => $value
+                        ));
+                    }
+
+                    $this->_responseHelper->success($this->_translator->translate('Updated'));
+                }
+
+                $this->_responseHelper->fail($this->_translator->translate('Nothing to delete'));
+            }
+
+            $this->_responseHelper->fail($this->_translator->translate('Empty userId'));
+        }
     }
 
 

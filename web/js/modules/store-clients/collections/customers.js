@@ -18,13 +18,14 @@ define([
         searchTerm: '',
         roleId: '',
         cached: {},
+        clientsFilter: 'clients-only',
         initialize: function(){
             this.bind('reset', this.updatePaginator, this);
         },
         url: function(){
             var url = this.urlRoot + 'for/dashboard/',
                 order = '';
-            url += '?'+'limit='+this.paginator.limit+'&offset='+this.paginator.offset;
+            url += '?'+'limit='+this.paginator.limit+'&offset='+this.paginator.offset+'&clientsFilter='+this.clientsFilter;
             if (this.order.by) {
                 url += '&order=' + this.order.by + ' ' + (this.order.asc ? 'asc' : 'desc');
             }
@@ -61,6 +62,15 @@ define([
         search: function(term){
             if (term !== this.searchTerm){
                 this.searchTerm = escape(term);
+                this.paginator.offset = 0;
+                this.paginator.last = false;
+                this.paginator.order = {by: null,asc: true};
+                return this.fetch();
+            }
+        },
+        clientsFilterAction: function (term) {
+            if (term !== this.clientsFilter){
+                this.clientsFilter = escape(term);
                 this.paginator.offset = 0;
                 this.paginator.last = false;
                 this.paginator.order = {by: null,asc: true};

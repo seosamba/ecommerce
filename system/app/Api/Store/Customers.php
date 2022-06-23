@@ -56,7 +56,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
 			$search = filter_var($this->_request->getParam('search'), FILTER_SANITIZE_SPECIAL_CHARS);
 
             $roleId = filter_var($this->_request->getParam('roleId'), FILTER_SANITIZE_STRING);
-
+            $clientsFilter = filter_var($this->_request->getParam('clientsFilter'), FILTER_SANITIZE_STRING);
 			$currency = Zend_Registry::get('Zend_Currency');
             $where = null;
             if (!empty($id)) {
@@ -92,7 +92,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
                 }
 				return $row;
 			},
-			$customerMapper->listAll($where, $order, $limit, $offset, $search));
+			$customerMapper->listAll($where, $order, $limit, $offset, $search, $clientsFilter));
 		} else {
 			if ($id) {
 				$result = $customerMapper->find($id);

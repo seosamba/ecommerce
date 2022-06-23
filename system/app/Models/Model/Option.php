@@ -30,6 +30,8 @@ class Models_Model_Option extends Application_Model_Models_Abstract {
 	protected $_type;
 	
 	protected $_selection;
+
+	protected $_hideDefaultOption = '0';
 	
 	public function getId() {
 		return $this->_id;
@@ -71,6 +73,24 @@ class Models_Model_Option extends Application_Model_Models_Abstract {
 		$this->_parentId = $_parentId;
 	}
 
+    /**
+     * @return mixed
+     */
+    public function getHideDefaultOption()
+    {
+        return $this->_hideDefaultOption;
+    }
+
+    /**
+     * @param mixed $hideDefaultOption
+     * @return mixed
+     */
+    public function setHideDefaultOption($hideDefaultOption)
+    {
+        $this->_hideDefaultOption = $hideDefaultOption;
+
+        return $this;
+    }
 
 
 }

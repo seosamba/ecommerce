@@ -760,6 +760,9 @@ class Tools_ShoppingCart {
 								if ($defaultSelection['id'] != $selectionId) {
 									continue;
 								}
+
+                                $defaultSelection['hideDefaultOption'] = $defaultOption['hideDefaultOption'];
+
 								$modifiers[$defaultOption['title']] = $defaultSelection;
 							}
 						}
@@ -777,7 +780,8 @@ class Tools_ShoppingCart {
 							'priceType'   => null,
 							'priceValue'  => null,
 							'weightSign'  => null,
-							'weightValue' => null
+							'weightValue' => null,
+                            'hideDefaultOption' => $defaultOption['hideDefaultOption']
 						);
 						break;
                     case Models_Model_Option::TYPE_TEXTAREA:
@@ -792,7 +796,8 @@ class Tools_ShoppingCart {
                             'priceType'   => null,
                             'priceValue'  => null,
                             'weightSign'  => null,
-                            'weightValue' => null
+                            'weightValue' => null,
+                            'hideDefaultOption' => $defaultOption['hideDefaultOption']
                         );
                         break;
                     case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
@@ -808,7 +813,8 @@ class Tools_ShoppingCart {
                             'priceType'   => 'unit',
                             'priceValue'  => preg_replace("/[^0-9.]/", '', $textValue),
                             'weightSign'  => '+',
-                            'weightValue' => '0.000'
+                            'weightValue' => '0.000',
+                            'hideDefaultOption' => $defaultOption['hideDefaultOption']
                         );
                         break;
 				}

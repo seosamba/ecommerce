@@ -126,6 +126,10 @@ Plugin widgets.
     {$postpurchase:isGift:some text here} -> Is a gift message will be returned
     {$postpurchase:giftEmail} -> return receiver gift email
     {$postpurchase:outstandingamount[:clean]} -> outstanding amount
+    {$postpurchase:quoteid} -> show quote id.
+    {$postpurchase:quotetitle} -> show quote title.
+    {$postpurchase:quotecreatedat[:Y-m-d]} -> show quote created at.
+    {$postpurchase:signatureinfo} -> show signature info
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -271,4 +275,11 @@ Example:
 
 {$productcustomparam:select:dogs:readonly} - on the product page
 {$productcustomparam:{$product:id}:select:dogs:readonly} - in the product list
+
+                                Freeshipment
+===========================================================================================================
+ {freeshipment} ... {/freeshipment} - displays content if user eligible for free shipment
+ {freeshipment:not} ... {/freeshipment} -  displays content if user not eligible for free shipment
+
+{$store:freeshippinggoal} - it will return amount required to get free shipment
 

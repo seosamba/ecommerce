@@ -24,7 +24,8 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		$data = array(
 			'title'     => $model->getTitle(),
 			'type'	    => $model->getType(),
-            'parentId'  => $model->getParentId()
+            'parentId'  => $model->getParentId(),
+            'hideDefaultOption' => $model->getHideDefaultOption()
 		);
 		
 		if ($model->getId()){
