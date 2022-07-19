@@ -283,3 +283,6 @@ Example:
 
 {$store:freeshippinggoal} - it will return amount required to get free shipment
 
+
+ {productoptions} ... {/productoptions} - Return wrapper for the single product options on the product page
+

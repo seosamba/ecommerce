@@ -46,7 +46,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	protected function _init(){
 		parent::_init();
 
-		if (in_array('options', $this->_options)){
+		if (in_array('options', $this->_options) || in_array('option', $this->_options)){
 			$layout = Zend_Layout::getMvcInstance();
 			$websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
 			$layout->getView()->headScript()->appendFile($websiteUrl.'plugins/shopping/web/js/product-options.js');
@@ -335,6 +335,32 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		$this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
 		return $this->_view->render('options.phtml');
 	}
+
+    private function _renderOption() {
+        $this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
+        $productOptions = $this->_view->product->getDefaultOptions();
+        $optionFound = false;
+        if (empty($this->_options['0'])) {
+            return '';
+        }
+        $optionInfo = array();
+
+        foreach ($productOptions as $productOption) {
+            if ($productOption['title'] === $this->_options['0']) {
+                $optionFound = true;
+                $optionInfo = $productOption;
+                break;
+            }
+        }
+
+        if ($optionFound === false) {
+            return '';
+        }
+
+        $this->_view->productOption = $optionInfo;
+
+        return $this->_view->render('option.phtml');
+    }
 	
 	private function _renderDescription() {
 		switch (isset($this->_options[0])?$this->_options[0]:'small') {
