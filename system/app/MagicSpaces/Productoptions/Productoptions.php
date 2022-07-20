@@ -20,7 +20,7 @@ class MagicSpaces_Productoptions_Productoptions extends Tools_MagicSpaces_Abstra
         $productMapper = Models_Mapper_ProductMapper::getInstance();
         $product = $productMapper->findByPageId($this->_toasterData['id']);
         if ($product instanceof Models_Model_Product) {
-            return '<div class="product-options-listing" data-productId="'.$product->getId().'">'.$this->_spaceContent.'</div>';
+            return '<div id="product-'.$product->getId().'-options-listing" class="product-options-listing" data-productId="'.$product->getId().'">'.$this->_spaceContent.'</div>';
         }
 
         return '';
