@@ -26,7 +26,8 @@ define([
             'blur input.change-user-attribute': 'changeUserAttr',
             'change select.change-user-attribute': 'changeUserAttr',
             'click th.customer-attribute':'deleteCustomAttr',
-            'change .mobile-phone-country-code':'changeMobileDesktopMask'
+            'change .mobile-phone-country-code':'changeMobileDesktopMask',
+            'click .clients-filter':'clientsFilter',
         },
         initialize: function(){
             $('#customer-details').hide();
@@ -35,6 +36,16 @@ define([
             this.customers.fetch();
         },
         render: function(){
+            var clientsFilter = this.customers.clientsFilter;
+            $.each($('.clients-filter'), function(index, value) {
+                var filterType = $(value).data('filter-type');
+                if(filterType == clientsFilter) {
+                    $(value).addClass('current');
+                } else {
+                    $(value).removeClass('current');
+                }
+            });
+
             $('#customer-list').empty();
             this.customers.each(function(customer){
                 var view = new CustomerRowView({model: customer});
@@ -635,6 +646,11 @@ define([
                     })
                 })
             });
+        },
+        clientsFilter: function (e)
+        {
+            var filterType = $(e.currentTarget).data('filter-type');
+            this.customers.clientsFilterAction(filterType);
         }
     });
 	return StoreClientsView;

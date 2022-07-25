@@ -21,7 +21,7 @@
     <?php if (empty($this->shoppingConfigParams['hideGroupNameFromClientsTab'])) :?>
         <td class="group">
             <?php if(!empty($this->allGroups)):?>
-                <select name="groups">
+                <select class="user-group-${id}" name="groups">
                     <option value="0"><?php echo $this->translate('select');?></option>
                     <?php foreach($this->allGroups as $group): ?>
                         <option {{if group_id == <?php echo $group->getId();?>}} selected="selected" {{/if}} value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
@@ -74,6 +74,10 @@
         <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>plugin/shopping/run/getUsers" method="post">
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
         </form>
+        <div class="btn-group">
+            <button data-filter-type="clients-only" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('Clients Only');?></button>
+            <button data-filter-type="all-accounts" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('All Accounts');?></button>
+        </div>
     </div>
     <?php $removeColumnCount = 0; ?>
     <table id="clients-table" class="widget table-hover hidden">

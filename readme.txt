@@ -60,6 +60,12 @@ Plugin widgets.
     {$product:allowance} - Displays the product allowance end date.
     {$product:wishlistqty} - Displays the product Wishlist qty.
     {$product:minimumorder} - Displays the product minimum order qty.
+    {$product:dimensionswidth[:unit]} - Displays the product dimensions width.
+        unit - length unit from config
+    {$product:dimensionslength[:unit]} - Displays the product dimensions length.
+        unit - length unit from config
+    {$product:dimensionsdepth[:unit]} - Displays the product dimensions depth.
+        unit - length unit from config
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
@@ -112,7 +118,7 @@ Plugin widgets.
     {$postpurchase:totalTax[:clean]} -> total tax
     {$postpurchase:total[:clean]} ->  cart total
     {$postpurchase:referer} -> referer link
-    {$postpurchase:createdAt} -> date when purchase created in d-M-Y format
+    {$postpurchase:createdAt[:d/M/Y]} -> date when purchase created in d-M-Y format. You can set your own date format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:additionalInfo} -> additional info of purchase
@@ -126,6 +132,10 @@ Plugin widgets.
     {$postpurchase:isGift:some text here} -> Is a gift message will be returned
     {$postpurchase:giftEmail} -> return receiver gift email
     {$postpurchase:outstandingamount[:clean]} -> outstanding amount
+    {$postpurchase:quoteid} -> show quote id.
+    {$postpurchase:quotetitle} -> show quote title.
+    {$postpurchase:quotecreatedat[:Y-m-d]} -> show quote created at.
+    {$postpurchase:signatureinfo} -> show signature info
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -271,4 +281,14 @@ Example:
 
 {$productcustomparam:select:dogs:readonly} - on the product page
 {$productcustomparam:{$product:id}:select:dogs:readonly} - in the product list
+
+                                Freeshipment
+===========================================================================================================
+ {freeshipment} ... {/freeshipment} - displays content if user eligible for free shipment
+ {freeshipment:not} ... {/freeshipment} -  displays content if user not eligible for free shipment
+
+{$store:freeshippinggoal} - it will return amount required to get free shipment
+
+
+ {productoptions} ... {/productoptions} - Return wrapper for the single product options on the product page
 

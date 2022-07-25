@@ -81,6 +81,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_negativeStock = 0;
 
+    protected $_companyProducts = '';
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -767,6 +769,25 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCompanyProducts()
+    {
+        return $this->_companyProducts;
+    }
+
+    /**
+     * @param string $companyProducts
+     * @return Models_Model_Product
+     */
+    public function setCompanyProducts($companyProducts)
+    {
+        $this->_companyProducts = $companyProducts;
+        return $this;
+    }
+
 
 
 

@@ -17,11 +17,12 @@ define([
     'text!../templates/company_product_dialog.html',
     'text!../templates/quantity_dialog.html',
     'text!../templates/negative-stock_dialog.html',
+    'text!../templates/promo_dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone, ProductsCollection, BrandsCollection, CompaniesCollection, TagsCollection, TemplatesCollection,
             ProductRowView,
             PaginatorTmpl, TaxDialogTmpl, BrandsDialogTmpl, TagsDialogTmpl, TemplateDialogTmpl, ToggleDialogTmpl, DeleteDialogTmpl,
-            FreeShippingDialogTmpl, CompanyProductDialogTmpl, QuantityDialogTmpl, NegativeStockDialogTmpl, i18n){
+            FreeShippingDialogTmpl, CompanyProductDialogTmpl, QuantityDialogTmpl, NegativeStockDialogTmpl, PromoDialogTmpl, i18n){
     var MainView = Backbone.View.extend({
         el: $('#store-products'),
         events: {
@@ -125,23 +126,29 @@ define([
         },
         brandAction: function(products){
             var self = this;
-            if (!this.brands){
-                this.brands = new BrandsCollection();
-                this.brands.fetch({async: false});
-            }
+            this.brands = new BrandsCollection();
+            this.brands.fetch({async: false});
 
             var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
             var brandButtons = {};
 
             brandButtons[applyButton] = function() {
-                var brand = $.trim($(this).find('input[name=newbrand]').val());
+                var brand = $.trim($(this).find('input[name=newbrand]').val()),
+                    brandValidation = new RegExp(/[^\u0080-\uFFFF\w\s-]+/gi);
+
                 brand = !!brand ? brand : $.trim($(this).find('select[name=brands]').val());
-
-                self.products.batch('PUT', {'brand': brand}, $(this).find('input[name="applyToAll"]').attr('checked') );
-
-                $(this).dialog('close');
+                if(brandValidation.test(brand)){
+                    showMessage(_.isUndefined(i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.'])?'Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.':i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.'], true, 3000);
+                    return false;
+                } else {
+                    if(brand == '' || typeof brand === 'undefined') {
+                        showMessage(_.isUndefined(i18n['Can\'t assign brand. Please select brand or provide new!']) ? 'Can\'t assign brand. Please select brand or provide new!':i18n['Can\'t assign brand. Please select brand or provide new!'], true, 3000);
+                        return false;
+                    }
+                    self.products.batch('PUT', {'brand': brand}, $(this).find('input[name="applyToAll"]').attr('checked') );
+                    $(this).dialog('close');
+                }
             };
-
 
             var dialog = _.template(BrandsDialogTmpl, {
                 brands: this.brands.toJSON(),
@@ -472,6 +479,84 @@ define([
             $(dialog).dialog({
                 dialogClass: 'seotoaster',
                 buttons: negativeStockButtons
+            });
+            return false;
+        },
+        promoAction:function (products){
+            var selectedProducts = products,
+                dialog = _.template(PromoDialogTmpl, {
+                totalProducts: this.products.totalRecords,
+                currencyUnit: $('input[name=currency-unit]').val(),
+                i18n:i18n
+            });
+
+            $(dialog).dialog({
+                dialogClass: 'seotoaster',
+                width: '480',
+                height: '360',
+                open: function(event, ui) {
+                    var promoFrom = $(document).find('#promo-from'),
+                        promoDue = $(document).find('#promo-due');
+
+                    promoFrom.datepicker({
+                        dateFormat: 'd-M-yy',
+                        defaultDate: "+1w",
+                        changeMonth: true,
+                        changeYear: true,
+                        yearRange: "c-5:c+5",
+                        onSelect: function(selectedDate){
+                            promoDue.datepicker("option", "minDate", selectedDate);
+                        }
+                    });
+                    promoDue.datepicker({
+                        dateFormat: 'd-M-yy',
+                        defaultDate: "+1w",
+                        changeMonth: true,
+                        changeYear: true,
+                        yearRange: "c-5:c+5",
+                        onSelect: function(selectedDate){
+                            promoFrom.datepicker("option", "maxDate", selectedDate);
+                        }
+                    });
+
+                    $('#assign-promo-dialog').on('submit',  function(e) {
+                        e.preventDefault();
+                        var promoPrice = $('#promo-price').val(),
+                            promoFrom = $('#promo-from').val(),
+                            promoDue = $('#promo-due').val(),
+                            productIds  = _.pluck(selectedProducts, 'id');
+
+                        if(promoFrom == '' || promoDue == '') {
+                            return showMessage(_.isUndefined(i18n['Wrong date format'])?'Wrong date format':i18n['Wrong date format'], true, 5000);
+                        }
+
+                        if(_.isEmpty(productIds)) {
+                            return showMessage(_.isUndefined(i18n['Please select product'])?'Please select product':i18n['Please select product'] , true, 5000);
+                        }
+
+                        $.ajax({
+                            url: $('#website_url').val()+'plugin/promo/run/assignPromoMass/',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                'promo-price' : promoPrice,
+                                'promo-from'  : promoFrom,
+                                'promo-due'   : promoDue,
+                                'productIds'  : productIds,
+                                'secureToken' : $('#shopping-token').val()
+                            }
+                        }).done(function (response) {
+                            if(response.error == 1) {
+                                showMessage(response.responseText, true, 5000);
+                            } else {
+                                showMessage(response.responseText, false, 3000);
+                            }
+                        });
+                    });
+                },
+                close: function(event, ui){
+                    $(this).dialog('close').remove();
+                }
             });
             return false;
         },

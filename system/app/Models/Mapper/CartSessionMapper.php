@@ -56,7 +56,17 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'partial_percentage'         => $model->getPartialPercentage(),
             'is_partial'                 => $model->getIsPartial(),
             'partial_paid_amount'        => $model->getPartialPaidAmount(),
-            'partial_purchased_on'        => $model->getPartialPurchasedOn()
+            'first_partial_paid_amount'  => $model->getFirstPartialPaidAmount(),
+            'second_partial_paid_amount' => $model->getSecondPartialPaidAmount(),
+            'partial_purchased_on'       => $model->getPartialPurchasedOn(),
+            'partial_type'               => $model->getPartialType(),
+            'partial_notification_date'  => $model->getPartialNotificationDate(),
+            'purchase_error_message'     => $model->getPurchaseErrorMessage(),
+            'is_first_payment_manually_paid'  => $model->getIsFirstPaymentManuallyPaid(),
+            'is_second_payment_manually_paid' => $model->getIsSecondPaymentManuallyPaid(),
+            'is_full_order_manually_paid'     => $model->getIsFullOrderManuallyPaid(),
+            'first_payment_gateway'           => $model->getFirstPaymentGateway(),
+            'second_payment_gateway'          => $model->getSecondPaymentGateway()
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {
@@ -92,6 +102,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
 		$cartSessionContentDbTable->delete(array('cart_id = ?' => $cartSessionId));
         if (!empty($content)) {
+            $cartItemKeys = array();
             foreach ($content as $item) {
 	            $productId = isset($item['product_id']) ? $item['product_id'] : $item['id'];
 
@@ -105,34 +116,117 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
                     'freebies'  => is_null($item['freebies']) ? 0 : $item['freebies'],
                     'is_digital' => isset($item['isDigital']) ? $item['isDigital'] : $item['is_digital']
 	            );
+                $optionsList = array();
 	            if (isset($item['options']) && !empty($item['options'])) {
+                    $productId = isset($item['product_id']) ? $item['product_id'] : $item['id'];
 		            $options = array();
+                    $archiveOptions = array();
 		            foreach ($item['options'] as $optName => $opt) {
 			            $options[$opt['option_id']] = isset($opt['id']) ? $opt['id'] : $opt['title'];
+                        $archiveOptions[$opt['option_id']] = $opt;
 		            }
 		            $data['options'] = http_build_query($options);
+                    $optionsList = http_build_query($options);
 		            unset($options);
 	            }
 
-	            $r = $cartSessionContentDbTable->insert($data);
+                $cartItemKeys[] = Tools_ShoppingCart::generateCartItemKey($cartSessionId, $productId,
+                    $optionsList);
+
+	            $cartSessionContentId = $cartSessionContentDbTable->insert($data);
+                try {
+                    if (!empty($archiveOptions)) {
+                        $this->_processHistoricalOptions($cartSession, $cartSessionContentId, $productId,
+                            $archiveOptions, $optionsList);
+                    }
+                } catch (Exception $e) {
+                    error_log($e->getMessage());
+                    error_log($e->getTraceAsString());
+                    return false;
+                }
+            }
+
+
+            if (!empty($cartItemKeys)) {
+                $cartSessionOptionMapper = Store_Mapper_CartSessionOptionMapper::getInstance();
+                $cartSessionOptionMapper->deleteNotUsedProductOptions($cartItemKeys, $cartSessionId);
             }
         }
         $cartSessionContentDbTable->getAdapter()->commit();
 	}
 
-	/**
-	 * Search for cart session by id
-	 * @param $id
-	 * @return Models_Model_CartSession
-	 */
-	public function find($id) {
+    /**
+     * Process archive (historical) options
+     *
+     * @param Models_Model_CartSession $cartSession
+     * @param int $cartSessionContentId cart session content id
+     * @param int $productId product id
+     * @param array $options product options
+     * @param string $optionsList options plus option selection Ex: 19=791
+     * @throws Exception
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _processHistoricalOptions(
+        Models_Model_CartSession $cartSession,
+        $cartSessionContentId,
+        $productId,
+        $options,
+        $optionsList
+    ) {
+        $cartSessionId = $cartSession->getId();
+        $cartSessionOptionMapper = Store_Mapper_CartSessionOptionMapper::getInstance();
+        $cartOptionMapper = Models_Mapper_OptionMapper::getInstance();
+        $allProductOptions = $cartOptionMapper->getOptions(array_keys($options));
+        foreach ($options as $optionId => $optionData) {
+            $optionSelectionId = $optionData['id'];
+            $cartItemKey = Tools_ShoppingCart::generateCartItemKey($cartSessionId, $productId,
+                $optionsList);
+            $cartItemOptionKey = Tools_ShoppingCart::generateCartItemOptionKey($cartSessionId, $productId,
+                $optionData['option_id'], $optionData['id']);
+
+            if (isset($allProductOptions[$optionId])) {
+                $cartSessionOptionModel = $cartSessionOptionMapper->getByUniqueKeys($cartItemKey, $cartItemOptionKey);
+                if (!$cartSessionOptionModel instanceof Store_Model_CartSessionOption) {
+                    $cartSessionOptionModel = new Store_Model_CartSessionOption();
+                    $cartSessionOptionModel->setCartId($cartSessionId);
+                    $cartSessionOptionModel->setProductId($productId);
+                    $cartSessionOptionModel->setOptionId($optionId);
+                    $cartSessionOptionModel->setOptionTitle($allProductOptions[$optionId]['title']);
+                    $cartSessionOptionModel->setOptionType($allProductOptions[$optionId]['type']);
+                    $cartSessionOptionModel->setTitle($options[$optionId]['title']);
+                    $cartSessionOptionModel->setPriceSign($options[$optionId]['priceSign']);
+                    $cartSessionOptionModel->setPriceValue($options[$optionId]['priceValue']);
+                    $cartSessionOptionModel->setPriceType($options[$optionId]['priceType']);
+                    $cartSessionOptionModel->setWeightSign($options[$optionId]['weightSign']);
+                    $cartSessionOptionModel->setWeightValue($options[$optionId]['weightValue']);
+                    $cartSessionOptionModel->setCartItemKey($cartItemKey);
+                    $cartSessionOptionModel->setCartItemOptionKey($cartItemOptionKey);
+                    $cartSessionOptionModel->setOptionSelectionId($optionSelectionId);
+                }
+
+                $cartSessionOptionModel->setCartContentId($cartSessionContentId);
+                $cartSessionOptionMapper->save($cartSessionOptionModel);
+            }
+        }
+
+    }
+
+    /**
+     * Search for cart session by id
+     * @param $id
+     * @param bool $withArchiveOptions get data with archive options
+     * @return Models_Model_CartSession
+     * @throws Exceptions_SeotoasterException
+     * @throws Zend_Db_Table_Exception
+     */
+	public function find($id, $withArchiveOptions = false) {
 		$result = $this->getDbTable()->find($id);
 		if(0 == count($result)) {
 			return null;
 		}
 		$row = $result->current();
 		if ($row) {
-			return $this->_toModel($row);
+			return $this->_toModel($row, $withArchiveOptions);
 		}
 		return null;
 	}
@@ -148,7 +242,13 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		return $entries;
 	}
 
-	private function _toModel(Zend_Db_Table_Row_Abstract $row) {
+    /**
+     * @param Zend_Db_Table_Row_Abstract $row
+     * @param bool $withArchiveOptions get data with archive options
+     * @return mixed
+     * @throws Exceptions_SeotoasterException
+     */
+	private function _toModel(Zend_Db_Table_Row_Abstract $row, $withArchiveOptions = false) {
 		$model = new $this->_model($row->toArray());
 		$contentTable = new Models_DbTable_CartSessionContent();
 		$select = $contentTable->select()
@@ -159,11 +259,19 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 		$content = $contentTable->fetchAll($select)->toArray();
 		if (!empty($content)){
 			$cartId = $model->getId();
+            if ($withArchiveOptions === true) {
+                $archiveOptions = $this->_restoreArchiveOptionsForCartSession($cartId);
+            }
 
 			foreach ($content as &$item) {
 				if (!empty($item['options'])) {
 					parse_str($item['options'], $tmpOptions);
 					$options = $this->_restoreOptionsForCartSession($tmpOptions);
+					if (!empty($archiveOptions) && isset($archiveOptions[$item['id']])) {
+                        $item['archiveOptions'] = $archiveOptions[$item['id']];
+                    } else {
+                        $item['archiveOptions'] = array();
+                    }
 					$item['options'] = empty($options) ? null : $options;
 				}
 			}
@@ -226,6 +334,28 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 	}
 
     /**
+     * Restore archive product options
+     *
+     * @param int $cartId cart id
+     * @return array
+     */
+    protected function _restoreArchiveOptionsForCartSession($cartId)
+    {
+        $cartSessionOptionMapper = Store_Mapper_CartSessionOptionMapper::getInstance();
+        $archiveOptions = $cartSessionOptionMapper->getByCartId($cartId);
+        $preparedOptions = array();
+        if (empty($archiveOptions)) {
+            return array();
+        }
+
+        foreach ($archiveOptions as $archiveOption) {
+            $preparedOptions[$archiveOption['cart_content_id']][$archiveOption['option_title']] = $archiveOption;
+        }
+
+        return $preparedOptions;
+    }
+
+    /*
      * Fetch orders  with quotes by user id including recurring payments data
      *
      * @param int $userId user Id
@@ -264,7 +394,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 						'priceType'   => null,
 						'priceValue'  => null,
 						'weightSign'  => null,
-						'weightValue' => null
+						'weightValue' => null,
+                        'hideDefaultOption' => $option->getHideDefaultOption()
 					);
 					break;
                 case Models_Model_Option::TYPE_TEXTAREA:
@@ -275,7 +406,8 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
                         'priceType'   => null,
                         'priceValue'  => null,
                         'weightSign'  => null,
-                        'weightValue' => null
+                        'weightValue' => null,
+                        'hideDefaultOption' => $option->getHideDefaultOption()
                     );
                     break;
                 case Models_Model_Option::TYPE_ADDITIONALPRICEFIELD:
@@ -298,6 +430,9 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 					$result[$option->getTitle()] = current(array_filter($selections, function($sel) use ($value) {
 						return $sel['id'] === $value;
 					}));
+
+                    $result[$option->getTitle()]['hideDefaultOption'] = $option->getHideDefaultOption();
+
 					break;
 			}
 		}
