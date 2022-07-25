@@ -484,6 +484,30 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 }
             }
 
+            $lengthUnit = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('lengthUnit');
+
+            $prodWidth = $product->getProdWidth();
+            $prodWidthUnit = $prodWidth . ' ' . $lengthUnit;
+            $prodLength = $product->getProdLength();
+            $prodLengthUnit = $prodLength . ' ' . $lengthUnit;
+            $prodDepth = $product->getProdDepth();
+            $prodDepthUnit = $prodDepth . ' ' . $lengthUnit;
+
+            if(empty($prodWidth) || $prodWidth == '0.00') {
+                $prodWidth = '';
+                $prodWidthUnit = '';
+            }
+
+            if(empty($prodLength) || $prodLength == '0.00') {
+                $prodLength = '';
+                $prodLengthUnit = '';
+            }
+
+            if(empty($prodDepth) || $prodDepth == '0.00') {
+                $prodDepth = '';
+                $prodDepthUnit = '';
+            }
+
             $dictionary = array(
                 '$product:name'                       => htmlspecialchars($product->getName(),ENT_QUOTES,'UTF-8'),
                 '$product:url'                        => $product->getPage() ? $websiteUrl . $product->getPage()->getUrl() : null,
@@ -502,7 +526,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 '$product:inventory'                  => $inventoryCount,
                 '$product:qty'                        => $productQty,
                 '$product:wishlistqty'                => $product->getWishlistQty(),
-                '$product:minimumorder'               => $product->getMinimumOrder()
+                '$product:minimumorder'               => $product->getMinimumOrder(),
+                '$product:dimensionswidth'            => $prodWidth,
+                '$product:dimensionswidth:unit'       => $prodWidthUnit,
+                '$product:dimensionslength'           => $prodLength,
+                '$product:dimensionslength:unit'      => $prodLengthUnit,
+                '$product:dimensionsdepth'            => $prodDepth,
+                '$product:dimensionsdepth:unit'       => $prodDepthUnit
             );
 
             if (isset($data['priceFilter'])) {
