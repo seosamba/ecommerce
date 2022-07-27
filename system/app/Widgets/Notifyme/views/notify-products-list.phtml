@@ -2,7 +2,9 @@
     <div class="product-list">
         <?php echo $this->plContent; ?>
         <?php if ($this->totalCount >= $this->limit): ?>
-            <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>"><?php echo $this->translate('show more'); ?></a>
+            <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>">
+                <span class="<?php echo $id; ?>-show-more"><?php echo $this->translate('show more'); ?></span>
+            </a>
         <?php endif; ?>
     </div>
 <?php if ($this->totalCount >= $this->limit): ?>
@@ -10,6 +12,8 @@
         $('#<?php echo $id; ?>').on('click', function(e){
             e.preventDefault();
             $(this).hide();
+
+            $('.<?php echo $id; ?>-show-more').removeClass('products-loaded').addClass('products-loading');
 
             var self = this,
                 nextpage = $(this).data('nextpage') || 1,
@@ -25,6 +29,9 @@
             $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/rendernotifiedlistproducts/', filters, function(response) {
                 hideSpinner();
                 $(self).show();
+
+                $('.<?php echo $id; ?>-show-more').removeClass('products-loading').addClass('products-loaded');
+
                 if (response) {
                     $(self).before(response);
                     $(self).data('nextpage', ++nextpage);
