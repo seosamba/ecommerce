@@ -15,8 +15,10 @@
     <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
     <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>
     <input type="hidden" name="currency-unit" value="<?php echo $this->currencyUnit ;?>"/>
-    <div class="search-line clearfix search-block-element">
-        <input type="text" class="pfilter grid_3 alpha omega mb20px search-input" name="productsearch" placeholder="<?php echo $this->translate('search by name, SKU, MPN') ?>" >
+    <div class="search-line clearfix">
+        <span class="search-block-element grid_3 alpha omega mb20px ">
+            <input type="text" class="pfilter search-input" name="productsearch" placeholder="<?php echo $this->translate('search by name, SKU, MPN') ?>" >
+        </span>
         <div class="grid_9 omega">
             <div class="grid_4 alpha t-grid_3 t-alpha mb20px">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">

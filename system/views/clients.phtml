@@ -70,8 +70,8 @@
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="clients" class="toaster-widget">
     <div class="search-line mt20px mb20px clearfix hidden">
-        <span class="search-block-element">
-            <input type="text" id="clients-search" class="grid_6 alpha search-input" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
+        <span class="search-block-element grid_6 alpha">
+            <input type="text" id="clients-search" class="search-input" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
         </span>
         <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>plugin/shopping/run/getUsers" method="post">
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
