@@ -2,8 +2,8 @@
     <div class="product-list">
         <?php echo $this->plContent; ?>
         <?php if ($this->totalCount >= $this->limit): ?>
-            <a href="#<?php echo $id;?>" class="show-more" id="<?php echo $id; ?>">
-                <span class="<?php echo $id; ?>-show-more"><?php echo $this->translate('show more'); ?></span>
+            <a href="#<?php echo $id;?>" class="show-more <?php echo $id; ?>-show-more" id="<?php echo $id; ?>">
+                <span><?php echo $this->translate('show more'); ?></span>
             </a>
         <?php endif; ?>
     </div>

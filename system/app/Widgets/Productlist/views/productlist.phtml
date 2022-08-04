@@ -45,8 +45,8 @@
         <input type="hidden" name="<?php echo $id; ?>_filters"
                data-filters-default='<?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>'>
         <?php if ($this->totalCount >= $this->limit): ?>
-            <a href="#<?php echo $id; ?>" class="show-more" id="<?php echo $id; ?>" data-sort="<?php echo $this->sort; ?>">
-                <span class="<?php echo $id; ?>-show-more"><?php echo $this->translate('show more'); ?></span>
+            <a href="#<?php echo $id; ?>" class="show-more <?php echo $id; ?>-show-more" id="<?php echo $id; ?>" data-sort="<?php echo $this->sort; ?>">
+                <span><?php echo $this->translate('show more'); ?></span>
             </a>
         <?php endif; ?>
 <?php if(empty($this->unwrap)): ?>
