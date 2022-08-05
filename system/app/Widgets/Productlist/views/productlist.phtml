@@ -45,8 +45,9 @@
         <input type="hidden" name="<?php echo $id; ?>_filters"
                data-filters-default='<?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>'>
         <?php if ($this->totalCount >= $this->limit): ?>
-            <a href="#<?php echo $id; ?>" class="show-more" id="<?php echo $id; ?>"
-               data-sort="<?php echo $this->sort; ?>"><?php echo $this->translate('show more'); ?></a>
+            <a href="#<?php echo $id; ?>" class="show-more <?php echo $id; ?>-show-more" id="<?php echo $id; ?>" data-sort="<?php echo $this->sort; ?>">
+                <span><?php echo $this->translate('show more'); ?></span>
+            </a>
         <?php endif; ?>
 <?php if(empty($this->unwrap)): ?>
     </div>
@@ -160,7 +161,9 @@
 <script>
     $('#<?php echo $id; ?>').on('click', function (e) {
         e.preventDefault();
-        $(this).hide();
+        //$(this).hide();
+
+        $('.<?php echo $id; ?>-show-more').removeClass('products-loaded').addClass('products-loading');
 
         var self = this,
             nextpage = $(this).data('nextpage') || 1,
@@ -181,6 +184,9 @@
         $.post('<?php echo $this->websiteUrl; ?>plugin/shopping/run/renderproducts/', filters, function (response) {
             hideSpinner();
             $(self).show();
+
+            $('.<?php echo $id; ?>-show-more').removeClass('products-loading').addClass('products-loaded');
+
             if (response) {
                 $('input[name="<?php echo $id;?>_filters"]').before(response);
                 $(self).data('nextpage', ++nextpage);
