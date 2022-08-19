@@ -90,6 +90,11 @@ define(['backbone',
                         withDetailedFilters = true;
                     }
 
+                    if (typeof options.filter_client_group !== 'undefined') {
+                        $('#filter-client-group').val(options.filter_client_group.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (typeof options.filter_state !== 'undefined') {
                         $('#filter-state').val(options.filter_state.split(',')).trigger('chosen:updated');
                         withDetailedFilters = true;
@@ -150,7 +155,8 @@ define(['backbone',
                         'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
                         'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val(),
                         'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; },
-                        'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; }
+                        'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; },
+                        'filter-client-group': $('select[name=filter-client-group]', '#store-orders form.filters').val()
                     };
                 }
             });
@@ -204,7 +210,8 @@ define(['backbone',
                     'filter_state': $('#filter-state').val(),
                     'filter_carrier': $('#filter-carrier').val(),
                     'exclude_quotes_from_search': $('input[name=exclude-quotes-from-search]:checked').val(),
-                    'is_a_gift': $('input[name=is-a-gift]:checked').val()
+                    'is_a_gift': $('input[name=is-a-gift]:checked').val(),
+                    'filter_client_group':$('#filter-client-group').val()
                 };
 
                 var formParams = {'filter_preset_name':filterPresetName,'is_default': filterPresetDefault,

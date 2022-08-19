@@ -108,6 +108,16 @@ $this->headLink()
                         <?php endif; ?>
                     </select>
                 </p>
+                <p class="grid_3 alpha t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By Client Group');?></label>
+                    <select class="filter" multiple id="filter-client-group" name="filter-client-group" data-placeholder="<?php echo $this->translate('show all');?>">
+                        <?php if (!empty($this->customerGroups)) : ?>
+                            <?php foreach ($this->customerGroups as $groupId => $groupName): ?>
+                                <option value="<?php echo $groupId; ?>" <?php echo (!empty($this->presetConfig['filter_client_group']) && in_array($groupId, $this->presetConfig['filter_client_group'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($groupName);?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </p>
                 <p class="grid_2 alpha <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?> recurring-filters t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
                     <?php echo $this->formSelect('filter-recurring-order-type', (!empty($this->presetConfig['filter_recurring_order_type'])) ? $this->presetConfig['filter_recurring_order_type'] : null, array(
@@ -141,7 +151,7 @@ $this->headLink()
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
                 </p>
-                <div class="grid_8 omega">
+                <div class="grid_8 omega alpha">
                     <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
                     <?php
                     $countryList = Tools_Geo::getCountries(true);

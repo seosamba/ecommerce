@@ -60,6 +60,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				->joinLeft(array('u' => 'user'), 'u.id = order.user_id', array(
 					'full_name', 'email', 'originalTotal' => new Zend_Db_Expr('SUM(order.total+order.refund_amount)')
 				))
+                ->joinLeft(array('sci'=>'shopping_customer_info'), 'sci.user_id=order.user_id',
+                    array())
                 ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
                     array('real_order_id'=>'imp.real_order_id'))
                 ->joinLeft(array('shrp'=>'shopping_recurring_payment'), 'shrp.cart_id=order.id',
@@ -391,6 +393,10 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             $select->where('imp.real_order_id IS NULL');
                             $select->where('order.order_subtype = ?', strtolower($val));
                         }
+                        break;
+                    case 'filter-client-group':
+                        $val = filter_var_array($val, FILTER_SANITIZE_NUMBER_INT);
+                        $select->where('sci.group_id IN (?)', $val);
                         break;
                     case 'filter-recurring-order-type':
                         $val = filter_var($val, FILTER_SANITIZE_STRING);
