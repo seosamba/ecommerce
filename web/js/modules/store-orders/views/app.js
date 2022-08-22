@@ -331,6 +331,12 @@ define(['backbone',
                     $('.recurring-filters').addClass('hidden');
                 }
 
+                if (!_.isUndefined(filtersData.filter_client_group) && !_.isEmpty(filtersData.filter_client_group)) {
+                    $('#filter-client-group').val(filtersData.filter_client_group).trigger("chosen:updated");
+                } else {
+                    $('#filter-client-group').val(0).trigger("chosen:updated");
+                }
+
                 if (!_.isUndefined(filtersData.filter_country) && !_.isEmpty(filtersData.filter_country)) {
                     $('#filter-country').val(filtersData.filter_country).trigger("chosen:updated");
                 } else {
