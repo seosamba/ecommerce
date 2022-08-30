@@ -3427,7 +3427,14 @@ class Shopping extends Tools_Plugins_Abstract {
     public static function getApiProducts($data)
     {
 
-        //$data = array('limit' => 4, 'offset' => '');
+//        $data = array(
+//            'limit' => 4,
+//            'offset' => '',
+//            'searchParams' =>
+//                array(
+//                    'productName' => 'Académiq'
+//                )
+//        );
 
         if (empty($data) || empty($data['limit'])) {
             return array('error' => '1', 'message' => 'Missing limit query limit');
@@ -3441,6 +3448,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
         $productMapper = Models_Mapper_ProductMapper::getInstance();
         $where = $productMapper->getDbTable()->getAdapter()->quoteInto('enabled = ?', '1');
+
+        if (!empty($data['searchParams'])) {
+            if (!empty($data['searchParams']['productName'])) {
+                $searchProductName = $data['searchParams']['productName'];
+                $where .= ' AND '. $productMapper->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?', '%' .$searchProductName. '%');
+            }
+        }
 
         $productsDataInfo = $productMapper->fetchAllData($where, null, $limit, $offset);
 
