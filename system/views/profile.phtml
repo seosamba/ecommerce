@@ -53,7 +53,7 @@ $this->headScript()
                     <?php if(!empty($this->allGroups)) :?>
                         <div class="fl-right grid_5 omega">
                             <select class="user-groups" name="user-groups">
-                                <option value="0"><?php echo $this->translate('Group');?></option>
+                                <option value="0"><?php echo $this->translate('Select group');?></option>
                                 <?php foreach($this->allGroups as $group): ?>
                                     <option <?php echo ($group->getId() == $this->customer->getGroupId()) ? 'selected="selected"' : '';?> value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
                                 <?php endforeach;?>
