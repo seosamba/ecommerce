@@ -87,15 +87,15 @@ class Api_Store_Groups extends Api_Service_Abstract {
 		}
         $translator = Zend_Registry::get('Zend_Translate');
         if(trim($data['groupName']) == ''){
-            $this->_error($translator->translate('Group Name Can\'t be empty'));
+            $this->_error(htmlentities($translator->translate('Group Name Can\'t be empty')));
         }
 
         if(!is_numeric($data['priceValue'])){
-            $this->_error($translator->translate('Price Value must be numeric'));
+            $this->_error(htmlentities($translator->translate('Price Value must be numeric')));
         }
 
         if(trim($data['priceValue']) == ''){
-            $this->_error($translator->translate('Price Value Can\'t be empty'));
+            $this->_error(htmlentities($translator->translate('Price Value Can\'t be empty')));
         }
 
         $data['groupName'] = trim($data['groupName']);
