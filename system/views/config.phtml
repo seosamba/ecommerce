@@ -7,7 +7,7 @@ $this->headLink()
 ?>
 
 <div id="config" class="seotoaster f-container">
-    <div class="header">
+    <div>
         <?php
         echo $this->partial(
             'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -21,7 +21,7 @@ $this->headLink()
         <div class="tabs-nav-wrap">
             <span class="arrow w5 omega left ticon-arrow-left3"></span>
             <span class="arrow w5 right ticon-arrow-right3"></span>
-            <ul>
+            <ul class="header">
                 <?php $subForms = $this->form->getSubForms(); ?>
                 <?php foreach ($subForms as $subform): ?>
                     <?php if($subform->getId() == 'notifications'){
