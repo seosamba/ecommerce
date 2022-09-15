@@ -6,39 +6,42 @@ $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
-<div id="config" class="seotoaster container">
-<?php
-    echo $this->partial(
-        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
-        array(
-            'helpSection' => $this->helpSection,
-            'hashMap'     => Tools_Misc::$_helpHashMap
-        )
-    );
-?>
-    <div class="tabs-nav-wrap">
-    <span class="arrow w5 omega left ticon-arrow-left3"></span>
-    <span class="arrow w5 right ticon-arrow-right3"></span>
-    <ul class="header">
-	    <?php $subForms = $this->form->getSubForms(); ?>
-        <?php foreach ($subForms as $subform): ?>
-            <?php if($subform->getId() == 'notifications'){
-                continue;
-            }?>
-            <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $this->translate($subform->getLegend()); ?></a></li>
-        <?php endforeach; ?>
-        <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
-            <?php foreach($this->configTabs as $configTab): ?>
-                <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
-            <?php endforeach; ?>
-        <?php endif; ?>
-        <?php if(!empty($subForms['notifications'])):?>
-            <li><a href="#<?php echo $subForms['notifications']->getId(); ?>-tab"><?php echo $this->translate($subForms['notifications']->getLegend()); ?></a></li>
-        <?php endif;?>
-	</ul>
+<div id="config" class="seotoaster f-container">
+    <div class="header">
+        <?php
+        echo $this->partial(
+            'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+            array(
+                'helpSection' => $this->helpSection,
+                'hashMap'     => Tools_Misc::$_helpHashMap
+            )
+        );
+        ?>
+
+        <div class="tabs-nav-wrap">
+            <span class="arrow w5 omega left ticon-arrow-left3"></span>
+            <span class="arrow w5 right ticon-arrow-right3"></span>
+            <ul>
+                <?php $subForms = $this->form->getSubForms(); ?>
+                <?php foreach ($subForms as $subform): ?>
+                    <?php if($subform->getId() == 'notifications'){
+                        continue;
+                    }?>
+                    <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $this->translate($subform->getLegend()); ?></a></li>
+                <?php endforeach; ?>
+                <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
+                    <?php foreach($this->configTabs as $configTab): ?>
+                        <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <?php if(!empty($subForms['notifications'])):?>
+                    <li><a href="#<?php echo $subForms['notifications']->getId(); ?>-tab"><?php echo $this->translate($subForms['notifications']->getLegend()); ?></a></li>
+                <?php endif;?>
+            </ul>
+        </div>
     </div>
     <?php $useOperationalHoursForOrders = '';?>
-	<form  style="overflow-y: auto;" class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+	<form class="f-content" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
     <?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">
             <?php $hoursFrom = array('0' => $this->translate('From')) + Tools_Misc::$_hoursUnits;?>
@@ -206,9 +209,10 @@ $this->headLink()
         <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>">
     </form>
 
-	<?php //echo $this->form; ?>
-    <div class="footer grid_12">
-	    <button id="save-btn" class="btn ticon-save mr-grid"><?php echo $this->translate('Save');?></button>
+    <div class="f-footer">
+        <div class="grid_12">
+            <button id="save-btn" class="btn ticon-save"><?php echo $this->translate('Save');?></button>
+        </div>
     </div>
 </div>
 
