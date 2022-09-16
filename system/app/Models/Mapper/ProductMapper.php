@@ -329,6 +329,85 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
     }
 
     /**
+     *
+     * @param string $where SQL where clause
+     * @param string $order OPTIONAL An SQL ORDER clause.
+     * @param int $limit OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
+     * @param bool $withoutCount flag to get with or without records quantity
+     * @param bool $singleRecord flag fetch single record
+     * @param string $having mysql having
+     *
+     * @return array
+     */
+    public function fetchAllData(
+        $where = null,
+        $order = null,
+        $limit = null,
+        $offset = null,
+        $withoutCount = false,
+        $singleRecord = false,
+        $having = ''
+    ) {
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sp' => 'shopping_product'),
+                array(
+                    'sp.*'
+                )
+            )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array('p.url'))
+             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array('brandName' => 'sb.name'));
+
+        if (!empty($having)) {
+            $select->having($having);
+        }
+
+        $select->group('sp.id');
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        if (!empty($where)) {
+            $select->where($where);
+        }
+
+        $select->limit($limit, $offset);
+
+        if ($singleRecord) {
+            $data = $this->getDbTable()->getAdapter()->fetchRow($select);
+        } else {
+            $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+        }
+
+        if ($withoutCount === false) {
+            $select->reset(Zend_Db_Select::COLUMNS);
+            $select->reset(Zend_Db_Select::FROM);
+            $select->reset(Zend_Db_Select::LIMIT_OFFSET);
+            $select->reset(Zend_Db_Select::LIMIT_COUNT);
+
+            $count = array('count' => new Zend_Db_Expr('COUNT(DISTINCT(sp.id))'));
+
+            $select->from(array('sp' => 'shopping_product'), $count);
+
+            $select =  $this->getDbTable()->getAdapter()->select()
+                ->from(
+                    array('subres' => $select),
+                    array('count' => 'SUM(count)')
+                );
+
+            $count = $this->getDbTable()->getAdapter()->fetchRow($select);
+
+            return array(
+                'totalRecords' => $count['count'],
+                'data' => $data,
+                'offset' => $offset,
+                'limit' => $limit
+            );
+        } else {
+            return $data;
+        }
+    }
+
+    /**
      * Returned products array
      */
     public function fetchAllProductByParams (
