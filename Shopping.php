@@ -177,6 +177,16 @@ class Shopping extends Tools_Plugins_Abstract {
 	);
 
     /**
+     * Plugin api actions
+     *
+     * @return array
+     */
+    public static function pluginApiActions()
+    {
+        return array('getApiProducts');
+    }
+
+    /**
      * @var null|Zend_Layout
      */
     protected $_layout = null;
@@ -273,6 +283,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		Zend_Registry::set('acl', $acl);
         Tools_System_Tools::firePluginMethodByTagName('salespermission', 'extendPermission');
+
+        //self::getApiProducts(array());
 	}
 
 	public function run($requestedParams = array()) {
@@ -3412,6 +3424,79 @@ class Shopping extends Tools_Plugins_Abstract {
     }
 
 
+    public static function getApiProducts($data)
+    {
+
+//        $data = array(
+//            'limit' => 4,
+//            'offset' => '',
+//            'searchParams' =>
+//                array(
+//                    'productName' => 'Académiq'
+//                )
+//        );
+
+        if (empty($data) || empty($data['limit'])) {
+            return array('error' => '1', 'message' => 'Missing limit query limit');
+        }
+
+        $limit = $data['limit'];
+        $offset = null;
+        if ($data['offset']) {
+            $offset = $data['offset'];
+        }
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $where = $productMapper->getDbTable()->getAdapter()->quoteInto('enabled = ?', '1');
+
+        if (!empty($data['searchParams'])) {
+            if (!empty($data['searchParams']['productName'])) {
+                $searchProductName = $data['searchParams']['productName'];
+                $where .= ' AND '. $productMapper->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?', '%' .$searchProductName. '%');
+            }
+        }
+
+        $productsDataInfo = $productMapper->fetchAllData($where, null, $limit, $offset);
+
+        if (empty($productsDataInfo) || empty($productsDataInfo['data'])) {
+            return array();
+        }
+
+        $productInfo = array();
+
+        $currency = Zend_Registry::get('Zend_Currency');
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+        $websiteUrl = $websiteHelper->getUrl();
+        $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
+        foreach ($productsDataInfo['data'] as $key => $product) {
+            $productPageUrl = $product['url'];
+            $productInfo[$key]['id'] = $product['id'];
+            $productInfo[$key]['title'] = $product['name'];
+            $productInfo[$key]['sku'] = $product['sku'];
+            $productInfo[$key]['link'] = $websiteUrl . $productPageUrl;
+            $productInfo[$key]['short_description'] = $product['short_description'];
+            $productInfo[$key]['full_description'] = $product['full_description'];
+            $productInfo[$key]['brand'] = $product['brandName'];
+            $productInfo[$key]['mpn'] = $product['mpn'];
+            $productInfo[$key]['gtin'] = $product['gtin'];
+            $productInfo[$key]['imageLinkSmall'] = Tools_Misc::prepareProductImage($product['photo'], 'small');
+
+            $productModel = $productMapper->find($product['id']);
+
+            if ($productModel->getCurrentPrice() !== null && $productModel->getExtraProperties()) {
+                $productModel->setCurrentPrice(null);
+            }
+
+            $price = number_format(Tools_ShoppingCart::getInstance()->calculateProductPrice($productModel, $productModel->getDefaultOptions()), 2, '.', '');
+            $productInfo[$key]['price'] = $price;
+            $productInfo[$key]['priceWithCurrency'] = $currency->toCurrency($price);
+        }
+
+        $productsDataInfo['data'] = $productInfo;
+
+        return $productsDataInfo;
+    }
 
 
 }

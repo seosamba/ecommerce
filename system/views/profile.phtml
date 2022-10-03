@@ -53,7 +53,7 @@ $this->headScript()
                     <?php if(!empty($this->allGroups)) :?>
                         <div class="fl-right grid_5 omega">
                             <select class="user-groups" name="user-groups">
-                                <option value="0"><?php echo $this->translate('select');?></option>
+                                <option value="0"><?php echo $this->translate('Select group');?></option>
                                 <?php foreach($this->allGroups as $group): ?>
                                     <option <?php echo ($group->getId() == $this->customer->getGroupId()) ? 'selected="selected"' : '';?> value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
                                 <?php endforeach;?>
@@ -74,8 +74,10 @@ $this->headScript()
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
-					if ($lastSeen < 7) {
-						$lastSeenStamp = date('l', strtotime($this->translate('days').' '.$lastSeen.' '.$this->translate('ago')));
+					if ($lastSeen < 7 && $lastSeen > 0) {
+						$lastSeenStamp =  $this->translate(date('l', strtotime('-'.$lastSeen.'ago')));
+					} elseif($lastSeen === 0) {
+                        $lastSeenStamp = $this->translate('today');
 					} else {
 						$lastSeenStamp = $this->translate('days').' '.$lastSeen.' '.$this->translate('ago');
 					}

@@ -205,7 +205,11 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
             $this->_view->orderStatuses = $orderStatuses;
 
+            $customerGroupsMapper = Store_Mapper_GroupMapper::getInstance();
+            $customerGroups = $customerGroupsMapper->fetchPairs();
+
             $this->_view->countriesList = Tools_Geo::getCountries(true);
+            $this->_view->customerGroups = $customerGroups;
 
 			return $this->_view->render('orders.phtml');
 		}

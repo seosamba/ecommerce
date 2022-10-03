@@ -786,12 +786,20 @@ class Tools_Misc
                 $parser = new Tools_Content_Parser($templateContent, $page, $parserOptions);
                 $content = $parser->parse();
 
-                if (!defined('_MPDF_TEMP_PATH')) {
-                    define('_MPDF_TEMP_PATH', $pdfPath);
-                }
-                require_once($websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'system/library/mpdf/mpdf.php');
+//                if (!defined('_MPDF_TEMP_PATH')) {
+//                    define('_MPDF_TEMP_PATH', $pdfPath);
+//                }
+//                require_once($websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'system/library/mpdf/mpdf.php');
 
-                $pdfFile = new mPDF('utf-8', 'A4');
+//                $pdfFile = new mPDF('utf-8', 'A4');
+                $pdfTmpPath = $websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR . 'invoices' . DIRECTORY_SEPARATOR;
+                require_once($websiteConfig['path'] . 'plugins' . DIRECTORY_SEPARATOR . 'invoicetopdf' . DIRECTORY_SEPARATOR.'system/library/mpdflatest/vendor/autoload.php');
+
+                $pdfFile = new \Mpdf\Mpdf([
+                    'mode' => 'utf-8',
+                    'format' => 'A4',
+                    'tempDir' => $pdfTmpPath
+                ]);
                 $pdfFile->WriteHTML($content);
 
                 if (isset($data['packing'])) {

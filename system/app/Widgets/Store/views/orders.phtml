@@ -28,9 +28,15 @@ $this->headLink()
         <form class="filters mb30px clearfix">
             <div class="grid_12 alpha omega">
                 <label class="h2 mt20px"><?php echo $this->translate('Search');?></label>
-                <input type="text" class="filter grid_3 alpha t-grid_2 t-alpha" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
-                <input type="text" class="filter grid_3 t-grid_2" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
-                <input type="text" class="filter grid_3 omega t-grid_2 t-omega" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
+                <div class="grid_3 alpha t-grid_2 t-alpha search-block-element">
+                    <input type="text" class="filter search-input" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
+                </div>
+                <div class="grid_3 t-grid_2 search-block-element">
+                    <input type="text" class="filter search-input" name="filter-product-key" placeholder="<?php echo $this->translate('by product name, sku, mpn');?>">
+                </div>
+                <div class="grid_3 omega t-grid_2 t-omega search-block-element">
+                    <input type="text" class="filter search-input" name="user-name" placeholder="<?php echo $this->translate('by name');?>">
+                </div>
                 <div id="extra-filters-switch" class="fl-right"><a class="btn icon-arrow-down2" href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
             </div>
             <fieldset id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
@@ -108,6 +114,16 @@ $this->headLink()
                         <?php endif; ?>
                     </select>
                 </p>
+                <p class="grid_3 alpha t-grid_3">
+                    <label class="text-bold"><?php echo $this->translate('By Client Group');?></label>
+                    <select class="filter" multiple id="filter-client-group" name="filter-client-group" data-placeholder="<?php echo $this->translate('show all');?>">
+                        <?php if (!empty($this->customerGroups)) : ?>
+                            <?php foreach ($this->customerGroups as $groupId => $groupName): ?>
+                                <option value="<?php echo $groupId; ?>" <?php echo (!empty($this->presetConfig['filter_client_group']) && in_array($groupId, $this->presetConfig['filter_client_group'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($groupName);?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </p>
                 <p class="grid_2 alpha <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?> recurring-filters t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
                     <?php echo $this->formSelect('filter-recurring-order-type', (!empty($this->presetConfig['filter_recurring_order_type'])) ? $this->presetConfig['filter_recurring_order_type'] : null, array(
@@ -141,7 +157,7 @@ $this->headLink()
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
                 </p>
-                <div class="grid_8 omega">
+                <div class="grid_8 omega alpha">
                     <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
                     <?php
                     $countryList = Tools_Geo::getCountries(true);
