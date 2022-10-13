@@ -22,9 +22,9 @@ define([
             offset: function() { return this.currentPage * this.perPage },
             order: 'reg_date DESC',
             search: '',
-            clientsFilter: 'clients-only',
+            clientsFilter: '',
+            roleId: ''
         },
-        roleId: '',
         cached: {},
         parse: function(response){
             if (this.server_api.count){

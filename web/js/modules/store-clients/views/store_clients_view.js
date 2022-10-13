@@ -15,8 +15,6 @@ define([
         el: $('#clients'),
         events: {
             'click #export-users': 'exportUsers',
-            'click #clients-previous': 'goPreviousPage',
-            'click #clients-next': 'goNextPage',
             'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
             'click #customer-details div.toolbar a:first': 'toggleDetails',
@@ -38,6 +36,7 @@ define([
             $('#customer-details').hide();
             this.customers = new CustomersCollection();
             this.customers.on('reset', this.renderCustomers, this);
+            this.customers.server_api.clientsFilter = 'clients-only';
             this.customers.pager();
         },
         render: function(){},
@@ -71,14 +70,6 @@ define([
             } else {
                 showMessage(_.isUndefined(i18n['There are no users for export'])?'There are no users for export':i18n['There are no users for export'], true);
             }
-        },
-        goPreviousPage: function() {
-            this.customers.previous();
-            return false;
-        },
-        goNextPage: function() {
-            this.customers.next();
-            return false;
         },
         navigate: function(e){
             e.preventDefault();

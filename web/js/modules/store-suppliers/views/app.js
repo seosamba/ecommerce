@@ -1,5 +1,6 @@
 define([
 	'backbone',
+    'text!../../store-clients/templates/paginator.html',
     '../../store-clients/collections/customers',
     './supplier_row',
     '../../companies/collections/company',
@@ -8,35 +9,51 @@ define([
     'text!../../store-clients/templates/email_service.html',
     'text!../../store-clients/templates/crm_service.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
-    ], function(Backbone, CustomersCollection, SupplierRowView, CompaniesCollection, GroupsDialogTmpl, CompanyDialogTmpl, EmailServiceDialogTmpl, CrmServiceDialogTmpl, i18n){
+    ], function(Backbone, PaginatorTmpl, CustomersCollection, SupplierRowView, CompaniesCollection, GroupsDialogTmpl, CompanyDialogTmpl, EmailServiceDialogTmpl, CrmServiceDialogTmpl, i18n){
 
     var AppView = Backbone.View.extend({
         el: $('#suppliers'),
         events: {
             'click #export-users': 'exportUsers',
-            'click #clients-previous': 'goPreviousPage',
-            'click #clients-next': 'goNextPage',
             'click th.sortable': 'sort',
             'click #supplier-details div.toolbar a:first': function() {$('#suppliers-table,#supplier-details, .search-line').toggle()},
             'change #clients-check-all': 'toggleAllPeople',
             'change select#mass-action': 'doAction',
             'keyup #suppliers-search': 'searchSupplier',
             'change .companies-assignment': 'assignSingleCompany',
-            'blur input.mobile-number': 'changeMobileNumber'
+            'blur input.mobile-number': 'changeMobileNumber',
+            'click td.paginator a.page': 'navigate',
+        },
+        templates: {
+            paginator: _.template(PaginatorTmpl)
         },
         initialize: function(){
             $('#supplier-details').hide();
             this.customers = new CustomersCollection();
-            this.customers.on('reset', this.render, this);
-            this.customers.roleId = 'supplier';
-            this.customers.fetch();
+            this.customers.on('reset', this.renderCustomers, this);
+            this.customers.server_api.roleId = 'supplier';
+            this.customers.pager();
         },
-        render: function(){
-            $('#supplier-list').empty();
-            this.customers.each(function(customer){
-                var view = new SupplierRowView({model: customer});
-                view.render().$el.appendTo('#supplier-list');
+        render: function(){},
+        renderCustomer: function(customer){
+            customer.set({i18n: i18n});
+            var view = new SupplierRowView({model: customer});
+            this.$('#supplier-list').append(view.render().el);
+        },
+        renderCustomers: function(){
+            var clientsFilter = this.customers.server_api.clientsFilter;
+            $.each($('.clients-filter'), function(index, value) {
+                var filterType = $(value).data('filter-type');
+                if(filterType == clientsFilter) {
+                    $(value).addClass('current');
+                } else {
+                    $(value).removeClass('current');
+                }
             });
+            this.$('#supplier-list').empty();
+            this.customers.each(this.renderCustomer.bind(this));
+            this.customers.info()['i18n'] = i18n;
+            this.$('td.paginator').html(this.templates.paginator(this.customers.information));
         },
         exportUsers: function(){
             if ($('#supplier-list tr').length > 1) {
@@ -45,30 +62,50 @@ define([
                 showMessage(_.isUndefined(i18n['There are no users for export'])?'There are no users for export':i18n['There are no users for export'], true);
             }
         },
-        goPreviousPage: function() {
-            this.customers.previous();
-            return false;
-        },
-        goNextPage: function() {
-            this.customers.next();
-            return false;
-        },
-        sort: function(e) {
-            var $el = $(e.target),
+        sort: function(e){
+            var $el = $(e.currentTarget),
                 key = $el.data('sortkey');
 
             $el.siblings('.sortable').removeClass('sortUp').removeClass('sortDown');
 
             if (!!key) {
-                this.customers.order.by = key;
                 if (!$el.hasClass('sortUp') && !$el.hasClass('sortDown')){
                     $el.addClass('sortUp');
-                    this.customers.order.asc = true;
-                } else  {
+                    key += ' ASC';
+                } else {
+                    if ($el.hasClass('sortUp')){
+                        key += ' DESC';
+                    }
+                    if ($el.hasClass('sortDown')){
+                        key += ' ASC';
+                    }
                     $el.toggleClass('sortUp').toggleClass('sortDown');
-                    this.customers.order.asc = !this.customers.order.asc;
                 }
-                this.customers.fetch()
+                this.customers.server_api.order = key;
+                this.customers.pager();
+            }
+        },
+        navigate: function(e){
+            e.preventDefault();
+
+            var page = $(e.currentTarget).data('page');
+            if ($.isNumeric(page)){
+                this.customers.goTo(page);
+            } else {
+                switch(page){
+                    case 'first':
+                        this.customers.goTo(this.customers.firstPage);
+                        break;
+                    case 'last':
+                        this.customers.goTo(this.customers.totalPages);
+                        break;
+                    case 'prev':
+                        this.customers.requestPreviousPage();
+                        break;
+                    case 'next':
+                        this.customers.requestNextPage();
+                        break;
+                }
             }
         },
         showSupplierDetails: function(uid) {
@@ -140,9 +177,18 @@ define([
 
             clearTimeout(self.searching);
             self.searching = setTimeout(function(){
-                self.customers.roleId = 'supplier';
-                self.customers.search(term);
+                self.customers.server_api.roleId = 'supplier';
+                self.customers.server_api.search = term;
+                self.applyFilter();
             }, 600);
+        },
+        applyFilter: function(e) {
+            if(typeof e !== 'undefined'){
+                e.preventDefault();
+            }
+            this.customers.ordersChecked = [];
+            this.customers.currentPage = 0;
+            this.customers.pager();
         },
         assignSingleCompany: function(e){
             var currentTarget = $(e.target),

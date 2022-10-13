@@ -74,10 +74,7 @@
 			            <option value="deleteSelected"><?php echo $this->translate('delete');?></option>
 		            </select>
 	            </td>
-                <td colspan="6" class="text-right">
-                    <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
-                    <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
-                </td>
+                <td colspan="6" class="paginator text-right"></td>
             </tr>
         </tfoot>
         <input class="clientsSecureToken" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo Tools_System_Tools::initSecureToken(Api_Store_Customers::CUSTOMERS_SECURE_TOKEN);?>" />
