@@ -1,5 +1,6 @@
 define([
 	'backbone',
+    'text!../templates/paginator.html',
     '../collections/customers',
     './customer_row',
     '../../groups/collections/group',
@@ -8,7 +9,7 @@ define([
     'text!../templates/crm_service.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     'tinyMCE',
-    ], function(Backbone, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, EmailServiceDialogTmpl, CrmServiceDialogTmpl, i18n, tinymce){
+    ], function(Backbone, PaginatorTmpl, CustomersCollection, CustomerRowView, GroupsCollection, GroupsDialogTmpl, EmailServiceDialogTmpl, CrmServiceDialogTmpl, i18n, tinymce){
 
     var StoreClientsView = Backbone.View.extend({
         el: $('#clients'),
@@ -16,6 +17,7 @@ define([
             'click #export-users': 'exportUsers',
             'click #clients-previous': 'goPreviousPage',
             'click #clients-next': 'goNextPage',
+            'click td.paginator a.page': 'navigate',
             'click th.sortable': 'sort',
             'click #customer-details div.toolbar a:first': 'toggleDetails',
             'change #clients-check-all': 'toggleAllPeople',
@@ -29,14 +31,23 @@ define([
             'change .mobile-phone-country-code':'changeMobileDesktopMask',
             'click .clients-filter':'clientsFilter',
         },
+        templates: {
+            paginator: _.template(PaginatorTmpl)
+        },
         initialize: function(){
             $('#customer-details').hide();
             this.customers = new CustomersCollection();
-            this.customers.on('reset', this.render, this);
-            this.customers.fetch();
+            this.customers.on('reset', this.renderCustomers, this);
+            this.customers.pager();
         },
-        render: function(){
-            var clientsFilter = this.customers.clientsFilter;
+        render: function(){},
+        renderCustomer: function(customer){
+            customer.set({i18n: i18n});
+            var view = new CustomerRowView({model: customer});
+            this.$('#customer-list').append(view.render().el);
+        },
+        renderCustomers: function(){
+            var clientsFilter = this.customers.server_api.clientsFilter;
             $.each($('.clients-filter'), function(index, value) {
                 var filterType = $(value).data('filter-type');
                 if(filterType == clientsFilter) {
@@ -45,12 +56,10 @@ define([
                     $(value).removeClass('current');
                 }
             });
-
-            $('#customer-list').empty();
-            this.customers.each(function(customer){
-                var view = new CustomerRowView({model: customer});
-                view.render().$el.appendTo('#customer-list');
-            });
+            this.$('#customer-list').empty();
+            this.customers.each(this.renderCustomer.bind(this));
+            this.customers.info()['i18n'] = i18n;
+            this.$('td.paginator').html(this.templates.paginator(this.customers.information));
         },
         toggleDetails: function()
         {
@@ -71,22 +80,50 @@ define([
             this.customers.next();
             return false;
         },
-        sort: function(e) {
-            var $el = $(e.target),
+        navigate: function(e){
+            e.preventDefault();
+
+            var page = $(e.currentTarget).data('page');
+            if ($.isNumeric(page)){
+                this.customers.goTo(page);
+            } else {
+                switch(page){
+                    case 'first':
+                        this.customers.goTo(this.customers.firstPage);
+                        break;
+                    case 'last':
+                        this.customers.goTo(this.customers.totalPages);
+                        break;
+                    case 'prev':
+                        this.customers.requestPreviousPage();
+                        break;
+                    case 'next':
+                        this.customers.requestNextPage();
+                        break;
+                }
+            }
+        },
+        sort: function(e){
+            var $el = $(e.currentTarget),
                 key = $el.data('sortkey');
 
             $el.siblings('.sortable').removeClass('sortUp').removeClass('sortDown');
 
             if (!!key) {
-                this.customers.order.by = key;
                 if (!$el.hasClass('sortUp') && !$el.hasClass('sortDown')){
                     $el.addClass('sortUp');
-                    this.customers.order.asc = true;
-                } else  {
+                    key += ' ASC';
+                } else {
+                    if ($el.hasClass('sortUp')){
+                        key += ' DESC';
+                    }
+                    if ($el.hasClass('sortDown')){
+                        key += ' ASC';
+                    }
                     $el.toggleClass('sortUp').toggleClass('sortDown');
-                    this.customers.order.asc = !this.customers.order.asc;
                 }
-                this.customers.fetch()
+                this.customers.server_api.order = key;
+                this.customers.pager();
             }
         },
         showCustomerDetails: function(uid) {
@@ -218,7 +255,8 @@ define([
 
             clearTimeout(self.searching);
             self.searching = setTimeout(function(){
-                self.customers.search(term);
+                self.customers.server_api.search = term;
+                self.applyFilter();
             }, 600);
         },
         assignGroup: function(e){
@@ -650,8 +688,17 @@ define([
         clientsFilter: function (e)
         {
             var filterType = $(e.currentTarget).data('filter-type');
-            this.customers.clientsFilterAction(filterType);
-        }
+            this.customers.server_api.clientsFilter = filterType;
+            this.applyFilter();
+        },
+        applyFilter: function(e) {
+            if(typeof e !== 'undefined'){
+                e.preventDefault();
+            }
+            this.customers.ordersChecked = [];
+            this.customers.currentPage = 0;
+            this.customers.pager();
+        },
     });
 	return StoreClientsView;
 });
