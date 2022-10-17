@@ -338,7 +338,7 @@ define([
 
                         var enabledServices = response.responseText.enabledServices,
                             enabledServicesLabels = response.responseText.enabledServicesLabels;
-                        
+
                         assignEmailService[applyButton] = function() {
 
                             if($("#marketing-services option:selected").val() == 'select'){
@@ -372,7 +372,8 @@ define([
                         var dialog = _.template(EmailServiceDialogTmpl, {
                             enabledServices:enabledServices,
                             customerIds:customerIds,
-                            i18n:i18n
+                            i18n:i18n,
+                            enabledServicesLabels:enabledServicesLabels
                         });
 
                         $(dialog).dialog({
@@ -448,7 +449,9 @@ define([
                         customerIds = customerIds.split(',');
 
 
-                    var enabledServices = response.responseText.enabledServices;
+                    var enabledServices = response.responseText.enabledServices,
+                        enabledServicesLabels = response.responseText.enabledServicesLabels;
+
                     assignCrmService[applyButton] = function() {
 
                         if($("#crm-services option:selected").val() == 'select'){
@@ -482,7 +485,8 @@ define([
                     var dialog = _.template(CrmServiceDialogTmpl, {
                         enabledServices:enabledServices,
                         customerIds:customerIds,
-                        i18n:i18n
+                        i18n:i18n,
+                        enabledServicesLabels:enabledServicesLabels
                     });
 
                     $(dialog).dialog({
