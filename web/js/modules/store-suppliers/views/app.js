@@ -1,6 +1,6 @@
 define([
 	'backbone',
-    'text!../../store-clients/templates/paginator.html',
+    'text!../templates/paginator.html',
     '../../store-clients/collections/customers',
     './supplier_row',
     '../../companies/collections/company',
@@ -336,7 +336,9 @@ define([
                         var customerIds = customerIds.split(',');
 
 
-                        var enabledServices = response.responseText.enabledServices;
+                        var enabledServices = response.responseText.enabledServices,
+                            enabledServicesLabels = response.responseText.enabledServicesLabels;
+                        
                         assignEmailService[applyButton] = function() {
 
                             if($("#marketing-services option:selected").val() == 'select'){

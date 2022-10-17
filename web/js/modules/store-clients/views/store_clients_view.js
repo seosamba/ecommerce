@@ -200,7 +200,8 @@ define([
             $(e.target).val(0);
         },
         deleteSelected: function(){
-            var checked = this.customers.checked();
+            var checked = this.customers.checked(),
+                generalView = this;
             if (_.isEmpty(checked)){
                 return false;
             }
@@ -228,6 +229,7 @@ define([
                                 showMessage(_.isUndefined(i18n['Unable to remove following users'])?'Unable to remove following users':i18n['Unable to remove following users']+': '+msg, true);
                             }else{
                                 showMessage(_.isUndefined(i18n['Users deleted'])?'Users deleted':i18n['Users deleted']);
+                                generalView.applyFilter();
                             }
                         //});
                     },
