@@ -75,6 +75,9 @@ class Api_Store_Customers extends Api_Service_Abstract {
             $mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
             $desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
+            $allClientsCount = 0;
+            $allAccountsCount = 0;
+
             if (!empty($withCounter)) {
                 $result = $customerMapper->clientsFilterData($where, $order, $limit, $offset, false, false, $search, $clientsFilter);
                 if (!empty($result['data'])) {
@@ -91,9 +94,33 @@ class Api_Store_Customers extends Api_Service_Abstract {
                             }
                         }
                     }
+
+                    if (!empty($clientsFilter) && $clientsFilter === 'clients-only') {
+                        if (!empty($result['totalRecords'])) {
+                            $allClientsCount = $result['totalRecords'];
+                        }
+
+                        $resultAll = $customerMapper->clientsFilterData($where, $order, $limit, $offset, false, false, $search);
+                        if (!empty($resultAll['totalRecords'])) {
+                            $allAccountsCount = $resultAll['totalRecords'];
+                        }
+
+                    } else {
+                        if (!empty($result['totalRecords'])) {
+                            $allAccountsCount = $result['totalRecords'];
+                        }
+                        $clientsFilter = 'clients-only';
+                        $resultAll = $customerMapper->clientsFilterData($where, $order, $limit, $offset, false, false, $search, $clientsFilter);
+                        if (!empty($resultAll['totalRecords'])) {
+                            $allClientsCount = $resultAll['totalRecords'];
+                        }
+                    }
+
                 }
 
                 $data = $result;
+                $data['allClientsCount'] = $allClientsCount;
+                $data['allAccountsCount'] = $allAccountsCount;
             } else {
                 $data = array_map(function ($row) use ($currency, $mobileMasks, $desktopMasks) {
                     $row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));

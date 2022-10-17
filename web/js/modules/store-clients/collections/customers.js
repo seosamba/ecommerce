@@ -32,6 +32,8 @@ define([
             } else {
                 this.totalRecords = response.length;
             }
+            this.allClientsCount = response.allClientsCount;
+            this.allAccountsCount = response.allAccountsCount;
             this.totalPages = Math.floor(this.totalRecords / this.perPage);
             return this.server_api.count ? response.data : response;
         },

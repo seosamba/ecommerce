@@ -77,8 +77,8 @@
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
         </form>
         <div class="btn-group">
-            <button data-filter-type="clients-only" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('Clients Only');?></button>
-            <button data-filter-type="all-accounts" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('All Accounts');?></button>
+            <button data-filter-type="clients-only" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('Clients Only');?> <span>(<span id="clients-number">0</span>)</span></button>
+            <button data-filter-type="all-accounts" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('All Accounts');?> <span>(<span id="all-accounts-number">0</span>)</span></button>
         </div>
     </div>
     <?php $removeColumnCount = 0; ?>

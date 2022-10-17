@@ -58,6 +58,9 @@ define([
             this.$('#customer-list').empty();
             this.customers.each(this.renderCustomer.bind(this));
             this.customers.info()['i18n'] = i18n;
+
+            this.$('#clients-number').text(this.customers.allClientsCount);
+            this.$('#all-accounts-number').text(this.customers.allAccountsCount);
             this.$('td.paginator').html(this.templates.paginator(this.customers.information));
         },
         toggleDetails: function()
