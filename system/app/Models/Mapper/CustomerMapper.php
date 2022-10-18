@@ -216,6 +216,128 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 		return $userDbTable->fetchAll($select)->toArray();
 	}
 
+    /**
+     * Method for fetching users for customer dashboard with special set of agregated fields
+     * @param null| $where
+     * @param null $order
+     * @param null $limit
+     * @param null $offset
+     * @param null $search
+     * @param null $withoutCount
+     * @param null $clientsFilter
+     * @param null $singleRecord
+     * @return array
+     */
+    public function clientsFilterData($where = null, $order = null, $limit = null, $offset = null, $withoutCount = false,
+                                      $singleRecord = false, $search = null, $clientsFilter = null) {
+        $userDbTable = new Application_Model_DbTable_User();
+        $joinCondition = '(cart.user_id = user.id)';
+        $joinConditionCustomer = ('userattr.user_id = user.id').' AND '.$userDbTable->getAdapter()->quoteInto('userattr.attribute LIKE ?', 'customer_%');
+
+        $select = $userDbTable->select()
+            ->setIntegrityCheck(false)
+            ->from('user',array('id', 'full_name', 'email', 'reg_date', 'mobile_phone', 'mobile_country_code', 'subscribed'))
+            ->joinLeft(
+                array('cart' => 'shopping_cart_session'),
+                $joinCondition,
+                array(
+                    'total_amount' => 'SUM(cart.total)',
+                    'total_orders'=>'COUNT(cart.id)'
+                ))
+            ->joinLeft(
+                array('customerinfo' => 'shopping_customer_info'),
+                ('customerinfo.user_id = user.id'),
+                array(
+                    'group_id' => 'customerinfo.group_id',
+                ))
+            ->joinLeft(
+                array('userattr' => 'user_attributes'),
+                $joinConditionCustomer,
+                array('customer_attr'=>'(GROUP_CONCAT(DISTINCT(userattr.attribute), \'||\', userattr.value))'))
+            ->joinLeft(array('scs' => 'shopping_company_suppliers'), 'scs.supplier_id=user.id', array())
+            ->joinLeft(array('sc' => 'shopping_companies'), 'scs.company_id=sc.id', array('company_name' => 'sc.company_name', 'company_id' => 'scs.company_id'))
+            ->joinLeft(array('sq' => 'shopping_quote'), 'sq.cart_id=cart.id', array())
+            ->group('user.id');
+
+        if (!Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_CONTENT)) {
+            $select->where('user.role_id NOT IN (?)', array(
+                Tools_Security_Acl::ROLE_SUPERADMIN,
+                Tools_Security_Acl::ROLE_ADMIN
+            ));
+        }
+
+        if($clientsFilter == 'clients-only') {
+            if(!empty($where)) {
+                $where .= ' AND ';
+            }
+
+            $where .= ' ('.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_COMPLETED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PENDING);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_SHIPPED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('sq.status=?', Quote_Models_Model_Quote::STATUS_SIGNATURE_ONLY_SIGNED);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_PARTIAL);
+            $where .= ' OR '.$userDbTable->getAdapter()->quoteInto('cart.status=?', Models_Model_CartSession::CART_STATUS_DELIVERED). ')';
+        }
+
+        if ($where) {
+            $select->where($where);
+        }
+        if ($order) {
+            $select->order($order);
+        }
+
+        if ($search) {
+            $orWhere = $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?', '%' . $search . '%');
+            $orWhere .= ' OR ' . $userDbTable->getAdapter()->quoteInto('user.email LIKE ?', '%' . $search . '%');
+            $select->where($orWhere);
+        }
+
+        $select->limit($limit, $offset);
+
+        if ($singleRecord) {
+            $data = $this->getDbTable()->getAdapter()->fetchRow($select);
+        } else {
+            $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+        }
+
+        if ($withoutCount === false) {
+            $select->reset(Zend_Db_Select::COLUMNS);
+            $select->reset(Zend_Db_Select::FROM);
+            $select->reset(Zend_Db_Select::LIMIT_OFFSET);
+            $select->reset(Zend_Db_Select::LIMIT_COUNT);
+
+            $count = array('count' => new Zend_Db_Expr('COUNT(DISTINCT(user.id))'));
+
+            $select->from(array('user' => 'user'), $count)
+                ->joinLeft(array('cart' => 'shopping_cart_session'), $joinCondition,   array(
+                    'total_amount' => 'SUM(cart.total)',
+                    'total_orders'=>'COUNT(cart.id)'
+                ))
+                ->joinLeft(array('customerinfo' => 'shopping_customer_info'), 'customerinfo.user_id = user.id', array())
+                ->joinLeft(array('userattr' => 'user_attributes'), $joinConditionCustomer, array())
+                ->joinLeft(array('scs' => 'shopping_company_suppliers'), 'scs.supplier_id=user.id', array())
+                ->joinLeft(array('sc' => 'shopping_companies'), 'scs.company_id=sc.id', array())
+                ->joinLeft(array('sq' => 'shopping_quote'), 'sq.cart_id=cart.id', array());
+
+            $select =  $this->getDbTable()->getAdapter()->select()
+                ->from(
+                    array('subres' => $select),
+                    array('count' => 'SUM(count)')
+                );
+
+            $count = $this->getDbTable()->getAdapter()->fetchRow($select);
+
+            return array(
+                'totalRecords' => $count['count'],
+                'data' => $data,
+                'offset' => $offset,
+                'limit' => $limit
+            );
+        } else {
+            return $data;
+        }
+    }
+
     public function getUserAddressByUserId($userId, $addressId = false)
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('user_id = ?', $userId);
