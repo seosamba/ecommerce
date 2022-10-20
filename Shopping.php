@@ -1434,6 +1434,42 @@ class Shopping extends Tools_Plugins_Abstract {
                 if ($quoteModel instanceof Quote_Models_Model_Quote) {
                     $quoteId = $quoteModel->getId();
                     $quoteTitle = $quoteModel->getTitle();
+
+                    $quoteDraggableMapper = Quote_Models_Mapper_QuoteDraggableMapper::getInstance();
+                    $quoteDraggableModel = $quoteDraggableMapper->findByQuoteId($quoteId);
+
+                    if($quoteDraggableModel instanceof Quote_Models_Model_QuoteDraggableModel) {
+                        $dragOrder = $quoteDraggableModel->getData();
+
+                        if(!empty($dragOrder)) {
+                            $dragOrder = explode(',', $dragOrder);
+                            $cartContent = $order->getCartContent();
+                            $prepareContentSids = array();
+                            foreach ($cartContent as $key => $content) {
+                                $product = Models_Mapper_ProductMapper::getInstance()->find($content['product_id']);
+                                $options = ($content['options']) ? $content['options'] : Quote_Tools_Tools::getProductDefaultOptions($product);
+                                $prodSid = Quote_Tools_Tools::generateStorageKey($product, $options);
+                                $prepareContentSids[$prodSid] = $content;
+                            }
+
+                            $sortedCartContent = array();
+                            foreach ($dragOrder as $productSid) {
+                                if(!empty($prepareContentSids[$productSid])) {
+                                    $sortedCartContent[$productSid] = $prepareContentSids[$productSid];
+                                }
+                            }
+                            $preparedCartContent = array_merge($sortedCartContent, $prepareContentSids);
+
+                            $cartContent = array();
+
+                            foreach ($preparedCartContent as $cContent) {
+                                $cartContent[] = $cContent;
+                            }
+
+                            $order->setCartContent($cartContent);
+                        }
+                    }
+
                 }
             }
 
