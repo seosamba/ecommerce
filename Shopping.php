@@ -3617,7 +3617,7 @@ class Shopping extends Tools_Plugins_Abstract {
                         if ($productObject instanceof Models_Model_Product) {
                             if ($product['freebies'] === '1' && !empty($productsFreebiesRelation)) {
                                 foreach ($productsFreebiesRelation[$product['product_id']] as $realProductId) {
-                                    $itemKey = $this->_generateStorageKey(
+                                    $itemKey = Tools_ShoppingCart::generateStorageKey(
                                         $productObject,
                                         array(0 => 'freebies_' . $realProductId)
                                     );
@@ -3633,7 +3633,7 @@ class Shopping extends Tools_Plugins_Abstract {
                             } else {
                                 $options = array();
                                 if (is_array($product['options'])) {
-                                    $options = $this->_parseProductOptions($product['options']);
+                                    $options = Tools_ShoppingCart::parseProductOptions($product['options']);
                                 }
                                 $productObject->setPrice($product['price']);
                                 $productObject->setOriginalPrice($product['original_price']);
