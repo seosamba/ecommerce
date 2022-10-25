@@ -1175,7 +1175,7 @@ class Tools_ShoppingCart {
     {
         $parsedOption = array();
         foreach ($options as $option) {
-            $parsedOption[$option['id']] = $option['option_id'];
+            $parsedOption[$option['option_id']] = $option['id'];
         }
         return $parsedOption;
     }
