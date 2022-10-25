@@ -1164,4 +1164,32 @@ class Tools_ShoppingCart {
 
     }
 
+    /**
+     *
+     * Prepare product options
+     *
+     * @param array $options
+     * @return array
+     */
+    public static function parseProductOptions($options)
+    {
+        $parsedOption = array();
+        foreach ($options as $option) {
+            $parsedOption[$option['option_id']] = $option['id'];
+        }
+        return $parsedOption;
+    }
+
+    /**
+     * Generate product unique key in cart
+     *
+     * @param Models_Model_Product $item
+     * @param array $options
+     * @return string
+     */
+    public static function generateStorageKey($item, $options = array())
+    {
+        return substr(md5($item->getName() . $item->getSku() . http_build_query($options)), 0, 10);
+    }
+
 }

@@ -36,6 +36,9 @@
                     <th><?php echo $this->translate('Invoice');?></th>
                 <?php endif;?>
                 <th><?php echo $this->translate('Quote');?></th>
+                <?php if (!empty($this->buyAgain)):?>
+                    <th></th>
+                <?php endif;?>
             </tr>
             </thead>
             <tbody>
@@ -92,6 +95,15 @@
                             <a href="<?php echo $this->websiteUrl.$order['quote_id'].'.html';?>"><?php echo $this->translate('Complete your order');?>
                           <?php endif;?>
                         </td>
+                        <?php if (!empty($this->buyAgain)):?>
+                            <?php if (empty($order['quote_id']) && in_array($order['status'], array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_REFUNDED, Models_Model_CartSession::CART_STATUS_NEW))):?>
+                                <td class="user-buy-again">
+                                    <a data-order-id="<?php echo $order['id'];?>" class="buy-again-user-link" href=""><?php echo $this->translate('Buy again');?>
+                                </td>
+                            <?php else:?>
+                                <td></td>
+                            <?php endif;?>
+                        <?php endif;?>
                     </tr>
                     <?php endif;?>
                 <?php endforeach; ?>
@@ -102,6 +114,29 @@
 <script>
 
        $(function(){
+
+           $(document).on('click', '.buy-again-user-link', function(){
+               var dataOrderId = $(this).data('order-id');
+
+               $.ajax({
+                   url      : "<?php echo $this->websiteUrl.'plugin/shopping/run/buyAgain/';?>",
+                   type     : 'post',
+                   data     : {
+                       'orderId' : dataOrderId
+                   },
+                   beforeSend: showSpinner(),
+                   dataType :'json',
+                   success  : function(response) {
+                       hideSpinner();
+                       if(response.error) {
+                           showMessage(response.responseText, response.error);
+                       } else {
+                            window.location.href = "<?php echo $this->checkoutRedirectUrl;?>";
+                       }
+                   }
+               });
+           });
+
             var oTable = $('#user-orders-table').dataTable({
                 iDisplayLength:10,
                 "sPaginationType": "full_numbers",

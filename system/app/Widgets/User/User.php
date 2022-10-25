@@ -12,6 +12,8 @@ class Widgets_User_User extends Widgets_User_Base {
 
     const GRID_TYPE_RECURRING = 'recurring';
 
+    const GRID_TYPE_BUY_AGAIN = 'buy-again';
+
     const GRID_OPTION_WITHOUT_PERIOD_CYCLE = 'without_period_cycle';
 
     /**
@@ -150,6 +152,18 @@ class Widgets_User_User extends Widgets_User_Base {
                 }
             }
         }
+
+        if (!empty($this->_options['0']) && $this->_options['0'] === self::GRID_TYPE_BUY_AGAIN) {
+            $this->_view->buyAgain = true;
+            $checkoutRedirectUrl = $this->_websiteHelper->getUrl();
+            $checkoutPage = Tools_Misc::getCheckoutPage();
+            if ($checkoutPage instanceof Application_Model_Models_Page) {
+                $checkoutRedirectUrl .= $checkoutPage->getUrl();
+            }
+
+            $this->_view->checkoutRedirectUrl = $checkoutRedirectUrl;
+        }
+
         $this->_view->orders = $orders;
         return $this->_view->render('grid.phtml');
 
