@@ -3543,6 +3543,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
         if ($this->_request->isPost() && !empty($userId)) {
             $orderId = $this->_request->getParam('orderId');
+            $dataOrderSubtype = $this->_request->getParam('dataOrderSubtype');
             if (!empty($orderId)) {
                 $cartMapper    = Models_Mapper_CartSessionMapper::getInstance();
                 $productMapper = Models_Mapper_ProductMapper::getInstance();
@@ -3554,9 +3555,11 @@ class Shopping extends Tools_Plugins_Abstract {
                         $this->_responseHelper->fail('status not allowed');
                     }
 
-                    $quoteModel = $quoteMapper->findByCartId($orderId);
-                    if ($quoteModel instanceof Quote_Models_Model_Quote) {
-                        $this->_responseHelper->fail('You can\'t purchase quote again');
+                    if ($dataOrderSubtype !== 'with-quote') {
+                        $quoteModel = $quoteMapper->findByCartId($orderId);
+                        if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                            $this->_responseHelper->fail('You can\'t purchase quote again');
+                        }
                     }
 
                     $cartSession = Tools_ShoppingCart::getInstance();

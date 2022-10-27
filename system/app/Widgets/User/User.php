@@ -14,6 +14,8 @@ class Widgets_User_User extends Widgets_User_Base {
 
     const GRID_TYPE_BUY_AGAIN = 'buy-again';
 
+    const GRID_TYPE_BUY_AGAIN_WITH_QUOTE = 'buy-again-with-quote';
+
     const GRID_OPTION_WITHOUT_PERIOD_CYCLE = 'without_period_cycle';
 
     /**
@@ -153,8 +155,13 @@ class Widgets_User_User extends Widgets_User_Base {
             }
         }
 
-        if (!empty($this->_options['0']) && $this->_options['0'] === self::GRID_TYPE_BUY_AGAIN) {
-            $this->_view->buyAgain = true;
+        if (!empty($this->_options['0']) && ($this->_options['0'] === self::GRID_TYPE_BUY_AGAIN || $this->_options['0'] === self::GRID_TYPE_BUY_AGAIN_WITH_QUOTE)) {
+            if ($this->_options['0'] === self::GRID_TYPE_BUY_AGAIN) {
+                $this->_view->buyAgain = true;
+            }
+            if ($this->_options['0'] === self::GRID_TYPE_BUY_AGAIN_WITH_QUOTE) {
+                $this->_view->buyAgainWithQuote = true;
+            }
             $checkoutRedirectUrl = $this->_websiteHelper->getUrl();
             $checkoutPage = Tools_Misc::getCheckoutPage();
             if ($checkoutPage instanceof Application_Model_Models_Page) {
