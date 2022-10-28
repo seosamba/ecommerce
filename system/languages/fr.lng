@@ -855,4 +855,7 @@
         'Group' => 'Groupe',
         'today' => 'aujourd\'hui',
         'Click preview to get to product landing page' => 'Cliquer l’aperçu pour accéder a la page produit',
+        'Warning!' => 'Attention!',
+        'You don\'t have any product template.' => 'Vous n\'avez pas de modèle de produit',
+        'Create one now' => 'Créez-le maintenant'
 );?>
