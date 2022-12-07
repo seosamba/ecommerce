@@ -1,82 +1,45 @@
 define([
 	'backbone',
-    '../models/customer_row'
+    '../models/customer_row',
+    'backbone.paginator'
 ], function(Backbone, CustomerRowModel){
 
-    var CustomersCollection = Backbone.Collection.extend({
+    var CustomersCollection =  Backbone.Paginator.requestPager.extend({
         model: CustomerRowModel,
-        urlRoot: 'api/store/customers/',
-        paginator: {
-            limit: 30,
-            offset: 0,
-            last: false
+        paginator_core: {
+            dataType: 'json',
+            url:  $('#website_url').val() + 'api/store/customers/for/dashboard/withcounter/1/'
         },
-        order: {
-            by: 'reg_date',
-            asc: false
+        paginator_ui: {
+            firstPage:    0,
+            currentPage:  0,
+            perPage:     10,
+            totalPages:  10
         },
-        searchTerm: '',
-        roleId: '',
+        server_api: {
+            count: true,
+            limit: function() { return this.perPage; },
+            offset: function() { return this.currentPage * this.perPage },
+            order: 'reg_date DESC',
+            search: '',
+            clientsFilter: '',
+            roleId: ''
+        },
         cached: {},
-        clientsFilter: 'clients-only',
-        initialize: function(){
-            this.bind('reset', this.updatePaginator, this);
-        },
-        url: function(){
-            var url = this.urlRoot + 'for/dashboard/',
-                order = '';
-            url += '?'+'limit='+this.paginator.limit+'&offset='+this.paginator.offset+'&clientsFilter='+this.clientsFilter;
-            if (this.order.by) {
-                url += '&order=' + this.order.by + ' ' + (this.order.asc ? 'asc' : 'desc');
-            }
-            if (this.searchTerm) {
-                url += '&search='+this.searchTerm;
-            }
-            if (this.roleId) {
-                url += '&roleId='+this.roleId;
-            }
-            return $('#website_url').val() + url + '&id=';
-        },
-        next: function(callback) {
-            if (!this.paginator.last) {
-                this.paginator.offset += this.paginator.limit;
-                return this.fetch().done(callback);
-            }
-        },
-        previous: function(callback) {
-            if (this.paginator.offset >= this.paginator.limit){
-                this.paginator.offset -= this.paginator.limit;
-                return this.fetch().done(callback);
-            }
-        },
-        updatePaginator: function(collection) {
-            if (this.length === 0){
-                this.previous();
+        parse: function(response){
+            if (this.server_api.count){
+                this.totalRecords = response.totalRecords;
             } else {
-                this.paginator.last = (this.length < this.paginator.limit);
+                this.totalRecords = response.length;
             }
+            this.allClientsCount = response.allClientsCount;
+            this.allAccountsCount = response.allAccountsCount;
+            this.totalPages = Math.floor(this.totalRecords / this.perPage);
+            return this.server_api.count ? response.data : response;
         },
         checked: function(){
             return this.filter(function(customer){ return customer.has('checked') && customer.get('checked'); });
         },
-        search: function(term){
-            if (term !== this.searchTerm){
-                this.searchTerm = escape(term);
-                this.paginator.offset = 0;
-                this.paginator.last = false;
-                this.paginator.order = {by: null,asc: true};
-                return this.fetch();
-            }
-        },
-        clientsFilterAction: function (term) {
-            if (term !== this.clientsFilter){
-                this.clientsFilter = escape(term);
-                this.paginator.offset = 0;
-                this.paginator.last = false;
-                this.paginator.order = {by: null,asc: true};
-                return this.fetch();
-            }
-        }
     });
 
 	return CustomersCollection;

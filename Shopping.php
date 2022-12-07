@@ -1434,6 +1434,42 @@ class Shopping extends Tools_Plugins_Abstract {
                 if ($quoteModel instanceof Quote_Models_Model_Quote) {
                     $quoteId = $quoteModel->getId();
                     $quoteTitle = $quoteModel->getTitle();
+
+                    $quoteDraggableMapper = Quote_Models_Mapper_QuoteDraggableMapper::getInstance();
+                    $quoteDraggableModel = $quoteDraggableMapper->findByQuoteId($quoteId);
+
+                    if($quoteDraggableModel instanceof Quote_Models_Model_QuoteDraggableModel) {
+                        $dragOrder = $quoteDraggableModel->getData();
+
+                        if(!empty($dragOrder)) {
+                            $dragOrder = explode(',', $dragOrder);
+                            $cartContent = $order->getCartContent();
+                            $prepareContentSids = array();
+                            foreach ($cartContent as $key => $content) {
+                                $product = Models_Mapper_ProductMapper::getInstance()->find($content['product_id']);
+                                $options = ($content['options']) ? $content['options'] : Quote_Tools_Tools::getProductDefaultOptions($product);
+                                $prodSid = Quote_Tools_Tools::generateStorageKey($product, $options);
+                                $prepareContentSids[$prodSid] = $content;
+                            }
+
+                            $sortedCartContent = array();
+                            foreach ($dragOrder as $productSid) {
+                                if(!empty($prepareContentSids[$productSid])) {
+                                    $sortedCartContent[$productSid] = $prepareContentSids[$productSid];
+                                }
+                            }
+                            $preparedCartContent = array_merge($sortedCartContent, $prepareContentSids);
+
+                            $cartContent = array();
+
+                            foreach ($preparedCartContent as $cContent) {
+                                $cartContent[] = $cContent;
+                            }
+
+                            $order->setCartContent($cartContent);
+                        }
+                    }
+
                 }
             }
 
@@ -3496,6 +3532,129 @@ class Shopping extends Tools_Plugins_Abstract {
         $productsDataInfo['data'] = $productInfo;
 
         return $productsDataInfo;
+    }
+
+
+    public function buyAgainAction()
+    {
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $userSession = $sessionHelper->getCurrentUser();
+        $userId = $userSession->getId();
+
+        if ($this->_request->isPost() && !empty($userId)) {
+            $orderId = $this->_request->getParam('orderId');
+            $dataOrderSubtype = $this->_request->getParam('dataOrderSubtype');
+            if (!empty($orderId)) {
+                $cartMapper    = Models_Mapper_CartSessionMapper::getInstance();
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $quoteMapper = Quote_Models_Mapper_QuoteMapper::getInstance();
+                $currentCart = $cartMapper->find($orderId);
+                if ($currentCart instanceof Models_Model_CartSession){
+                    $currentCartStatus = $currentCart->getStatus();
+                    if (!in_array($currentCartStatus, array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_REFUNDED, Models_Model_CartSession::CART_STATUS_NEW))) {
+                        $this->_responseHelper->fail('status not allowed');
+                    }
+
+                    if ($dataOrderSubtype !== 'with-quote') {
+                        $quoteModel = $quoteMapper->findByCartId($orderId);
+                        if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                            $this->_responseHelper->fail('You can\'t purchase quote again');
+                        }
+                    }
+
+                    $cartSession = Tools_ShoppingCart::getInstance();
+                    $cartSession->setContent(array());
+                    $cartSession->save();
+                    $cartSession->setShippingAddressKey($currentCart->getShippingAddressId());
+                    $notFreebiesInCart = array();
+                    $freebiesInCart = array();
+                    $productsFreebiesRelation = array();
+                    $cartContent = $currentCart->getCartContent();
+
+                    foreach ($cartContent as $key => $product) {
+                        if ($product['freebies'] === '1') {
+                            $freebiesInCart[$product['product_id']] = $product['product_id'];
+                        } else {
+                            $notFreebiesInCart[$product['product_id']] = $product['product_id'];
+                        }
+                    }
+                    if (!empty($freebiesInCart)) {
+                        $where = $productMapper->getDbTable()->getAdapter()->quoteInto(
+                            'sphp.freebies_id IN (?)',
+                            $freebiesInCart
+                        );
+                        $where .= ' AND ' . $productMapper->getDbTable()->getAdapter()->quoteInto(
+                                'sphp.product_id IN (?)',
+                                $notFreebiesInCart
+                            );
+                        $select = $productMapper->getDbTable()->getAdapter()->select()
+                            ->from(
+                                array('spfs' => 'shopping_product_freebies_settings'),
+                                array(
+                                    'freebiesGroupKey' => new Zend_Db_Expr("CONCAT(sphp.freebies_id, '_', sphp.product_id)"),
+                                    'price_value'
+                                )
+                            )
+                            ->joinleft(
+                                array('sphp' => 'shopping_product_has_freebies'),
+                                'spfs.prod_id = sphp.product_id'
+                            )
+                            ->where($where);
+                        $productFreebiesSettings = $productMapper->getDbTable()->getAdapter()->fetchAssoc($select);
+                    }
+
+                    if (!empty($productFreebiesSettings)) {
+                        foreach ($productFreebiesSettings as $prodInfo) {
+                            if (array_key_exists($prodInfo['freebies_id'], $freebiesInCart)) {
+                                if (isset($productsFreebiesRelation[$prodInfo['freebies_id']])) {
+                                    $productsFreebiesRelation[$prodInfo['freebies_id']][$prodInfo['product_id']] = $prodInfo['product_id'];
+                                } else {
+                                    $productsFreebiesRelation[$prodInfo['freebies_id']] = array($prodInfo['product_id'] => $prodInfo['product_id']);
+                                }
+                            }
+                        }
+                    }
+
+                    foreach ($cartContent as $key => $product) {
+                        $productObject = $productMapper->find($product['product_id']);
+                        if ($productObject instanceof Models_Model_Product) {
+                            if ($product['freebies'] === '1' && !empty($productsFreebiesRelation)) {
+                                foreach ($productsFreebiesRelation[$product['product_id']] as $realProductId) {
+                                    $itemKey = Tools_ShoppingCart::generateStorageKey(
+                                        $productObject,
+                                        array(0 => 'freebies_' . $realProductId)
+                                    );
+                                    if (!$cartSession->findBySid($itemKey)) {
+                                        $productObject->setFreebies(1);
+                                        $cartSession->add(
+                                            $productObject,
+                                            array(0 => 'freebies_' . $realProductId),
+                                            $product['qty'], true
+                                        );
+                                    }
+                                }
+                            } else {
+                                $options = array();
+                                if (is_array($product['options'])) {
+                                    $options = Tools_ShoppingCart::parseProductOptions($product['options']);
+                                }
+                                $productObject->setPrice($product['price']);
+                                $productObject->setOriginalPrice($product['original_price']);
+                                $productObject->setCurrentPrice(floatval($productObject->getPrice()));
+                                $cartSession->add($productObject, $options, $product['qty'], true);
+                            }
+                        }
+                    }
+                    $cartSession->setDiscount(0);
+                    $cartSession->setShippingData(array());
+                    $cartSession->setDiscountTaxRate(0);
+                    $cartSession->calculate(true);
+                    $cartSession->save();
+
+                    $this->_responseHelper->success('');
+                }
+            }
+        }
     }
 
 

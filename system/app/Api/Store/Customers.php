@@ -48,6 +48,7 @@ class Api_Store_Customers extends Api_Service_Abstract {
 		$customerMapper = Models_Mapper_CustomerMapper::getInstance();
 		$id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT);
 		$for = filter_var($this->_request->getParam('for'), FILTER_SANITIZE_STRING);
+		$withCounter = filter_var($this->_request->getParam('withcounter'), FILTER_SANITIZE_STRING);
 
 		if ($for === 'dashboard'){
 			$order = filter_var($this->_request->getParam('order'), FILTER_SANITIZE_STRING);
@@ -74,25 +75,73 @@ class Api_Store_Customers extends Api_Service_Abstract {
             $mobileMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_MOBILE);
             $desktopMasks = $listMasksMapper->getListOfMasksByType(Application_Model_Models_MaskList::MASK_TYPE_DESKTOP);
 
-            $data = array_map(function($row) use ($currency, $mobileMasks, $desktopMasks){
-				$row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
-                $row['total_amount'] = $currency->toCurrency($row['total_amount']);
-                $row['mobileMasks'] = $mobileMasks;
-                $row['desktopMasks'] = $desktopMasks;
-                if (!empty($row['customer_attr'])) {
-                    $attributes = explode(',', $row['customer_attr']);
-                    unset($row['customer_attr']);
-                    foreach ($attributes as $attribute) {
-                        $attribute = explode('||', $attribute);
-                        $row[preg_replace('`customer_`', '', $attribute[0])] = $attribute[1];
+            $allClientsCount = 0;
+            $allAccountsCount = 0;
 
+            if (!empty($withCounter)) {
+                $result = $customerMapper->clientsFilterData($where, $order, $limit, $offset, false, false, $search, $clientsFilter);
+                if (!empty($result['data'])) {
+                    foreach ($result['data'] as $key => $resData) {
+                        $result['data'][$key]['reg_date'] = date('d M, Y', strtotime($resData['reg_date']));
+                        $result['data'][$key]['total_amount'] = $currency->toCurrency($resData['total_amount']);
+                        $result['data'][$key]['mobileMasks'] = $mobileMasks;
+                        $result['data'][$key]['desktopMasks'] = $desktopMasks;
+                        if (!empty($resData['customer_attr'])) {
+                            $attributes = explode(',', $resData['customer_attr']);
+                            foreach ($attributes as $attribute) {
+                                $attribute = explode('||', $attribute);
+                                $result['data'][$key][preg_replace('`customer_`', '', $attribute[0])] = $attribute[1];
+                            }
+                        }
                     }
-                } else {
-                    unset($row['customer_attr']);
+
+                    if (!empty($clientsFilter) && $clientsFilter === 'clients-only') {
+                        if (!empty($result['totalRecords'])) {
+                            $allClientsCount = $result['totalRecords'];
+                        }
+
+                        $resultAll = $customerMapper->clientsFilterData($where, $order, $limit, $offset, false, false, $search);
+                        if (!empty($resultAll['totalRecords'])) {
+                            $allAccountsCount = $resultAll['totalRecords'];
+                        }
+
+                    } else {
+                        if (!empty($result['totalRecords'])) {
+                            $allAccountsCount = $result['totalRecords'];
+                        }
+                        $clientsFilter = 'clients-only';
+                        $resultAll = $customerMapper->clientsFilterData($where, $order, $limit, $offset, false, false, $search, $clientsFilter);
+                        if (!empty($resultAll['totalRecords'])) {
+                            $allClientsCount = $resultAll['totalRecords'];
+                        }
+                    }
+
                 }
-				return $row;
-			},
-			$customerMapper->listAll($where, $order, $limit, $offset, $search, $clientsFilter));
+
+                $data = $result;
+                $data['allClientsCount'] = $allClientsCount;
+                $data['allAccountsCount'] = $allAccountsCount;
+            } else {
+                $data = array_map(function ($row) use ($currency, $mobileMasks, $desktopMasks) {
+                    $row['reg_date'] = date('d M, Y', strtotime($row['reg_date']));
+                    $row['total_amount'] = $currency->toCurrency($row['total_amount']);
+                    $row['mobileMasks'] = $mobileMasks;
+                    $row['desktopMasks'] = $desktopMasks;
+                    if (!empty($row['customer_attr'])) {
+                        $attributes = explode(',', $row['customer_attr']);
+                        unset($row['customer_attr']);
+                        foreach ($attributes as $attribute) {
+                            $attribute = explode('||', $attribute);
+                            $row[preg_replace('`customer_`', '', $attribute[0])] = $attribute[1];
+
+                        }
+                    } else {
+                        unset($row['customer_attr']);
+                    }
+                    return $row;
+                },
+                    $customerMapper->listAll($where, $order, $limit, $offset, $search, $clientsFilter));
+            }
 		} else {
 			if ($id) {
 				$result = $customerMapper->find($id);
