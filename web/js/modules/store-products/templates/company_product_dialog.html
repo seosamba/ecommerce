@@ -1,5 +1,5 @@
 <div title="<%= _.isUndefined(i18n['Assign suppliers']) ? 'Assign suppliers':i18n['Assign suppliers'] %>">
-    <div class="assign-suppliers-mass-action-content h-scroll">
+    <div class="assign-suppliers-mass-action-content">
     <% _.each(companies, function(company){ %>
             <% checked = '' %>
             <% if (_.isArray(usedCompanyIds) && usedCompanyIds[company.id]) { %>
