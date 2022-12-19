@@ -92,9 +92,26 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         }
 
         $this->_view->productId = $product->getId();
-        $this->_view->tags = $product->getTags();
-        $this->_view->currentFilters = $mapper->getAttributes($product->getId());
 
+        $productTags = $product->getTags();
+        $this->_view->tags = $productTags;
+
+        $tagIds = array();
+        if(!empty($productTags)) {
+            foreach ($productTags as $tag) {
+                $tagIds[] = $tag['id'];
+            }
+        }
+
+        $currentFilters = $mapper->getAttributes($product->getId());
+
+        if(!empty($currentFilters) && !empty($tagIds)) {
+            foreach ($currentFilters as $key => $filter) {
+                $currentFilters[$key]['tags'] = $tagIds;
+            }
+        }
+
+        $this->_view->currentFilters = $currentFilters;
 
         return $this->_view->render('builder.phtml');
     }
