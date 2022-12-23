@@ -38,6 +38,14 @@
                                 <?php $changePaymentPeriod = 'quarter'; ?>
                             <?php elseif ($changePaymentPeriod === '+6 month'): ?>
                                 <?php $changePaymentPeriod = 'semester'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 month'): ?>
+                                <?php $changePaymentPeriod = 'month'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 year'): ?>
+                                <?php $changePaymentPeriod = 'year'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 week'): ?>
+                                <?php $changePaymentPeriod = 'week'; ?>
+                            <?php elseif ($changePaymentPeriod === '+2 month'): ?>
+                                <?php $changePaymentPeriod = 'month-two'; ?>
                             <?php endif; ?>
 
                             <?php $changePaymentPeriodCustom = strtolower(preg_replace('/[^a-zA-Z]/ui', '', $order['payment_period']));?>
