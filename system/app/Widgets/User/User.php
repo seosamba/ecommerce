@@ -18,6 +18,8 @@ class Widgets_User_User extends Widgets_User_Base {
 
     const GRID_OPTION_WITHOUT_PERIOD_CYCLE = 'without_period_cycle';
 
+    const GRID_OPTION_DISABLE_PERIOD_CHANGE = 'disable_period_change';
+
     /**
      * @var Models_Mapper_ProductMapper Product Mapper
      */
@@ -185,6 +187,11 @@ class Widgets_User_User extends Widgets_User_Base {
      */
     protected function _recurringOrdersGrid($userId, $addresses)
     {
+        $this->_view->disablePeriodOptions = false;
+        if (in_array(self::GRID_OPTION_DISABLE_PERIOD_CHANGE, $this->_options)) {
+            $this->_view->disablePeriodOptions = true;
+        }
+
         $orders = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringOrdersDataByUserId($userId);
         $this->_view->stats = array(
             'all' => sizeof($orders),

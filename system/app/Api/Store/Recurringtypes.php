@@ -68,6 +68,7 @@ class Api_Store_Recurringtypes extends Api_Service_Abstract
         'week' => self::RECURRING_PAYMENT_TYPE_WEEK,
         'month' => self::RECURRING_PAYMENT_TYPE_MONTH,
         'two_months' => self::RECURRING_PAYMENT_TYPE_TWO_MONTHS,
+        'month-two' => self::RECURRING_PAYMENT_TYPE_TWO_MONTHS,
         'quarter' =>  self::RECURRING_PAYMENT_TYPE_QUARTER,
         'semester' => self::RECURRING_PAYMENT_TYPE_SEMESTER,
         'year' => self::RECURRING_PAYMENT_TYPE_YEAR
