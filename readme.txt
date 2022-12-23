@@ -101,6 +101,7 @@ Plugin widgets.
     {$user:grid} - grid with information about purchases for current logged user
     {$user:grid:recurring} - grid with information about recurring payments(subscriptions)
     {$user:grid:recurring:without_period_cycle} - this option allows to hide 'payment period cycle' column and to block 'next billing date' changing.
+    {$user:grid:recurring:disable_period_change} - this option disables changing type and period of recurrent payment
 
 7. Post purchase widgets:
     This type of widgets you can use at the post purchase page(page with option Post purchase "Thank you" page)
