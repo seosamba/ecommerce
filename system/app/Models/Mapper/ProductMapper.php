@@ -128,7 +128,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processCustomParams($model->getCustomParams(), $model->getId());
         }
 
-        $this->_processCompanyProducts($model->getCompanyProducts(), $model->getId());
+        if(!empty($model->getCompanyProducts())) {
+            $this->_processCompanyProducts($model->getCompanyProducts(), $model->getId());
+        }
 
         //process product parts if any
         $this->_processParts($model);
@@ -830,6 +832,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         if(!empty($productId)) {
             $companyProductsMapper->deleteByProductId($productId);
             if (!empty($companyProducts)) {
+                if(!is_array($companyProducts)) {
+                    $companyProducts = explode(',', $companyProducts);
+                }
                 $companyProductsMapper->processData($productId, $companyProducts);
             }
         }
