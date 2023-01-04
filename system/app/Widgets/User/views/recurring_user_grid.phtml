@@ -46,6 +46,8 @@
                                 <?php $changePaymentPeriod = 'week'; ?>
                             <?php elseif ($changePaymentPeriod === '+2 month'): ?>
                                 <?php $changePaymentPeriod = 'month-two'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 day'): ?>
+                                <?php $changePaymentPeriod = 'day'; ?>
                             <?php endif; ?>
 
                             <?php $changePaymentPeriodCustom = strtolower(preg_replace('/[^a-zA-Z]/ui', '', $order['payment_period']));?>
