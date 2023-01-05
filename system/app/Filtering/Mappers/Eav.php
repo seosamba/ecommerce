@@ -7,6 +7,9 @@
 class Filtering_Mappers_Eav
 {
 
+    const DOUBLE_QUOTE_NEW_FORMAT = '”';
+    const SINGLE_QUOTE_NEW_FORMAT = '’';
+
     /**
      * @var string Name of tables containing attributes
      */
@@ -102,6 +105,9 @@ class Filtering_Mappers_Eav
         $attributeId = intval($attributeId);
         $productId = intval($productId);
         $value = (string)$value;
+
+        $value = str_replace('"', self::DOUBLE_QUOTE_NEW_FORMAT, $value);
+        $value = str_replace('\'', self::SINGLE_QUOTE_NEW_FORMAT, $value);
 
         $dbTable = new Filtering_DbTables_Eav();
 
