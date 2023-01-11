@@ -273,8 +273,33 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				$key = strtolower($key);
 				switch($key){
                     case 'user':
-                        $likeWhere = "CONCAT(TRIM(s_adr.firstname), ' ',  TRIM(s_adr.lastname)) LIKE ?  OR CONCAT(TRIM(b_adr.firstname), ' ',  TRIM(b_adr.lastname)) LIKE ?";
-                        $select->where($likeWhere, '%' . $val . '%');
+                        //$likeWhere = "CONCAT(TRIM(s_adr.firstname), ' ',  TRIM(s_adr.lastname)) LIKE ?  OR CONCAT(TRIM(b_adr.firstname), ' ',  TRIM(b_adr.lastname)) LIKE ?";
+
+                        $attributeValues = explode(' ', $val);
+
+                        $likeWhere = ' (';
+                        foreach ($attributeValues as $key => $attrVal) {
+                            $likeWhere .= $this->getDbTable()->getAdapter()->quoteInto('CONCAT(TRIM(s_adr.firstname), " ",  TRIM(s_adr.lastname)) LIKE ?',
+                                '%' . $attrVal . '%');
+                            if (count($attributeValues) > $key + 1) {
+                                $likeWhere .= ' AND ';
+                            }
+                        }
+
+                        $likeWhere .= ') OR ( ';
+
+                        foreach ($attributeValues as $key => $attrVal) {
+                            $likeWhere .= $this->getDbTable()->getAdapter()->quoteInto('CONCAT(TRIM(b_adr.firstname), " ",  TRIM(b_adr.lastname)) LIKE ?',
+                                '%'. $attrVal . '%');
+
+                            if (count($attributeValues) > $key+1) {
+                                $likeWhere .= ' AND ';
+                            }
+                        }
+
+                        $likeWhere .= ')';
+
+                        $select->where($likeWhere);
                         break;
 					case 'product-id':
 						$select->where('p.id = ?', $val);
@@ -321,7 +346,42 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             }
                         }
                         else {
-                            $subSelect->where($likeWhere, '%'.$val.'%');
+                            $attributeValues = explode(' ', $val);
+
+                            $whereParam = ' (';
+                            foreach ($attributeValues as $key => $attrVal) {
+                                $whereParam .= $this->getDbTable()->getAdapter()->quoteInto('product.name LIKE ?',
+                                    '%' . $attrVal . '%');
+                                if (count($attributeValues) > $key + 1) {
+                                    $whereParam .= ' AND ';
+                                }
+                            }
+
+                            $whereParam .= ') OR ( ';
+
+                            foreach ($attributeValues as $key => $attrVal) {
+                                $whereParam .= $this->getDbTable()->getAdapter()->quoteInto('product.sku LIKE ?',
+                                    '%'. $attrVal . '%');
+
+                                if (count($attributeValues) > $key+1) {
+                                    $whereParam .= ' AND ';
+                                }
+                            }
+
+                            $whereParam .= ') OR ( ';
+
+                            foreach ($attributeValues as $key => $attrVal) {
+                                $whereParam .= $this->getDbTable()->getAdapter()->quoteInto('product.mpn LIKE ?',
+                                    '%'. $attrVal . '%');
+
+                                if (count($attributeValues) > $key+1) {
+                                    $whereParam .= ' AND ';
+                                }
+                            }
+
+                            $whereParam .= ')';
+
+                            $subSelect->where($whereParam);
                         }
 
                         $cartIds = $this->getDbTable()->getAdapter()->fetchCol($subSelect);
