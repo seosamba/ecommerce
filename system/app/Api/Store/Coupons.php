@@ -51,6 +51,14 @@ class Api_Store_Coupons extends Api_Service_Abstract {
                         $data[$key]['zoneName'] = '';
                     }
 
+                    if(!empty($couponData['startDate'])) {
+                        $data[$key]['startDate'] = date('d-M-Y', strtotime($couponData['startDate']));
+                    }
+
+                    if(!empty($couponData['endDate'])) {
+                        $data[$key]['endDate'] = date('d-M-Y', strtotime($couponData['endDate']));
+                    }
+
                 }
             }
 
