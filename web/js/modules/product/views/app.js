@@ -404,7 +404,7 @@ define([
             });
 
             if (this.model.has('related')){
-                _.isEmpty(this.model.get('related')) && this.$('#related-holder').find('.spinner').remove();
+                _.isEmpty(this.model.get('related')) && this.$('#related-holder').find('#core-spinner').remove();
             }
 
             self.initTinyMce();
@@ -1007,7 +1007,7 @@ define([
         },
         filterProducts: function(e, forceRun) {
             if (e.keyCode === 13 || forceRun === true) {
-                $('#product-list-holder').html('<div class="spinner"></div>');
+                $('#product-list-holder').html('<div id="core-spinner"></div>');
                 this.products.key = e.currentTarget.value.replace('&', '*-amp-*');
                 this.products.goTo(this.products.firstPage);
                 $(e.target).autocomplete('close');
@@ -1166,7 +1166,7 @@ define([
             $('#massaction').html(labels[listtype]);
 
             if (this.products === null) {
-                $('#product-list-holder').html('<div class="spinner"></div>');
+                $('#product-list-holder').html('<div id="core-spinner"></div>');
                 return this.initProducts().pager();
             }
         },
