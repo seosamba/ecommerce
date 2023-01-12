@@ -1008,7 +1008,7 @@ define([
         filterProducts: function(e, forceRun) {
             if (e.keyCode === 13 || forceRun === true) {
                 $('#product-list-holder').html('<div class="spinner"></div>');
-                this.products.key = e.currentTarget.value;
+                this.products.key = e.currentTarget.value.replace('&', '*-amp-*');
                 this.products.goTo(this.products.firstPage);
                 $(e.target).autocomplete('close');
             }

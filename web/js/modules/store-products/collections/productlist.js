@@ -17,7 +17,7 @@ define([
             perPage: 20
         },
         server_api: {
-            'key': function() { return $('input[name="productsearch"]').val(); },
+            'key': function() { return $('input[name="productsearch"]').val().replace('&', '*-amp-*'); },
             'limit': function() { return this.perPage },
             'offset': function() { return this.currentPage * this.perPage },
             'order': '',
