@@ -287,7 +287,20 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         }
 
         if ($search) {
-            $orWhere = $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?', '%' . $search . '%');
+            //$orWhere = $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?', '%' . $search . '%');
+            $orWhere = ' (';
+            $attributeValues = explode(' ', $search);
+            foreach ($attributeValues as $key => $attrVal) {
+                $orWhere .= $userDbTable->getAdapter()->quoteInto('user.full_name LIKE ?',
+                    '%'. $attrVal . '%');
+
+                if (count($attributeValues) > $key+1) {
+                    $orWhere .= ' AND ';
+                }
+            }
+
+            $orWhere .= ')';
+
             $orWhere .= ' OR ' . $userDbTable->getAdapter()->quoteInto('user.email LIKE ?', '%' . $search . '%');
             $select->where($orWhere);
         }
