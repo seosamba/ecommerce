@@ -136,6 +136,8 @@ define([
 
             this.model = new ProductModel();
 
+            $('#core-spinner').remove();
+
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
             this.model.on('change:id', this.setProductIdForCouponAndGroup, this);
