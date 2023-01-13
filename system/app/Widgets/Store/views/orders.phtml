@@ -124,7 +124,33 @@ $this->headLink()
                         <?php endif; ?>
                     </select>
                 </p>
-                <p class="grid_2 alpha <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?> recurring-filters t-grid_3">
+                <div class="grid_9 omega alpha mb20px">
+                    <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
+                    <?php
+                    $countryList = Tools_Geo::getCountries(true);
+                    $countryList = array_merge(array('_' => ''), $countryList);
+                    echo '<div class="grid_4 alpha t-grid_2 t-alpha">' . $this->formSelect('filter-country', (!empty($this->presetConfig['filter_country'])) ? $this->presetConfig['filter_country'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
+
+                    $stateList = array('' => '');
+                    if(!empty($this->states) && !empty($this->presetConfig['filter_country']) && ($this->presetConfig['filter_country'] == 'US' || $this->presetConfig['filter_country'] == 'CA' || $this->presetConfig['filter_country'] == 'AU')){
+                        $stateList = array('' => '') + $this->states;
+                    }
+
+                    echo '<div class="grid_4 alpha t-grid_2">' . $this->formSelect('filter-state', (!empty($this->presetConfig['filter_state'])) ? $this->presetConfig['filter_state'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), $stateList) . '</div>';
+
+                $shippingServices = array_merge(array(''), $this->shippingServices);
+                echo '<div class="grid_4 alpha omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', (!empty($this->presetConfig['filter_carrier'])) ? $this->presetConfig['filter_carrier'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
+                ?>
+
+                <?php $countriesWithStates = array(); ?>
+                <?php foreach ($this->countriesList as $countryAbbr => $countryFullName) : ?>
+                    <?php if (!empty($countryStates = Tools_Geo::getState($countryAbbr, true))) {
+                        $countriesWithStates[$countryAbbr] = $countryStates;
+                    } ?>
+                <?php endforeach;?>
+                <input type="hidden" id="countries-with-states" value='<?php echo json_encode($countriesWithStates); ?>'/>
+            </div>
+                <p class="grid_3 alpha recurring-filters t-grid_3 <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?>">
                     <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
                     <?php echo $this->formSelect('filter-recurring-order-type', (!empty($this->presetConfig['filter_recurring_order_type'])) ? $this->presetConfig['filter_recurring_order_type'] : null, array(
                         'class' => 'filter',
@@ -139,7 +165,7 @@ $this->headLink()
                         'canceled' => $this->translate('Canceled')
                     )); ?>
                 </p>
-                <p class="grid_2 alpha omega t-grid_3">
+                <p class="grid_3 alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order type');?></label>
                     <?php $orderTypes = array(
                         '',
@@ -157,33 +183,7 @@ $this->headLink()
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
                 </p>
-                <div class="grid_8 omega alpha">
-                    <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
-                    <?php
-                    $countryList = Tools_Geo::getCountries(true);
-                    $countryList = array_merge(array('_' => ''), $countryList);
-                    echo '<div class="grid_4 alpha t-grid_2 t-alpha">' . $this->formSelect('filter-country', (!empty($this->presetConfig['filter_country'])) ? $this->presetConfig['filter_country'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping country')), $countryList ) . '</div>';
-
-                    $stateList = array('' => '');
-                    if(!empty($this->states) && !empty($this->presetConfig['filter_country']) && ($this->presetConfig['filter_country'] == 'US' || $this->presetConfig['filter_country'] == 'CA' || $this->presetConfig['filter_country'] == 'AU')){
-                        $stateList = array('' => '') + $this->states;
-                    }
-
-                    echo '<div class="grid_4 t-grid_2">' . $this->formSelect('filter-state', (!empty($this->presetConfig['filter_state'])) ? $this->presetConfig['filter_state'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping state')), $stateList) . '</div>';
-
-                $shippingServices = array_merge(array(''), $this->shippingServices);
-                echo '<div class="grid_4 omega t-grid_2 t-omega">' . $this->formSelect('filter-carrier', (!empty($this->presetConfig['filter_carrier'])) ? $this->presetConfig['filter_carrier'] : null, array('class' => 'filter', 'data-placeholder' => $this->translate('shipping carrier')), $shippingServices ) . '</div>';
-                ?>
-
-                <?php $countriesWithStates = array(); ?>
-                <?php foreach ($this->countriesList as $countryAbbr => $countryFullName) : ?>
-                    <?php if (!empty($countryStates = Tools_Geo::getState($countryAbbr, true))) {
-                        $countriesWithStates[$countryAbbr] = $countryStates;
-                    } ?>
-                <?php endforeach;?>
-                <input type="hidden" id="countries-with-states" value='<?php echo json_encode($countriesWithStates); ?>'/>
-            </div>
-            <div class="grid_2 mt20px">
+            <div class="grid_2 alpha mt20px">
                 <label><input type="checkbox" id="exclude-quotes-from-search" name="exclude-quotes-from-search" <?php echo ((!empty($this->presetConfig['exclude_quotes_from_search']))) ? "checked" : ''; ?>> <?php echo $this->translate('Exclude quotes');?></label>
                 <label><input type="checkbox" id="is-a-gift" name="is-a-gift" <?php echo ((!empty($this->presetConfig['is_a_gift']))) ? "checked" : ''; ?>> <?php echo $this->translate('Is a gift');?></label>
             </div>
