@@ -141,7 +141,7 @@ define(['backbone',
                 'id': function() { return $('input[name=search]').val(); },
                 'filter': function() {
                     return {
-                        'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),
+                        'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val().replace('&', '*-amp-*'),
                         'status': $('#filter-status', '#store-orders form.filters').val(),
                         'country': $('select[name=filter-country]', '#store-orders form.filters').val(),
                         'state': $('select[name=filter-state]', '#store-orders form.filters').val(),

@@ -42,6 +42,7 @@ class Tools_ExportImportOrders
         unset($data['controller']);
         unset($data['action']);
         $filters = $data['filters'];
+        $filters['product-key'] = str_replace('*-amp-*', '&', $filters['product-key']);
         unset($data['filters']);
         $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
         $excludeFields = array();
