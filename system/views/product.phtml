@@ -216,7 +216,7 @@ $this->headLink()
         );
     ?>
     <div id="manage-product" class="with-content-footer">
-        <span class="spinner"></span>
+        <span id="core-spinner"></span>
         <div id="product-list" class="show-right">
             <div class="header shadow">
                 <div class="closebutton">
@@ -241,7 +241,7 @@ $this->headLink()
                     <a class="hide-block ticon-chevron-left" href="javascript:;" onclick="$('#product-image-folder').val('0');$('#image-list, .paginator').empty();" title="<?php echo $this->translate('Back'); ?>"></a>
                 </div>
             </div>
-            <div id="image-list" class="content-footer grid_12 list-images"><span class="spinner"></span></div>
+            <div id="image-list" class="content-footer grid_12 list-images"><span id="core-spinner"></span></div>
             <div class="footer grid_12 text-center">
                 <div class="paginator"></div>
             </div>
@@ -517,7 +517,7 @@ $this->headLink()
             <div id="related-tab" class="scroll">
                 <div id="related-holder" class="column_8 full-width">
                     <a href="javascript:;" data-listtype="related" class="show-list productlisting ticon-plus-sign fs48" title="<?php echo $this->translate('Add related'); ?>"></a>
-                    <span class="spinner"></span>
+                    <span id="core-spinner"></span>
                 </div>
             </div>
         <?php endif;?>
