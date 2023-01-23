@@ -290,7 +290,70 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 }
 
             } else {
-                $select->where($likeWhere, '%' . $search . '%');
+                $attributeValues = explode(' ', $search);
+                $whereSplitSearch = ' (';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.name LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.sku LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.mpn LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('b.name LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('t.name LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ')';
+
+                $select->where($whereSplitSearch);
             }
         }
 

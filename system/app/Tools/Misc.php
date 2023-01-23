@@ -922,7 +922,7 @@ class Tools_Misc
             }
 
             $preparedDate = Tools_System_Tools::convertDateFromTimezone('now', $serverTimezone, 'UTC');
-            $preparedDate = date(Tools_System_Tools::DATE_MYSQL, strtotime($preparedDate .'+'.Tools_EmailSequenceTools::getTimezoneShift('UTC', $storeTimezone).'hours'));
+            $preparedDate = date(Tools_System_Tools::DATE_MYSQL, strtotime($preparedDate .'+'.self::getTimezoneShift('UTC', $storeTimezone).'hours'));
 
             $currentDayOfTheWeek = strtolower(date('l', strtotime($preparedDate)));
             $currentHourOfTheWeek = intval(strtolower(date('H', strtotime($preparedDate))));
@@ -981,6 +981,22 @@ class Tools_Misc
         }
 
         return false;
+    }
+
+    /**
+     * @param $timezoneFrom
+     * @param $timeZoneToShift
+     * @return float|int
+     */
+    public static function getTimezoneShift($timezoneFrom, $timeZoneToShift)
+    {
+        $dateTimeZoneServer = new DateTimeZone($timezoneFrom);
+        $dateTimeZoneStore = new DateTimeZone($timeZoneToShift);
+        $dateTimeServer = new DateTime("now", $dateTimeZoneServer);
+
+        $timeOffsetInHours = $dateTimeZoneStore->getOffset($dateTimeServer) / 3600;
+
+        return $timeOffsetInHours;
     }
 
 }

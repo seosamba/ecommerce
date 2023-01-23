@@ -66,11 +66,13 @@ class Widgets_User_User extends Widgets_User_Base {
     }
 
     protected function _renderRegistration() {
-        return $this->_getCustomer()->getRegDate();
+        $regDate = self::convertToTimezone($this->_getCustomer()->getRegDate());
+        return $regDate;
     }
 
     protected function _renderLastlogin() {
-        return $this->_getCustomer()->getLastLogin();
+        $lastLogin = self::convertToTimezone($this->_getCustomer()->getLastLogin());
+        return $lastLogin;
     }
 
     protected function _renderEmail() {
@@ -240,6 +242,25 @@ class Widgets_User_User extends Widgets_User_Base {
         $digitalProducts = Store_Mapper_DigitalProductMapper::getInstance()->findDigitalProductsByUserId($userId);
         $this->_view->digitalProducts = $digitalProducts;
         return $this->_view->render('digital-products-grid.phtml');
+    }
+
+    protected function convertToTimezone($date) {
+        if(!empty($date)) {
+            $serverTimezone = date_default_timezone_get();
+            if (empty($serverTimezone)) {
+                $serverTimezone = 'UTC';
+            }
+
+            $userTimezone = $this->_getCustomer()->getTimezone();
+            if(!empty($userTimezone)) {
+                $userTimezoneOffset = Tools_System_Tools::convertDateFromTimezone('now', 'UTC', Tools_System_Tools::getUserTimezone(), 'T');
+
+                $date = Tools_System_Tools::convertDateFromTimezone($date, $serverTimezone, 'UTC');
+                $date = date(Tools_System_Tools::DATE_MYSQL, strtotime($date .'+'.Tools_Misc::getTimezoneShift('UTC', $userTimezone).'hours'));
+                $date = date('d-M-Y H:i:s', strtotime($date)) . ' ' . $userTimezoneOffset;
+            }
+        }
+        return $date;
     }
 
 }

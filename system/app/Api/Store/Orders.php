@@ -83,6 +83,7 @@ class Api_Store_Orders extends Api_Service_Abstract {
 		} else {
 			$filter = filter_var_array($this->_request->getParam('filter'), FILTER_SANITIZE_STRING);
             $filter['product-id'] = filter_var($this->_request->getParam('productid'), FILTER_SANITIZE_NUMBER_INT);
+            $filter['product-key'] = str_replace('*-amp-*', '&', $filter['product-key']);
 			$limit = filter_var($this->_request->getParam('limit'), FILTER_SANITIZE_NUMBER_INT);
 			$offset = filter_var($this->_request->getParam('offset'), FILTER_SANITIZE_NUMBER_INT);
             $user = filter_var($this->_request->getParam('user'), FILTER_SANITIZE_STRING);

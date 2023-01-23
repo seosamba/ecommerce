@@ -14,6 +14,7 @@ define({
         'cs_canceled'	  : 'Cancelado',
         'cs_error'        : 'Error',
         'cs_partial'      : 'Partial Order',
+        'cs_not_verified' : 'Quote Signed (Signature only quote)',
         'New quote'       : 'Nuevo presupuesto',
         'Quote Sent'      : 'Presupuesto enviado',
         'Mark order paid' : 'Marcar presupuesto como pagado',
