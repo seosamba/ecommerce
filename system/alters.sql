@@ -690,7 +690,12 @@ UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = `total` - ROUN
 UPDATE `shopping_cart_session` SET `first_partial_paid_amount` = `partial_percentage` WHERE `is_partial` = '1' AND `status` IN ('partial', 'completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
 UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = (`total` - `partial_percentage`) WHERE `is_partial` = '1' AND `status` IN ('completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
 
+-- 26/01/2023
+-- version: 2.9.6
+ALTER TABLE `shopping_filtering_tags_has_attributes` ADD CONSTRAINT `shopping_filtering_tags_has_attributes_ibfk_1` FOREIGN KEY (`tag_id`) REFERENCES `shopping_tags` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `shopping_filtering_values` ADD CONSTRAINT `shopping_filtering_values_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.7' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
