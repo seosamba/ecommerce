@@ -159,7 +159,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('minimumOrder', '0'),
 ('fiscalYearStart', '1'),
-('version', '2.9.0');
+('version', '2.9.7');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -710,7 +710,8 @@ CREATE TABLE IF NOT EXISTS  `shopping_filtering_tags_has_attributes` (
   `tag_id` int(10) unsigned NOT NULL,
   `attribute_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`tag_id`,`attribute_id`),
-  KEY `attribute_id` (`attribute_id`)
+  KEY `attribute_id` (`attribute_id`),
+  FOREIGN KEY(`tag_id`) REFERENCES `shopping_tags`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
@@ -721,7 +722,8 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `attribute_id_2` (`attribute_id`,`product_id`),
   KEY `attribute_id` (`attribute_id`),
-  KEY `product_id` (`product_id`)
+  KEY `product_id` (`product_id`),
+  FOREIGN KEY(`product_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `shopping_import_orders` (
@@ -1109,5 +1111,5 @@ INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_
 
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.7' WHERE `name` = 'shopping';
 

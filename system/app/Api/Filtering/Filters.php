@@ -43,7 +43,7 @@ class Api_Filtering_Filters extends Api_Service_Abstract
         }
         $label = filter_var($data['label'], FILTER_SANITIZE_STRING);
         if (!preg_match('/(?<label>.*)\[(?<name>.*)\]$/', $label, $matches)) {
-            $name = strtolower(preg_replace(array('/\s/', '/[^\w\d\-_]/'), array('_', ''), $label));
+            $name = strtolower(preg_replace(array('/[\s\-]/', '/[^\w\d_]/'), array('_', ''), $label));
         } else {
             $name = $matches['name'];
             $label = $matches['label'];
