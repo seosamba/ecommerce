@@ -11,6 +11,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const TRIGGER_SHIPPING_TRACKING_NUMBER = 'store_trackingnumber';
 
+	const TRIGGER_SHIPPING_PICKUP_NOTIFICATION = 'store_pickupnotification';
+
     const TRIGGER_REFUND = 'store_refund';
 
     const TRIGGER_DELIVERED = 'store_delivered';
@@ -519,6 +521,35 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }else{
             $this->_entityParser->addToDictionary(array('order:shippingtrackingurl' =>  ''));
         }
+        $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
+
+        return $this->_send();
+    }
+
+    /**
+     * Send email for pickup notification
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendPickupnotificationMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser
+            ->objectToDictionary($this->_object, 'order')
+            ->objectToDictionary($this->_customer);
+
+        $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
+            self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
+            self::SHIPPING_TYPE);
+        if (isset($withBillingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:billingaddress' => $withBillingAddress));
+        }
+        if (isset($withShippingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
+        }
+
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
 
         return $this->_send();
