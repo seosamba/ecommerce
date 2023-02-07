@@ -997,7 +997,7 @@ define(['backbone',
                     pickupNotification : 1,
                     id : id
                 },
-                confirmMessage = _.isUndefined(i18n['You are about to send pickup notification, proceed?']) ? 'You are about to send pickup notification, proceed?' : i18n['You are about to send pickup notification, proceed?'];
+                confirmMessage = _.isUndefined(i18n['You are about to send a pickup notification to the customer, proceed?']) ? 'You are about to send a pickup notification to the customer, proceed?' : i18n['You are about to send a pickup notification to the customer, proceed?'];
 
             smoke.confirm(confirmMessage, function (e) {
                 if (e) {
