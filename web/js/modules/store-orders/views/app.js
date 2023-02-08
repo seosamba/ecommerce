@@ -1017,6 +1017,8 @@ define(['backbone',
 
                             model.set({
                                 'status': response.responseText.status,
+                                'is_pickup_notification_sent': response.responseText.isPickupNotificationSent,
+                                'pickup_notification_sent_on': response.responseText.pickupNotificationSentOn,
                             });
 
                             el.closest('td').find('.ajax-loader').hide();
