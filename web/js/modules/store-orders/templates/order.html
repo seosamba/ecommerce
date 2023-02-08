@@ -71,9 +71,9 @@
                 <% if (status == 'completed' || status == 'shipped') { %>
                     <% if (is_pickup_notification_sent == '1') { %>
                         <%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(pickup_notification_sent_on.replace(/\-/g, '/')))) %>
-                        <a href="javascript:;" class="btn set-pickup"><%= _.isUndefined(i18n['notify again']) ? 'notify again':i18n['notify again'] %></a>
+                        <a href="javascript:;" class="btn set-pickup"><%= _.isUndefined(i18n['Notify again']) ? 'Notify again':i18n['Notify again'] %></a>
                     <% } else { %>
-                        <a href="javascript:;" class="btn set-pickup"><%= _.isUndefined(i18n['ready for pickup']) ? 'ready for pickup':i18n['ready for pickup'] %></a>
+                        <a href="javascript:;" class="btn set-pickup"><%= _.isUndefined(i18n['Ready for pickup']) ? 'Ready for pickup':i18n['Ready for pickup'] %></a>
                     <% } %>
                 <% } %>
             <% } %>
