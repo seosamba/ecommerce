@@ -9,6 +9,8 @@ class Forms_Checkout_Pickup extends Zend_Form {
 
     protected $_mobile = null;
 
+    protected $_notes = null;
+
     public function setMobilecountrycode($_mobilecountrycode)
     {
         $this->_mobilecountrycode = $_mobilecountrycode;
@@ -30,6 +32,17 @@ class Forms_Checkout_Pickup extends Zend_Form {
     public function getMobile()
     {
         return $this->_mobile;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->_notes = $notes;
+        $this->getElement('notes')->setValue($this->_notes);
+    }
+
+    public function getNotes()
+    {
+        return $this->_notes;
     }
 
 	public function init(){
@@ -104,6 +117,14 @@ class Forms_Checkout_Pickup extends Zend_Form {
             'validators' => array('EmailAddress'),
             'required'   => true,
             'class'    => array('required')
+        )));
+
+        $this->addElement(new Zend_Form_Element_Textarea(array(
+            'name'     => 'notes',
+            'label'    => $translator->translate('Notes'),
+            'rows'     => '3',
+            'cols'     => '45',
+            'value'     => $this->_notes,
         )));
 
         $this->addElement('hidden', 'step', array(
