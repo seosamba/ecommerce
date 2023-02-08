@@ -1398,6 +1398,18 @@ class Shopping extends Tools_Plugins_Abstract {
                     $params['shippingTrackingCodeId'] = $currenttrackingUrlId;
                 }
 
+                if (isset($params['pickupNotification'])) {
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_PICKUP_NOTIFICATION,
+                    )));
+
+                    if ($order->getStatus() !== Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                        $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                    }
+                    $params['pickup_notification_sent_on'] = Tools_System_Tools::convertDateFromTimezone('now');
+                    $params['is_pickup_notification_sent'] = '1';
+                }
+
                 if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED) {
                     $order->registerObserver(new Tools_Mail_Watchdog(array(
                         'trigger' => Tools_StoreMailWatchdog::TRIGGER_DELIVERED

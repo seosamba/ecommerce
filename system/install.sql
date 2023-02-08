@@ -340,6 +340,8 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `order_subtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `partial_notification_date` TIMESTAMP NULL,
   `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_pickup_notification_sent` ENUM('0', '1') DEFAULT '0',
+  `pickup_notification_sent_on` timestamp NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -1109,7 +1111,12 @@ CREATE TABLE IF NOT EXISTS `shopping_filter_preset` (
 INSERT IGNORE INTO `shopping_filter_preset` (`id`, `creator_id`, `filter_preset_name`, `filter_preset_data`, `is_default`, `access`) VALUES
     (1,	1,	'Default filter',	'{"filter_from_amount":"","filter_to_amount":"","filter_by_coupon_code":"","orders_filter_fromdate":"","orders_filter_todate":"","filter_status":["pending","partial","completed","shipped","delivered","quote_signed"],"filter_order_type":"0","filter_recurring_order_type":"","filter_country":"_","filter_state":null,"filter_carrier":"0"}',	'1', 'all');
 
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_pickupnotification'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.7' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.8' WHERE `name` = 'shopping';
 
