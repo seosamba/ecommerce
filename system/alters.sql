@@ -706,7 +706,11 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `is_pickup_notification_sent` ENUM('0', '1') DEFAULT '0';
 ALTER TABLE `shopping_cart_session` ADD COLUMN `pickup_notification_sent_on` timestamp NULL;
 
+-- 23/02/2023
+-- version: 2.9.8
+ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(12,6) DEFAULT '0.00';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.8' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='2.9.9' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
