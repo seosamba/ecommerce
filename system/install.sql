@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `refund_notes` TEXT DEFAULT NULL COMMENT 'Refund info',
   `purchased_on` timestamp NULL,
   `partial_type` ENUM('amount', 'percentage') DEFAULT NULL,
-  `partial_percentage` DECIMAL(10,6) DEFAULT '0.00',
+  `partial_percentage` DECIMAL(12,6) DEFAULT '0.00',
   `is_partial` ENUM('0', '1') DEFAULT '0',
   `partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
   `first_partial_paid_amount` DECIMAL(10,2) DEFAULT '0.00',
@@ -1118,5 +1118,5 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `obser
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.8' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '2.9.9' WHERE `name` = 'shopping';
 
