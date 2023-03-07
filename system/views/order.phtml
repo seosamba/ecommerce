@@ -110,6 +110,8 @@
                                     <?php if (!empty($this->order->getPurchasedOn())):?>
                                         <?php echo $this->translate('Full payment');?>: <?php echo $gateway;?>
                                         (<?php echo $this->currency($this->order->getTotal());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                    <?php else: ?>
+                                        <?php echo $gateway;?>
                                     <?php endif;?>
                                 </span>
                             <?php endif;?>
