@@ -107,8 +107,10 @@
                                 <span><b><?php echo $this->translate('Payment Method');?>:</b>
                                       <br/>
                                 <span>
-                                    <?php echo $this->translate('Full payment');?>: <?php echo $gateway;?>
-                                    (<?php echo $this->currency($this->order->getTotal());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                    <?php if (!empty($this->order->getPurchasedOn())):?>
+                                        <?php echo $this->translate('Full payment');?>: <?php echo $gateway;?>
+                                        (<?php echo $this->currency($this->order->getTotal());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                    <?php endif;?>
                                 </span>
                             <?php endif;?>
                         <?php endif; ?>
