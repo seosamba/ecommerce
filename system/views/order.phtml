@@ -104,8 +104,12 @@
                                     <?php endif;?>
                                   <?php endif;?>
                             <?php else :?>
-                                <span><?php echo $this->translate('Payment Method');?>
-                                    : <?php echo $gateway ;?></span>
+                                <span><b><?php echo $this->translate('Payment Method');?>:</b>
+                                      <br/>
+                                <span>
+                                    <?php echo $this->translate('Full payment');?>: <?php echo $gateway;?>
+                                    (<?php echo $this->currency($this->order->getTotal());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                </span>
                             <?php endif;?>
                         <?php endif; ?>
                     <?php else: ?>
