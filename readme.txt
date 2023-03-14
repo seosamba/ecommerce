@@ -226,6 +226,7 @@ Magic spaces:
  allitems - Show all filter values without All others group
  usesort - enable the ability to sort custom filters list
  usesortvalues - enable the ability to sort custom filters values list. May use with "usesort" option only
+ without-option-counter - Allow to hide counter next to the filter item
 
 10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}

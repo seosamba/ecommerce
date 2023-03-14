@@ -15,7 +15,7 @@
                     <?php } ?>
                     />
                 <a href="<?php echo $this->url() . '?' . $this->name . '=' . urlencode($value); ?>">
-                    <?php echo $value; ?><?php if(empty($this->nocount)) { echo '&nbsp;[' . $count . ']'; } ?>
+                    <?php echo $value; ?><?php if(empty($this->withoutOptionCounter)) { echo '&nbsp;[' . $count . ']'; } ?>
                 </a>
             </label>
         </li>

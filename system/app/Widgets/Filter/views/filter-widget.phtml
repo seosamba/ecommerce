@@ -72,7 +72,11 @@
                                                                     <?php if ($checked) { ?> checked <?php }; ?>
                                                                 />
                                                                 <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
-                                                                    <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                                                    <?php if (empty($this->withoutOptionCounter)):?>
+                                                                        <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                                                    <?php else:?>
+                                                                        <?php echo $value;?>
+                                                                    <?php endif;?>
                                                                 </a>
                                                             </label>
                                                         </li>
@@ -98,7 +102,11 @@
                                                                     <?php }; ?>
                                                                 />
                                                                 <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
-                                                                    <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                                                    <?php if (empty($this->withoutOptionCounter)):?>
+                                                                        <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                                                    <?php else:?>
+                                                                        <?php echo $this->translate('All others'); ?>
+                                                                    <?php endif;?>
                                                                 </a>
                                                             </label>
                                                         </li>
@@ -122,7 +130,11 @@
                                                         <?php if ($checked) { ?> checked <?php }; ?>
                                                     />
                                                     <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
-                                                        <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                                        <?php if (empty($this->withoutOptionCounter)):?>
+                                                            <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                                        <?php else:?>
+                                                            <?php echo $value; ?>
+                                                        <?php endif;?>
                                                     </a>
                                                 </label>
                                             </li>
@@ -148,7 +160,11 @@
                                                         <?php }; ?>
                                                     />
                                                     <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
-                                                        <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                                        <?php if (empty($this->withoutOptionCounter)):?>
+                                                            <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                                        <?php else:?>
+                                                            <?php echo $this->translate('All others'); ?>
+                                                        <?php endif;?>
                                                     </a>
                                                 </label>
                                             </li>
@@ -187,7 +203,11 @@
                                             <?php if ($checked) { ?> checked <?php }; ?>
                                         />
                                         <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode($value); ?>">
-                                            <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                            <?php if (empty($this->withoutOptionCounter)):?>
+                                                <?php echo $value . '&nbsp;[' . $count . ']'; ?>
+                                            <?php else:?>
+                                                <?php echo $value; ?>
+                                            <?php endif;?>
                                         </a>
                                     </label>
                                 </li>
@@ -212,7 +232,11 @@
                                             <?php }; ?>
                                         />
                                         <a href="<?php echo $this->url() . '?' . $filter['name'] . '=' . urlencode(Widgets_Filter_Filter::FILTER_OTHERS); ?>">
-                                            <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                            <?php if (empty($this->withoutOptionCounter)):?>
+                                                <?php echo $this->translate('All others') . '&nbsp;[' . sizeof($others) . ']'; ?>
+                                            <?php else:?>
+                                                <?php echo $this->translate('All others'); ?>
+                                            <?php endif;?>
                                         </a>
                                     </label>
                                 </li>
