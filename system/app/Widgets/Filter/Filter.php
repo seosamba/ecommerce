@@ -21,6 +21,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
      */
     const FILTER_ALLITEMS = 'allitems';
 
+    const WITHOUT_OPTION_COUNTER = 'without-option-counter';
+
     private $_allowedOptions = array(
         'builder', 'product', 'attribute'
     );
@@ -128,6 +130,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $additionalAttributeName = '';
         $additionalAttributeLabel = '';
         $showAllItems = false;
+        $withoutOptionCounter = false;
         foreach ($this->_options as $option) {
             if (preg_match('/^(brands|tagnames|order)-(.*)$/u', $option, $parts)) {
                 $options[$parts[1]] = explode(',', $parts[2]);
@@ -150,6 +153,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
             if(in_array(self::FILTER_ALLITEMS, $this->_options)) {
                 $showAllItems = true;
+            }
+
+            if(in_array(self::WITHOUT_OPTION_COUNTER, $this->_options)) {
+                $withoutOptionCounter = true;
             }
         }
 
@@ -534,7 +541,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             'name' => 'category',
             'values' => $tagValues,
             'checked' => !empty($appliedFilters['category']) ? $appliedFilters['category'] : array(),
-            'nocount' => true
+            'nocount' => true,
+            'withoutOptionCounter' => true
         );
 
         if (!empty($widgetSettings['brands'])) {
@@ -554,7 +562,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $this->_view->brands = array(
             'name' => 'brand',
             'values' => $brandValues,
-            'checked' => !empty($appliedFilters['brand']) ? $appliedFilters['brand'] : array()
+            'checked' => !empty($appliedFilters['brand']) ? $appliedFilters['brand'] : array(),
+            'withoutOptionCounter' => $withoutOptionCounter
         );
 
         if(isset($priceTax) && !empty($priceTax)){
@@ -582,6 +591,8 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         if($showAllItems) {
             $this->_view->showAllItems = $showAllItems;
         }
+
+        $this->_view->withoutOptionCounter = $withoutOptionCounter;
 
         return $this->_view->render('filter-widget.phtml');
     }
