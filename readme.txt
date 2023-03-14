@@ -121,6 +121,7 @@ Plugin widgets.
     {$postpurchase:referer} -> referer link
     {$postpurchase:createdAt[:d/M/Y]} -> date when purchase created in d-M-Y format. You can set your own date format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
+    {$postpurchase:purchasedon[:d/M/Y]} -> when purchase on date in d-M-Y format. You can set your own date format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:additionalInfo} -> additional info of purchase
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
