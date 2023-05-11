@@ -19,7 +19,13 @@ define(['backbone',
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
         events: {
-            'click #extra-filters-switch': function(){ $('#extra-filters', this.el).slideToggle(); } ,
+            'click #extra-filters-switch': function(){
+                    if ($('#extra-filters', this.el).hasClass('hidden')) {
+                        $('#extra-filters', this.el).removeClass('hidden');
+                    } else {
+                        $('#extra-filters', this.el).addClass('hidden');
+                    }
+                } ,
             'change input.filter': 'applyFilter',
             'change #orders-check-all': 'checkAllOrders',
             'click #orders-filter-apply-btn': 'applyFilter',
@@ -133,7 +139,11 @@ define(['backbone',
                     }
 
                     if (withDetailedFilters === true) {
-                        $('#extra-filters').slideToggle();
+                        if ($('#extra-filters').hasClass('hidden')) {
+                            $('#extra-filters').removeClass('hidden');
+                        } else {
+                            $('#extra-filters').addClass('hidden');
+                        }
                     }
                 }
             }
