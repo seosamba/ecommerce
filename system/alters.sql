@@ -710,7 +710,21 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `pickup_notification_sent_on` tim
 -- version: 2.9.8
 ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(12,6) DEFAULT '0.00';
 
+-- 16/05/2023
+-- version: 2.9.9
+DELETE FROM `shopping_filtering_tags_has_attributes`
+WHERE (`tag_id` IN (
+  SELECT DISTINCT `tag_id` FROM (SELECT `tag_id` FROM `shopping_filtering_tags_has_attributes` WHERE `tag_id` NOT IN (SELECT `id` FROM `shopping_tags`)) as sftha
+));
+ALTER TABLE `shopping_filtering_tags_has_attributes` ADD CONSTRAINT `shopping_filtering_tags_has_attributes_ibfk_1` FOREIGN KEY (`tag_id`) REFERENCES `shopping_tags` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+DELETE FROM `shopping_filtering_values`
+WHERE (`product_id` IN (
+  SELECT DISTINCT `product_id` FROM (SELECT `product_id` FROM `shopping_filtering_values` WHERE `product_id` NOT IN (SELECT `id` FROM `shopping_product`)) as sfv
+));
+ALTER TABLE `shopping_filtering_values` ADD CONSTRAINT `shopping_filtering_values_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.9' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
