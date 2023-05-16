@@ -159,7 +159,7 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('minimumOrder', '0'),
 ('fiscalYearStart', '1'),
-('version', '2.9.7');
+('version', '3.0.0');
 
 DROP TABLE IF EXISTS `shopping_product`;
 CREATE TABLE IF NOT EXISTS `shopping_product` (
@@ -1118,5 +1118,5 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `obser
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.0' WHERE `name` = 'shopping';
 
