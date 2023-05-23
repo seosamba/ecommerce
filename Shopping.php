@@ -2034,6 +2034,8 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $user->setPassword(null);
                     $userMapper->save($user);
+                    $updateUserInfoStatus = Tools_System_Tools::firePluginMethodByTagName('userupdate', 'updateUserInfo', $user->getId());
+
                     $this->_responseHelper->success('');
                 }
                 $this->_responseHelper->fail();
