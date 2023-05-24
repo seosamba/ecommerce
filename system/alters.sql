@@ -710,7 +710,11 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `pickup_notification_sent_on` tim
 -- version: 2.9.8
 ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(12,6) DEFAULT '0.00';
 
+-- 24/05/2023
+-- version: 2.9.9
+UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.9' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

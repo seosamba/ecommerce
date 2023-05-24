@@ -1998,8 +1998,12 @@ class Shopping extends Tools_Plugins_Abstract {
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);
                 if($user instanceof Application_Model_Models_User){
+                    $changeEmail = false;
+                    $oldUserEmailAddress = '';
+                    $newEmailAddress = '';
                     switch($data['profileElement']) {
                         case 'email':
+                            $oldUserEmailAddress = $user->getEmail();
                             $validator = new Tools_System_CustomEmailValidator();
                             if ($validator->isValid($data['profileValue'])) {
                                 $user->setEmail($data['profileValue']);
@@ -2015,6 +2019,9 @@ class Shopping extends Tools_Plugins_Abstract {
                             if ($validator->isValid($data['profileValue'])) {
                                 $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                             }
+
+                            $newEmailAddress = $data['profileValue'];
+                            $changeEmail = true;
                         break;
                         case 'prefix':
                             $user->setPrefix($data['profileValue']);
@@ -2034,7 +2041,13 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $user->setPassword(null);
                     $userMapper->save($user);
-                    $updateUserInfoStatus = Tools_System_Tools::firePluginMethodByTagName('userupdate', 'updateUserInfo', $user->getId());
+                    if ($changeEmail === true) {
+                        $updateUserInfoStatus = Tools_System_Tools::firePluginMethodByTagName('userupdate', 'updateUserInfo', array(
+                            'userId' => $user->getId(),
+                            'oldEmail' => $oldUserEmailAddress,
+                            'newEmail' => $newEmailAddress
+                        ));
+                    }
 
                     $this->_responseHelper->success('');
                 }

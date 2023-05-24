@@ -1117,6 +1117,6 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
-UPDATE `plugin` SET `tags`='processphones' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '2.9.9' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.0' WHERE `name` = 'shopping';
 
