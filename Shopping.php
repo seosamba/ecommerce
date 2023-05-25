@@ -1998,8 +1998,12 @@ class Shopping extends Tools_Plugins_Abstract {
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);
                 if($user instanceof Application_Model_Models_User){
+                    $changeEmail = false;
+                    $oldUserEmailAddress = '';
+                    $newEmailAddress = '';
                     switch($data['profileElement']) {
                         case 'email':
+                            $oldUserEmailAddress = $user->getEmail();
                             $validator = new Tools_System_CustomEmailValidator();
                             if ($validator->isValid($data['profileValue'])) {
                                 $user->setEmail($data['profileValue']);
@@ -2015,6 +2019,9 @@ class Shopping extends Tools_Plugins_Abstract {
                             if ($validator->isValid($data['profileValue'])) {
                                 $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                             }
+
+                            $newEmailAddress = $data['profileValue'];
+                            $changeEmail = true;
                         break;
                         case 'prefix':
                             $user->setPrefix($data['profileValue']);
@@ -2034,6 +2041,14 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $user->setPassword(null);
                     $userMapper->save($user);
+                    if ($changeEmail === true) {
+                        $updateUserInfoStatus = Tools_System_Tools::firePluginMethodByTagName('userupdate', 'updateUserInfo', array(
+                            'userId' => $user->getId(),
+                            'oldEmail' => $oldUserEmailAddress,
+                            'newEmail' => $newEmailAddress
+                        ));
+                    }
+
                     $this->_responseHelper->success('');
                 }
                 $this->_responseHelper->fail();
@@ -3667,6 +3682,52 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
         }
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return null
+     */
+    public static function updateUserInfo($data)
+    {
+        if (!empty($data['userId'])) {
+            $userId = $data['userId'];
+            $userModel = Application_Model_Mappers_UserMapper::getInstance()->find($userId);
+            if ($userModel instanceof Application_Model_Models_User) {
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $currentCustomer = $customerMapper->find($userId);
+                $customerAddress = $customerMapper->getUserAddressByUserId($userId, false, $data['oldEmail']);
+                if (!empty($customerAddress) && !empty($data['oldEmail']) && !empty($data['newEmail']) && $data['oldEmail'] !== $data['newEmail']) {
+                    $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                    $customerTable = new Models_DbTable_CustomerAddress();
+                    foreach ($customerAddress as $value) {
+                        $value['email'] = $data['newEmail'];
+                        $customerToken = $customerMapper->addAddress($currentCustomer, $value, $value['address_type']);
+                        $currentCartSession = $cartSessionMapper->fetchOrders($currentCustomer->getId());
+
+                        if (!empty($currentCartSession) && (!empty($customerToken))) {
+                            if ($value['address_type'] === 'shipping') {
+                                $newToken['shipping_address_id'] = $customerToken;
+                            } else {
+                                $newToken['billing_address_id'] = $customerToken;
+                            }
+                            $newToken['updated_at'] = date(DATE_ATOM);
+                            $cartSessionMapper->updateAddress($value['id'], $value['address_type'], $newToken);
+
+                        }
+                        $lastData = $customerMapper->getUserAddressByUserId($currentCustomer->getId(), $customerToken);
+                        if (!empty($lastData) && ($value['id'] !== $customerToken)) {
+                            $where = $customerTable->getAdapter()->quoteInto('id =?', $value['id']);
+                            $customerTable->delete($where);
+                        }
+                    }
+
+                }
+            }
+
+        }
+
     }
 
 
