@@ -3713,7 +3713,7 @@ class Shopping extends Tools_Plugins_Abstract {
                                 $newToken['billing_address_id'] = $customerToken;
                             }
                             $newToken['updated_at'] = date(DATE_ATOM);
-                            $cartSessionMapper->updateAddress($value['id'], $data['addressType'], $newToken);
+                            $cartSessionMapper->updateAddress($value['id'], $value['address_type'], $newToken);
 
                         }
                         $lastData = $customerMapper->getUserAddressByUserId($currentCustomer->getId(), $customerToken);
