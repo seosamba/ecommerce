@@ -71,13 +71,14 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		$selectionTable->getAdapter()->beginTransaction();
 
         $selectionList = $model->getSelection();
+        $optionType = $model->getType();
 		foreach ($selectionList as &$item) {
 			$data = array(
 				'option_id'		=> $model->getId(),
 				'title'			=> $item['title'],
 				'priceSign'		=> $item['priceSign'],
 				'priceValue'	=> $item['priceValue'],
-				'priceType'		=> $item['priceType'],
+				'priceType'		=> ($optionType == Models_Model_Option::TYPE_TEXT || $optionType == Models_Model_Option::TYPE_DATE || $optionType == Models_Model_Option::TYPE_TEXTAREA || $optionType == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) ? 'unit' : $item['priceType'],
 				'weightValue'	=> $item['weightValue'],
 				'weightSign'	=> $item['weightSign'],
 				'isDefault'		=> $item['isDefault']
