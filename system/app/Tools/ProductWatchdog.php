@@ -244,7 +244,7 @@ class Tools_ProductWatchdog extends Tools_System_GarbageCollector
         Tools_Search_Tools::removeFromIndex($page->getId());
         $page->setH1(implode(', ', array($this->_object->getName(), $this->_object->getSku(), $this->_object->getMpn(), $page->getH1())));
 
-        if (!empty($this->_object->tags) && is_array($this->_object->tags)){
+        if (!empty($this->_object->getTags()) && is_array($this->_object->getTags())){
             $tags = implode(
                 ', ',
                 array_map(
