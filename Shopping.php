@@ -3614,7 +3614,7 @@ class Shopping extends Tools_Plugins_Abstract {
                                         'name' => $productObject->getName(),
                                         'sku' => $productObject->getSku(),
                                     );
-                                } elseif ($productInventory < $product['qty'] && $productNegativeStock != '1') {
+                                } elseif ($productInventory < $product['qty'] && $productNegativeStock != '1' && $productInventory !== null) {
                                     $notAllowedProducts[$productObject->getId()] = array(
                                         'name' => $productObject->getName(),
                                         'sku' => $productObject->getSku(),
