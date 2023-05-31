@@ -3564,6 +3564,7 @@ class Shopping extends Tools_Plugins_Abstract {
 
     public function buyAgainAction()
     {
+
         $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
         $userSession = $sessionHelper->getCurrentUser();
         $userId = $userSession->getId();
@@ -3589,14 +3590,11 @@ class Shopping extends Tools_Plugins_Abstract {
                         }
                     }
 
-                    $cartSession = Tools_ShoppingCart::getInstance();
-                    $cartSession->setContent(array());
-                    $cartSession->save();
-                    $cartSession->setShippingAddressKey($currentCart->getShippingAddressId());
+                    $cartContent = $currentCart->getCartContent();
                     $notFreebiesInCart = array();
                     $freebiesInCart = array();
                     $productsFreebiesRelation = array();
-                    $cartContent = $currentCart->getCartContent();
+                    $notAllowedProducts = array();
 
                     foreach ($cartContent as $key => $product) {
                         if ($product['freebies'] === '1') {
@@ -3604,7 +3602,58 @@ class Shopping extends Tools_Plugins_Abstract {
                         } else {
                             $notFreebiesInCart[$product['product_id']] = $product['product_id'];
                         }
+
+                        $productObject = $productMapper->find($product['product_id']);
+                        if ($productObject instanceof Models_Model_Product) {
+                            $productEnabled = $productObject->getEnabled();
+                            $productInventory = $productObject->getInventory();
+                            $productNegativeStock = $productObject->getNegativeStock();
+                            if(!empty($productEnabled)) {
+                                if($productInventory == '0' && $productNegativeStock == '0') {
+                                    $notAllowedProducts[$productObject->getId()] = array(
+                                        'name' => $productObject->getName(),
+                                        'sku' => $productObject->getSku(),
+                                    );
+                                } elseif ($productInventory < $product['qty'] && $productNegativeStock != '1' && $productInventory !== null) {
+                                    $notAllowedProducts[$productObject->getId()] = array(
+                                        'name' => $productObject->getName(),
+                                        'sku' => $productObject->getSku(),
+                                    );
+                                }
+                            } else {
+                                $notAllowedProducts[$productObject->getId()] = array(
+                                    'name' => $productObject->getName(),
+                                    'sku' => $productObject->getSku(),
+                                );
+                            }
+                        }
                     }
+
+                    if(!empty($notAllowedProducts)) {
+                        $notAllowedProductsMessage = $this->_translator->translate('Oops! Product:');
+                        $multipleProducts = false;
+                        if(count($notAllowedProducts) > 1) {
+                            $notAllowedProductsMessage = $this->_translator->translate('Oops! Products:');
+                            $multipleProducts = true;
+                        }
+
+                        foreach ($notAllowedProducts as $key => $value) {
+                            $notAllowedProductsMessage .= ' ' . $value['name'] . ' (' . $value['sku'] . ') ';
+                            if($multipleProducts) {
+                                $notAllowedProductsMessage .= ',';
+                            }
+                        }
+                        $notAllowedProductsMessage = rtrim($notAllowedProductsMessage, ",");
+                        $notAllowedProductsMessage .= $this->_translator->translate('not available at the moment.');
+
+                        $this->_responseHelper->fail($notAllowedProductsMessage);
+                    }
+
+                    $cartSession = Tools_ShoppingCart::getInstance();
+                    $cartSession->setContent(array());
+                    $cartSession->save();
+                    $cartSession->setShippingAddressKey($currentCart->getShippingAddressId());
+
                     if (!empty($freebiesInCart)) {
                         $where = $productMapper->getDbTable()->getAdapter()->quoteInto(
                             'sphp.freebies_id IN (?)',

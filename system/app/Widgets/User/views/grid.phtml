@@ -119,26 +119,26 @@
 
        $(function(){
 
-           $(document).on('click', '.buy-again-user-link', function(){
+           $(document).on('click', '.buy-again-user-link', function(e){
+               e.preventDefault();
                var dataOrderId = $(this).data('order-id'),
                    dataOrderSubtype = $(this).data('order-subtype');
 
+               showSpinner();
                $.ajax({
                    url      : "<?php echo $this->websiteUrl.'plugin/shopping/run/buyAgain/';?>",
-                   type     : 'post',
+                   type     : 'POST',
                    data     : {
                        'orderId' : dataOrderId,
                        'dataOrderSubtype' : dataOrderSubtype,
                    },
-                   beforeSend: showSpinner(),
                    dataType :'json',
-                   success  : function(response) {
-                       hideSpinner();
-                       if(response.error) {
-                           showMessage(response.responseText, response.error);
-                       } else {
-                            window.location.href = "<?php echo $this->checkoutRedirectUrl;?>";
-                       }
+               }).done(function(response){
+                   hideSpinner();
+                   if(response.error) {
+                       showMessage(response.responseText, response.error);
+                   } else {
+                       window.location.href = "<?php echo $this->checkoutRedirectUrl;?>";
                    }
                });
            });
