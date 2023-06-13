@@ -66,7 +66,9 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'is_second_payment_manually_paid' => $model->getIsSecondPaymentManuallyPaid(),
             'is_full_order_manually_paid'     => $model->getIsFullOrderManuallyPaid(),
             'first_payment_gateway'           => $model->getFirstPaymentGateway(),
-            'second_payment_gateway'          => $model->getSecondPaymentGateway()
+            'second_payment_gateway'          => $model->getSecondPaymentGateway(),
+            'is_pickup_notification_sent'     => $model->getIsPickupNotificationSent(),
+            'pickup_notification_sent_on'     => $model->getPickupNotificationSentOn(),
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {

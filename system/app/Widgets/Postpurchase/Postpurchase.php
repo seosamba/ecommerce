@@ -452,6 +452,25 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return date("d-M-Y", strtotime($this->_cart->getUpdatedAt()));
     }
 
+
+    /**
+     * Return cart purchased on date in d-M-Y format
+     *
+     * @return string
+     */
+    protected function _renderPurchasedOn()
+    {
+        if (empty($this->_cart->getPurchasedOn())) {
+            return '';
+        }
+
+        if (!empty($this->_options[0])) {
+            return date($this->_options[0], strtotime($this->_cart->getPurchasedOn()));
+        }
+
+        return date("d-M-Y", strtotime($this->_cart->getPurchasedOn()));
+    }
+
     /**
      * Return cart notes
      *

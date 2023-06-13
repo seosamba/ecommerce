@@ -10,7 +10,7 @@
         <?php
         if (!empty($this->tags)) {
             foreach($this->tags as $tag) { ?>
-                <label><input type="checkbox" name="tags[]" value="<?php echo $tag['id']; ?>"
+                <label><input disabled type="checkbox" name="tags[]" value="<?php echo $tag['id']; ?>"
                               checked />&nbsp;<?php echo $tag['name']; ?></label>
         <?php
             }

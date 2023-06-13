@@ -755,20 +755,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			if ( !isset($option['title']) || empty($option['title']) ) {
 				continue;
 			} else {
-                if($option['type'] == Models_Model_Option::TYPE_TEXT || $option['type'] == Models_Model_Option::TYPE_DATE || $option['type'] == Models_Model_Option::TYPE_TEXTAREA || $option['type'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
-                    $defOptionSelection = array(
-                        'title'       => '',
-                        'priceSign'   => '+',
-                        'priceType'   => 'unit',
-                        'priceValue'  => '',
-                        'weightSign'  => '+',
-                        'weightValue' => '',
-                        'isDefault'   => 1
-                    );
-
-                    $option['selection'] = array($defOptionSelection);
-                }
-
                 if (isset($option['isTemplate']) && $option['isTemplate'] === true){
                     $template = $optionMapper->save( array(
                         'title'     => isset($option['templateName']) && !empty($option['templateName']) ? $option['templateName'] : 'template-'.$option['title'],

@@ -27,7 +27,7 @@ $this->headLink()
 	<div>
         <form class="filters mb30px clearfix">
             <div class="grid_12 alpha omega">
-                <label class="h2 mt20px"><?php echo $this->translate('Search');?></label>
+                <label class="h2"><?php echo $this->translate('Search');?></label>
                 <div class="grid_3 alpha t-grid_2 t-alpha search-block-element">
                     <input type="text" class="filter search-input" name="search" placeholder="<?php echo $this->translate('by order ID') ?>" >
                 </div>
@@ -39,8 +39,8 @@ $this->headLink()
                 </div>
                 <div id="extra-filters-switch" class="fl-right"><a class="btn icon-arrow-down2" href="javascript:;">[ <?php echo $this->translate('show/hide advanced filters');?> ]</a></div>
             </div>
-            <fieldset id="extra-filters" class="grid_12 mt20px block-wrap hide alpha omega">
-                <fieldset id="filter-settings-preset-block" class="grid_12 alpha omega">
+            <fieldset id="extra-filters" class="flex-row grid_12 mt20px block-wrap hidden alpha omega">
+                <fieldset id="filter-settings-preset-block" class="flex_12 f-alpha f-omega">
                     <legend><?php echo $this->translate('Filter settings'); ?></legend>
                     <div class="grid_5 alpha">
                         <?php $presetApplied = false;?>
@@ -90,21 +90,21 @@ $this->headLink()
                     <span class="btn green grid_1 omega fl-right" name="saveFilterPreset"
                             id="save-filter-preset"><?php echo $this->translate('Save filter'); ?></span>
                 </fieldset>
-                <p class="grid_3 alpha t-grid_3">
+                <p class="flex_3 f-alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order amount');?></label>
                     <input id="filter-from-amount" class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" name="filter-from-amount" placeholder="<?php echo $this->translate('from');?>" value="<?php echo (!empty($this->presetConfig['filter_from_amount'])) ? $this->presetConfig['filter_from_amount'] : ''; ?>">
                     <input id="filter-to-amount" class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" name="filter-to-amount" placeholder="<?php echo $this->translate('to');?>" value="<?php echo (!empty($this->presetConfig['filter_to_amount'])) ? $this->presetConfig['filter_to_amount'] : ''; ?>">
                 </p>
-                <p class="grid_3 alpha t-grid_3">
+                <p class="flex_3 f-alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By coupon');?></label>
                     <input type="text" class="filter" id="filter-by-coupon-code" name="filter-by-coupon-code" placeholder="<?php echo $this->translate('by coupon code');?>" value="<?php echo (!empty($this->presetConfig['filter_by_coupon_code'])) ? $this->presetConfig['filter_by_coupon_code'] : ''; ?>">
                 </p>
-                <p class="grid_3 alpha t-grid_3">
+                <p class="flex_3 f-alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By date');?></label>
                     <input class="grid_6 alpha t-grid_3 t-alpha m-grid_2 m-alpha" type="text" autocomplete="off" id="orders-filter-fromdate" name="filter-from-date" placeholder="<?php echo $this->translate('from');?>" value="<?php echo(!empty($this->presetConfig['orders_filter_fromdate']) ? date('d-M-y', strtotime($this->presetConfig['orders_filter_fromdate'])) : ''); ?>">
                     <input class="grid_6 omega t-grid_3 t-omega m-grid_2 m-omega" type="text" autocomplete="off" id="orders-filter-todate" name="filter-to-date" placeholder="<?php echo $this->translate('to');?>" value="<?php echo(!empty($this->presetConfig['orders_filter_todate']) ? date('d-M-y', strtotime($this->presetConfig['orders_filter_todate'])) : ''); ?>">
                 </p>
-                <p class="grid_3 alpha omega t-grid_3">
+                <p class="flex_3 f-alpha f-omega t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order status');?></label>
                     <select class="filter" multiple id="filter-status" name="filter-status" data-placeholder="<?php echo $this->translate('show all');?>">
                         <?php if (!empty($this->orderStatuses)) : ?>
@@ -114,7 +114,7 @@ $this->headLink()
                         <?php endif; ?>
                     </select>
                 </p>
-                <p class="grid_3 alpha t-grid_3">
+                <p class="flex_3 f-alpha t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By Client Group');?></label>
                     <select class="filter" multiple id="filter-client-group" name="filter-client-group" data-placeholder="<?php echo $this->translate('show all');?>">
                         <?php if (!empty($this->customerGroups)) : ?>
@@ -124,7 +124,7 @@ $this->headLink()
                         <?php endif; ?>
                     </select>
                 </p>
-                <p class="grid_2 alpha <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?> recurring-filters t-grid_3">
+                <p class="flex_2 f-alpha <?php echo (!empty($this->presetConfig['filter_order_type']) && $this->presetConfig['filter_order_type'] == 'recurring_id') ? '' : 'hidden' ;?> recurring-filters t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order recurring status type');?></label>
                     <?php echo $this->formSelect('filter-recurring-order-type', (!empty($this->presetConfig['filter_recurring_order_type'])) ? $this->presetConfig['filter_recurring_order_type'] : null, array(
                         'class' => 'filter',
@@ -139,7 +139,7 @@ $this->headLink()
                         'canceled' => $this->translate('Canceled')
                     )); ?>
                 </p>
-                <p class="grid_2 alpha omega t-grid_3">
+                <p class="flex_2 f-alpha f-omega t-grid_3">
                     <label class="text-bold"><?php echo $this->translate('By order type');?></label>
                     <?php $orderTypes = array(
                         '',
@@ -157,7 +157,7 @@ $this->headLink()
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
                 </p>
-                <div class="grid_8 omega alpha">
+                <div class="flex_8 f-omega f-alpha">
                     <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
                     <?php
                     $countryList = Tools_Geo::getCountries(true);
@@ -183,11 +183,11 @@ $this->headLink()
                 <?php endforeach;?>
                 <input type="hidden" id="countries-with-states" value='<?php echo json_encode($countriesWithStates); ?>'/>
             </div>
-            <div class="grid_2 mt20px">
+            <div class="flex_2 mt20px">
                 <label><input type="checkbox" id="exclude-quotes-from-search" name="exclude-quotes-from-search" <?php echo ((!empty($this->presetConfig['exclude_quotes_from_search']))) ? "checked" : ''; ?>> <?php echo $this->translate('Exclude quotes');?></label>
                 <label><input type="checkbox" id="is-a-gift" name="is-a-gift" <?php echo ((!empty($this->presetConfig['is_a_gift']))) ? "checked" : ''; ?>> <?php echo $this->translate('Is a gift');?></label>
             </div>
-            <div class="grid_12 alpha omega text-right">
+            <div class="flex_12 f-alpha f-omega text-right">
                 <button class="btn green ticon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
                 <button class="btn red ticon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>
             </div>

@@ -33,7 +33,7 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
 
             if ($status === Models_Model_CartSession::CART_STATUS_COMPLETED) {
                 $currentStatus = $cart->getStatus();
-                if ($currentStatus === Models_Model_CartSession::CART_STATUS_PARTIAL) {
+                if (!empty($cart->getIsPartial())) {
                     $cart->setSecondPaymentGateway($gateway);
                     $cart->setSecondPartialPaidAmount(round($cart->getTotal() - $cart->getFirstPartialPaidAmount(), 2));
                     if ($gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE || $gateway === Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_MANUALL) {

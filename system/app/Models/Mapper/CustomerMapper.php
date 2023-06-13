@@ -351,12 +351,17 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
         }
     }
 
-    public function getUserAddressByUserId($userId, $addressId = false)
+    public function getUserAddressByUserId($userId, $addressId = false, $email = '')
     {
         $where = $this->getDbTable()->getAdapter()->quoteInto('user_id = ?', $userId);
         if ($addressId) {
             $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $addressId);
         }
+
+        if (!empty($email)) {
+            $where .= ' AND '. $this->getDbTable()->getAdapter()->quoteInto('email = ?', $email);
+        }
+
         $select = $this->getDbTable()->getAdapter()->select()
             ->from('shopping_customer_address', array(
                 'id',

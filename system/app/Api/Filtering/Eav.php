@@ -62,18 +62,23 @@ class Api_Filtering_Eav extends Api_Service_Abstract
             $this->_error();
         }
 
-        if (!empty($data['tags']) && is_array($data['tags'])) {
-            $tags = filter_var_array($data['tags'], FILTER_SANITIZE_NUMBER_INT);
+        $container = array();
+        if($data['value'] == '') {
+            $this->_eavMapper->deleteAttributeById(intval($data['attribute_id']));
+        } else {
+            $container = $this->_eavMapper->saveEavContainer(
+                intval($data['product_id']),
+                intval($data['attribute_id']),
+                htmlspecialchars(strip_tags($data['value']), ENT_COMPAT, 'UTF-8')
+            );
         }
 
-        $container = $this->_eavMapper->saveEavContainer(
-            intval($data['product_id']),
-            intval($data['attribute_id']),
-            htmlspecialchars(strip_tags($data['value']), ENT_COMPAT, 'UTF-8')
-        );
-
-        if (!empty($tags)) {
-            $this->_assignFilterToTags($container, $tags);
+        $productAttributes = $this->_eavMapper->getAttributes(intval($data['product_id']));
+        $tags = Models_Mapper_Tag::getInstance()->findTagsByProductId(intval($data['product_id']));
+        if(!empty($productAttributes) && !empty($tags)) {
+            foreach ($productAttributes as $attribute) {
+                $this->_assignFilterToTags($attribute, $tags);
+            }
         }
 
         return $container;
