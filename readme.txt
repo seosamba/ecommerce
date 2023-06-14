@@ -174,6 +174,7 @@ Plugin widgets.
 
     {$postpurchase:cartitem:photo[:small|medium|large|original|product]} -> product photo (by default from product folder)
     {$postpurchase:cartitem:price[:clean]} -> product price without tax (if product freebies return text 'freebies')
+    {$postpurchase:cartitem:pricewithoutoption[:clean][:withouttax]} -> total price without product options with tax (or without tax "withouttax")
     {$postpurchase:cartitem:tax[:clean]} -> product tax
     {$postpurchase:cartitem:taxprice[:clean]} -> product price with tax
     {$postpurchase:cartitem:sku} -> product sku
@@ -182,7 +183,6 @@ Plugin widgets.
     {$postpurchase:cartitem:qty} -> product quantity
     {$postpurchase:cartitem:cartId} -> cart id
     {$postpurchase:cartitem:total[:clean][:withouttax]} -> total price with tax (or without tax "withouttax")
-    {$postpurchase:cartitem:totalwithoutoption[:clean][:withouttax]} -> total price without product options with tax (or without tax "withouttax")
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:option:optionName}
     {$postpurchase:cartitem:producturl} -> product url

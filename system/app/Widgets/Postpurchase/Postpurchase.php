@@ -895,7 +895,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $priceWithTax;
     }
 
-    protected function _renderCartItemTotalWithoutOption($sid)
+    protected function _renderCartItemPriceWithoutOption($sid)
     {
         if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
@@ -910,14 +910,12 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
         if (in_array(self::WITHOUT_TAX, $this->_options)) {
             $priceWithTax = (is_null($cartItemOriginalPrice)) ? 0 : $cartItemOriginalPrice;
-            $priceWithTax = $priceWithTax * $this->_cartContent[$sid]['qty'];
         } else {
             $priceWithTax = (is_null($cartItemOriginalPrice)) ? 0 : $cartItemOriginalPrice;
             if (!empty($taxRate)) {
                 $itemTax = ($priceWithTax / 100) * $taxRate;
                 $priceWithTax += $itemTax;
             }
-            $priceWithTax = $priceWithTax * $this->_cartContent[$sid]['qty'];
         }
 
         if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
