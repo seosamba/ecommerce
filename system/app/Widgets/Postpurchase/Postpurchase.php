@@ -895,6 +895,40 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $priceWithTax;
     }
 
+    protected function _renderCartItemPriceWithoutOption($sid)
+    {
+        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+            return '';
+        }
+
+        $cartItem = $this->_cartContent[$sid];
+        $cartItemOriginalPrice = $cartItem['price'];
+        $taxRate = $cartItem['taxRate'];
+        if (!empty($cartItem['original_price'])) {
+            $cartItemOriginalPrice = $cartItem['original_price'];
+        }
+
+        if (in_array(self::WITHOUT_TAX, $this->_options)) {
+            $priceWithTax = (is_null($cartItemOriginalPrice)) ? 0 : $cartItemOriginalPrice;
+        } else {
+            $priceWithTax = (is_null($cartItemOriginalPrice)) ? 0 : $cartItemOriginalPrice;
+            if (!empty($taxRate)) {
+                $itemTax = ($priceWithTax / 100) * $taxRate;
+                $priceWithTax += $itemTax;
+            }
+        }
+
+        if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+            return $priceWithTax;
+        } elseif (intval($this->_cartContent[$sid]['freebies']) === 1) {
+            return $this->_translator->translate('free');
+        }
+
+        $priceWithTax = $this->_currency->toCurrency($priceWithTax);
+
+        return $priceWithTax;
+    }
+
     /**
      * Return product photo for single item in cart
      *
