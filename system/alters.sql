@@ -745,6 +745,9 @@ UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = (`total` - `pa
 ALTER TABLE `shopping_filtering_tags_has_attributes` ADD CONSTRAINT `shopping_filtering_tags_has_attributes_ibfk_1` FOREIGN KEY (`tag_id`) REFERENCES `shopping_tags` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE `shopping_filtering_values` ADD CONSTRAINT `shopping_filtering_values_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
+-- DELETE FROM `shopping_filtering_tags_has_attributes` WHERE (`tag_id` IN ( SELECT DISTINCT `tag_id` FROM (SELECT `tag_id` FROM `shopping_filtering_tags_has_attributes` WHERE `tag_id` NOT IN (SELECT `id` FROM `shopping_tags`)) as sftha ));
+-- DELETE FROM `shopping_filtering_values` WHERE (`product_id` IN ( SELECT DISTINCT `product_id` FROM (SELECT `product_id` FROM `shopping_filtering_values` WHERE `product_id` NOT IN (SELECT `id` FROM `shopping_product`)) as sfv ));
+
 -- 06/02/2023
 -- version: 2.9.7
 INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
