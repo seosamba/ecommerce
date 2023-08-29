@@ -11,6 +11,8 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
 	const TRIGGER_SHIPPING_TRACKING_NUMBER = 'store_trackingnumber';
 
+	const TRIGGER_SHIPPING_PICKUP_NOTIFICATION = 'store_pickupnotification';
+
     const TRIGGER_REFUND = 'store_refund';
 
     const TRIGGER_DELIVERED = 'store_delivered';
@@ -525,6 +527,35 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
     }
 
     /**
+     * Send email for pickup notification
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendPickupnotificationMail()
+    {
+        $this->_prepareEmailToSend();
+        $this->_entityParser
+            ->objectToDictionary($this->_object, 'order')
+            ->objectToDictionary($this->_customer);
+
+        $withBillingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getBillingAddressId(),
+            self::BILLING_TYPE);
+        $withShippingAddress = $this->_prepareAdddress($this->_customer, $this->_object->getShippingAddressId(),
+            self::SHIPPING_TYPE);
+        if (isset($withBillingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:billingaddress' => $withBillingAddress));
+        }
+        if (isset($withShippingAddress)) {
+            $this->_entityParser->addToDictionary(array('order:shippingaddress' => $withShippingAddress));
+        }
+
+        $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
+
+        return $this->_send();
+    }
+
+    /**
      * Send delivered email
      *
      * @return bool
@@ -726,6 +757,22 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
 
         $this->_entityParser->addToDictionary(array('store:name' => !empty($this->_storeConfig['company']) ? $this->_storeConfig['company'] : ''));
+
+        $pluginInvoicePdf = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
+        if ($pluginInvoicePdf instanceof Application_Model_Models_Plugin && $pluginInvoicePdf->getStatus() === Application_Model_Models_Plugin::ENABLED) {
+            $invoicetopdfConfig = Invoicetopdf_Models_Mapper_InvoicetopdfSettingsMapper::getInstance()->getConfigParams();
+            if (isset($invoicetopdfConfig['attachInvoiceActionEmailPaymentCompletion']) && $invoicetopdfConfig['attachInvoiceActionEmailPaymentCompletion'] === '1') {
+                $fileInfo = Tools_Misc::prepareInvoice(['cartId' => $this->_object->getId(), 'dwn' => 0]);
+                if (isset($fileInfo['folder']) && isset($fileInfo['fileName'])) {
+                    $attachment = new Zend_Mime_Part(file_get_contents($fileInfo['folder'] . $fileInfo['fileName']));
+                    $attachment->type = 'application/pdf';
+                    $attachment->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
+                    $attachment->encoding = Zend_Mime::ENCODING_BASE64;
+                    $attachment->filename = $fileInfo['fileName'];
+                    $this->_mailer->addAttachment($attachment);
+                }
+            }
+        }
 
         //if (empty($this->_options['excludeNotify'])) {
             $this->_addToLeadsLog();

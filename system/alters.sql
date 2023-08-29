@@ -690,7 +690,34 @@ UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = `total` - ROUN
 UPDATE `shopping_cart_session` SET `first_partial_paid_amount` = `partial_percentage` WHERE `is_partial` = '1' AND `status` IN ('partial', 'completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
 UPDATE `shopping_cart_session` SET `second_partial_paid_amount` = (`total` - `partial_percentage`) WHERE `is_partial` = '1' AND `status` IN ('completed', 'shipped', 'delivered') AND `partial_type` = 'amount';
 
+-- 26/01/2023
+-- version: 2.9.6
+ALTER TABLE `shopping_filtering_tags_has_attributes` ADD CONSTRAINT `shopping_filtering_tags_has_attributes_ibfk_1` FOREIGN KEY (`tag_id`) REFERENCES `shopping_tags` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `shopping_filtering_values` ADD CONSTRAINT `shopping_filtering_values_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- DELETE FROM `shopping_filtering_tags_has_attributes` WHERE (`tag_id` IN ( SELECT DISTINCT `tag_id` FROM (SELECT `tag_id` FROM `shopping_filtering_tags_has_attributes` WHERE `tag_id` NOT IN (SELECT `id` FROM `shopping_tags`)) as sftha ));
+-- DELETE FROM `shopping_filtering_values` WHERE (`product_id` IN ( SELECT DISTINCT `product_id` FROM (SELECT `product_id` FROM `shopping_filtering_values` WHERE `product_id` NOT IN (SELECT `id` FROM `shopping_product`)) as sfv ));
+
+-- 06/02/2023
+-- version: 2.9.7
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_pickupnotification'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
+ALTER TABLE `shopping_cart_session` ADD COLUMN `is_pickup_notification_sent` ENUM('0', '1') DEFAULT '0';
+ALTER TABLE `shopping_cart_session` ADD COLUMN `pickup_notification_sent_on` timestamp NULL;
+
+-- 23/02/2023
+-- version: 2.9.8
+ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(12,6) DEFAULT '0.00';
+
+-- 24/05/2023
+-- version: 2.9.9
+UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='2.9.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.0' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

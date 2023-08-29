@@ -36,7 +36,7 @@
 ?>
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="suppliers" class="toaster-widget">
-    <div class="search-line mt20px mb20px clearfix search-block-element grid_6 alpha">
+    <div class="search-line mb20px clearfix search-block-element grid_6 alpha">
         <input type="text" id="suppliers-search" class="search-input" name="suppliers-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
     </div>
     <table id="suppliers-table" class="widget table-hover">
@@ -59,7 +59,7 @@
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="2">
+	            <td colspan="2" class="suppliers-mass-action-block">
 		            <?php echo $this->translate('with selected do');?>
 
                     <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>

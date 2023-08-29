@@ -76,7 +76,10 @@
                                 <?php $gateway = $this->translate('Manually paid');?>
                             <?php endif;?>
 
-                            <?php if (!empty($this->order->getIsPartial()) && ($this->order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL)):?>
+                            <?php if (!empty($this->order->getIsPartial()) &&
+                                ($this->order->getStatus() === Models_Model_CartSession::CART_STATUS_COMPLETED || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_SHIPPED || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_DELIVERED || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_PARTIAL || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_ERROR || $this->order->getStatus() === Models_Model_CartSession::CART_STATUS_PROCESSING)
+                                && (!empty($this->order->getFirstPaymentGateway()))
+                            ):?>
                                 <span><b><?php echo $this->translate('Payment Method');?>:</b></span>
                                 <br/>
                                 <?php if(!empty($this->order->getIsFirstPaymentManuallyPaid())):?>
@@ -101,8 +104,16 @@
                                     <?php endif;?>
                                   <?php endif;?>
                             <?php else :?>
-                                <span><?php echo $this->translate('Payment Method');?>
-                                    : <?php echo $gateway ;?></span>
+                                <span><b><?php echo $this->translate('Payment Method');?>:</b>
+                                      <br/>
+                                <span>
+                                    <?php if (!empty($this->order->getPurchasedOn())):?>
+                                        <?php echo $this->translate('Full payment');?>: <?php echo $gateway;?>
+                                        (<?php echo $this->currency($this->order->getTotal());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
+                                    <?php else: ?>
+                                        <?php echo $gateway;?>
+                                    <?php endif;?>
+                                </span>
                             <?php endif;?>
                         <?php endif; ?>
                     <?php else: ?>

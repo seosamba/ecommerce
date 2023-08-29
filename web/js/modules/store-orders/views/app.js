@@ -19,7 +19,13 @@ define(['backbone',
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
         events: {
-            'click #extra-filters-switch': function(){ $('#extra-filters', this.el).slideToggle(); } ,
+            'click #extra-filters-switch': function(){
+                    if ($('#extra-filters', this.el).hasClass('hidden')) {
+                        $('#extra-filters', this.el).removeClass('hidden');
+                    } else {
+                        $('#extra-filters', this.el).addClass('hidden');
+                    }
+                } ,
             'change input.filter': 'applyFilter',
             'change #orders-check-all': 'checkAllOrders',
             'click #orders-filter-apply-btn': 'applyFilter',
@@ -27,6 +33,7 @@ define(['backbone',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
             'click td.shipping-service .setTracking': 'changeTracking',
+            'click td.shipping-service .set-pickup': 'markShipmentPickup',
             'click .sendInvoice': 'sendInvoice',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
@@ -132,7 +139,11 @@ define(['backbone',
                     }
 
                     if (withDetailedFilters === true) {
-                        $('#extra-filters').slideToggle();
+                        if ($('#extra-filters').hasClass('hidden')) {
+                            $('#extra-filters').removeClass('hidden');
+                        } else {
+                            $('#extra-filters').addClass('hidden');
+                        }
                     }
                 }
             }
@@ -986,6 +997,51 @@ define(['backbone',
                     cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
                 });
             }
+        },
+        markShipmentPickup: function (e) {
+            var self = this,
+                el = $(e.currentTarget),
+                id = parseInt(el.closest('tr').find('td.order-id').text()),
+                model = this.orders.get(id),
+                data = {
+                    pickupNotification : 1,
+                    id : id
+                },
+                confirmMessage = _.isUndefined(i18n['You are about to send a pickup notification to the customer, proceed?']) ? 'You are about to send a pickup notification to the customer, proceed?' : i18n['You are about to send a pickup notification to the customer, proceed?'];
+
+            smoke.confirm(confirmMessage, function (e) {
+                if (e) {
+                    $.ajax({
+                        url: $('#website_url').val() + 'plugin/shopping/run/order',
+                        data: data,
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            el.closest('td').find('.tracking-info').hide();
+                            el.closest('td').find('.ajax-loader').show();
+                        },
+                        success: function (response) {
+                            if (response.hasOwnProperty('error') && !response.error) {
+                                showMessage(_.isUndefined(i18n['Email has been sent']) ? 'Email has been sent' : i18n['Email has been sent']);
+                            }
+
+                            model.set({
+                                'status': response.responseText.status,
+                                'is_pickup_notification_sent': response.responseText.isPickupNotificationSent,
+                                'pickup_notification_sent_on': response.responseText.pickupNotificationSentOn,
+                            });
+
+                            el.closest('td').find('.ajax-loader').hide();
+                            el.closest('td').find('.tracking-info').show();
+
+                            $('#tracking-dialog').dialog('close');
+                        }
+                    });
+                }
+            }, {
+                ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+            });
         },
         changeTracking: function(e){
 

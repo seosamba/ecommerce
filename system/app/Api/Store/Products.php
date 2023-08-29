@@ -317,6 +317,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 		if (!empty($products)){
             $allowanceProductsMapper = Store_Mapper_AllowanceProductsMapper::getInstance();
+            $filteringMapper = Filtering_Mappers_Eav::getInstance();
 
 			foreach ($products as $product) {
 			    $productId = $product->getId();
@@ -335,6 +336,18 @@ class Api_Store_Products extends Api_Service_Abstract {
                 }
                 try {
                     if ($this->_productMapper->save($product)) {
+                        $productAttributes = $filteringMapper->getAttributes($productId);
+                        $productTags = $product->getTags();
+                        if(!empty($productAttributes) && !empty($productTags)) {
+                            foreach ($productAttributes as $attribute) {
+                               $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+                               $sql = "INSERT IGNORE INTO shopping_filtering_tags_has_attributes (attribute_id, tag_id) VALUES (:attribute_id, :tag_id)";
+                                foreach ($productTags as $tag) {
+                                    $dbAdapter->query($sql, array('attribute_id' => $attribute['attribute_id'], 'tag_id' => $tag['id']));
+                                }
+                            }
+                        }
+
                         $data[] = $product->toArray();
                     }
                 } catch (Exception $e) {

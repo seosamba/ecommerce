@@ -121,6 +121,7 @@ Plugin widgets.
     {$postpurchase:referer} -> referer link
     {$postpurchase:createdAt[:d/M/Y]} -> date when purchase created in d-M-Y format. You can set your own date format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
+    {$postpurchase:purchasedon[:d/M/Y]} -> when purchase on date in d-M-Y format. You can set your own date format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:additionalInfo} -> additional info of purchase
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
@@ -173,6 +174,7 @@ Plugin widgets.
 
     {$postpurchase:cartitem:photo[:small|medium|large|original|product]} -> product photo (by default from product folder)
     {$postpurchase:cartitem:price[:clean]} -> product price without tax (if product freebies return text 'freebies')
+    {$postpurchase:cartitem:pricewithoutoption[:clean][:withouttax]} -> total price without product options with tax (or without tax "withouttax")
     {$postpurchase:cartitem:tax[:clean]} -> product tax
     {$postpurchase:cartitem:taxprice[:clean]} -> product price with tax
     {$postpurchase:cartitem:sku} -> product sku
@@ -180,7 +182,7 @@ Plugin widgets.
     {$postpurchase:cartitem:name} -> product name
     {$postpurchase:cartitem:qty} -> product quantity
     {$postpurchase:cartitem:cartId} -> cart id
-    {$postpurchase:cartitem:total[:clean]} -> total price with tax
+    {$postpurchase:cartitem:total[:clean][:withouttax]} -> total price with tax (or without tax "withouttax")
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:option:optionName}
     {$postpurchase:cartitem:producturl} -> product url
@@ -225,6 +227,7 @@ Magic spaces:
  allitems - Show all filter values without All others group
  usesort - enable the ability to sort custom filters list
  usesortvalues - enable the ability to sort custom filters values list. May use with "usesort" option only
+ without-option-counter - Allow to hide counter next to the filter item
 
 10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}

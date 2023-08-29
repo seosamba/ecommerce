@@ -134,4 +134,26 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 			}
 		}
 	}
+
+    /**
+     * Get product tags id by product id
+     *
+     * @param $productId
+     * @return array|false
+     */
+    public function findTagsByProductId($productId)
+    {
+        if(!empty($productId)) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('sp.id = ?', $productId);
+
+            $select = $this->getDbTable()->select()->from(array('sp' => 'shopping_product'), array('st.id'))
+                ->joinLeft(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
+                ->joinLeft(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
+                ->where($where);
+            $data = $this->getDbTable()->getAdapter()->fetchCol($select);
+
+            return $data;
+        }
+        return false;
+    }
 }

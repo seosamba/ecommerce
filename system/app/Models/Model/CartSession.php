@@ -168,6 +168,10 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_secondPartialPaidAmount = '';
 
+    protected $_pickupNotificationSentOn = null;
+
+    protected $_isPickupNotificationSent = '0';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -885,6 +889,36 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         $this->_secondPartialPaidAmount = $secondPartialPaidAmount;
     }
 
+    /**
+     * @return null
+     */
+    public function getPickupNotificationSentOn()
+    {
+        return $this->_pickupNotificationSentOn;
+    }
 
+    /**
+     * @param null $pickupNotificationSentOn
+     */
+    public function setPickupNotificationSentOn($pickupNotificationSentOn)
+    {
+        $this->_pickupNotificationSentOn = $pickupNotificationSentOn;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsPickupNotificationSent()
+    {
+        return $this->_isPickupNotificationSent;
+    }
+
+    /**
+     * @param string $isPickupNotificationSent
+     */
+    public function setIsPickupNotificationSent($isPickupNotificationSent)
+    {
+        $this->_isPickupNotificationSent = $isPickupNotificationSent;
+    }
 
 }

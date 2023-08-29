@@ -69,7 +69,7 @@
 ?>
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="clients" class="toaster-widget">
-    <div class="search-line mt20px mb20px clearfix hidden">
+    <div class="search-line mb20px clearfix hidden">
         <span class="search-block-element grid_6 alpha">
             <input type="text" id="clients-search" class="search-input" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
         </span>
@@ -119,7 +119,7 @@
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="2">
+	            <td colspan="2" class="clients-mass-action-block">
 		            <?php echo $this->translate('with selected do');?>
 
                     <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>

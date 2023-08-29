@@ -281,7 +281,7 @@ $this->headLink()
                             <span class="ticon-folder-upload"><?php echo $this->translate('Choose your image');?></span>
                             <input type="hidden" id="things-new-folder" value="products"/>
                             <?php
-                                $uploader = $this->toasterUploader(array('id' => 'product-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'filters' => array("image"), 'caption' => " "));
+                                $uploader = $this->toasterUploader(array('id' => 'product-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'filters' => array("imageWithWebpSupport"), 'caption' => " "));
                                 echo $uploader;
                             ?>
                         </div>
