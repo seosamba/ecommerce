@@ -1863,7 +1863,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 
 		// fetching all product pages
-		$pagesSql = "SELECT * FROM `page` WHERE system = '0' AND draft = '0' AND (`id` = " . $category->getId() . " OR `parent_id` = " . $category->getId() . ")  ORDER BY `order` ASC;";
+		$pagesSql = "SELECT * FROM `page` WHERE `system` = '0' AND draft = '0' AND (`id` = " . $category->getId() . " OR `parent_id` = " . $category->getId() . ")  ORDER BY `order` ASC;";
 		$dbAdapter = Zend_Registry::get('dbAdapter');
 
 		try {
