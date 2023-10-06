@@ -468,6 +468,18 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             $select->where('shcoupon.coupon_code = ?', $val);
                         }
                         break;
+                    case 'filter-by-cashier-id':
+                        $val = filter_var_array($val, FILTER_SANITIZE_STRING);
+                        if (!empty($val)) {
+                            $filterWhere = '(';
+                            foreach ($val as $cashier) {
+                                $filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.cashier_id = ?', $cashier);
+                                $filterWhere .= ') OR (';
+                            }
+                            $filterWhere = rtrim($filterWhere, ' OR (');
+                            $select->where($filterWhere);
+                        }
+                        break;
                     case 'filter-exclude-quotes':
                         $val = trim(filter_var($val, FILTER_SANITIZE_STRING));
                         if (!empty($val)) {
@@ -539,6 +551,13 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
             );
 
         return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
+
+    public function getCashierIds()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_cart_session', array('cashier_id', 'cashier_id'))->group('cashier_id');
+        $select->where('cashier_id IS NOT NULL');
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
     }
 
 }

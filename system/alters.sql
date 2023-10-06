@@ -717,7 +717,12 @@ ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(1
 -- version: 2.9.9
 UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
 
+-- 05/10/2023
+-- version: 3.0.0
+ALTER TABLE `shopping_pickup_location` ADD COLUMN `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

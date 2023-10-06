@@ -22,6 +22,9 @@
                 <?php if (!empty($this->quoteId)):?>
                     <div class="mt10px"><?php echo $this->translate("Quote");?>: <a target="_blank" href="<?php echo $this->websiteUrl.$this->quoteId.'.html';?>"><?php echo $this->quoteTitle;?></a></div>
                 <?php endif;?>
+                <?php if (!empty($this->isPluginWithTagPosExist) && !empty($this->order->getCashierId())):?>
+                    <div class="mt10px"><?php echo $this->translate("Cashier ID");?>: <?php echo $this->order->getCashierId();?></div>
+                <?php endif;?>
             </div>
 
             <div class="grid_6">

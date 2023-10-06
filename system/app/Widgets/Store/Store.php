@@ -210,6 +210,14 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $this->_view->countriesList = Tools_Geo::getCountries(true);
             $this->_view->customerGroups = $customerGroups;
 
+            $this->_view->cashierIds = $ordersMapper->getCashierIds();
+            $isPluginWithTagPosExist = false;
+            $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
+            if (!empty($availablePlugins)) {
+                $isPluginWithTagPosExist = true;
+            }
+            $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
+
 			return $this->_view->render('orders.phtml');
 		}
 	}

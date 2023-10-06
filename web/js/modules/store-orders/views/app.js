@@ -77,6 +77,11 @@ define(['backbone',
                         withDetailedFilters = true;
                     }
 
+                    if (typeof options.filter_by_cashier_id !== 'undefined') {
+                        $('#filter-by-cashier-id').val(options.filter_by_cashier_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (typeof options.filter_from_amount !== 'undefined') {
                         $('input[name=filter-from-amount]', '#store-orders form.filters').val(options.filter_from_amount);
                         withDetailedFilters = true;
@@ -165,6 +170,7 @@ define(['backbone',
                         'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
                         'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
                         'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val(),
+                        'filter-by-cashier-id': $('#filter-by-cashier-id', '#store-orders form.filters').val(),
                         'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; },
                         'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; },
                         'filter-client-group': $('select[name=filter-client-group]', '#store-orders form.filters').val()
@@ -212,6 +218,7 @@ define(['backbone',
                     'filter_from_amount': $('#filter-from-amount').val(),
                     'filter_to_amount': $('#filter-to-amount').val(),
                     'filter_by_coupon_code': $('#filter-by-coupon-code').val(),
+                    'filter_by_cashier_id': $('#filter-by-cashier-id').val(),
                     'orders_filter_fromdate' : $('#orders-filter-fromdate').val() ? $.datepicker.formatDate('yy-mm-dd', new Date( $('#orders-filter-fromdate').val())): '',
                     'orders_filter_todate' : ($('#orders-filter-todate').val()) ? $.datepicker.formatDate('yy-mm-dd', new Date( $('#orders-filter-todate').val())): '',
                     'filter_status': $('#filter-status').val(),
@@ -305,6 +312,12 @@ define(['backbone',
                 $('#filter-from-amount').val(filtersData.filter_from_amount);
                 $('#filter-to-amount').val(filtersData.filter_to_amount);
                 $('#filter-by-coupon-code').val(filtersData.filter_by_coupon_code);
+
+                if (!_.isUndefined(filtersData.filter_by_cashier_id) && !_.isEmpty(filtersData.filter_by_cashier_id)) {
+                    $('#filter-by-cashier-id').val(filtersData.filter_by_cashier_id).trigger("chosen:updated");
+                } else {
+                    $('#filter-by-cashier-id').val(0).trigger("chosen:updated");
+                }
 
                 if (filtersData.orders_filter_fromdate !== '' && !_.isUndefined(filtersData.orders_filter_fromdate)) {
                     ordersFilterFromdate = $.datepicker.formatDate('d-M-yy', new Date(filtersData.orders_filter_fromdate));

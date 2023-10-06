@@ -159,6 +159,18 @@ $this->headLink()
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
                 </p>
+                <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                    <p class="flex_3 f-omega t-grid_3">
+                        <label class="text-bold"><?php echo $this->translate('By cashier id');?></label>
+                        <select class="filter" multiple id="filter-by-cashier-id" name="filter-by-cashier-id" data-placeholder="<?php echo $this->translate('show all');?>">
+                            <?php if (!empty($this->cashierIds)) : ?>
+                                <?php foreach ($this->cashierIds as $cashier => $cashierName): ?>
+                                    <option value="<?php echo $cashier; ?>" <?php echo (!empty($this->presetConfig['filter_by_cashier_id']) && in_array($cashier, $this->presetConfig['filter_by_cashier_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($cashierName);?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </p>
+                <?php endif;?>
                 <div class="flex_8 f-omega f-alpha">
                     <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
                     <?php

@@ -35,6 +35,9 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_allowed_to_delete = 0;
 
+    protected $_cashRegisterId = '';
+
+
     public function setName($name)
     {
         $this->_name = $name;
@@ -211,6 +214,24 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
         $this->_allowed_to_delete = $allowed_to_delete;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCashRegisterId()
+    {
+        return $this->_cashRegisterId;
+    }
+
+    /**
+     * @param string $cashRegisterId
+     */
+    public function setCashRegisterId($cashRegisterId)
+    {
+        $this->_cashRegisterId = $cashRegisterId;
+        return $this;
+    }
+
 
 
 }

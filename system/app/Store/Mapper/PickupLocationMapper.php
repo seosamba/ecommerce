@@ -46,7 +46,8 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'notes'                => $model->getNotes(),
             'weight'               => $model->getWeight(),
             'external_id'          => $model->getExternalId(),
-            'allowed_to_delete'    => $model->getAllowedToDelete()
+            'allowed_to_delete'    => $model->getAllowedToDelete(),
+            'cash_register_id'     => $model->getCashRegisterId(),
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);

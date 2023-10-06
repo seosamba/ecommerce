@@ -71,6 +71,7 @@ define([
             $('.location-phone').val(model.get('phone'));
             $('#location-external-id').val(model.get('external_id'));
             $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
+            $('#cash-register-id').val(model.get('cash_register_id'));
             _.each(workingHours, function(value, name){
                 $('input[name="working-hours-'+name+'"]').val(value);
             });

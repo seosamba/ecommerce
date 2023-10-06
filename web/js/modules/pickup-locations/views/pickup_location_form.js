@@ -15,6 +15,7 @@ define([
         },
         render: function(){
             $('#location-edit-id').val('');
+            $('#cash-register-id').val('');
             $('#edit-pickup-location').attr('method', 'POST');
             return this;
         },
@@ -44,6 +45,7 @@ define([
                 success: function(response){
                     $('.working-hours-list').find('input').val('');
                     $('#location-edit-id').val('');
+                    $('#cash-register-id').val('');
                     self.$el.trigger('pickupLocation:created');
                     hideSpinner();
                     if($('#edit-pickup-location').attr('method') === 'POST'){

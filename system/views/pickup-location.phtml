@@ -66,16 +66,16 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <img src="'<?php echo $this->websiteUrl; ?>system/images/noimage.png'" width="50"/>
             <?php endif; ?>
         </div>
-        <form id="edit-pickup-location" class="grid_12 background mt10px mb15px" method="POST">
+        <form id="edit-pickup-location" class="grid_12 background mt10px mb10px" method="POST">
             <fieldset class="column_4 full-width">
                 <p>
                     <label><?php echo $this->translate('Name'); ?></label>
-                    <input type="text" name="location-name" class="location-name"/>
+                    <input type="text" required name="location-name" class="location-name"/>
                 </p>
 
                 <p class="mt0px">
                     <label><?php echo $this->translate('Address 1'); ?></label>
-                    <input type="text" name="address1" class="location-address1"/>
+                    <input type="text" required name="address1" class="location-address1"/>
                 </p>
 
                 <p class="mt0px">
@@ -85,17 +85,17 @@ $this->headScript()->setAllowArbitraryAttributes(true)
 
                 <p class="mt0px">
                     <label><?php echo $this->translate('City'); ?></label>
-                    <input type="text" name="city" class="location-city"/>
+                    <input type="text" required name="city" class="location-city"/>
                 </p>
 
                 <p>
                     <label><?php echo $this->translate('Zip'); ?></label>
-                    <input type="text" name="zip" class="location-zip"/>
+                    <input type="text" required name="zip" class="location-zip"/>
                 </p>
 
                 <p>
                     <label><?php echo $this->translate('Country'); ?></label>
-                    <select name="country" class="location-country">
+                    <select name="country" required class="location-country">
                         <?php foreach ($this->countries as $countryCode => $country): ?>
                             <option value="<?php echo $this->defaultCountries[$countryCode]; ?>"><?php echo $country; ?></option>
                         <?php endforeach; ?>
@@ -111,7 +111,14 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     <input type="text" name="weight" class="location-weight"/>
                 </p>
             </fieldset>
-
+            <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                <fieldset class="full-width mt5px">
+                    <p class="grid_12 alpha omega">
+                        <label><?php echo $this->translate('Cash register id'); ?></label>
+                        <textarea id="cash-register-id" name="cash-register-id" class="cash-register-id" placeholder="<?php echo $this->translate('Cash register id comma-separated'); ?>"></textarea>
+                    </p>
+                </fieldset>
+            <?php endif;?>
             <p class="grid_3 mt15px text-center" id="working_hours">
                 <a class="working-hours-dialog" href="javascript:;">[ <?php
                     echo $this->translate(
@@ -164,7 +171,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
             </p>
         </div>
         <div class="grid_12 location-table">
-            <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
+            <table id="pickup-locations-table" class="table-striped table-hover small">
                 <thead class="header-inner">
                 <tr>
                     <th><?php echo $this->translate('Name'); ?></th>
@@ -183,7 +190,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 </tfoot>
             </table>
         </div>
-        <footer class="grid_12">
+        <footer class="grid_12 mt0px">
             <a id="delete-pickup-location-category" class="delete-selected-category error"
                href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a>
         </footer>

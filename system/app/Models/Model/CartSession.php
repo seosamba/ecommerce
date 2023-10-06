@@ -172,6 +172,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_isPickupNotificationSent = '0';
 
+    protected $_cashierId = '';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -920,5 +922,22 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     {
         $this->_isPickupNotificationSent = $isPickupNotificationSent;
     }
+
+    /**
+     * @return string
+     */
+    public function getCashierId()
+    {
+        return $this->_cashierId;
+    }
+
+    /**
+     * @param string $cashierId
+     */
+    public function setCashierId($cashierId)
+    {
+        $this->_cashierId = $cashierId;
+    }
+
 
 }

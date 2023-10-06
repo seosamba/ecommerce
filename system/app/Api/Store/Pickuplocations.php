@@ -110,6 +110,13 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $pickupLocationModel->setLocationCategoryId($data['categoryId']);
         $pickupLocationModel->setExternalId(null);
         $pickupLocationModel->setAllowedToDelete(0);
+
+        $cashRegisterData = '';
+        if(!empty($data['cash-register-id'])) {
+            $cashRegisterData = $data['cash-register-id'];
+        }
+
+        $pickupLocationModel->setCashRegisterId($cashRegisterData);
         $pickupLocationMapper->save($pickupLocationModel);
     }
 
@@ -156,6 +163,12 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             $pickupLocationModel->setLng($coordinates['lng']);
             $pickupLocationModel->setExternalId($data['locationExternalId']);
             $pickupLocationModel->setAllowedToDelete($data['locationAllowedToDelete']);
+
+            $cashRegisterData = '';
+            if(!empty($data['cash-register-id'])) {
+                $cashRegisterData = $data['cash-register-id'];
+            }
+            $pickupLocationModel->setCashRegisterId($cashRegisterData);
             $pickupLocationMapper->save($pickupLocationModel);
         } else {
             $this->_error();

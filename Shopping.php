@@ -1492,6 +1492,13 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
 
+            $isPluginWithTagPosExist = false;
+            $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
+            if (!empty($availablePlugins)) {
+                $isPluginWithTagPosExist = true;
+            }
+            $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
+
 			$this->_layout->content = $this->_view->render('order.phtml');
 
 			echo $this->_layout->render();
@@ -2104,6 +2111,14 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_view->countries = Tools_Geo::getCountries(true);
         $this->_view->defaultCountries = Zend_Locale::getTranslationList('territory', 'en_GB', 2);
         $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGELOCATION;
+
+        $isPluginWithTagPosExist = false;
+        $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
+        if (!empty($availablePlugins)) {
+            $isPluginWithTagPosExist = true;
+        }
+
+        $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
         $this->_layout->content = $this->_view->render('pickup-location.phtml');
         $this->_layout->sectionId = Tools_Misc::SECTION_STORE_MANAGEZONES;
         echo $this->_layout->render();

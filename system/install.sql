@@ -342,6 +342,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_pickup_notification_sent` ENUM('0', '1') DEFAULT '0',
   `pickup_notification_sent_on` timestamp NULL,
+  `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -760,6 +761,7 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `country` (`country`),
   INDEX `city` (`city`),
@@ -1118,5 +1120,5 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `obser
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.1' WHERE `name` = 'shopping';
 
