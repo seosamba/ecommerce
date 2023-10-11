@@ -343,7 +343,8 @@ define([
             }
 
             var checked = this.products.where({checked: true}),
-                productIds     = _.pluck(checked, 'id');
+                productIds     = _.pluck(checked, 'id'),
+                self = this;
 
             if (!productIds.length){
                 return false;
@@ -399,6 +400,7 @@ define([
                         buttons: companyProductButtons,
                         close: function (event, ui) {
                             $(this).dialog('destroy');
+                            self.products.pager();
                         }
                     });
 
