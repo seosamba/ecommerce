@@ -160,7 +160,19 @@ define([
 
             this.model.get('options').on('add', this.renderOption, this);
             this.model.get('options').on('reset', this.renderOptions, this);
-            $('#product-supplier').chosen();
+
+            var self = this;
+            $('#product-supplier').chosen().change(function(e, result) {
+                e.preventDefault();
+                var searchChoice = $(".chosen-choices li.search-choice");
+                if(searchChoice.length) {
+                    _.each(searchChoice, function (cName, key) {
+                        if($(cName).find('span').length == 1) {
+                            $(cName).find('span')[0].textContent = self.truncateString($(cName).find('span')[0].textContent, 15);
+                        }
+                    });
+                }
+            });
 
             return this;
 		},
@@ -528,6 +540,8 @@ define([
                 }));
             }
 
+            $('#product-supplier').trigger('change');
+
 			hideSpinner();
 		},
         initTinyMce() {
@@ -759,9 +773,7 @@ define([
             this.model.set({customParams: productCustomParams});
 
             var companyProducts = $('#product-supplier').val();
-            if(companyProducts) {
-                this.model.set({companyProducts: companyProducts});
-            }
+            this.model.set({companyProducts: companyProducts});
 
             var ptodFullDescription = tinymce.activeEditor.getContent();
             this.model.set({fullDescription: ptodFullDescription});
@@ -1233,6 +1245,12 @@ define([
             this.digitalProduct.digitalProducts.server_api.productId = productId;
             this.digitalProduct.digitalProducts.currentPage = 0;
             this.digitalProduct.render();
+        },
+        truncateString: function (str, num) {
+            if (str.length <= num) {
+                return str;
+            }
+            return str.slice(0, num) + '...';
         }
 	});
 
