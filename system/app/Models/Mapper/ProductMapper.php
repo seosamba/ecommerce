@@ -128,9 +128,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processCustomParams($model->getCustomParams(), $model->getId());
         }
 
-        if(!empty($model->getCompanyProducts())) {
-            $this->_processCompanyProducts($model->getCompanyProducts(), $model->getId());
-        }
+        $this->_processCompanyProducts($model->getCompanyProducts(), $model->getId());
 
         //process product parts if any
         $this->_processParts($model);

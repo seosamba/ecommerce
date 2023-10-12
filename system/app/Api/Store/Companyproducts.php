@@ -59,20 +59,23 @@ class Api_Store_Companyproducts extends Api_Service_Abstract
      */
     public function postAction()
     {
+        $translator = Zend_Registry::get('Zend_Translate');
+        $responseHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('response');
         $postData =  filter_var_array($this->_request->getParams(), FILTER_SANITIZE_STRING);
 
-        if (!empty($postData['companies']) && !empty($postData['productIds'])) {
+        if (!empty($postData['productIds'])) {
             $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
             foreach ($postData['productIds'] as $productId) {
                 if (!empty($postData['removeOldCompanies'])) {
                     $companyProductsMapper->deleteByProductId($productId);
                 }
-                $companyProductsMapper->processData($productId, $postData['companies']);
-            }
 
+                if(!empty($postData['companies'])) {
+                    $companyProductsMapper->processData($productId, $postData['companies']);
+                }
+            }
+            $responseHelper->success($translator->translate('Saved'));
         } else {
-            $translator = Zend_Registry::get('Zend_Translate');
-            $responseHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('response');
             $responseHelper->fail($translator->translate('No data provided'));
         }
     }
