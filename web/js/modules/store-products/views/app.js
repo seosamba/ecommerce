@@ -343,7 +343,8 @@ define([
             }
 
             var checked = this.products.where({checked: true}),
-                productIds     = _.pluck(checked, 'id');
+                productIds     = _.pluck(checked, 'id'),
+                self = this;
 
             if (!productIds.length){
                 return false;
@@ -365,7 +366,7 @@ define([
                     data: {'companies': companies, productIds:productIds, removeOldCompanies: '1'},
                     dataType: 'json',
                     success: function(response){
-                        showMessage(_.isUndefined(i18n['Saved']) ? 'Saved':i18n['Saved'], false, 5000);
+                        showMessage(response.responseText, false, 5000);
                     }
                 });
 
@@ -399,6 +400,7 @@ define([
                         buttons: companyProductButtons,
                         close: function (event, ui) {
                             $(this).dialog('destroy');
+                            self.products.pager();
                         }
                     });
 
