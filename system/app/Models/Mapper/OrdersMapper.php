@@ -60,6 +60,8 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				->joinLeft(array('u' => 'user'), 'u.id = order.user_id', array(
 					'full_name', 'email', 'originalTotal' => new Zend_Db_Expr('SUM(order.total+order.refund_amount)')
 				))
+                ->joinLeft(array('sci'=>'shopping_customer_info'), 'sci.user_id=order.user_id',
+                    array())
                 ->joinLeft(array('imp'=>'shopping_import_orders'), 'imp.real_order_id=order.id',
                     array('real_order_id'=>'imp.real_order_id'))
                 ->joinLeft(array('shrp'=>'shopping_recurring_payment'), 'shrp.cart_id=order.id',
@@ -271,8 +273,33 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
 				$key = strtolower($key);
 				switch($key){
                     case 'user':
-                        $likeWhere = "CONCAT(TRIM(s_adr.firstname), ' ',  TRIM(s_adr.lastname)) LIKE ?  OR CONCAT(TRIM(b_adr.firstname), ' ',  TRIM(b_adr.lastname)) LIKE ?";
-                        $select->where($likeWhere, '%' . $val . '%');
+                        //$likeWhere = "CONCAT(TRIM(s_adr.firstname), ' ',  TRIM(s_adr.lastname)) LIKE ?  OR CONCAT(TRIM(b_adr.firstname), ' ',  TRIM(b_adr.lastname)) LIKE ?";
+
+                        $attributeValues = explode(' ', $val);
+
+                        $likeWhere = ' (';
+                        foreach ($attributeValues as $key => $attrVal) {
+                            $likeWhere .= $this->getDbTable()->getAdapter()->quoteInto('CONCAT(TRIM(s_adr.firstname), " ",  TRIM(s_adr.lastname)) LIKE ?',
+                                '%' . $attrVal . '%');
+                            if (count($attributeValues) > $key + 1) {
+                                $likeWhere .= ' AND ';
+                            }
+                        }
+
+                        $likeWhere .= ') OR ( ';
+
+                        foreach ($attributeValues as $key => $attrVal) {
+                            $likeWhere .= $this->getDbTable()->getAdapter()->quoteInto('CONCAT(TRIM(b_adr.firstname), " ",  TRIM(b_adr.lastname)) LIKE ?',
+                                '%'. $attrVal . '%');
+
+                            if (count($attributeValues) > $key+1) {
+                                $likeWhere .= ' AND ';
+                            }
+                        }
+
+                        $likeWhere .= ')';
+
+                        $select->where($likeWhere);
                         break;
 					case 'product-id':
 						$select->where('p.id = ?', $val);
@@ -319,7 +346,42 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             }
                         }
                         else {
-                            $subSelect->where($likeWhere, '%'.$val.'%');
+                            $attributeValues = explode(' ', $val);
+
+                            $whereParam = ' (';
+                            foreach ($attributeValues as $key => $attrVal) {
+                                $whereParam .= $this->getDbTable()->getAdapter()->quoteInto('product.name LIKE ?',
+                                    '%' . $attrVal . '%');
+                                if (count($attributeValues) > $key + 1) {
+                                    $whereParam .= ' AND ';
+                                }
+                            }
+
+                            $whereParam .= ') OR ( ';
+
+                            foreach ($attributeValues as $key => $attrVal) {
+                                $whereParam .= $this->getDbTable()->getAdapter()->quoteInto('product.sku LIKE ?',
+                                    '%'. $attrVal . '%');
+
+                                if (count($attributeValues) > $key+1) {
+                                    $whereParam .= ' AND ';
+                                }
+                            }
+
+                            $whereParam .= ') OR ( ';
+
+                            foreach ($attributeValues as $key => $attrVal) {
+                                $whereParam .= $this->getDbTable()->getAdapter()->quoteInto('product.mpn LIKE ?',
+                                    '%'. $attrVal . '%');
+
+                                if (count($attributeValues) > $key+1) {
+                                    $whereParam .= ' AND ';
+                                }
+                            }
+
+                            $whereParam .= ')';
+
+                            $subSelect->where($whereParam);
                         }
 
                         $cartIds = $this->getDbTable()->getAdapter()->fetchCol($subSelect);
@@ -391,6 +453,10 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             $select->where('imp.real_order_id IS NULL');
                             $select->where('order.order_subtype = ?', strtolower($val));
                         }
+                        break;
+                    case 'filter-client-group':
+                        $val = filter_var_array($val, FILTER_SANITIZE_NUMBER_INT);
+                        $select->where('sci.group_id IN (?)', $val);
                         break;
                     case 'filter-recurring-order-type':
                         $val = filter_var($val, FILTER_SANITIZE_STRING);

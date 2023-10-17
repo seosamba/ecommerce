@@ -144,11 +144,18 @@ if (_.isUndefined(TFilter)) {
         },
         saveAttributeValue: function (e) {
             var $input = $(e.currentTarget),
-                data = {
+                inputValue = $input.val();
+
+            if (inputValue.indexOf('\'') >= 0 || inputValue.indexOf('"') >= 0) {
+                inputValue = inputValue.replace(/["]/g, '”');
+                inputValue = inputValue.replace(/[']/g, '’');
+            }
+
+            var data = {
                     product_id: this.productId,
                     attribute_id: $input.data('aid'),
                     tags: $input.data('tags'),
-                    value: $input.val()
+                    value: inputValue
                 };
 
             $.ajax({

@@ -45,30 +45,13 @@ class Forms_BasicsSettings extends Zend_Form {
 		));
 
         $this->addElement('checkbox', 'deductSetStock', array(
-            'label' => $translator->translate('Deduct from inventory of products used in sets'),
+            'label' => $translator->translate('Deduct products used in sets from inventory'),
             'class' => 'grid_6 alpha'
         ));
 
         $this->addElement('checkbox', 'minimumOrder', array(
-            'label' => $translator->translate('Minimum order'),
+            'label' => $translator->translate('Enable individual product minimum order handling (set values in product screen)'),
             'class' => 'grid_6 alpha'
-        ));
-
-        $this->addElement('text', 'operationalHours', array(
-            'label' => $translator->translate('store operational hours')
-        ));
-
-        $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
-        array_pop($timezones);
-
-        $this->addElement(new Zend_Form_Element_Select(
-            array(
-                'name' => 'timezone',
-                'id' => 'user-timezone',
-                'label' => $translator->translate('Timezone'),
-                'class' => 'grid_6 alpha mb10px',
-                'multiOptions' => array('0' => $translator->translate('Select timezone')) + array_combine($timezones, $timezones)
-            )
         ));
 
         $this->addElement('checkbox', 'smartFilter', array(

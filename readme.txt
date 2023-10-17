@@ -60,6 +60,12 @@ Plugin widgets.
     {$product:allowance} - Displays the product allowance end date.
     {$product:wishlistqty} - Displays the product Wishlist qty.
     {$product:minimumorder} - Displays the product minimum order qty.
+    {$product:dimensionswidth[:unit]} - Displays the product dimensions width.
+        unit - length unit from config
+    {$product:dimensionslength[:unit]} - Displays the product dimensions length.
+        unit - length unit from config
+    {$product:dimensionsdepth[:unit]} - Displays the product dimensions depth.
+        unit - length unit from config
 
 2. Product list widget.
     {$productlist:template_name[:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku]]]:desc:unwrap:5} - Creates a list of products using the same tags.
@@ -95,6 +101,7 @@ Plugin widgets.
     {$user:grid} - grid with information about purchases for current logged user
     {$user:grid:recurring} - grid with information about recurring payments(subscriptions)
     {$user:grid:recurring:without_period_cycle} - this option allows to hide 'payment period cycle' column and to block 'next billing date' changing.
+    {$user:grid:recurring:disable_period_change} - this option disables changing type and period of recurrent payment
 
 7. Post purchase widgets:
     This type of widgets you can use at the post purchase page(page with option Post purchase "Thank you" page)
@@ -114,6 +121,7 @@ Plugin widgets.
     {$postpurchase:referer} -> referer link
     {$postpurchase:createdAt[:d/M/Y]} -> date when purchase created in d-M-Y format. You can set your own date format
     {$postpurchase:updatedAt} -> date when purchase updated in d-M-Y format
+    {$postpurchase:purchasedon[:d/M/Y]} -> when purchase on date in d-M-Y format. You can set your own date format
     {$postpurchase:notes} -> customer notes
     {$postpurchase:additionalInfo} -> additional info of purchase
     {$postpurchase:discount[:clean[:withouttax]]} -> purchase discount (with tax if tax enabled)
@@ -126,6 +134,10 @@ Plugin widgets.
     {$postpurchase:isGift:some text here} -> Is a gift message will be returned
     {$postpurchase:giftEmail} -> return receiver gift email
     {$postpurchase:outstandingamount[:clean]} -> outstanding amount
+    {$postpurchase:quoteid} -> show quote id.
+    {$postpurchase:quotetitle} -> show quote title.
+    {$postpurchase:quotecreatedat[:Y-m-d]} -> show quote created at.
+    {$postpurchase:signatureinfo} -> show signature info
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -162,6 +174,7 @@ Plugin widgets.
 
     {$postpurchase:cartitem:photo[:small|medium|large|original|product]} -> product photo (by default from product folder)
     {$postpurchase:cartitem:price[:clean]} -> product price without tax (if product freebies return text 'freebies')
+    {$postpurchase:cartitem:pricewithoutoption[:clean][:withouttax]} -> total price without product options with tax (or without tax "withouttax")
     {$postpurchase:cartitem:tax[:clean]} -> product tax
     {$postpurchase:cartitem:taxprice[:clean]} -> product price with tax
     {$postpurchase:cartitem:sku} -> product sku
@@ -169,7 +182,7 @@ Plugin widgets.
     {$postpurchase:cartitem:name} -> product name
     {$postpurchase:cartitem:qty} -> product quantity
     {$postpurchase:cartitem:cartId} -> cart id
-    {$postpurchase:cartitem:total[:clean]} -> total price with tax
+    {$postpurchase:cartitem:total[:clean][:withouttax]} -> total price with tax (or without tax "withouttax")
     {$postpurchase:cartitem:options[:email[:cleanOptionPrice]} -> <div class="options">some options info</div>
     {$postpurchase:cartitem:option:optionName}
     {$postpurchase:cartitem:producturl} -> product url
@@ -214,6 +227,7 @@ Magic spaces:
  allitems - Show all filter values without All others group
  usesort - enable the ability to sort custom filters list
  usesortvalues - enable the ability to sort custom filters values list. May use with "usesort" option only
+ without-option-counter - Allow to hide counter next to the filter item
 
 10. Wishlist widget:
 a. {$storewishlist:addtowishlist:{$product:id}[:htmlclass:class class2 class3[:btnname:sometext[:profile]]]]}
@@ -271,4 +285,18 @@ Example:
 
 {$productcustomparam:select:dogs:readonly} - on the product page
 {$productcustomparam:{$product:id}:select:dogs:readonly} - in the product list
+
+                                Freeshipment
+===========================================================================================================
+ {freeshipment} ... {/freeshipment} - displays content if user eligible for free shipment
+ {freeshipment:not} ... {/freeshipment} -  displays content if user not eligible for free shipment
+
+{$store:freeshippinggoal} - it will return amount required to get free shipment
+
+
+ {productoptions} ... {/productoptions} - Return wrapper for the single product options on the product page
+
+
+ {postpurchasestatus:partial} magicspace to show content based on the cart status
+ :partial - specify appropriate statuses such as "new|completed|partial|shipped|delivered" etc..
 

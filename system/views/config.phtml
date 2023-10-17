@@ -6,38 +6,42 @@ $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
-<div id="config" class="seotoaster container">
-<?php
-    echo $this->partial(
-        'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
-        array(
-            'helpSection' => $this->helpSection,
-            'hashMap'     => Tools_Misc::$_helpHashMap
-        )
-    );
-?>
-    <div class="tabs-nav-wrap">
-    <span class="arrow w5 omega left ticon-arrow-left3"></span>
-    <span class="arrow w5 right ticon-arrow-right3"></span>
-    <ul class="header">
-	    <?php $subForms = $this->form->getSubForms(); ?>
-        <?php foreach ($subForms as $subform): ?>
-            <?php if($subform->getId() == 'notifications'){
-                continue;
-            }?>
-            <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $this->translate($subform->getLegend()); ?></a></li>
-        <?php endforeach; ?>
-        <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
-            <?php foreach($this->configTabs as $configTab): ?>
-                <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
-            <?php endforeach; ?>
-        <?php endif; ?>
-        <?php if(!empty($subForms['notifications'])):?>
-            <li><a href="#<?php echo $subForms['notifications']->getId(); ?>-tab"><?php echo $this->translate($subForms['notifications']->getLegend()); ?></a></li>
-        <?php endif;?>
-	</ul>
+<div id="config" class="seotoaster f-container">
+    <div>
+        <?php
+        echo $this->partial(
+            'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
+            array(
+                'helpSection' => $this->helpSection,
+                'hashMap'     => Tools_Misc::$_helpHashMap
+            )
+        );
+        ?>
+
+        <div class="tabs-nav-wrap">
+            <span class="arrow w5 omega left ticon-arrow-left3"></span>
+            <span class="arrow w5 right ticon-arrow-right3"></span>
+            <ul class="header">
+                <?php $subForms = $this->form->getSubForms(); ?>
+                <?php foreach ($subForms as $subform): ?>
+                    <?php if($subform->getId() == 'notifications'){
+                        continue;
+                    }?>
+                    <li><a href="#<?php echo $subform->getId(); ?>-tab"><?php echo $this->translate($subform->getLegend()); ?></a></li>
+                <?php endforeach; ?>
+                <?php if(isset($this->configTabs) && is_array($this->configTabs) && !empty($this->configTabs)): ?>
+                    <?php foreach($this->configTabs as $configTab): ?>
+                        <li><a class="no-save-btn" href="<?php echo $configTab['contentUrl']; ?>"><?php echo $configTab['title']; ?></a></li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <?php if(!empty($subForms['notifications'])):?>
+                    <li><a href="#<?php echo $subForms['notifications']->getId(); ?>-tab"><?php echo $this->translate($subForms['notifications']->getLegend()); ?></a></li>
+                <?php endif;?>
+            </ul>
+        </div>
     </div>
-	<form  style="overflow-y: auto;" class="content-medium-footer" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
+    <?php $useOperationalHoursForOrders = '';?>
+	<form class="f-content" action="<?php echo $this->form->getAction();?>" id="<?php echo $this->form->getId();?>">
     <?php foreach ($subForms as $subform) :?>
 		<fieldset id="<?php echo $subform->getId();?>-tab">
             <?php $hoursFrom = array('0' => $this->translate('From')) + Tools_Misc::$_hoursUnits;?>
@@ -45,20 +49,32 @@ $this->headLink()
 			<?php foreach ($subform->getElements() as $elem):?>
 			<div>
                 <?php $elemName = $elem->getName();?>
-                <?php if ($elemName !== 'operationalHours') :?>
+                <?php if ($elemName !== 'operationalHours' && $elemName !== 'useOperationalHoursForOrders' && $elemName !== 'useOperationalHoursForOrdersMessage') :?>
                     <?php $labelText = $this->translate($elem->getLabel());?>
                     <?php $elem->setLabel($labelText);?>
 				    <?php echo $elem->renderLabel();?>
                     <?php echo $elem->renderViewHelper();?>
                 <?php else: ?>
-                    <?php $operationalHours = $elem->getValue();?>
-                    <?php if(!empty($operationalHours)) :?>
-                        <?php $operationalHours = unserialize($elem->getValue());?>
+                    <?php if($elemName === 'operationalHours'):?>
+                        <?php $operationalHours = $elem->getValue();?>
+                        <?php if(!empty($operationalHours)) :?>
+                            <?php $operationalHours = unserialize($elem->getValue());?>
+                        <?php endif;?>
+                    <?php endif;?>
+                    <?php if($elemName === 'useOperationalHoursForOrders'):?>
+                        <?php if(!empty($elem->getValue())):?>
+                            <?php $useOperationalHoursForOrders = '1';?>
+                        <?php else:?>
+                            <?php $useOperationalHoursForOrders = '0';?>
+                        <?php endif;?>
+                    <?php endif;?>
+                    <?php if($elemName === 'useOperationalHoursForOrdersMessage'):?>
+                        <?php $useOperationalHoursForOrdersMessage = $elem->getValue();?>
                     <?php endif;?>
                 <?php endif;?>
             </div>
 			<?php endforeach; ?>
-            <?php if ($subform->getId() === 'display'): ?>
+            <?php if ($subform->getId() === 'operations'): ?>
                 <p class="grid_12 text-center mb10px mt0px">
                     <a href="javascript:;" class="text-center" id="switch-operational-hours"><?php echo $this->translate('View and edit your business operating hours');?></a>
                 </p>
@@ -157,7 +173,15 @@ $this->headLink()
                             <?php endforeach;?>
                         </select>
                     </p>
-
+                    <p class="grid_12 mt10px">
+                        <label for="use-operational-hours-for-orders">
+                            <?php echo $this->translate('Limit online orders taking to store hours above');?>
+                            <input <?php echo (!empty($useOperationalHoursForOrders) ? 'checked' : '');?> id="use-operational-hours-for-orders" type="checkbox" name="useOperationalHoursForOrders" value="1">
+                        </label>
+                        <label id="use-operational-hours-for-orders-message" class="mt10px <?php echo (!empty($useOperationalHoursForOrders) ? '' : 'hidden');?>">
+                            <input placeholder="<?php echo $this->translate('Online ordering unavailable');?>" type="text" name="useOperationalHoursForOrdersMessage" value="<?php echo $useOperationalHoursForOrdersMessage;?>">
+                        </label>
+                    </p>
                 </div>
                 <?php $links = Tools_Misc::getPostPurchaseAndLandingPageLinks(); ?>
                 <?php if (!empty($links)): ?>
@@ -185,15 +209,26 @@ $this->headLink()
         <input type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>">
     </form>
 
-	<?php //echo $this->form; ?>
-    <div class="footer grid_12">
-	    <button id="save-btn" class="btn ticon-save mr-grid"><?php echo $this->translate('Save');?></button>
+    <div class="f-footer">
+        <div class="grid_12">
+            <button id="save-btn" class="btn ticon-save"><?php echo $this->translate('Save');?></button>
+        </div>
     </div>
 </div>
 
 <script>
 <?php $this->jQuery()->onLoadCaptureStart();?>
     //	$('div.seotoaster > div.ui-widget-header:first').remove();
+
+    if($('#disabledStore').is(':checked')) {
+        $('#disabledStoreMessage').removeClass('hidden');
+        $('#disabledStoreMessage').closest('div').removeClass('hidden');
+    } else {
+        $('#disabledStoreMessage').closest('div').addClass('hidden');
+        $('#disabledStoreMessage').addClass('hidden');
+    }
+
+    $('#disabledStoreMessage').closest('div').find('label').addClass('mt5px');
 
     var shopping = {};
     shopping.saveconfig = function(){
@@ -228,7 +263,15 @@ $this->headLink()
                 showMessage('<?php echo $this->translate('Saved'); ?>');
             }
         });
-    }
+    };
+
+    $(document).on('change', '#use-operational-hours-for-orders', function(){
+        if ($(this).is(':checked')) {
+            $('#use-operational-hours-for-orders-message').removeClass('hidden');
+        }  else {
+            $('#use-operational-hours-for-orders-message').addClass('hidden');
+        }
+    });
 
     $('#save-btn').on('click', shopping.saveconfig);
 
@@ -267,6 +310,16 @@ $this->headLink()
             $form.attr('user-changed', true);
             var currentTab = $('#config').tabs('option', 'selected');
             $('#config > ul > li:eq('+currentTab+') > a').addClass('user-changed');
+        }
+    });
+
+    $('#disabledStore').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#disabledStoreMessage').removeClass('hidden');
+            $('#disabledStoreMessage').closest('div').removeClass('hidden');
+        } else {
+            $('#disabledStoreMessage').addClass('hidden');
+            $('#disabledStoreMessage').closest('div').addClass('hidden');
         }
     });
 

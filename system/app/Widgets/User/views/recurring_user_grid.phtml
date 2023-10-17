@@ -1,3 +1,7 @@
+<?php
+    $this->headScript()->appendFile($this->websiteUrl.'plugins/shopping/web/js/libs/moment.min.js');
+?>
+
 <div id="user-recurring-grid">
     <input type="hidden" class="secureToken" name="secureToken"
            value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
@@ -38,20 +42,49 @@
                                 <?php $changePaymentPeriod = 'quarter'; ?>
                             <?php elseif ($changePaymentPeriod === '+6 month'): ?>
                                 <?php $changePaymentPeriod = 'semester'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 month'): ?>
+                                <?php $changePaymentPeriod = 'month'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 year'): ?>
+                                <?php $changePaymentPeriod = 'year'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 week'): ?>
+                                <?php $changePaymentPeriod = 'week'; ?>
+                            <?php elseif ($changePaymentPeriod === '+2 month'): ?>
+                                <?php $changePaymentPeriod = 'month-two'; ?>
+                            <?php elseif ($changePaymentPeriod === '+1 day'): ?>
+                                <?php $changePaymentPeriod = 'day'; ?>
                             <?php endif; ?>
 
-                            <?php $changePaymentPeriod = preg_replace('/[^a-zA-Z]/ui', '', $changePaymentPeriod);?>
-                            <?php if (array_key_exists('recurring-payment-' . $changePaymentPeriod, $this->activeRecurringPaymentTypes)): ?>
+                            <?php $changePaymentPeriodCustom = strtolower(preg_replace('/[^a-zA-Z]/ui', '', $order['payment_period']));?>
+                            <?php $changePaymentPeriodQuantity =  preg_replace('/[\D]/ui', '', $order['payment_period']);?>
+                            <?php $customRange = false;?>
+
+                            <?php if ($changePaymentPeriodCustom === 'month' || $changePaymentPeriodCustom === 'day'): ?>
+                                <?php if ($changePaymentPeriodCustom === 'month'): ?>
+                                    <?php if (!in_array($changePaymentPeriodQuantity, array('1', '2', '3', '6'))): ?>
+                                        <?php $customRange = true; ?>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <?php if (!in_array($changePaymentPeriodQuantity, array('1'))): ?>
+                                        <?php $customRange = true; ?>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php if (array_key_exists('recurring-payment-' . $changePaymentPeriod, $this->activeRecurringPaymentTypes) && $customRange === false && $this->disablePeriodOptions === false): ?>
                                 <select class="change-recurring-payment-period" name="change-recurring-payment-period">
                                     <?php foreach (Api_Store_Recurringtypes::$recurringAcceptType as $recurringType => $recurringTypeFullName): ?>
                                         <?php if (array_key_exists(strtolower('recurring-payment-' . $recurringType),
                                             $this->activeRecurringPaymentTypes)): ?>
-                                            <option value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo $this->translate('Every') . ' ' . $this->translate($recurringType); ?></option>
+                                            <?php $recurringTypeLabel = $recurringType;?>
+                                            <?php if ($recurringTypeLabel === 'month-two'):?>
+                                                <?php $recurringTypeLabel = 'two month';?>
+                                            <?php endif;?>
+                                            <option value="<?php echo strtoupper($recurringType); ?>" <?php echo ($changePaymentPeriod === $recurringType) ? 'selected' : ''; ?>> <?php echo $this->translate('Every') . ' ' . $this->translate($recurringTypeLabel); ?></option>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 </select>
                             <?php else: ?>
-                                <?php echo $this->translate('Every') . ' ' . preg_replace('/[^+0-9]/ui', '', $order['payment_period']) . $this->translate($changePaymentPeriod); ?>
+                                <?php echo $this->translate('Every') . ' ' . $changePaymentPeriodQuantity .' '. $this->translate($changePaymentPeriodCustom).'(s)'; ?>
                             <?php endif; ?>
                         </td>
                     <?php endif; ?>
@@ -60,8 +93,12 @@
                             strtotime($order['last_payment_date'])); ?></td>
                     <td class="user-order-next-billing-date">
                         <?php if ($order['accept_changing_next_billing_date'] && $order['recurring_status'] === Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT): ?>
-                            <input type="text" class="user-order-next-billing-date-change"
-                                   name="user-order-next-billing-date-change" value="<?php echo date("d-M-Y", strtotime($order['next_payment_date'])); ?>"/>
+                            <?php if ($this->disablePeriodOptions === false):?>
+                                <input type="text" class="user-order-next-billing-date-change"
+                                       name="user-order-next-billing-date-change" value="<?php echo date("d-M-Y", strtotime($order['next_payment_date'])); ?>"/>
+                            <?php else:?>
+                                <?php echo  date("d-M-Y", strtotime($order['next_payment_date'])); ?>
+                            <?php endif;?>
                         <?php else: ?>
                             <?php echo  date("d-M-Y", strtotime($order['next_payment_date'])); ?>
                         <?php endif; ?>
@@ -153,21 +190,79 @@
 
         $('.change-recurring-payment-period').on('focus', function () {
             previousPaymentPeriodValue = $(this).val();
-        }).on('change', function () {
+        }).on('change', function (e) {
             var cartId = $(this).closest('tr').data('id'),
                 secureToken = $('.secureToken').val(),
                 paymentCycle = $(this).val(),
-                self = $(this);
+                self = $(this),
+                el = $(e.currentTarget);
             $.post('<?php echo $this->websiteUrl;?>' + 'plugin/shopping/run/updateRecurringData/', {
                 'cartId': cartId,
                 'secureToken': secureToken,
                 'changeType': 'payment_cycle',
                 'paymentCycle': paymentCycle
             }, function (response) {
+                var today = '<?php echo date('Y-m-d', strtotime('now'))?>';
                 if (response.error) {
                     self.val(previousPaymentPeriodValue);
                     showMessage(response.responseText, true);
                 } else {
+                    var date = moment(today);
+                    var recurringStatusEl =  el.closest('tr').find('.change-recurring-status');
+                    var nextBillingDateEl = el.closest('tr').find('.user-order-next-billing-date-change');
+                    if(!nextBillingDateEl.length) {
+                        nextBillingDateEl = el.closest('tr').find('.user-order-next-billing-date');
+                        if(paymentCycle == 'DAY') {
+                            date.add(1, 'days').startOf('day').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        } else if(paymentCycle == 'WEEK') {
+                            date.add(7, 'days').startOf('day').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        } else if(paymentCycle == 'MONTH') {
+                            date.add(1, 'M').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        } else if(paymentCycle == 'MONTH-TWO' || paymentCycle == 'TWO_MONTHS') {
+                            date.add(2, 'M').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        } else if(paymentCycle == 'QUARTER') {
+                            date.add(3, 'M').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        } else if(paymentCycle == 'SEMESTER') {
+                            date.add(6, 'M').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        } else if(paymentCycle == 'YEAR') {
+                            date.add(1, 'Y').toDate();
+                            let dateLabel = date.format('DD-MMM-YYYY');
+                            nextBillingDateEl.text(dateLabel);
+                        }
+                    } else {
+                        if(paymentCycle == 'DAY') {
+                            nextBillingDateEl.datepicker('setDate', date.add(1, 'days').startOf('day').toDate());
+                        } else if(paymentCycle == 'WEEK') {
+                            nextBillingDateEl.datepicker('setDate', date.add(7, 'days').startOf('day').toDate());
+                        } else if(paymentCycle == 'MONTH') {
+                            nextBillingDateEl.datepicker('setDate', date.add(1, 'M').toDate());
+                        } else if(paymentCycle == 'MONTH-TWO' || paymentCycle == 'TWO_MONTHS') {
+                            nextBillingDateEl.datepicker('setDate', date.add(2, 'M').toDate());
+                        } else if(paymentCycle == 'QUARTER') {
+                            nextBillingDateEl.datepicker('setDate', date.add(3, 'M').toDate());
+                        } else if(paymentCycle == 'SEMESTER') {
+                            nextBillingDateEl.datepicker('setDate', date.add(6, 'M').toDate());
+                        } else if(paymentCycle == 'YEAR') {
+                            nextBillingDateEl.datepicker('setDate', date.add(1, 'Y').toDate());
+                        }
+                    }
+
+                    if(recurringStatusEl.val() != 'canceled') {
+                        recurringStatusEl.val('<?php echo Store_Model_RecurringPayments::ACTIVE_RECURRING_PAYMENT; ?>');
+                    }
+
                     showMessage(response.responseText);
                 }
             }, 'json');

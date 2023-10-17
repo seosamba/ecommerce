@@ -99,8 +99,8 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$order  = filter_var($this->_request->getParam('order', null), FILTER_SANITIZE_STRING);
 			$offset = filter_var($this->_request->getParam('offset', 0), FILTER_SANITIZE_NUMBER_INT);
 			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_SANITIZE_NUMBER_INT);
-            $key    = filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-			$count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+            $key    = str_replace('*-amp-*', '&', filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+            $count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
@@ -317,6 +317,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 
 		if (!empty($products)){
             $allowanceProductsMapper = Store_Mapper_AllowanceProductsMapper::getInstance();
+            $filteringMapper = Filtering_Mappers_Eav::getInstance();
 
 			foreach ($products as $product) {
 			    $productId = $product->getId();
@@ -335,6 +336,18 @@ class Api_Store_Products extends Api_Service_Abstract {
                 }
                 try {
                     if ($this->_productMapper->save($product)) {
+                        $productAttributes = $filteringMapper->getAttributes($productId);
+                        $productTags = $product->getTags();
+                        if(!empty($productAttributes) && !empty($productTags)) {
+                            foreach ($productAttributes as $attribute) {
+                               $dbAdapter = Zend_Db_Table::getDefaultAdapter();
+                               $sql = "INSERT IGNORE INTO shopping_filtering_tags_has_attributes (attribute_id, tag_id) VALUES (:attribute_id, :tag_id)";
+                                foreach ($productTags as $tag) {
+                                    $dbAdapter->query($sql, array('attribute_id' => $attribute['attribute_id'], 'tag_id' => $tag['id']));
+                                }
+                            }
+                        }
+
                         $data[] = $product->toArray();
                     }
                 } catch (Exception $e) {

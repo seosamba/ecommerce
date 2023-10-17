@@ -16,7 +16,9 @@
     <input type="hidden" name="system-currency" value="<?php echo $this->currency->getSymbol() ;?>"/>
     <input type="hidden" name="currency-unit" value="<?php echo $this->currencyUnit ;?>"/>
     <div class="search-line clearfix">
-        <input type="text" class="pfilter grid_3 alpha omega mb20px" name="productsearch" placeholder="<?php echo $this->translate('search by name, SKU, MPN') ?>" >
+        <span class="search-block-element grid_3 alpha omega mb20px ">
+            <input type="text" class="pfilter search-input" name="productsearch" placeholder="<?php echo $this->translate('search by name, SKU, MPN') ?>" >
+        </span>
         <div class="grid_9 omega">
             <div class="grid_4 alpha t-grid_3 t-alpha mb20px">
                 <select class="pfilter" multiple name="filter-brand" data-placeholder="<?php echo $this->translate('Filter by brand..');?>">
@@ -73,7 +75,7 @@
 		<tfoot>
 			<tr>
 				<td colspan="11">
-                    <div class="grid_3 alpha">
+                    <div class="grid_3 alpha product-mass-action-block">
                         <?php echo $this->translate('with selected');?>:&nbsp;
                         <select name="product-mass-action" id="">
                             <option value="0"><?php echo $this->translate('select mass action');?></option>

@@ -10,7 +10,7 @@ $this->headLink()
     ->appendStylesheet($this->websiteUrl . 'plugins/shopping/web/css/store.css');
 ?>
 
-<div class="seotoaster container">
+<div class="seotoaster f-container">
     <?php
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -21,7 +21,7 @@ $this->headLink()
         )
     );
     ?>
-    <div class="content-footer scroll">
+    <div class="f-content f-scroll">
         <div class="hidden">
         <?php
             echo $this->formHidden('things-select-folder', Shopping::BRAND_LOGOS_FOLDER);
@@ -41,7 +41,7 @@ $this->headLink()
             <span class="spinner"></span>
         </div>
     </div>
-    <div class="footer grid_12">
+    <div class="f-footer grid_12">
         <div id="progressbar" class="hidden">
             <span class="label"><?php echo $this->translate('Uploading');?>&nbsp;<b class="value">0</b></span>
         </div>

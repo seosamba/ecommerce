@@ -15,11 +15,13 @@ class Forms_Config extends Zend_Form {
 		$general = new Forms_GeneralSettings();
 		$display = new Forms_BasicsSettings();
 		$storeNotifications = new Forms_StoreNotifications();
+		$operationsSettings = new Forms_OperationsSettings();
 
 		$this->addSubForms(array(
 			'general' => $general,
 			'display' => $display,
-            'notifications' => $storeNotifications
+            'notifications' => $storeNotifications,
+            'operations'    => $operationsSettings
 		));
 		
 		foreach ($this->getSubForms() as $id => $form){

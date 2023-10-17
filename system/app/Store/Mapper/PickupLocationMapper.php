@@ -43,6 +43,7 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'name'                 => $model->getName(),
             'lat'                  => $model->getLat(),
             'lng'                  => $model->getLng(),
+            'notes'                => $model->getNotes(),
             'weight'               => $model->getWeight(),
             'external_id'          => $model->getExternalId(),
             'allowed_to_delete'    => $model->getAllowedToDelete()

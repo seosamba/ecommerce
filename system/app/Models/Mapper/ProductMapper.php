@@ -128,6 +128,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $this->_processCustomParams($model->getCustomParams(), $model->getId());
         }
 
+        $this->_processCompanyProducts($model->getCompanyProducts(), $model->getId());
+
         //process product parts if any
         $this->_processParts($model);
 
@@ -286,13 +288,78 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 }
 
             } else {
-                $select->where($likeWhere, '%' . $search . '%');
+                $attributeValues = explode(' ', $search);
+                $whereSplitSearch = ' (';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.name LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.sku LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.mpn LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('b.name LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ') OR ( ';
+
+                foreach ($attributeValues as $key => $attrVal) {
+                    $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('t.name LIKE ?',
+                        '%' . $attrVal . '%');
+
+                    if (count($attributeValues) > $key + 1) {
+                        $whereSplitSearch .= ' AND ';
+                    }
+
+                }
+
+                $whereSplitSearch .= ')';
+
+                $select->where($whereSplitSearch);
             }
         }
 
         if($allowance) {
             $select->joinLeft(array('ap' => 'shopping_allowance_products'), 'ap.product_id = p.id', array('allowance' => 'ap.allowance_due'));
         }
+
+        $select->joinLeft(array('scp' => 'shopping_company_products'), 'scp.product_id = p.id', array('companyProducts' => new Zend_Db_Expr('GROUP_CONCAT(DISTINCT(scp.company_id))')));
 
         if (self::$_logSelectResultLength === false) {
             $select->limit($limit, $offset);
@@ -322,6 +389,85 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             array_push($entities, $this->_toModel($row));
         }
         return $entities;
+    }
+
+    /**
+     *
+     * @param string $where SQL where clause
+     * @param string $order OPTIONAL An SQL ORDER clause.
+     * @param int $limit OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
+     * @param bool $withoutCount flag to get with or without records quantity
+     * @param bool $singleRecord flag fetch single record
+     * @param string $having mysql having
+     *
+     * @return array
+     */
+    public function fetchAllData(
+        $where = null,
+        $order = null,
+        $limit = null,
+        $offset = null,
+        $withoutCount = false,
+        $singleRecord = false,
+        $having = ''
+    ) {
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sp' => 'shopping_product'),
+                array(
+                    'sp.*'
+                )
+            )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array('p.url'))
+             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array('brandName' => 'sb.name'));
+
+        if (!empty($having)) {
+            $select->having($having);
+        }
+
+        $select->group('sp.id');
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        if (!empty($where)) {
+            $select->where($where);
+        }
+
+        $select->limit($limit, $offset);
+
+        if ($singleRecord) {
+            $data = $this->getDbTable()->getAdapter()->fetchRow($select);
+        } else {
+            $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+        }
+
+        if ($withoutCount === false) {
+            $select->reset(Zend_Db_Select::COLUMNS);
+            $select->reset(Zend_Db_Select::FROM);
+            $select->reset(Zend_Db_Select::LIMIT_OFFSET);
+            $select->reset(Zend_Db_Select::LIMIT_COUNT);
+
+            $count = array('count' => new Zend_Db_Expr('COUNT(DISTINCT(sp.id))'));
+
+            $select->from(array('sp' => 'shopping_product'), $count);
+
+            $select =  $this->getDbTable()->getAdapter()->select()
+                ->from(
+                    array('subres' => $select),
+                    array('count' => 'SUM(count)')
+                );
+
+            $count = $this->getDbTable()->getAdapter()->fetchRow($select);
+
+            return array(
+                'totalRecords' => $count['count'],
+                'data' => $data,
+                'offset' => $offset,
+                'limit' => $limit
+            );
+        } else {
+            return $data;
+        }
     }
 
     /**
@@ -607,26 +753,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			if ( !isset($option['title']) || empty($option['title']) ) {
 				continue;
 			} else {
-                if($option['type'] == Models_Model_Option::TYPE_TEXT || $option['type'] == Models_Model_Option::TYPE_DATE || $option['type'] == Models_Model_Option::TYPE_TEXTAREA || $option['type'] == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) {
-                    $defOptionSelection = array(
-                        'title'       => '',
-                        'priceSign'   => '+',
-                        'priceType'   => 'unit',
-                        'priceValue'  => '',
-                        'weightSign'  => '+',
-                        'weightValue' => '',
-                        'isDefault'   => 1
-                    );
-
-                    $option['selection'] = array($defOptionSelection);
-                }
-
                 if (isset($option['isTemplate']) && $option['isTemplate'] === true){
                     $template = $optionMapper->save( array(
                         'title'     => isset($option['templateName']) && !empty($option['templateName']) ? $option['templateName'] : 'template-'.$option['title'],
                         'type'      => $option['type'],
                         'parentId'  => '0',
-                        'selection' => $option['selection']
+                        'selection' => $option['selection'],
+                        'hideDefaultOption' => $option['hideDefaultOption']
                     ) );
                     $option['parentId'] = $template->getId();
                     unset($template);
@@ -734,6 +867,25 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         }
     }
 
+    /**
+     * @param $companyProducts
+     * @param $productId
+     * @return void
+     */
+    private function _processCompanyProducts($companyProducts, $productId)
+    {
+        $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+
+        if(!empty($productId)) {
+            $companyProductsMapper->deleteByProductId($productId);
+            if (!empty($companyProducts)) {
+                if(!is_array($companyProducts)) {
+                    $companyProducts = explode(',', $companyProducts);
+                }
+                $companyProductsMapper->processData($productId, $companyProducts);
+            }
+        }
+    }
 
     private function _processParts(Models_Model_Product $model) {
         $parts                 = $model->getParts();

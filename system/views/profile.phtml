@@ -30,25 +30,35 @@ $this->headScript()
             </div>
 			<div class="grid_12 alpha client-fullname client-info">
                 <b class="grid_3"><?php echo $this->translate('Full name');?>:</b>
-                <div class="grid_9">
+                <div class="grid_9 omega">
                     <span class="edit-client-fullname inline-data"><?php echo $this->customer->getFullName();?></span>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                        <input class="edit-client-fullname-input edit-client-profile" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname-input" />
+                        <input class="edit-client-fullname-input edit-client-profile grid_7 alpha" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname-input" />
                         <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                     <?php endif;?>
                     <?php if(!empty($this->leadLink)) :?>
-                        <div class="fl-right"><a target="_blank" class="lead-link btn" title="<?php echo $this->translate('Go to CRM Record'); ?>" href="<?php echo $this->leadLink;?>"><?php echo $this->translate('Go to CRM Record'); ?></a></div>
+                        <div class="fl-right grid_5 omega"><a target="_blank" class="lead-link btn" title="<?php echo $this->translate('Go to CRM Record'); ?>" href="<?php echo $this->leadLink;?>"><?php echo $this->translate('Go to CRM Record'); ?></a></div>
                     <?php endif;?>
                 </div>
             </div>
          	<div class="grid_12 alpha client-email client-info">
                 <b class="grid_3"><?php echo $this->translate('Email');?>:</b>
-                <div class="grid_9">
+                <div class="grid_9 omega">
                     <a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data edit-client-email"><?php echo $this->customer->getEmail();?></span></a>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                        <input class="edit-client-email-input edit-client-profile" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
+                        <input class="edit-client-email-input edit-client-profile grid_7 alpha" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
                         <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
                         <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
+                    <?php endif;?>
+                    <?php if(!empty($this->allGroups)) :?>
+                        <div class="fl-right grid_5 omega">
+                            <select class="user-groups" name="user-groups">
+                                <option value="0"><?php echo $this->translate('Select group');?></option>
+                                <?php foreach($this->allGroups as $group): ?>
+                                    <option <?php echo ($group->getId() == $this->customer->getGroupId()) ? 'selected="selected"' : '';?> value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
                     <?php endif;?>
                 </div>
             </div>
@@ -64,8 +74,10 @@ $this->headScript()
 				if ($this->customer->getLastLogin()) {
 					$lastSeen = date_diff(date_create($this->customer->getLastLogin()), date_create());
 					$lastSeen = intval($lastSeen->format('%a'));
-					if ($lastSeen < 7) {
-						$lastSeenStamp = date('l', strtotime($this->translate('days').' '.$lastSeen.' '.$this->translate('ago')));
+					if ($lastSeen < 7 && $lastSeen > 0) {
+						$lastSeenStamp =  $this->translate(date('l', strtotime('-'.$lastSeen.'ago')));
+					} elseif($lastSeen === 0) {
+                        $lastSeenStamp = $this->translate('today');
 					} else {
 						$lastSeenStamp = $this->translate('days').' '.$lastSeen.' '.$this->translate('ago');
 					}
@@ -137,6 +149,7 @@ $this->headScript()
 	<ul class="profile-nav">
 		<li><a href="#profile-orders-list"><?php echo $this->translate('Orders');?></a></li>
 		<li><a href="#profile-address-list"><?php echo $this->translate('Addresses');?></a></li>
+		<li><a href="#profile-user-attributes-list"><?php echo $this->translate('User attributes');?></a></li>
 	</ul>
 
 	<div id="profile-orders-list" class="clearfix">
@@ -371,6 +384,24 @@ $this->headScript()
     <?php else : ?>
         <p><?php echo $this->translate("You don't have any saved addresses");?></p>
     <?php endif;?>
+    </div>
+    <div id="profile-user-attributes-list" class="clearfix">
+        <?php if(!empty($this->userAttributes)):?>
+        <span class="grid_6 text-center"><?php echo $this->translate('Attribute name');?></span>
+        <span class="grid_6 text-center"><?php echo $this->translate('Attribute value');?></span>
+        <?php foreach ($this->userAttributes as $attrName => $attrValue):?>
+                <div class="grid_12 attribute-block">
+                    <div class="grid_6 mt5px">
+                        <input type="text" class="user-custom-attribute user-custom-attribute-name" name="user-custom-attribute-name" data-attribute-param="attribute-name" data-attribute-oldvalue="<?php echo $attrName;?>" value="<?php echo $attrName;?>">
+                    </div>
+                    <div class="grid_6 mt5px">
+                        <input type="text" class="user-custom-attribute" name="user-custom-attribute-value" data-attribute-param="attribute-value" data-attribute-oldvalue="<?php echo $attrValue;?>" value="<?php echo $attrValue;?>">
+                    </div>
+                </div>
+        <?php endforeach;?>
+        <?php else:?>
+            <p><?php echo $this->translate('You don\'t have any saved user attributes');?></p>
+        <?php endif;?>
     </div>
 </div>
 <?php endif;?>
@@ -756,6 +787,82 @@ $this->headScript()
         });
         return false;
     }
+
+    $('.user-custom-attribute').on('change', function(e){
+        e.preventDefault();
+        var attributeEl = $(e.currentTarget),
+            attributeParam = $(attributeEl).data('attribute-param'),
+            changedValue = $(attributeEl).val(),
+            oldAttributeValue = $(attributeEl).data('attribute-oldvalue'),
+            attributeBelonging = $(this).closest('.attribute-block').find('.user-custom-attribute-name').data('attribute-oldvalue'),
+            existAttribute = false;
+
+        var attributeLabel = "<?php echo $this->translate('Are you sure want to change the value?');?>";
+        if(attributeParam == 'attribute-name') {
+            attributeLabel = "<?php echo $this->translate('Are you sure want to change Attribute name?');?>";
+
+            if(changedValue == '') {
+                showMessage("<?php echo $this->translate('Empty attribute name. Please provide name.');?>", true, 3000);
+                attributeEl.val(oldAttributeValue);
+                return false;
+            }
+
+            var existedAttributesNames = $('.user-custom-attribute-name');
+
+            $.each(existedAttributesNames, function(key, val) {
+                var attrVal = $(val).data('attribute-oldvalue');
+                if(attrVal == changedValue) {
+                    showMessage(attrVal + " <?php echo $this->translate('attribute name already exists!');?>", true, 3000);
+                    existAttribute = true;
+                    attributeEl.val(oldAttributeValue);
+                }
+            });
+        }
+
+        if(!existAttribute) {
+            showConfirm(attributeLabel,  function (){
+                $.ajax({
+                    type: "POST",
+                    url: $('#website_url').val() + 'plugin/shopping/run/updateUserAttribute/',
+                    dataType: "json",
+                    data: {
+                        attributeType:      attributeParam,
+                        fieldValue:         changedValue,
+                        oldFieldValue:      oldAttributeValue,
+                        attributeBelonging: attributeBelonging,
+                        userId:             $('#userId').val(),
+                        secureToken:        $('.secure-token-user').val(),
+                    }
+                }).done(function (response) {
+                    if (response.error == 1) {
+                        attributeEl.val(oldAttributeValue);
+                        showMessage(response.responseText, true, 3000);
+                    } else {
+                        $(attributeEl).data('attribute-oldvalue', changedValue);
+                        showMessage('<?php echo $this->translate('Updated');?>', false, 2000);
+                    }
+                })
+            }, function () {
+                attributeEl.val(oldAttributeValue);
+            });
+        }
+    });
+
+    $('.user-groups').on('change', function(e){
+        e.preventDefault();
+        var selectedGroupId = $(this).val(),
+            userId = $('#userId').val();
+
+        $.ajax({
+            url: $('#website_url').val()+'api/store/customers/groupId/'+selectedGroupId+'/customerIds/'+userId,
+            type: 'PUT',
+            dataType: 'json',
+            success: function(response){
+                showMessage('<?php echo $this->translate('Group saved');?>', false, 2000);
+                $('.user-group-'+userId).val(selectedGroupId);
+            }
+        });
+    });
 
     <?php endif;?>
 

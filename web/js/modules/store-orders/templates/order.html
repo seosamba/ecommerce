@@ -22,6 +22,17 @@
 <% } %>
 <% if (status === 'refunded') { %>
     <td data-mobile-title="Status" class="status-change tooltip" title="<%= _.isUndefined(i18n['Original total']) ? 'Original total':i18n['Original total'] %> <%= _.isNull(originalTotal) ? total : (parseFloat(total) + parseFloat((parseFloat(refund_amount).toFixed(2)))) %>"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
+<% } else if(status === 'partial') {%>
+    <td data-mobile-title="Status" class="status-change">
+        <%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %>
+        <% if (typeof partial_notification_date !== 'undefined' && partial_notification_date && partial_notification_date !== null) { %>
+            <p class="mt5px">
+                <%= !_.isUndefined(i18n['Last request sent on'])?i18n['Last request sent on']:'Last request sent on' %>: <%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(partial_notification_date.replace(/\-/g, '/')))) %>
+            </p>
+        <% } %>
+    </td>
+<% } else if(status === 'error') {%>
+    <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %><i class="info-block tooltip fl-center ticon-info icon16" title="<%= _.isNull(purchase_error_message) ? '' : purchase_error_message %>"></i></td>
 <% } else {%>
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
@@ -37,24 +48,35 @@
     <div class="tracking-info">
         <p class="full-width-td"><%= _.isNull(shipping_service) ? 'n/a' : shipping_service+( _.isNull(shipping_type) ? '' : ': '+shipping_type ) %></p>
         <% if(_.isNull(recurring_id)) {%>
-        <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<span class="tracking-code-text"><%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %></span>
-            <% if (status == 'completed' || status == 'shipped') { %>
-                <% addButton = 'add' %>
-                <% editButton = 'edit' %>
-                <% if (!_.isUndefined(i18n['add'])){ %>
-                    <% addButton = i18n['add'] %>
-                <% } %>
-                <% if (!_.isUndefined(i18n['edit'])){ %>
-                    <% editButton = i18n['edit'] %>
-                <% } %>
-                <a href="javascript:;" class="setTracking" data-tracking-id="<%= shipping_tracking_code_id%>">[&nbsp;<%= (_.isNull(shipping_tracking_id) || shipping_tracking_id == '') ? addButton : editButton %>&nbsp;]</a>
-                <% if(!_.isNull(shipping_tracking_id) && shipping_tracking_id != '') { %>
-                    <p class="textcentered">
-                        <a target="_blank" class="tracking-link" href="<%= shipping_tracking_id %>"><%= _.isUndefined(i18n['Where is my order?']) ? 'Where is my order?':i18n['Where is my order?'] %></a>
-                    </p>
+            <% if (shipping_service !== "pickup") { %>
+                <p class="full-width-td word-break mb0px"><i><%= _.isUndefined(i18n['Tracking ID']) ? 'Tracking ID':i18n['Tracking ID'] %>:</i>&nbsp;<span class="tracking-code-text"><%= _.isNull(shipping_tracking_id) ? '' : shipping_tracking_id %></span>
+                    <% if (status == 'completed' || status == 'shipped') { %>
+                        <% addButton = 'add' %>
+                        <% editButton = 'edit' %>
+                        <% if (!_.isUndefined(i18n['add'])){ %>
+                            <% addButton = i18n['add'] %>
+                        <% } %>
+                        <% if (!_.isUndefined(i18n['edit'])){ %>
+                            <% editButton = i18n['edit'] %>
+                        <% } %>
+                        <a href="javascript:;" class="setTracking" data-tracking-id="<%= shipping_tracking_code_id%>">[&nbsp;<%= (_.isNull(shipping_tracking_id) || shipping_tracking_id == '') ? addButton : editButton %>&nbsp;]</a>
+                        <% if(!_.isNull(shipping_tracking_id) && shipping_tracking_id != '') { %>
+                            <p class="textcentered">
+                                <a target="_blank" class="tracking-link" href="<%= shipping_tracking_id %>"><%= _.isUndefined(i18n['Where is my order?']) ? 'Where is my order?':i18n['Where is my order?'] %></a>
+                            </p>
+                        <% } %>
+                    <% } %>
+                </p>
+            <% } else { %>
+                <% if (status == 'completed' || status == 'shipped') { %>
+                    <% if (is_pickup_notification_sent == '1') { %>
+                        <%= $.datepicker.formatDate('dd-M-yy', new Date(Date.parse(pickup_notification_sent_on.replace(/\-/g, '/')))) %>
+                        <a href="javascript:;" class="btn set-pickup"><%= _.isUndefined(i18n['Notify again']) ? 'Notify again':i18n['Notify again'] %></a>
+                    <% } else { %>
+                        <a href="javascript:;" class="btn set-pickup"><%= _.isUndefined(i18n['Ready for pickup']) ? 'Ready for pickup':i18n['Ready for pickup'] %></a>
+                    <% } %>
                 <% } %>
             <% } %>
-            </p>
         <% } %>
     </div>
     <div class="ajax-loader hide"><img src="<%= $('#website_url').val() %>system/images/ajax-loader-small.gif" style="margin: 20px auto; display: block;"></div>

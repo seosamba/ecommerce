@@ -10,6 +10,7 @@ define({
 	    'cs_canceled'	  : 'Commande annulée',
         'cs_error'        : 'erreur',
         'cs_partial'      : 'Partial Order',
+        'cs_not_verified' : 'Quote Signed (Signature only quote)',
         'New quote'       : 'Nouveau devis',
         'Quote Sent'      : 'Devis envoyé',
 	    'Mark order paid' : 'Recevoir paiement',

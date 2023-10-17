@@ -10,6 +10,7 @@ define({
 	    'cs_canceled'	  : 'canceled',
         'cs_error'        : 'error',
         'cs_partial'      : 'Partial Order',
+        'cs_not_verified' : 'Quote Signed (Signature only quote)',
         'Mark order paid' : 'Mark order paid',
 	    'Refund payment'  : 'Refund payment',
 	    'Cancel order'	  : 'Cancel order',

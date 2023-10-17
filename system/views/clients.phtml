@@ -21,7 +21,7 @@
     <?php if (empty($this->shoppingConfigParams['hideGroupNameFromClientsTab'])) :?>
         <td class="group">
             <?php if(!empty($this->allGroups)):?>
-                <select name="groups">
+                <select class="user-group-${id}" name="groups">
                     <option value="0"><?php echo $this->translate('select');?></option>
                     <?php foreach($this->allGroups as $group): ?>
                         <option {{if group_id == <?php echo $group->getId();?>}} selected="selected" {{/if}} value="<?php echo $group->getId();?>"><?php echo $group->getGroupName();?></option>
@@ -69,11 +69,17 @@
 ?>
 <?php $this->headLink()->appendStylesheet($this->websiteUrl . 'system/css/reset-widgets.css') ?>
 <div id="clients" class="toaster-widget">
-    <div class="search-line mt20px mb20px clearfix hidden">
-        <input type="text" id="clients-search" class="grid_6 alpha" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
+    <div class="search-line mb20px clearfix hidden">
+        <span class="search-block-element grid_6 alpha">
+            <input type="text" id="clients-search" class="search-input" name="clients-search" placeholder="<?php echo $this->translate('search by name or email');?>"/>
+        </span>
         <form id="export-users-form" class="fl-right mt5px" action="<?php echo $this->websiteUrl;?>plugin/shopping/run/getUsers" method="post">
             <a href="javascript:;" id="export-users">[&nbsp;<?php echo $this->translate('export as csv file');?>&nbsp;]</a>
         </form>
+        <div class="btn-group">
+            <button data-filter-type="clients-only" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('Clients Only');?> <span>(<span id="clients-number">0</span>)</span></button>
+            <button data-filter-type="all-accounts" class="trigger-type-switcher clients-filter btn"><?php echo $this->translate('All Accounts');?> <span>(<span id="all-accounts-number">0</span>)</span></button>
+        </div>
     </div>
     <?php $removeColumnCount = 0; ?>
     <table id="clients-table" class="widget table-hover hidden">
@@ -113,7 +119,7 @@
         </tbody>
         <tfoot>
             <tr>
-	            <td colspan="2">
+	            <td colspan="2" class="clients-mass-action-block">
 		            <?php echo $this->translate('with selected do');?>
 
                     <?php $enabledAppsPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('apps');?>
@@ -131,9 +137,7 @@
 		            </select>
 	            </td>
 
-	            <td colspan="<?php echo 6 + count($this->customerAttributes) - $removeColumnCount; ?>" class="text-right">
-		            <a href="#" id="clients-previous" class="table-nav mr15px">&#8656;&nbsp;<?php echo $this->translate('previous');?></a>
-		            <a href="#" id="clients-next" class="table-nav"><?php echo $this->translate('next');?>&nbsp;&#8658;</a>
+	            <td colspan="<?php echo 6 + count($this->customerAttributes) - $removeColumnCount; ?>" class="paginator text-right">
 	            </td>
             </tr>
         </tfoot>

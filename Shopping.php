@@ -177,6 +177,16 @@ class Shopping extends Tools_Plugins_Abstract {
 	);
 
     /**
+     * Plugin api actions
+     *
+     * @return array
+     */
+    public static function pluginApiActions()
+    {
+        return array('getApiProducts');
+    }
+
+    /**
      * @var null|Zend_Layout
      */
     protected $_layout = null;
@@ -273,6 +283,8 @@ class Shopping extends Tools_Plugins_Abstract {
 
 		Zend_Registry::set('acl', $acl);
         Tools_System_Tools::firePluginMethodByTagName('salespermission', 'extendPermission');
+
+        //self::getApiProducts(array());
 	}
 
 	public function run($requestedParams = array()) {
@@ -319,6 +331,11 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!$valid) {
                 exit;
             }
+
+            if (empty($this->_requestedParams['useOperationalHoursForOrders'])){
+                $this->_requestedParams['useOperationalHoursForOrders'] = '0';
+            }
+
             if ($form->isValid($this->_requestedParams)) {
 				foreach ($form->getValues() as $key => $subFormValues) {
                     if (!empty($subFormValues['operationalHours'])) {
@@ -840,6 +857,13 @@ class Shopping extends Tools_Plugins_Abstract {
 
                         $product->setPrice($productPrice);
 
+                        $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+                        $savedCompanies = $companyProductsMapper->getColByProductIds(array($product->getId()));
+
+                        if(!empty($savedCompanies)) {
+                            $product->setCompanyProducts($savedCompanies);
+                        }
+
                         $this->_view->product = $product;
                     }
 				}
@@ -884,6 +908,9 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_ADDEDITPRODUCT;
             $defaultTaxes = Models_Mapper_Tax::getInstance()->getDefaultRule();
             $this->_view->defaultTaxes = $defaultTaxes;
+
+            $companyMapper = Store_Mapper_CompaniesMapper::getInstance();
+            $this->_view->companies = $companyMapper->fetchAll();
 
             $this->_layout->content = $this->_view->render('product.phtml');
 			echo $this->_layout->render();
@@ -1245,6 +1272,22 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 			$this->_view->orders = $orders;
+
+            $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+
+            $currentUserModel = $userMapper->find($customer->getId());
+
+            $userAttributes = array();
+            if($currentUserModel instanceof Application_Model_Models_User) {
+                $userMapper->loadUserAttributes($currentUserModel);
+
+                $userAttributes = $currentUserModel->getAttributes();
+            }
+
+            $this->_view->userAttributes = $userAttributes;
+
+            $allGroups = Store_Mapper_GroupMapper::getInstance()->fetchAll();
+            $this->_view->allGroups = $allGroups;
 		}
 
 		$enabledInvoicePlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('invoicetopdf');
@@ -1285,7 +1328,15 @@ class Shopping extends Tools_Plugins_Abstract {
         if ($orderId) {
             $order = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
             if ($order instanceof Models_Model_CartSession) {
+                $isFirstPaymentManuallyPaid = $order->getIsFirstPaymentManuallyPaid();
+                if (!empty($isFirstPaymentManuallyPaid)) {
+                    $order->setIsFullOrderManuallyPaid('1');
+                }
                 $order->setStatus(Models_Model_CartSession::CART_STATUS_COMPLETED);
+                $order->setGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setSecondPartialPaidAmount(round($order->getTotal() - $order->getFirstPartialPaidAmount(), 2));
+                $order->setSecondPaymentGateway(Models_Model_CartSession::MANUALLY_PAYED_GATEWAY_QUOTE);
+                $order->setIsSecondPaymentManuallyPaid('1');
                 Models_Mapper_CartSessionMapper::getInstance()->save($order);
                 $this->_responseHelper->success( $this->_translator->translate('Status has been changed'));
             }
@@ -1296,7 +1347,7 @@ class Shopping extends Tools_Plugins_Abstract {
 	public function orderAction() {
 		$id = isset($this->_requestedParams['id']) ? filter_var($this->_requestedParams['id'], FILTER_VALIDATE_INT) : false;
 		if ($id) {
-			$order = Models_Mapper_CartSessionMapper::getInstance()->find($id);
+			$order = Models_Mapper_CartSessionMapper::getInstance()->find($id, true);
 			$customer = Tools_ShoppingCart::getInstance()->getInstance()->getCustomer();
 			if (!$order) {
 				throw new Exceptions_SeotoasterPluginException('Order not found');
@@ -1347,6 +1398,18 @@ class Shopping extends Tools_Plugins_Abstract {
                     $params['shippingTrackingCodeId'] = $currenttrackingUrlId;
                 }
 
+                if (isset($params['pickupNotification'])) {
+                    $order->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_SHIPPING_PICKUP_NOTIFICATION,
+                    )));
+
+                    if ($order->getStatus() !== Models_Model_CartSession::CART_STATUS_SHIPPED) {
+                        $params['status'] = Models_Model_CartSession::CART_STATUS_SHIPPED;
+                    }
+                    $params['pickup_notification_sent_on'] = Tools_System_Tools::convertDateFromTimezone('now');
+                    $params['is_pickup_notification_sent'] = '1';
+                }
+
                 if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED) {
                     $order->registerObserver(new Tools_Mail_Watchdog(array(
                         'trigger' => Tools_StoreMailWatchdog::TRIGGER_DELIVERED
@@ -1372,6 +1435,58 @@ class Shopping extends Tools_Plugins_Abstract {
             if (!empty($shippingServiceLabel)) {
                 $this->_view->shippingServiceLabel = $shippingServiceLabel;
             }
+
+            $quoteId = '';
+            $quoteTitle = '';
+            $orderId = $order->getId();
+            $quoteEnabled = Tools_Plugins_Tools::findPluginByName('quote');
+            if ($quoteEnabled->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                $quoteMapper = Quote_Models_Mapper_QuoteMapper::getInstance();
+                $quoteModel = $quoteMapper->findByCartId($orderId);
+                if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                    $quoteId = $quoteModel->getId();
+                    $quoteTitle = $quoteModel->getTitle();
+
+                    $quoteDraggableMapper = Quote_Models_Mapper_QuoteDraggableMapper::getInstance();
+                    $quoteDraggableModel = $quoteDraggableMapper->findByQuoteId($quoteId);
+
+                    if($quoteDraggableModel instanceof Quote_Models_Model_QuoteDraggableModel) {
+                        $dragOrder = $quoteDraggableModel->getData();
+
+                        if(!empty($dragOrder)) {
+                            $dragOrder = explode(',', $dragOrder);
+                            $cartContent = $order->getCartContent();
+                            $prepareContentSids = array();
+                            foreach ($cartContent as $key => $content) {
+                                $product = Models_Mapper_ProductMapper::getInstance()->find($content['product_id']);
+                                $options = ($content['options']) ? $content['options'] : Quote_Tools_Tools::getProductDefaultOptions($product);
+                                $prodSid = Quote_Tools_Tools::generateStorageKey($product, $options);
+                                $prepareContentSids[$prodSid] = $content;
+                            }
+
+                            $sortedCartContent = array();
+                            foreach ($dragOrder as $productSid) {
+                                if(!empty($prepareContentSids[$productSid])) {
+                                    $sortedCartContent[$productSid] = $prepareContentSids[$productSid];
+                                }
+                            }
+                            $preparedCartContent = array_merge($sortedCartContent, $prepareContentSids);
+
+                            $cartContent = array();
+
+                            foreach ($preparedCartContent as $cContent) {
+                                $cartContent[] = $cContent;
+                            }
+
+                            $order->setCartContent($cartContent);
+                        }
+                    }
+
+                }
+            }
+
+            $this->_view->quoteId = $quoteId;
+            $this->_view->quoteTitle = $quoteTitle;
 
 			$this->_view->order = $order;
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
@@ -1748,7 +1863,7 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 
 		// fetching all product pages
-		$pagesSql = "SELECT * FROM `page` WHERE system = '0' AND draft = '0' AND (`id` = " . $category->getId() . " OR `parent_id` = " . $category->getId() . ")  ORDER BY `order` ASC;";
+		$pagesSql = "SELECT * FROM `page` WHERE `system` = '0' AND draft = '0' AND (`id` = " . $category->getId() . " OR `parent_id` = " . $category->getId() . ")  ORDER BY `order` ASC;";
 		$dbAdapter = Zend_Registry::get('dbAdapter');
 
 		try {
@@ -1883,8 +1998,12 @@ class Shopping extends Tools_Plugins_Abstract {
                 $user = $userMapper->find($data['userId']);
                 $data['profileValue'] = trim($data['profileValue']);
                 if($user instanceof Application_Model_Models_User){
+                    $changeEmail = false;
+                    $oldUserEmailAddress = '';
+                    $newEmailAddress = '';
                     switch($data['profileElement']) {
                         case 'email':
+                            $oldUserEmailAddress = $user->getEmail();
                             $validator = new Tools_System_CustomEmailValidator();
                             if ($validator->isValid($data['profileValue'])) {
                                 $user->setEmail($data['profileValue']);
@@ -1900,6 +2019,9 @@ class Shopping extends Tools_Plugins_Abstract {
                             if ($validator->isValid($data['profileValue'])) {
                                 $this->_responseHelper->fail($this->_translator->translate('User with this email already exists'));
                             }
+
+                            $newEmailAddress = $data['profileValue'];
+                            $changeEmail = true;
                         break;
                         case 'prefix':
                             $user->setPrefix($data['profileValue']);
@@ -1919,6 +2041,14 @@ class Shopping extends Tools_Plugins_Abstract {
                     }
                     $user->setPassword(null);
                     $userMapper->save($user);
+                    if ($changeEmail === true) {
+                        $updateUserInfoStatus = Tools_System_Tools::firePluginMethodByTagName('userupdate', 'updateUserInfo', array(
+                            'userId' => $user->getId(),
+                            'oldEmail' => $oldUserEmailAddress,
+                            'newEmail' => $newEmailAddress
+                        ));
+                    }
+
                     $this->_responseHelper->success('');
                 }
                 $this->_responseHelper->fail();
@@ -3269,8 +3399,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
                     $cartSession->notifyObservers();
 
+                    $date = date(Tools_System_Tools::DATE_MYSQL);
+
                     $partialNotificationLogModel->setCartId($orderId);
-                    $partialNotificationLogModel->setNotifiedAt(date(Tools_System_Tools::DATE_MYSQL));
+                    $partialNotificationLogModel->setNotifiedAt($date);
+                    $cartSessionModel->setPartialNotificationDate($date);
+                    $cartSessionMapper->save($cartSessionModel);
                     $partialNotificationMapper->save($partialNotificationLogModel);
 
                 }
@@ -3284,7 +3418,366 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    /**
+     * Update user attributes on Dashboard clients grid
+     *
+     * @return void
+     */
+    public function updateUserAttributeAction()
+    {
+        if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam('secureToken', false);
 
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $this->_responseHelper->fail('');
+            }
+
+            $attributeParamsData = $this->_request->getParams();
+
+            $userId = $attributeParamsData['userId'];
+            $attributeType = $attributeParamsData['attributeType'];
+            $oldFieldValue = $attributeParamsData['oldFieldValue'];
+            $fieldValue = $attributeParamsData['fieldValue'];
+
+            if(!empty($userId)) {
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $currentUserModel = $userMapper->find($userId);
+
+                $userAttributes = array();
+                if($currentUserModel instanceof Application_Model_Models_User) {
+                    $userMapper->loadUserAttributes($currentUserModel);
+
+                    $userAttributes = $currentUserModel->getAttributes();
+                }
+
+                $dbTable = new Zend_Db_Table('user_attributes');
+
+                if(!empty($userAttributes)) {
+                    $dbTable->delete(array('user_id = ?' => $userId));
+
+                    $attributeBelonging = $attributeParamsData['attributeBelonging'];
+
+                    foreach ($userAttributes as $attribute => $value) {
+                        if($attributeType == 'attribute-name') {
+                            if($attribute == $oldFieldValue) {
+                                $attribute = $fieldValue;
+                            }
+                        } elseif ($attributeType == 'attribute-value') {
+                            if($value == $oldFieldValue && $attributeBelonging == $attribute) {
+                                $value = $fieldValue;
+                            }
+                        }
+
+                        $dbTable->insert(array(
+                            'user_id' => $userId,
+                            'attribute' => $attribute,
+                            'value' => $value
+                        ));
+                    }
+
+                    $this->_responseHelper->success($this->_translator->translate('Updated'));
+                }
+
+                $this->_responseHelper->fail($this->_translator->translate('Nothing to delete'));
+            }
+
+            $this->_responseHelper->fail($this->_translator->translate('Empty userId'));
+        }
+    }
+
+
+    public static function getApiProducts($data)
+    {
+
+//        $data = array(
+//            'limit' => 4,
+//            'offset' => '',
+//            'searchParams' =>
+//                array(
+//                    'productName' => 'Académiq'
+//                )
+//        );
+
+        if (empty($data) || empty($data['limit'])) {
+            return array('error' => '1', 'message' => 'Missing limit query limit');
+        }
+
+        $limit = $data['limit'];
+        $offset = null;
+        if ($data['offset']) {
+            $offset = $data['offset'];
+        }
+
+        $productMapper = Models_Mapper_ProductMapper::getInstance();
+        $where = $productMapper->getDbTable()->getAdapter()->quoteInto('enabled = ?', '1');
+
+        if (!empty($data['searchParams'])) {
+            if (!empty($data['searchParams']['productName'])) {
+                $searchProductName = $data['searchParams']['productName'];
+                $where .= ' AND '. $productMapper->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?', '%' .$searchProductName. '%');
+            }
+        }
+
+        $productsDataInfo = $productMapper->fetchAllData($where, null, $limit, $offset);
+
+        if (empty($productsDataInfo) || empty($productsDataInfo['data'])) {
+            return array();
+        }
+
+        $productInfo = array();
+
+        $currency = Zend_Registry::get('Zend_Currency');
+        $websiteHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('website');
+        $websiteUrl = $websiteHelper->getUrl();
+        $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
+        foreach ($productsDataInfo['data'] as $key => $product) {
+            $productPageUrl = $product['url'];
+            $productInfo[$key]['id'] = $product['id'];
+            $productInfo[$key]['title'] = $product['name'];
+            $productInfo[$key]['sku'] = $product['sku'];
+            $productInfo[$key]['link'] = $websiteUrl . $productPageUrl;
+            $productInfo[$key]['short_description'] = $product['short_description'];
+            $productInfo[$key]['full_description'] = $product['full_description'];
+            $productInfo[$key]['brand'] = $product['brandName'];
+            $productInfo[$key]['mpn'] = $product['mpn'];
+            $productInfo[$key]['gtin'] = $product['gtin'];
+            $productInfo[$key]['imageLinkSmall'] = Tools_Misc::prepareProductImage($product['photo'], 'small');
+
+            $productModel = $productMapper->find($product['id']);
+
+            if ($productModel->getCurrentPrice() !== null && $productModel->getExtraProperties()) {
+                $productModel->setCurrentPrice(null);
+            }
+
+            $price = number_format(Tools_ShoppingCart::getInstance()->calculateProductPrice($productModel, $productModel->getDefaultOptions()), 2, '.', '');
+            $productInfo[$key]['price'] = $price;
+            $productInfo[$key]['priceWithCurrency'] = $currency->toCurrency($price);
+        }
+
+        $productsDataInfo['data'] = $productInfo;
+
+        return $productsDataInfo;
+    }
+
+
+    public function buyAgainAction()
+    {
+
+        $sessionHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('session');
+        $userSession = $sessionHelper->getCurrentUser();
+        $userId = $userSession->getId();
+
+        if ($this->_request->isPost() && !empty($userId)) {
+            $orderId = $this->_request->getParam('orderId');
+            $dataOrderSubtype = $this->_request->getParam('dataOrderSubtype');
+            if (!empty($orderId)) {
+                $cartMapper    = Models_Mapper_CartSessionMapper::getInstance();
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                $quoteMapper = Quote_Models_Mapper_QuoteMapper::getInstance();
+                $currentCart = $cartMapper->find($orderId);
+                if ($currentCart instanceof Models_Model_CartSession){
+                    $currentCartStatus = $currentCart->getStatus();
+                    if (!in_array($currentCartStatus, array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_REFUNDED, Models_Model_CartSession::CART_STATUS_NEW))) {
+                        $this->_responseHelper->fail('status not allowed');
+                    }
+
+                    if ($dataOrderSubtype !== 'with-quote') {
+                        $quoteModel = $quoteMapper->findByCartId($orderId);
+                        if ($quoteModel instanceof Quote_Models_Model_Quote) {
+                            $this->_responseHelper->fail('You can\'t purchase quote again');
+                        }
+                    }
+
+                    $cartContent = $currentCart->getCartContent();
+                    $notFreebiesInCart = array();
+                    $freebiesInCart = array();
+                    $productsFreebiesRelation = array();
+                    $notAllowedProducts = array();
+
+                    foreach ($cartContent as $key => $product) {
+                        if ($product['freebies'] === '1') {
+                            $freebiesInCart[$product['product_id']] = $product['product_id'];
+                        } else {
+                            $notFreebiesInCart[$product['product_id']] = $product['product_id'];
+                        }
+
+                        $productObject = $productMapper->find($product['product_id']);
+                        if ($productObject instanceof Models_Model_Product) {
+                            $productEnabled = $productObject->getEnabled();
+                            $productInventory = $productObject->getInventory();
+                            $productNegativeStock = $productObject->getNegativeStock();
+                            if(!empty($productEnabled)) {
+                                if($productInventory == '0' && $productNegativeStock == '0') {
+                                    $notAllowedProducts[$productObject->getId()] = array(
+                                        'name' => $productObject->getName(),
+                                        'sku' => $productObject->getSku(),
+                                    );
+                                } elseif ($productInventory < $product['qty'] && $productNegativeStock != '1' && $productInventory !== null) {
+                                    $notAllowedProducts[$productObject->getId()] = array(
+                                        'name' => $productObject->getName(),
+                                        'sku' => $productObject->getSku(),
+                                    );
+                                }
+                            } else {
+                                $notAllowedProducts[$productObject->getId()] = array(
+                                    'name' => $productObject->getName(),
+                                    'sku' => $productObject->getSku(),
+                                );
+                            }
+                        }
+                    }
+
+                    if(!empty($notAllowedProducts)) {
+                        $notAllowedProductsMessage = $this->_translator->translate('Oops! Product:');
+                        $multipleProducts = false;
+                        if(count($notAllowedProducts) > 1) {
+                            $notAllowedProductsMessage = $this->_translator->translate('Oops! Products:');
+                            $multipleProducts = true;
+                        }
+
+                        foreach ($notAllowedProducts as $key => $value) {
+                            $notAllowedProductsMessage .= ' ' . $value['name'] . ' (' . $value['sku'] . ') ';
+                            if($multipleProducts) {
+                                $notAllowedProductsMessage .= ',';
+                            }
+                        }
+                        $notAllowedProductsMessage = rtrim($notAllowedProductsMessage, ",");
+                        $notAllowedProductsMessage .= $this->_translator->translate('not available at the moment.');
+
+                        $this->_responseHelper->fail($notAllowedProductsMessage);
+                    }
+
+                    $cartSession = Tools_ShoppingCart::getInstance();
+                    $cartSession->setContent(array());
+                    $cartSession->save();
+                    $cartSession->setShippingAddressKey($currentCart->getShippingAddressId());
+
+                    if (!empty($freebiesInCart)) {
+                        $where = $productMapper->getDbTable()->getAdapter()->quoteInto(
+                            'sphp.freebies_id IN (?)',
+                            $freebiesInCart
+                        );
+                        $where .= ' AND ' . $productMapper->getDbTable()->getAdapter()->quoteInto(
+                                'sphp.product_id IN (?)',
+                                $notFreebiesInCart
+                            );
+                        $select = $productMapper->getDbTable()->getAdapter()->select()
+                            ->from(
+                                array('spfs' => 'shopping_product_freebies_settings'),
+                                array(
+                                    'freebiesGroupKey' => new Zend_Db_Expr("CONCAT(sphp.freebies_id, '_', sphp.product_id)"),
+                                    'price_value'
+                                )
+                            )
+                            ->joinleft(
+                                array('sphp' => 'shopping_product_has_freebies'),
+                                'spfs.prod_id = sphp.product_id'
+                            )
+                            ->where($where);
+                        $productFreebiesSettings = $productMapper->getDbTable()->getAdapter()->fetchAssoc($select);
+                    }
+
+                    if (!empty($productFreebiesSettings)) {
+                        foreach ($productFreebiesSettings as $prodInfo) {
+                            if (array_key_exists($prodInfo['freebies_id'], $freebiesInCart)) {
+                                if (isset($productsFreebiesRelation[$prodInfo['freebies_id']])) {
+                                    $productsFreebiesRelation[$prodInfo['freebies_id']][$prodInfo['product_id']] = $prodInfo['product_id'];
+                                } else {
+                                    $productsFreebiesRelation[$prodInfo['freebies_id']] = array($prodInfo['product_id'] => $prodInfo['product_id']);
+                                }
+                            }
+                        }
+                    }
+
+                    foreach ($cartContent as $key => $product) {
+                        $productObject = $productMapper->find($product['product_id']);
+                        if ($productObject instanceof Models_Model_Product) {
+                            if ($product['freebies'] === '1' && !empty($productsFreebiesRelation)) {
+                                foreach ($productsFreebiesRelation[$product['product_id']] as $realProductId) {
+                                    $itemKey = Tools_ShoppingCart::generateStorageKey(
+                                        $productObject,
+                                        array(0 => 'freebies_' . $realProductId)
+                                    );
+                                    if (!$cartSession->findBySid($itemKey)) {
+                                        $productObject->setFreebies(1);
+                                        $cartSession->add(
+                                            $productObject,
+                                            array(0 => 'freebies_' . $realProductId),
+                                            $product['qty'], true
+                                        );
+                                    }
+                                }
+                            } else {
+                                $options = array();
+                                if (is_array($product['options'])) {
+                                    $options = Tools_ShoppingCart::parseProductOptions($product['options']);
+                                }
+                                $productObject->setPrice($product['price']);
+                                $productObject->setOriginalPrice($product['original_price']);
+                                $productObject->setCurrentPrice(floatval($productObject->getPrice()));
+                                $cartSession->add($productObject, $options, $product['qty'], true);
+                            }
+                        }
+                    }
+                    $cartSession->setDiscount(0);
+                    $cartSession->setShippingData(array());
+                    $cartSession->setDiscountTaxRate(0);
+                    $cartSession->calculate(true);
+                    $cartSession->save();
+
+                    $this->_responseHelper->success('');
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return null
+     */
+    public static function updateUserInfo($data)
+    {
+        if (!empty($data['userId'])) {
+            $userId = $data['userId'];
+            $userModel = Application_Model_Mappers_UserMapper::getInstance()->find($userId);
+            if ($userModel instanceof Application_Model_Models_User) {
+                $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+                $currentCustomer = $customerMapper->find($userId);
+                $customerAddress = $customerMapper->getUserAddressByUserId($userId, false, $data['oldEmail']);
+                if (!empty($customerAddress) && !empty($data['oldEmail']) && !empty($data['newEmail']) && $data['oldEmail'] !== $data['newEmail']) {
+                    $cartSessionMapper = Models_Mapper_CartSessionMapper::getInstance();
+                    $customerTable = new Models_DbTable_CustomerAddress();
+                    foreach ($customerAddress as $value) {
+                        $value['email'] = $data['newEmail'];
+                        $customerToken = $customerMapper->addAddress($currentCustomer, $value, $value['address_type']);
+                        $currentCartSession = $cartSessionMapper->fetchOrders($currentCustomer->getId());
+
+                        if (!empty($currentCartSession) && (!empty($customerToken))) {
+                            if ($value['address_type'] === 'shipping') {
+                                $newToken['shipping_address_id'] = $customerToken;
+                            } else {
+                                $newToken['billing_address_id'] = $customerToken;
+                            }
+                            $newToken['updated_at'] = date(DATE_ATOM);
+                            $cartSessionMapper->updateAddress($value['id'], $value['address_type'], $newToken);
+
+                        }
+                        $lastData = $customerMapper->getUserAddressByUserId($currentCustomer->getId(), $customerToken);
+                        if (!empty($lastData) && ($value['id'] !== $customerToken)) {
+                            $where = $customerTable->getAdapter()->quoteInto('id =?', $value['id']);
+                            $customerTable->delete($where);
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+    }
 
 
 }

@@ -12,7 +12,13 @@ class Widgets_User_User extends Widgets_User_Base {
 
     const GRID_TYPE_RECURRING = 'recurring';
 
+    const GRID_TYPE_BUY_AGAIN = 'buy-again';
+
+    const GRID_TYPE_BUY_AGAIN_WITH_QUOTE = 'buy-again-with-quote';
+
     const GRID_OPTION_WITHOUT_PERIOD_CYCLE = 'without_period_cycle';
+
+    const GRID_OPTION_DISABLE_PERIOD_CHANGE = 'disable_period_change';
 
     /**
      * @var Models_Mapper_ProductMapper Product Mapper
@@ -60,11 +66,13 @@ class Widgets_User_User extends Widgets_User_Base {
     }
 
     protected function _renderRegistration() {
-        return $this->_getCustomer()->getRegDate();
+        $regDate = self::convertToTimezone($this->_getCustomer()->getRegDate());
+        return $regDate;
     }
 
     protected function _renderLastlogin() {
-        return $this->_getCustomer()->getLastLogin();
+        $lastLogin = self::convertToTimezone($this->_getCustomer()->getLastLogin());
+        return $lastLogin;
     }
 
     protected function _renderEmail() {
@@ -145,11 +153,28 @@ class Widgets_User_User extends Widgets_User_Base {
         $shippingServiceLabels = $serviceLabelMapper->fetchAllAssoc();
         if(!empty($orders) && !empty($shippingServiceLabels)){
             foreach ($orders as $index => $order) {
-                if (isset($shippingServiceLabels[$order->getShippingService()])) {
-                    $orders[$index]->setShippingService($shippingServiceLabels[$order->getShippingService()]);
+                if (!empty($shippingServiceLabels[$order['shipping_service']])) {
+                    $orders[$index]['shipping_service'] = $shippingServiceLabels[$order['shipping_service']];
                 }
             }
         }
+
+        if (!empty($this->_options['0']) && ($this->_options['0'] === self::GRID_TYPE_BUY_AGAIN || $this->_options['0'] === self::GRID_TYPE_BUY_AGAIN_WITH_QUOTE)) {
+            if ($this->_options['0'] === self::GRID_TYPE_BUY_AGAIN) {
+                $this->_view->buyAgain = true;
+            }
+            if ($this->_options['0'] === self::GRID_TYPE_BUY_AGAIN_WITH_QUOTE) {
+                $this->_view->buyAgainWithQuote = true;
+            }
+            $checkoutRedirectUrl = $this->_websiteHelper->getUrl();
+            $checkoutPage = Tools_Misc::getCheckoutPage();
+            if ($checkoutPage instanceof Application_Model_Models_Page) {
+                $checkoutRedirectUrl .= $checkoutPage->getUrl();
+            }
+
+            $this->_view->checkoutRedirectUrl = $checkoutRedirectUrl;
+        }
+
         $this->_view->orders = $orders;
         return $this->_view->render('grid.phtml');
 
@@ -164,6 +189,11 @@ class Widgets_User_User extends Widgets_User_Base {
      */
     protected function _recurringOrdersGrid($userId, $addresses)
     {
+        $this->_view->disablePeriodOptions = false;
+        if (in_array(self::GRID_OPTION_DISABLE_PERIOD_CHANGE, $this->_options)) {
+            $this->_view->disablePeriodOptions = true;
+        }
+
         $orders = Store_Mapper_RecurringPaymentsMapper::getInstance()->getRecurringOrdersDataByUserId($userId);
         $this->_view->stats = array(
             'all' => sizeof($orders),
@@ -212,6 +242,25 @@ class Widgets_User_User extends Widgets_User_Base {
         $digitalProducts = Store_Mapper_DigitalProductMapper::getInstance()->findDigitalProductsByUserId($userId);
         $this->_view->digitalProducts = $digitalProducts;
         return $this->_view->render('digital-products-grid.phtml');
+    }
+
+    protected function convertToTimezone($date) {
+        if(!empty($date)) {
+            $serverTimezone = date_default_timezone_get();
+            if (empty($serverTimezone)) {
+                $serverTimezone = 'UTC';
+            }
+
+            $userTimezone = $this->_getCustomer()->getTimezone();
+            if(!empty($userTimezone)) {
+                $userTimezoneOffset = Tools_System_Tools::convertDateFromTimezone('now', 'UTC', Tools_System_Tools::getUserTimezone(), 'T');
+
+                $date = Tools_System_Tools::convertDateFromTimezone($date, $serverTimezone, 'UTC');
+                $date = date(Tools_System_Tools::DATE_MYSQL, strtotime($date .'+'.Tools_Misc::getTimezoneShift('UTC', $userTimezone).'hours'));
+                $date = date('d-M-Y H:i:s', strtotime($date)) . ' ' . $userTimezoneOffset;
+            }
+        }
+        return $date;
     }
 
 }

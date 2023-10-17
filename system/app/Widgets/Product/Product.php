@@ -46,7 +46,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 	protected function _init(){
 		parent::_init();
 
-		if (in_array('options', $this->_options)){
+		if (in_array('options', $this->_options) || in_array('option', $this->_options)){
 			$layout = Zend_Layout::getMvcInstance();
 			$websiteUrl = Zend_Controller_Action_HelperBroker::getExistingHelper('website')->getUrl();
 			$layout->getView()->headScript()->appendFile($websiteUrl.'plugins/shopping/web/js/product-options.js');
@@ -335,6 +335,32 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		$this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
 		return $this->_view->render('options.phtml');
 	}
+
+    private function _renderOption() {
+        $this->_view->taxRate = Tools_Tax_Tax::calculateProductTax($this->_product, null, true);
+        $productOptions = $this->_view->product->getDefaultOptions();
+        $optionFound = false;
+        if (empty($this->_options['0'])) {
+            return '';
+        }
+        $optionInfo = array();
+
+        foreach ($productOptions as $productOption) {
+            if ($productOption['title'] === $this->_options['0']) {
+                $optionFound = true;
+                $optionInfo = $productOption;
+                break;
+            }
+        }
+
+        if ($optionFound === false) {
+            return '';
+        }
+
+        $this->_view->productOption = $optionInfo;
+
+        return $this->_view->render('option.phtml');
+    }
 	
 	private function _renderDescription() {
 		switch (isset($this->_options[0])?$this->_options[0]:'small') {
@@ -391,7 +417,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
                 return htmlentities($tagsData);
             }
             $pageHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('page');
-	        $pagesList = $pageMapper->getDbTable()->getAdapter()->fetchCol($pageMapper->getDbTable()->select()->from($pageMapper->getDbTable()->info('name'), 'url')->where("system = '0'"));
+	        $pagesList = $pageMapper->getDbTable()->getAdapter()->fetchCol($pageMapper->getDbTable()->select()->from($pageMapper->getDbTable()->info('name'), 'url')->where("`system` = '0'"));
             foreach ($tags as &$tag) {
 	            $url = $pageHelper->filterUrl($tag['name']);
                 if (in_array($url, $pagesList)){
@@ -492,6 +518,28 @@ class Widgets_Product_Product extends Widgets_Abstract {
                             $photoSrcOriginal = Tools_Misc::prepareProductImage($photoSrc, 'original');
                         }
 
+                        $prodWidth = $relatedProduct->getProdWidth();
+                        $prodWidthUnit = $prodWidth . ' ' . self::$_shoppingConfig['lengthUnit'];
+                        $prodLength = $relatedProduct->getProdLength();
+                        $prodLengthUnit = $prodLength . ' ' . self::$_shoppingConfig['lengthUnit'];
+                        $prodDepth = $relatedProduct->getProdDepth();
+                        $prodDepthUnit = $prodDepth . ' ' . self::$_shoppingConfig['lengthUnit'];
+
+                        if(empty($prodWidth) || $prodWidth == '0.00') {
+                            $prodWidth = '';
+                            $prodWidthUnit = '';
+                        }
+
+                        if(empty($prodLength) || $prodLength == '0.00') {
+                            $prodLength = '';
+                            $prodLengthUnit = '';
+                        }
+
+                        if(empty($prodDepth) || $prodDepth == '0.00') {
+                            $prodDepth = '';
+                            $prodDepthUnit = '';
+                        }
+
                         $dictionary = array(
                             '$product:name'                              => htmlspecialchars($relatedProduct->getName(),ENT_QUOTES,'UTF-8'),
                             '$product:url'                               => $relatedProduct->getPage() ? $this->_websiteUrl . $relatedProduct->getPage()->getUrl() : null,
@@ -516,7 +564,14 @@ class Widgets_Product_Product extends Widgets_Abstract {
                             '$product:photourl:medium'                   => $photoSrcMedium,
                             '$product:photourl:large'                    => $photoSrcLarge,
                             '$product:photourl:original'                 => $photoSrcOriginal,
-                            '$product:minimumorder'                      => $relatedProduct->getMinimumOrder()
+                            '$product:minimumorder'                      => $relatedProduct->getMinimumOrder(),
+                            '$product:dimensionswidth'                   => $prodWidth,
+                            '$product:dimensionswidth:unit'              => $prodWidthUnit,
+                            '$product:dimensionslength'                  => $prodLength,
+                            '$product:dimensionslength:unit'             => $prodLengthUnit,
+                            '$product:dimensionsdepth'                   => $prodDepth,
+                            '$product:dimensionsdepth:unit'              => $prodDepthUnit
+
                         );
 
                         $renderedContent[] = Tools_Misc::preparingProductListing($template->getContent(), $relatedProduct, $dictionary);
@@ -545,7 +600,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
         return false;
     }
 
-	private function  _renderInventory() {
+	private function _renderInventory() {
 		$inventoryCount = $this->_product->getInventory();
 		if (is_null($inventoryCount)){
 			return $this->_translator->translate('In stock');
@@ -559,7 +614,7 @@ class Widgets_Product_Product extends Widgets_Abstract {
 		return $inventoryCount > 0 ? $inventoryCount : $this->_translator->translate('Out of stock');
 	}
 
-    private function  _renderQty() {
+    private function _renderQty() {
         $inventoryCount = $this->_product->getInventory();
         if (is_null($inventoryCount)){
             return '&infin;';
@@ -655,6 +710,48 @@ class Widgets_Product_Product extends Widgets_Abstract {
 
     private function _renderMinimumOrder() {
         return $this->_product->getMinimumOrder();
+    }
+
+    private function _renderDimensionsWidth() {
+        $prodWidth = $this->_product->getProdWidth();
+
+        if(!empty($prodWidth) && $prodWidth != '0.00') {
+            if(in_array('unit', $this->_options)) {
+                return $prodWidth . ' ' . self::$_shoppingConfig['lengthUnit'];
+            }
+
+            return $prodWidth;
+        }
+
+        return '';
+    }
+
+    private function _renderDimensionsLength() {
+        $prodLength = $this->_product->getProdLength();
+
+        if(!empty($prodLength) && $prodLength != '0.00') {
+            if(in_array('unit', $this->_options)) {
+                return $prodLength . ' ' . self::$_shoppingConfig['lengthUnit'];
+            }
+
+            return $prodLength;
+        }
+
+        return '';
+    }
+
+    private function _renderDimensionsDepth() {
+        $prodDepth = $this->_product->getProdDepth();
+
+        if(!empty($prodDepth) && $prodDepth != '0.00') {
+            if(in_array('unit', $this->_options)) {
+                return $prodDepth . ' ' . self::$_shoppingConfig['lengthUnit'];
+            }
+
+            return $prodDepth;
+        }
+
+        return '';
     }
 
 }

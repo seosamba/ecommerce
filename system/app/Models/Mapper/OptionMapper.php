@@ -24,7 +24,8 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		$data = array(
 			'title'     => $model->getTitle(),
 			'type'	    => $model->getType(),
-            'parentId'  => $model->getParentId()
+            'parentId'  => $model->getParentId(),
+            'hideDefaultOption' => $model->getHideDefaultOption()
 		);
 		
 		if ($model->getId()){
@@ -70,13 +71,14 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
 		$selectionTable->getAdapter()->beginTransaction();
 
         $selectionList = $model->getSelection();
+        $optionType = $model->getType();
 		foreach ($selectionList as &$item) {
 			$data = array(
 				'option_id'		=> $model->getId(),
 				'title'			=> $item['title'],
 				'priceSign'		=> $item['priceSign'],
 				'priceValue'	=> $item['priceValue'],
-				'priceType'		=> $item['priceType'],
+				'priceType'		=> ($optionType == Models_Model_Option::TYPE_TEXT || $optionType == Models_Model_Option::TYPE_DATE || $optionType == Models_Model_Option::TYPE_TEXTAREA || $optionType == Models_Model_Option::TYPE_ADDITIONALPRICEFIELD) ? 'unit' : $item['priceType'],
 				'weightValue'	=> $item['weightValue'],
 				'weightSign'	=> $item['weightSign'],
 				'isDefault'		=> $item['isDefault']
@@ -119,6 +121,21 @@ class Models_Mapper_OptionMapper extends Application_Model_Mappers_Abstract {
             array_push($entries, $objects ? $model : $model->toArray());
         }
         return $entries;
+    }
+
+    /**
+     * get options
+     *
+     * @param array $options option ids
+     * @return mixed
+     * @throws Exception
+     */
+    public function getOptions($options)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('id IN (?)', $options);
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_product_option')->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
 
     /**

@@ -38,7 +38,7 @@ define([
             'change #digital-product': 'toggleDigitalProduct',
 			'change #product-tags-available .tag-widget input[name^=tag]': 'toggleTag',
 			'click #delete': 'deleteProduct',
-            'keypress input#new-brand': 'newBrand',
+            'keyup input#new-brand': 'newBrand',
             'keypress #product-list-search': 'filterProducts',
             'click a[href="#options-tab"]': 'fetchOptionLibrary',
             'submit form.binded-plugin': 'formSubmit',
@@ -136,6 +136,8 @@ define([
 
             this.model = new ProductModel();
 
+            $('#core-spinner').remove();
+
             this.model.on('change:tags', this.renderProductTags, this);
             this.model.on('change:related', this.renderRelated, this);
             this.model.on('change:id', this.setProductIdForCouponAndGroup, this);
@@ -159,6 +161,18 @@ define([
             this.model.get('options').on('add', this.renderOption, this);
             this.model.get('options').on('reset', this.renderOptions, this);
 
+            var self = this;
+            $('#product-supplier').chosen().change(function(e, result) {
+                e.preventDefault();
+                var searchChoice = $(".chosen-choices li.search-choice");
+                if(searchChoice.length) {
+                    _.each(searchChoice, function (cName, key) {
+                        if($(cName).find('span').length == 1) {
+                            $(cName).find('span')[0].textContent = self.truncateString($(cName).find('span')[0].textContent, 15);
+                        }
+                    });
+                }
+            });
 
             return this;
 		},
@@ -258,7 +272,7 @@ define([
             }
 		},
 		newOption: function(){
-			var newOption = new ProductOption();
+			var newOption = new ProductOption({'showHiddenValue': true});
             newOption.get('selection').add({isDefault: 1});
 			this.model.get('options').add(newOption);
             this.renderOptions();
@@ -266,12 +280,19 @@ define([
         addOption: function(){
             var optId = this.$('#option-library').val();
             if (optId > 0 ){
-                var option = this.optionLibrary.get(optId);
+                var option = this.optionLibrary.get(optId),
+                    showHiddenValue = false;
+
+                if (option.get('type') === 'radio' || option.get('type') === 'dropdown') {
+                    showHiddenValue = true;
+                }
+
                 var newOption = new ProductOption({
                     title: option.get('title'),
                     parentId: option.get('id'),
                     type: option.get('type'),
-                    libraryOption: true
+                    libraryOption: true,
+                    showHiddenValue:showHiddenValue
                 });
                 newOption.get('selection').reset(option.get('selection').map(function(item){ item.unset('id'); return item.toJSON(); }));
                 this.model.get('options').add(newOption);
@@ -381,10 +402,23 @@ define([
                         $('#custom-param-'+attr.param_type+'-'+attr.param_name).val(paramVal);
                     });
                 }
+
+                if(name == 'companyProducts') {
+                    if (!_.isUndefined(value) && !_.isEmpty(value) && value !== null) {
+                        var companiesP = value;
+
+                        if(!_.isArray(companiesP)) {
+                            companiesP = value.split(',');
+                        }
+                        $('#product-supplier').val(companiesP).trigger("chosen:updated");
+                    } else {
+                        $('#product-supplier').val(0).trigger("chosen:updated");
+                    }
+                }
             });
 
             if (this.model.has('related')){
-                _.isEmpty(this.model.get('related')) && this.$('#related-holder').find('.spinner').remove();
+                _.isEmpty(this.model.get('related')) && this.$('#related-holder').find('#core-spinner').remove();
             }
 
             self.initTinyMce();
@@ -505,6 +539,8 @@ define([
                     photoUrl: photoUrl
                 }));
             }
+
+            $('#product-supplier').trigger('change');
 
 			hideSpinner();
 		},
@@ -651,16 +687,15 @@ define([
             }
         },
         renderBrands: function(brands){
-            var tmpl = _.template("<% _.each(brands, function(brand){ %><option value='<%= brand %>'><%= brand %></option><% }); %>");
-
-            $('#product-brand').html('<option value="-1" disabled="disable">'+ _.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand'] +'</option>' +
-                tmpl({brands: _.sortBy(brands, function(v){ return v.toLowerCase();}) })
-            );
+            $('#product-brand').empty().append('<option value="-1" disabled="disable">'+ (_.isUndefined(i18n['Select a brand'])?'Select a brand':i18n['Select a brand']) +'</option>');
+            _.each(brands, function(brand){
+                $('#product-brand').append('<option value="'+ brand +'">'+brand+'</option>');
+            });
 
             if (this.model && this.model.has('brand')){
-                this.$('#product-brand').val(this.model.get('brand'));
+                $('#product-brand').val(this.model.get('brand'));
             } else {
-                this.$('#product-brand').val(-1);
+                $('#product-brand').val(-1);
             }
         },
         renderProduct: function(product){
@@ -736,6 +771,9 @@ define([
 
             this.model.set({allowance: productAllowanceDate});
             this.model.set({customParams: productCustomParams});
+
+            var companyProducts = $('#product-supplier').val();
+            this.model.set({companyProducts: companyProducts});
 
             var ptodFullDescription = tinymce.activeEditor.getContent();
             this.model.set({fullDescription: ptodFullDescription});
@@ -938,11 +976,19 @@ define([
             return false;
         },
         newBrand: function(e){
-            var newBrand = $.trim(this.$('#new-brand').val());
+            var newBrand = $.trim(this.$('#new-brand').val()),
+                brandValidation = new RegExp(/[^\u0080-\uFFFF\w\s-]+/gi);
+
             if (e.keyCode === 13 && newBrand !== '') {
-                this.addNewBrand(newBrand)
-                    .$('#new-brand').val('');
-                this.$('#product-brand').focus();
+                if(brandValidation.test(newBrand)){
+                    showMessage(_.isUndefined(i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash) and space.'])?'Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash) and space.':i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, _(underscore), -(dash) and space.'], true, 3000);
+                    $(e.currentTarget).blur();
+                    return false;
+                } else {
+                    this.addNewBrand(newBrand)
+                        .$('#new-brand').val('');
+                    this.$('#product-brand').focus();
+                }
             }
             return this;
         },
@@ -975,13 +1021,16 @@ define([
         },
         filterProducts: function(e, forceRun) {
             if (e.keyCode === 13 || forceRun === true) {
-                $('#product-list-holder').html('<div class="spinner"></div>');
-                this.products.key = e.currentTarget.value;
+                $('#product-list-holder').html('<div id="core-spinner"></div>');
+                this.products.key = e.currentTarget.value.replace('&', '*-amp-*');
                 this.products.goTo(this.products.firstPage);
                 $(e.target).autocomplete('close');
             }
         },
         renderOption: function(option){
+		    if (typeof option !== 'undefined' && (option.get('type') === 'radio' || option.get('type') === 'dropdown')) {
+                option.set('showHiddenValue', true);
+            }
             var optWidget = new ProductOptionView({model: option});
             optWidget.render().$el.appendTo('#options-holder');
             checkboxRadioStyle();
@@ -1131,7 +1180,7 @@ define([
             $('#massaction').html(labels[listtype]);
 
             if (this.products === null) {
-                $('#product-list-holder').html('<div class="spinner"></div>');
+                $('#product-list-holder').html('<div id="core-spinner"></div>');
                 return this.initProducts().pager();
             }
         },
@@ -1196,6 +1245,12 @@ define([
             this.digitalProduct.digitalProducts.server_api.productId = productId;
             this.digitalProduct.digitalProducts.currentPage = 0;
             this.digitalProduct.render();
+        },
+        truncateString: function (str, num) {
+            if (str.length <= num) {
+                return str;
+            }
+            return str.slice(0, num) + '...';
         }
 	});
 

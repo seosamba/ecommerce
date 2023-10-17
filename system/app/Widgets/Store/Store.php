@@ -140,6 +140,76 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
             $this->_view->shoppingConfig = $shoppingConfig;
 
+            $currentUser = $this->_sessionHelper->getCurrentUser();
+            $userId = $currentUser->getId();
+            $userRole = $currentUser->getRoleId();
+            $this->_view->userRole = $userRole;
+
+            $filterPresetMapper = Models_Mapper_FilterPresetMapper::getInstance();
+            $where = null;
+
+            if ($userRole !== Tools_Security_Acl::ROLE_SUPERADMIN && $userRole !== Tools_Security_Acl::ROLE_ADMIN) {
+                $where = '('.$filterPresetMapper->getDbTable()->getAdapter()->quoteInto('creator_id = ?', $userId);
+                $where .= ' OR '.$filterPresetMapper->getDbTable()->getAdapter()->quoteInto('access = ?', 'all').')';
+            }
+
+            $filtersPreset = $filterPresetMapper->fetchAll($where, array('filter_preset_name'));
+            $this->_view->filtersPreset = $filtersPreset;
+
+            $defaultPreset = $filterPresetMapper->getDefaultPreset($userId);
+
+            if (($userRole === Tools_Security_Acl::ROLE_ADMIN || $userRole === Shopping::ROLE_SALESPERSON) && !$defaultPreset instanceof Models_Model_FilterPresetModel) {
+                $defaultPreset = $filterPresetMapper->getDefaultAndAllAccessPreset('1', 'all');
+            }
+
+            if ($defaultPreset instanceof Models_Model_FilterPresetModel) {
+                $presetData = $defaultPreset->getFilterPresetData();
+                if (!empty($presetData)) {
+                    $presetData = json_decode($presetData, true);
+                    $this->_view->presetConfig = $presetData;
+
+                    if(!empty($presetData['filter_country'])) {
+                        $states = Tools_Geo::getState($presetData['filter_country'], 'pairs');
+
+                        $this->_view->states = $states;
+                    }
+                }
+                $this->_view->presetDefaultId = $defaultPreset->getId();
+                $this->_view->presetDefaultName = $defaultPreset->getFilterPresetName();
+                $this->_view->presetDefault = $defaultPreset->getIsDefault();
+                $this->_view->presetDefaultAccess = $defaultPreset->getAccess();
+            }
+
+            $orderStatuses = array(
+                Models_Model_CartSession::CART_STATUS_NEW => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_NEW),
+                Models_Model_CartSession::CART_STATUS_PENDING => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_PENDING),
+                Models_Model_CartSession::CART_STATUS_PROCESSING => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_PROCESSING)
+            );
+
+            if(!empty($shoppingConfig['enabledPartialPayment'])) {
+                $orderStatuses[Models_Model_CartSession::CART_STATUS_PARTIAL] = $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_PARTIAL);
+            }
+
+            $orderStatuses += array(
+                Models_Model_CartSession::CART_STATUS_COMPLETED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_COMPLETED),
+                Models_Model_CartSession::CART_STATUS_SHIPPED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_SHIPPED),
+                Models_Model_CartSession::CART_STATUS_DELIVERED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_DELIVERED),
+                Models_Model_CartSession::CART_STATUS_CANCELED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_CANCELED),
+                Models_Model_CartSession::CART_STATUS_REFUNDED => $this->_translator->translate('cs_'.Models_Model_CartSession::CART_STATUS_REFUNDED),
+                Tools_Misc::CS_ALIAS_PENDING => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_PENDING),
+                Tools_Misc::CS_ALIAS_PROCESSING => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_PROCESSING),
+                Tools_Misc::CS_ALIAS_QUOTE_SIGNED => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_QUOTE_SIGNED),
+                Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY => $this->_translator->translate('cs_'.Tools_Misc::CS_ALIAS_LOST_OPPORTUNITY)
+            );
+
+            $this->_view->orderStatuses = $orderStatuses;
+
+            $customerGroupsMapper = Store_Mapper_GroupMapper::getInstance();
+            $customerGroups = $customerGroupsMapper->fetchPairs();
+
+            $this->_view->countriesList = Tools_Geo::getCountries(true);
+            $this->_view->customerGroups = $customerGroups;
+
 			return $this->_view->render('orders.phtml');
 		}
 	}
@@ -152,7 +222,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
 		$sessionHelper = Zend_Controller_Action_HelperBroker::getExistingHelper('session');
 		if (isset($sessionHelper->storeCartSessionKey)){
 			$cartId = intval($sessionHelper->storeCartSessionKey);
-            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId);
+            $cartSession = Models_Mapper_CartSessionMapper::getInstance()->find($cartId, true);
             if(isset($this->_options[1]) && $this->_options[1] == 'mailreport'){
                 $this->_view->mailReport = 1;
             }else{
@@ -583,4 +653,73 @@ class Widgets_Store_Store extends Widgets_Abstract {
         return $checkoutPage;
     }
 
+    /**
+     * Generates number left to get free shipping
+     */
+    protected function _makeOptionfreeshippinggoal()
+    {
+        $shippingConfigMapper = Models_Mapper_ShippingConfigMapper::getInstance();
+        $freeShippingConfig = $shippingConfigMapper->find(Shopping::SHIPPING_FREESHIPPING);
+        if (!empty($freeShippingConfig['config']) && !empty($freeShippingConfig['enabled'])) {
+
+            $currency = Zend_Registry::get('Zend_Currency');
+
+            $cart = Tools_ShoppingCart::getInstance();
+            if (empty($cart)) {
+                return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+            }
+
+            $cartAmount = $cart->calculateCartPrice();
+
+            if (empty($cart->getShippingAddressKey())){
+                return $currency->toCurrency(round($freeShippingConfig['config']['cartamount'] - $cartAmount, 2));
+            }
+
+            $shippingAddress = $cart->getAddressById($cart->getShippingAddressKey());
+
+            if (empty($cartAmount)) {
+                return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+            }
+
+            $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+            $cartContent = $cart->getContent();
+            $quantityOfCartProducts = count($cartContent);
+            $freeShippingProductsQuantity = 0;
+            if (is_array($cartContent) && !empty($cartContent)) {
+                foreach ($cartContent as $cartItem) {
+                    if ($cartItem['freeShipping'] == 1) {
+                        $freeShippingProductsQuantity += 1;
+                    }
+                }
+            }
+
+            if ($freeShippingProductsQuantity == $quantityOfCartProducts) {
+                return 0;
+            }
+
+            $deliveryType = $shoppingConfig['country'] == $shippingAddress['country'] ? Forms_Shipping_FreeShipping::DESTINATION_NATIONAL : Forms_Shipping_FreeShipping::DESTINATION_INTERNATIONAL;
+
+            if ($freeShippingConfig['config']['destination'] === Forms_Shipping_FreeShipping::DESTINATION_BOTH
+                || $freeShippingConfig['config']['destination'] === $deliveryType
+            ) {
+                if ($cartAmount > $freeShippingConfig['config']['cartamount']) {
+                    return 0;
+                }
+
+                return $currency->toCurrency(round($freeShippingConfig['config']['cartamount'] - $cartAmount, 2));
+            } elseif ($freeShippingConfig['config']['destination'] > 0) {
+                $zoneId = Tools_Tax_Tax::getZone($shippingAddress, false);
+                if ($zoneId == $freeShippingConfig['config']['destination']) {
+                    if ($cartAmount > $freeShippingConfig['config']['cartamount']) {
+                        return 0;
+                    }
+
+                    return $currency->toCurrency(round($freeShippingConfig['config']['cartamount'] - $cartAmount, 2));
+                }
+            }
+
+            return $currency->toCurrency($freeShippingConfig['config']['cartamount']);
+
+        }
+    }
 }

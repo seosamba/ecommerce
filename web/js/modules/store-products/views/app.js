@@ -126,23 +126,29 @@ define([
         },
         brandAction: function(products){
             var self = this;
-            if (!this.brands){
-                this.brands = new BrandsCollection();
-                this.brands.fetch({async: false});
-            }
+            this.brands = new BrandsCollection();
+            this.brands.fetch({async: false});
 
             var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
             var brandButtons = {};
 
             brandButtons[applyButton] = function() {
-                var brand = $.trim($(this).find('input[name=newbrand]').val());
+                var brand = $.trim($(this).find('input[name=newbrand]').val()),
+                    brandValidation = new RegExp(/[^\u0080-\uFFFF\w\s-]+/gi);
+
                 brand = !!brand ? brand : $.trim($(this).find('select[name=brands]').val());
-
-                self.products.batch('PUT', {'brand': brand}, $(this).find('input[name="applyToAll"]').attr('checked') );
-
-                $(this).dialog('close');
+                if(brandValidation.test(brand)){
+                    showMessage(_.isUndefined(i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.'])?'Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.':i18n['Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.'], true, 3000);
+                    return false;
+                } else {
+                    if(brand == '' || typeof brand === 'undefined') {
+                        showMessage(_.isUndefined(i18n['Can\'t assign brand. Please select brand or provide new!']) ? 'Can\'t assign brand. Please select brand or provide new!':i18n['Can\'t assign brand. Please select brand or provide new!'], true, 3000);
+                        return false;
+                    }
+                    self.products.batch('PUT', {'brand': brand}, $(this).find('input[name="applyToAll"]').attr('checked') );
+                    $(this).dialog('close');
+                }
             };
-
 
             var dialog = _.template(BrandsDialogTmpl, {
                 brands: this.brands.toJSON(),
@@ -337,7 +343,8 @@ define([
             }
 
             var checked = this.products.where({checked: true}),
-                productIds     = _.pluck(checked, 'id');
+                productIds     = _.pluck(checked, 'id'),
+                self = this;
 
             if (!productIds.length){
                 return false;
@@ -359,7 +366,7 @@ define([
                     data: {'companies': companies, productIds:productIds, removeOldCompanies: '1'},
                     dataType: 'json',
                     success: function(response){
-                        showMessage(_.isUndefined(i18n['Saved']) ? 'Saved':i18n['Saved'], false, 5000);
+                        showMessage(response.responseText, false, 5000);
                     }
                 });
 
@@ -393,6 +400,7 @@ define([
                         buttons: companyProductButtons,
                         close: function (event, ui) {
                             $(this).dialog('destroy');
+                            self.products.pager();
                         }
                     });
 

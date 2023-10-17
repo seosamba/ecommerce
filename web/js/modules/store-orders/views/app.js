@@ -19,7 +19,13 @@ define(['backbone',
     var MainView = Backbone.View.extend({
         el: $('#store-orders'),
         events: {
-            'click #extra-filters-switch': function(){ $('#extra-filters', this.el).slideToggle(); } ,
+            'click #extra-filters-switch': function(){
+                    if ($('#extra-filters', this.el).hasClass('hidden')) {
+                        $('#extra-filters', this.el).removeClass('hidden');
+                    } else {
+                        $('#extra-filters', this.el).addClass('hidden');
+                    }
+                } ,
             'change input.filter': 'applyFilter',
             'change #orders-check-all': 'checkAllOrders',
             'click #orders-filter-apply-btn': 'applyFilter',
@@ -27,13 +33,17 @@ define(['backbone',
             'click th.sortable': 'sort',
             'click button.change-status': 'changeStatus',
             'click td.shipping-service .setTracking': 'changeTracking',
+            'click td.shipping-service .set-pickup': 'markShipmentPickup',
             'click .sendInvoice': 'sendInvoice',
             'click #orders-filter-reset-btn': 'resetFilter',
             'change select[name="order-mass-action"]': 'massAction',
             'change input[name="check-order[]"]': 'toggleOrder',
             'change #filter-order-type': 'toggleRecurring',
             'click .generate-shipping-order-label' : 'generateShippingLabel',
-            'click .refund-shipping-order-label' : 'refundShippingLabel'
+            'click .refund-shipping-order-label' : 'refundShippingLabel',
+            'click #save-filter-preset': 'saveFilterPreset',
+            'change #predefined-filter-list': 'changeFilterPreset',
+            'click #delete-filter-preset': 'deleteFilterPreset'
         },
         templates: {
             paginator: _.template(PaginatorTmpl)
@@ -87,6 +97,11 @@ define(['backbone',
                         withDetailedFilters = true;
                     }
 
+                    if (typeof options.filter_client_group !== 'undefined') {
+                        $('#filter-client-group').val(options.filter_client_group.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (typeof options.filter_state !== 'undefined') {
                         $('#filter-state').val(options.filter_state.split(',')).trigger('chosen:updated');
                         withDetailedFilters = true;
@@ -124,7 +139,11 @@ define(['backbone',
                     }
 
                     if (withDetailedFilters === true) {
-                        $('#extra-filters').slideToggle();
+                        if ($('#extra-filters').hasClass('hidden')) {
+                            $('#extra-filters').removeClass('hidden');
+                        } else {
+                            $('#extra-filters').addClass('hidden');
+                        }
                     }
                 }
             }
@@ -133,7 +152,7 @@ define(['backbone',
                 'id': function() { return $('input[name=search]').val(); },
                 'filter': function() {
                     return {
-                        'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val(),
+                        'product-key': $('input[name=filter-product-key]', '#store-orders form.filters').val().replace('&', '*-amp-*'),
                         'status': $('#filter-status', '#store-orders form.filters').val(),
                         'country': $('select[name=filter-country]', '#store-orders form.filters').val(),
                         'state': $('select[name=filter-state]', '#store-orders form.filters').val(),
@@ -147,12 +166,267 @@ define(['backbone',
                         'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
                         'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val(),
                         'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; },
-                        'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; }
+                        'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; },
+                        'filter-client-group': $('select[name=filter-client-group]', '#store-orders form.filters').val()
                     };
                 }
             });
             this.orders.on('reset', this.renderOrders, this);
             this.orders.pager();
+        },
+        saveFilterPreset: function(e)
+        {
+            e.preventDefault();
+            var filterPresetName = $('#filter-preset-name').val(),
+                filterPresetDefault = 0,
+                filterAllowPreset = 'individual',
+                requestType = 'POST',
+                presetId = $('#preset-id').val(),
+                filterPresetData = {},
+                notAllowedSymbols = false,
+                self = this;
+
+            if (!_.isEmpty(filterPresetName)) {
+                if (filterPresetName.match(/[^\w\s]/)) {
+                    notAllowedSymbols = true;
+                }
+
+                if(notAllowedSymbols) {
+                    showMessage(_.isUndefined(i18n['Special symbols like !.,?-@:; can\'t be used for names'])?'Special symbols like !.,?"@:; can\'t be used for names':i18n['Special symbols like !.,?"@:; can\'t be used for names'], true, 5000);
+                    return false;
+                }
+
+                if ($('#filter-preset-default').is(':checked')) {
+                    filterPresetDefault = 1;
+                }
+
+                if ($('#filter-preset-allow').is(':checked')) {
+                    filterAllowPreset = 'all';
+                }
+
+                if (!_.isEmpty(presetId)) {
+                    requestType = 'PUT';
+                }
+
+                filterPresetData = {
+                    'filter_from_amount': $('#filter-from-amount').val(),
+                    'filter_to_amount': $('#filter-to-amount').val(),
+                    'filter_by_coupon_code': $('#filter-by-coupon-code').val(),
+                    'orders_filter_fromdate' : $('#orders-filter-fromdate').val() ? $.datepicker.formatDate('yy-mm-dd', new Date( $('#orders-filter-fromdate').val())): '',
+                    'orders_filter_todate' : ($('#orders-filter-todate').val()) ? $.datepicker.formatDate('yy-mm-dd', new Date( $('#orders-filter-todate').val())): '',
+                    'filter_status': $('#filter-status').val(),
+                    'filter_order_type': $('#filter-order-type').val(),
+                    'filter_recurring_order_type' : ($('#filter-order-type').val() != '0' && $('#filter-order-type').val() == 'recurring_id') ? $('#filter-recurring-order-type').val() : '',
+                    'filter_country': $('#filter-country').val(),
+                    'filter_state': $('#filter-state').val(),
+                    'filter_carrier': $('#filter-carrier').val(),
+                    'exclude_quotes_from_search': $('input[name=exclude-quotes-from-search]:checked').val(),
+                    'is_a_gift': $('input[name=is-a-gift]:checked').val(),
+                    'filter_client_group':$('#filter-client-group').val()
+                };
+
+                var formParams = {'filter_preset_name':filterPresetName,'is_default': filterPresetDefault,
+                    'access': filterAllowPreset, 'filter_preset_data': filterPresetData, 'secureToken': $('#orders-secure-token').val()
+                };
+                if (requestType === 'PUT') {
+                    formParams.id = presetId;
+                    formParams = JSON.stringify(formParams);
+                }
+
+                $.ajax({
+                    'url': $('#website_url').val() + 'api/store/filterpreset/',
+                    'type' : requestType,
+                    'dataType': 'json',
+                    'data': formParams
+                }).done(function(response){
+                    $('#preset-id').val('');
+                    $('#filter-preset-default').prop('checked', false);
+                    $('#filter-preset-allow').prop('checked', false);
+                    $('#filter-preset-name').val('');
+                    if (requestType === 'POST') {
+                        $('#predefined-filter-list').append('<option value="' + response.responseText.id + '">' + filterPresetName + '</option>');
+                    } else {
+                        $('#predefined-filter-list option:selected').text(filterPresetName);
+                    }
+                    $('#predefined-filter-list').val(0);
+                    $('#delete-filter-preset').hide();
+                    $('.recurring-filters').addClass('hidden');
+
+                    showMessage(response.responseText.message, false, 3000);
+                    $('#orders-filter-reset-btn').trigger('click');
+                }).fail(function(response) {
+                    showMessage(response.responseJSON, true, 3000);
+                });
+            }
+        },
+        changeFilterPreset:function(e)
+        {
+            var presetId = $(e.currentTarget).val();
+            self = this;
+            if (_.isEmpty(presetId)) {
+                return false;
+            }
+
+            if (presetId == '0') {
+                $('#preset-id').val('');
+                $('#orders-filter-reset-btn').trigger('click');
+                $('#switch-search-filter-label').text((_.isUndefined(i18n['OR'])?'OR':i18n['OR']));
+                $('#delete-filter-preset').hide();
+                $('.recurring-filters').addClass('hidden');
+                $('#filter-preset-default').prop('checked', false);
+                $('#filter-preset-allow').prop('checked', false);
+                return false;
+            }
+
+            $('#switch-search-filter-label').text((_.isUndefined(i18n['Modify preset name'])?'Modify preset name':i18n['Modify preset name']));
+
+            $.ajax({
+                'url': $('#website_url').val()+'api/store/filterpreset/',
+                'type':'GET',
+                'dataType':'json',
+                'data': {'id': presetId, 'secureToken': $('#orders-secure-token').val()}
+            }).done(function(responseData){
+                if (typeof responseData.isDefault !=='undefined' && responseData.isDefault == '1') {
+                    $('#filter-preset-default').prop('checked', true);
+                } else {
+                    $('#filter-preset-default').prop('checked', false);
+                }
+
+                if (typeof responseData.access !=='undefined' && responseData.access === 'individual') {
+                    $('#filter-preset-allow').prop('checked', false);
+                } else {
+                    $('#filter-preset-allow').prop('checked', true);
+                }
+
+                var filtersData = JSON.parse(responseData.filterPresetData),
+                    ordersFilterFromdate = '',
+                    ordersFilterTodate = '';
+
+                $('#filter-from-amount').val(filtersData.filter_from_amount);
+                $('#filter-to-amount').val(filtersData.filter_to_amount);
+                $('#filter-by-coupon-code').val(filtersData.filter_by_coupon_code);
+
+                if (filtersData.orders_filter_fromdate !== '' && !_.isUndefined(filtersData.orders_filter_fromdate)) {
+                    ordersFilterFromdate = $.datepicker.formatDate('d-M-yy', new Date(filtersData.orders_filter_fromdate));
+                }
+
+                $('#orders-filter-fromdate').val(ordersFilterFromdate);
+
+                if (filtersData.orders_filter_todate !== '' && !_.isUndefined(filtersData.orders_filter_todate)) {
+                    ordersFilterTodate = $.datepicker.formatDate('d-M-yy', new Date(filtersData.orders_filter_todate));
+                }
+
+                $('#orders-filter-todate').val(ordersFilterTodate);
+
+                if (!_.isUndefined(filtersData.filter_status) && !_.isEmpty(filtersData.filter_status)) {
+                    $('#filter-status').val(filtersData.filter_status).trigger("chosen:updated");
+                } else {
+                    $('#filter-status').val(0).trigger("chosen:updated");
+                }
+
+                if (!_.isUndefined(filtersData.filter_recurring_order_type) && !_.isEmpty(filtersData.filter_recurring_order_type)) {
+                    $('#filter-recurring-order-type').val(filtersData.filter_recurring_order_type).trigger("chosen:updated");
+                } else {
+                    $('#filter-recurring-order-type').val(0).trigger("chosen:updated");
+                }
+
+                if (!_.isUndefined(filtersData.filter_order_type) && !_.isEmpty(filtersData.filter_order_type)) {
+                    $('#filter-order-type').val(filtersData.filter_order_type).trigger("chosen:updated");
+                    if(filtersData.filter_order_type == 'recurring_id') {
+                        $('.recurring-filters').removeClass('hidden');
+                    } else {
+                        $('.recurring-filters').addClass('hidden');
+                    }
+                } else {
+                    $('#filter-order-type').val(0).trigger("chosen:updated");
+                    $('.recurring-filters').addClass('hidden');
+                }
+
+                if (!_.isUndefined(filtersData.filter_client_group) && !_.isEmpty(filtersData.filter_client_group)) {
+                    $('#filter-client-group').val(filtersData.filter_client_group).trigger("chosen:updated");
+                } else {
+                    $('#filter-client-group').val(0).trigger("chosen:updated");
+                }
+
+                if (!_.isUndefined(filtersData.filter_country) && !_.isEmpty(filtersData.filter_country)) {
+                    $('#filter-country').val(filtersData.filter_country).trigger("chosen:updated");
+                } else {
+                    $('#filter-country').val(0).trigger("chosen:updated");
+                }
+
+                self.setStateOptions();
+                if (!_.isUndefined(filtersData.filter_state) && !_.isEmpty(filtersData.filter_state)) {
+                    $('#filter-state').val(filtersData.filter_state).trigger("chosen:updated");
+                } else {
+                    $('#filter-state').val(0).trigger("chosen:updated");
+                }
+
+                if (!_.isUndefined(filtersData.filter_carrier) && !_.isEmpty(filtersData.filter_carrier)) {
+                    $('#filter-carrier').val(filtersData.filter_carrier).trigger("chosen:updated");
+                } else {
+                    $('#filter-carrier').val(0).trigger("chosen:updated");
+                }
+
+                if (filtersData.exclude_quotes_from_search !== '' && !_.isUndefined(filtersData.exclude_quotes_from_search)) {
+                    $('#exclude-quotes-from-search').prop('checked', true);
+                } else {
+                    $('#exclude-quotes-from-search').prop('checked', false);
+                }
+
+                if (filtersData.is_a_gift !== '' && !_.isUndefined(filtersData.is_a_gift)) {
+                    $('#is-a-gift').prop('checked', true);
+                } else {
+                    $('#is-a-gift').prop('checked', false);
+                }
+
+                $('#filter-preset-name').val(responseData.filterPresetName);
+                $('#preset-id').val(presetId);
+
+                $('#delete-filter-preset').show();
+
+                $('#orders-filter-apply-btn').trigger('click');
+            }).fail(function(response) {
+                showMessage(response.responseJSON, true, 3000);
+            });
+        },
+        deleteFilterPreset: function(e) {
+            e.preventDefault();
+            var presetId = $('#predefined-filter-list').val();
+
+            if (_.isEmpty(presetId)) {
+                return false;
+            }
+
+            showConfirm(_.isUndefined(i18n['Are you sure want to delete'])?'Are you sure want to delete':i18n['Are you sure want to delete'], function(){
+                $.ajax({
+                    url: $('#website_url').val() + 'api/store/filterpreset/id/' + presetId,
+                    type: 'DELETE'
+                }).done(function(response){
+                    if(response.error == 1) {
+                        showMessage(response.responseText, true, 3000);
+                    } else {
+                        $('#preset-id').val('');
+                        $('#filter-preset-default').prop('checked', false);
+                        $('#filter-preset-name').val('');
+
+                        $('#predefined-filter-list').val(0);
+                        $('#delete-filter-preset').hide();
+                        $('#predefined-filter-list option[value="'+ presetId +'"]').remove();
+
+                        showMessage(response.responseText, false, 3000);
+                        $('#orders-filter-reset-btn').trigger('click');
+                    }
+                });
+            });
+        },
+        setStateOptions : function() {
+            let countriesWithStates = JSON.parse($('#countries-with-states').val());
+            $('#filter-state option').remove();
+            if (typeof countriesWithStates[$('#filter-country').val()] !== 'undefined') {
+                for (const [key, value] of Object.entries(countriesWithStates[$('#filter-country').val()])) {
+                    $('#filter-state').append($('<option></option>').val(key).text(value));
+                }
+            }
         },
         massAction: function(e){
             var func = $(e.currentTarget).val()+'Action';
@@ -670,6 +944,7 @@ define(['backbone',
                                     } else {
                                         showMessage(response.responseText, false, 5000);
                                         $('.ui-dialog-titlebar-close').trigger('click');
+                                        self.applyFilter();
                                     }
                                 }
                             });
@@ -722,6 +997,51 @@ define(['backbone',
                     cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
                 });
             }
+        },
+        markShipmentPickup: function (e) {
+            var self = this,
+                el = $(e.currentTarget),
+                id = parseInt(el.closest('tr').find('td.order-id').text()),
+                model = this.orders.get(id),
+                data = {
+                    pickupNotification : 1,
+                    id : id
+                },
+                confirmMessage = _.isUndefined(i18n['You are about to send a pickup notification to the customer, proceed?']) ? 'You are about to send a pickup notification to the customer, proceed?' : i18n['You are about to send a pickup notification to the customer, proceed?'];
+
+            smoke.confirm(confirmMessage, function (e) {
+                if (e) {
+                    $.ajax({
+                        url: $('#website_url').val() + 'plugin/shopping/run/order',
+                        data: data,
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            el.closest('td').find('.tracking-info').hide();
+                            el.closest('td').find('.ajax-loader').show();
+                        },
+                        success: function (response) {
+                            if (response.hasOwnProperty('error') && !response.error) {
+                                showMessage(_.isUndefined(i18n['Email has been sent']) ? 'Email has been sent' : i18n['Email has been sent']);
+                            }
+
+                            model.set({
+                                'status': response.responseText.status,
+                                'is_pickup_notification_sent': response.responseText.isPickupNotificationSent,
+                                'pickup_notification_sent_on': response.responseText.pickupNotificationSentOn,
+                            });
+
+                            el.closest('td').find('.ajax-loader').hide();
+                            el.closest('td').find('.tracking-info').show();
+
+                            $('#tracking-dialog').dialog('close');
+                        }
+                    });
+                }
+            }, {
+                ok: _.isUndefined(i18n['Yes']) ? 'Yes' : i18n['Yes'],
+                cancel: _.isUndefined(i18n['No']) ? 'No' : i18n['No']
+            });
         },
         changeTracking: function(e){
 
