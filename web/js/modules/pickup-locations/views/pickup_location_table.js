@@ -2,10 +2,11 @@ define([
     'backbone',
     '../collections/pickup-location',
     'text!../templates/paginator.html',
+    'text!../templates/add-new-cash-register-id.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
-            PickupLocationCollection,PaginatorTmpl, i18n
+            PickupLocationCollection,PaginatorTmpl, addNewCashRegisterIdTmpl, i18n
     ){
 
     var PickupLocationTableView = Backbone.View.extend({
@@ -59,8 +60,11 @@ define([
         editLocation: function(e){
             var locationId = $(e.currentTarget).data('cid'),
                 model = this.pickupLocation.get(locationId),
-                workingHours = model.get('workingHours');
+                workingHours = model.get('workingHours'),
+                cashRegisterId = model.get('cashRegisterId'),
+                cashRegisterLabel = model.get('cashRegisterLabel');
 
+            $('.register-row').remove();
             $('.location-name').val(model.get('name'));
             $('.location-address1').val(model.get('address1'));
             $('.location-address2').val(model.get('address2'));
@@ -71,10 +75,28 @@ define([
             $('.location-phone').val(model.get('phone'));
             $('#location-external-id').val(model.get('external_id'));
             $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
-            $('#cash-register-id').val(model.get('cash_register_id'));
+            var cashRegisterIdView = [];
+            if(typeof cashRegisterId !=- 'undefined' && cashRegisterId.length && typeof cashRegisterLabel !=- 'undefined' && cashRegisterLabel.length) {
+                _.each(cashRegisterId, function(value, id){
+                    var cRow = 'ID: '+ value + ' Label: '+ cashRegisterLabel[id];
+                    cashRegisterIdView.push(cRow);
+                });
+
+                if(cashRegisterIdView.length) {
+                    $('#cash-register-id-view').val(cashRegisterIdView.join(', '));
+                }
+            }
             _.each(workingHours, function(value, name){
                 $('input[name="working-hours-'+name+'"]').val(value);
             });
+
+            if(cashRegisterId.length && cashRegisterLabel.length && typeof cashRegisterLabel !=- 'undefined' && cashRegisterLabel.length) {
+                _.each(cashRegisterId, function(value, id){
+                    var rowDiv = _.template(addNewCashRegisterIdTmpl, {'cashRegisterId':cashRegisterId[id], 'cashRegisterLabel':cashRegisterLabel[id] , 'i18n':i18n});
+                    $('.cash-register-block').append(rowDiv);
+                });
+            }
+
             $('#location-edit-id').val(locationId);
             $('#edit-pickup-location').attr('method', 'PUT');
         },

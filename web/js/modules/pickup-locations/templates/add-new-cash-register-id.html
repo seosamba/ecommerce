@@ -1,0 +1,23 @@
+<div class="register-row grid_12 mt5px">
+    <%
+        var cashRegisterIdParam = '';
+        var cashRegisterLabelParam = '';
+        if(typeof cashRegisterId !== 'undefined' && cashRegisterId != '') {
+            cashRegisterIdParam = cashRegisterId;
+        }
+
+        if(typeof cashRegisterLabel !== 'undefined' && cashRegisterLabel != '') {
+            cashRegisterLabelParam = cashRegisterLabel;
+        }
+    %>
+
+    <div class="grid_5">
+        <label><%= _.isUndefined(i18n['ID']) ? 'ID':i18n['ID'] %></label>
+        <input required class="cash-register-id" type="text" name="cash-register-id" value="<%= cashRegisterIdParam %>"/>
+    </div>
+    <div class="grid_6">
+        <label><%= _.isUndefined(i18n['Label']) ? 'Label':i18n['Label'] %></label>
+        <input class="cash-register-label" type="text" name="cash-register-label" value="<%= cashRegisterLabelParam %>"/>
+    </div>
+    <a class="remove-register-id ticon-cancel error icon18 mt25px" data-role="delete" href="javascript:;"></a>
+</div>

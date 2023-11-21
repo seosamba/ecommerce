@@ -762,6 +762,7 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cash_register_label` text COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `country` (`country`),
   INDEX `city` (`city`),

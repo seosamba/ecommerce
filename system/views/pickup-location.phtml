@@ -115,7 +115,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <fieldset class="full-width mt5px">
                     <p class="grid_12 alpha omega">
                         <label><?php echo $this->translate('Cash register id'); ?></label>
-                        <textarea id="cash-register-id" name="cash-register-id" class="cash-register-id" placeholder="<?php echo $this->translate('Cash register id comma-separated'); ?>"></textarea>
+                        <textarea id="cash-register-id-view" disabled name="cash-register-id-view" class="cash-register-id-view"></textarea>
                     </p>
                 </fieldset>
             <?php endif;?>
@@ -126,6 +126,11 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     );
                 ?> ]</a>
             </p>
+            <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                <p class="grid_3 mt15px text-center" id="cash-register-id-block">
+                    <a class="cash-register-id-dialog" href="javascript:;">[ <?php echo $this->translate('Cash register ids');?> ]</a>
+                </p>
+            <?php endif;?>
             <input type="hidden" name="id" id="location-edit-id"/>
             <input type="hidden" name="locationExternalId" id="location-external-id" value="" />
             <input type="hidden" name="locationAllowedToDelete" id="location-allowed-to-delete" value="" />
@@ -170,6 +175,14 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <input type="text" name="working-hours-saturday"/>
             </p>
         </div>
+        <?php if(!empty($this->isPluginWithTagPosExist)):?>
+            <div class="cash-register-id-list pt10px hide" title="<?php echo $this->translate('Cash register ids'); ?>">
+                <div class="f-scroll cash-register-block h450px" style="height: 100%;">
+
+                </div>
+                <div id="add-new-row" class="btn mt10px add-new-row grid_12 success ticon-plus"><?php echo $this->translate('Add new ID'); ?></div>
+            </div>
+        <?php endif;?>
         <div class="grid_12 location-table">
             <table id="pickup-locations-table" class="table-striped table-hover small">
                 <thead class="header-inner">

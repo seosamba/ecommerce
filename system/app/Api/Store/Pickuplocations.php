@@ -41,6 +41,11 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
                     function ($pickupLocation) {
                         $pickupLocationData = $pickupLocation;
                         $pickupLocationData['workingHours'] = unserialize($pickupLocationData['working_hours']);
+                        if(!empty($pickupLocationData['cash_register_id']) && !empty($pickupLocationData['cash_register_label'])) {
+                            $pickupLocationData['cashRegisterId'] = explode(',', $pickupLocationData['cash_register_id']);
+                            $pickupLocationData['cashRegisterLabel'] = explode(',', $pickupLocationData['cash_register_label']);
+                        }
+
                         return $pickupLocationData;
                     },
                     $data['data']
@@ -111,12 +116,14 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $pickupLocationModel->setExternalId(null);
         $pickupLocationModel->setAllowedToDelete(0);
 
-        $cashRegisterData = '';
-        if(!empty($data['cash-register-id'])) {
-            $cashRegisterData = $data['cash-register-id'];
+        if(!empty($data['cashRegisterId'])) {
+            $pickupLocationModel->setCashRegisterId($data['cashRegisterId']);
         }
 
-        $pickupLocationModel->setCashRegisterId($cashRegisterData);
+        if(!empty($data['cashRegisterLabel'])) {
+            $pickupLocationModel->setCashRegisterLabel($data['cashRegisterLabel']);
+        }
+
         $pickupLocationMapper->save($pickupLocationModel);
     }
 
@@ -164,11 +171,14 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             $pickupLocationModel->setExternalId($data['locationExternalId']);
             $pickupLocationModel->setAllowedToDelete($data['locationAllowedToDelete']);
 
-            $cashRegisterData = '';
-            if(!empty($data['cash-register-id'])) {
-                $cashRegisterData = $data['cash-register-id'];
+            if(!empty($data['cashRegisterId'])) {
+                $pickupLocationModel->setCashRegisterId($data['cashRegisterId']);
             }
-            $pickupLocationModel->setCashRegisterId($cashRegisterData);
+
+            if(!empty($data['cashRegisterLabel'])) {
+                $pickupLocationModel->setCashRegisterLabel($data['cashRegisterLabel']);
+            }
+
             $pickupLocationMapper->save($pickupLocationModel);
         } else {
             $this->_error();

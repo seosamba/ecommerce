@@ -1,11 +1,15 @@
 define([
-	'backbone'
-], function(Backbone){
+	'backbone',
+    'text!../templates/add-new-cash-register-id.html',
+    'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
+], function(Backbone,
+            addNewCashRegisterIdTmpl, i18n){
     var PickupLocationFormView = Backbone.View.extend({
         el: $('#edit-pickup-location'),
         events: {
             'submit': 'submit',
-            'click .working-hours-dialog': 'workingHoursDialog'
+            'click .working-hours-dialog': 'workingHoursDialog',
+            'click .cash-register-id-dialog': 'cashRegisterIdDialog',
         },
         templates: {
 
@@ -15,7 +19,7 @@ define([
         },
         render: function(){
             $('#location-edit-id').val('');
-            $('#cash-register-id').val('');
+            $('#cash-register-id-view').val('');
             $('#edit-pickup-location').attr('method', 'POST');
             return this;
         },
@@ -32,11 +36,45 @@ define([
             });
 
             if (!isValid){
-                showMessage('Missing required field', true);
+                showMessage(_.isUndefined(i18n['Missing required field'])?'Missing required field':i18n['Missing required field'], true);
                 return false;
             }
             showSpinner();
-            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val();
+            var cashRegisterId = [];
+            var cashRegisterLabel = [];
+            var hasEmptyRegisterId = false;
+            if($('.cash-register-id-list').find('.cash-register-id').length) {
+                _.each($('.cash-register-id-list').find('.cash-register-id'), function(el){
+                    if ($(el).val() == ''){
+                        hasEmptyRegisterId = true;
+                    }
+                    cashRegisterId.push($(el).val());
+                });
+
+                _.each($('.cash-register-id-list').find('.cash-register-label'), function(el){
+                    var elLabel = $(el).val();
+
+                    if(elLabel == '') {
+                        elLabel = $(el).closest('.register-row').find('.cash-register-id').val();
+                    }
+                    cashRegisterLabel.push(elLabel);
+                });
+
+                if(cashRegisterId.length) {
+                    cashRegisterId = cashRegisterId.join();
+                }
+
+                if(cashRegisterLabel.length) {
+                    cashRegisterLabel = cashRegisterLabel.join();
+                }
+            }
+
+            if(hasEmptyRegisterId) {
+                showMessage(_.isUndefined(i18n['Cash register id should be not empty.'])?'Cash register id should be not empty.':i18n['Cash register id should be not empty.'], true);
+                return false;
+            }
+
+            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterId='+cashRegisterId+'&cashRegisterLabel='+cashRegisterLabel;
             $.ajax({
                 url: this.$el.attr('action'),
                 data: data,
@@ -44,14 +82,15 @@ define([
                 dataType: 'json',
                 success: function(response){
                     $('.working-hours-list').find('input').val('');
+                    $('.register-row').remove();
+                    $('#cash-register-id-view').val('');
                     $('#location-edit-id').val('');
-                    $('#cash-register-id').val('');
                     self.$el.trigger('pickupLocation:created');
                     hideSpinner();
                     if($('#edit-pickup-location').attr('method') === 'POST'){
-                        showMessage('Created', false);
+                        showMessage(_.isUndefined(i18n['Created'])?'Created':i18n['Created'], false);
                     }else{
-                        showMessage('Updated', false);
+                        showMessage(_.isUndefined(i18n['Updated'])?'Updated':i18n['Updated'], false);
                     }
                     $('#edit-pickup-location').attr('method', 'POST');
                     $('#edit-pickup-location').find('input[name!="secureToken"]').val('');
@@ -63,7 +102,7 @@ define([
             });
         },
         workingHoursDialog: function(e){
-            var applyButton  = 'Apply';
+            var applyButton  = _.isUndefined(i18n['Apply'])?'Apply':i18n['Apply'];
             var assignWorkingHoursButtons = {};
 
             assignWorkingHoursButtons[applyButton] = function() {
@@ -77,6 +116,45 @@ define([
                 dialogClass: 'seotoaster',
                 resizable : false,
                 modal     : true
+            });
+            return false;
+
+        },
+        cashRegisterIdDialog: function(e){
+            e.preventDefault();
+            var applyButton  = _.isUndefined(i18n['Apply'])?'Apply':i18n['Apply'];
+            var assignCashRegisterIdButtons = {};
+
+            assignCashRegisterIdButtons[applyButton] = function() {
+                $(this).dialog('close');
+                $('#add-new-row').unbind();
+            };
+
+            $('.cash-register-id-list').dialog({
+                buttons: assignCashRegisterIdButtons,
+                width: 650,
+                dialogClass: 'seotoaster',
+                resizable : false,
+                modal     : true,
+                show      : 'clip',
+                hide      : 'clip',
+                open: function(event, ui) {
+                    event.preventDefault();
+                    $('#add-new-row').on('click', function(e){
+                        e.preventDefault();
+                        var rowDiv = _.template(addNewCashRegisterIdTmpl, {'i18n':i18n});
+                        $('.cash-register-block').append(rowDiv);
+                    });
+
+                    $(document).on('click', '.remove-register-id', function(e){
+                        var el = $(e.currentTarget);
+                        $(el).closest('.register-row').remove();
+                    });
+                },
+                close: function (event, ui) {
+                    $(this).dialog('destroy');
+                    $('#add-new-row').unbind();
+                }
             });
             return false;
 

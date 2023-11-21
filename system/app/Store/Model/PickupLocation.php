@@ -37,6 +37,8 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_cashRegisterId = '';
 
+    protected $_cashRegisterLabel = '';
+
 
     public function setName($name)
     {
@@ -231,6 +233,24 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
         $this->_cashRegisterId = $cashRegisterId;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCashRegisterLabel()
+    {
+        return $this->_cashRegisterLabel;
+    }
+
+    /**
+     * @param string $cashRegisterLabel
+     */
+    public function setCashRegisterLabel($cashRegisterLabel)
+    {
+        $this->_cashRegisterLabel = $cashRegisterLabel;
+        return $this;
+    }
+
 
 
 
