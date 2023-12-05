@@ -52,7 +52,7 @@ define([
                 });
 
                 _.each($('.cash-register-id-list').find('.cash-register-label'), function(el){
-                    var elLabel = $(el).val();
+                    var elLabel = $(el).val().replace(',', '');
 
                     if(elLabel == '') {
                         elLabel = $(el).closest('.register-row').find('.cash-register-id').val();
