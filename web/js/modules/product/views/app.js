@@ -161,18 +161,21 @@ define([
             this.model.get('options').on('add', this.renderOption, this);
             this.model.get('options').on('reset', this.renderOptions, this);
 
-            var self = this;
-            $('#product-supplier').chosen().change(function(e, result) {
-                e.preventDefault();
-                var searchChoice = $(".chosen-choices li.search-choice");
-                if(searchChoice.length) {
-                    _.each(searchChoice, function (cName, key) {
-                        if($(cName).find('span').length == 1) {
-                            $(cName).find('span')[0].textContent = self.truncateString($(cName).find('span')[0].textContent, 15);
-                        }
-                    });
-                }
-            });
+            var currentTabId = $(".ui-state-active").find('a').attr("href");
+            if(currentTabId == '#main-tab') {
+                var self = this;
+                $('#product-supplier').chosen().change(function(e, result) {
+                    e.preventDefault();
+                    var searchChoice = $(".chosen-choices li.search-choice");
+                    if(searchChoice.length) {
+                        _.each(searchChoice, function (cName, key) {
+                            if($(cName).find('span').length == 1) {
+                                $(cName).find('span')[0].textContent = self.truncateString($(cName).find('span')[0].textContent, 15);
+                            }
+                        });
+                    }
+                });
+            }
 
             return this;
 		},

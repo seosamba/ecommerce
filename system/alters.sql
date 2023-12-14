@@ -719,6 +719,7 @@ UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
 
 -- 05/10/2023
 -- version: 3.0.0
+ALTER TABLE `shopping_pickup_location` ADD COLUMN `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `country`;
 ALTER TABLE `shopping_pickup_location` ADD COLUMN `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_pickup_location` ADD COLUMN `cash_register_label` text COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL;

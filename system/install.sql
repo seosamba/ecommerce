@@ -751,6 +751,7 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `address2` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `zip` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
   `country` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `city` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `working_hours` TEXT COLLATE utf8_unicode_ci NOT NULL,
   `phone` varchar(50) COLLATE utf8_unicode_ci NOT NULL,

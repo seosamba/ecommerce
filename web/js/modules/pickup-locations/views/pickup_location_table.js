@@ -62,7 +62,9 @@ define([
                 model = this.pickupLocation.get(locationId),
                 workingHours = model.get('workingHours'),
                 cashRegisterId = model.get('cashRegisterId'),
-                cashRegisterLabel = model.get('cashRegisterLabel');
+                cashRegisterLabel = model.get('cashRegisterLabel'),
+                country = model.get('country'),
+                state = model.get('state');
 
             $('.register-row').remove();
             $('.location-name').val(model.get('name'));
@@ -71,12 +73,45 @@ define([
             $('.location-city').val(model.get('city'));
             $('.location-zip').val(model.get('zip'));
             $('.location-weight').val(model.get('weight'));
-            $('.location-country [value="'+model.get('country')+'"]').prop('selected', true);
+            $('.location-country [value="'+country+'"]').prop('selected', true);
+
+            $('.state-block').addClass('hide');
+            $('.cash-register-id-view').val('');
+
+            var states = '<option value="">'+ (_.isUndefined(i18n['Select state'])?'Select state':i18n['Select state']) +'</option>';
+            if(country == 'United States' || country == 'Canada' || country == 'Australia') {
+                $.ajax({
+                    url: $('#website_url').val()+'plugin/shopping/run/getStateListByCountry',
+                    type: 'POST',
+                    data:{country: country, secureToken: $('.secure-token-pickup-cat').val()},
+                    dataType: 'json',
+                    success: function(response) {
+                        if(!response.error) {
+                            var stateList = response.responseText.stateList;
+
+                            _.each(stateList, function(stateData, key ){
+                                states += '<option value="'+ stateData.state +'">'+ stateData.name +'</option>';
+                            });
+
+                            $('.state-block').removeClass('hide');
+                            $('.location-state').empty().append(states);
+
+                            $('.location-state [value="'+state+'"]').prop('selected', true);
+                        } else {
+                            $('.location-state').empty().append(states);
+                        }
+                    }
+                });
+            } else {
+                $('.state-block').addClass('hide');
+                $('.location-state').empty().append(states);
+            }
+
             $('.location-phone').val(model.get('phone'));
             $('#location-external-id').val(model.get('external_id'));
             $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
             var cashRegisterIdView = [];
-            if(typeof cashRegisterId !=- 'undefined' && cashRegisterId.length && typeof cashRegisterLabel !=- 'undefined' && cashRegisterLabel.length) {
+            if(typeof cashRegisterId !== 'undefined' && cashRegisterId.length && typeof cashRegisterLabel !== 'undefined' && cashRegisterLabel.length) {
                 _.each(cashRegisterId, function(value, id){
                     var cRow = 'ID: '+ value + ' Label: '+ cashRegisterLabel[id];
                     cashRegisterIdView.push(cRow);
@@ -90,7 +125,7 @@ define([
                 $('input[name="working-hours-'+name+'"]').val(value);
             });
 
-            if(cashRegisterId.length && cashRegisterLabel.length && typeof cashRegisterLabel !=- 'undefined' && cashRegisterLabel.length) {
+            if(typeof cashRegisterId !== 'undefined' && cashRegisterId.length && typeof cashRegisterLabel !== 'undefined' && cashRegisterLabel.length) {
                 _.each(cashRegisterId, function(value, id){
                     var rowDiv = _.template(addNewCashRegisterIdTmpl, {'cashRegisterId':cashRegisterId[id], 'cashRegisterLabel':cashRegisterLabel[id] , 'i18n':i18n});
                     $('.cash-register-block').append(rowDiv);
@@ -107,6 +142,19 @@ define([
             showConfirmCustom(_.isUndefined(i18n['Are you sure want to delete?'])?'Are you sure want to delete?':i18n['Are you sure want to delete?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (model){
                     model.destroy();
+                    $('.working-hours-list').find('input').val('');
+                    $('.register-row').remove();
+                    $('#location-edit-id').val('');
+                    $('.state-block').addClass('hide');
+                    $('.location-state').empty().append('<option value="">'+ (_.isUndefined(i18n['Select state'])?'Select state':i18n['Select state']) +'</option>');
+                    $('.location-name').val('');
+                    $('.location-address1').val('');
+                    $('.location-address2').val('');
+                    $('.location-city').val('');
+                    $('.location-zip').val('');
+                    $('.location-phone').val('');
+                    $('.location-weight').val('');
+                    $('#cash-register-id-view').val('');
                 }
             });
         },

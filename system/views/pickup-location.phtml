@@ -67,7 +67,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
             <?php endif; ?>
         </div>
         <form id="edit-pickup-location" class="grid_12 background mt10px mb10px" method="POST">
-            <fieldset class="column_4 full-width">
+            <fieldset class="column_4">
                 <p>
                     <label><?php echo $this->translate('Name'); ?></label>
                     <input type="text" required name="location-name" class="location-name"/>
@@ -101,6 +101,12 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                         <?php endforeach; ?>
                     </select>
                 </p>
+                <p class="state-block hide">
+                    <label><?php echo $this->translate('State'); ?></label>
+                    <select name="state" class="location-state">
+                        <option value=""><?php echo $this->translate('Select state'); ?></option>
+                    </select>
+                </p>
                 <p>
                     <label><?php echo $this->translate('Phone'); ?></label>
                     <input type="text" name="phone" class="location-phone"/>
@@ -110,15 +116,13 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     <label><?php echo $this->translate('Weight limit'); ?></label>
                     <input type="text" name="weight" class="location-weight"/>
                 </p>
-            </fieldset>
-            <?php if(!empty($this->isPluginWithTagPosExist)):?>
-                <fieldset class="full-width mt5px">
-                    <p class="grid_12 alpha omega">
+                <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                    <p class="grid_8 omega">
                         <label><?php echo $this->translate('Cash register id'); ?></label>
                         <textarea id="cash-register-id-view" disabled name="cash-register-id-view" class="cash-register-id-view"></textarea>
                     </p>
-                </fieldset>
-            <?php endif;?>
+                <?php endif;?>
+            </fieldset>
             <p class="grid_3 mt15px text-center" id="working_hours">
                 <a class="working-hours-dialog" href="javascript:;">[ <?php
                     echo $this->translate(

@@ -96,6 +96,7 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
         $pickupLocationModel->setAddress1($data['address1']);
         $pickupLocationModel->setAddress2($data['address2']);
         $pickupLocationModel->setCountry($data['country']);
+        $pickupLocationModel->setState($data['state']);
         $pickupLocationModel->setCity($data['city']);
         $pickupLocationModel->setPhone($data['phone']);
         $pickupLocationModel->setWeight($data['weight']);
@@ -151,6 +152,7 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             $pickupLocationModel->setAddress1($data['address1']);
             $pickupLocationModel->setAddress2($data['address2']);
             $pickupLocationModel->setCountry($data['country']);
+            $pickupLocationModel->setState($data['state']);
             $pickupLocationModel->setCity($data['city']);
             $pickupLocationModel->setPhone($data['phone']);
             $pickupLocationModel->setZip($data['zip']);

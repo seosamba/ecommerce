@@ -9,6 +9,8 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_country;
 
+    protected $_state = '';
+
     protected $_city;
 
     protected $_address1;
@@ -93,6 +95,23 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function getCountry()
     {
         return $this->_country;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getState()
+    {
+        return $this->_state;
+    }
+
+    /**
+     * @param mixed $state
+     */
+    public function setState($state)
+    {
+        $this->_state = $state;
+        return $this;
     }
 
     public function setPhone($phone)

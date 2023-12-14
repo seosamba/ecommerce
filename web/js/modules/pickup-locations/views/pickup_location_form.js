@@ -10,6 +10,7 @@ define([
             'submit': 'submit',
             'click .working-hours-dialog': 'workingHoursDialog',
             'click .cash-register-id-dialog': 'cashRegisterIdDialog',
+            'change .location-country': 'changeLocationCountry',
         },
         templates: {
 
@@ -85,6 +86,8 @@ define([
                     $('.register-row').remove();
                     $('#cash-register-id-view').val('');
                     $('#location-edit-id').val('');
+                    $('.state-block').addClass('hide');
+                    $('.location-state').empty().append('<option value="">'+ (_.isUndefined(i18n['Select state'])?'Select state':i18n['Select state']) +'</option>');
                     self.$el.trigger('pickupLocation:created');
                     hideSpinner();
                     if($('#edit-pickup-location').attr('method') === 'POST'){
@@ -158,6 +161,37 @@ define([
             });
             return false;
 
+        },
+        changeLocationCountry: function (e) {
+            var el = $(e.currentTarget),
+                country = $(el).val(),
+                states = '<option value="">'+ (_.isUndefined(i18n['Select state'])?'Select state':i18n['Select state']) +'</option>';
+
+            if(country == 'United States' || country == 'Canada' || country == 'Australia') {
+                $.ajax({
+                    url: $('#website_url').val()+'plugin/shopping/run/getStateListByCountry',
+                    type: 'POST',
+                    data:{country: country, secureToken: $('.secure-token-pickup-cat').val()},
+                    dataType: 'json',
+                    success: function(response) {
+                        if(!response.error) {
+                           var stateList = response.responseText.stateList;
+
+                            _.each(stateList, function(stateData, key ){
+                                states += '<option value="'+ stateData.state +'">'+ stateData.name +'</option>';
+                            });
+
+                            $('.state-block').removeClass('hide');
+                            $('.location-state').empty().append(states);
+                        } else {
+                            $('.location-state').empty().append(states);
+                        }
+                    }
+                });
+            } else {
+                $('.state-block').addClass('hide');
+                $('.location-state').empty().append(states);
+            }
         }
     });
 

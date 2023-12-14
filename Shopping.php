@@ -3794,5 +3794,32 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    public function getStateListByCountryAction() {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, Api_Store_Pickuplocationcategories::PICKUPLOCATIONS_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $countryParam = filter_var($this->_request->getParam('country'), FILTER_SANITIZE_STRING);
+            $countryListNames = Tools_Geo::countryListNames();
+
+            if(!empty($countryParam)) {
+                $country = array_search($countryParam, $countryListNames);
+
+                if(!empty($country)) {
+                    $stateList = Tools_Geo::getState($country);
+
+                    if(!empty($stateList)) {
+                        $this->_responseHelper->success(array('stateList' => $stateList));
+                    }
+                }
+            }
+        }
+
+        $this->_responseHelper->fail('');
+    }
+
 
 }

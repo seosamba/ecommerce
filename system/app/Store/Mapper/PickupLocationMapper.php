@@ -36,6 +36,7 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'address2'             => $model->getAddress2(),
             'zip'                  => $model->getZip(),
             'country'              => $model->getCountry(),
+            'state'                => $model->getState(),
             'city'                 => $model->getCity(),
             'working_hours'        => $model->getWorkingHours(),
             'phone'                => $model->getPhone(),
