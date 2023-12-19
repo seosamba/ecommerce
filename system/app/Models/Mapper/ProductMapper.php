@@ -1149,4 +1149,17 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         return $this->getDbTable()->getAdapter()->fetchRow($select);
     }
 
+    /**
+     * Find product model by gtin
+     *
+     * @param $gtin
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function findByGtin($gtin)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('gtin = ?', $gtin);
+        return $this->_findWhere($where);
+    }
+
 }
