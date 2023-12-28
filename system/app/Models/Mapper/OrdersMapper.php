@@ -553,10 +553,17 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
         return $this->getDbTable()->getAdapter()->fetchCol($select);
     }
 
+    /**
+     * Get cashier register ids for orders filter
+     *
+     * @return array
+     */
     public function getCashierIds()
     {
-        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_cart_session', array('cashier_id', 'cashier_id'))->group('cashier_id');
-        $select->where('cashier_id IS NOT NULL');
+        $where = new Zend_Db_Expr('cashier_id IS NOT NULL');
+        $where .= ' AND ' . new Zend_Db_Expr('cashier_label IS NOT NULL');
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_cart_session', array('cashier_id', 'cashier_label'))->group('cashier_id');
+        $select->where($where);
         return $this->getDbTable()->getAdapter()->fetchPairs($select);
     }
 

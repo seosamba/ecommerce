@@ -3794,6 +3794,9 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    /**
+     * @return void
+     */
     public function getStateListByCountryAction() {
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
@@ -3819,6 +3822,28 @@ class Shopping extends Tools_Plugins_Abstract {
         }
 
         $this->_responseHelper->fail('');
+    }
+
+    /**
+     * @return void
+     */
+    public function getCashRegisterListAction() {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isGet()) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, Api_Store_Pickuplocationcategories::PICKUPLOCATIONS_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
+            if (!empty($availablePlugins)) {
+                $cashRegisterList = Tools_LocationsTools::getCashRegisterList();
+
+                if(!empty($cashRegisterList)) {
+                    $this->_responseHelper->success(array('cashRegisterList' => $cashRegisterList));
+                }
+            }
+        }
     }
 
 

@@ -343,6 +343,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `is_pickup_notification_sent` ENUM('0', '1') DEFAULT '0',
   `pickup_notification_sent_on` timestamp NULL,
   `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cashier_label` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),

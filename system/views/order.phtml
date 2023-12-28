@@ -24,6 +24,7 @@
                 <?php endif;?>
                 <?php if (!empty($this->isPluginWithTagPosExist) && !empty($this->order->getCashierId())):?>
                     <div class="mt10px"><?php echo $this->translate("Cashier ID");?>: <?php echo $this->order->getCashierId();?></div>
+                    <div><?php echo $this->translate("Cashier Label");?>: <?php echo $this->order->getCashierLabel();?></div>
                 <?php endif;?>
             </div>
 

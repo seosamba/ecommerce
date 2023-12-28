@@ -174,6 +174,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_cashierId = '';
 
+    protected $_cashierLabel = '';
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -541,6 +543,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setShippingLabelLink($shippingLabelLink)
     {
         $this->_shippingLabelLink = $shippingLabelLink;
+
+        return $this;
     }
 
     public function getPurchasedOn()
@@ -743,6 +747,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     {
         $this->_partialNotificationDate = $partialNotificationDate;
 
+        return $this;
+
     }
 
     /**
@@ -873,6 +879,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setFirstPartialPaidAmount($firstPartialPaidAmount)
     {
         $this->_firstPartialPaidAmount = $firstPartialPaidAmount;
+
+        return $this;
     }
 
     /**
@@ -889,6 +897,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setSecondPartialPaidAmount($secondPartialPaidAmount)
     {
         $this->_secondPartialPaidAmount = $secondPartialPaidAmount;
+
+        return $this;
     }
 
     /**
@@ -905,6 +915,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setPickupNotificationSentOn($pickupNotificationSentOn)
     {
         $this->_pickupNotificationSentOn = $pickupNotificationSentOn;
+
+        return $this;
     }
 
     /**
@@ -921,6 +933,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setIsPickupNotificationSent($isPickupNotificationSent)
     {
         $this->_isPickupNotificationSent = $isPickupNotificationSent;
+
+        return $this;
     }
 
     /**
@@ -937,7 +951,29 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setCashierId($cashierId)
     {
         $this->_cashierId = $cashierId;
+
+        return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCashierLabel()
+    {
+        return $this->_cashierLabel;
+    }
+
+    /**
+     * @param string $cashierLabel
+     */
+    public function setCashierLabel($cashierLabel)
+    {
+        $this->_cashierLabel = $cashierLabel;
+
+        return $this;
+    }
+
+
 
 
 }

@@ -41,15 +41,22 @@ define([
                 return false;
             }
             showSpinner();
-            var cashRegisterId = [];
-            var cashRegisterLabel = [];
+            var cashRegisterIds = [];
+            var cashRegisterLabels = [];
             var hasEmptyRegisterId = false;
             if($('.cash-register-id-list').find('.cash-register-id').length) {
                 _.each($('.cash-register-id-list').find('.cash-register-id'), function(el){
                     if ($(el).val() == ''){
                         hasEmptyRegisterId = true;
                     }
-                    cashRegisterId.push($(el).val());
+
+                    var regId = parseInt($(el).val());
+                    if(isNaN(regId)) {
+                        hasEmptyRegisterId = true;
+                        return false;
+                    }
+
+                    cashRegisterIds.push(regId);
                 });
 
                 _.each($('.cash-register-id-list').find('.cash-register-label'), function(el){
@@ -58,24 +65,24 @@ define([
                     if(elLabel == '') {
                         elLabel = $(el).closest('.register-row').find('.cash-register-id').val();
                     }
-                    cashRegisterLabel.push(elLabel);
+                    cashRegisterLabels.push(elLabel);
                 });
 
-                if(cashRegisterId.length) {
-                    cashRegisterId = cashRegisterId.join();
+                if(cashRegisterIds.length) {
+                    cashRegisterIds = cashRegisterIds.join();
                 }
 
-                if(cashRegisterLabel.length) {
-                    cashRegisterLabel = cashRegisterLabel.join();
+                if(cashRegisterLabels.length) {
+                    cashRegisterLabels = cashRegisterLabels.join();
                 }
             }
 
             if(hasEmptyRegisterId) {
-                showMessage(_.isUndefined(i18n['Cash register id should be not empty.'])?'Cash register id should be not empty.':i18n['Cash register id should be not empty.'], true);
+                showMessage(_.isUndefined(i18n['Cash register id should be not empty or should be the number'])?'Cash register id should be not empty or should be the number':i18n['Cash register id should be not empty or should be the number'], true);
                 return false;
             }
 
-            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterId='+cashRegisterId+'&cashRegisterLabel='+cashRegisterLabel;
+            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterId='+cashRegisterIds+'&cashRegisterLabel='+cashRegisterLabels;
             $.ajax({
                 url: this.$el.attr('action'),
                 data: data,
@@ -125,8 +132,9 @@ define([
         },
         cashRegisterIdDialog: function(e){
             e.preventDefault();
-            var applyButton  = _.isUndefined(i18n['Apply'])?'Apply':i18n['Apply'];
-            var assignCashRegisterIdButtons = {};
+            var applyButton  = _.isUndefined(i18n['Apply'])?'Apply':i18n['Apply'],
+                assignCashRegisterIdButtons = {},
+                cashRegisterList = {};
 
             assignCashRegisterIdButtons[applyButton] = function() {
                 $(this).dialog('close');
@@ -143,6 +151,18 @@ define([
                 hide      : 'clip',
                 open: function(event, ui) {
                     event.preventDefault();
+                    $.ajax({
+                        url: $('#website_url').val()+'plugin/shopping/run/getCashRegisterList',
+                        type: 'GET',
+                        data:{secureToken: $('.secure-token-pickup-cat').val()},
+                        dataType: 'json',
+                        success: function(response) {
+                            if(!response.error) {
+                                cashRegisterList = response.responseText.cashRegisterList;
+                            }
+                        }
+                    });
+
                     $('#add-new-row').on('click', function(e){
                         e.preventDefault();
                         var rowDiv = _.template(addNewCashRegisterIdTmpl, {'i18n':i18n});
@@ -152,6 +172,18 @@ define([
                     $(document).on('click', '.remove-register-id', function(e){
                         var el = $(e.currentTarget);
                         $(el).closest('.register-row').remove();
+                    });
+
+                    $(document).on('change', '.cash-register-id', function(e){
+                        e.preventDefault();
+                        var el = $(e.currentTarget),
+                            cashRegisterId = $(el).val();
+
+                        if(!_.isEmpty(cashRegisterList)) {
+                            if(typeof cashRegisterList[parseInt(cashRegisterId)] !== 'undefined') {
+                                $(el).closest('.register-row').find('.cash-register-label').val(cashRegisterList[parseInt(cashRegisterId)]);
+                            }
+                        }
                     });
                 },
                 close: function (event, ui) {
