@@ -1136,6 +1136,10 @@ class Tools_ShoppingCart {
      */
     public static function generateCartItemKey($cartId, $productId, $options)
     {
+        if (is_array($options) && empty($options)) {
+            $options = 'Array';
+        } 
+
         return md5($cartId . '_' . $productId . '_' . $options);
     }
 
