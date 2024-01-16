@@ -346,7 +346,9 @@ class Tools_ShoppingCart {
 
 		$shippingPrice = 0;
 		if (($shipping = $this->getShippingData()) !== null) {
-			$shippingPrice = floatval($shipping['price']);
+			if (!empty($shipping['price'])) {
+                $shippingPrice = floatval($shipping['price']);
+            }
 		}
 
 		if ($recalculate === true) {
