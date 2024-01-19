@@ -280,7 +280,7 @@ class Tools_ExportImportOrders
         $shoppingConfigMapper->save($config);
         $assignHeaders = false;
         if ($ordersCsv !== false) {
-            while (($orderData = fgetcsv($ordersCsvFile, ',')) !== false) {
+            while (($orderData = fgetcsv($ordersCsvFile, 0,',')) !== false) {
                 if (!$assignHeaders) {
                     $ordersHeaders = array_flip(array_map('strtolower', $orderData));
                     $changedMinReqFields = array_intersect_key(
