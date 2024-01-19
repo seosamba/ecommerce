@@ -119,7 +119,11 @@ class Api_Store_Orders extends Api_Service_Abstract {
                 $defaultTaxes = null;
             }
             $orderList['defaultTaxes'] = $defaultTaxes;
-            $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
+            if (isset($shoppingConfig['shippingTaxRate'])) {
+                $orderList['shippingTaxRate'] = $shoppingConfig['shippingTaxRate'];
+            } else {
+                $orderList['shippingTaxRate'] = null;
+            }
 
             $recipientName = 'customer';
             $triggerName = Tools_StoreMailWatchdog::TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION;
