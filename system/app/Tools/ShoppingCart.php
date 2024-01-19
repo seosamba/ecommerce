@@ -82,7 +82,7 @@ class Tools_ShoppingCart {
 	private function __clone() {
 	}
 
-	private function __wakeup() {
+	public function __wakeup() {
 	}
 
     /**
