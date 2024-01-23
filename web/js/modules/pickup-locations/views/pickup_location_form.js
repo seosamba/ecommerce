@@ -1,9 +1,9 @@
 define([
 	'backbone',
-    'text!../templates/add-new-cash-register-id.html',
+    'text!../templates/cash-register-ids.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
 ], function(Backbone,
-            addNewCashRegisterIdTmpl, i18n){
+            cashRegisterIdsTmpl, i18n){
     var PickupLocationFormView = Backbone.View.extend({
         el: $('#edit-pickup-location'),
         events: {
@@ -42,47 +42,20 @@ define([
             }
             showSpinner();
             var cashRegisterIds = [];
-            var cashRegisterLabels = [];
-            var hasEmptyRegisterId = false;
-            if($('.cash-register-id-list').find('.cash-register-id').length) {
-                _.each($('.cash-register-id-list').find('.cash-register-id'), function(el){
-                    if ($(el).val() == ''){
-                        hasEmptyRegisterId = true;
+            if($('.cash-register-id-list').find('input.register-field').length) {
+                _.each($('.cash-register-id-list').find('input.register-field'), function(el){
+                    if($(el).is(":checked")) {
+                        var regId = $(el).val();
+                        cashRegisterIds.push(regId);
                     }
-
-                    var regId = parseInt($(el).val());
-                    if(isNaN(regId)) {
-                        hasEmptyRegisterId = true;
-                        return false;
-                    }
-
-                    cashRegisterIds.push(regId);
-                });
-
-                _.each($('.cash-register-id-list').find('.cash-register-label'), function(el){
-                    var elLabel = $(el).val().replace(',', '');
-
-                    if(elLabel == '') {
-                        elLabel = $(el).closest('.register-row').find('.cash-register-id').val();
-                    }
-                    cashRegisterLabels.push(elLabel);
                 });
 
                 if(cashRegisterIds.length) {
                     cashRegisterIds = cashRegisterIds.join();
                 }
-
-                if(cashRegisterLabels.length) {
-                    cashRegisterLabels = cashRegisterLabels.join();
-                }
             }
 
-            if(hasEmptyRegisterId) {
-                showMessage(_.isUndefined(i18n['Cash register id should be not empty or should be the number'])?'Cash register id should be not empty or should be the number':i18n['Cash register id should be not empty or should be the number'], true);
-                return false;
-            }
-
-            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterId='+cashRegisterIds+'&cashRegisterLabel='+cashRegisterLabels;
+            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterIds='+cashRegisterIds;
             $.ajax({
                 url: this.$el.attr('action'),
                 data: data,
@@ -138,7 +111,6 @@ define([
 
             assignCashRegisterIdButtons[applyButton] = function() {
                 $(this).dialog('close');
-                $('#add-new-row').unbind();
             };
 
             $('.cash-register-id-list').dialog({
@@ -159,36 +131,17 @@ define([
                         success: function(response) {
                             if(!response.error) {
                                 cashRegisterList = response.responseText.cashRegisterList;
-                            }
-                        }
-                    });
 
-                    $('#add-new-row').on('click', function(e){
-                        e.preventDefault();
-                        var rowDiv = _.template(addNewCashRegisterIdTmpl, {'i18n':i18n});
-                        $('.cash-register-block').append(rowDiv);
-                    });
-
-                    $(document).on('click', '.remove-register-id', function(e){
-                        var el = $(e.currentTarget);
-                        $(el).closest('.register-row').remove();
-                    });
-
-                    $(document).on('change', '.cash-register-id', function(e){
-                        e.preventDefault();
-                        var el = $(e.currentTarget),
-                            cashRegisterId = $(el).val();
-
-                        if(!_.isEmpty(cashRegisterList)) {
-                            if(typeof cashRegisterList[parseInt(cashRegisterId)] !== 'undefined') {
-                                $(el).closest('.register-row').find('.cash-register-label').val(cashRegisterList[parseInt(cashRegisterId)]);
+                                if(!$('.register-row').find('.cash-register-field-row').length) {
+                                    var rowsDiv = _.template(cashRegisterIdsTmpl, {'i18n':i18n, cashRegisterList});
+                                    $('.cash-register-block').append(rowsDiv);
+                                }
                             }
                         }
                     });
                 },
                 close: function (event, ui) {
                     $(this).dialog('destroy');
-                    $('#add-new-row').unbind();
                 }
             });
             return false;

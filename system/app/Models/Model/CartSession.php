@@ -176,6 +176,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_cashierLabel = '';
 
+    protected $_locationId = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -972,6 +974,26 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
         return $this;
     }
+
+    /**
+     * @return null
+     */
+    public function getLocationId()
+    {
+        return $this->_locationId;
+    }
+
+    /**
+     * @param null $locationId
+     */
+    public function setLocationId($locationId)
+    {
+        $this->_locationId = $locationId;
+
+        return $this;
+    }
+
+
 
 
 

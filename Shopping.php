@@ -1495,6 +1495,10 @@ class Shopping extends Tools_Plugins_Abstract {
             $isPluginWithTagPosExist = false;
             $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
             if (!empty($availablePlugins)) {
+                $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+                $pickupLocations = $pickupLocationConfigMapper->getLocationNames();
+                $this->_view->pickupLocations = $pickupLocations;
+
                 $isPluginWithTagPosExist = true;
             }
             $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;

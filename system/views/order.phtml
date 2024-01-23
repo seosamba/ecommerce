@@ -23,7 +23,12 @@
                     <div class="mt10px"><?php echo $this->translate("Quote");?>: <a target="_blank" href="<?php echo $this->websiteUrl.$this->quoteId.'.html';?>"><?php echo $this->quoteTitle;?></a></div>
                 <?php endif;?>
                 <?php if (!empty($this->isPluginWithTagPosExist) && !empty($this->order->getCashierId())):?>
-                    <div class="mt10px"><?php echo $this->translate("Cashier ID");?>: <?php echo $this->order->getCashierId();?></div>
+                    <?php if (!empty($this->pickupLocations)):?>
+                        <?php if(array_key_exists($this->order->getLocationId(), $this->pickupLocations)):?>
+                            <div class="mt10px"><?php echo $this->translate("Location Name");?>: <?php echo $this->pickupLocations[$this->order->getLocationId()];?></div>
+                        <?php endif;?>
+                    <?php endif;?>
+                    <div><?php echo $this->translate("Cashier ID");?>: <?php echo $this->order->getCashierId();?></div>
                     <div><?php echo $this->translate("Cashier Label");?>: <?php echo $this->order->getCashierLabel();?></div>
                 <?php endif;?>
             </div>

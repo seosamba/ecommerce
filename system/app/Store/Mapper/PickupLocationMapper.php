@@ -49,7 +49,6 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             'external_id'          => $model->getExternalId(),
             'allowed_to_delete'    => $model->getAllowedToDelete(),
             'cash_register_id'     => $model->getCashRegisterId(),
-            'cash_register_label'  => $model->getCashRegisterLabel(),
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);

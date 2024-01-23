@@ -331,4 +331,16 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         $where = $this->getDbTable()->getAdapter()->quoteInto("id = ?", $configId);
         $this->getDbTable()->delete($where);
     }
+
+    /**
+     * Get pickup location names
+     *
+     * @return array
+     *
+     */
+    public function getLocationNames()
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_pickup_location', array('id', 'name'));
+        return  $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
 }

@@ -117,8 +117,8 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     <input type="text" name="weight" class="location-weight"/>
                 </p>
                 <?php if(!empty($this->isPluginWithTagPosExist)):?>
-                    <p class="grid_8 omega">
-                        <label><?php echo $this->translate('Cash register id'); ?></label>
+                    <p class="grid_9 omega">
+                        <label><?php echo $this->translate('Cash registers info'); ?></label>
                         <textarea id="cash-register-id-view" disabled name="cash-register-id-view" class="cash-register-id-view"></textarea>
                     </p>
                 <?php endif;?>
@@ -184,7 +184,6 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <div class="f-scroll cash-register-block h450px" style="height: 100%;">
 
                 </div>
-                <div id="add-new-row" class="btn mt10px add-new-row grid_12 success ticon-plus"><?php echo $this->translate('Add new ID'); ?></div>
             </div>
         <?php endif;?>
         <div class="grid_12 location-table">

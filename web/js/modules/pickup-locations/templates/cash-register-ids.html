@@ -1,0 +1,22 @@
+<div class="register-row grid_12 mt5px">
+    <ul class="block-body block-wrap">
+        <% _.each(cashRegisterList, function(fields, key){%>
+            <li class="cash-register-field-row cash-register-field-checked">
+                <label class="pointer text-overflow" title="<%= fields.cash_register_label %>">
+                    <%
+                    checkedAttribute = '';
+                    if(typeof checkedCashRegisterIds !== 'undefined' && checkedCashRegisterIds.length) {
+                        _.each(checkedCashRegisterIds, function(checkedField, keyF){
+                            if(fields.cash_register_id == checkedField) {
+                                checkedAttribute = 'checked="checked"';
+                            }
+                        })
+                    }
+                    %>
+                    <input type="checkbox" class="register-field register-field-selector" value="<%= fields.cash_register_id %>" name="<%= fields.cash_register_id %>-checked" <%= checkedAttribute %>/>
+                    <%= fields.cash_register_label %> (<%= fields.cash_register_id %>)
+                </label>
+            </li>
+        <%})%>
+    </ul>
+</div>
