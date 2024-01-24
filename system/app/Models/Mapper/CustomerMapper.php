@@ -508,7 +508,8 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
             ->group('u.id')
             ->where('role_id <> "' . Tools_Security_Acl::ROLE_SUPERADMIN . '"');
 
-        $users = $this->getDbTable()->getAdapter()->fetchAll($select, 'role_id ASC');
+        $select->order('role_id ASC');
+        $users = $this->getDbTable()->getAdapter()->fetchAll($select);
         return $users;
     }
 

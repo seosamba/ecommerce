@@ -39,7 +39,7 @@ class Models_Mapper_ShoppingShippingServiceLabelMapper extends Application_Model
         }
     }
 
-    public function fetchAll($where = null)
+    public function fetchAll($where = null, $order = array())
     {
         $results = $this->getDbTable()->fetchAll($where);
         if (sizeof($results)) {

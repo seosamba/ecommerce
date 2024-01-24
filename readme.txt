@@ -296,3 +296,7 @@ Example:
 
  {productoptions} ... {/productoptions} - Return wrapper for the single product options on the product page
 
+
+ {postpurchasestatus:partial} magicspace to show content based on the cart status
+ :partial - specify appropriate statuses such as "new|completed|partial|shipped|delivered" etc..
+

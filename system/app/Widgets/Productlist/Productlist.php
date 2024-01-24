@@ -393,7 +393,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 
         $this->_view->dragproducts = $products;
 
-        if (is_array($this->draglist['data']) && is_array($this->dragproducts)) {
+        if (isset($this->draglist['data']) && is_array($this->draglist['data']) && is_array($this->dragproducts)) {
             $dragOrderResult = $this->_dragListNewOrder();
             if (is_array($dragOrderResult) && (count($dragOrderResult) > 0)) {
                 $products = $dragOrderResult;

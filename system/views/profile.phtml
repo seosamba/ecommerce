@@ -175,7 +175,13 @@ $this->headScript()
 				<tr data-role="cart" data-id="<?php echo $order->getId();?>">
 					<td><?php echo $order->getId();?></td>
 					<td><?php echo date('d M, Y', strtotime($order->getCreatedAt()));?></td>
-					<td><?php echo sizeof($order->getCartContent());?></td>
+					<td>
+                        <?php if(!empty($order->getCartContent())) :?>
+                            <?php echo sizeof($order->getCartContent());?>
+                        <?php else:?>
+                            0
+                        <?php endif;?>
+                    </td>
 					<td><?php echo $this->currency(floatval($order->getTotal()));?></td>
 					<td><?php echo $this->currency(floatval($order->getShippingPrice()));?></td>
 					<td class="shipping-data">
