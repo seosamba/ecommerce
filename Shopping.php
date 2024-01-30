@@ -2219,7 +2219,12 @@ class Shopping extends Tools_Plugins_Abstract {
     {
         $ordersIds = filter_var($this->_request->getParam('orderIds'), FILTER_SANITIZE_STRING);
         $data = $this->_request->getParams();
-        $ordersIds = ($data['allOrders'] == 1 || empty($ordersIds)) ? array() : explode(',', $ordersIds);
+        if ((!empty($data['allOrders']) && $data['allOrders'] == 1) || empty($ordersIds)) {
+            $ordersIds = array();
+        } else {
+            $ordersIds = explode(',', $ordersIds);
+        }
+
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
             if (!empty($ordersIds)) {
                 Tools_ExportImportOrders::prepareOrdersDataForExport($data, $ordersIds);
