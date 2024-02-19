@@ -650,7 +650,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemSku($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -665,7 +665,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemMpn($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -680,7 +680,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemGtin($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -695,7 +695,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemPrice($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -721,7 +721,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCartItemQty($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -736,7 +736,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemName($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '&nbsp;';
         }
 
@@ -751,7 +751,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemShortdescription($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -777,7 +777,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemFulldescription($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -800,7 +800,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemTax($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -823,7 +823,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemTaxprice($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -848,7 +848,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemFreebies($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -863,7 +863,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemCartid($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -872,7 +872,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCartItemTotal($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -897,7 +897,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
 
     protected function _renderCartItemPriceWithoutOption($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -937,7 +937,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemPhoto($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -959,7 +959,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemPhotourl($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -981,7 +981,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemOption($sid)
     {
-        if ($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if ($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -1091,7 +1091,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemOptions($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -1163,7 +1163,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemProducturl($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
@@ -1178,7 +1178,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderCartItemBrand($sid)
     {
-        if($this->_cartContent[$sid]['price'] == 0 && empty($this->_cartContent[$sid]['isEnabled'])) {
+        if($this->_cartContent[$sid]['price'] == 0 && isset($this->_cartContent[$sid]['isEnabled']) && empty($this->_cartContent[$sid]['isEnabled'])) {
             return '';
         }
 
