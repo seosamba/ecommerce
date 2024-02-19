@@ -311,7 +311,15 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
      */
     protected function _renderGateway()
     {
-        return $this->_cart->getGateway();
+        $gatewayLabelMapper = Store_Mapper_GatewayLabelMapper::getInstance();
+        $gatewayLabelsList = $gatewayLabelMapper->getLabelsList();
+        $gateway = $this->_cart->getGateway();
+
+        if (isset($gatewayLabelsList[$gateway])) {
+            $gateway = $gatewayLabelsList[$gateway]['gateway_label'];
+        }
+
+        return $gateway;
     }
 
     /**
