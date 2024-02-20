@@ -401,7 +401,12 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             }
         }
 
-		$this->_view->totalCount = sizeof($products);
+        $totalCount = 0;
+        if (!empty($products)) {
+            $totalCount = sizeof($products);
+        }
+
+		$this->_view->totalCount = $totalCount;
 		$wesiteData = Zend_Registry::get('website');
 		$confiHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('config');
 		// init variables we will use in closure
