@@ -2,7 +2,8 @@
 <div id="cart-coupon-form">
     <h3 class="checkout-widget-title">
 	    <?php echo $this->translate('Enter coupon');?>
-	    <?php if (count(Tools_ShoppingCart::getInstance()->getCoupons()) > 0): ?>
+        <?php $numberOfCoupons = Tools_ShoppingCart::getInstance()->getCoupons();?>
+	    <?php if (!empty($numberOfCoupons) && count($numberOfCoupons) > 0): ?>
         <a href="<?php echo $this->websiteUrl . $this->returnUrl ;?>?step=signup" class="checkout-edit" title="<?php echo $this->translate('Edit coupons');?>">[&nbsp;<?php echo $this->translate('edit');?>&nbsp;]</a>
 	    <?php endif; ?>
     </h3>
