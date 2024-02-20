@@ -315,9 +315,11 @@ class Tools_ShoppingCart {
 		if (!empty($modifiers)) {
 			foreach ($modifiers as $modifier) {
 				if ($taxRate) {
-					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue']);
-				} else {
-					$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+					//$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] + round(($taxRate * $modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * $modifier['priceValue']);
+                    $addPrice = (($modifier['priceType'] == 'unit') ? (float)$modifier['priceValue'] + round(($taxRate * (float)$modifier['priceValue']) / 100, 2) : ($originalPrice / 100) * (float)$modifier['priceValue']);
+                } else {
+					//$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+                    $addPrice = (($modifier['priceType'] == 'unit') ? (float)$modifier['priceValue'] : ($originalPrice / 100) * (float)$modifier['priceValue']);
 				}
 				$price = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
 			}
