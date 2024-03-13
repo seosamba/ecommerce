@@ -410,8 +410,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $offset = null,
         $withoutCount = false,
         $singleRecord = false,
-        $having = '',
-        $searchByLocationId = false
+        $having = ''
     ) {
         $select = $this->getDbTable()->getAdapter()->select()
             ->from(array('sp' => 'shopping_product'),
@@ -420,18 +419,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
                 )
             )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array('p.url'))
              ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array('brandName' => 'sb.name'));
-
-        if($searchByLocationId) {
-            $select->joinLeft(array('pspl' => 'plugin_seosambapos_product_locations'), 'sp.id = pspl.product_id', array());
-            $select->joinLeft(array('spl' => 'shopping_pickup_location'), 'pspl.location_id = spl.id', array(
-                'locationId' => 'spl.id',
-                'locationName' => 'spl.name',
-                'locationAddress1' => 'spl.address1',
-                'locationAddress2' => 'spl.address2',
-                'locationZip' => 'spl.zip',
-                'locationCity' => 'spl.city'
-            ));
-        }
 
         if (!empty($having)) {
             $select->having($having);
@@ -463,10 +450,6 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             $count = array('count' => new Zend_Db_Expr('COUNT(DISTINCT(sp.id))'));
 
             $select->from(array('sp' => 'shopping_product'), $count);
-            if($searchByLocationId) {
-                $select->joinLeft(array('pspl' => 'plugin_seosambapos_product_locations'), 'sp.id = pspl.product_id', array());
-                $select->joinLeft(array('spl' => 'shopping_pickup_location'), 'pspl.location_id = spl.id', array());
-            }
 
             $select =  $this->getDbTable()->getAdapter()->select()
                 ->from(
