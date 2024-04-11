@@ -717,7 +717,13 @@ ALTER TABLE `shopping_cart_session` MODIFY COLUMN `partial_percentage` DECIMAL(1
 -- version: 2.9.9
 UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
 
+-- 11/04/2024
+-- version: 3.0.0
+ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_key`);
+ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_option_key`);
+ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_key`, `cart_item_option_key`);
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.0' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.1' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

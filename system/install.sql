@@ -920,6 +920,9 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session_options` (
 `weightValue` decimal(8,3) DEFAULT NULL,
 `cart_item_key` CHAR(32) NOT NULL,
 `cart_item_option_key` CHAR(32) NOT NULL,
+INDEX (`cart_item_key`),
+INDEX (`cart_item_option_key`),
+INDEX (`cart_item_key`, `cart_item_option_key`),
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -1118,5 +1121,5 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `obser
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.0' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.1' WHERE `name` = 'shopping';
 
