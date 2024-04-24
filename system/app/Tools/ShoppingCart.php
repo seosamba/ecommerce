@@ -302,6 +302,7 @@ class Tools_ShoppingCart {
 					continue;
 				}
 				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+                $addPrice = (float) $addPrice;
 				$price = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
 			}
 		}
