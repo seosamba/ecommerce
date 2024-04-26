@@ -756,6 +756,7 @@ define(['backbone',
 
             $('#exclude-quotes-from-search').prop('checked', false);
             $('#is-a-gift').prop('checked', false);
+            $('.clear-input').addClass('hidden');
             this.applyFilter();
         },
         navigate: function(e){
