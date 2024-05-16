@@ -84,9 +84,9 @@
 <td data-mobile-title="Details" class="text-center">
     <a href="javascript:;" class="tpopup" data-pheight="560" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a>
 </td>
-<% if(useInvoice == 'enabled') { %>
+<% if(useInvoice == 'enabled' || useSeosambaPos == 'enabled') { %>
     <td data-mobile-title="Invoice & packing slip" class="text-center">
-    <% if(_.isNull(recurring_id)) { %>
+    <% if(_.isNull(recurring_id) && useInvoice == 'enabled') { %>
         <a href="javascript:;" class="sendInvoice" title="<%= _.isUndefined(i18n['Send invoice to user via email']) ? 'Send invoice to user via email':i18n['Send invoice to user via email'] %>">
             <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/send-invoice.png" />
         </a>
@@ -125,6 +125,14 @@
                 </a>
             <% } %>
         <% } %>
+    <% } %>
+    <% if(_.isNull(recurring_id) && useSeosambaPos == 'enabled' && (status == 'completed' || status == 'shipped' || status == 'delivered')) { %>
+        <a target="_blank" href="<%= $('#website_url').val() %>plugin/seosambapos/run/createPdfReceipt/cartId/<%= id %>/dwn/0/">
+            <img src="<%= $('#website_url').val() %>plugins/seosambapos/web/images/view-pos-receipt.png" alt="<%= _.isUndefined(i18n['View POS receipt']) ? 'View POS receipt':i18n['View POS receipt'] %>" title="<%= _.isUndefined(i18n['View POS receipt']) ? 'View POS receipt':i18n['View POS receipt'] %>"/>
+        </a>
+        <a href="<%= $('#website_url').val() %>plugin/seosambapos/run/createPdfReceipt/cartId/<%= id %>/dwn/1/">
+            <img src="<%= $('#website_url').val() %>plugins/seosambapos/web/images/download-pos-receipt.png" alt="<%= _.isUndefined(i18n['Download POS receipt']) ? 'Download POS receipt':i18n['Download POS receipt'] %>" title="<%= _.isUndefined(i18n['Download POS receipt']) ? 'Download POS receipt':i18n['Download POS receipt'] %>"/>
+        </a>
     <% } %>
     </td>
 <% } %>

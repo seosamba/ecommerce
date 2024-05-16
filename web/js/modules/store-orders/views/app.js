@@ -743,6 +743,7 @@ define(['backbone',
         render: function(){},
         renderOrder: function(order){
             order.set({useInvoice: $('#invoiceEnable').val()});
+            order.set({useSeosambaPos: $('#seosambaPosEnable').val()});
             order.set({i18n: i18n});
             var view = new OrdersView({model: order});
             this.$('#orders-list').append(view.render().el);

@@ -245,16 +245,19 @@ $this->headLink()
                     <option value="exportOrders"><?php echo $this->translate('Export orders');?></option>
                 </select>
             </td>
-            <?php if(isset($this->invoicePlugin)):?>
+            <?php if(isset($this->invoicePlugin) || isset($this->seosambaPosPlugin)):?>
                     <td colspan="9" class="paginator text-right"></td>
-                <?php else:?>
+            <?php else:?>
                     <td colspan="8" class="paginator text-right"></td>
-                <?php endif;?>
+            <?php endif;?>
             </tfoot>
         </table>
         <input type="hidden" id="orders-secure-token" name="orders-secure-token" class="orders-secure-token" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>" />
         <?php if(isset($this->invoicePlugin)):?>
             <input type="hidden" value="enabled" name="invoiceEnable" id="invoiceEnable"/>
+        <?php endif;?>
+        <?php if(isset($this->seosambaPosPlugin)):?>
+            <input type="hidden" value="enabled" name="seosambaPosEnable" id="seosambaPosEnable"/>
         <?php endif;?>
     </div>
 </div>

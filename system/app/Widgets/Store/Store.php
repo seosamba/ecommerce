@@ -132,6 +132,13 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 }
             }
 
+            $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+            if($enabledSeosambaPosPlugin != null){
+                if($enabledSeosambaPosPlugin->getStatus() == 'enabled'){
+                    $this->_view->seosambaPosPlugin = 1;
+                }
+            }
+
             $ordersMapper = Models_Mapper_OrdersMapper::getInstance();
             $orderSubtypes = $ordersMapper->getUniqueSubtypes();
             $orderSubtypes = array_filter($orderSubtypes);
