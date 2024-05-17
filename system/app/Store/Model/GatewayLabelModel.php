@@ -9,7 +9,7 @@ class Store_Model_GatewayLabelModel extends Application_Model_Models_Abstract
     /**
      * @return string
      */
-    public function getGateway(): string
+    public function getGateway()
     {
         return $this->_gateway;
     }
@@ -17,7 +17,7 @@ class Store_Model_GatewayLabelModel extends Application_Model_Models_Abstract
     /**
      * @param string $gateway
      */
-    public function setGateway(string $gateway): void
+    public function setGateway($gateway)
     {
         $this->_gateway = $gateway;
     }
@@ -25,7 +25,7 @@ class Store_Model_GatewayLabelModel extends Application_Model_Models_Abstract
     /**
      * @return string
      */
-    public function getGatewayLabel(): string
+    public function getGatewayLabel()
     {
         return $this->_gatewayLabel;
     }
@@ -33,7 +33,7 @@ class Store_Model_GatewayLabelModel extends Application_Model_Models_Abstract
     /**
      * @param string $gatewayLabel
      */
-    public function setGatewayLabel(string $gatewayLabel): void
+    public function setGatewayLabel($gatewayLabel)
     {
         $this->_gatewayLabel = $gatewayLabel;
     }
