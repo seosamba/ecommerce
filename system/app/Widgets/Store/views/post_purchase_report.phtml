@@ -42,7 +42,7 @@
                     <br/>
                 <?php endif; ?>
 				<span><?php echo $this->translate('Payment Method');?>
-					: <?php echo $this->cart->getGateway();?></span>
+					: <?php echo (isset($this->gatewayLabelsList[$this->cart->getGateway()]) ? $this->gatewayLabelsList[$this->cart->getGateway()]['gateway_label'] :$this->cart->getGateway());?></span>
 			<?php else: ?>
 				<span><?php echo $this->translate('not provided');?></span>
 			<?php endif;?>
@@ -342,7 +342,7 @@
 					<br/>
 				<?php endif; ?>
 				<span><?php echo $this->translate('Payment Method');?>
-					: <?php echo $this->cart->getGateway();?></span>
+					: <?php echo (isset($this->gatewayLabelsList[$this->cart->getGateway()]) ? $this->gatewayLabelsList[$this->cart->getGateway()]['gateway_label'] :$this->cart->getGateway());?></span>
 			<?php else: ?>
 				<span><?php echo $this->translate('not provided');?></span>
 			<?php endif;?>
@@ -488,7 +488,7 @@
 		<?php foreach ($this->cartContent as $product) : ?>
 			<tr>
 				<td align="left" valign="middle">
-                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled'])) :?>
                         <?php if (isset($product['photo']) && $product['photo'] != ''): ?>
                             <a class="page-teaser-image"
                                href="<?php echo $this->websiteUrl . $product['productUrl']; ?>"
@@ -506,7 +506,7 @@
                     <?php endif;?>
 				</td>
 				<td align="left" valign="middle">
-                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled'])) :?>
 						<span class="post-purchase-report-product-name" style="display:block; margin-bottom:5px; font-weight:bold;"><?php echo $product['name']; ?></span>
 					<?php if (!empty($product['options'])): ?>
                         <?php if (empty($product['archiveOptions'])):?>
@@ -548,7 +548,7 @@
 					<?php foreach ($this->additionalTableRows as $tableRow): ?>
 						<?php if (isset($product[$tableRow])): ?>
 							<td valign="middle" align="center">
-                            <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                            <?php if(!empty($product['isEnabled'])) :?>
                                 <?php echo $product[$tableRow]; ?>
                             <?php endif; ?>
                             </td>
@@ -556,7 +556,7 @@
 					<?php endforeach; ?>
 				<?php endif; ?>
                 <td valign="middle" align="center">
-                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled'])) :?>
                         <?php if($product['freebies'] == 1):?>
                             <?php echo $this->translate('free'); ?>
                         <?php else:?>
@@ -565,12 +565,12 @@
                     <?php endif;?>
                 </td>
 				<td valign="middle" align="center">
-                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled'])) :?>
                         <?php echo $product['qty']; ?>
                     <?php endif;?>
                 </td>
                 <td valign="middle" align="center">
-                    <?php if(!empty($product['isEnabled']) && $product['price'] > 0) :?>
+                    <?php if(!empty($product['isEnabled'])) :?>
                         <?php if($product['freebies'] == 1):?>
                             <?php echo $this->translate('free'); ?>
                         <?php else:?>

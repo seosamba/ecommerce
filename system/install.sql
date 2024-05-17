@@ -1120,6 +1120,13 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_pickupnotification' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+CREATE TABLE IF NOT EXISTS `shopping_gateway_label` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `gateway` INT(10) UNSIGNED NOT NULL,
+    `gateway_label` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.1' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.2' WHERE `name` = 'shopping';
 
