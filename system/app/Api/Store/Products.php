@@ -287,6 +287,27 @@ class Api_Store_Products extends Api_Service_Abstract {
                     }
 
                 }
+
+                //@todo compare product inventory with plugin seosambapos location inventories
+                if($srcData['inventory'] != '') {
+                    $seosambaposPlugin = Tools_Plugins_Tools::findPluginByName('seosambapos');
+
+                    if($seosambaposPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                        $locationInventories = 0;
+                        $seosambaposProductLocationsMapper = Seosambapos_Models_Mappers_SeosambaposProductLocationsMapper::getInstance();
+                        $productLocations = $seosambaposProductLocationsMapper->findLocationsByProductId($products->getId());
+
+                        if(!empty($productLocations)) {
+                            foreach ($productLocations as $pKey => $pLocation){
+                                $locationInventories += (int)$pLocation['inventory'];
+                            }
+                        }
+
+                        if(!empty($locationInventories) && $locationInventories > $srcData['inventory']) {
+                            $this->_error('you cannot set a smaller quantity than that specified for your locations in (POS location inventory) tab.');
+                        }
+                    }
+                }
             }
 
 			!is_array($products) && $products = array($products);
