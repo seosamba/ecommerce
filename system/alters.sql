@@ -724,7 +724,7 @@ ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_option_key`);
 ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_key`, `cart_item_option_key`);
 
 -- 19/02/2024
--- version: 3.0.0
+-- version: 3.0.1
 CREATE TABLE IF NOT EXISTS `shopping_gateway_label` (
 `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
 `gateway` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
