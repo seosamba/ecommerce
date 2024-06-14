@@ -1,5 +1,5 @@
 <div class="register-row grid_12 mt5px">
-    <ul class="block-body block-wrap">
+    <ul class="block-body block-wrap list-unstyled">
         <% _.each(cashRegisterList, function(fields, key){%>
             <li class="cash-register-field-row cash-register-field-checked">
                 <label class="pointer text-overflow" title="<%= fields.cash_register_label %>">
@@ -14,7 +14,7 @@
                     }
                     %>
                     <input type="checkbox" class="register-field register-field-selector" value="<%= fields.cash_register_id %>" name="<%= fields.cash_register_id %>-checked" <%= checkedAttribute %>/>
-                    <%= fields.cash_register_label %> (<%= fields.cash_register_id %>)
+                    <%= fields.cash_register_label %> (id: <%= fields.cash_register_id %>)
                 </label>
             </li>
         <%})%>

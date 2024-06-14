@@ -114,7 +114,7 @@ define([
             var cashRegisterIdView = [];
             if(typeof checkedCashRegisterId !== 'undefined' && checkedCashRegisterId.length && typeof checkedCashRegisterLabel !== 'undefined' && checkedCashRegisterLabel.length) {
                 _.each(checkedCashRegisterId, function(value, id){
-                    var cRow = checkedCashRegisterLabel[id] + '('+value+')';
+                    var cRow = checkedCashRegisterLabel[id] + ' (id: '+value+')';
                     cashRegisterIdView.push(cRow);
                 });
 
