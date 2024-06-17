@@ -267,7 +267,7 @@ class Api_Store_Products extends Api_Service_Abstract {
         }
 
         if(empty($srcData['negativeStock'])) {
-            if(gmp_sign($srcData['inventory']) < 0) {
+            if(gmp_sign((int)$srcData['inventory']) < 0) {
                 $this->_error(htmlentities($this->_translator->translate('You can\'t save product with negative qty, please enter positive qty of product or enable "Negative stock" checkbox')), self::REST_STATUS_BAD_REQUEST);
             }
         }

@@ -42,7 +42,10 @@ class Tools_ExportImportOrders
         unset($data['controller']);
         unset($data['action']);
         $filters = $data['filters'];
-        $filters['product-key'] = str_replace('*-amp-*', '&', $filters['product-key']);
+        if (!empty($filters['product-key'])) {
+            $filters['product-key'] = str_replace('*-amp-*', '&', $filters['product-key']);
+        }
+
         unset($data['filters']);
         $shoppingConfigMapper = Models_Mapper_ShoppingConfig::getInstance();
         $excludeFields = array();
@@ -280,7 +283,7 @@ class Tools_ExportImportOrders
         $shoppingConfigMapper->save($config);
         $assignHeaders = false;
         if ($ordersCsv !== false) {
-            while (($orderData = fgetcsv($ordersCsvFile, ',')) !== false) {
+            while (($orderData = fgetcsv($ordersCsvFile, 0,',')) !== false) {
                 if (!$assignHeaders) {
                     $ordersHeaders = array_flip(array_map('strtolower', $orderData));
                     $changedMinReqFields = array_intersect_key(

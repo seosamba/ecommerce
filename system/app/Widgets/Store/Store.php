@@ -313,6 +313,10 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 $this->_view->weightSign = $shoppingConfig['weightUnit'];
                 $this->_view->cartContent = $cartContent;
                 $this->_view->cart = $cartSession;
+                $gatewayLabelMapper = Store_Mapper_GatewayLabelMapper::getInstance();
+                $gatewayLabelsList = $gatewayLabelMapper->getLabelsList();
+
+                $this->_view->gatewayLabelsList = $gatewayLabelsList;
 				return $this->_view->render('post_purchase_report.phtml');
 			}
 			return;
