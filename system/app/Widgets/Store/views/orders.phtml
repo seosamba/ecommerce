@@ -160,8 +160,19 @@ $this->headLink()
                     ), $orderTypes); ?>
                 </p>
                 <?php if(!empty($this->isPluginWithTagPosExist)):?>
-                    <p class="flex_3 f-omega t-grid_3">
-                        <label class="text-bold"><?php echo $this->translate('By cashier id');?></label>
+                    <p class="flex_2 f-omega t-grid_2">
+                        <label class="text-bold"><?php echo $this->translate('By location');?></label>
+                        <select class="filter" multiple id="filter-by-location-id" name="filter-by-location-id" data-placeholder="<?php echo $this->translate('show all');?>">
+                            <?php if (!empty($this->locationIds)) : ?>
+                                <?php foreach ($this->locationIds as $location => $locationName): ?>
+                                    <option value="<?php echo $location; ?>" <?php echo (!empty($this->presetConfig['filter_by_location_id']) && in_array($location, $this->presetConfig['filter_by_location_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($locationName);?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </p>
+
+                    <p class="flex_2 f-omega t-grid_2">
+                        <label class="text-bold"><?php echo $this->translate('By cashier');?></label>
                         <select class="filter" multiple id="filter-by-cashier-id" name="filter-by-cashier-id" data-placeholder="<?php echo $this->translate('show all');?>">
                             <?php if (!empty($this->cashierIds)) : ?>
                                 <?php foreach ($this->cashierIds as $cashier => $cashierName): ?>

@@ -217,6 +217,20 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $this->_view->countriesList = Tools_Geo::getCountries(true);
             $this->_view->customerGroups = $customerGroups;
 
+            $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+            $pickupLocations = $pickupLocationConfigMapper->getLocations(0, false, array(), false, false, array(), '', '', false, true);
+            $usedLocationIds = $ordersMapper->getLocationIds();
+
+            $locationIds = array();
+            if(!empty($pickupLocations)) {
+                foreach ($pickupLocations as $location) {
+                    if(in_array($location['id'], $usedLocationIds)) {
+                        $locationIds[$location['id']] = $location['name'];
+                    }
+                }
+            }
+
+            $this->_view->locationIds = $locationIds;
             $this->_view->cashierIds = $ordersMapper->getCashierIds();
             $isPluginWithTagPosExist = false;
             $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
