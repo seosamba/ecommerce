@@ -55,7 +55,7 @@ class Forms_BasicsSettings extends Zend_Form {
         ));
 
         $this->addElement('checkbox', 'smartFilter', array(
-            'label' => $translator->translate('Smart product list filter'),
+            'label' => $translator->translate('Smart product list filter (hides unavailable product filter combinations)'),
             'class' => 'grid_6 alpha'
         ));
 
