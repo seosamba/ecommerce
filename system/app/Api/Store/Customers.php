@@ -274,6 +274,12 @@ class Api_Store_Customers extends Api_Service_Abstract {
                         );
                     }
                 }
+
+                foreach ($customersIdsArray as $customerId) {
+                    $dataGroup = array('userId' => $customerId, 'groupId' => $groupId);
+                    Tools_System_Tools::firePluginMethodByTagName('assigngroup', 'assignLeadGroup', $dataGroup, true);
+                }
+
                 $where = $customerInfoDbTable->getAdapter()->quoteInto('user_id IN (?)', $customersIdsArray);
                 $customerInfoDbTable->update(array('group_id'=>$groupId), $where);
             }

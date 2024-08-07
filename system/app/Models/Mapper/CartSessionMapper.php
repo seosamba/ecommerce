@@ -211,11 +211,15 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
         $cartOptionMapper = Models_Mapper_OptionMapper::getInstance();
         $allProductOptions = $cartOptionMapper->getOptions(array_keys($options));
         foreach ($options as $optionId => $optionData) {
-            $optionSelectionId = $optionData['id'];
+            $optionSelectionId = null;
+            if (isset($optionData['id'])) {
+                $optionSelectionId = $optionData['id'];
+            }
+
             $cartItemKey = Tools_ShoppingCart::generateCartItemKey($cartSessionId, $productId,
                 $optionsList);
             $cartItemOptionKey = Tools_ShoppingCart::generateCartItemOptionKey($cartSessionId, $productId,
-                $optionData['option_id'], $optionData['id']);
+                $optionData['option_id'], $optionSelectionId);
 
             if (isset($allProductOptions[$optionId])) {
                 $cartSessionOptionModel = $cartSessionOptionMapper->getByUniqueKeys($cartItemKey, $cartItemOptionKey);
@@ -469,7 +473,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 						continue;
 					}
 					$result[$option->getTitle()] = current(array_filter($selections, function($sel) use ($value) {
-						return $sel['id'] === $value;
+						return (int) $sel['id'] === (int) $value;
 					}));
 
                     $result[$option->getTitle()]['hideDefaultOption'] = $option->getHideDefaultOption();

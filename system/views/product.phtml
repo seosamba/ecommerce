@@ -22,11 +22,13 @@ $this->headLink()
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage();?>"/>
 <?php echo $this->partial('merchandising/_actionTemplate.phtml', array('currency' => $this->generalConfig['currency'])); ?>
 
+<script id="paginatorTotalProductsTemplate" type="text/template">
+    <div class="product-total-records grid_4"><?php echo $this->translate('Total'); ?> <%= totalCount %> <?php echo $this->translate('products found'); ?></div>
+</script>
 <script id="paginatorTemplate" type="text/template">
-	<div class="paginator <%= cssClass %>" data-collection="<%= collection %>">
+    <div class="paginator <%= cssClass %>" data-collection="<%= collection %>">
 	    <% if (_.isUndefined(pages)) { var pages = 5; } %>
-		<% if (firstPage != currentPage) { %><a href="#" class="page" data-page="first"><?php echo $firstPageCaption; ?></a><% } else { %><span><?php echo $firstPageCaption; ?></span><% } %>
-
+		<% if (firstPage != currentPage && parseInt(currentPage) !== 1) { %><a href="#" class="page" data-page="first"><?php echo $firstPageCaption; ?></a><% } else if(parseInt(currentPage) !== 1) { %><span><?php echo $firstPageCaption; ?></span><% } %>
         <% if (currentPage > firstPage) { %><a href="#" class="page" data-page="prev"><?php echo $this->translate('Previous'); ?></a><% } %>
 
         <% if (currentPage - pages > firstPage) { %><span>...</span><% } %>
@@ -41,6 +43,9 @@ $this->headLink()
         <% } %>
 
         <% if (currentPage + pages < lastPage) { %><span>...</span><% } %>
+        <% if (totalPages > pages && totalPages !== parseInt(currentPage) && currentPage < totalPages - pages) { %>
+            <a href="#" class="page" data-page="<%= totalPages %>"><%= totalPages %></a>
+        <% } %>
 
         <% if (currentPage < totalPages) { %><a href="#" class="page" data-page="next"><?php echo $this->translate('Next'); ?></a><% } %>
 
@@ -230,6 +235,7 @@ $this->headLink()
             <div id="product-list-holder" class="content-footer scroll pl2 pr2 column_8 full-width" data-emptymsg="<?php echo $this->translate('Nothing Found'); ?>"></div>
             <div class="footer text-right grid_12">
                 <a id="massaction" class="fl-left" href="javascript:;">run mass action</a>
+                <div class="product-total-records"></div>
                 <div class="paginator"><!-- placeholder for paginator --></div>
             </div>
         </div>

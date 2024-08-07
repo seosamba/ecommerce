@@ -32,7 +32,7 @@ class Models_Mapper_ShoppingShippingUrlMapper extends Application_Model_Mappers_
 
     }
 
-    public function fetchAll($where = null)
+    public function fetchAll($where = null, $order = array())
     {
         $results = $this->getDbTable()->fetchAll($where);
         if (sizeof($results)) {

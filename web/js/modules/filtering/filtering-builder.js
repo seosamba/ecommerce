@@ -137,7 +137,7 @@ if (_.isUndefined(TFilter)) {
             return $('<p>', {'class': 'filtering-attribute-widget'})
                 .append($('<label>').html(attr.label))
                 .append(
-                    $('<input>', {type: 'text', name: attr.name, value: _.unescape(attributeValue)})
+                    $('<input>', {type: 'text', placeholder: 'Use the unique separator " | " to add more values. Ex: Red | Green', name: attr.name, value: _.unescape(attributeValue)})
                         .data({aid: attr.attribute_id, tags: tags})
                 )
                 .appendTo(this.list);
@@ -163,7 +163,14 @@ if (_.isUndefined(TFilter)) {
                 type: 'PUT',
                 data: JSON.stringify(data),
                 success: function (model) {
-                    $input.val(_.unescape(model.value));
+                    var attributeValues = '';
+                    if(model.length) {
+                        _.each(model, function (v) {
+                            attributeValues += v.value + ' | ';
+                        });
+                    }
+
+                    $input.val(_.unescape(attributeValues.slice(0, -3)));
                 }
             });
         },

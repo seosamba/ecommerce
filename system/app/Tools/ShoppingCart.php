@@ -85,7 +85,7 @@ class Tools_ShoppingCart {
 	private function __clone() {
 	}
 
-	private function __wakeup() {
+	public function __wakeup() {
 	}
 
     /**
@@ -306,6 +306,7 @@ class Tools_ShoppingCart {
 					continue;
 				}
 				$addPrice = (($modifier['priceType'] == 'unit') ? $modifier['priceValue'] : ($originalPrice / 100) * $modifier['priceValue']);
+                $addPrice = (float) $addPrice;
 				$price = (($modifier['priceSign'] == '+') ? $price + $addPrice : $price - $addPrice);
 			}
 		}
@@ -350,7 +351,9 @@ class Tools_ShoppingCart {
 
 		$shippingPrice = 0;
 		if (($shipping = $this->getShippingData()) !== null) {
-			$shippingPrice = floatval($shipping['price']);
+			if (!empty($shipping['price'])) {
+                $shippingPrice = floatval($shipping['price']);
+            }
 		}
 
 		if ($recalculate === true) {
@@ -708,7 +711,7 @@ class Tools_ShoppingCart {
 		}
 
 		//saving "one use per client" coupons to DB
-		if (sizeof($this->getCoupons())){
+		if (!empty($this->getCoupons()) && sizeof($this->getCoupons())){
             $shoppingCouponUsage = Store_Mapper_CouponMapper::getInstance();
             $shoppingCouponUsage->saveCouponsToCart($this);
             $shoppingCouponUsage->saveCouponSales($this);
@@ -1135,6 +1138,10 @@ class Tools_ShoppingCart {
      */
     public static function generateCartItemKey($cartId, $productId, $options)
     {
+        if (is_array($options) && empty($options)) {
+            $options = 'Array';
+        } 
+
         return md5($cartId . '_' . $productId . '_' . $options);
     }
 

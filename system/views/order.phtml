@@ -108,10 +108,10 @@
                                       <br/>
                                 <span>
                                     <?php if (!empty($this->order->getPurchasedOn())):?>
-                                        <?php echo $this->translate('Full payment');?>: <?php echo $gateway;?>
+                                        <?php echo $this->translate('Full payment');?>: <?php echo (isset($this->gatewayLabelsList[$gateway]) ? $this->gatewayLabelsList[$gateway]['gateway_label']: $gateway);?>
                                         (<?php echo $this->currency($this->order->getTotal());?>) - <?php echo date('d M, Y', strtotime($this->order->getPurchasedOn()));?>
                                     <?php else: ?>
-                                        <?php echo $gateway;?>
+                                        <?php echo (isset($this->gatewayLabelsList[$gateway]) ? $this->gatewayLabelsList[$gateway]['gateway_label']: $gateway);?>
                                     <?php endif;?>
                                 </span>
                             <?php endif;?>
@@ -145,7 +145,12 @@
                                 echo $shippingAddress['city'] .
                                         ($shippingAddress['city'] && ($shippingAddress['state'] || $shippingAddress['zip']) ? ',' : '');
                                 ?></span>
-                            <span class="region"><?php $state = Tools_Geo::getStateById($shippingAddress['state']); echo $state['state']; ?></span>
+                            <span class="region">
+                                <?php $state = Tools_Geo::getStateById($shippingAddress['state']); ?>
+                                <?php if (!empty($state['state'])):?>
+                                    <?php echo $state['state'];?>
+                                <?php endif;?>
+                            </span>
                             <span class="postal-code"><?php echo $shippingAddress['zip'];?></span>
                             <br/>
                             <span><?php echo $countryList[$shippingAddress['country']];?></span>

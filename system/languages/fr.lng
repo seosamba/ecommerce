@@ -837,7 +837,7 @@
         'Additional price field' => 'Champ de prix supplémentaire',
         'Enter position' => 'Indiquer une position',
         'Enable individual product minimum order handling (set values in product screen)' => 'Activer le controle d\'achat minimum par produit',
-        'Smart product list filter' => 'Smart filtre de liste des produits',
+        'Smart product list filter' => 'Smart filtre de liste des produits (masque les combinaisons de filtres de produits non disponibles)',
         'Weight limit' => 'Limite de poids',
         'Custom title' => 'Titre personnalisé',
         'Default pickup behaviour' => 'Comportement de ramassage par défaut',

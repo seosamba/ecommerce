@@ -133,7 +133,7 @@ class Widgets_User_User extends Widgets_User_Base {
                 return $order['status'] === Models_Model_CartSession::CART_STATUS_COMPLETED;
             })),
             'shipped'   => sizeof(array_filter($orders, function ($order) {
-                return $$order['status'] === Models_Model_CartSession::CART_STATUS_SHIPPED;
+                return $order['status'] === Models_Model_CartSession::CART_STATUS_SHIPPED;
             })),
             'delivered' => sizeof(array_filter($orders, function ($order) {
                 return $order['status'] === Models_Model_CartSession::CART_STATUS_DELIVERED;
