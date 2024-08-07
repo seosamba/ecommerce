@@ -717,7 +717,10 @@ define([
                     cssClass: ''
                 };
                 paginatorData = _.extend(paginatorData, this.products.info());
+                paginatorData.totalCount = this.products.totalCount;
+
                 $('.paginator', '#product-list').replaceWith(_.template($('#paginatorTemplate').html(), paginatorData));
+                $('.product-total-records', '#product-list').replaceWith(_.template($('#paginatorTotalProductsTemplate').html(), paginatorData));
             } else {
                 $('#product-list-holder').html('<p class="nothing">'+$('#product-list-holder').data('emptymsg')+'</p>');
             }
