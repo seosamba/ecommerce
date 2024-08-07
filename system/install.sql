@@ -722,7 +722,6 @@ CREATE TABLE IF NOT EXISTS `shopping_filtering_values` (
   `attribute_id` int(10) unsigned NOT NULL COMMENT 'Attribute ID',
   `value` tinytext COLLATE utf8_unicode_ci NOT NULL COMMENT 'Attribute Value',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `attribute_id_2` (`attribute_id`,`product_id`),
   KEY `attribute_id` (`attribute_id`),
   KEY `product_id` (`product_id`),
   FOREIGN KEY(`product_id`) REFERENCES `shopping_product`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION
@@ -1128,5 +1127,5 @@ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.2' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.3' WHERE `name` = 'shopping';
 

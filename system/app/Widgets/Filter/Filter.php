@@ -108,9 +108,19 @@ class Widgets_Filter_Filter extends Widgets_Abstract
         $currentFilters = $mapper->getAttributes($product->getId());
 
         if(!empty($currentFilters) && !empty($tagIds)) {
+            $attributes = array();
             foreach ($currentFilters as $key => $filter) {
-                $currentFilters[$key]['tags'] = $tagIds;
+                $filter['tags'] = $tagIds;
+
+                if(array_key_exists($filter['attribute_id'], $attributes)) {
+                    $attributes[$filter['attribute_id']]['id'] .= ',' . $filter['id'];
+                    $attributes[$filter['attribute_id']]['value'] .= Filtering_Mappers_Eav::ATTRIBUTE_VALUE_SEPARATOR . $filter['value'];
+                } else {
+                    $attributes[$filter['attribute_id']] = $filter;
+                }
             }
+
+            $currentFilters = $attributes;
         }
 
         $this->_view->currentFilters = $currentFilters;

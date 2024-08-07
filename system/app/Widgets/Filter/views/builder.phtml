@@ -1,6 +1,6 @@
 <?php $widgetId = uniqid('widget-filtering-'); ?>
 <div class="filtering-builder-wrap" id="<?php echo $widgetId; ?>" data-productid="<?php echo $this->productId; ?>">
-    <header><?php echo $this->translate('Manage product attributes'); ?>:</header>
+    <header><?php echo $this->translate('Manage product attributes'); ?> <i class="tooltip info ticon-info-sign icon16 mb5px" title="<?php echo $this->translate('You can use the unique separator \' | \' to add more filter values. Ex: Red | Green');?>"></i>:</header>
     <div class="product-filters-list">
     </div>
     <header><?php echo $this->translate('Attach attribute to this product'); ?>:</header>

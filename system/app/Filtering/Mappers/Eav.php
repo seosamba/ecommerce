@@ -11,6 +11,11 @@ class Filtering_Mappers_Eav
     const SINGLE_QUOTE_NEW_FORMAT = '’';
 
     /**
+     * Unique product filter attribute value separator. Used for multiple values to attribute.
+     */
+    const ATTRIBUTE_VALUE_SEPARATOR = ' | ';
+
+    /**
      * @var string Name of tables containing attributes
      */
     protected $_attributesTable = 'shopping_filtering_attributes';
@@ -96,36 +101,55 @@ class Filtering_Mappers_Eav
      * Save entity-attributev-value container into database
      * @param int $productId     Entity ID
      * @param int $attributeId   Attribute ID
-     * @param string $value         Value
+     * @param string $attributeValue Attribute value
      * @return array Saved EAV container data
      * @throws Exceptions_SeotoasterException
      */
-    public function saveEavContainer($productId, $attributeId, $value)
+    public function saveEavContainer($productId, $attributeId, $attributeValue)
     {
         $attributeId = intval($attributeId);
         $productId = intval($productId);
-        $value = (string)$value;
+        $attributeValue = (string)$attributeValue;
 
-        $value = str_replace('"', self::DOUBLE_QUOTE_NEW_FORMAT, $value);
-        $value = str_replace('\'', self::SINGLE_QUOTE_NEW_FORMAT, $value);
+        $attributeValue = str_replace('"', self::DOUBLE_QUOTE_NEW_FORMAT, $attributeValue);
+        $attributeValue = str_replace('\'', self::SINGLE_QUOTE_NEW_FORMAT, $attributeValue);
+        $attributeValue = explode(self::ATTRIBUTE_VALUE_SEPARATOR, $attributeValue);
+        $attributeValue = array_unique(array_filter($attributeValue));
 
         $dbTable = new Filtering_DbTables_Eav();
 
-        $data = array(
-            'product_id'   => $productId,
-            'attribute_id' => $attributeId,
-            'value'        => $value
-        );
+        $savedAttributes = $dbTable->find($productId, $attributeId);
 
-        $row = $dbTable->find($productId, $attributeId);
-        if ($row->count()) {
-            $row = $row->current();
-        } else {
-            $row = $dbTable->createRow();
+        if($savedAttributes->count()) {
+            $savedAttributes = $savedAttributes->toArray();
+
+            if(!empty($savedAttributes)) {
+                foreach ($savedAttributes as $attribute) {
+                    if(!in_array($attribute['value'], $attributeValue)) {
+                        $this->deleteById($attribute['id']);
+                    }
+                }
+            }
         }
-        $row->setFromArray($data)
-            ->save();
-        return $row->toArray();
+
+        $attributesData = array();
+        foreach ($attributeValue as $value) {
+            $row = $this->findFilteringValuesByParams($productId, $attributeId, $value);
+            if (empty($row) ) {
+                $row = $dbTable->createRow(array(
+                    'product_id'   => $productId,
+                    'attribute_id' => $attributeId,
+                    'value'        => $value
+                ));
+                $row->save();
+
+                $row = $this->findFilteringValuesByParams($productId, $attributeId, $value);
+            }
+
+            $attributesData[] = $row;
+        }
+
+        return $attributesData;
     }
 
     /**
@@ -241,8 +265,11 @@ class Filtering_Mappers_Eav
                 'attr.id = eav.attribute_id',
                 null
             );
-
+        $counterAttributes = sizeof($attributes);
+        $counterAttrValues = 0;
         foreach ($attributes as $name => $value) {
+            $counterAttrValues += sizeof($value);
+
             $nameWhere = $dbAdapter->quoteInto('attr.name = ?', $name);
             if (isset($value['from']) && isset($value['to'])) {
                 $valueWhere = $dbAdapter->quoteInto('(eav.value BETWEEN ? ', $value['from']);
@@ -270,10 +297,38 @@ class Filtering_Mappers_Eav
         $select->group('eav.product_id');
 
         if ($strictMatch) {
-            $select->having('COUNT(eav.product_id) = ?', sizeof($attributes));
+            $select->having('COUNT(eav.product_id) IN (?)', range($counterAttributes, $counterAttrValues));
         }
 
-        return $dbAdapter->fetchCol($select);
+        $productsData = $dbAdapter->fetchCol($select);
+
+        if($counterAttributes > 1 && !empty($productsData)) {
+            $eavMapper = Filtering_Mappers_Eav::getInstance();
+
+            $attributesExists = array();
+            foreach ($productsData as $key => $productId) {
+                $productAttributes = $eavMapper->getAttributes($productId);
+
+                if(!empty($productAttributes)) {
+                    foreach ($productAttributes as $attribute) {
+                        if(in_array($attribute['value'], $attributes[$attribute['name']])) {
+                            $attributesExists[$productId][$attribute['name']] = 1;
+                        }
+                    }
+                }
+            }
+
+            if(!empty($attributesExists)) {
+                foreach ($attributesExists as $key => $value) {
+                    if(sizeof($value) < $counterAttributes) {
+                        $prodKey = array_search($key, $productsData);
+                        unset($productsData[$prodKey]);
+                    }
+                }
+            }
+        }
+
+        return $productsData;
     }
 
     public function getPriceRange($productTags, array $productsIds = array())
@@ -412,6 +467,39 @@ class Filtering_Mappers_Eav
      */
     public function deleteAttributeById($attributeId = null) {
         $where = $this->_dbAdapter->quoteInto('attribute_id = ?', $attributeId);
+        return $this->_dbAdapter->delete('shopping_filtering_values', $where);
+    }
+
+    /**
+     * @param $productId
+     * @param $attributeId
+     * @param $value
+     * @return mixed
+     */
+    public function findFilteringValuesByParams($productId, $attributeId, $value)
+    {
+        $where = $this->_dbAdapter->quoteInto('product_id = ?', $productId);
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('attribute_id = ?', $attributeId);
+        $where .= ' AND ' . $this->_dbAdapter->quoteInto('value = ?', $value);
+
+        $select = $this->_dbAdapter->select()->from(array('sfv' => 'shopping_filtering_values'), array(
+            'sfv.id',
+            'sfv.product_id',
+            'sfv.attribute_id',
+            'sfv.value',
+        ))->where($where);
+
+        $data = $this->_dbAdapter->fetchRow($select);
+
+        return $data;
+    }
+
+    /**
+     * @param $id
+     * @return int
+     */
+    public function deleteById($id) {
+        $where = $this->_dbAdapter->quoteInto('id = ?', $id);
         return $this->_dbAdapter->delete('shopping_filtering_values', $where);
     }
 }
