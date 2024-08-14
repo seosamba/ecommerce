@@ -1492,6 +1492,10 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->showPriceIncTax = $this->_configMapper->getConfigParam('showPriceIncTax');
             $this->_view->weightSign = $this->_configMapper->getConfigParam('weightUnit');
 
+            $gatewayLabelMapper = Store_Mapper_GatewayLabelMapper::getInstance();
+            $gatewayLabelsList = $gatewayLabelMapper->getLabelsList();
+            $this->_view->gatewayLabelsList = $gatewayLabelsList;
+
             $isPluginWithTagPosExist = false;
             $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
             if (!empty($availablePlugins)) {

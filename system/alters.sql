@@ -723,8 +723,22 @@ ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_key`);
 ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_option_key`);
 ALTER TABLE `shopping_cart_session_options` ADD INDEX (`cart_item_key`, `cart_item_option_key`);
 
--- 05/10/2023
+-- 19/02/2024
 -- version: 3.0.1
+CREATE TABLE IF NOT EXISTS `shopping_gateway_label` (
+`id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+`gateway` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+`gateway_label` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+PRIMARY KEY (`id`),
+UNIQUE (`gateway`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- 26/07/2024
+-- version: 3.0.2
+ALTER TABLE `shopping_filtering_values` DROP INDEX `attribute_id_2`;
+
+-- 05/10/2023
+-- version: 3.0.3
 ALTER TABLE `shopping_pickup_location` ADD COLUMN `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `country`;
 ALTER TABLE `shopping_pickup_location` ADD COLUMN `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL;
@@ -732,6 +746,6 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_label` VARCHAR(255) COLL
 ALTER TABLE `shopping_cart_session` ADD COLUMN `location_id` int(10) unsigned DEFAULT NULL;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.2' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.4' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
