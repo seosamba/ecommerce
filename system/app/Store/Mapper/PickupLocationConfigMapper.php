@@ -135,8 +135,7 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
         $searchBy = array(),
         $originalLatitude = '',
         $originalLongitude = '',
-        $pickupLocationLinks = false,
-        $cashRegisterIds = false
+        $pickupLocationLinks = false
     ) {
         $pickupLocationsZonesConfig = new Store_DbTable_PickupLocationZonesConfig();
         $where = $pickupLocationsZonesConfig->getAdapter()->quoteInto('shplz.pickup_location_category_id <> ?', 0);
@@ -206,11 +205,6 @@ class Store_Mapper_PickupLocationConfigMapper extends Application_Model_Mappers_
                     * sin( radians( `shpl`.`lat` ) )
                     )
                 )"));
-        }
-
-        if(!empty($cashRegisterIds)) {
-            $where .= ' AND ' . $pickupLocationsZonesConfig->getAdapter()->quoteInto('shpl.cash_register_id <> ?', ' ');
-            $where .= ' AND ' . new Zend_Db_Expr('shpl.cash_register_id IS NOT NULL');
         }
 
         $select = $pickupLocationsZonesConfig->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)

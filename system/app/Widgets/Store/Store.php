@@ -217,8 +217,19 @@ class Widgets_Store_Store extends Widgets_Abstract {
             $this->_view->countriesList = Tools_Geo::getCountries(true);
             $this->_view->customerGroups = $customerGroups;
 
-            $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
-            $pickupLocations = $pickupLocationConfigMapper->getLocations(0, false, array(), false, false, array(), '', '', false, true);
+            $isPluginWithTagPosExist = false;
+            $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
+            if (!empty($availablePlugins)) {
+                $isPluginWithTagPosExist = true;
+            }
+            $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
+
+            $pickupLocations = array();
+
+            if($isPluginWithTagPosExist) {
+                $seosambaposTerminalLocationsMapper = Seosambapos_Models_Mappers_SeosambaposTerminalLocationsMapper::getInstance();
+                $pickupLocations = $seosambaposTerminalLocationsMapper->getLocationsData();
+            }
             $usedLocationIds = $ordersMapper->getLocationIds();
 
             $locationIds = array();
@@ -232,12 +243,6 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
             $this->_view->locationIds = $locationIds;
             $this->_view->cashierIds = $ordersMapper->getCashierIds();
-            $isPluginWithTagPosExist = false;
-            $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
-            if (!empty($availablePlugins)) {
-                $isPluginWithTagPosExist = true;
-            }
-            $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
 
 			return $this->_view->render('orders.phtml');
 		}
