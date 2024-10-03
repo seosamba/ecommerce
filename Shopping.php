@@ -13,6 +13,17 @@ class Shopping extends Tools_Plugins_Abstract {
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
 
+    public static function crmConfigNameActions()
+    {
+        return array(
+            'configCustomerGroups' => array(
+                'label' => 'Customers/Leads groups',
+                'position' => 9,
+                'settingActionPath' => 'configCustomerGroups'
+            )
+        );
+    }
+
 	/**
 	 * New system role 'customer'
 	 *
@@ -362,6 +373,17 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_layout->content = $this->_view->render('config.phtml');
 		echo $this->_layout->render();
 	}
+
+    /**
+     * Tab for customer group actions
+     */
+    public function configCustomerGroupsAction()
+    {
+        $currentUserRole = $this->_sessionHelper->getCurrentUser()->getRoleId();
+        if ($currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN) {
+            echo $this->_view->render('customer-groups-config.phtml');
+        }
+    }
 
 	/**
 	 * Shipping configuration action
