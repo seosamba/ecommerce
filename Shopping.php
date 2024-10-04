@@ -1766,6 +1766,18 @@ class Shopping extends Tools_Plugins_Abstract {
 				unset($tags);
 			}
 
+            $data = $this->_request->getParams();
+
+            $tabName = '';
+            if (!empty($data['tabName'])) {
+                $tabName = $data['tabName'];
+            }
+
+            $tabPosition = 0;
+            if (!empty($data['tabPosition'])) {
+                $tabPosition = $data['tabPosition'];
+            }
+
             if (!empty($plugins)) {
                 foreach ($plugins as $plugin) {
                     $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
@@ -1790,6 +1802,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
             $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::DEFAULT_USER_GROUP));
             $this->_view->defaultGroupId = $defaultUserGroupId;
+            $this->_view->tabName = $tabName;
+            $this->_view->tabPosition = $tabPosition;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}

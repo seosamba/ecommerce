@@ -27,6 +27,7 @@ $this->headLink()
             <span class="arrow left ticon-arrow-left3"></span>
             <span class="arrow right ticon-arrow-right3"></span>
             <ul class="header">
+                <?php $settingsActionPathList = array();?>
                 <?php foreach ($this->configTabs as $configTab) :?>
                     <?php if ($configTab['type'] === 'internal') :?>
                         <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
@@ -35,15 +36,16 @@ $this->headLink()
                     <?php else :?>
                         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $configTab['tabId'];?>/run/merchandising/""><?php echo $this->translate($configTab['tabName']);?></a></li>
                     <?php endif;?>
+                    <?php $settingsActionPathList[$configTab['tabId']] = $configTab;?>
                 <?php endforeach;?>
             </ul>
         </div>
         <div id="coupons">
             <?php echo $this->partial('merchandising/coupon.phtml'); ?>
         </div>
-        <div id="group-pricing">
-            <?php echo $this->partial('merchandising/grouping.phtml', array('defaultGroupId'=> $this->defaultGroupId)); ?>
-        </div>
+<!--        <div id="group-pricing">-->
+<!--            --><?php //echo $this->partial('merchandising/grouping.phtml', array('defaultGroupId'=> $this->defaultGroupId)); ?>
+<!--        </div>-->
         <div id="recurring-payments">
             <?php echo $this->partial('merchandising/recurring.phtml'); ?>
         </div>
@@ -69,5 +71,27 @@ $this->headLink()
                 showSpinner('#merchandising');
             }
         });
+
+        <?php if (!empty($this->tabName) && !empty($settingsActionPathList)):?>
+            <?php $position = array_search($this->tabName, array_keys($settingsActionPathList));?>
+
+            <?php if ($position !== false):?>
+                var tabsNav = $('.tabs-nav-wrap .ticon-arrow-right3'),
+                    $nav = tabsNav.nextAll('.ui-tabs-nav'),
+                    navScroll = $nav.scrollLeft(),
+                    tabPosition = 100 * parseInt(<?php echo intval($position);?>);
+
+                <?php if(!empty($this->tabPosition)):?>
+                    tabPosition = parseInt(<?php echo $this->tabPosition;?>);
+                <?php endif;?>
+
+                $nav.stop().animate({
+                    scrollLeft : navScroll+tabPosition
+                });
+
+                $('#merchandising').tabs( "option", "active", parseInt(<?php echo intval($position);?>));
+            <?php endif;?>
+        <?php endif;?>
+
     });
 </script>

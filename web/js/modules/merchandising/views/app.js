@@ -22,13 +22,13 @@ define([
             this.couponsTable = new CouponsTableView();
             this.couponsTable.render();
 
-            this.groupForm = new GroupFormView();
-            this.groupForm.render();
+            //this.groupForm = new GroupFormView();
+            //this.groupForm.render();
 
-            this.groupsTable = new GroupsTableView();
-            this.groupsTable.render();
+            //this.groupsTable = new GroupsTableView();
+            //this.groupsTable.render();
 
-            this.groupForm.$el.on('group:created', _.bind(this.groupsTable.render, this.groupsTable));
+            //this.groupForm.$el.on('group:created', _.bind(this.groupsTable.render, this.groupsTable));
             this.couponForm.$el.on('coupon:created', _.bind(this.couponsTable.render, this.couponsTable));
         },
         formSubmit: function(e) {
