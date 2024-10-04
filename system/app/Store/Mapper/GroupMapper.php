@@ -55,6 +55,102 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
 		return $groups;
 	}
 
+    /**
+     * Get presets
+     *
+     * @param string $where SQL where clause
+     * @param string $order OPTIONAL An SQL ORDER clause.
+     * @param int $limit OPTIONAL An SQL LIMIT count.
+     * @param int $offset OPTIONAL An SQL LIMIT offset.
+     * @param bool $withoutCount flag to get with or without records quantity
+     * @param bool $singleRecord flag fetch single record
+     * @return array
+     */
+    public function fetchAllData(
+        $where = null,
+        $order = null,
+        $limit = null,
+        $offset = null,
+        $withoutCount = false,
+        $singleRecord = false
+    ) {
+
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sg' => 'shopping_group'),
+                array(
+                    'sg.id',
+                    'sg.groupName',
+                    'sg.priceSign',
+                    'sg.priceType',
+                    'sg.priceValue',
+                    'sg.nonTaxable'
+                )
+            );
+
+
+        $select->group('sg.id');
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        if (!empty($where)) {
+            $select->where($where);
+        }
+
+        $select->limit($limit, $offset);
+
+        if ($singleRecord) {
+            $data = $this->getDbTable()->getAdapter()->fetchRow($select);
+        } else {
+            $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+        }
+
+        if ($withoutCount === false) {
+            $select->reset(Zend_Db_Select::COLUMNS);
+            $select->reset(Zend_Db_Select::FROM);
+            $select->reset(Zend_Db_Select::LIMIT_OFFSET);
+            $select->reset(Zend_Db_Select::LIMIT_COUNT);
+
+            $count = array('count' => new Zend_Db_Expr('COUNT(DISTINCT(sg.id))'));
+
+            $select->from(array('sg' => 'shopping_group'), $count);
+
+
+            $select = $this->getDbTable()->getAdapter()->select()
+                ->from(
+                    array('subres' => $select),
+                    array('count' => 'SUM(count)')
+                );
+
+            $count = $this->getDbTable()->getAdapter()->fetchRow($select);
+
+            if (empty($count['count'])) {
+                $count['count'] = 0;
+            }
+
+            return array(
+                'totalRecords' => $count['count'],
+                'data' => $data,
+                'offset' => $offset,
+                'limit' => $limit
+            );
+        } else {
+            return $data;
+        }
+    }
+
+    /**
+     * Find by group name
+     *
+     * @param string $groupName group name
+     * @return Store_Model_Group|null
+     */
+    public function findByGroupName($groupName)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('groupName = ?', $groupName);
+        return $this->_findWhere($where);
+    }
+
 	/**
 	 * Delete group model from DB
 	 * @param $model Store_Model_Group Group model

@@ -2,14 +2,16 @@ export const saveConfigData = ({commit, state, dispatch}, payload) => {
     showLoader();
     return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val() + 'api/leads/leadtaskspreset/',
+            'url': $('#website_url').val() + 'api/store/groupconfig/',
             'type': 'POST',
             'dataType': 'json',
             'data': {
                 'secureToken' : $('#customer-groups-tab-config-token').val(),
-                'presetName':payload.presetName,
-                'taskTitle':payload.taskTitle,
-                'taskNotes':payload.taskNotes,
+                'groupName':payload.groupName,
+                'priceValue':payload.priceValue,
+                'priceSign':payload.priceSign,
+                'priceType':payload.priceType,
+                'nonTaxable':payload.nonTaxable,
             }
         }).done(async function (response) {
             hideLoader();
@@ -30,15 +32,17 @@ export const updateConfigData = ({commit, state, dispatch}, payload) => {
     showLoader();
     return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val() + 'api/leads/leadtaskspreset/',
+            'url': $('#website_url').val() + 'api/store/groupconfig/',
             'type': 'PUT',
             'dataType': 'json',
             'data': JSON.stringify({
                 'secureToken' : $('#customer-groups-tab-config-token').val(),
-                'presetName':payload.presetName,
-                'taskTitle':payload.taskTitle,
-                'taskNotes':payload.taskNotes,
-                'id':payload.presetId
+                'groupName':payload.groupName,
+                'priceValue':payload.priceValue,
+                'priceSign':payload.priceSign,
+                'priceType':payload.priceType,
+                'nonTaxable':payload.nonTaxable,
+                'id':payload.configId
             })
         }).done(async function (response) {
             hideLoader();
@@ -59,7 +63,7 @@ export const deleteConfigRecord = ({commit, state, dispatch}, payload) => {
         showLoader();
         return new Promise((resolve, reject) => {
             $.ajax({
-                'url': $('#website_url').val() + 'api/leads/leadtaskspreset/id/' + payload.id,
+                'url': $('#website_url').val() + 'api/store/groupconfig/id/' + payload.id,
                 'type': 'DELETE',
                 'dataType': 'json'
             }).done(async function (response) {
@@ -82,13 +86,13 @@ export const getConfigSavedData = ({commit, state, dispatch}, payload) => {
 
     return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val()+'api/leads/leadtaskspreset/',
+            'url': $('#website_url').val()+'api/store/groupconfig/',
             'type': 'GET',
             'dataType': 'json',
             'data': {
                 'limit': state.pagination.generalConfig.itemsPerPage,
                 'offset': (state.pagination.generalConfig.currentPage - 1) * state.pagination.generalConfig.itemsPerPage,
-                'id': payload.presetId
+                'id': payload.configId
             }
         }).done(async  function(response){
             hideLoader();
@@ -101,6 +105,58 @@ export const getConfigSavedData = ({commit, state, dispatch}, payload) => {
                 resolve({ name: 'login', 'message': 'Please re-login'});
             }
         }).fail(async function(response){
+            resolve({ name: 'login', 'message': 'Please re-login'});
+        });
+    });
+};
+
+export const getConfigDetails = ({commit, state, dispatch}, payload) => {
+    showLoader();
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/groupconfig/',
+            'type': 'GET',
+            'dataType': 'json',
+            'data': {
+                'id': payload.configId
+            }
+        }).done(async  function(response){
+            hideLoader();
+            if (response.status !== 'error') {
+                commit('setAdditionalInfo', response.additionalInfo);
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ name: 'login', 'message': 'Please re-login'});
+        });
+    });
+};
+
+
+export const changeDefaultGroup = ({commit, state, dispatch}, payload) => {
+    showLoader();
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val() + 'plugin/shopping/run/changeDefaultUserGroup/',
+            'type': 'POST',
+            'dataType': 'json',
+            'data': {
+                'secureToken' : $('#customer-groups-tab-config-token').val(),
+                'defaultGroupId':payload.defaultGroupId,
+            }
+        }).done(async function (response) {
+            hideLoader();
+            if (response.status === 'error') {
+                resolve(response);
+            } else {
+                resolve(response);
+            }
+
+        }).fail(async function(response){
+            hideLoader();
             resolve({ name: 'login', 'message': 'Please re-login'});
         });
     });

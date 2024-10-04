@@ -1,5 +1,4 @@
 import merge from 'lodash/merge';
-import lodash from 'lodash';
 import unescape from "lodash/unescape";
 
 let defaultState = {
