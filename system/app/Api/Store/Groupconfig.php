@@ -239,6 +239,11 @@ class Api_Store_Groupconfig extends Api_Service_Abstract
 
                 $groupMapper->save($groupModel);
 
+                $cache = Zend_Controller_Action_HelperBroker::getStaticHelper('Cache');
+                $cache->clean('', '', array('0' => 'product_price'));
+                $cache->clean('products_groups_price', 'store_');
+                $cache->clean('customers_groups', 'store_');
+
                 return array(
                     'error' => '0',
                     'message' => $translator->translate('Group has been updated')

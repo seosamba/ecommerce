@@ -27,7 +27,12 @@ class Store_Mapper_GroupMapper extends Application_Model_Mappers_Abstract {
 			unset($data['action']);
 		}
 
-        $where = $this->getDbTable()->getAdapter()->quoteInto('`groupName` = ?', $model->getGroupName());
+		if (isset($data['id']) && !empty($data['id'])) {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $data['id']);
+        } else {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('`groupName` = ?', $model->getGroupName());
+        }
+
         $existGroup = parent::fetchAll($where);
 
         if (!empty($existGroup)){
