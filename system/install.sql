@@ -1126,6 +1126,6 @@ CREATE TABLE IF NOT EXISTS `shopping_gateway_label` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.3' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.4' WHERE `name` = 'shopping';
 
