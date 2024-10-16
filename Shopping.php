@@ -1497,6 +1497,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->gatewayLabelsList = $gatewayLabelsList;
 
             $isPluginWithTagPosExist = false;
+            $soldLocationsInfo = array();
             $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
             if (!empty($availablePlugins)) {
                 $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
@@ -1504,7 +1505,27 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->pickupLocations = $pickupLocations;
 
                 $isPluginWithTagPosExist = true;
+
+                $pluginExistsAndEnabled = false;
+                $pluginMapper = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+                if ($pluginMapper instanceof Application_Model_Models_Plugin) {
+                    $pluginStatus = $pluginMapper->getStatus();
+                    if ($pluginStatus === 'enabled') {
+                        $pluginExistsAndEnabled = true;
+                    }
+                }
+
+                if($pluginExistsAndEnabled) {
+                    $seosambaposCartLocationInventoryMapper = Seosambapos_Models_Mappers_SeosambaposCartLocationInventoryMapper::getInstance();
+                    $productAndLocationInfo = $seosambaposCartLocationInventoryMapper->getLocationInventoryInfo($id);
+
+                    if(!empty($productAndLocationInfo)) {
+                        $soldLocationsInfo = $productAndLocationInfo;
+                    }
+                }
             }
+
+            $this->_view->soldLocationsInfo = $soldLocationsInfo;
             $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
 
 			$this->_layout->content = $this->_view->render('order.phtml');

@@ -286,6 +286,17 @@
                                              alt="<?php echo $product->getName(); ?>"/>
                                     <?php endif;?>
                                     <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?>
+                                    <?php if (!empty($this->isPluginWithTagPosExist) && !empty($this->soldLocationsInfo)):?>
+                                        <br/>
+                                        <b><?php echo $this->translate('The location of the product\'s sale');?></b>:
+                                        <?php foreach ($this->soldLocationsInfo as $locationInfo): ?>
+                                            <br/>
+                                            <?php if($item['product_id'] == $locationInfo['product_id']):?>
+                                                <span class="sold-location"><?php echo $locationInfo['location_name'];?> - (<?php echo $locationInfo['location_inventory'];?>) </span>
+                                            <?php endif;?>
+                                        <?php endforeach;?>
+                                    <?php endif;?>
+
                                     <?php if (!empty($item['options'])): ?>
                                         <?php $item['taxRate'] = Tools_Tax_Tax::calculateProductTax($product, null, true);?>
                                         <?php if (empty($item['archiveOptions'])):?>
