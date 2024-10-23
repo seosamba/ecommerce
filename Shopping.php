@@ -13,6 +13,17 @@ class Shopping extends Tools_Plugins_Abstract {
 	const BRAND_LOGOS_FOLDER  = 'brands';
     const PICKUP_LOGOS_FOLDER = 'pickup-logos';
 
+    public static function crmConfigNameActions()
+    {
+        return array(
+            'configCustomerGroups' => array(
+                'label' => 'Customers/Leads groups',
+                'position' => 9,
+                'settingActionPath' => 'configCustomerGroups'
+            )
+        );
+    }
+
 	/**
 	 * New system role 'customer'
 	 *
@@ -362,6 +373,17 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_layout->content = $this->_view->render('config.phtml');
 		echo $this->_layout->render();
 	}
+
+    /**
+     * Tab for customer group actions
+     */
+    public function configCustomerGroupsAction()
+    {
+        $currentUserRole = $this->_sessionHelper->getCurrentUser()->getRoleId();
+        if ($currentUserRole === Tools_Security_Acl::ROLE_ADMIN || $currentUserRole === Tools_Security_Acl::ROLE_SUPERADMIN) {
+            echo $this->_view->render('customer-groups-config.phtml');
+        }
+    }
 
 	/**
 	 * Shipping configuration action
@@ -1776,6 +1798,18 @@ class Shopping extends Tools_Plugins_Abstract {
 				unset($tags);
 			}
 
+            $data = $this->_request->getParams();
+
+            $tabName = '';
+            if (!empty($data['tabName'])) {
+                $tabName = $data['tabName'];
+            }
+
+            $tabPosition = 0;
+            if (!empty($data['tabPosition'])) {
+                $tabPosition = $data['tabPosition'];
+            }
+
             if (!empty($plugins)) {
                 foreach ($plugins as $plugin) {
                     $pluginClass = new Zend_Reflection_Class(ucfirst(strtolower($plugin)));
@@ -1800,6 +1834,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->helpSection = Tools_Misc::SECTION_STORE_MERCHANDISING;
             $defaultUserGroupId = intval(Models_Mapper_ShoppingConfig::getInstance()->getConfigParam(Shopping::DEFAULT_USER_GROUP));
             $this->_view->defaultGroupId = $defaultUserGroupId;
+            $this->_view->tabName = $tabName;
+            $this->_view->tabPosition = $tabPosition;
 			$this->_layout->content = $this->_view->render('merchandising.phtml');
 			echo $this->_layout->render();
 		}

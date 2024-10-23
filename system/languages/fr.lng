@@ -857,5 +857,13 @@
         'Click preview to get to product landing page' => 'Cliquer l’aperçu pour accéder a la page produit',
         'Warning!' => 'Attention!',
         'You don\'t have any product template.' => 'Vous n\'avez pas de modèle de produit',
-        'Create one now' => 'Créez-le maintenant'
+        'Create one now' => 'Créez-le maintenant',
+        'Price Value must be numeric' => 'La valeur du prix doit être numérique',
+        'Group Name Can\'t be empty' => 'Le nom du groupe ne peut pas être vide',
+        'Price Value Can\'t be empty' => 'Prix Valeur Ne peut pas être vide',
+        'Group has been added' => 'Le groupe a été ajouté',
+        'Group has been updated' => 'Le groupe a été mis à jour',
+        'Group has been deleted' => 'Le groupe a été supprimé',
+        'Group already exists' => 'Le groupe existe déjà'
+
 );?>
