@@ -342,6 +342,15 @@ $this->headLink()
                         <input class="grid_9 alpha omega fl-right" type="text" id="product-gtin" data-reflection="gtin" placeholder="<?php echo $this->translate('global trade item number'); ?>"/>
                         <label class="grid_3 alpha omega" for="product-gtin"><?php echo $this->translate('Gtin'); ?></label>
                     </div>
+                    <div class="grid_3"></div>
+                    <div class="grid_4 alpha omega labeled mt1-5em">
+                        <label class="grid_5 alpha omega" for="product-condition"><?php echo $this->translate('Condition'); ?></label>
+                        <select id="product-condition" class="grid_7 alpha omega fl-right" data-reflection="condition">
+                            <option value="new"><?php echo $this->translate('condition_new'); ?></option>
+                            <option value="refurbished"><?php echo $this->translate('condition_refurbished'); ?></option>
+                            <option value="used"><?php echo $this->translate('condition_used'); ?></option>
+                        </select>
+                    </div>
                 </fieldset>
 
                 <div class="mt10px">

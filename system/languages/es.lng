@@ -548,6 +548,10 @@
 'Miss' => 'Srta',
 'Dr' => 'Dr',
 'Additional info' => 'Información adicional',
-'Add to favorites' => 'Agregar a favoritos'
+'Add to favorites' => 'Agregar a favoritos',
+'Condition' => 'Condition',
+'condition_new' => 'New',
+'condition_refurbished' => 'Refurbished',
+'condition_used'    => 'Used'
 
 );

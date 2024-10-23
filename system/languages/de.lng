@@ -71,5 +71,9 @@ return array(
 	'Total price'								=> 'Gesamtpreis',
 	'Shipping price'							=> 'Versandkosten',
 	'Shipping via'								=> 'versendet durch',
-	'View/Download invoice'						=> 'Rechnung ansehen/herunterladen'
+	'View/Download invoice'						=> 'Rechnung ansehen/herunterladen',
+	'Condition'                                 => 'Condition',
+	'condition_new'                             => 'New',
+	'condition_refurbished'                     => 'Refurbished',
+	'condition_used'                            => 'Used'
 );

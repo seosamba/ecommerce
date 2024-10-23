@@ -80,7 +80,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'gtin'              => $model->getGtin(),
             'wishlist_qty'      => $model->getWishlistQty(),
             'minimum_order'     => $model->getMinimumOrder(),
-            'negative_stock'    => $model->getNegativeStock()
+            'negative_stock'    => $model->getNegativeStock(),
+            'condition'         => $model->getCondition(),
 		);
 
 		if ($model->getId()){

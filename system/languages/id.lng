@@ -161,5 +161,9 @@
     'Insert list of zip/postal codes: one per line' => 'Menyisipkan daftar kode pos: satu per baris',
     'Manage brand logos' => 'Mengelola logo brand',
     'Upload brand logos' => 'Mengunggah logo brand',
-    'Uploading' => 'Proses mengunggah'
+    'Uploading' => 'Proses mengunggah',
+    'Condition' => 'Condition',
+    'condition_new' => 'New',
+    'condition_refurbished' => 'Refurbished',
+    'condition_used' => 'Used'
 ); ?>

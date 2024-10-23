@@ -190,6 +190,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `wishlist_qty` int(10) unsigned DEFAULT '0',
   `minimum_order` int(3) unsigned DEFAULT '0',
   `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `condition` ENUM('new','refurbished', 'used') DEFAULT 'new',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -1127,5 +1128,5 @@ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.4' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.5' WHERE `name` = 'shopping';
 
