@@ -282,7 +282,7 @@ $this->headLink()
                 <fieldset>
                     <div class="grid_3 alpha text-center">
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'small'), $this->imageDirList); ?>
-                        <div class="product-preview page-preview">
+                        <div class="product-preview page-preview" style="height: 128px;">
                             <img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
                             <span class="ticon-folder-upload"><?php echo $this->translate('Choose your image');?></span>
                             <input type="hidden" id="things-new-folder" value="products"/>
