@@ -548,6 +548,10 @@
 'Miss' => 'Srta',
 'Dr' => 'Dr',
 'Additional info' => 'Información adicional',
-'Add to favorites' => 'Agregar a favoritos'
+'Add to favorites' => 'Agregar a favoritos',
+'Create your'						        => 'Create your',
+'SeoSamba Free account'						=> 'SeoSamba Free account',
+'Please upload product image'				=> 'Please upload product image',
+'Please specify product name'				=> 'Please specify product name'
 
 );

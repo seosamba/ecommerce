@@ -76,86 +76,48 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
         if (empty($isRegistered) || empty($sambaToken)) {
             return array(
                 'error' => '1',
-                'message' => ''
+                'message' => $translator->translate('Create your').' '.'<a href="https://mojo.seosamba.com/register.html">'.$translator->translate('SeoSamba Free account').'</a>'
             );
         }
 
         $imageUrl = $this->getRequest()->getParam('imageUrl');
-
+        $productName = $this->getRequest()->getParam('productName');
         $imageUrl = 'https://cdn.webshopapp.com/shops/212063/files/429043524/650x650x2/santa-cruz-v-10-cc-s.jpg';
+        $productName = 'Zenith sofa';
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $imageUrl);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        $data = curl_exec($ch);
-        curl_close($ch);
-
-        if (empty($data)) {
+        if (empty($imageUrl)) {
             return array(
                 'error' => '1',
-                'message' => ''
+                'message' => $translator->translate('Please upload product image')
             );
         }
 
-        $encodedImage = base64_encode($data);
-
-        $promt = 'Analyze the image and generate a detailed product description for [the product titled [ZINUS Josh Loveseat Sofa]]. Highlight key features such as size, material, color, design, and functionality. Emphasize the product\'s unique characteristics and potential uses. If applicable, mention any aesthetic or practical benefits. Write in a tone suitable for an online product listing, ensuring the description appeals to potential buyers.';
+        if (empty($productName)) {
+            return array(
+                'error' => '1',
+                'message' => $translator->translate('Please specify product name')
+            );
+        }
 
         $info = array(
-            'promt' => $promt,
-            'image_url' => $encodedImage,
-            'temperature' => 1,
-            'presence_penalty' => 0.6,
-            'response_format' => 'json_object',
+            'image_url' => $imageUrl,
+            'product_title' => $productName
         );
 
-        $result = Apps::apiCall('POST', 'aipPoductDescription', array(), $info);
+        $result = Apps::apiCall('POST', 'openaiProductDescription', array(), $info);
+        if (empty($result)) {
+            return array(
+                'error' => '1',
+                'message' => $translator->translate('Service not available')
+            );
+        }
 
-
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            "Authorization: Bearer $apiKey",
-        ]);
-        $data = '{
-    "model": "gpt-4o",
-    "messages": [
-      {
-        "role": "user",
-        "content": [
-          {
-            "type": "text",
-            "text": "' . $promt . '"
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": "data:image/jpg;base64,' . $encodedImage . '"
-            }
-          }
-          
-        ]
-      },
-      {
-        "role": "system",
-        "content": "You are a helpful assistant. Response should be in json format"
-      }
-    ],
-    "temperature":1,    
-    "presence_penalty":0.6, 
-    "response_format": {"type" : "json_object"}, 
-    "max_tokens": 3000
-  }';
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        $response = curl_exec($ch);
-        $res = json_decode($response, true);
+        if ($result['done'] === false) {
+            return array(
+                'error' => '1',
+                'message' => $result['message']
+            );
+        }
 
         return array(
             'error' => '0',

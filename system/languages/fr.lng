@@ -864,6 +864,10 @@
         'Group has been added' => 'Le groupe a été ajouté',
         'Group has been updated' => 'Le groupe a été mis à jour',
         'Group has been deleted' => 'Le groupe a été supprimé',
-        'Group already exists' => 'Le groupe existe déjà'
+        'Group already exists' => 'Le groupe existe déjà',
+        'Create your'				 => 'Create your',
+        'SeoSamba Free account'		 => 'SeoSamba Free account',
+        'Please upload product image' => 'Please upload product image',
+        'Please specify product name' => 'Please specify product name'
 
 );?>

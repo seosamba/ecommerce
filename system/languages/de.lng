@@ -71,5 +71,9 @@ return array(
 	'Total price'								=> 'Gesamtpreis',
 	'Shipping price'							=> 'Versandkosten',
 	'Shipping via'								=> 'versendet durch',
-	'View/Download invoice'						=> 'Rechnung ansehen/herunterladen'
+	'View/Download invoice'						=> 'Rechnung ansehen/herunterladen',
+	'Create your'						        => 'Create your',
+	'SeoSamba Free account'						=> 'SeoSamba Free account',
+	'Please upload product image'				=> 'Please upload product image',
+	'Please specify product name'				=> 'Please specify product name'
 );
