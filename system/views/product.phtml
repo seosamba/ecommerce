@@ -360,6 +360,7 @@ $this->headLink()
                         </ul>
                         <div id="short-description-tab">
                             <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
+                            <a id="generate-ai-product-description" data-type="no_formatting" href="javascript:;">Generate AI Description</a>
                         </div>
                         <div id="full-description-tab">
                             <textarea id="product-fullDescription" data-reflection="fullDescription" placeholder="<?php echo $lexemFullDescription; ?>"></textarea>
@@ -555,7 +556,7 @@ $this->headLink()
             <button class="btn ticon-save" type="submit" name="submit" id="submit" value="Save"/><?php echo $this->translate('Save product'); ?></button>
         </div>
     </div>
-    <input class="secure-token-tax" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
+    <input id="product-screen-secure-token" class="secure-token-tax" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
 </div>
 
 <script>

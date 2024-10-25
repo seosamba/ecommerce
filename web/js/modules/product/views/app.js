@@ -54,7 +54,8 @@ define([
             'click .paginator a.page': 'paginatorAction',
             'change #automated-set-price': 'toggleSetPriceConfig',
             'click .remove-from-library-btn': 'removeOption',
-            'click #negative-stock': 'negativeProductStock'
+            'click #negative-stock': 'negativeProductStock',
+            'click #generate-ai-product-description':'generateAIDescription'
 		},
         products: null,
         tags: null,
@@ -1254,7 +1255,63 @@ define([
                 return str;
             }
             return str.slice(0, num) + '...';
+        },
+        generateAIDescription: function(e)
+        {
+            var responseType = $(e.currentTarget).data('type'),
+                imageUrl = this.$el.find('#product-image').attr('src'),
+                productName = this.$el.find('#product-name').val(),
+                self = this,
+                error = false,
+                errorMessage = '';
+
+            if (productName === '') {
+                errorMessage += (_.isUndefined(i18n['Please specify product name'])?'Please specify product name':i18n['Please specify product name']);
+                error = true;
+                self.$el.find('#product-name').addClass('error');
+            }
+
+            if (imageUrl === '' || imageUrl === this.websiteUrl+'system/images/noimage.png') {
+                errorMessage +='<br/>'+ (_.isUndefined(i18n['Please upload product image'])?'Please upload product image':i18n['Please upload product image']);
+                error = true;
+                self.$el.find('.product-preview').addClass('error');
+            }
+
+            if (error === true) {
+                showMessage(errorMessage, true, 3000);
+                return false;
+            }
+
+            self.$el.find('#product-name').removeClass('error');
+            self.$el.find('.product-preview').removeClass('error');
+
+            showSpinner();
+
+            $.ajax({
+                'url': $('#website_url').val() + 'api/store/productdescriptionai/',
+                'type':'POST',
+                'dataType':'json',
+                'data': {
+                    responseType: responseType,
+                    imageUrl:imageUrl,
+                    productName:productName,
+                    secureToken:$('#product-screen-secure-token').val()
+                }
+            }).done(function(responseData){
+                hideSpinner();
+                if (parseInt(responseData.error) === 1) {
+                    showMessage(responseData.message, true, 3000);
+                    return false;
+                }
+
+                if (responseType === 'no_formatting') {
+                    self.$el.find('#product-shortDescription').val(responseData.message);
+                } else {
+                    tinymce.activeEditor.setContent(responseData.message);
+                }
+            });
         }
+
 	});
 
 	return AppView;
