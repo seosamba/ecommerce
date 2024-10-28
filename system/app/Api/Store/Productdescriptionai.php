@@ -104,8 +104,6 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
             );
         }
 
-        $imageUrl = 'https://seosamba-clone.seolap.com/media/products/small/db2dc653e7478d9a551241955a511a1f.jpeg';
-
         $info = array(
             'image_url' => $imageUrl,
             'product_title' => $productName
@@ -146,6 +144,17 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
             $finalMessage .= 'Color - '.$data['features']['color'].' ';
             $finalMessage .= 'Design - '.$data['features']['design'].' ';
             $finalMessage .= 'Functionality - '.$data['features']['functionality'].' ';
+            $finalMessage .= $data['potential_uses'];
+        } else {
+            $finalMessage .= $data['overview'];
+            $finalMessage .= $data['unique_characteristics'].' <br/>';
+            $finalMessage .= $data['aesthetic_benefits'].' <br/>';
+            $finalMessage .= '<b>Features</b>:'.' <br/>';
+            $finalMessage .= '<b>Size</b> - '.$data['features']['size'].' <br/>';
+            $finalMessage .= '<b>Material</b> - '.$data['features']['material'].' <br/>';
+            $finalMessage .= '<b>Color</b> - '.$data['features']['color'].' <br/>';
+            $finalMessage .= '<b>Design</b> - '.$data['features']['design'].' <br/>';
+            $finalMessage .= '<b>Functionality</b> - '.$data['features']['functionality'].' <br/>';
             $finalMessage .= $data['potential_uses'];
         }
 

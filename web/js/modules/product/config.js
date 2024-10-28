@@ -11,7 +11,8 @@ require.config({
         'text'      : '../../libs/require/text',
         'moment' : '../../libs/moment.min',
         'i18n'  : '../../libs/require/i18n',
-        'tinyMCE5':'../../../../../../system/js/external/tinymce5/tinymce.min'
+        'tinyMCE5':'../../../../../../system/js/external/tinymce5/tinymce.min',
+        'aidescription':'./tinymce-plugins/aidescription/plugin',
     },
     shim: {
         underscore: {exports: '_'},
@@ -20,6 +21,10 @@ require.config({
             exports: 'Backbone'
         },
         'backbone.paginator': ['backbone'],
-        'tinyMCE5': { exports: 'tinyMCE'}
+        'tinyMCE5': { exports: 'tinyMCE'},
+        'aidescription': {
+            deps:['tinyMCE5'],
+            exports:'aidescription'
+        },
     }
 });
