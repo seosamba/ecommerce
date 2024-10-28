@@ -1309,6 +1309,7 @@ define([
 
                 if (responseType === 'no_formatting') {
                     self.$el.find('#product-shortDescription').val(responseData.message);
+                    self.model.set('shortDescription', responseData.message);
                 } else {
                     tinymce.activeEditor.setContent(responseData.message);
                 }
