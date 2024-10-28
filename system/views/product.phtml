@@ -282,7 +282,7 @@ $this->headLink()
                 <fieldset>
                     <div class="grid_3 alpha text-center">
                         <?php echo $this->formSelect('product-image-folder', null, array('title' => 'select folder', 'class' => 'small'), $this->imageDirList); ?>
-                        <div class="product-preview page-preview">
+                        <div class="product-preview page-preview" style="height: 128px;">
                             <img id="product-image" src="<?php echo $this->websiteUrl; ?>system/images/noimage.png" alt=""/>
                             <span class="ticon-folder-upload"><?php echo $this->translate('Choose your image');?></span>
                             <input type="hidden" id="things-new-folder" value="products"/>
@@ -338,9 +338,17 @@ $this->headLink()
                         <input class="grid_9 alpha omega fl-right" type="text" id="product-mpn" data-reflection="mpn" placeholder="<?php echo $this->translate('manufacturer partnumber'); ?>"/>
                         <label class="grid_3 alpha omega" for="product-mpn"><?php echo $this->translate('MPN'); ?></label>
                     </div>
-                    <div class="grid_5 omega labeled mt1-5em">
+                    <div class="grid_4 omega labeled mt1-5em">
                         <input class="grid_9 alpha omega fl-right" type="text" id="product-gtin" data-reflection="gtin" placeholder="<?php echo $this->translate('global trade item number'); ?>"/>
                         <label class="grid_3 alpha omega" for="product-gtin"><?php echo $this->translate('Gtin'); ?></label>
+                    </div>
+                    <div class="grid_4 omega labeled mt1-5em">
+                        <label class="grid_5 alpha omega" for="product-condition"><?php echo $this->translate('Condition'); ?></label>
+                        <select id="product-condition" class="grid_7 alpha omega fl-right" data-reflection="condition">
+                            <option value="new"><?php echo $this->translate('condition_new'); ?></option>
+                            <option value="refurbished"><?php echo $this->translate('condition_refurbished'); ?></option>
+                            <option value="used"><?php echo $this->translate('condition_used'); ?></option>
+                        </select>
                     </div>
                 </fieldset>
 

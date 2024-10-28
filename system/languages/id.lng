@@ -165,5 +165,9 @@
     'Create your'=> 'Create your',
     'SeoSamba Free account'	=> 'SeoSamba Free account',
     'Please upload product image' => 'Please upload product image',
-    'Please specify product name' => 'Please specify product name'
+    'Please specify product name' => 'Please specify product name',
+    'Condition' => 'Condition',
+    'condition_new' => 'New',
+    'condition_refurbished' => 'Refurbished',
+    'condition_used' => 'Used'
 ); ?>

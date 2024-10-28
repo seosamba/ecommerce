@@ -741,7 +741,12 @@ ALTER TABLE `shopping_filtering_values` DROP INDEX `attribute_id_2`;
 -- version: 3.0.3
 UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
 
+-- 23/10/2024
+-- version: 3.0.4
+-- Add condition for product
+ALTER TABLE `shopping_product` ADD COLUMN `condition` ENUM('new','refurbished', 'used') DEFAULT 'new';
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.4' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.5' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
