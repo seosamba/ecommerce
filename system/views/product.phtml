@@ -360,7 +360,9 @@ $this->headLink()
                         </ul>
                         <div id="short-description-tab">
                             <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
-                            <a id="generate-ai-product-description" data-type="no_formatting" href="javascript:;">Generate AI Description</a>
+                            <div class="shortcut-buttons" style="clear: both;padding: 0.5em;transform: translate(0, -100%);-webkit-filter: blur(0);">
+                                <span id="generate-ai-product-description" data-type="no_formatting" class="add-shortcut btn mini outline" data-shortcut="<?php echo $this->translate('Generate AI Description');?>"><?php echo $this->translate('Generate AI Description');?></span>
+                            </div>
                         </div>
                         <div id="full-description-tab">
                             <textarea id="product-fullDescription" data-reflection="fullDescription" placeholder="<?php echo $lexemFullDescription; ?>"></textarea>
