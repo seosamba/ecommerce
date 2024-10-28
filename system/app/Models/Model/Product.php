@@ -83,6 +83,8 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_companyProducts = '';
 
+    protected $_condition = 'new';
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -785,6 +787,23 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
     public function setCompanyProducts($companyProducts)
     {
         $this->_companyProducts = $companyProducts;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCondition()
+    {
+        return $this->_condition;
+    }
+
+    /**
+     * @param string $condition
+     */
+    public function setCondition($condition)
+    {
+        $this->_condition = $condition;
         return $this;
     }
 

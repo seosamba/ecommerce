@@ -70,7 +70,6 @@ class Tools_FeedGenerator {
 			$item->appendChild($feed->createElement('link', $websiteUrl.$productPage->getUrl()));
 			$item->appendChild($feed->createElement('description', str_replace('&', '&amp;', $product->getShortDescription())));
 			$item->appendChild($feed->createElement('g:id', $product->getId()));
-			$item->appendChild($feed->createElement('g:condition', 'new'));
 			$item->appendChild($feed->createElement('g:availability', 'in stock'));
 
             if ($product->getCurrentPrice() !== null && $product->getExtraProperties()) {
@@ -92,6 +91,13 @@ class Tools_FeedGenerator {
 			$gtin = $product->getGtin();
 			if (!empty($gtin)) {
                 $item->appendChild($feed->createElement('g:gtin', $gtin));
+            }
+
+            $condition = $product->getCondition();
+            if (!empty($condition)) {
+                $item->appendChild($feed->createElement('g:condition', $condition));
+            } else {
+                $item->appendChild($feed->createElement('g:condition', 'new'));
             }
 
 			$tags = $product->getTags();
