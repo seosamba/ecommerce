@@ -1266,7 +1266,14 @@ define([
                 productName = this.$el.find('#product-name').val(),
                 self = this,
                 error = false,
-                errorMessage = '';
+                errorMessage = '',
+                wordCount = 0;
+
+            if (responseType === 'no_formatting') {
+                wordCount = parseInt(this.$el.find('#ai-description-amount').val());
+            } else {
+
+            }
 
             if (productName === '') {
                 errorMessage += (_.isUndefined(i18n['Please specify product name'])?'Please specify product name':i18n['Please specify product name']);
@@ -1298,6 +1305,7 @@ define([
                     responseType: responseType,
                     imageUrl:imageUrl,
                     productName:productName,
+                    wordCount:wordCount,
                     secureToken:$('#product-screen-secure-token').val()
                 }
             }).done(function(responseData){

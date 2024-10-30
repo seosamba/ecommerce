@@ -159,6 +159,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('minimumOrder', '0'),
 ('fiscalYearStart', '1'),
+('wordCountAiShortDescription', '150'),
+('wordCountAiFullDescription', '500'),
 ('version', '2.9.7');
 
 DROP TABLE IF EXISTS `shopping_product`;
@@ -1128,5 +1130,5 @@ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.5' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.6' WHERE `name` = 'shopping';
 

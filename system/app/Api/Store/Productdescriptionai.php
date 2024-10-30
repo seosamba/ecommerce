@@ -82,6 +82,7 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
 
         $responseType = $this->getRequest()->getParam('responseType');
         $imageUrl = $this->getRequest()->getParam('imageUrl');
+        $wordCount = $this->getRequest()->getParam('wordCount');
         $imageUrlData = parse_url($imageUrl);
         $websiteUrlData = parse_url($websiteUrl);
         if ($websiteUrlData['host'] === $imageUrlData['host']) {
@@ -106,7 +107,8 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
 
         $info = array(
             'image_url' => $imageUrl,
-            'product_title' => $productName
+            'product_title' => $productName,
+            'wordCount' => $wordCount
         );
 
         $result = Apps::apiCall('POST', 'openaiProductDescription', array(), $info);
