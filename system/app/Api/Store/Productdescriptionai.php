@@ -105,8 +105,18 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
             );
         }
 
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $imageUrl);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $res = curl_exec($ch);
+        curl_close($ch) ;
+
+        $encodedImage = base64_encode($res);
+
         $info = array(
-            'image_url' => $imageUrl,
+            'image_url' => $encodedImage,
             'product_title' => $productName,
             'wordCount' => $wordCount
         );
