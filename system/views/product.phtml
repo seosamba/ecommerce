@@ -381,7 +381,7 @@ $this->headLink()
                         <div id="full-description-tab">
                             <textarea id="product-fullDescription" data-reflection="fullDescription" placeholder="<?php echo $lexemFullDescription; ?>"></textarea>
                             <a id="generate-ai-product-full-description" href="javascript:;"></a>
-                            <input id="generate-ai-product-full-description-translation" type="hidden" name="generate-ai-product-full-description-translation" value="<?php echo $this->translate('Generate AI description using the product\'s image');?>"/>
+                            <input id="generate-ai-product-full-description-translation" type="hidden" name="generate-ai-product-full-description-translation" value="<?php echo $this->translate('Generate AI description using the product\'s image').' ';?>(<?php echo $this->translate('up to');?><?php echo ' '.$this->generalConfig['wordCountAiFullDescription'];?><?php echo ' '.$this->translate('words');?>)"/>
                             <input id="generate-ai-product-full-description-word-count" type="hidden" name="generate-ai-product-full-description-word-count" value="<?php echo $this->generalConfig['wordCountAiFullDescription'];?>"/>
                         </div>
 
