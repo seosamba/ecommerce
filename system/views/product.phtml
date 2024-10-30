@@ -367,9 +367,11 @@ $this->headLink()
                             <li><a href="#product-custom-attributes-tab"><?php echo $lexemCustomAttributes; ?></a></li>
                         </ul>
                         <div id="short-description-tab">
-                            <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
-                            <div class="shortcut-buttons">
-                                <span id="generate-ai-product-description" data-type="no_formatting" class="add-shortcut btn mini outline" title="<?php echo $this->translate('Generate AI description using the product\'s image');?>" data-shortcut="<?php echo $this->translate('Generate AI description using the product\'s image');?>"><?php echo $this->translate('Generate AI Description');?></span>
+                            <div class="textarea-bg">
+                                <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
+                                <div class="shortcut-buttons p5px">
+                                    <span id="generate-ai-product-description" data-type="no_formatting" class="add-shortcut btn mini outline" title="<?php echo $this->translate('Generate AI description using the product\'s image');?>" data-shortcut="<?php echo $this->translate('Generate AI description using the product\'s image');?>"><?php echo $this->translate('Generate AI Description');?></span>
+                                </div>
                             </div>
                         </div>
                         <div id="full-description-tab">
