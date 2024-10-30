@@ -1,5 +1,4 @@
 @import "../../../../../system/css/less/base/variables";
-
 // Table of Content
 //==================================================
 //	Add/edit product
@@ -65,9 +64,19 @@
 			}
 		}
 		
-		.textarea-bg{
-			background-color: #fff;
-			border: 1px solid #ccc;
+		.textarea-bg {
+			background-color : #fff;
+			border           : 1px solid #ccc;
+			
+			.shortcut-buttons {
+				display     : flex;
+				align-items : center;
+				
+				input {
+					flex   : 0 0 10%;
+					margin : 0 1%;
+				}
+			}
 		}
 		
 		#quick-preview {

@@ -21,12 +21,20 @@
   height: 158px;
   border-color: #fff;
 }
-#manage-product #main-tab #description-box textarea:focus{
-  box-shadow : none;
+#manage-product #main-tab #description-box textarea:focus {
+  box-shadow: none;
 }
 #manage-product #main-tab .textarea-bg {
   background-color: #fff;
   border: 1px solid #ccc;
+}
+#manage-product #main-tab .textarea-bg .shortcut-buttons {
+  display: flex;
+  align-items: center;
+}
+#manage-product #main-tab .textarea-bg .shortcut-buttons input {
+  flex: 0 0 10%;
+  margin: 0 1%;
 }
 #manage-product #main-tab #quick-preview {
   position: relative;
