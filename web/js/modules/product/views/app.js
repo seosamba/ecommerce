@@ -1272,7 +1272,7 @@ define([
             if (responseType === 'no_formatting') {
                 wordCount = parseInt(this.$el.find('#ai-description-amount').val());
             } else {
-
+                wordCount = parseInt(this.$el.find('#generate-ai-product-full-description-word-count').val());
             }
 
             if (productName === '') {
