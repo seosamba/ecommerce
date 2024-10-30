@@ -21,6 +21,9 @@
   height: 158px;
   border-color: #fff;
 }
+#manage-product #main-tab #description-box textarea:focus{
+  box-shadow : none;
+}
 #manage-product #main-tab .textarea-bg {
   background-color: #fff;
   border: 1px solid #ccc;

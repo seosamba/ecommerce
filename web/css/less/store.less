@@ -56,10 +56,15 @@
 	#main-tab {
 		#description-box {
 			textarea {
-				height: 158px;
-				border-color: #fff;
+				height       : 158px;
+				border-color : #fff;
+				
+				&:focus {
+					box-shadow : none;
+				}
 			}
 		}
+		
 		.textarea-bg{
 			background-color: #fff;
 			border: 1px solid #ccc;
