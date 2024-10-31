@@ -1,4 +1,6 @@
-@import "../../../../../system/css/less/base/variables";
+//@import "../../../../../system/css/less/base/variables";
+@import "E:/Projects/Project (core)/seotoaster/system/css/less/base/variables";
+
 // Table of Content
 //==================================================
 //	Add/edit product
@@ -13,7 +15,6 @@
 #product-list {
 	width : 100%;
 }
-
 
 // Add/edit product
 //==================================================
@@ -73,8 +74,15 @@
 				align-items : center;
 				
 				input {
-					flex   : 0 0 10%;
-					margin : 0 1%;
+					flex          : 0 0 10%;
+					margin        : 0 1%;
+					text-align    : center;
+					border        : none;
+					border-bottom : 1px solid @input-border-color;
+				}
+				
+				em {
+					color : @input-border-color;
 				}
 			}
 		}
