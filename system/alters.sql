@@ -741,8 +741,19 @@ ALTER TABLE `shopping_filtering_values` DROP INDEX `attribute_id_2`;
 -- version: 3.0.3
 UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
 
--- 05/10/2023
+-- 23/10/2024
 -- version: 3.0.4
+-- Add condition for product
+ALTER TABLE `shopping_product` ADD COLUMN `condition` ENUM('new','refurbished', 'used') DEFAULT 'new';
+
+-- 23/10/2024
+-- version: 3.0.5
+-- Add ai short and full description default values
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES ('wordCountAiShortDescription', '150');
+INSERT IGNORE INTO `shopping_config` (`name`, `value`) VALUES ('wordCountAiFullDescription', '500');
+
+-- 05/10/2023
+-- version: 3.0.6
 ALTER TABLE `shopping_pickup_location` ADD COLUMN `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL AFTER `country`;
 ALTER TABLE `shopping_pickup_location` ADD COLUMN `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL;
@@ -750,7 +761,7 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_label` VARCHAR(255) COLL
 ALTER TABLE `shopping_cart_session` ADD COLUMN `location_id` int(10) unsigned DEFAULT NULL;
 
 -- 24/10/2024
--- version: 3.0.5
+-- version: 3.0.7
 CREATE TABLE IF NOT EXISTS `shopping_product_locations` (
     `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
     `product_id` INT(10) UNSIGNED NOT NULL,
@@ -786,6 +797,6 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_locationinventorynotification'
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.6' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.8' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

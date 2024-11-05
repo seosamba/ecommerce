@@ -159,6 +159,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('minimumOrder', '0'),
 ('fiscalYearStart', '1'),
+('wordCountAiShortDescription', '150'),
+('wordCountAiFullDescription', '500'),
 ('version', '2.9.7');
 
 DROP TABLE IF EXISTS `shopping_product`;
@@ -190,6 +192,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `wishlist_qty` int(10) unsigned DEFAULT '0',
   `minimum_order` int(3) unsigned DEFAULT '0',
   `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `condition` ENUM('new','refurbished', 'used') DEFAULT 'new',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -1166,5 +1169,5 @@ WHERE `enabled` = '1' AND `trigger_name` = 'store_locationinventorynotification'
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.8' WHERE `name` = 'shopping';
 

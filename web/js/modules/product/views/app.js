@@ -15,11 +15,12 @@ define([
     '../../digital-products/views/digital_product',
     'moment',
     'tinyMCE5',
+    'aidescription',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, tinymce, i18n){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, tinymce, aidescription, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -54,7 +55,9 @@ define([
             'click .paginator a.page': 'paginatorAction',
             'change #automated-set-price': 'toggleSetPriceConfig',
             'click .remove-from-library-btn': 'removeOption',
-            'click #negative-stock': 'negativeProductStock'
+            'click #negative-stock': 'negativeProductStock',
+            'click #generate-ai-product-description':'generateAIDescription',
+            'click #generate-ai-product-full-description':'generateAIDescription'
 		},
         products: null,
         tags: null,
@@ -570,9 +573,9 @@ define([
                 advlist_number_styles: 'default,lower-alpha,lower-greek,lower-roman,upper-alpha,upper-roman',
                 entity_encoding: "raw",
                 plugins: [
-                    "advlist lists charmap visualblocks link code"
+                    "advlist lists charmap visualblocks link code aidescription"
                 ],
-                toolbar1: 'bold italic underline linebreak paragraphbreak numlist bullist| link unlink | code |', //formatselect
+                toolbar1: 'bold italic underline linebreak paragraphbreak numlist bullist| link unlink | code | aidescription', //formatselect
                 //block_formats: "Block=div;Paragraph=p;Block Quote=blockquote;Preformatted=pre;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6",
                 extended_valid_elements: "a[*],input[*],select[*],textarea[*]",
                 image_advtab: true,
@@ -595,6 +598,7 @@ define([
                         tooltip: _.isUndefined(i18n['Paragraph <p></p>'])?'Paragraph <p></p>':i18n['Paragraph <p></p>'],
                         onAction: () =>  ed.execCommand('FormatBlock', false, 'p')
                     });
+                    ed.ui.registry.addIcon('triangleUp', '<svg height="24" width="24"><path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" d="M5 3C3.34315 3 2 4.34315 2 6V18C2 19.6569 3.34315 21 5 21H19C20.6569 21 22 19.6569 22 18V6C22 4.34315 20.6569 3 19 3H5ZM11.8038 14.4512L12.2652 15.6641C12.3268 15.8135 12.3993 15.9871 12.4828 16.1849C12.5707 16.3782 12.652 16.5233 12.7267 16.6199C12.8014 16.7122 12.8937 16.7847 13.0035 16.8375C13.1134 16.8946 13.2452 16.9232 13.399 16.9232C13.6627 16.9232 13.8868 16.8309 14.0714 16.6463C14.2604 16.4573 14.3548 16.2508 14.3548 16.0267C14.3548 15.8113 14.256 15.4664 14.0582 14.9918L11.5336 8.75593C11.4149 8.44392 11.316 8.19563 11.2369 8.01105C11.1622 7.82209 11.0677 7.64631 10.9535 7.48371C10.8436 7.32111 10.6964 7.18928 10.5118 7.0882C10.3316 6.98273 10.1053 6.93 9.83287 6.93C9.5648 6.93 9.33849 6.98273 9.15392 7.0882C8.97374 7.18928 8.82652 7.32331 8.71227 7.4903C8.6024 7.6573 8.49693 7.86823 8.39586 8.12312C8.29918 8.3736 8.21568 8.58894 8.14537 8.76911L5.67345 15.0445C5.57237 15.295 5.49986 15.4905 5.45592 15.6312C5.41197 15.7718 5.39 15.908 5.39 16.0399C5.39 16.2684 5.48448 16.4727 5.67345 16.6529C5.86241 16.8331 6.07994 16.9232 6.32603 16.9232C6.61607 16.9232 6.82481 16.8397 6.95226 16.6727C7.0797 16.5013 7.23351 16.1739 7.41368 15.6905L7.87511 14.4512H11.8038ZM9.81969 8.99323L11.2765 12.9813H8.38927L9.81969 8.99323ZM15.3775 8.11652V15.73C15.3775 16.1256 15.4676 16.4244 15.6478 16.6265C15.8324 16.8243 16.0653 16.9232 16.3465 16.9232C16.641 16.9232 16.8783 16.8243 17.0585 16.6265C17.243 16.4288 17.3353 16.13 17.3353 15.73V8.11652C17.3353 7.71662 17.243 7.41999 17.0585 7.22663C16.8783 7.02888 16.641 6.93 16.3465 6.93C16.0609 6.93 15.828 7.02888 15.6478 7.22663C15.4676 7.42439 15.3775 7.72102 15.3775 8.11652Z" fill="black"/></svg>');
                 }
             });
         },
@@ -1258,7 +1262,72 @@ define([
                 return str;
             }
             return str.slice(0, num) + '...';
+        },
+        generateAIDescription: function(e)
+        {
+            var responseType = $(e.currentTarget).data('type'),
+                imageUrl = this.$el.find('#product-image').attr('src'),
+                productName = this.$el.find('#product-name').val(),
+                self = this,
+                error = false,
+                errorMessage = '',
+                wordCount = 0;
+
+            if (responseType === 'no_formatting') {
+                wordCount = parseInt(this.$el.find('#ai-description-amount').val());
+            } else {
+                wordCount = parseInt(this.$el.find('#generate-ai-product-full-description-word-count').val());
+            }
+
+            if (productName === '') {
+                errorMessage += (_.isUndefined(i18n['Please specify product name'])?'Please specify product name':i18n['Please specify product name']);
+                error = true;
+                self.$el.find('#product-name').addClass('error');
+            }
+
+            if (imageUrl === '' || imageUrl === this.websiteUrl+'system/images/noimage.png') {
+                errorMessage +='<br/>'+ (_.isUndefined(i18n['Please upload product image'])?'Please upload product image':i18n['Please upload product image']);
+                error = true;
+                self.$el.find('.product-preview').addClass('error');
+            }
+
+            if (error === true) {
+                showMessage(errorMessage, true, 3000);
+                return false;
+            }
+
+            self.$el.find('#product-name').removeClass('error');
+            self.$el.find('.product-preview').removeClass('error');
+
+            showSpinner();
+
+            $.ajax({
+                'url': $('#website_url').val() + 'api/store/productdescriptionai/',
+                'type':'POST',
+                'dataType':'json',
+                'data': {
+                    responseType: responseType,
+                    imageUrl:imageUrl,
+                    productName:productName,
+                    wordCount:wordCount,
+                    secureToken:$('#product-screen-secure-token').val()
+                }
+            }).done(function(responseData){
+                hideSpinner();
+                if (parseInt(responseData.error) === 1) {
+                    showMessage(responseData.message, true, 3000);
+                    return false;
+                }
+
+                if (responseType === 'no_formatting') {
+                    self.$el.find('#product-shortDescription').val(responseData.message);
+                    self.model.set('shortDescription', responseData.message);
+                } else {
+                    tinymce.activeEditor.setContent(responseData.message);
+                }
+            });
         }
+
 	});
 
 	return AppView;
