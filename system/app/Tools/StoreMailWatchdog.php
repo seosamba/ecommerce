@@ -64,6 +64,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     const TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION = 'store_partialpaymentnotif';
 
+    /**
+     * Notify customer if qty of product was changed
+     */
+    const TRIGGER_LOCATION_INVENTORY_NOTIFICATION = 'store_locationinventorynotification';
+
     const SHIPPING_TYPE = 'shipping';
 
     const BILLING_TYPE = 'billing';
@@ -1011,6 +1016,101 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
 
         return '';
+    }
+
+    private function _sendLocationinventorynotificationMail()
+    {
+        $systemConfig = $this->_configHelper->getConfig();
+        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+        $bccArray = array();
+        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
+        switch ($this->_options['recipient']) {
+            case Tools_Security_Acl::ROLE_ADMIN:
+                $this->_mailer->setMailToLabel('Admin')
+                    ->setMailTo($adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
+                $adminUsers = $userMapper->fetchAll($where);
+                if(!empty($adminUsers)){
+                   $locationEmails = $this->_options['notificationData']['locationEmail'];
+
+                   if(!empty($locationEmails)){
+                       $locationEmails = explode(',', $locationEmails);
+                       foreach($adminUsers as $admin){
+                           if(in_array($admin->getEmail(), $locationEmails)){
+                               array_push($bccArray, $admin->getEmail());
+                           }
+                       }
+                   } else {
+                       foreach($adminUsers as $admin){
+                           array_push($bccArray, $admin->getEmail());
+                       }
+
+                       $this->_mailer->setMailBcc($bccArray);
+                   }
+                }
+
+                break;
+            case self::RECIPIENT_SALESPERSON:
+                $this->_mailer->setMailToLabel($this->_object->getFullName())
+                    ->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
+                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
+                $salesPersons = $userMapper->fetchAll($where);
+                if(!empty($salesPersons)){
+                    $locationEmails = $this->_options['notificationData']['locationEmail'];
+
+                    if(!empty($locationEmails)){
+                        $locationEmails = explode(',', $locationEmails);
+                        foreach($salesPersons as $salesPerson){
+                            if(in_array($salesPerson->getEmail(), $locationEmails)){
+                                array_push($bccArray, $salesPerson->getEmail());
+                            }
+                        }
+                    } else {
+                        foreach($salesPersons as $salesPerson){
+                            array_push($bccArray, $salesPerson->getEmail());
+                        }
+
+                        $this->_mailer->setMailBcc($bccArray);
+                    }
+
+                }
+                break;
+            default:
+                error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+                return false;
+                break;
+        }
+
+        if(!empty($bccArray) && !empty($this->_options['notificationData']['locationEmail'])){
+            $locationEmails = explode(',', $this->_options['notificationData']['locationEmail']);
+            foreach($locationEmails as $locationEmail){
+                if(!in_array($locationEmail, $bccArray)){
+                    array_push($bccArray, $locationEmail);
+                }
+            }
+
+            $this->_mailer->setMailBcc($bccArray);
+        }
+
+        $preparedProducts = '';
+        $products = $this->_options['notificationData']['products'];
+
+        if(!empty($products)){
+            foreach ($products as $product) {
+                $preparedProducts .= $product . '</br>';
+            }
+        }
+
+        $this->_entityParser->addToDictionary(
+            array(
+                'order:id' => $this->_options['notificationData']['orderId'],
+                'location:name' => $this->_options['notificationData']['locationName'],
+                'location:products' => $preparedProducts,
+            )
+        );
+
+        $status = $this->_send();
+        return $status;
     }
 
 }

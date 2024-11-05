@@ -268,6 +268,8 @@ $this->headLink()
                         <?php else:?>
                             <li><a href="#<?php echo $configTab['tabId'];?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
                         <?php endif;?>
+                    <?php elseif($configTab['type'] === 'internalAdditional' && !empty($configTab['internalActionTab'])):?>
+                        <li><a href="<?php echo $this->websiteUrl; ?>plugin/shopping/run/<?php echo $configTab['internalActionTab']; ?>"><?php echo $this->translate($configTab['tabName']);?></a></li>
                     <?php else :?>
                         <li><a href="<?php echo $this->websiteUrl; ?>plugin/<?php echo $configTab['tabId'];?>/run/tab/""><?php echo $this->translate($configTab['tabName']);?></a></li>
                     <?php endif;?>
@@ -549,6 +551,7 @@ $this->headLink()
                 <?php echo $this->partial('product/digital-product.phtml'); ?>
             </div>
         <?php endif;?>
+
 
         <div class="mt10px grid_12">
             <a href="javascript:;" class="delete-selected error" alt="<?php echo $this->translate('Delete this product'); ?>" id="delete" style="display: none;">[ <?php echo $this->translate('Delete this product'); ?> ]</a>

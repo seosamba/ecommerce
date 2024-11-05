@@ -52,6 +52,25 @@ class Forms_OperationsSettings extends Zend_Form {
             )
         ));
 
+        $locations = Tools_Misc::getLocationsData();
+
+        $locationsList = array();
+        if(!empty($locations)) {
+            foreach($locations as $location) {
+                $locationsList[$location['id']] = $location['name'];
+            }
+        }
+
+        $this->addElement(new Zend_Form_Element_Select(
+            array(
+                'name' => 'defaultLocationId',
+                'id' => 'default-location-id',
+                'label' => $translator->translate('Global default location'),
+                'class' => 'grid_6 alpha mb10px',
+                'multiOptions' => array('0' => $translator->translate('Select global default location')) + $locationsList
+            )
+        ));
+
 
     }
 

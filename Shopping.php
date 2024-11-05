@@ -1519,7 +1519,6 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->gatewayLabelsList = $gatewayLabelsList;
 
             $isPluginWithTagPosExist = false;
-            $soldLocationsInfo = array();
             $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
             if (!empty($availablePlugins)) {
                 $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
@@ -1527,26 +1526,24 @@ class Shopping extends Tools_Plugins_Abstract {
                 $this->_view->pickupLocations = $pickupLocations;
 
                 $isPluginWithTagPosExist = true;
+            }
 
-                $pluginExistsAndEnabled = false;
-                $pluginMapper = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
-                if ($pluginMapper instanceof Application_Model_Models_Plugin) {
-                    $pluginStatus = $pluginMapper->getStatus();
-                    if ($pluginStatus === 'enabled') {
-                        $pluginExistsAndEnabled = true;
-                    }
-                }
+            $cartLocationInventoryMapper = Models_Mapper_CartLocationInventoryMapper::getInstance();
+            $productAndLocationInfo = $cartLocationInventoryMapper->getLocationInventoryInfo($id);
 
-                if($pluginExistsAndEnabled) {
-                    $seosambaposCartLocationInventoryMapper = Seosambapos_Models_Mappers_SeosambaposCartLocationInventoryMapper::getInstance();
-                    $productAndLocationInfo = $seosambaposCartLocationInventoryMapper->getLocationInventoryInfo($id);
+            $soldLocationsInfo = array();
+            $locationsCounter = array();
+            if(!empty($productAndLocationInfo)) {
+                $soldLocationsInfo = $productAndLocationInfo;
 
-                    if(!empty($productAndLocationInfo)) {
-                        $soldLocationsInfo = $productAndLocationInfo;
+                foreach ($soldLocationsInfo as $key => $locationInfo) {
+                    if(!empty($locationInfo['location_id'])) {
+                        $locationsCounter[$locationInfo['product_id']] += 1;
                     }
                 }
             }
 
+            $this->_view->locationsCounter = $locationsCounter;
             $this->_view->soldLocationsInfo = $soldLocationsInfo;
             $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
 
@@ -3914,6 +3911,256 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
         }
+    }
+
+    public function productLocationInventoryAction()
+    {
+        if (!Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            throw new Exceptions_SeotoasterPluginException('Forbidden');
+        }
+
+        $pid = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+        $productId = '';
+        if (!empty($pid)) {
+            $productId = $pid;
+        }
+
+        $this->_view->productId = $productId;
+
+        echo $this->_view->render('productLocationInventoryTab.phtml');
+    }
+
+    public function productLocationsDataAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+            if (!$tokenValid) {
+                $this->_responseHelper->fail(array('message' => $this->_translator->translate('Please re-login'), 'status' => 'error'));
+            }
+
+            $productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+
+            $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+
+            $savedLocations = array();
+            $selectedLocationsData = array();
+            $productInventory = null;
+            if(!empty($productId)) {
+                $product = $productMapper->findByProductId($productId);
+
+                if(!empty($product)) {
+                    $productInventory = $product['inventory'];
+                }
+
+                $savedLocations = $productLocationsMapper->findLocationsByProductId($productId);
+
+                if(!empty($savedLocations)) {
+                    foreach ($savedLocations as $key => $sLocation) {
+                        $selectedLocationsData[$key] = array('label' => $sLocation['name'], 'id' => $sLocation['location_id']);
+                    }
+                }
+            }
+
+            $pickupLocationsData = array();
+
+            $pickupLocations = Tools_Misc::getLocationsData();
+
+            if(!empty($pickupLocations)) {
+                foreach ($pickupLocations as $location) {
+                    $pickupLocationsData[] = array('label' => $location['name'], 'id' => $location['id']);
+                }
+
+                $enableSeosambaPosPlugin = false;
+
+                $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+                if ($enabledSeosambaPosPlugin != null) {
+                    if ($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                        $enableSeosambaPosPlugin = true;
+                    }
+                }
+
+                $defProductId = '';
+
+                if($enableSeosambaPosPlugin){
+                    $defaultProductSettingsMapper = Seosambapos_Models_Mappers_SeosambaposDefaultproductSettingMapper::getInstance();
+                    $defaultProductId = $defaultProductSettingsMapper->getConfigParam('defaultProductId');
+
+                    if(!empty($defaultProductId)) {
+                        $defProductId = $defaultProductId;
+                    }
+                }
+
+                $this->_responseHelper->success(array(
+                    'savedLocations' => $savedLocations,
+                    'pickupLocations' => $pickupLocationsData,
+                    'selectedLocationsData' => $selectedLocationsData,
+                    'productInventory' => $productInventory,
+                    'defaultProductId' => $defProductId,
+                    'status' => 'ok'
+                ));
+            }
+
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('Locations not found!'), 'status' => 'error'));
+        } else {
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('You have no access!'), 'status' => 'error'));
+        }
+    }
+
+    public function addNewLocationAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+            if (!$tokenValid) {
+                $this->_responseHelper->fail(array('message' => $this->_translator->translate('Please re-login'), 'status' => 'error'));
+            }
+
+            $productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+            $newLocationId = filter_var($this->_request->getParam('newLocationId'), FILTER_SANITIZE_NUMBER_INT);
+            $newInventory = filter_var($this->_request->getParam('newInventory'), FILTER_SANITIZE_NUMBER_INT);
+
+            if(!empty($productId) && !empty($newLocationId)) {
+                $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+
+                $existedProductLocation = $productLocationsMapper->findLocationByProductIdAndLocationId($productId, $newLocationId);
+
+                if(!empty($existedProductLocation)) {
+                    $this->_responseHelper->fail(array('message' => $this->_translator->translate('Product location already exists for this product'), 'status' => 'error'));
+                }
+
+                $newInventory = empty($newInventory) ? 0 : $newInventory;
+
+                $productLocationsModel = new Models_Model_ProductLocationsModel();
+                $productLocationsModel->setProductId($productId);
+                $productLocationsModel->setLocationId($newLocationId);
+                $productLocationsModel->setInventory($newInventory);
+                $productLocationsModel->setIsDefaultLocation(0);
+                $productLocationsModel->setIsQuickProduct(0);
+
+                $productLocationsMapper->save($productLocationsModel);
+
+                $this->_responseHelper->success(array('status' => 'ok', 'message' => $this->_translator->translate('Added')));
+            }
+
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('Requested params should not be empty!'), 'status' => 'error'));
+        } else {
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('You have no access!'), 'status' => 'error'));
+        }
+    }
+
+    public function deleteLocationAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+            if (!$tokenValid) {
+                $this->_responseHelper->fail(array('message' => $this->_translator->translate('Please re-login'), 'status' => 'error'));
+            }
+
+            $locationId = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+
+            if(!empty($locationId)) {
+                $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+                $productLocationsMapper->deleteLocation($locationId);
+
+                $this->_responseHelper->success(array('status' => 'ok', 'message' => $this->_translator->translate('Deleted')));
+            }
+
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('ID is empty!'), 'status' => 'error'));
+        } else {
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('You have no access!'), 'status' => 'error'));
+        }
+    }
+
+    public function changeSavedLocationInfoAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+            if (!$tokenValid) {
+                $this->_responseHelper->fail(array('message' => $this->_translator->translate('Please re-login'), 'status' => 'error'));
+            }
+
+            $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
+            $newLocationId = filter_var($this->_request->getParam('newLocationId'), FILTER_SANITIZE_NUMBER_INT);
+            $newInventory = filter_var($this->_request->getParam('newInventory'), FILTER_SANITIZE_NUMBER_INT);
+            $checkedDefault = filter_var($this->_request->getParam('checkedDefault'), FILTER_SANITIZE_NUMBER_INT);
+
+            if(!empty($id)) {
+                $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+                $currentLocation = $productLocationsMapper->find($id);
+
+                if($currentLocation instanceof Models_Model_ProductLocationsModel) {
+                    if(!empty($newLocationId)) {
+                        $pickupLocationMapper = Store_Mapper_PickupLocationMapper::getInstance();
+                        $pickupLocation = $pickupLocationMapper->find($newLocationId);
+
+                        if($pickupLocation instanceof Store_Model_PickupLocation) {
+                            $currentLocation->setLocationId($newLocationId);
+                            $productLocationsMapper->save($currentLocation);
+                        } else {
+                            $this->_responseHelper->fail(array('message' => $this->_translator->translate('Location not found in store!'), 'status' => 'error'));
+                        }
+                    }
+
+                    if($newInventory != '') {
+                        $currentLocation->setInventory($newInventory);
+                        $productLocationsMapper->save($currentLocation);
+                    }
+
+                    if($checkedDefault != '') {
+                        $isDefaultLocation = 0;
+                        if(!empty($checkedDefault)) {
+                            $isDefaultLocation = 1;
+                        }
+
+                        $currentLocation->setIsDefaultLocation($isDefaultLocation);
+                        $productLocationsMapper->save($currentLocation);
+                    }
+
+                    $this->_responseHelper->success(array('status' => 'ok', 'message' => $this->_translator->translate('Updated')));
+                }
+
+                $this->_responseHelper->fail(array('message' => $this->_translator->translate('Saved location not found!'), 'status' => 'error'));
+            }
+
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('ID is empty!'), 'status' => 'error'));
+        } else {
+            $this->_responseHelper->fail(array('message' => $this->_translator->translate('You have no access!'), 'status' => 'error'));
+        }
+    }
+
+    public function changeLocationProductOrderStatusAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)) {
+            $secureToken = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $tokenValid = Tools_System_Tools::validateToken($secureToken, self::SHOPPING_SECURE_TOKEN);
+            if (!$tokenValid) {
+                $this->_responseHelper->fail(array('message' => $this->_translator->translate('Please re-login'), 'status' => 'error'));
+            }
+
+            $cartId = filter_var($this->_request->getParam('cartId'), FILTER_SANITIZE_NUMBER_INT);
+            $productId = filter_var($this->_request->getParam('productId'), FILTER_SANITIZE_NUMBER_INT);
+            $locationId = filter_var($this->_request->getParam('locationId'), FILTER_SANITIZE_NUMBER_INT);
+            $status = filter_var($this->_request->getParam('status'), FILTER_SANITIZE_STRING);
+
+            $cartLocationInventoryMapper = Models_Mapper_CartLocationInventoryMapper::getInstance();
+
+            $cartLocationInventoryModel = $cartLocationInventoryMapper->findByCartProductLocationId($cartId, $productId, $locationId);
+
+            if($cartLocationInventoryModel instanceof Models_Model_CartLocationInventoryModel) {
+                $cartLocationInventoryModel->setProductStatus($status);
+
+                $cartLocationInventoryMapper->save($cartLocationInventoryModel);
+
+                $this->_responseHelper->success($this->_translator->translate('Status changed'));
+            }
+
+            $this->_responseHelper->fail($this->_translator->translate('Can not change status. Saved location not found!'));
+        }
+
     }
 
 

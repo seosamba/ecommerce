@@ -299,8 +299,8 @@ class Api_Store_Products extends Api_Service_Abstract {
                         $defaultProductId = $defaultProductSettingsMapper->getConfigParam('defaultProductId');
 
                         $locationInventories = 0;
-                        $seosambaposProductLocationsMapper = Seosambapos_Models_Mappers_SeosambaposProductLocationsMapper::getInstance();
-                        $productLocations = $seosambaposProductLocationsMapper->findLocationsByProductId($products->getId());
+                        $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+                        $productLocations = $productLocationsMapper->findLocationsByProductId($products->getId());
 
                         if(!empty($productLocations)) {
                             foreach ($productLocations as $pKey => $pLocation){

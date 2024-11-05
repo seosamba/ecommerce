@@ -65,7 +65,9 @@ define([
                 checkedCashRegisterLabel = model.get('cashRegisterLabel'),
                 cashRegisterList = model.get('cashRegisterList'),
                 country = model.get('country'),
-                state = model.get('state');
+                state = model.get('state'),
+                email = model.get('email'),
+                sendEmailNotification = model.get('send_email_notification');
 
             $('.register-row').remove();
             $('.location-name').val(model.get('name'));
@@ -111,6 +113,13 @@ define([
             $('.location-phone').val(model.get('phone'));
             $('#location-external-id').val(model.get('external_id'));
             $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
+            $('.location-email').val(model.get('email'));
+            $('#send-email-notification').val(model.get('send_email_notification')).prop('checked', true);
+
+            if(sendEmailNotification == 0) {
+                $('#send-email-notification').prop('checked', false);
+            }
+
             var cashRegisterIdView = [];
             if(typeof checkedCashRegisterId !== 'undefined' && checkedCashRegisterId.length && typeof checkedCashRegisterLabel !== 'undefined' && checkedCashRegisterLabel.length) {
                 _.each(checkedCashRegisterId, function(value, id){

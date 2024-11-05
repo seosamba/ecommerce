@@ -55,7 +55,12 @@ define([
                 }
             }
 
-            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterIds='+cashRegisterIds;
+            var sendEmailNotification = 0;
+            if(form.find('#send-email-notification').prop('checked')){
+                sendEmailNotification = 1;
+            }
+
+            var data = this.$el.serialize()+'&'+$('.working-hours-list').find('input').serialize()+'&categoryId='+$(".ui-state-active").find('a').data('category-id')+'&id='+$('#location-edit-id').val()+'&cashRegisterIds='+cashRegisterIds+'&sendEmailNotification='+sendEmailNotification;
             $.ajax({
                 url: this.$el.attr('action'),
                 data: data,
@@ -77,6 +82,7 @@ define([
                     }
                     $('#edit-pickup-location').attr('method', 'POST');
                     $('#edit-pickup-location').find('input[name!="secureToken"]').val('');
+                    $('#send-email-notification').prop('checked', true);
                 },
                 error: function(response){
                     hideSpinner();

@@ -10,6 +10,8 @@
         <link href="<?php echo $this->websiteUrl;?>system/css/seotoaster.css" rel="stylesheet" media="all">
     <?php endif;?>
     <div class="content scroll">
+        <input type="hidden" id="shopping-secure-token" name="secureToken"
+               value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
         <div id="order-view" class="toaster-widget clearfix">
             <div class="grid_12 mb20px">
                 <div class="title"><?php echo $this->translate('Summary');?></div>
@@ -286,13 +288,25 @@
                                              alt="<?php echo $product->getName(); ?>"/>
                                     <?php endif;?>
                                     <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?>
-                                    <?php if (!empty($this->isPluginWithTagPosExist) && !empty($this->soldLocationsInfo)):?>
+                                    <?php if (!empty($this->soldLocationsInfo)):?>
                                         <br/>
-                                        <b><?php echo $this->translate('The location of the product\'s sale');?></b>:
+                                        <?php $wisibleLabel = false;?>
                                         <?php foreach ($this->soldLocationsInfo as $locationInfo): ?>
-                                            <br/>
-                                            <?php if($item['product_id'] == $locationInfo['product_id']):?>
-                                                <span class="sold-location"><?php echo $locationInfo['location_name'];?> - (<?php echo $locationInfo['location_inventory'];?>) </span>
+                                            <?php if($item['product_id'] == $locationInfo['product_id'] && array_key_exists($locationInfo['product_id'], $this->locationsCounter)):?>
+                                                <?php if(!$wisibleLabel):?>
+                                                    <b><?php echo $this->translate('The location of the product\'s sale');?></b>:
+                                                <?php endif;?>
+                                                <?php $wisibleLabel = true;?>
+                                                <br/>
+                                                <div class="grid_12 alpha omega location-order">
+                                                    <span class="sold-location"><?php echo (!empty($locationInfo['location_name']) ? $locationInfo['location_name'] : $this->translate('none location'));?> <?php echo (empty($locationInfo['location_name']) ? '<i class="ticon-info tooltip icon15 mb0px" title="'. $this->translate('The product quantity was larger than available in all locations warehouses.') .'"></i>' : '');?> - (<?php echo $locationInfo['location_inventory'];?>)</span>
+                                                    <?php if(!empty($locationInfo['location_name'])):?>
+                                                        <select class="location-order-status" name="location-order-status" id="location-order-status" data-cartid="<?php echo $locationInfo['cart_id']; ?>" data-productid="<?php echo $locationInfo['product_id']; ?>" data-locationid="<?php echo $locationInfo['location_id']; ?>">
+                                                            <option value="new"><?php echo $this->translate('New');?></option>
+                                                            <option value="fulfilled" <?php echo (!empty($locationInfo['product_status']) && ($locationInfo['product_status'] == 'fulfilled')) ? 'selected' : ''?>><?php echo $this->translate('Fulfilled');?></option>
+                                                        </select>
+                                                    <?php endif;?>
+                                                </div>
                                             <?php endif;?>
                                         <?php endforeach;?>
                                     <?php endif;?>
@@ -468,6 +482,38 @@
         </div>
     </div>
 </div>
+<script>
+    $('.location-order-status').on('change', function(e) {
+        e.preventDefault();
+        var locationOrderEl = $(e.currentTarget),
+            cartId = locationOrderEl.data('cartid'),
+            productId = locationOrderEl.data('productid'),
+            locationId = locationOrderEl.data('locationid'),
+            status = locationOrderEl.val();
+
+        $.ajax({
+            'url': $('#website_url').val()+'plugin/shopping/run/changeLocationProductOrderStatus/',
+            'type': 'POST',
+            'dataType': 'json',
+            'data': {
+                'cartId': cartId,
+                'productId': productId,
+                'locationId': locationId,
+                'status': status,
+                'secureToken': $('#shopping-secure-token').val()
+            }
+        }).done(function(response){
+            if (!response.error) {
+                showMessage(response.responseText, false);
+            } else {
+                showMessage(response.responseText, true);
+            }
+        }).fail(function(response){
+
+        });
+    });
+</script>
+
 <style>
 	.title{
         color         : #666;

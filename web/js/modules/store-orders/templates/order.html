@@ -37,6 +37,12 @@
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
 
+<td>
+    <span class="location-inventory-status-<%= id %> hide">
+        <i class="tooltip info ticon-question-sign icon16 mb5px ml3"
+           title="<%= _.isUndefined(i18n['You have unprocessed products in the locations with the status \'new\'. Please change this status in order details.']) ? 'You have unprocessed products in the locations with the status \'new\'. Please change this status in order details.':i18n['You have unprocessed products in the locations with the status \'new\'. Please change this status in order details.'] %>"></i>
+    </span>
+</td>
 <td data-mobile-title="Products in cart"><%= total_products %></td>
 <td data-mobile-title="Total price"><%= accounting.formatMoney(total, moneyFormat) %>
     <% if(status === 'partial') { %>

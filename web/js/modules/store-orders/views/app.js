@@ -766,6 +766,8 @@ define(['backbone',
             this.orders.each(this.renderOrder.bind(this));
             this.orders.info()['i18n'] = i18n;
             this.$('td.paginator').html(this.templates.paginator(this.orders.information));
+            this.getOrdersLocationInventoryStatusGrid(this.orders.pluck("id"));
+            setInterval(() => {this.getOrdersLocationInventoryStatusGrid(this.orders.pluck("id"));}, 5000);
         },
         applyFilter: function(e) {
             if(typeof e !== 'undefined'){
@@ -1241,6 +1243,21 @@ define(['backbone',
                 }, 1000)
             }
         },
+        getOrdersLocationInventoryStatusGrid: function(orderIds) {
+            var self = this;
+
+            $.get($('#website_url').val()+'api/store/locationinventorygridstatus/', {'orderIds' : orderIds.join(',')}, function(response){
+                if (!_.isEmpty(response)) {
+                    _.each(response, function (statData, id) {
+                        if(statData != 'new') {
+                            self.$el.find('.location-inventory-status-' + id).addClass('hide');
+                        } else {
+                            self.$el.find('.location-inventory-status-' + id).removeClass('hide');
+                        }
+                    });
+                }
+            }, 'json');
+        }
     });
 
     return MainView;

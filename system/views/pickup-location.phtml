@@ -22,7 +22,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     ?>
 </div>
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage(); ?>"/>
-<div id="manage-pickup-locations">
+<div id="manage-pickup-locations" class="seotoaster f-container">
     <?php
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -116,14 +116,18 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     <label><?php echo $this->translate('Weight limit'); ?></label>
                     <input type="text" name="weight" class="location-weight"/>
                 </p>
+                <p>
+                    <label><?php echo $this->translate('Email'); ?></label>
+                    <input type="text" name="email" class="location-email" placeholder="first email,second email,..."/>
+                </p>
                 <?php if(!empty($this->isPluginWithTagPosExist)):?>
-                    <p class="grid_9 omega">
+                    <p class="grid_6 omega">
                         <label><?php echo $this->translate('Cash registers info'); ?></label>
                         <textarea id="cash-register-id-view" disabled name="cash-register-id-view" class="cash-register-id-view"></textarea>
                     </p>
                 <?php endif;?>
             </fieldset>
-            <p class="grid_3 mt15px text-center" id="working_hours">
+            <p class="grid_3 mt15px text-center alpha" id="working_hours">
                 <a class="working-hours-dialog" href="javascript:;">[ <?php
                     echo $this->translate(
                         'Working hours'
@@ -131,10 +135,14 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 ?> ]</a>
             </p>
             <?php if(!empty($this->isPluginWithTagPosExist)):?>
-                <p class="grid_3 mt15px text-center" id="cash-register-id-block">
+                <p class="grid_3 mt15px text-center alpha" id="cash-register-id-block">
                     <a class="cash-register-id-dialog" href="javascript:;">[ <?php echo $this->translate('Cash register ids');?> ]</a>
                 </p>
             <?php endif;?>
+            <label class="grid_3 omega mt15px mb0px "><?php echo $this->translate('Send email notification'); ?>
+                <input id="send-email-notification" class="e" checked type="checkbox" name="sendEmailNotification" value="1"/>
+            </label>
+
             <input type="hidden" name="id" id="location-edit-id"/>
             <input type="hidden" name="locationExternalId" id="location-external-id" value="" />
             <input type="hidden" name="locationAllowedToDelete" id="location-allowed-to-delete" value="" />

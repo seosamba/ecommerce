@@ -39,6 +39,10 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_cashRegisterId = '';
 
+    protected $_email = '';
+
+    protected $_sendEmailNotification = 1;
+
 
     public function setName($name)
     {
@@ -250,6 +254,30 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
         $this->_cashRegisterId = $cashRegisterId;
         return $this;
     }
+
+    public function getEmail()
+    {
+        return $this->_email;
+    }
+
+    public function setEmail($email)
+    {
+        $this->_email = $email;
+        return $this;
+    }
+
+    public function getSendEmailNotification()
+    {
+        return $this->_sendEmailNotification;
+    }
+
+    public function setSendEmailNotification($sendEmailNotification)
+    {
+        $this->_sendEmailNotification = $sendEmailNotification;
+        return $this;
+    }
+
+
 
 
 

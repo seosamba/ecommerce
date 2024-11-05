@@ -749,7 +749,43 @@ ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_id` VARCHAR(25) COLLATE 
 ALTER TABLE `shopping_cart_session` ADD COLUMN `cashier_label` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
 ALTER TABLE `shopping_cart_session` ADD COLUMN `location_id` int(10) unsigned DEFAULT NULL;
 
+-- 24/10/2024
+-- version: 3.0.5
+CREATE TABLE IF NOT EXISTS `shopping_product_locations` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `product_id` INT(10) UNSIGNED NOT NULL,
+    `location_id` INT(10) UNSIGNED NOT NULL,
+    `inventory` INT(10) UNSIGNED DEFAULT NULL,
+    `is_default_location` ENUM('0', '1') DEFAULT '0',
+    `is_quick_product` ENUM('0', '1') DEFAULT '0',
+    PRIMARY KEY(`id`),
+    UNIQUE (`product_id`, `location_id`),
+    FOREIGN KEY(`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (`location_id`) REFERENCES `shopping_pickup_location` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_cart_location_inventory` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `cart_id` INT(10) UNSIGNED NOT NULL,
+    `product_id` INT(10) UNSIGNED NOT NULL,
+    `location_id` INT(10) UNSIGNED DEFAULT NULL COMMENT 'from which location added inventory',
+    `location_inventory` INT(10) UNSIGNED DEFAULT NULL COMMENT 'location inventory added to cart',
+    `product_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY(`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+    INDEX `cart_id` (`cart_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `shopping_pickup_location` ADD COLUMN `email` TEXT COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_pickup_location` ADD COLUMN `send_email_notification` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '1';
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_locationinventorynotification'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_locationinventorynotification' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.5' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.6' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 

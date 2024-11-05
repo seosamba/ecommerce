@@ -115,7 +115,8 @@ class Tools_Misc
         3 => array('tabId' => 'options-tab', 'tabName' => 'Product options', 'type' => 'internal'),
         4 => array('tabId' => 'related-tab', 'tabName' => 'Cross selling', 'type' => 'internal'),
         5 => array('tabId' => 'coupon-tab', 'tabName' => 'Coupons', 'type' => 'internal'),
-        6 => array('tabId' => 'group-pricing-tab', 'tabName' => 'Groups', 'type' => 'internal')
+        6 => array('tabId' => 'group-pricing-tab', 'tabName' => 'Groups', 'type' => 'internal'),
+        7 => array('tabId' => 'location-inventory-tab', 'tabName' => 'Location inventory', 'type' => 'internalAdditional', 'internalActionTab' => 'productLocationInventory'),
     );
 
     public static $_merchandisingConfigTabs = array(
@@ -996,6 +997,33 @@ class Tools_Misc
         $timeOffsetInHours = $dateTimeZoneStore->getOffset($dateTimeServer) / 3600;
 
         return $timeOffsetInHours;
+    }
+
+    public static function getLocationsData($locationId = false)
+    {
+        $pluginExistsAndEnabled = false;
+        $pluginMapper = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+        if ($pluginMapper instanceof Application_Model_Models_Plugin) {
+            $pluginStatus = $pluginMapper->getStatus();
+            if ($pluginStatus === Application_Model_Models_Plugin::ENABLED) {
+                $pluginExistsAndEnabled = true;
+            }
+        }
+
+        if($pluginExistsAndEnabled) {
+            $terminalLocationsMapper = Seosambapos_Models_Mappers_SeosambaposTerminalLocationsMapper::getInstance();
+            $pickupLocations = $terminalLocationsMapper->getLocationsData($locationId);
+        } else {
+            $pickupLocationConfigMapper = Store_Mapper_PickupLocationConfigMapper::getInstance();
+            $pickupLocations = $pickupLocationConfigMapper->getLocationsData();
+        }
+
+        if(!empty($pickupLocations)) {
+            return $pickupLocations;
+        }
+
+        return array();
+
     }
 
 }

@@ -90,6 +90,7 @@ define([
                     case 'coupon-tab':
                     case 'group-pricing-tab':
                     case 'digital-product-tab':
+                    case 'location-inventory-tab':
                         if (self.model.isNew()){
                             showMessage(_.isUndefined(i18n['Please save product information first'])?'Please save product information first':i18n['Please save product information first'], true);
                             return false;

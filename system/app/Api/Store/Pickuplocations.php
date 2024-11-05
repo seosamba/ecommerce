@@ -136,6 +136,9 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             $pickupLocationModel->setCashRegisterId($data['cashRegisterIds']);
         }
 
+        $pickupLocationModel->setEmail($data['email']);
+        $pickupLocationModel->setSendEmailNotification($data['sendEmailNotification']);
+
         $pickupLocationMapper->save($pickupLocationModel);
     }
 
@@ -188,6 +191,9 @@ class Api_Store_Pickuplocations extends Api_Service_Abstract
             if(!empty($data['cashRegisterIds'])) {
                 $pickupLocationModel->setCashRegisterId($data['cashRegisterIds']);
             }
+
+            $pickupLocationModel->setEmail($data['email']);
+            $pickupLocationModel->setSendEmailNotification($data['sendEmailNotification']);
 
             $pickupLocationMapper->save($pickupLocationModel);
         } else {
