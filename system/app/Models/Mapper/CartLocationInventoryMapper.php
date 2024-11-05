@@ -101,7 +101,9 @@ class Models_Mapper_CartLocationInventoryMapper extends Application_Model_Mapper
             'pscli.location_id',
             'pscli.location_inventory',
             'pscli.product_status',
-        ));
+            'cartStatus' => 'scs.status',
+        ))
+        ->joinLeft(array('scs' => 'shopping_cart_session'), 'pscli.cart_id = scs.id', array());
         $select->where($where);
         return $this->getDbTable()->getAdapter()->fetchAll($select);
 

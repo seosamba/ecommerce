@@ -58,9 +58,6 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                 if (Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('throttleTransactions') === 'true') {
                     Tools_Misc::addThrottleTransaction();
                 }
-
-                self::processProductLocationInventory($cart);
-                self::productLocationInventoryNotification($cartId);
             }
 
             if ($status === Models_Model_CartSession::CART_STATUS_NOT_VERIFIED) {
@@ -94,7 +91,16 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
             }
 
 
-			Models_Mapper_CartSessionMapper::getInstance()->save($cart);
+            Models_Mapper_CartSessionMapper::getInstance()->save($cart);
+
+            if($status == Models_Model_CartSession::CART_STATUS_COMPLETED
+                || $status == Models_Model_CartSession::CART_STATUS_SHIPPED
+                || $status == Models_Model_CartSession::CART_STATUS_DELIVERED
+                || $status == Models_Model_CartSession::CART_STATUS_PARTIAL
+            ) {
+                self::processProductLocationInventory($cart);
+                self::productLocationInventoryNotification($cartId);
+            }
 		}
 
 		return $this;

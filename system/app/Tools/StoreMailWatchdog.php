@@ -1051,7 +1051,7 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
 
                 break;
             case self::RECIPIENT_SALESPERSON:
-                $this->_mailer->setMailToLabel($this->_object->getFullName())
+                $this->_mailer->setMailToLabel('Sales person')
                     ->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
                 $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
                 $salesPersons = $userMapper->fetchAll($where);

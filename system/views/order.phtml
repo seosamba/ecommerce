@@ -288,27 +288,33 @@
                                              alt="<?php echo $product->getName(); ?>"/>
                                     <?php endif;?>
                                     <br/><?php echo $this->translate('SKU');?>: <?php echo $item['sku'];?>
-                                    <?php if (!empty($this->soldLocationsInfo)):?>
-                                        <br/>
-                                        <?php $wisibleLabel = false;?>
-                                        <?php foreach ($this->soldLocationsInfo as $locationInfo): ?>
-                                            <?php if($item['product_id'] == $locationInfo['product_id'] && array_key_exists($locationInfo['product_id'], $this->locationsCounter)):?>
-                                                <?php if(!$wisibleLabel):?>
-                                                    <b><?php echo $this->translate('The location of the product\'s sale');?></b>:
-                                                <?php endif;?>
-                                                <?php $wisibleLabel = true;?>
-                                                <br/>
-                                                <div class="grid_12 alpha omega location-order">
-                                                    <span class="sold-location"><?php echo (!empty($locationInfo['location_name']) ? $locationInfo['location_name'] : $this->translate('none location'));?> <?php echo (empty($locationInfo['location_name']) ? '<i class="ticon-info tooltip icon15 mb0px" title="'. $this->translate('The product quantity was larger than available in all locations warehouses.') .'"></i>' : '');?> - (<?php echo $locationInfo['location_inventory'];?>)</span>
-                                                    <?php if(!empty($locationInfo['location_name'])):?>
-                                                        <select class="location-order-status" name="location-order-status" id="location-order-status" data-cartid="<?php echo $locationInfo['cart_id']; ?>" data-productid="<?php echo $locationInfo['product_id']; ?>" data-locationid="<?php echo $locationInfo['location_id']; ?>">
-                                                            <option value="new"><?php echo $this->translate('New');?></option>
-                                                            <option value="fulfilled" <?php echo (!empty($locationInfo['product_status']) && ($locationInfo['product_status'] == 'fulfilled')) ? 'selected' : ''?>><?php echo $this->translate('Fulfilled');?></option>
-                                                        </select>
+                                    <?php if($this->order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED
+                                        || $this->order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED
+                                        || $this->order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED
+                                        || $this->order->getStatus() == Models_Model_CartSession::CART_STATUS_PARTIAL
+                                    ) :?>
+                                        <?php if (!empty($this->soldLocationsInfo)):?>
+                                            <br/>
+                                            <?php $wisibleLabel = false;?>
+                                            <?php foreach ($this->soldLocationsInfo as $locationInfo): ?>
+                                                <?php if($item['product_id'] == $locationInfo['product_id'] && array_key_exists($locationInfo['product_id'], $this->locationsCounter)):?>
+                                                    <?php if(!$wisibleLabel):?>
+                                                        <b><?php echo $this->translate('The location of the product\'s sale');?></b>:
                                                     <?php endif;?>
-                                                </div>
-                                            <?php endif;?>
-                                        <?php endforeach;?>
+                                                    <?php $wisibleLabel = true;?>
+                                                    <br/>
+                                                    <div class="grid_12 alpha omega location-order">
+                                                        <span class="sold-location"><?php echo (!empty($locationInfo['location_name']) ? $locationInfo['location_name'] : $this->translate('none location'));?> <?php echo (empty($locationInfo['location_name']) ? '<i class="ticon-info tooltip icon15 mb0px" title="'. $this->translate('The product quantity was larger than available in all locations warehouses.') .'"></i>' : '');?> - (<?php echo $locationInfo['location_inventory'];?>)</span>
+                                                        <?php if(!empty($locationInfo['location_name'])):?>
+                                                            <select class="location-order-status" name="location-order-status" id="location-order-status" data-cartid="<?php echo $locationInfo['cart_id']; ?>" data-productid="<?php echo $locationInfo['product_id']; ?>" data-locationid="<?php echo $locationInfo['location_id']; ?>">
+                                                                <option value="new"><?php echo $this->translate('New');?></option>
+                                                                <option value="fulfilled" <?php echo (!empty($locationInfo['product_status']) && ($locationInfo['product_status'] == 'fulfilled')) ? 'selected' : ''?>><?php echo $this->translate('Fulfilled');?></option>
+                                                            </select>
+                                                        <?php endif;?>
+                                                    </div>
+                                                <?php endif;?>
+                                            <?php endforeach;?>
+                                        <?php endif;?>
                                     <?php endif;?>
 
                                     <?php if (!empty($item['options'])): ?>
