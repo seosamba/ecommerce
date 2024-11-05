@@ -35,6 +35,9 @@ class Api_Store_LocationInventoryGridStatus extends Api_Service_Abstract {
             if(!empty($cartLocationInventoryData)) {
                 foreach ($cartLocationInventoryData as $cartLocationInventory) {
                     if($cartLocationInventory['product_status'] != 'new') {
+                        if(!empty($data[$cartLocationInventory['cart_id']]) && $data[$cartLocationInventory['cart_id']] == 'new') {
+                            continue;
+                        }
                         $data[$cartLocationInventory['cart_id']] = 'fulfilled';
                     } else {
                         $data[$cartLocationInventory['cart_id']] = 'new';
