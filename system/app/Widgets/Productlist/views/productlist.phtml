@@ -41,6 +41,9 @@
         <?php if (!empty($this->isPreview) && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)): ?>
             <a class="btn backToOriginal"><?php echo $this->translate('Back to drag & drop'); ?></a>
         <?php endif; ?>
+        <?php if(!empty($this->filterable) && empty($this->plContent)) {
+            $this->plContent = $this->translate('Sorry, there are no products matching selected filters.');
+        }?>
         <?php echo $this->plContent; ?>
         <input type="hidden" name="<?php echo $id; ?>_filters"
                data-filters-default='<?php echo json_encode(!empty($this->filters) ? array_filter($this->filters) : array()); ?>'>
