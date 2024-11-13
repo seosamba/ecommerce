@@ -1018,77 +1018,43 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         return '';
     }
 
+    /**
+     * Send location inventory email notification
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
     private function _sendLocationinventorynotificationMail()
     {
-        $systemConfig = $this->_configHelper->getConfig();
-        $userMapper = Application_Model_Mappers_UserMapper::getInstance();
         $bccArray = array();
-        $adminEmail = isset($systemConfig['adminEmail'])?$systemConfig['adminEmail']:'admin@localhost';
         switch ($this->_options['recipient']) {
-            case Tools_Security_Acl::ROLE_ADMIN:
-                $this->_mailer->setMailToLabel('Admin')
-                    ->setMailTo($adminEmail);
-                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Tools_Security_Acl::ROLE_ADMIN);
-                $adminUsers = $userMapper->fetchAll($where);
-                if(!empty($adminUsers)){
-                   $locationEmails = $this->_options['notificationData']['locationEmail'];
-
-                   if(!empty($locationEmails)){
-                       $locationEmails = explode(',', $locationEmails);
-                       foreach($adminUsers as $admin){
-                           if(in_array($admin->getEmail(), $locationEmails)){
-                               array_push($bccArray, $admin->getEmail());
-                           }
-                       }
-                   } else {
-                       foreach($adminUsers as $admin){
-                           array_push($bccArray, $admin->getEmail());
-                       }
-
-                       $this->_mailer->setMailBcc($bccArray);
-                   }
-                }
-
-                break;
+            case Tools_Security_Acl::ROLE_SUPERADMIN:
+            case self::RECIPIENT_ADMIN:
             case self::RECIPIENT_SALESPERSON:
-                $this->_mailer->setMailToLabel('Sales person')
-                    ->setMailTo(!empty($this->_storeConfig['email'])?$this->_storeConfig['email']:$adminEmail);
-                $where = $userMapper->getDbTable()->getAdapter()->quoteInto("role_id = ?", Shopping::ROLE_SALESPERSON);
-                $salesPersons = $userMapper->fetchAll($where);
-                if(!empty($salesPersons)){
-                    $locationEmails = $this->_options['notificationData']['locationEmail'];
+            case self::RECIPIENT_CUSTOMER:
+            case Tools_Security_Acl::ROLE_MEMBER:
+                $locationEmails = $this->_options['notificationData']['locationEmail'];
+                if(!empty($locationEmails)){
+                    $locationEmails = explode(',', $locationEmails);
+                    $firstEmail = array_shift($locationEmails);
 
+                    $this->_mailer->setMailToLabel('Notified user')->setMailTo($firstEmail);
                     if(!empty($locationEmails)){
-                        $locationEmails = explode(',', $locationEmails);
-                        foreach($salesPersons as $salesPerson){
-                            if(in_array($salesPerson->getEmail(), $locationEmails)){
-                                array_push($bccArray, $salesPerson->getEmail());
-                            }
+                        foreach ($locationEmails as $locationEmail) {
+                            array_push($bccArray, $locationEmail);
                         }
-                    } else {
-                        foreach($salesPersons as $salesPerson){
-                            array_push($bccArray, $salesPerson->getEmail());
-                        }
-
-                        $this->_mailer->setMailBcc($bccArray);
                     }
-
+                    break;
+                } else {
+                    return false;
                 }
-                break;
             default:
                 error_log('Unsupported recipient '.$this->_options['recipient'].' given');
                 return false;
                 break;
         }
 
-        if(!empty($bccArray) && !empty($this->_options['notificationData']['locationEmail'])){
-            $locationEmails = explode(',', $this->_options['notificationData']['locationEmail']);
-            foreach($locationEmails as $locationEmail){
-                if(!in_array($locationEmail, $bccArray)){
-                    array_push($bccArray, $locationEmail);
-                }
-            }
-
+        if(!empty($bccArray)){
             $this->_mailer->setMailBcc($bccArray);
         }
 

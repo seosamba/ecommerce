@@ -82,7 +82,7 @@ define([
                     }
                     $('#edit-pickup-location').attr('method', 'POST');
                     $('#edit-pickup-location').find('input[name!="secureToken"]').val('');
-                    $('#send-email-notification').prop('checked', true);
+                    $('#send-email-notification').prop('checked', false);
                 },
                 error: function(response){
                     hideSpinner();

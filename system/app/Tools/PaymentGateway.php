@@ -229,7 +229,6 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
         }
 
         if(!empty($preparedLocationinventoryData)) {
-
             foreach ($preparedLocationinventoryData as $locationInventoryData) {
                 $cartLocationInventory = $cartLocationInventoryMapper->find($locationInventoryData['id']);
 
@@ -242,7 +241,6 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
                     $cartLocationInventory->notifyObservers();
                 }
             }
-
         }
     }
 
