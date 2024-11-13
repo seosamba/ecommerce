@@ -35,6 +35,9 @@
         </ul>
     <?php endif; ?>
 <?php endif; ?>
+<?php if(!empty($this->filterable) && empty($this->plContent)) :?>
+    <h3 class="nothing-found-results"><?php echo $this->translate('Sorry, there are no products matching selected filters.'); ?></h3>
+<?php endif;?>
 <?php if(empty($this->unwrap)): ?>
     <div class="product-list">
 <?php endif;?>
