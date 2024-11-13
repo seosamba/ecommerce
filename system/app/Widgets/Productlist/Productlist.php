@@ -350,15 +350,19 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 		} elseif (empty($products)) {
 			$products = $this->_loadProducts();
 		}
-        if (!empty($this->draglist) && !empty($products)) {
-            $productsToCompare = $products;
-            if($this->_limit){
-                $currentLimit = $this->_limit;
-                unset($this->_limit);
-                $productsToCompare = $this->_loadProducts();
-                $this->_limit = $currentLimit;
+        if (!empty($this->draglist)) {
+            if(empty($products)) {
+                $this->draglist['data'] = array();
+            } else {
+                $productsToCompare = $products;
+                if($this->_limit){
+                    $currentLimit = $this->_limit;
+                    unset($this->_limit);
+                    $productsToCompare = $this->_loadProducts();
+                    $this->_limit = $currentLimit;
+                }
+                $this->_compareProductsWithDraglist($productsToCompare);
             }
-            $this->_compareProductsWithDraglist($productsToCompare);
         }
         if (!empty($this->_limit) && is_numeric($this->_limit) && !empty($this->draglist)) {
             $neededIds = array();
@@ -376,11 +380,13 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
                 $res = $productMapper->fetchAll($productMapper->getDbTable()->getAdapter()->quoteInto('p.id IN (?)',
                     $neededIds));
                 $final = array();
-                for ($i = 0; $i < count($neededIds); $i++) {
-                    foreach ($res as $product) {
-                        $prodId = $product->getId();
-                        if ($neededIds[$i] == $prodId) {
-                            $final[$i] = $product;
+                if(!empty($res)) {
+                    for ($i = 0; $i < count($neededIds); $i++) {
+                        foreach ($res as $product) {
+                            $prodId = $product->getId();
+                            if ($neededIds[$i] == $prodId) {
+                                $final[$i] = $product;
+                            }
                         }
                     }
                 }
