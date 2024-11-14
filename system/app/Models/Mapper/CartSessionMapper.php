@@ -315,6 +315,25 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
     }
 
+    public function findAllAddressesByCustomerIdAndAddressId($customerId, $addressId, $type = ''){
+        if(empty($type)){
+            $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $addressId);
+            $where .= ' OR '. $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $addressId);
+            $where .= ' AND ';
+        } elseif ($type == 'shipping') {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $addressId);
+            $where .= ' AND ';
+        } elseif ($type == 'billing') {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $addressId);
+            $where .= ' AND ';
+        }
+
+        $where .= $this->getDbTable()->getAdapter()->quoteInto('user_id = ?', $customerId);
+
+        $select = $this->getDbTable()->getAdapter()->select()->from($this->getDbTable()->info('name'))->where($where);
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
+
     /**
      * Fetch orders  by user id including recurring payments data
      *
