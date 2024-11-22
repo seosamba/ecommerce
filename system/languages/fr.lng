@@ -842,6 +842,7 @@
         'Display location search on checkout' => 'Montrer la location lors du paiement',
         'Map zoom' => 'Zoom de carte',
         'Zoom range (6-18)' => 'Plage de zoom (6-18)',
+        'Google map ID' => 'ID de la carte Google',
         'total amount' => 'montant total',
         'order weight' => 'poids de commande',
         'Units' => 'Unités',
