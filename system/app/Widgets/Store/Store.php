@@ -240,6 +240,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 }
             }
 
+            $this->_view->salesIds = $ordersMapper->getSalesIds();
             $this->_view->locationIds = $locationIds;
             $this->_view->cashierIds = $ordersMapper->getCashierIds();
 

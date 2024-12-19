@@ -178,6 +178,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_locationId = null;
 
+    protected $_salesId = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -993,6 +995,23 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
         return $this;
     }
 
+    /**
+     * @return null
+     */
+    public function getSalesId()
+    {
+        return $this->_salesId;
+    }
+
+    /**
+     * @param null $salesId
+     */
+    public function setSalesId($salesId)
+    {
+        $this->_salesId = $salesId;
+
+        return $this;
+    }
 
 
 

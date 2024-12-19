@@ -796,6 +796,8 @@ NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_trigg
 WHERE `enabled` = '1' AND `trigger_name` = 'store_locationinventorynotification' AND `observer` = 'Tools_StoreMailWatchdog')
 AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
+ALTER TABLE `shopping_cart_session` ADD COLUMN `sales_id` int(10) unsigned DEFAULT NULL;
+
 -- These alters are always the latest and updated version of the database
 UPDATE `plugin` SET `version`='3.0.8' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';

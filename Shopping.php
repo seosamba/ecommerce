@@ -1531,6 +1531,7 @@ class Shopping extends Tools_Plugins_Abstract {
             $cartLocationInventoryMapper = Models_Mapper_CartLocationInventoryMapper::getInstance();
             $productAndLocationInfo = $cartLocationInventoryMapper->getLocationInventoryInfo($id);
 
+            $salesName = '';
             $soldLocationsInfo = array();
             $locationsCounter = array();
             if(!empty($productAndLocationInfo)) {
@@ -1543,9 +1544,20 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
             }
 
+            $salesId = $order->getSalesId();
+            if(!empty($salesId)) {
+                $userMapper = Application_Model_Mappers_UserMapper::getInstance();
+                $salesUserModel = $userMapper->find($salesId);
+
+                if($salesUserModel instanceof Application_Model_Models_User){
+                    $salesName = $salesUserModel->getFullName();
+                }
+            }
+
             $this->_view->locationsCounter = $locationsCounter;
             $this->_view->soldLocationsInfo = $soldLocationsInfo;
             $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
+            $this->_view->salesName = $salesName;
 
 			$this->_layout->content = $this->_view->render('order.phtml');
 

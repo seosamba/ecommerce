@@ -348,6 +348,7 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL,
   `cashier_label` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `location_id` int(10) unsigned DEFAULT NULL,
+  `sales_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),

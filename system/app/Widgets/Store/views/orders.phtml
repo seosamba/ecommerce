@@ -161,6 +161,17 @@ $this->headLink()
                 </p>
                 <?php if(!empty($this->isPluginWithTagPosExist)):?>
                     <p class="flex_2 f-omega t-grid_2">
+                        <label class="text-bold"><?php echo $this->translate('By sales person');?></label>
+                        <select class="filter" multiple id="filter-by-sales-id" name="filter-by-sales-id" data-placeholder="<?php echo $this->translate('show all');?>">
+                            <?php if (!empty($this->salesIds)) : ?>
+                                <?php foreach ($this->salesIds as $sales => $salesName): ?>
+                                    <option value="<?php echo $sales; ?>" <?php echo (!empty($this->presetConfig['filter_by_sales_id']) && in_array($sales, $this->presetConfig['filter_by_sales_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($salesName);?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </p>
+
+                    <p class="flex_2 f-omega t-grid_2">
                         <label class="text-bold"><?php echo $this->translate('By location');?></label>
                         <select class="filter" multiple id="filter-by-location-id" name="filter-by-location-id" data-placeholder="<?php echo $this->translate('show all');?>">
                             <?php if (!empty($this->locationIds)) : ?>
@@ -171,7 +182,7 @@ $this->headLink()
                         </select>
                     </p>
 
-                    <p class="flex_2 f-omega t-grid_2">
+                    <p class="flex_2 t-grid_2">
                         <label class="text-bold"><?php echo $this->translate('By cashier');?></label>
                         <select class="filter" multiple id="filter-by-cashier-id" name="filter-by-cashier-id" data-placeholder="<?php echo $this->translate('show all');?>">
                             <?php if (!empty($this->cashierIds)) : ?>

@@ -72,6 +72,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'cashier_id'                      => $model->getCashierId(),
             'cashier_label'                   => $model->getCashierLabel(),
             'location_id'                     => $model->getLocationId(),
+            'sales_id'                        => $model->getSalesId(),
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {
