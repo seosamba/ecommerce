@@ -1052,6 +1052,7 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog'),
 ('1', 'store_partialpayment', 'Tools_StoreMailWatchdog'),
+('1', 'store_partialpaymentnotif', 'Tools_StoreMailWatchdog'),
 ('1', 'store_partialpaymentsecond', 'Tools_StoreMailWatchdog'),
 ('1', 'store_locationinventorynotification', 'Tools_StoreMailWatchdog');
 

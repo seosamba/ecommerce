@@ -1617,6 +1617,7 @@ class Shopping extends Tools_Plugins_Abstract {
                                 'title' => $pickupLocationConfig['title'],
                                 'units' => $pickupLocationConfig['units'],
                                 'gmapsZoom' => $pickupLocationConfig['gmapsZoom'],
+                                'mapId' => $pickupLocationConfig['mapId'],
                                 'defaultPickupConfig' => $pickupLocationConfig['defaultPickupConfig'],
                                 'searchEnabled' => $pickupLocationConfig['searchEnabled']
                             )
@@ -2395,11 +2396,11 @@ class Shopping extends Tools_Plugins_Abstract {
             $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
             $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
             if (!$valid) {
-                exit;
+                $this->_responseHelper->fail();
             }
             $recurringPaymentType = filter_var($this->_request->getParam('recurringPaymentType'),
                 FILTER_SANITIZE_STRING);
-            $paymentType = false;
+            $paymentType = '';
             if (in_array($recurringPaymentType, Api_Store_Recurringtypes::$recurringAcceptType)) {
                 $paymentType = $recurringPaymentType;
             }
@@ -2407,6 +2408,8 @@ class Shopping extends Tools_Plugins_Abstract {
             $customer = $shoppingCart->getCustomer();
             $shoppingCart->setRecurringPaymentType($paymentType);
             $shoppingCart->save()->saveCartSession($customer);
+
+            $this->_responseHelper->success();
         }
 
     }

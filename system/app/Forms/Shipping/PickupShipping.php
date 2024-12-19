@@ -56,6 +56,14 @@ class Forms_Shipping_PickupShipping extends Zend_Form
 
         $this->addElement(
             'text',
+            'mapId',
+            array(
+                'label' => $translator->translate('Google map ID')
+            )
+        );
+
+        $this->addElement(
+            'text',
             'gmapsZoom',
             array(
                 'label' => $translator->translate('Map zoom'),

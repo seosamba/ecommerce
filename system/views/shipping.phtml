@@ -135,15 +135,20 @@ $this->headLink()
 
                     <fieldset class="config-fields-pickup-config mt10px background hidden">
                         <legend class="background large p5px"><?php echo $this->translate('Shipping pickup configuration'); ?></legend>
-                        <label class="grid_6 alpha">
+                        <label class="grid_12 omega">
                             <?php echo $this->pickupForm->getElement('searchEnabled')->renderViewHelper(); ?>
                             <?php echo $this->translate('Display location search on checkout');?>
                         </label>
-                        <p class="grid_6 omega labeled icon right mt0px">
+                        <p class="grid_6 omega labeled icon right mt5px">
+                            <?php echo $this->pickupForm->getElement('mapId')->setAttrib('class', 'grid_7 alpha omega fl-right')->renderViewHelper();?>
+                            <a href="https://developers.google.com/maps/documentation/get-map-id" target="_blank" title="<?php echo $this->translate('Click to how to get Google Map ID');?>" class="tooltip info ticon-info-sign icon16"></a>
+                            <?php echo $this->pickupForm->getElement('mapId')->addDecorator('Label', array('class' => 'grid_5 alpha omega'))->renderLabel();?>
+                        </p>
+                        <p class="grid_6 omega labeled icon right mt5px">
                             <?php echo $this->pickupForm->getElement('gmapsZoom')->setAttrib('class', 'grid_7 alpha omega fl-right')->renderViewHelper();?>
                             <?php echo $this->pickupForm->getElement('gmapsZoom')->addDecorator('Label', array('class' => 'grid_5 alpha omega'))->renderLabel();?>
                         </p>
-                        <p class="grid_6 alpha labeled icon right">
+                        <p class="grid_6 omega labeled icon right">
                             <?php echo $this->pickupForm->getElement('title')->setAttrib('class', 'grid_8 alpha omega fl-right')->renderViewHelper();?>
                             <i class="tooltip info ticon-info-sign icon16" title="<?php echo $this->translate('custom title');?>"></i>
                             <?php echo $this->pickupForm->getElement('title')->addDecorator('Label', array('class' => 'grid_4 alpha omega'))->renderLabel();?>
@@ -490,6 +495,7 @@ $(function(){
                     title:$('#title').val(),
                     units:$('#units option:selected').val(),
                     gmapsZoom:$('#gmapsZoom').val(),
+                    mapId:$('#mapId').val(),
                     shipper:'<?php echo Shopping::SHIPPING_PICKUP;?>',
                     defaultPickupConfig:defaultPickupConfig,
                     searchEnabled:searchEnabled
