@@ -159,6 +159,8 @@ INSERT INTO `shopping_config` (`name`, `value`) VALUES
 ('pickupLocationLinksLimit', 4),
 ('minimumOrder', '0'),
 ('fiscalYearStart', '1'),
+('wordCountAiShortDescription', '150'),
+('wordCountAiFullDescription', '500'),
 ('version', '2.9.7');
 
 DROP TABLE IF EXISTS `shopping_product`;
@@ -190,6 +192,7 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `wishlist_qty` int(10) unsigned DEFAULT '0',
   `minimum_order` int(3) unsigned DEFAULT '0',
   `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `condition` ENUM('new','refurbished', 'used') DEFAULT 'new',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),
@@ -1041,6 +1044,7 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_giftorder', 'Tools_StoreMailWatchdog'),
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog'),
 ('1', 'store_partialpayment', 'Tools_StoreMailWatchdog'),
+('1', 'store_partialpaymentnotif', 'Tools_StoreMailWatchdog'),
 ('1', 'store_partialpaymentsecond', 'Tools_StoreMailWatchdog');
 
 CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
@@ -1126,6 +1130,6 @@ CREATE TABLE IF NOT EXISTS `shopping_gateway_label` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-UPDATE `plugin` SET `tags`='processphones,userupdate' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.3' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.6' WHERE `name` = 'shopping';
 

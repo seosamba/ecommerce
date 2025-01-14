@@ -67,5 +67,9 @@
     'Custom attributes' => 'Property data',
     'Go to Dashboard' => ' ',
 	'cs_partial' => 'Partial Orders',
-	'cs_quote_signed' => 'Quote Signed (Signature only quote)'
+	'cs_quote_signed' => 'Quote Signed (Signature only quote)',
+    'Condition'     => 'Condition',
+    'condition_new' => 'New',
+    'condition_refurbished' => 'Refurbished',
+    'condition_used'        => 'Used'
 );
