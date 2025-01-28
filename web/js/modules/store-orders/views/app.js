@@ -153,6 +153,11 @@ define(['backbone',
                         $('input[name=user-name]').val(options.filter_by_user_name);
                     }
 
+                    if (typeof options.filter_by_sales_id !== 'undefined' && options.filter_by_sales_id != '-1') {
+                        $('#filter-by-sales-id').val(options.filter_by_sales_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (withDetailedFilters === true) {
                         if ($('#extra-filters').hasClass('hidden')) {
                             $('#extra-filters').removeClass('hidden');

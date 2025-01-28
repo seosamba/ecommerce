@@ -578,11 +578,11 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
     }
 
     /**
-     * Get sales person ids for orders filter
+     * Get sales person data for orders filter
      *
      * @return array
      */
-    public function getSalesIds()
+    public function getSalesData()
     {
         $where = new Zend_Db_Expr('scs.sales_id IS NOT NULL');
         $select = $this->getDbTable()->getAdapter()->select()->from(array('scs' => 'shopping_cart_session'), array(
