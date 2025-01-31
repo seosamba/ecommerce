@@ -158,6 +158,11 @@ define(['backbone',
                         withDetailedFilters = true;
                     }
 
+                    if (typeof options.filter_by_location_id !== 'undefined') {
+                        $('#filter-by-location-id').val(options.filter_by_location_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (withDetailedFilters === true) {
                         if ($('#extra-filters').hasClass('hidden')) {
                             $('#extra-filters').removeClass('hidden');
