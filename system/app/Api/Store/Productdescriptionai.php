@@ -76,7 +76,7 @@ class Api_Store_Productdescriptionai extends Api_Service_Abstract
         if (empty($isRegistered) || empty($sambaToken)) {
             return array(
                 'error' => '1',
-                'message' => $translator->translate('Create your').' '.'<a href="https://mojo.seosamba.com/register.html">'.$translator->translate('SeoSamba Free account').'</a>'
+                'message' => $translator->translate('Create your').' '.'<a href="https://mojo.seosamba.com/register.html" target="_blank">'.$translator->translate('SeoSamba Free account').'</a>'
             );
         }
 
