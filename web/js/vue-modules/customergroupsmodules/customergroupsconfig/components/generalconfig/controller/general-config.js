@@ -29,6 +29,7 @@ export default {
             truncateText: 'truncateText',
             sortByColumn: 'sortByColumn',
             filterData:'getFilterData',
+            unescapeValue:'unescapeValue'
         }),
     },
     methods: {
@@ -40,7 +41,7 @@ export default {
                 showMessage('Please re-login', true, 3000);
             } else {
                 this.configId = result.id;
-                this.groupName = result.groupName;
+                this.groupName = this.unescapeValue(result.groupName);
                 this.priceValue = result.priceValue;
                 this.priceSign = result.priceSign;
                 this.priceType = result.priceType;

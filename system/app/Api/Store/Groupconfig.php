@@ -199,7 +199,7 @@ class Api_Store_Groupconfig extends Api_Service_Abstract
 
             $groupModel = $groupMapper->find($data['id']);
             if ($groupModel instanceof Store_Model_Group) {
-                $data['groupName'] = filter_var($data['groupName'], FILTER_SANITIZE_STRING);
+                $data['groupName'] = filter_var($data['groupName'], FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
                 if ($groupModel->getGroupName() !== $data['groupName']) {
                     $groupWithNameExists = $groupMapper->findByGroupName($data['groupName']);
                     if ($groupWithNameExists instanceof Store_Model_Group) {

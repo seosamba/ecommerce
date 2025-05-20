@@ -51,7 +51,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="configData in configDataInfo">
-                            <td>{{configData.groupName}}</td>
+                            <td>{{unescapeValue(configData.groupName)}}</td>
                             <td>
                               <span v-if="configData.priceSign === 'plus'">+</span>
                               <span v-if="configData.priceSign === 'minus'">-</span>
