@@ -1390,10 +1390,15 @@ define([
 
                         $('.recommended-price-btn').on('click', function(e){
                             e.preventDefault();
-                            var recommendedAIPrice = $(e.currentTarget).data('price');
-                            self.model.set({price: recommendedAIPrice});
-                            showMessage((_.isUndefined(i18n['Price'])?'Price':i18n['Price']) + ' ' + recommendedAIPrice + ' ' +(_.isUndefined(i18n['have been applied'])?'have been applied':i18n['have been applied']), false);
-                            $('#ai-price-suggestion-dialog').dialog('close').remove();
+                            showConfirm(_.isUndefined(i18n['Are you sure you want to apply this price? ']) ? 'Are you sure you want to apply this price? ' : i18n['Are you sure you want to apply this price? '], async () => {
+                                var recommendedAIPrice = $(e.currentTarget).data('price');
+                                self.model.set({price: recommendedAIPrice});
+                                self.$el.find('#product-price').val(recommendedAIPrice);
+                                showMessage((_.isUndefined(i18n['Price']) ? 'Price' : i18n['Price']) + ' ' + recommendedAIPrice + ' ' + (_.isUndefined(i18n['have been applied']) ? 'have been applied' : i18n['have been applied']), false);
+                                $('#ai-price-suggestion-dialog').dialog('close').remove();
+                            }, async () => {
+
+                            });
                         });
 
                         title = priceRecommendationText;
