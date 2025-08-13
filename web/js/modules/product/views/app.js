@@ -1367,6 +1367,10 @@ define([
                     return false;
                 }
 
+                console.log(responseData.recommendedPrice);
+
+                var priceCurrency = self.$el.find('#currency-unit').text();
+
                 var dialog = _.template(aiPriceSuggestionDialog, {
                     pricingAnalysis: responseData.pricingAnalysis,
                     priceRange: responseData.priceRange,
@@ -1374,6 +1378,7 @@ define([
                     links: responseData.links,
                     justification: responseData.justification,
                     recommendedPrice: responseData.recommendedPrice,
+                    currency: priceCurrency,
                     i18n:i18n
                 });
 
@@ -1394,7 +1399,7 @@ define([
                                 var recommendedAIPrice = $(e.currentTarget).data('price');
                                 self.model.set({price: recommendedAIPrice});
                                 self.$el.find('#product-price').val(recommendedAIPrice);
-                                showMessage((_.isUndefined(i18n['Price']) ? 'Price' : i18n['Price']) + ' ' + recommendedAIPrice + ' ' + (_.isUndefined(i18n['have been applied']) ? 'have been applied' : i18n['have been applied']), false);
+                                showMessage((_.isUndefined(i18n['Price']) ? 'Price' : i18n['Price']) + ' ' + priceCurrency + ' ' +recommendedAIPrice + ' ' + (_.isUndefined(i18n['has been applied']) ? 'has been applied' : i18n['has been applied']), false);
                                 $('#ai-price-suggestion-dialog').dialog('close').remove();
                             }, async () => {
 

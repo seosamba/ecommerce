@@ -21,7 +21,7 @@
                         <%= linkData.name %>
                     </a>
                     <button class="recommended-price-btn" data-price="<%= linkData.price %>" style="background-color:#007acc; color:#fff; padding:6px 12px; font-size:14px; border:none; border-radius:5px; margin-left:10px; cursor:pointer;">
-                        $<%= linkData.price %>
+                        <%= currency %> <%= linkData.price %>
                     </button>
                 </li>
             <% }) %>
@@ -33,12 +33,10 @@
             <%= justification %>
         </p>
     <% } %>
-    <% if (!_.isEmpty(recommendedPrice)) { %>
-        <!-- Recommended Price Floating Button -->
-        <button class="recommended-price-btn" data-price="<%= recommendedPrice %>" style="position:fixed; bottom:20px; right:20px; background-color:#007acc; color:#fff; padding:14px 24px; font-size:16px; border:none; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:999;">
-            <%= _.isUndefined(i18n['Recommended price']) ? 'Recommended price' : i18n['Recommended price'] %> $<%= recommendedPrice %> USD
-        </button>
-    <% } %>
+
+    <button class="recommended-price-btn" data-price="<%= recommendedPrice %>" style="position:fixed; bottom:20px; right:20px; background-color:#007acc; color:#fff; padding:14px 24px; font-size:16px; border:none; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:999;">
+        <%= _.isUndefined(i18n['Recommended price']) ? 'Recommended price' : i18n['Recommended price'] %> <%= currency %> <%= recommendedPrice %>
+    </button>
     </div>
 </div>
 

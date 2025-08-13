@@ -80,7 +80,6 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
             );
         }
 
-        $responseType = $this->getRequest()->getParam('responseType');
         $productName = $this->getRequest()->getParam('productName');
         $productCondition = $this->getRequest()->getParam('productCondition');
 
@@ -113,48 +112,9 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
             'product_currency' => $currency,
         );
 
-        //$result = Apps::apiCall('POST', 'openaiProductRecommendedPrice', array(), $info);
+        $result = Apps::apiCall('POST', 'openaiProductRecommendedPrice', array(), $info);
 
-        $result['error'] = 0;
-        $result['message'] = '';
-        $result['done'] = true;
-
-        //$data = json_decode($result['data'], true);
-        $result['data']['pricingAnalysis'] = "<em>Monaco Heart Casino Magnet</em> (New Condition)</h4>";
-        $result['data']['priceRange'] = "$7.47 – $21.88 USD";
-        $result['data']['sources']['description'] = "The Monaco Heart Casino Magnet is available in various designs and materials, leading to a broad price range:";
-        $result['data']['sources']['links'] = array(
-            array(
-                'name' => 'Monaco-Addict.com – Monaco Heart Casino Magnet',
-                'link' => 'https://monaco-addict.com/monaco-heart-casino-magnet/',
-                'price' => '7.20',
-            ),
-            array(
-                'name' => 'eBay – MONACOMETAL Fridge Magnet',
-                'link' => 'https://www.ebay.com/itm/126737461735',
-                'price' => '21.88',
-            ),
-            array(
-                'name' => 'eBay – Casino de Monte Carlo 3D Resin Magnet',
-                'link' => 'https://www.ebay.com/itm/177237778400',
-                'price' => '8.98',
-            ),
-            array(
-                'name' => 'Amazon.de – Monaco Heart Shaped 3D Magnet',
-                'link' => 'https://www.amazon.de/-/en/Monaco-Shaped-Stickers-Souvenirs-Kitchen/dp/B07JHBC6L7',
-                'price' => '7.99',
-            ),
-            array(
-                'name' => 'Bonanza – Vintage Casino de Monte-Carlo Hand-Painted Magnet',
-                'link' => 'https://www.bonanza.com/listings/Vintage-Monaco-Monte-Carlo-Metal-Magnet-Casino-de-Monte-Carlo-2-Hand-Painted/1753011406',
-                'price' => '12.99',
-            ),
-        );
-
-        $result['data']['justification'] = "The recommended price reflects similar market offerings while providing a slight premium for uniqueness. It targets souvenir shoppers and collectors interested in Monaco-themed items without being overpriced.";
-        $result['data']['recommendedPrice'] = '9.99';
-
-        if (empty($result)) {
+        if (empty($result['data'])) {
             return array(
                 'error' => '1',
                 'message' => $translator->translate('Service not available')
@@ -175,16 +135,40 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
             );
         }
 
+        $data = json_decode($result['data'], true);
+
+        if (empty($data['sources']['links'])) {
+            return array(
+                'error' => '1',
+                'message' => $data['sources']['description']
+            );
+        }
+
+        $response = array();
+
+        $response['priceRange'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $data['priceRange']);
+        $response['justification'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $data['justification']);
+
+        foreach ($data['sources']['links'] as $key => $source) {
+            $response['links'][$key]['link'] = $source['link'];
+            $response['links'][$key]['name'] = $source['name'];
+            $response['links'][$key]['price'] = $source['price'];
+        }
+
+        $response['priceRange'] = $data['priceRange'];
+        $response['justification'] = $data['justification'];
+        $response['pricingAnalysis'] = $data['pricingAnalysis'];
+        $response['recommendedPrice'] = $data['recommendedPrice'];
+
+
         return array(
             'error' => '0',
-            //'content' => $result['data']['overview'],
-            //'price' => $result['data']['price'],
-            'pricingAnalysis' => $result['data']['pricingAnalysis'],
-            'priceRange' => $result['data']['priceRange'],
-            'description' => $result['data']['sources']['description'],
-            'links' => $result['data']['sources']['links'],
-            'justification' => $result['data']['justification'],
-            'recommendedPrice' => $result['data']['recommendedPrice'],
+            'pricingAnalysis' => $response['pricingAnalysis'],
+            'priceRange' => $response['priceRange'],
+            'description' => $response['description'],
+            'links' => $response['links'],
+            'justification' => $response['justification'],
+            'recommendedPrice' => $response['recommendedPrice'],
         );
 
     }
