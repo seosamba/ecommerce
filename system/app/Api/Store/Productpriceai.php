@@ -82,6 +82,9 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
 
         $productName = $this->getRequest()->getParam('productName');
         $productCondition = $this->getRequest()->getParam('productCondition');
+        $productMpn = $this->getRequest()->getParam('productMpn');
+        $productBrand = $this->getRequest()->getParam('productBrand');
+        $productNewBrand = $this->getRequest()->getParam('productNewBrand');
 
         if (empty($productName)) {
             return array(
@@ -110,7 +113,21 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
             'product_title' => $productName,
             'product_condition' => $productCondition,
             'product_currency' => $currency,
+            'product_mpn' => '',
+            'product_brand' => '',
         );
+
+        if (!empty($productMpn)) {
+            $info['product_mpn'] = $productMpn;
+        }
+
+        if (!empty($productBrand) && $productBrand != '-1') {
+            $info['product_brand'] = $productBrand;
+        }
+
+        if (!empty($productNewBrand)) {
+            $info['product_brand'] = $productNewBrand;
+        }
 
         $result = Apps::apiCall('POST', 'openaiProductRecommendedPrice', array(), $info);
 
@@ -149,16 +166,20 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
         $response['priceRange'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $data['priceRange']);
         $response['justification'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $data['justification']);
 
+        $currency = Zend_Registry::get('Zend_Currency');
+
         foreach ($data['sources']['links'] as $key => $source) {
             $response['links'][$key]['link'] = $source['link'];
             $response['links'][$key]['name'] = $source['name'];
             $response['links'][$key]['price'] = $source['price'];
+            $response['links'][$key]['priceWithCurrency'] = $currency->toCurrency($source['price']);
         }
 
         $response['priceRange'] = $data['priceRange'];
         $response['justification'] = $data['justification'];
         $response['pricingAnalysis'] = $data['pricingAnalysis'];
         $response['recommendedPrice'] = $data['recommendedPrice'];
+        $response['recommendedPriceWithCurrency'] = $currency->toCurrency($data['recommendedPrice']);
 
 
         return array(
@@ -169,6 +190,7 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
             'links' => $response['links'],
             'justification' => $response['justification'],
             'recommendedPrice' => $response['recommendedPrice'],
+            'recommendedPriceWithCurrency' => $response['recommendedPriceWithCurrency'],
         );
 
     }

@@ -1332,6 +1332,9 @@ define([
                 responseType = $(e.currentTarget).data('type'),
                 productName = this.$el.find('#product-name').val(),
                 productCondition = this.$el.find('#product-condition').val(),
+                productMpn = this.$el.find('#product-mpn').val(),
+                productBrand = this.$el.find('#product-brand').val(),
+                productNewBrand = this.$el.find('#new-brand').val(),
                 error = false,
                 errorMessage = '';
 
@@ -1358,6 +1361,9 @@ define([
                     responseType: responseType,
                     productName: productName,
                     productCondition: productCondition,
+                    productMpn: productMpn,
+                    productBrand: productBrand,
+                    productNewBrand: productNewBrand,
                     secureToken: $('#product-screen-secure-token').val()
                 }
             }).done(function(responseData){
@@ -1378,6 +1384,7 @@ define([
                     links: responseData.links,
                     justification: responseData.justification,
                     recommendedPrice: responseData.recommendedPrice,
+                    recommendedPriceWithCurrency: responseData.recommendedPriceWithCurrency,
                     currency: priceCurrency,
                     i18n:i18n
                 });
