@@ -85,6 +85,8 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
         $productMpn = $this->getRequest()->getParam('productMpn');
         $productBrand = $this->getRequest()->getParam('productBrand');
         $productNewBrand = $this->getRequest()->getParam('productNewBrand');
+        $productGtin = $this->getRequest()->getParam('productGtin');
+        $productShortDescription = $this->getRequest()->getParam('productShortDescription');
 
         if (empty($productName)) {
             return array(
@@ -115,6 +117,8 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
             'product_currency' => $currency,
             'product_mpn' => '',
             'product_brand' => '',
+            'product_gtin' => '',
+            'product_short_description' => '',
         );
 
         if (!empty($productMpn)) {
@@ -127,6 +131,14 @@ class Api_Store_Productpriceai extends Api_Service_Abstract
 
         if (!empty($productNewBrand)) {
             $info['product_brand'] = $productNewBrand;
+        }
+
+        if (!empty($productGtin)) {
+            $info['product_gtin'] = $productGtin;
+        }
+
+        if (!empty($productShortDescription)) {
+            $info['product_short_description'] = $productShortDescription;
         }
 
         $result = Apps::apiCall('POST', 'openaiProductRecommendedPrice', array(), $info);

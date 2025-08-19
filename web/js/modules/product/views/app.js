@@ -1335,6 +1335,8 @@ define([
                 productMpn = this.$el.find('#product-mpn').val(),
                 productBrand = this.$el.find('#product-brand').val(),
                 productNewBrand = this.$el.find('#new-brand').val(),
+                productGtin = this.$el.find('#product-gtin').val(),
+                productShortDescription = this.$el.find('#product-shortDescription').val(),
                 error = false,
                 errorMessage = '';
 
@@ -1364,6 +1366,8 @@ define([
                     productMpn: productMpn,
                     productBrand: productBrand,
                     productNewBrand: productNewBrand,
+                    productGtin: productGtin,
+                    productShortDescription: productShortDescription,
                     secureToken: $('#product-screen-secure-token').val()
                 }
             }).done(function(responseData){
