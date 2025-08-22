@@ -956,7 +956,7 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         }
         $photoSrc = $this->_cartContent[$sid]['photo'];
         $photoSrc = Tools_Misc::prepareProductImage($photoSrc, $folder);
-        return '<img class="cart-product-image" src="' . $photoSrc . '" alt="' . $this->_cartContent[$sid]['name'] . '">';
+        return '<img class="cart-product-image" src="' . $photoSrc . '" alt="' . htmlspecialchars($this->_cartContent[$sid]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">';
     }
 
     /**
