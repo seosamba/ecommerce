@@ -1,0 +1,42 @@
+
+<div id="ai-price-suggestion-dialog" class="ai-price-suggestion-dialog" style="width: 100%" title="">
+    <div style="background-color:#fff; max-width:800px; margin:auto; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.08); position:relative;">
+    <% if (!_.isEmpty(pricingAnalysis)) { %>
+        <h4 style="color:#2a2a2a; font-size:28px; margin-bottom:20px;"><%= _.isUndefined(i18n['Pricing Analysis']) ? 'Pricing Analysis' : i18n['Pricing Analysis'] %>: <%= pricingAnalysis %></h4>
+    <% } %>
+    <% if (!_.isEmpty(priceRange)) { %>
+        <p style="font-size:20px; font-weight:600; margin-top:30px; color:#444;"><%= _.isUndefined(i18n['Price Range']) ? 'Price Range' : i18n['Price Range'] %>:</p>
+        <p style="font-size:18px; color:#1a8a34; font-weight:bold;"><%= priceRange %></p>
+    <% } %>
+    <% if (!_.isEmpty(description)) { %>
+        <p style="font-size:16px; line-height:1.6;">
+            <%= description %>
+        </p>
+    <% } %>
+    <% if (!_.isEmpty(links)) { %>
+        <ul style="list-style-type:none; padding-left:0;">
+            <% _.each(links, function(linkData) { %>
+                <li style="margin-bottom:15px;">
+                    <a href="<%= linkData.link %>" target="_blank" rel="noopener noreferrer" style="color:#007acc; text-decoration:none;">
+                        <%= linkData.name %>
+                    </a>
+                    <button class="recommended-price-btn" data-price="<%= linkData.price %>" style="background-color:#007acc; color:#fff; padding:6px 12px; font-size:14px; border:none; border-radius:5px; margin-left:10px; cursor:pointer;">
+                        <%= linkData.priceWithCurrency %>
+                    </button>
+                </li>
+            <% }) %>
+        </ul>
+    <% } %>
+    <% if (!_.isEmpty(justification)) { %>
+        <p style="font-size:20px; font-weight:600; margin-top:30px; color:#444;"><%= _.isUndefined(i18n['Justification']) ? 'Justification' : i18n['Justification'] %>:</p>
+        <p style="font-size:16px; line-height:1.6;">
+            <%= justification %>
+        </p>
+    <% } %>
+
+    <button class="recommended-price-btn" data-price="<%= recommendedPrice %>" style="position:fixed; bottom:20px; right:20px; background-color:#007acc; color:#fff; padding:14px 24px; font-size:16px; border:none; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:999;">
+        <%= _.isUndefined(i18n['Recommended price']) ? 'Recommended price' : i18n['Recommended price'] %> <%= recommendedPriceWithCurrency %>
+    </button>
+    </div>
+</div>
+

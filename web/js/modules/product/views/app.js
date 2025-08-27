@@ -16,11 +16,12 @@ define([
     'moment',
     'tinyMCE5',
     'aidescription',
+    'text!../templates/ai-price-suggestion-dialog.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln'
 ], function(Backbone,
             ProductModel,  ProductOption,
             ProductsCollection, TagsCollection, OptionsCollection, ImagesCollection,
-            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, tinymce, aidescription, i18n){
+            TagView, ProductOptionView, ProductListView, CouponFormView, CouponGridView, GroupsPriceView, DigitalProductView, moment, tinymce, aidescription, aiPriceSuggestionDialog, i18n){
 
 	var AppView = Backbone.View.extend({
 		el: $('#manage-product'),
@@ -57,7 +58,8 @@ define([
             'click .remove-from-library-btn': 'removeOption',
             'click #negative-stock': 'negativeProductStock',
             'click #generate-ai-product-description':'generateAIDescription',
-            'click #generate-ai-product-full-description':'generateAIDescription'
+            'click #generate-ai-product-full-description':'generateAIDescription',
+            'click #generate-ai-price-suggestion':'generateAIPriceSuggestion',
 		},
         products: null,
         tags: null,
@@ -1325,6 +1327,107 @@ define([
                 } else {
                     tinymce.activeEditor.setContent(responseData.message);
                 }
+            });
+        },
+        generateAIPriceSuggestion: function (e) {
+            e.preventDefault();
+
+            var self = this,
+                responseType = $(e.currentTarget).data('type'),
+                productName = this.$el.find('#product-name').val(),
+                productCondition = this.$el.find('#product-condition').val(),
+                productMpn = this.$el.find('#product-mpn').val(),
+                productBrand = this.$el.find('#product-brand').val(),
+                productNewBrand = this.$el.find('#new-brand').val(),
+                productGtin = this.$el.find('#product-gtin').val(),
+                productShortDescription = this.$el.find('#product-shortDescription').val(),
+                error = false,
+                errorMessage = '';
+
+            if (productName === '') {
+                errorMessage += (_.isUndefined(i18n['Please specify product name'])?'Please specify product name':i18n['Please specify product name']);
+                error = true;
+                self.$el.find('#product-name').addClass('error');
+            }
+
+            if (error === true) {
+                showMessage(errorMessage, true, 3000);
+                return false;
+            }
+
+            self.$el.find('#product-name').removeClass('error');
+
+            showSpinner();
+
+            $.ajax({
+                'url': $('#website_url').val() + 'api/store/productpriceai/',
+                'type':'POST',
+                'dataType':'json',
+                'data': {
+                    responseType: responseType,
+                    productName: productName,
+                    productCondition: productCondition,
+                    productMpn: productMpn,
+                    productBrand: productBrand,
+                    productNewBrand: productNewBrand,
+                    productGtin: productGtin,
+                    productShortDescription: productShortDescription,
+                    secureToken: $('#product-screen-secure-token').val()
+                }
+            }).done(function(responseData){
+                hideSpinner();
+                if (parseInt(responseData.error) === 1) {
+                    showMessage(responseData.message, true, 3000);
+                    return false;
+                }
+
+                console.log(responseData.recommendedPrice);
+
+                var priceCurrency = self.$el.find('#currency-unit').text();
+
+                var dialog = _.template(aiPriceSuggestionDialog, {
+                    pricingAnalysis: responseData.pricingAnalysis,
+                    priceRange: responseData.priceRange,
+                    description: responseData.description,
+                    links: responseData.links,
+                    justification: responseData.justification,
+                    recommendedPrice: responseData.recommendedPrice,
+                    recommendedPriceWithCurrency: responseData.recommendedPriceWithCurrency,
+                    currency: priceCurrency,
+                    i18n:i18n
+                });
+
+                $(dialog).dialog({
+                    dialogClass: 'seotoaster seotoaster-dialog',
+                    width: '100%',
+                    height: '565',
+                    resizable: false,
+                    draggable: false,
+                    closeText : "",
+                    open: function (event, ui) {
+                        var priceRecommendationText = (_.isUndefined(i18n['Price Recommendation']) ? 'Price Recommendation' : i18n['Price Recommendation']) + ' - ' + productName,
+                            title = '';
+
+                        $('.recommended-price-btn').on('click', function(e){
+                            e.preventDefault();
+                            showConfirm(_.isUndefined(i18n['Are you sure you want to apply this price? ']) ? 'Are you sure you want to apply this price? ' : i18n['Are you sure you want to apply this price? '], async () => {
+                                var recommendedAIPrice = $(e.currentTarget).data('price');
+                                self.model.set({price: recommendedAIPrice});
+                                self.$el.find('#product-price').val(recommendedAIPrice);
+                                showMessage((_.isUndefined(i18n['Price']) ? 'Price' : i18n['Price']) + ' ' + priceCurrency + ' ' +recommendedAIPrice + ' ' + (_.isUndefined(i18n['has been applied']) ? 'has been applied' : i18n['has been applied']), false);
+                                $('#ai-price-suggestion-dialog').dialog('close').remove();
+                            }, async () => {
+
+                            });
+                        });
+
+                        title = priceRecommendationText;
+                        $('.ai-price-suggestion-dialog').dialog('option', 'title', title);
+                    },
+                    close: function (event, ui) {
+                        $(this).dialog('close').remove();
+                    }
+                });
             });
         }
 

@@ -447,13 +447,18 @@ $this->headLink()
                         </div>
                     <?php endif;?>
                     </div>
-                    <div class="grid_6 alpha labeled mt1-5em">
+                    <div class="grid_5 alpha omega labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-price" data-reflection="price" placeholder="0.00"/>
                         <label class="grid_4 alpha omega" for="product-price" id="currency-unit"><?php echo $this->translate($this->generalConfig['currency']); ?></label>
                     </div>
-                    <div class="grid_6 omega labeled mt1-5em">
-                        <input class="grid_8 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="&infin;">
-                        <label class="grid_4 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
+                    <div class="grid_2 alpha mt1-5em">
+                        <a href="javascript" id="toggle-generate-ai-price-suggestion">
+                            <img id="generate-ai-price-suggestion" data-type="" src="<?php echo $this->websiteUrl;?>plugins/shopping/web/images/generate-ai-price-suggestion.png" alt="<?php echo $this->translate('AI price suggestion (based on product name, mpn, gtin, brand, short description)'); ?>" title="<?php echo $this->translate('AI price suggestion (based on product name, mpn, gtin, brand, short description)'); ?>"/>
+                        </a>
+                    </div>
+                    <div class="grid_5 alpha omega labeled mt1-5em">
+                        <input class="grid_7 alpha omega fl-right" type="text" id="product-inventory" data-reflection="inventory" placeholder="&infin;">
+                        <label class="grid_5 alpha omega" for="product-inventory"><?php echo $this->translate('QTY'); ?></label>
                     </div>
                     <div class="grid_6 alpha labeled mt1-5em">
                         <input class="grid_8 alpha omega fl-right" type="text" id="product-weight" data-reflection="weight" placeholder="0.00">
