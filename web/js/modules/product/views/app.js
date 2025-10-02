@@ -824,7 +824,7 @@ define([
 		    var self = this;
 
             if (e.currentTarget.checked){
-                showConfirmCustom(_.isUndefined(i18n['This checkbox will permit to use of the negative stock of product, enable this ability?'])?'This checkbox will permit to use of the negative stock of product, enable this ability?':i18n['This checkbox will permit to use of the negative stock of product, enable this ability?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
+                showConfirmCustom(_.isUndefined(i18n['Allow this product to be sold even if stock goes negative. Do you want to enable this option?'])?'Allow this product to be sold even if stock goes negative. Do you want to enable this option?':i18n['Allow this product to be sold even if stock goes negative. Do you want to enable this option?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                     $(e.currentTarget).prop('checked', true);
                     self.model.set({negativeStock: 1});
                 }, function(){
