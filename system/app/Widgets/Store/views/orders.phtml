@@ -165,7 +165,9 @@ $this->headLink()
                         <select class="filter" multiple id="filter-by-sales-id" name="filter-by-sales-id" data-placeholder="<?php echo $this->translate('show all');?>">
                             <?php if (!empty($this->salesData)) : ?>
                                 <?php foreach ($this->salesData as $salesId => $salesName): ?>
-                                    <option value="<?php echo $salesId; ?>" <?php echo (!empty($this->presetConfig['filter_by_sales_id']) && in_array($salesId, $this->presetConfig['filter_by_sales_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($salesName);?></option>
+                                    <?php if(!is_null($salesName)):?>
+                                        <option value="<?php echo $salesId; ?>" <?php echo (!empty($this->presetConfig['filter_by_sales_id']) && in_array($salesId, $this->presetConfig['filter_by_sales_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($salesName);?></option>
+                                    <?php endif;?>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </select>
