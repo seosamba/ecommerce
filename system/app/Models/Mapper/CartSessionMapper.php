@@ -476,4 +476,24 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             }
             return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
     }
+
+    /**
+     * @return bool
+     */
+    public function ifSuccessfulPurchaseExists(){
+
+        $statuses = array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_PARTIAL);
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart.status IN (?)', $statuses);
+
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+            ->from(array('cart' => 'shopping_cart_session'))
+            ->where($where);
+        $result = $this->getDbTable()->fetchRow($select);
+
+        $existedPurchase = false;
+        if(sizeof($result)){
+            $existedPurchase = true;
+        }
+        return $existedPurchase;
+    }
 }
