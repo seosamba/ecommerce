@@ -1,0 +1,10 @@
+{
+  "name": "seosamba/ecommerce",
+  "description": "Ecommerce plugin for SeoToaster CMS",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "SeoToaster\\Ecommerce\\": "src/"
+    }
+  }
+}
