@@ -411,15 +411,56 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $offset = null,
         $withoutCount = false,
         $singleRecord = false,
-        $having = ''
+        $having = '',
+        $additionalParamsForSelect = array(),
+        $includesTags = false
     ) {
+
+        $params = array(
+            'sp.id',
+            'sp.parent_id',
+            'sp.page_id',
+            'p.url',
+            'sp.enabled',
+            'sp.sku',
+            'sp.name',
+            'sp.mpn',
+            'sp.weight',
+            'sp.brand_id',
+            'brandName' => 'sb.name',
+            'sp.photo',
+            'sp.short_description',
+            'sp.full_description',
+            'sp.price',
+            'sp.tax_class',
+            'sp.created_at',
+            'sp.updated_at',
+            'sp.base_price',
+            'sp.inventory',
+            'sp.free_shipping',
+            'sp.is_digital',
+            'sp.prod_length',
+            'sp.prod_depth',
+            'sp.prod_width',
+            'sp.gtin',
+            'sp.wishlist_qty',
+            'sp.minimum_order',
+            'sp.negative_stock',
+            'sp.condition'
+        );
+
+        $params = array_merge($additionalParamsForSelect, $params);
+
         $select = $this->getDbTable()->getAdapter()->select()
             ->from(array('sp' => 'shopping_product'),
-                array(
-                    'sp.*'
-                )
-            )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array('p.url'))
-             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array('brandName' => 'sb.name'));
+                $params
+            )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array())
+             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array());
+
+        if($includesTags) {
+            $select->from(array('t' => 'shopping_tags'), null)
+                ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = p.id', null);
+        }
 
         if (!empty($having)) {
             $select->having($having);

@@ -1168,6 +1168,14 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
+    protected function _makeOptionProductsnew() {
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            return $this->_view->render('manage_products-new.phtml');
+        }
+
+        return '';
+    }
+
 	/**
 	 * Generates product grid for admins only
      *
