@@ -1275,7 +1275,7 @@ define([
                 errorMessage = '',
                 wordCount = 0;
 
-            if (responseType === 'no_formatting') {
+            if (responseType === 'short') {
                 wordCount = parseInt(this.$el.find('#ai-description-amount').val());
             } else {
                 wordCount = parseInt(this.$el.find('#generate-ai-product-full-description-word-count').val());
@@ -1321,9 +1321,9 @@ define([
                     return false;
                 }
 
-                if (responseType === 'no_formatting') {
-                    self.$el.find('#product-shortDescription').val(responseData.message);
-                    self.model.set('shortDescription', responseData.message);
+                if (responseType === 'short') {
+                    self.$el.find('#product-shortDescription').val(responseData.message.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+>/g, ''));
+                    self.model.set('shortDescription', responseData.message.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+>/g, ''));
                 } else {
                     tinymce.activeEditor.setContent(responseData.message);
                 }
