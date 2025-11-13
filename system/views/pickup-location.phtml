@@ -49,7 +49,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     <?php if (empty($this->pickupLocationsCategories)): ?>
         <?php $hidden = 'hidden'; ?>
     <?php endif; ?>
-    <div id="pickup-location-config" class="content <?php echo $hidden; ?>">
+    <div id="pickup-location-config" class="<?php echo $hidden; ?>">
         <label class="category-label grid_3 mt10px"><?php echo $this->translate('Change category name'); ?></label>
         <input class="change-category-label grid_3 mt5px" name="change-category-label"/>
         <div class="grid_2 mt10px"><span class="imported-category"></span></div>
@@ -68,7 +68,8 @@ $this->headScript()->setAllowArbitraryAttributes(true)
         </div>
         <form id="edit-pickup-location" class="grid_12 background mt10px mb10px" method="POST">
             <fieldset class="column_4">
-                <p>
+                <legend class="large mb5px"><?php echo $this->translate('Location information');?></legend>
+                <p class="mt0px">
                     <label><?php echo $this->translate('Name'); ?></label>
                     <input type="text" required name="location-name" class="location-name"/>
                 </p>
