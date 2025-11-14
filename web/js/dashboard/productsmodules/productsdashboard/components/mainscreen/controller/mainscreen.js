@@ -23,7 +23,7 @@ export default {
             formatOnlyDate: 'formatOnlyDate',
             formatTimeOnly: 'formatTimeOnly',
             configDataInfo:'getConfigDataInfo',
-            additionalInfo:'getAdditionalInfo',
+            gridInfo:'getGridInfo',
             truncateText: 'truncateText',
             //sortByColumn: 'sortByColumn'
         }),

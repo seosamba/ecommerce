@@ -115,4 +115,25 @@ class Store_Mapper_CompaniesMapper extends Application_Model_Mappers_Abstract
 
         return $this->getDbTable()->getAdapter()->delete('shopping_company_suppliers', $where);
     }
+
+    public function fetchAllCompanies($where = null) {
+
+        $select = $this->getDbTable()->getAdapter()->select()
+            ->from(array('sc' => 'shopping_companies'),
+                array(
+                    'sc.id',
+                    'sc.company_name',
+                )
+            );
+
+        $select->group('sc.id');
+
+        if (!empty($where)) {
+            $select->where($where);
+        }
+
+        $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+
+        return $data;
+    }
 }

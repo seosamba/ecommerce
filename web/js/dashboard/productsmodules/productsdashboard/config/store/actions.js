@@ -1,6 +1,6 @@
 export const getGeneralProductsScreenData = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
-        showSpinner('#leads-screen-config-block', 'products-screen-config-block-spinner dashboard-spinner');
+        showSpinner('#produucts-screen-config-block', 'products-screen-config-block-spinner dashboard-spinner');
         $.ajax({
             'url': $('#website_url').val()+'api/productsdashboard/productsgridinfo/',
             'type': 'GET',
@@ -11,7 +11,8 @@ export const getGeneralProductsScreenData = ({commit, state, dispatch}, payload)
 
             if (response.status !== 'error') {
                 commit('setConfigDataInfo', response.data);
-                commit('setAdditionalInfo', response.additionalInfo);
+                commit('setGridInfo', response.gridInfo);
+                commit('setCurrencyInfo', response.currencyInfo);
                 resolve(response);
             } else {
                 resolve({ name: 'login', 'message': 'Please re-login'});
@@ -47,10 +48,9 @@ export const getProductsGridData = ({commit, state, dispatch}, payload) => {
                 commit('setProductsGridInfo', response.data);
                 commit('setPaginationData', {productsGrid: {totalItems: totalRecords}});
                 commit('setTotalItemsFound', response.totalRecords);
-                commit('setLeadGridAdditionalInfo', response.leadGridAdditionalInfo);
-                commit('setCurrencyInfo', response.currencyInfo);
-                if (typeof payload.updateOppStats !== 'undefined') {
-                    commit('setUpdateOppStats', Date.now())
+                //commit('setLeadGridAdditionalInfo', response.leadGridAdditionalInfo);
+                if (typeof payload.updateGridStats !== 'undefined') {
+                    commit('setUpdateGridStats', Date.now())
                 }
                 resolve(response);
             } else {
@@ -62,45 +62,73 @@ export const getProductsGridData = ({commit, state, dispatch}, payload) => {
     });
 };
 
-
-export const countLeadsMassAction = ({commit, state, dispatch}, payload) => {
+export const getSuppliersCompaniesGridData = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
-        let uniqueEmail = 0,
-            validateEmailBalance = 0,
-            additionalParams = 0,
-            advertising = 0;
-
-        if(payload.uniqueEmail) {
-            uniqueEmail = 1;
-        }
-
-        if(payload.validateEmailBalance) {
-            validateEmailBalance = 1;
-        }
-
-        if(payload.additionalParams) {
-            additionalParams = payload.additionalParams;
-        }
-
-        if(payload.advertising) {
-            advertising = payload.advertising;
-        }
 
         $.ajax({
-            'url': $('#website_url').val()+'plugin/leads/run/countAllLeads/',
-            'type': 'POST',
+            'url': $('#website_url').val()+'api/store/companyproducts/',
+            'type': 'GET',
             'dataType': 'json',
             'data': {
-                'secureToken' :  $('#leads-screen-config-token').val(),
-                'filters': payload.filters,
-                'leadIds':payload.leadIds,
-                'existMobileNumber': payload.existMobileNumber,
-                'filterAsArray':1,
-                'uniqueEmail':uniqueEmail,
-                'validateEmailBalance':validateEmailBalance,
-                'additionalParams':additionalParams,
-                'advertising':advertising,
+                'isGrid': 1,
+                'productIds':payload.productIdsString
             }
+        }).done(async  function(response){
+            commit('setSuppliersCompanies', response);
+            resolve(response);
+        }).fail(async function(response){
+            resolve({ name: 'login', 'message': 'Please re-login'});
+        });
+    });
+};
+
+export const getSalesStatsGridData = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/stats',
+            'type': 'GET',
+            'dataType': 'json',
+            'data': {
+                'isGrid': 1,
+                'id':payload.productIdsString
+            }
+        }).done(async  function(response){
+            commit('setSalesStats', response);
+            resolve(response);
+        }).fail(async function(response){
+            resolve({ name: 'login', 'message': 'Please re-login'});
+        });
+    });
+};
+
+export const updateParam = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/products/id/'+payload.id,
+            'type': 'PUT',
+            'dataType': 'json',
+            'data': JSON.stringify({
+                'id': payload.id,
+                'secureToken':$('#leads-screen-config-token').val(),
+                'data':payload.data,
+                'newGrid':1,
+            })
+        }).done(async  function(response){
+            resolve(response);
+        }).fail(async function(response){
+            resolve({ 'error': 1, 'message': response.responseText});
+        });
+    });
+};
+
+//Add brand for products mass-action
+export const getAssignBrandMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/brands/',
+            'type': 'GET',
+            'dataType': 'json'
         }).done(async  function(response){
             if (response.status !== 'error') {
                 resolve(response);
@@ -113,29 +141,22 @@ export const countLeadsMassAction = ({commit, state, dispatch}, payload) => {
     });
 };
 
-//Add tags for leads mass-action
-export const addLeadTagsMassAction = ({commit, state, dispatch}, payload) => {
+//Add brand for products mass-action
+export const assignProductBrandMassAction = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
-        let allRecords = 0;
-        if(payload.allRecords) {
-            allRecords = 1;
-        }
-
         $.ajax({
-            'url': $('#website_url').val()+'plugin/leads/run/addTags/',
-            'type': 'POST',
+            'url': $('#website_url').val()+'api/store/products/id/'+payload.productIds,
+            'type': 'PUT',
             'dataType': 'json',
-            'data': {
+            'data': JSON.stringify({
                 'secureToken' :  $('#leads-screen-config-token').val(),
-                'tagsIds':payload.tagsIds,
-                'leadIds':payload.leadIds,
-                'tagsFunction':payload.tagsFunction,
+                'data': {'brand': payload.brand},
+                'id':payload.productIds,
                 'filters':payload.filters,
-                'tagsType':payload.tagsType,
-                'allRecords':allRecords,
-                'offset':payload.offset,
-                'preParseParams':0,
-            }
+                'filterAsArray':1,
+                'newGrid':1,
+
+            })
         }).done(async  function(response){
             if (response.status !== 'error') {
                 resolve(response);

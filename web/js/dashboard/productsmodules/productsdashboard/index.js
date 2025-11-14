@@ -53,16 +53,16 @@ router.beforeEach((to, from, next) => {
 
         if (to.hash !== '' && from.hash === '') {
             let pathParams = decodeURI(to.hash);
-            let leadRouteInfo = pathParams.match('(#lead\\/\\d*)');
+            let productRouteInfo = pathParams.match('(#product\\/\\d*)');
 
-            if (!leadRouteInfo) {
+            if (!productRouteInfo) {
                 next({ name: 'grid'});
             }
 
-            let leadId = leadRouteInfo[0].replace('#lead/', '');
+            let productId = productRouteInfo[0].replace('#product/', '');
             let additionalParams= [];
 
-            pathParams = pathParams.replace(new RegExp('#lead\/\\d*'), '');
+            pathParams = pathParams.replace(new RegExp('#product\/\\d*'), '');
 
             if (pathParams !== '' && pathParams.indexOf('?') > -1) {
                 additionalParams = getParams(pathParams.replace('?', ''));
@@ -73,7 +73,7 @@ router.beforeEach((to, from, next) => {
                 next({ name: 'grid'});
             } else {
                 skip = true;
-                next({ name: 'lead', params: {'id': leadId}, query:additionalParams});
+                next({ name: 'product', params: {'id': productId}, query:additionalParams});
             }
         }
 

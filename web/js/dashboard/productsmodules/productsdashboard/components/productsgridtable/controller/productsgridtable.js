@@ -2,7 +2,7 @@ import {mapGetters} from 'vuex';
 import lodash from 'lodash';
 import localeMapping from '../../../localizationLanguages';
 import pagination from '../../pagination';
-//import massactiongridsendsms from '../../massactiongridsendsms';
+import massactiongridassignbrand from '../../massactiongridassignbrand';
 //import massactiongridaddtags from '../../massactiongridaddtags';
 
 import { isProxy, toRaw } from 'vue';
@@ -21,46 +21,13 @@ export default {
                 '50':50,
                 '100':100
             },
-
-
-
-
-            columnsHeaders: {},
-            listOfDefaultColumnNamesOrder: [],
-            options: [],
-            columnSelectionModel:[],
-            tableColumnOrderName:'',
-            restrictColumnEditing:'0',
-            columnsModified:false,
-            applyColumnOrderToAllUsers:'',
-            userPresetsList: [],
-            presetId:0,
-            currentPresetId:0,
-            newPresetName:'',
-            presetDefault:false,
-            stages:{},
-            customerGroups:{},
-            leadTypes:{},
-            userTimezoneOffset:'',
-            displayCallDialog:false,
-            activeDialogId:0,
-            callDialogLeadName:'',
-            callDialogCountryCodeMobile:'',
-            callDialogCountryCodeDesktop:'',
-            callDialogMobile:'',
-            callDialogDeviceFrom:'mobile',
-            callDialogDeviceTo:'mobile',
-            callDialogNumber:'',
-            callDialogCountryCodeChosen:'',
             urlPredefinedFilterParams:[],
-            scrollBarStyle:'',
             initialScrollBarSize:'',
-            currentScrollBarSize:''
         }
     },
     components: {
         pagination: pagination,
-        //massactiongridsendsms:massactiongridsendsms,
+        massactiongridassignbrand:massactiongridassignbrand,
         //massactiongridaddtags:massactiongridaddtags,
 
     },
@@ -70,25 +37,21 @@ export default {
             formatOnlyDate: 'formatOnlyDate',
             formatTimeOnly: 'formatTimeOnly',
             configDataInfo:'getConfigDataInfo',
-            additionalInfo:'getAdditionalInfo',
+            gridInfo:'getGridInfo',
             filterData:'getFilterData',
-            //sortByColumn: 'sortByColumn',
             truncateText: 'truncateText',
-            //changeFilter: 'getChangeFilter',
+            changeFilter: 'getChangeFilter',
             unescapeValue:'unescapeValue',
             ProductsGridInfoData: 'getProductsGridInfo',
-            leadsGridAdditionalInfoData: 'getLeadGridAdditionalInfo',
             checkedItems:'getCheckedItems',
             activeMassAction:'getActiveMassAction',
             massActionActive:'getIsMassActionActive',
-            //
             salesStats:'getSalesStats',
-            opportunitiesStats:'getOpportunitiesStats',
+            suppliersCompanies:'getSuppliersCompanies',
             toCurrency:'toCurrency',
-            //updateOppStats:'getUpdateOppStats',
-            activeGridTablePreset:'getActiveGridTablePreset',
-            //applyFilterRemote:'getApplyFilterRemote',
+            updateGridStats:'getUpdateGridStats',
             pagerState: 'getPagerState',
+            currencyInfo: 'getCurrencyInfo',
         })
     },
     watch: {
@@ -110,268 +73,20 @@ export default {
             if (typeof newData.searchData !== 'undefined') {
                 if (isProxy(newData.searchData)) {
                     let filterDataObject = {};
-                    if (newData.searchData.filterBy !== 'undefined') {
-                        filterDataObject['filter-by'] = toRaw(newData.searchData.filterBy);
-                    }
-
-                    if (newData.searchData.filterOrderBy !== 'undefined') {
-                        filterDataObject['interaction_value'] = toRaw(newData.searchData.filterOrderBy);
-                    }
-
-                    if (newData.searchData.filterIncludeCustomLeadFields !== 'undefined') {
-                        filterDataObject['search_includes_custom_lead_fields'] = toRaw(newData.searchData.filterIncludeCustomLeadFields);
-                    }
-
-                    if (newData.searchData.filterIncludeCustomNotes !== 'undefined') {
-                        filterDataObject['search_includes_notes'] = toRaw(newData.searchData.filterIncludeCustomNotes);
-                    }
-
-                    if (newData.searchData.filterIncludeCallTranscript !== 'undefined') {
-                        filterDataObject['search_includes_call_transcript'] = toRaw(newData.searchData.filterIncludeCallTranscript);
-                    }
-
-                    if (newData.searchData.filterCreationDateFrom !== 'undefined') {
-                        filterDataObject['created_at_from'] = toRaw(newData.searchData.filterCreationDateFrom);
-                    }
-
-                    if (newData.searchData.filterCreationDateTo !== 'undefined') {
-                        filterDataObject['created_at_to'] = toRaw(newData.searchData.filterCreationDateTo);
-                    }
-
-                    if (newData.searchData.filterActivityDateFrom !== 'undefined') {
-                        filterDataObject['next_activity_from'] = toRaw(newData.searchData.filterActivityDateFrom);
-                    }
-
-                    if (newData.searchData.filterActivityDateTo !== 'undefined') {
-                        filterDataObject['next_activity_to'] = toRaw(newData.searchData.filterActivityDateTo);
-                    }
-
-                    if (newData.searchData.filterSequenceDateFrom !== 'undefined') {
-                        filterDataObject['last_sequence_from'] = toRaw(newData.searchData.filterSequenceDateFrom);
-                    }
-
-                    if (newData.searchData.filterSequenceDateTo !== 'undefined') {
-                        filterDataObject['last_sequence_to'] = toRaw(newData.searchData.filterSequenceDateTo);
-                    }
-
-                    if (newData.searchData.filterOpportunityDateFrom !== 'undefined') {
-                        filterDataObject['opportunity_date_from'] = toRaw(newData.searchData.filterOpportunityDateFrom);
-                    }
-
-                    if (newData.searchData.filterOpportunityDateTo !== 'undefined') {
-                        filterDataObject['opportunity_date_to'] = toRaw(newData.searchData.filterOpportunityDateTo);
-                    }
-
-                    if (newData.searchData.creationAt !== 'undefined') {
-                        filterDataObject['creation_at'] = toRaw(newData.searchData.creationAt);
-                    }
-
-                    if (newData.searchData.stateChangeAt !== 'undefined') {
-                        filterDataObject['state_change_at'] = toRaw(newData.searchData.stateChangeAt);
-                    }
-
-                    if (newData.searchData.expectedAt !== 'undefined') {
-                        filterDataObject['expected_at'] = toRaw(newData.searchData.expectedAt);
-                    }
-
-                    if (newData.searchData.filterActivities !== 'undefined') {
-                        filterDataObject['activity_id'] = toRaw(newData.searchData.filterActivities);
-                    }
-
-                    if (newData.searchData.lastUpdatedFlag !== 'undefined') {
-                        filterDataObject['last_updated'] = toRaw(newData.searchData.lastUpdatedFlag);
-                    }
-
-                    if (newData.searchData.searchTerm !== 'undefined') {
-                        filterDataObject['lead-attribute'] = toRaw(newData.searchData.searchTerm);
-                    }
-
-                    if (newData.searchData.filterLifecycles !== 'undefined') {
-                        filterDataObject['stage_id'] = toRaw(newData.searchData.filterLifecycles);
-                    }
-
-                    if (newData.searchData.emailInteractionActivitySubtype !== 'undefined') {
-                        filterDataObject['outbound_emails_sub_type'] = toRaw(newData.searchData.emailInteractionActivitySubtype);
-                    }
-
-                    if (newData.searchData.filterByTaskStatus !== 'undefined') {
-                        filterDataObject['lead_task'] = toRaw(newData.searchData.filterByTaskStatus);
-                    }
-
-                    if (newData.searchData.filterByCountry !== 'undefined') {
-                        filterDataObject['lead_country'] = toRaw(newData.searchData.filterByCountry);
-                    }
-
-                    if (newData.searchData.filterByCountryState !== 'undefined') {
-                        filterDataObject['lead_country_state'] = toRaw(newData.searchData.filterByCountryState);
-                    }
-
-                    if (newData.searchData.filterByIndustry !== 'undefined') {
-                        filterDataObject['industry_id'] = toRaw(newData.searchData.filterByIndustry);
-                    }
-
-                    if (newData.searchData.filterByEmailSequence !== 'undefined') {
-                        filterDataObject['email_sms_sequences'] = toRaw(newData.searchData.filterByEmailSequence);
-                    }
-
-                    if (newData.searchData.filterBySequenceType !== 'undefined') {
-                        filterDataObject['email_sequence_type'] = toRaw(newData.searchData.filterBySequenceType);
-                    }
-
-                    if (newData.searchData.filterBySequenceTypeAction !== 'undefined') {
-                        filterDataObject['email_sequence_type_action'] = toRaw(newData.searchData.filterBySequenceTypeAction);
-                    }
-
-                    if (newData.searchData.filterByOpportunityOwnerId !== 'undefined') {
-                        filterDataObject['opportunity_owner_id'] = toRaw(newData.searchData.filterByOpportunityOwnerId);
-                    }
-
-                    if (newData.searchData.filterByTotalOpportunityAmountFrom !== 'undefined') {
-                        filterDataObject['total_opportunity_amount_from'] = toRaw(newData.searchData.filterByTotalOpportunityAmountFrom);
-                    }
-
-                    if (newData.searchData.filterByTotalOpportunityAmountTo !== 'undefined') {
-                        filterDataObject['total_opportunity_amount_to'] = toRaw(newData.searchData.filterByTotalOpportunityAmountTo);
-                    }
-
-                    if (newData.searchData.filterByTotalSpentPurchaseAmountFrom !== 'undefined') {
-                        filterDataObject['total_spent_purchase_amount_from'] = toRaw(newData.searchData.filterByTotalSpentPurchaseAmountFrom);
-                    }
-
-                    if (newData.searchData.filterByTotalSpentPurchaseAmountTo !== 'undefined') {
-                        filterDataObject['total_spent_purchase_amount_to'] = toRaw(newData.searchData.filterByTotalSpentPurchaseAmountTo);
-                    }
-
-                    if (newData.searchData.filterLeadOwnerId !== 'undefined') {
-                        filterDataObject['owner_id'] = toRaw(newData.searchData.filterLeadOwnerId);
-                    }
-
-                    if (newData.searchData.filterByGroup !== 'undefined') {
-                        filterDataObject['customer_group_id'] = toRaw(newData.searchData.filterByGroup);
+                    if (newData.searchData.filterByBrands !== 'undefined') {
+                        filterDataObject['fbrand'] = toRaw(newData.searchData.filterByBrands);
                     }
 
                     if (newData.searchData.filterByTags !== 'undefined') {
-                        filterDataObject['lead_tags'] = toRaw(newData.searchData.filterByTags);
+                        filterDataObject['ftag'] = toRaw(newData.searchData.filterByTags);
                     }
 
-                    if (newData.searchData.filterBySourceTypes !== 'undefined') {
-                        filterDataObject['lead_source_type_and_utm'] = toRaw(newData.searchData.filterBySourceTypes);
+                    if (newData.searchData.filterByStock !== 'undefined') {
+                        filterDataObject['fqty'] = toRaw(newData.searchData.filterByStock);
                     }
 
-                    if (newData.searchData.filterBySourceUtmValues !== 'undefined') {
-                        filterDataObject['lead_utm_source_value_id'] = toRaw(newData.searchData.filterBySourceUtmValues);
-                    }
-
-                    if (newData.searchData.filterByCampaignUtmValues !== 'undefined') {
-                        filterDataObject['lead_utm_campaign_value_id'] = toRaw(newData.searchData.filterByCampaignUtmValues);
-                    }
-
-                    if (newData.searchData.filterByCity !== 'undefined') {
-                        filterDataObject['lead_city'] = toRaw(newData.searchData.filterByCity);
-                    }
-
-                    if (newData.searchData.filterByTitleOperator !== 'undefined') {
-                        filterDataObject['lead_title_operator'] = toRaw(newData.searchData.filterByTitleOperator);
-                    }
-
-                    if (newData.searchData.byLeadTitle !== 'undefined') {
-                        filterDataObject['lead_titles'] = toRaw(newData.searchData.byLeadTitle);
-                    }
-
-                    if (newData.searchData.filterByOpportunityStatus !== 'undefined') {
-                        filterDataObject['lead_opportunity_stages'] = toRaw(newData.searchData.filterByOpportunityStatus);
-                    }
-
-                    if (newData.searchData.filterByScoreFrom !== 'undefined') {
-                        filterDataObject['lead_score_from'] = toRaw(newData.searchData.filterByScoreFrom);
-                    }
-
-                    if (newData.searchData.filterByScoreTo !== 'undefined') {
-                        filterDataObject['lead_score_to'] = toRaw(newData.searchData.filterByScoreTo);
-                    }
-
-                    if (newData.searchData.filterBySentimentScoreFrom !== 'undefined') {
-                        filterDataObject['lead_sentiment_score_from'] = toRaw(newData.searchData.filterBySentimentScoreFrom);
-                    }
-
-                    if (newData.searchData.filterBySentimentScoreTo !== 'undefined') {
-                        filterDataObject['lead_sentiment_score_to'] = toRaw(newData.searchData.filterBySentimentScoreTo);
-                    }
-
-                    if (newData.searchData.filterByLeadType !== 'undefined') {
-                        filterDataObject['lead_source_type'] = toRaw(newData.searchData.filterByLeadType);
-                    }
-
-                    if (newData.searchData.filterBySignCallDuration !== 'undefined') {
-                        filterDataObject['more_less_call_duration'] = toRaw(newData.searchData.filterBySignCallDuration);
-                    }
-
-                    if (newData.searchData.filterByCallDuration !== 'undefined') {
-                        filterDataObject['call_duration'] = toRaw(newData.searchData.filterByCallDuration);
-                    }
-
-                    if (newData.searchData.filterByLeadSource !== 'undefined') {
-                        filterDataObject['lead_source'] = toRaw(newData.searchData.filterByLeadSource);
-                    }
-
-                    if (newData.searchData.filterByExcludeTags !== 'undefined') {
-                        filterDataObject['lead_tags_exclude'] = toRaw(newData.searchData.filterByExcludeTags);
-                    }
-
-                    if (newData.searchData.filterByLeadZip !== 'undefined') {
-                        filterDataObject['lead_zip'] = toRaw(newData.searchData.filterByLeadZip);
-                    }
-
-                    if (newData.searchData.filterByNpsScoreOperator !== 'undefined') {
-                        filterDataObject['lead_filter_nps_score_operator'] = toRaw(newData.searchData.filterByNpsScoreOperator);
-                    }
-
-                    if (newData.searchData.filterByNpsScore !== 'undefined') {
-                        filterDataObject['nps_score'] = toRaw(newData.searchData.filterByNpsScore);
-                    }
-
-                    if (newData.searchData.filterByEmailValidation !== 'undefined') {
-                        filterDataObject['email_validation_status'] = toRaw(newData.searchData.filterByEmailValidation);
-                    }
-
-                    if (newData.searchData.filterEmailValidationDatepicker !== 'undefined') {
-                        filterDataObject['validated_date_to'] = toRaw(newData.searchData.filterEmailValidationDatepicker);
-                    }
-
-                    if (newData.searchData.filterByOpportunityType !== 'undefined') {
-                        filterDataObject['opportunity_type_id'] = toRaw(newData.searchData.filterByOpportunityType);
-                    }
-
-                    if (newData.searchData.filterByEmailStatus !== 'undefined') {
-                        filterDataObject['email_status'] = toRaw(newData.searchData.filterByEmailStatus);
-                    }
-
-                    if (newData.searchData.filterByLastInteractionType !== 'undefined') {
-                        filterDataObject['last_interaction_id'] = toRaw(newData.searchData.filterByLastInteractionType);
-                    }
-
-                    if (newData.searchData.filterLeadsCustomParams !== 'undefined') {
-                        filterDataObject['custom_params_search'] = toRaw(newData.searchData.filterLeadsCustomParams);
-                    }
-
-                    if (newData.searchData.filterOrganizationsCustomParams !== 'undefined') {
-                        filterDataObject['custom_organization_params_search'] = toRaw(newData.searchData.filterOrganizationsCustomParams);
-                    }
-
-                    if (newData.searchData.specialFilterType !== 'undefined') {
-                        filterDataObject['special_filter_type'] = toRaw(newData.searchData.specialFilterType);
-                    }
-
-                    if (newData.searchData.rangeOptions !== 'undefined') {
-                        filterDataObject['range_options'] = toRaw(newData.searchData.rangeOptions);
-                    }
-
-                    if (newData.searchData.switchLastNextActivityDate !== 'undefined') {
-                        filterDataObject['switch_last_next_activity_date'] = toRaw(newData.searchData.switchLastNextActivityDate);
-                    }
-
-                    if (newData.searchData.emailSmsSequencesTypePeriod !== 'undefined') {
-                        filterDataObject['email_sms_sequences_type_period'] = toRaw(newData.searchData.emailSmsSequencesTypePeriod);
+                    if (newData.searchData.searchTerm !== 'undefined') {
+                        filterDataObject['searchTerm'] = toRaw(newData.searchData.searchTerm);
                     }
 
                     this.searchData = filterDataObject;
@@ -386,15 +101,16 @@ export default {
 
             this.applyFilter();
         },
-        async updateOppStats (newData, originalData) {
+        async updateGridStats (newData, originalData) {
             if (typeof newData !== 'undefined') {
-                let leadIdsString = '';
+                let productIdsString = '';
 
-                _.each(this.ProductsGridInfoData, function(leadInfo, index) {
-                    leadIdsString = leadIdsString.concat(leadInfo.id, ",");
+                _.each(this.ProductsGridInfoData, function(produuctInfo, index) {
+                    productIdsString = productIdsString.concat(produuctInfo.id, ",");
                 });
 
-                const resultStats = await this.$store.dispatch('getLeadStatsGridData', {'router':this.$router, 'leadIdsString' : leadIdsString});
+                const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString});
+                const resultSalesStats = await this.$store.dispatch('getSalesStatsGridData', {'router':this.$router, 'productIdsString' : productIdsString});
             }
         },
         activeMassAction  (newData, originalData) {
@@ -403,14 +119,11 @@ export default {
             } else {
                 this.$store.commit('setIsMassActionActive', true);
             }
-        }
+        },
 
     },
     methods: {
         async applyFilter(type) {
-
-
-
             const result = await this.$store.dispatch('getProductsGridData', {
                 'router': this.$router,
                 'searchData': this.filterData
@@ -420,22 +133,20 @@ export default {
                 showMessage('Please re-login', true, 3000);
             } else {
                 this.loadedScreen = true;
+                this.$store.commit('setUpdateGridStats', Date.now());
             }
-
-
-
         },
-        async goToLeadDetailsScreen(id, tabName, subTabName)
+        async goToProductDetailsScreen(id, tabName, subTabName)
         {
             let openTabName = tabName || '',
                 openSubTabName = subTabName || '';
 
             if (openTabName !== '') {
-                this.$router.push({ name: 'lead', params: {'id': id}, query:{'tabName': openTabName}});
+                this.$router.push({ name: 'product', params: {'id': id}, query:{'tabName': openTabName}});
             } else if (openSubTabName !== '') {
-                this.$router.push({ name: 'lead', params: {'id': id}, query:{'subTabName': openSubTabName}});
+                this.$router.push({ name: 'product', params: {'id': id}, query:{'subTabName': openSubTabName}});
             } else {
-                this.$router.push({name: 'lead', params: {'id': id}, query: {'tabName': 'timeline'}});
+                this.$router.push({name: 'product', params: {'id': id}, query: {'tabName': 'timeline'}});
             }
         },
         addRemoveItem: function(e, itemKey) {
@@ -523,7 +234,69 @@ export default {
                     }
                 });
             return result;
-        }
+        },
+        getTotal(productId) {
+            let total = this.salesStats.filter(s => s.product_id == productId && s.status !== 'new').reduce((sum, s) => sum + Number(s.count), 0);
+            return total > 0 ? this.$t('message.totalSales') +': '+ total : '';
+        },
+        async updateProp(event, index, elementName){
+            let newValue = event.target.value;
+
+            if (typeof this.ProductsGridInfoData[index][elementName] ===  'undefined') {
+                return false;
+            }
+
+            let data = toRaw(this.ProductsGridInfoData[index]);
+            let oldValue = data[elementName];
+            let productId = data['id'];
+            let currencySymbol = this.currencyInfo.currencySymbol;
+            let denyEdit = false;
+
+            if (elementName == 'inventory' && oldValue === newValue) {
+                denyEdit = true;
+            } else {
+                if(elementName == 'price') {
+                    newValue = newValue.replace(currencySymbol, '');
+                }
+
+                if (oldValue === newValue || (oldValue === null || newValue === '')) {
+                    denyEdit = true;
+                }
+            }
+
+            if(denyEdit) {
+                this.ProductsGridInfoData[index][elementName] = oldValue;
+                data = structuredClone(toRaw(this.ProductsGridInfoData));
+                this.$store.commit('setProductsGridInfo', data);
+                return false;
+            }
+
+            data[elementName] = newValue;
+
+            const result = await this.$store.dispatch('updateParam', {'router':this.$router, 'id':productId, 'data':data});
+
+            if (parseInt(result.error) === 1) {
+                this.ProductsGridInfoData[index][elementName] = oldValue;
+                showMessage(result.message, true, 3000);
+                return false;
+            } else {
+                this.ProductsGridInfoData[index][elementName] = newValue;
+                showMessage(this.$t('message.updated'), false, 2000);
+            }
+
+            data = structuredClone(toRaw(this.ProductsGridInfoData));
+            this.$store.commit('setProductsGridInfo', data);
+        },
+        changeMassAction: function(e) {
+            let activeMassAction = e.target.value;
+            if (activeMassAction != 0 && Object.keys(this.checkedItems).length === 0) {
+                showMessage(this.$t('message.pleaseChooseAtLeastOneProduct'), true, 3000);
+                this.$store.commit('setActiveMassAction', '0');
+                e.target.value = '0';
+            } else {
+                this.$store.commit('setActiveMassAction', activeMassAction);
+            }
+        },
 
     },
     async created(){
@@ -546,19 +319,6 @@ export default {
             if (typeof checkboxRadioStyle !== 'undefined' && typeof checkboxRadioStyle() === "function") {
                 checkboxRadioStyle();
             }
-
-            const table = document.getElementById('leads-grid-table');
-            const tableWidth = table.offsetWidth;
-            this.scrollBarStyle = 'width:'+tableWidth+'px;';
-            this.currentScrollBarSize = tableWidth;
-
-            $('.opportunities-block-scroll').on('scroll', function (e) {
-                $('#leads-grid-table-dashboard-table-scroll').scrollLeft($('.opportunities-block-scroll').scrollLeft());
-            });
-
-            $('#leads-grid-table-dashboard-table-scroll').on('scroll', function (e) {
-                $('.opportunities-block-scroll').scrollLeft($('#leads-grid-table-dashboard-table-scroll').scrollLeft());
-            });
         })
     }
 }

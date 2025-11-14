@@ -103,7 +103,9 @@ class Api_Store_Products extends Api_Service_Abstract {
             $key    = str_replace('*-amp-*', '&', filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
             $count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
             $forGrid = (bool)filter_var($this->_request->getParam('isGrid', false), FILTER_SANITIZE_STRING);
+            $gridFilter = $this->_request->getParam('filter', array());
             $includesTags = false;
+            $useSearch = false;
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
@@ -124,39 +126,72 @@ class Api_Store_Products extends Api_Service_Abstract {
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
             if ($forGrid) {
+                if(!empty($gridFilter)) {
+                    if(!empty($gridFilter['searchTerm'])) {
+                        $key = $gridFilter['searchTerm'];
+                    }
+
+                    if(!empty($gridFilter['fbrand'])) {
+                        foreach ($gridFilter['fbrand'] as $fbrand) {
+                            array_push($filter['brands'], $fbrand['name']);
+                        }
+                    }
+
+                    if(!empty($gridFilter['ftag'])) {
+                        foreach ($gridFilter['ftag'] as $ftag) {
+                            array_push($filter['tags'], $ftag['id']);
+                        }
+                    }
+
+                    if(!empty($gridFilter['fqty'])) {
+                        foreach ($gridFilter['fqty'] as $fqty) {
+                            array_push($filter['inventory'], $fqty['id']);
+                        }
+                    }
+
+                }
+
                 $where = '';
 
                 if((is_array($filter['tags']) && !empty($filter['tags']))) {
                     $includesTags = true;
-                    $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('pt.tag_id IN (?)', $filter['tags']);
+                    $where .= '(' . $this->_productMapper->getDbTable()->getAdapter()->quoteInto('pt.tag_id IN (?)', $filter['tags']) . ')';
                 }
 
                 if((is_array($filter['brands']) && !empty($filter['brands']))) {
                     if (!empty($where)) {
-                        $where .= ' AND ';
+                        $where .= ' AND (';
+                    } else {
+                        $where .= ' (';
                     }
 
-                    $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('b.name in (?)', $filter['brands']);
+                    $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('b.name in (?)', $filter['brands']) . ')';
                 }
 
                 if((is_array($filter['inventory']) && !empty($filter['inventory']))) {
                     if (!empty($where)) {
-                        $where .= ' AND ';
+                        $where .= ' AND (';
+                    } else {
+                        $where .= ' (';
                     }
 
                     if(in_array('unlimited', $filter['inventory'])){
-                        $where .= new Zend_Db_Expr('p.inventory IS NULL');
-                        unset($filter['inventory'][0]);
+                        $where .= new Zend_Db_Expr('sp.inventory IS NULL');
+                        $foundUnlimitedParam = array_search('unlimited', $filter['inventory']);
+                        unset($filter['inventory'][$foundUnlimitedParam]);
                         if (!empty($filter['inventory'])) {
-                            $where .= ' OR ' . $this->_productMapper->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $filter['inventory']);
+                            $where .= ' OR ' . $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.inventory IN (?)', $filter['inventory']) . ')';
+                        } else {
+                            $where .= ')';
                         }
                     }else{
-                        $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('p.inventory IN (?)', $filter['inventory']);
+                        $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.inventory IN (?)', $filter['inventory']) . ')';
                     }
                 }
 
                 if(!empty($key)) {
                     $includesTags = true;
+                    $useSearch = true;
                     $search = $key;
 
                     if (!empty($where)) {
@@ -164,20 +199,18 @@ class Api_Store_Products extends Api_Service_Abstract {
                     }
 
                     $likeWhere = array(
-                        'p.name LIKE ?',
-                        'p.sku LIKE ?',
-                        'p.mpn LIKE ?',
+                        'sp.name LIKE ?',
+                        'sp.sku LIKE ?',
+                        'sp.mpn LIKE ?',
                         'b.name LIKE ?',
                         't.name LIKE ?'
                     );
-
-                    $likeWhere = implode(' OR ', $likeWhere);
 
                     $attributeValues = explode(' ', $search);
                     $whereSplitSearch = ' (';
 
                     foreach ($attributeValues as $key => $attrVal) {
-                        $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.name LIKE ?',
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?',
                             '%' . $attrVal . '%');
 
                         if (count($attributeValues) > $key + 1) {
@@ -189,7 +222,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $whereSplitSearch .= ') OR ( ';
 
                     foreach ($attributeValues as $key => $attrVal) {
-                        $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.sku LIKE ?',
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.sku LIKE ?',
                             '%' . $attrVal . '%');
 
                         if (count($attributeValues) > $key + 1) {
@@ -201,7 +234,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $whereSplitSearch .= ') OR ( ';
 
                     foreach ($attributeValues as $key => $attrVal) {
-                        $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('p.mpn LIKE ?',
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.mpn LIKE ?',
                             '%' . $attrVal . '%');
 
                         if (count($attributeValues) > $key + 1) {
@@ -213,7 +246,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $whereSplitSearch .= ') OR ( ';
 
                     foreach ($attributeValues as $key => $attrVal) {
-                        $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('b.name LIKE ?',
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('b.name LIKE ?',
                             '%' . $attrVal . '%');
 
                         if (count($attributeValues) > $key + 1) {
@@ -225,7 +258,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $whereSplitSearch .= ') OR ( ';
 
                     foreach ($attributeValues as $key => $attrVal) {
-                        $whereSplitSearch .= $this->getDbTable()->getAdapter()->quoteInto('t.name LIKE ?',
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('t.name LIKE ?',
                             '%' . $attrVal . '%');
 
                         if (count($attributeValues) > $key + 1) {
@@ -248,9 +281,11 @@ class Api_Store_Products extends Api_Service_Abstract {
                     false,
                     '',
                     array(),
-                    $includesTags
+                    $includesTags,
+                    $useSearch
                 );
 
+                $data['data'] = array();
                 if(!empty($products['data'])) {
                     $data['data'] = $products['data'];
                 }
@@ -388,6 +423,10 @@ class Api_Store_Products extends Api_Service_Abstract {
         $configMapper = Models_Mapper_ShoppingConfig::getInstance();
         $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
         $productWeightMandatory = $configMapper->getConfigParam('productWeightMandatory');
+
+        if(!empty($srcData['data']) && !empty($srcData['newGrid'])){
+            $srcData = $srcData['data'];
+        }
 
         if (!empty($productSizeMandatory)) {
             if (empty($srcData['prodLength']) || !is_numeric($srcData['prodLength']) || $srcData['prodLength'] <= 0) {

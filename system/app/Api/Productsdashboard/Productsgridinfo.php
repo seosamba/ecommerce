@@ -56,7 +56,7 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
      * Leads grid info
      *
      * Resource:
-     * : /api/leads/leadgridinfo/
+     * : api/productsdashboard/productsgridinfo/
      *
      * HttpMethod:
      * : GET
@@ -66,8 +66,6 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
     public function getAction()
     {
         $id = filter_var($this->_request->getParam('id'), FILTER_SANITIZE_NUMBER_INT);
-
-        $where = null;
 
         if (!empty($id)) {
 
@@ -90,14 +88,17 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
 
         $data = array();
         $data['data'] = array();
-        $data['additionalInfo'] = array(
+        $data['gridInfo'] = array(
             'brands' => $brands,
             'tags' => $tags,
             'inventory' => $inventoryData,
         );
 
-        $data['additionalInfo']['restrictedUserId'] = Tools_LeadTools::getUserIdIfActionNotAllowed(Shopping::ROLE_SALESPERSON);
-
+        $data['gridInfo']['restrictedUserId'] = Tools_LeadTools::getUserIdIfActionNotAllowed(Shopping::ROLE_SALESPERSON);
+        $data['currencyInfo'] = Tools_LeadWelcomeScreenTools::getCurrencyInfo();
+        $currency = Zend_Registry::get('Zend_Currency');
+        $currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
+        $data['currencyInfo']['currencySymbol'] = $currencySymbol;
 
         return $data;
     }

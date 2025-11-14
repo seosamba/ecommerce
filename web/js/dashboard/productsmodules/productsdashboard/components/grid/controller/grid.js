@@ -12,19 +12,13 @@ export default {
             websiteUrl: $('#website_url').val(),
             localeMapping: localeMapping,
             locale: $('#dashboard-system-language').val(),
+            searchData:[],
             filterByBrands:[],
             filterByTags:[],
             filterByStock:[],
             searchTerm:'',
-            quickLeadExistingLeadId:0,
             urlPredefinedFilterParams:[],
-
-
-
-
-
-
-
+            filterByBrand:[],
         }
     },
     components: {
@@ -33,7 +27,7 @@ export default {
     computed: {
         ...mapGetters({
             configDataInfo:'getConfigDataInfo',
-            additionalInfo:'getAdditionalInfo',
+            gridInfo:'getGridInfo',
             truncateText: 'truncateText',
             sortByColumn: 'sortByColumn',
         }),
@@ -46,16 +40,8 @@ export default {
         async resetSearchBar()
         {
             this.searchTerm = '';
+            this.applyFilter();
         },
-
-        goToProfile()
-        {
-          if (this.quickLeadExistingLeadId > 0) {
-              this.$router.push({ name: 'lead', params: {'id': this.quickLeadExistingLeadId}, query:{'tabName': 'timeline'}});
-          }
-        },
-
-
         getParams(pathParams) {
             let result = {},
                 tmpData = [];
@@ -69,6 +55,19 @@ export default {
                     }
                 });
             return result;
+        },
+        async applyFilter() {
+            this.searchData['searchTerm'] = this.searchTerm;
+            this.searchData['filterByBrands'] = this.filterByBrands;
+            this.searchData['filterByTags'] = this.filterByTags;
+            this.searchData['filterByStock'] = this.filterByStock;
+
+            this.$store.commit('setChangeFilter', {
+                'searchData':this.searchData,
+            });
+
+            this.$store.commit('setCheckedItems', {});
+
         }
     },
     async created(){
