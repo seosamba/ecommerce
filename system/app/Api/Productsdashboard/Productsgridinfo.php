@@ -3,28 +3,12 @@
 class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
 {
 
-
-
     /**
      * System response helper
      *
      * @var null
      */
     protected $_responseHelper = null;
-
-    /**
-     * User restricted id access
-     *
-     * @var null
-     */
-    protected $_restrictedUserId = null;
-
-    /**
-     * User restricted lifecycle id
-     *
-     * @var null
-     */
-    protected $_restrictedLifeCycleId = 0;
 
     /**
      * @var array Access Control List
@@ -45,10 +29,7 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
     {
         parent::init();
         $this->_responseHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('response');
-        $this->_restrictedUserId = Tools_LeadTools::getUserIdIfActionNotAllowed(Shopping::ROLE_SALESPERSON);
         $this->_loggedUserRoleId = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser()->getRoleId();
-        $this->_restrictedLifeCycleId = Tools_LeadTools::getLifecycleIdIfActionNotAllowed(Shopping::ROLE_SALESPERSON);
-
     }
 
 
@@ -85,7 +66,6 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
             }
         }
 
-
         $data = array();
         $data['data'] = array();
         $data['gridInfo'] = array(
@@ -94,8 +74,7 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
             'inventory' => $inventoryData,
         );
 
-        $data['gridInfo']['restrictedUserId'] = Tools_LeadTools::getUserIdIfActionNotAllowed(Shopping::ROLE_SALESPERSON);
-        $data['currencyInfo'] = Tools_LeadWelcomeScreenTools::getCurrencyInfo();
+        $data['currencyInfo'] = Tools_Misc::getCurrencyInfo();
         $currency = Zend_Registry::get('Zend_Currency');
         $currencySymbol = preg_replace('~[\w]~', '', $currency->getSymbol());
         $data['currencyInfo']['currencySymbol'] = $currencySymbol;
