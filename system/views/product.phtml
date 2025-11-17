@@ -370,7 +370,7 @@ $this->headLink()
                             <div class="textarea-bg">
                                 <textarea id="product-shortDescription" data-reflection="shortDescription" placeholder="<?php echo $lexemShortDescription; ?>"></textarea>
                                 <div class="shortcut-buttons p5px">
-                                    <span id="generate-ai-product-description" data-type="no_formatting" class="add-shortcut btn mini outline" title="<?php echo $this->translate('Generate AI description using the product\'s image');?>" data-shortcut="<?php echo $this->translate('Generate AI description using the product\'s image');?>">
+                                    <span id="generate-ai-product-description" data-type="short" class="add-shortcut btn mini outline" title="<?php echo $this->translate('Generate AI description using the product\'s image');?>" data-shortcut="<?php echo $this->translate('Generate AI description using the product\'s image');?>">
                                         <?php echo $this->translate('AI Generate');?>
                                     </span>
                                     <input id="ai-description-amount" type="text" name="ai-description-amount" class="inline-block" value="<?php echo $this->generalConfig['wordCountAiShortDescription'];?>">

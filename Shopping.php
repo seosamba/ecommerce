@@ -19,7 +19,8 @@ class Shopping extends Tools_Plugins_Abstract {
             'configCustomerGroups' => array(
                 'label' => 'Customers/Leads groups',
                 'position' => 9,
-                'settingActionPath' => 'configCustomerGroups'
+                'settingActionPath' => 'configCustomerGroups',
+                'helpLink' => 'groups-and-merchandising.html'
             )
         );
     }
