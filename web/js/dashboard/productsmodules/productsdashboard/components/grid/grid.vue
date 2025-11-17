@@ -1,5 +1,6 @@
 <template>
     <div v-show="loadedScreen" class="flex-row">
+        <h2 class="mt0px">{{$t('message.productTabTitle')}}</h2>
         <div id="store-products" class="flex-row flex_12 f-alpha f-omega">
           <div class="search-line clearfix">
             <span class="search-block-element grid_3 alpha omega mb20px ">

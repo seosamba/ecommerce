@@ -53,8 +53,7 @@ const messages = {
             'notValidBrand':'Brand name should contain the following characters only: a-z, A-Z, 0-9, -(dash), _(underscore) and space.',
             'done':'Done',
             'canNotAssignBrand':'Can not assign brand',
-
-
+            'productTabTitle':'Manage your product catalog'
         }
     },
     es: {

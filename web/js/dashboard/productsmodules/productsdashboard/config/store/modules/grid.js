@@ -154,6 +154,15 @@ const getters = {
             return result;
         }
     },
+    currencyOnly: (state) => {
+        return (value) => {
+            let result ='';
+
+            result = (0).toLocaleString(state.currencyInfo.locale, { style: 'currency', currency:state.currencyInfo.currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/\d/g, '').trim()
+
+            return result;
+        }
+    },
     unescapeValue: (state) => {
         return (value) => {
             return unescape(value);

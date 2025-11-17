@@ -2,7 +2,7 @@
   <div v-if="loadedScreen" id="products-grid-table-block" class="flex_12">
     <div class="products-table mb0px grid-table-block">
       <div id="products-grid-table-dashboard-table-scroll" class="dashboard-table-scroll">
-        <table id="products-grid-table" class="dynamic-columns product-grid-table">
+        <table id="products-grid-table" class="product-grid-table">
           <thead class="header-inner">
           <tr>
             <th>
@@ -24,61 +24,65 @@
           </tr>
           </thead>
           <tbody id="product-grid-table-body">
-            <tr v-if="Object.keys(ProductsGridInfoData).length > 0" :key="produuctsGridInfo.id" class="product-row" v-for="(produuctsGridInfo, index) in ProductsGridInfoData">
+            <tr v-if="Object.keys(ProductsGridInfoData).length > 0" :key="productsGridInfo.id" class="product-row" v-for="(productsGridInfo, index) in ProductsGridInfoData">
               <td>
                 <span>
-                  <label :for="'grid-product-line-'+produuctsGridInfo.id">
-                    <input :checked="isCheckedItem(produuctsGridInfo.id)" :id="'grid-product-line-'+produuctsGridInfo.id"
-                           @change="addRemoveItem($event, produuctsGridInfo.id)" type="checkbox"
-                           :name="'grid-item-number-'+produuctsGridInfo.id">
+                  <label :for="'grid-product-line-'+productsGridInfo.id">
+                    <input :checked="isCheckedItem(productsGridInfo.id)" :id="'grid-product-line-'+productsGridInfo.id"
+                           @change="addRemoveItem($event, productsGridInfo.id)" type="checkbox"
+                           :name="'grid-item-number-'+productsGridInfo.id">
                   </label>
                 </span>
               </td>
               <td>
                 <span>
-                  <a href="javascript:;" title="Click to open editor" class="tpopup" :data-url="websiteUrl+'plugin/shopping/run/product/id/'+produuctsGridInfo.id">{{produuctsGridInfo.name}}</a>
+                  <a href="javascript:;" title="Click to open editor" class="tpopup" :data-url="websiteUrl+'plugin/shopping/run/product/id/'+productsGridInfo.id">{{productsGridInfo.name}}</a>
                 </span>
               </td>
               <td>
-                <input @blur="updateProp($event, index, 'inventory')" type="text" :value="(produuctsGridInfo.inventory === null || produuctsGridInfo.inventory == '') ? 'unlimited' : produuctsGridInfo.inventory">
+                <input @blur="updateProp($event, index, 'inventory')" :placeholder="(productsGridInfo.inventory === null || productsGridInfo.inventory === '') ? 'unlimited':''" type="text" :value="(productsGridInfo.inventory === null || productsGridInfo.inventory === '') ? '' : productsGridInfo.inventory">
               </td>
               <td>
                 <span>
-                  {{produuctsGridInfo.brandName}}
+                  {{productsGridInfo.brandName}}
                 </span>
               </td>
               <td>
-                <div v-if="typeof suppliersCompanies !== 'undefined'">
+                <div v-if="typeof suppliersCompanies !== 'undefined' && suppliersSpinner === false">
                   <p v-for="(supCompany, ind) in suppliersCompanies">
-                    <strong v-if="produuctsGridInfo.id == supCompany.product_id">{{supCompany.company_name}}</strong>
+                    <strong v-if="productsGridInfo.id == supCompany.product_id">{{supCompany.company_name}}</strong>
                   </p>
                 </div>
+                <img v-if="suppliersSpinner === true" :src="websiteUrl+'plugins/shopping/web/images/spinner_16.gif'" alt="loading" />
               </td>
               <td>
-                <input @blur="updateProp($event, index, 'sku')" type="text" :value="produuctsGridInfo.sku">
+                <input @blur="updateProp($event, index, 'sku')" type="text" :value="productsGridInfo.sku">
               </td>
               <td>
-                <input @blur="updateProp($event, index, 'mpn')" type="text" :value="produuctsGridInfo.mpn">
+                <input @blur="updateProp($event, index, 'mpn')" type="text" :value="productsGridInfo.mpn">
               </td>
               <td>
-                <span v-if="produuctsGridInfo.free_shipping === null || produuctsGridInfo.free_shipping == '' || produuctsGridInfo.free_shipping == 0">{{$t('message.no')}}</span>
-                <span v-else-if="produuctsGridInfo.free_shipping == 1">{{$t('message.yes')}}</span>
+                <span v-if="productsGridInfo.free_shipping === null || productsGridInfo.free_shipping == '' || productsGridInfo.free_shipping == 0">{{$t('message.no')}}</span>
+                <span v-else-if="productsGridInfo.free_shipping == 1">{{$t('message.yes')}}</span>
               </td>
               <td>
-                <input @blur="updateProp($event, index, 'weight')" type="text" :value="produuctsGridInfo.weight">
+                <input @blur="updateProp($event, index, 'weight')" type="text" :value="productsGridInfo.weight">
               </td>
               <td>
-                <input @blur="updateProp($event, index, 'price')" type="text" :value="toCurrency(produuctsGridInfo.price, 2)">
+                {{currencyOnly()}}<input @blur="updateProp($event, index, 'price')" type="text" :value="toCurrency(productsGridInfo.price, 2).replace(/[^0-9.]+/g, '').trim()">
               </td>
-              <td>
-                <div v-if="salesStats && salesStats.length">
-                  <p>{{getTotal(produuctsGridInfo.id)}}</p>
-                  <div v-for="(sStats, index) in salesStats" :key="index">
-                    <div v-if="produuctsGridInfo.id == sStats.product_id">
-                      <p><strong>{{$t('message.cs_' + sStats.status)}}</strong>: {{sStats.count}}</p>
-                    </div>
-                  </div>
-                </div>
+              <td class="textcentered">
+                <template v-if="salesStats && salesStats.length && salesSpinner === false">
+                  {{getTotal(productsGridInfo.id)}}
+                  <ul>
+                    <template v-for="(sStats, index) in salesStats" :key="index">
+                       <li v-if="parseInt(productsGridInfo.id) === parseInt(sStats.product_id)">
+                         <strong>{{$t('message.cs_' + sStats.status)}}</strong>: {{sStats.count}}
+                       </li>
+                    </template>
+                  </ul>
+                </template>
+                <img v-if="salesSpinner === true" :src="websiteUrl+'plugins/shopping/web/images/spinner_16.gif'" alt="loading" />
               </td>
             </tr>
           </tbody>
@@ -93,7 +97,7 @@
     <div class="white-box omega p15px mb10px alpha tfoot-block">
       <div class="grid_3 produsts-mass-action-block f-alpha">
         <span class="mass-action-title">{{$t('message.withSelectedDo')}}</span>
-        <select @change="changeMassAction" name="produucts-mass-action-selection" class="mass-action-selection">
+        <select @change="changeMassAction" name="products-mass-action-selection" class="mass-action-selection">
           <option :selected="activeMassAction === 0" value="0">{{$t('message.noMassActions')}}</option>
           <option :selected="activeMassAction === 'assignBrand'" value="assignBrand">{{$t('message.massActionChangeProductBrand')}}</option>
         </select>

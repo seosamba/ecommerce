@@ -23,6 +23,8 @@ export default {
             },
             urlPredefinedFilterParams:[],
             initialScrollBarSize:'',
+            salesSpinner:false,
+            suppliersSpinner:false,
         }
     },
     components: {
@@ -49,6 +51,7 @@ export default {
             salesStats:'getSalesStats',
             suppliersCompanies:'getSuppliersCompanies',
             toCurrency:'toCurrency',
+            currencyOnly:'currencyOnly',
             updateGridStats:'getUpdateGridStats',
             pagerState: 'getPagerState',
             currencyInfo: 'getCurrencyInfo',
@@ -103,6 +106,9 @@ export default {
         },
         async updateGridStats (newData, originalData) {
             if (typeof newData !== 'undefined') {
+                this.suppliersSpinner = true;
+                this.salesSpinner = true;
+
                 let productIdsString = '';
 
                 _.each(this.ProductsGridInfoData, function(produuctInfo, index) {
@@ -110,7 +116,9 @@ export default {
                 });
 
                 const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString});
+                this.suppliersSpinner = false;
                 const resultSalesStats = await this.$store.dispatch('getSalesStatsGridData', {'router':this.$router, 'productIdsString' : productIdsString});
+                this.salesSpinner = false;
             }
         },
         activeMassAction  (newData, originalData) {
@@ -124,6 +132,9 @@ export default {
     },
     methods: {
         async applyFilter(type) {
+            this.suppliersSpinner = true;
+            this.salesSpinner = true;
+
             const result = await this.$store.dispatch('getProductsGridData', {
                 'router': this.$router,
                 'searchData': this.filterData

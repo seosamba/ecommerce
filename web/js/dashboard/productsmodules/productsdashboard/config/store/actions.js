@@ -1,6 +1,6 @@
 export const getGeneralProductsScreenData = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
-        showSpinner('#produucts-screen-config-block', 'products-screen-config-block-spinner dashboard-spinner');
+        showSpinner('#products-screen-config-block', 'products-screen-config-block-spinner dashboard-spinner');
         $.ajax({
             'url': $('#website_url').val()+'api/productsdashboard/productsgridinfo/',
             'type': 'GET',
@@ -25,7 +25,7 @@ export const getGeneralProductsScreenData = ({commit, state, dispatch}, payload)
 
 export const getProductsGridData = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
-        showSpinner('#product-grid-table-dashboard-table-scroll', 'product-grid-table-body-spinner dashboard-spinner');
+        showSpinner('#product-grid-table-body', 'product-grid-table-body-spinner dashboard-spinner');
 
         $.ajax({
             'url': $('#website_url').val()+'api/store/products/',
