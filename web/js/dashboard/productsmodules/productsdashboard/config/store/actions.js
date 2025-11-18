@@ -110,7 +110,7 @@ export const updateParam = ({commit, state, dispatch}, payload) => {
             'dataType': 'json',
             'data': JSON.stringify({
                 'id': payload.id,
-                'secureToken':$('#leads-screen-config-token').val(),
+                'secureToken':$('#shopping-token').val(),
                 'data':payload.data,
                 'newGrid':1,
             })
@@ -149,8 +149,110 @@ export const assignProductBrandMassAction = ({commit, state, dispatch}, payload)
             'type': 'PUT',
             'dataType': 'json',
             'data': JSON.stringify({
-                'secureToken' :  $('#leads-screen-config-token').val(),
+                'secureToken' :  $('#shopping-token').val(),
                 'data': {'brand': payload.brand},
+                'id':payload.productIds,
+                'filters':payload.filters,
+                'filterAsArray':1,
+                'newGrid':1,
+
+            })
+        }).done(async  function(response){
+            if (response.status !== 'error') {
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ error: 1});
+        });
+    });
+};
+
+//Add template for products mass-action
+export const getAssignTemplateMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/templates/filter/typeproduct/',
+            'type': 'GET',
+            'dataType': 'json'
+        }).done(async  function(response){
+            if (response.status !== 'error') {
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ error: 1});
+        });
+    });
+};
+
+//Add template for products mass-action
+export const assignProductTemplateMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/products/id/'+payload.productIds,
+            'type': 'PUT',
+            'dataType': 'json',
+            'data': JSON.stringify({
+                'secureToken' :  $('#shopping-token').val(),
+                'data': {'pageTemplate': payload.pageTemplate},
+                'id':payload.productIds,
+                'filters':payload.filters,
+                'filterAsArray':1,
+                'newGrid':1,
+
+            })
+        }).done(async  function(response){
+            if (response.status !== 'error') {
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ error: 1});
+        });
+    });
+};
+
+//Add tax for products mass-action
+export const assignProductTaxMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/products/id/'+payload.productIds,
+            'type': 'PUT',
+            'dataType': 'json',
+            'data': JSON.stringify({
+                'secureToken' :  $('#shopping-token').val(),
+                'data': {'taxClass': payload.taxClass},
+                'id':payload.productIds,
+                'filters':payload.filters,
+                'filterAsArray':1,
+                'newGrid':1,
+
+            })
+        }).done(async  function(response){
+            if (response.status !== 'error') {
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ error: 1});
+        });
+    });
+};
+
+export const assignProductShippingMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/products/id/'+payload.productIds,
+            'type': 'PUT',
+            'dataType': 'json',
+            'data': JSON.stringify({
+                'secureToken' :  $('#shopping-token').val(),
+                'data': {'freeShipping': payload.freeShipping},
                 'id':payload.productIds,
                 'filters':payload.filters,
                 'filterAsArray':1,

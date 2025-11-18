@@ -3,7 +3,9 @@ import lodash from 'lodash';
 import localeMapping from '../../../localizationLanguages';
 import pagination from '../../pagination';
 import massactiongridassignbrand from '../../massactiongridassignbrand';
-//import massactiongridaddtags from '../../massactiongridaddtags';
+import massactiongridassigntemplate from '../../massactiongridassigntemplate';
+import massactiongridassigntax from '../../massactiongridassigntax';
+import massactiongridassignshipping from '../../massactiongridassignshipping';
 
 import { isProxy, toRaw } from 'vue';
 export default {
@@ -30,7 +32,9 @@ export default {
     components: {
         pagination: pagination,
         massactiongridassignbrand:massactiongridassignbrand,
-        //massactiongridaddtags:massactiongridaddtags,
+        massactiongridassigntemplate:massactiongridassigntemplate,
+        massactiongridassigntax:massactiongridassigntax,
+        massactiongridassignshipping:massactiongridassignshipping,
 
     },
     computed: {

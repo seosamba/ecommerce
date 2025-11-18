@@ -91,6 +91,9 @@
     </div>
     <div id="leads-mass-actions-block" :class="[{ hidden: (massActionActive === false)}, 'mass-actions-block-content']">
       <massactiongridassignbrand v-if="activeMassAction === 'assignBrand'"></massactiongridassignbrand>
+      <massactiongridassigntemplate v-if="activeMassAction === 'assignTemplate'"></massactiongridassigntemplate>
+      <massactiongridassigntax v-if="activeMassAction === 'assignTax'"></massactiongridassigntax>
+      <massactiongridassignshipping v-if="activeMassAction === 'assignShipping'"></massactiongridassignshipping>
 
     </div>
 
@@ -100,6 +103,10 @@
         <select @change="changeMassAction" name="products-mass-action-selection" class="mass-action-selection">
           <option :selected="activeMassAction === 0" value="0">{{$t('message.noMassActions')}}</option>
           <option :selected="activeMassAction === 'assignBrand'" value="assignBrand">{{$t('message.massActionChangeProductBrand')}}</option>
+          <option :selected="activeMassAction === 'assignTemplate'" value="assignTemplate">{{$t('message.massActionChangeProductTemplate')}}</option>
+          <option :selected="activeMassAction === 'assignTax'" value="assignTax">{{$t('message.massActionChangeProductTax')}}</option>
+          <option :selected="activeMassAction === 'assignShipping'" value="assignShipping">{{$t('message.massActionChangeProductShipping')}}</option>
+
         </select>
       </div>
       <pagination sectionName="productsGrid" :perPageDropdown="perPageDataValues"
