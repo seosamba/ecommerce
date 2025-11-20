@@ -58,9 +58,9 @@ export default {
                 return false;
             }
 
-            const result = await this.$store.dispatch('assignProductShippingMassAction', {
+            const result = await this.$store.dispatch('assignProductParamsMassAction', {
                 'router': this.$router,
-                'freeShipping': this.selectedShipping,
+                'data': {'freeShipping': this.selectedShipping},
                 'productIds': Object.keys(this.checkedItemsData).join(','),
                 'filters': filters,
             });

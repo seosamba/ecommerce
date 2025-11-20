@@ -141,16 +141,25 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
      * @param $productId
      * @return array|false
      */
-    public function findTagsByProductId($productId)
+    public function findTagsByProductId($productId, $getName = false)
     {
+        $cols = array('st.id');
+
+        if($getName){
+            $cols = array('st.id', 'st.name');
+        }
         if(!empty($productId)) {
             $where = $this->getDbTable()->getAdapter()->quoteInto('sp.id = ?', $productId);
 
-            $select = $this->getDbTable()->select()->from(array('sp' => 'shopping_product'), array('st.id'))
+            $select = $this->getDbTable()->select()->from(array('sp' => 'shopping_product'), $cols)
                 ->joinLeft(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
                 ->joinLeft(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
                 ->where($where);
-            $data = $this->getDbTable()->getAdapter()->fetchCol($select);
+            if($getName){
+                $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+            } else {
+                $data = $this->getDbTable()->getAdapter()->fetchCol($select);
+            }
 
             return $data;
         }

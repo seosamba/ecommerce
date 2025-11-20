@@ -6,6 +6,8 @@ import massactiongridassignbrand from '../../massactiongridassignbrand';
 import massactiongridassigntemplate from '../../massactiongridassigntemplate';
 import massactiongridassigntax from '../../massactiongridassigntax';
 import massactiongridassignshipping from '../../massactiongridassignshipping';
+import massactiongridassigntag from '../../massactiongridassigntag';
+import massactiongridassigncompany from '../../massactiongridassigncompany';
 
 import { isProxy, toRaw } from 'vue';
 export default {
@@ -35,6 +37,8 @@ export default {
         massactiongridassigntemplate:massactiongridassigntemplate,
         massactiongridassigntax:massactiongridassigntax,
         massactiongridassignshipping:massactiongridassignshipping,
+        massactiongridassigntag:massactiongridassigntag,
+        massactiongridassigncompany:massactiongridassigncompany,
 
     },
     computed: {
@@ -119,7 +123,7 @@ export default {
                     productIdsString = productIdsString.concat(produuctInfo.id, ",");
                 });
 
-                const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString});
+                const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString, 'groupByCompany': 0});
                 this.suppliersSpinner = false;
                 const resultSalesStats = await this.$store.dispatch('getSalesStatsGridData', {'router':this.$router, 'productIdsString' : productIdsString});
                 this.salesSpinner = false;
@@ -274,7 +278,7 @@ export default {
                     newValue = newValue.replace(currencySymbol, '');
                 }
 
-                if (oldValue === newValue || (oldValue === null || newValue === '')) {
+                if (oldValue === newValue) {
                     denyEdit = true;
                 }
             }

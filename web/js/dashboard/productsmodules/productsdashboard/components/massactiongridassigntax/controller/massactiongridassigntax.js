@@ -55,9 +55,9 @@ export default {
                 filters = {};
             }
 
-            const result = await this.$store.dispatch('assignProductTaxMassAction', {
+            const result = await this.$store.dispatch('assignProductParamsMassAction', {
                 'router': this.$router,
-                'taxClass': this.selectedTax,
+                'data': {'taxClass': this.selectedTax},
                 'productIds': Object.keys(this.checkedItemsData).join(','),
                 'filters': filters,
             });

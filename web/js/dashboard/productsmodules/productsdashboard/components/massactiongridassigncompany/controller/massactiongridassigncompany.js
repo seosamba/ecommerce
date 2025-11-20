@@ -12,10 +12,11 @@ export default {
             websiteUrl: $('#website_url').val(),
             localeMapping: localeMapping,
             locale: $('#dashboard-system-language').val(),
-            productTemplates:[],
-            selectedTemplate:0,
+            allCompanies:[],
+            usedCompanyIds:[],
             filter:'',
             itemsQuantity:0,
+            checkedCompanies:[],
         }
     },
     components: {
@@ -50,53 +51,55 @@ export default {
                 filters = {};
             }
 
-            if(this.selectedTemplate == 0) {
-                showMessage(this.$t('message.pleaseChooseProductTemplate'), true, 5000);
-                return false;
-            }
-
-            const result = await this.$store.dispatch('assignProductParamsMassAction', {
+            const result = await this.$store.dispatch('changeProductSuppliersMassAction', {
                 'router': this.$router,
-                'data': {'pageTemplate': this.selectedTemplate},
-                'productIds': Object.keys(this.checkedItemsData).join(','),
+                'companies': this.checkedCompanies,
+                'productIds': Object.keys(this.checkedItemsData),
                 'filters': filters,
             });
 
+            this.usedCompanyIds = [];
+            this.checkedCompanies = [];
             if(result.error != 1) {
-                showMessage(this.$t('message.templateHasBeenChanged'), false, 3000);
+                showMessage(this.$t('message.done'), false, 3000);
                 this.closeMassAction();
 
-                let productIds = Object.keys(this.checkedItemsData);
-                let data = structuredClone(toRaw(this.ProductsGridInfoData));
-                if(productIds) {
-                    _.each(productIds, function(prodId, ind) {
-                        _.each(data, function(prodData, index) {
-                            if(prodData.id == prodId) {
-                                data[index]['pageTemplate'] = self.selectedTemplate;
-                            }
-                        });
-                    });
-                }
+                let productIdsString = '';
 
-                this.$store.commit('setProductsGridInfo', data);
+                _.each(this.ProductsGridInfoData, function(produuctInfo, index) {
+                    productIdsString = productIdsString.concat(produuctInfo.id, ",");
+                });
+                const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString, 'groupByCompany': 0});
+
+
             } else {
                 showMessage(this.$t('message.canNotAssignTemplate'), true, 5000);
             }
         },
-        async getProductTemplates()
+        async getProductCompanies()
         {
-            const result = await this.$store.dispatch('getAssignTemplateMassAction', {
-                'router': this.$router
+            let checkedProductsIds = Object.keys(this.checkedItemsData);
+            let data = toRaw(this.ProductsGridInfoData);
+            let self = this;
+
+            let productIdsString = '';
+            _.each(checkedProductsIds, function(productId, index) {
+                productIdsString = productIdsString.concat(productId, ",");
             });
 
-            if (result.error === 1) {
-                showMessage(this.$t('message.smsNoMassActionRecordsFound'), true, 3000);
-                this.closeMassAction();
-                return false;
-            } else {
-                this.productTemplates = result;
-                this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
+            const supCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString, 'groupByCompany': 1});
+
+            if(typeof supCompanies !== 'undefined') {
+                $.each(supCompanies, function(key, val) {
+                    self.usedCompanyIds[val.company_id] = 1;
+                    self.checkedCompanies.push(parseInt(val.company_id));
+                });
             }
+
+            const resultGetAllCompaniesData = await this.$store.dispatch('getAllCompaniesDataMassAction', {'router':this.$router});
+
+            this.allCompanies = resultGetAllCompaniesData;
+            this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
         },
         async getInitialData()
         {
@@ -105,12 +108,26 @@ export default {
                 this.closeMassAction();
             }
 
-            await this.getProductTemplates();
+            await this.getProductCompanies();
 
             if (this.itemsQuantity > 0) {
                 this.loadedScreen = true;
             }
         },
+        async markCompany(event, companyId)
+        {
+            let isChecked = event.target.checked,
+                self = this;
+
+            if (isChecked === true) {
+                self.checkedCompanies.push(parseInt(companyId));
+            } else {
+                const index = self.checkedCompanies.indexOf(companyId);
+                if (index !== -1) {
+                    self.checkedCompanies.splice(index, 1);
+                }
+            }
+        }
     },
     async created(){
         if (typeof this.localeMapping[this.locale] !== 'undefined') {

@@ -94,6 +94,8 @@
       <massactiongridassigntemplate v-if="activeMassAction === 'assignTemplate'"></massactiongridassigntemplate>
       <massactiongridassigntax v-if="activeMassAction === 'assignTax'"></massactiongridassigntax>
       <massactiongridassignshipping v-if="activeMassAction === 'assignShipping'"></massactiongridassignshipping>
+      <massactiongridassigntag v-if="activeMassAction === 'assignTag'"></massactiongridassigntag>
+      <massactiongridassigncompany v-if="activeMassAction === 'assignCompany'"></massactiongridassigncompany>
 
     </div>
 
@@ -106,6 +108,8 @@
           <option :selected="activeMassAction === 'assignTemplate'" value="assignTemplate">{{$t('message.massActionChangeProductTemplate')}}</option>
           <option :selected="activeMassAction === 'assignTax'" value="assignTax">{{$t('message.massActionChangeProductTax')}}</option>
           <option :selected="activeMassAction === 'assignShipping'" value="assignShipping">{{$t('message.massActionChangeProductShipping')}}</option>
+          <option :selected="activeMassAction === 'assignTag'" value="assignTag">{{$t('message.massActionChangeProductTag')}}</option>
+          <option :selected="activeMassAction === 'assignCompany'" value="assignCompany">{{$t('message.massActionChangeProductCompany')}}</option>
 
         </select>
       </div>

@@ -33,6 +33,7 @@ export default {
             filterData:'getFilterData',
             ucFirstAllText:'ucFirstAllText',
             ProductsGridInfoData: 'getProductsGridInfo',
+            gridInfo:'getGridInfo',
         })
     },
     watch: {
@@ -74,15 +75,15 @@ export default {
                     return false;
                 }
 
-                const result = await this.$store.dispatch('assignProductBrandMassAction', {
+                const result = await this.$store.dispatch('assignProductParamsMassAction', {
                     'router': this.$router,
-                    'brand': requestedBrand,
+                    'data': {'brand': requestedBrand},
                     'productIds': Object.keys(this.checkedItemsData).join(','),
                     'filters': filters,
                 });
 
                 if(result.error != 1) {
-                    showMessage(this.$t('message.done'), false, 3000);
+                    showMessage(this.$t('message.brandHasBeenChanged'), false, 3000);
                     this.closeMassAction();
 
                     let productIds = Object.keys(this.checkedItemsData);
@@ -105,18 +106,9 @@ export default {
         },
         async getProductBrands()
         {
-            const result = await this.$store.dispatch('getAssignBrandMassAction', {
-                'router': this.$router
-            });
-
-            if (result.error === 1) {
-                showMessage(this.$t('message.smsNoMassActionRecordsFound'), true, 3000);
-                this.closeMassAction();
-                return false;
-            } else {
-                this.productBrands = result;
-                this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
-            }
+            let gridInfoBrands = structuredClone(toRaw(this.gridInfo.brands));
+            this.productBrands = gridInfoBrands;
+            this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
         },
         async getInitialData()
         {

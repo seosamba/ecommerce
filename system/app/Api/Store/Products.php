@@ -287,6 +287,14 @@ class Api_Store_Products extends Api_Service_Abstract {
 
                 $data['data'] = array();
                 if(!empty($products['data'])) {
+                    $tagsMapper = Models_Mapper_Tag::getInstance();
+                    foreach ($products['data'] as $pKey => $product) {
+                        $tags = $tagsMapper->findTagsByProductId($product['id'], true);
+                        if(!empty($tags)) {
+                            $products['data'][$pKey]['tags'] = $tags;
+                        }
+                    }
+
                     $data['data'] = $products['data'];
                 }
 

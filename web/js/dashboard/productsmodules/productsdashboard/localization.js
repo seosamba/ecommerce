@@ -77,6 +77,11 @@ const messages = {
             'pleaseChooseProductShipping':'Please choose product shipping',
             'shippingHasBeenChanged':'Shipping has been changed',
             'canNotAssignShipping':'Can not assign shipping',
+            'massActionChangeProductTag':'assign/remove tag',
+            'brandHasBeenChanged':'Brand has been changed',
+            'massActionAssignTag':'Manage tags',
+            'massActionChangeProductCompany':'Assign suppliers',
+            'massActionAssignCompany':'Assign suppliers',
         }
     },
     es: {

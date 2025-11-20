@@ -12,10 +12,11 @@ export default {
             websiteUrl: $('#website_url').val(),
             localeMapping: localeMapping,
             locale: $('#dashboard-system-language').val(),
-            productTemplates:[],
-            selectedTemplate:0,
+            productTags:[],
+            usedTags:{},
             filter:'',
             itemsQuantity:0,
+            checkedTags:[],
         }
     },
     components: {
@@ -32,6 +33,7 @@ export default {
             filterData:'getFilterData',
             ucFirstAllText:'ucFirstAllText',
             ProductsGridInfoData: 'getProductsGridInfo',
+            gridInfo:'getGridInfo',
         })
     },
     watch: {
@@ -50,29 +52,24 @@ export default {
                 filters = {};
             }
 
-            if(this.selectedTemplate == 0) {
-                showMessage(this.$t('message.pleaseChooseProductTemplate'), true, 5000);
-                return false;
-            }
-
             const result = await this.$store.dispatch('assignProductParamsMassAction', {
                 'router': this.$router,
-                'data': {'pageTemplate': this.selectedTemplate},
+                'data': {'tags': this.checkedTags},
                 'productIds': Object.keys(this.checkedItemsData).join(','),
                 'filters': filters,
             });
 
             if(result.error != 1) {
-                showMessage(this.$t('message.templateHasBeenChanged'), false, 3000);
+                showMessage(this.$t('message.done'), false, 3000);
                 this.closeMassAction();
 
                 let productIds = Object.keys(this.checkedItemsData);
-                let data = structuredClone(toRaw(this.ProductsGridInfoData));
+                let data = toRaw(this.ProductsGridInfoData);
                 if(productIds) {
                     _.each(productIds, function(prodId, ind) {
                         _.each(data, function(prodData, index) {
                             if(prodData.id == prodId) {
-                                data[index]['pageTemplate'] = self.selectedTemplate;
+                                data[index]['tags'] = self.checkedTags;
                             }
                         });
                     });
@@ -83,20 +80,28 @@ export default {
                 showMessage(this.$t('message.canNotAssignTemplate'), true, 5000);
             }
         },
-        async getProductTemplates()
+        async getProductTags()
         {
-            const result = await this.$store.dispatch('getAssignTemplateMassAction', {
-                'router': this.$router
+            let checkedProductsIds = Object.keys(this.checkedItemsData);
+            let data = toRaw(this.ProductsGridInfoData);
+            let gridInfoTags = toRaw(this.gridInfo.tags);
+            let self = this;
+
+            _.each(data, function(prod){
+                if (checkedProductsIds.includes(prod.id)) {
+                    _.each(prod.tags, function(tag){
+                        if (!_.has(self.usedTags, tag.name)){
+                            self.usedTags[tag.name] = 1;
+                            self.checkedTags.push({'id':tag.id, 'name': tag.name});
+                        } else{
+                            self.usedTags[tag.name] += 1;
+                        }
+                    });
+                }
             });
 
-            if (result.error === 1) {
-                showMessage(this.$t('message.smsNoMassActionRecordsFound'), true, 3000);
-                this.closeMassAction();
-                return false;
-            } else {
-                this.productTemplates = result;
-                this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
-            }
+            this.productTags = gridInfoTags;
+            this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
         },
         async getInitialData()
         {
@@ -105,12 +110,26 @@ export default {
                 this.closeMassAction();
             }
 
-            await this.getProductTemplates();
+            await this.getProductTags();
 
             if (this.itemsQuantity > 0) {
                 this.loadedScreen = true;
             }
         },
+        async markTag(event, tagId, tagName)
+        {
+            let isChecked = event.target.checked,
+                self = this;
+
+            if (isChecked === true) {
+                self.checkedTags.push({'id':tagId, 'name': tagName});
+            } else {
+                const index = self.checkedTags.findIndex(item => item.id === tagId);
+                if (index !== -1) {
+                    self.checkedTags.splice(index, 1);
+                }
+            }
+        }
     },
     async created(){
         if (typeof this.localeMapping[this.locale] !== 'undefined') {
