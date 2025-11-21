@@ -1,6 +1,6 @@
 import { mainscreen } from '../../components/mainscreen/';
 import { grid } from '../../components/grid/';
-//import { produuctinfo } from '../../components/productinfo/';
+//import { productinfo } from '../../components/productinfo/';
 const routes = [
     {
         path: '/',

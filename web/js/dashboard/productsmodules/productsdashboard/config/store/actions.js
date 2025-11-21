@@ -211,5 +211,44 @@ export const changeProductSuppliersMassAction = ({commit, state, dispatch}, payl
     });
 };
 
+//Delete product mass-action
+export const deleteProductMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'api/store/products/id/'+payload.id,
+            'type': 'DELETE',
+            'dataType': 'json',
+            'data': {
+            }
+        }).done(async  function(response){
+            resolve(response);
+        }).fail(async function(response){
+            resolve({ 'error': 1, 'message': response.responseText});
+        });
+    });
+};
+
+//Assign promo mass-action
+export const assignPromoMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'plugin/promo/run/assignPromoMass/',
+            'type': 'POST',
+            'dataType': 'json',
+            'data': {
+                'promo-price' : payload.promoPrice,
+                'promo-from'  : payload.promoFrom,
+                'promo-due'   : payload.promoDue,
+                'productIds'  : payload.productIds,
+                'secureToken' : $('#shopping-token').val()
+            }
+        }).done(async  function(response){
+            resolve(response);
+        }).fail(async function(response){
+            resolve({ 'error': 1, 'message': response.responseText});
+        });
+    });
+};
+
 
 

@@ -96,6 +96,11 @@
       <massactiongridassignshipping v-if="activeMassAction === 'assignShipping'"></massactiongridassignshipping>
       <massactiongridassigntag v-if="activeMassAction === 'assignTag'"></massactiongridassigntag>
       <massactiongridassigncompany v-if="activeMassAction === 'assignCompany'"></massactiongridassigncompany>
+      <massactiongriddeleteproduct v-if="activeMassAction === 'deleteProduct'"></massactiongriddeleteproduct>
+      <massactiongridtoggleproduct v-if="activeMassAction === 'toggleProduct'"></massactiongridtoggleproduct>
+      <massactiongridproductquantity v-if="activeMassAction === 'quantityProduct'"></massactiongridproductquantity>
+      <massactiongridassignnegativestock v-if="activeMassAction === 'negativeStock'"></massactiongridassignnegativestock>
+      <massactiongridassignpromo v-if="activeMassAction === 'assignPromo'"></massactiongridassignpromo>
 
     </div>
 
@@ -110,6 +115,11 @@
           <option :selected="activeMassAction === 'assignShipping'" value="assignShipping">{{$t('message.massActionChangeProductShipping')}}</option>
           <option :selected="activeMassAction === 'assignTag'" value="assignTag">{{$t('message.massActionChangeProductTag')}}</option>
           <option :selected="activeMassAction === 'assignCompany'" value="assignCompany">{{$t('message.massActionChangeProductCompany')}}</option>
+          <option :selected="activeMassAction === 'deleteProduct'" value="deleteProduct">{{$t('message.massActionDeleteProduct')}}</option>
+          <option :selected="activeMassAction === 'toggleProduct'" value="toggleProduct">{{$t('message.massActionToggleProduct')}}</option>
+          <option :selected="activeMassAction === 'quantityProduct'" value="quantityProduct">{{$t('message.massActionProductQuantity')}}</option>
+          <option :selected="activeMassAction === 'negativeStock'" value="negativeStock">{{$t('message.massActionProductNegativeStock')}}</option>
+          <option :selected="activeMassAction === 'assignPromo'" value="assignPromo">{{$t('message.massActionAssignPromo')}}</option>
 
         </select>
       </div>

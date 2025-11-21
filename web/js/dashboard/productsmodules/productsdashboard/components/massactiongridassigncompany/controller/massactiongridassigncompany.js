@@ -66,8 +66,8 @@ export default {
 
                 let productIdsString = '';
 
-                _.each(this.ProductsGridInfoData, function(produuctInfo, index) {
-                    productIdsString = productIdsString.concat(produuctInfo.id, ",");
+                _.each(this.ProductsGridInfoData, function(productInfo, index) {
+                    productIdsString = productIdsString.concat(productInfo.id, ",");
                 });
                 const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString, 'groupByCompany': 0});
 

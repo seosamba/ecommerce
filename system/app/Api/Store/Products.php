@@ -432,7 +432,9 @@ class Api_Store_Products extends Api_Service_Abstract {
         $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
         $productWeightMandatory = $configMapper->getConfigParam('productWeightMandatory');
 
+        $newGrid = false;
         if(!empty($srcData['data']) && !empty($srcData['newGrid'])){
+            $newGrid = true;
             $srcData = $srcData['data'];
         }
 
@@ -516,6 +518,16 @@ class Api_Store_Products extends Api_Service_Abstract {
                 }
 
 				$product->setOptions($srcData);
+
+                if($newGrid) {
+                    $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+                    $savedCompanies = $companyProductsMapper->getColByProductIds(array($product->getId()));
+
+                    if(!empty($savedCompanies)) {
+                        $product->setCompanyProducts($savedCompanies);
+                    }
+                }
+
                 $currentProductWithSkuModel = $this->_productMapper->findBySku($product->getSku());
                 if ($currentProductWithSkuModel instanceof Models_Model_Product) {
                     if ($productId != $currentProductWithSkuModel->getId()) {

@@ -8,6 +8,11 @@ import massactiongridassigntax from '../../massactiongridassigntax';
 import massactiongridassignshipping from '../../massactiongridassignshipping';
 import massactiongridassigntag from '../../massactiongridassigntag';
 import massactiongridassigncompany from '../../massactiongridassigncompany';
+import massactiongriddeleteproduct from '../../massactiongriddeleteproduct';
+import massactiongridtoggleproduct from '../../massactiongridtoggleproduct';
+import massactiongridproductquantity from '../../massactiongridproductquantity';
+import massactiongridassignnegativestock from '../../massactiongridassignnegativestock';
+import massactiongridassignpromo from '../../massactiongridassignpromo';
 
 import { isProxy, toRaw } from 'vue';
 export default {
@@ -39,6 +44,11 @@ export default {
         massactiongridassignshipping:massactiongridassignshipping,
         massactiongridassigntag:massactiongridassigntag,
         massactiongridassigncompany:massactiongridassigncompany,
+        massactiongriddeleteproduct:massactiongriddeleteproduct,
+        massactiongridtoggleproduct:massactiongridtoggleproduct,
+        massactiongridproductquantity:massactiongridproductquantity,
+        massactiongridassignnegativestock:massactiongridassignnegativestock,
+        massactiongridassignpromo:massactiongridassignpromo,
 
     },
     computed: {
@@ -119,8 +129,8 @@ export default {
 
                 let productIdsString = '';
 
-                _.each(this.ProductsGridInfoData, function(produuctInfo, index) {
-                    productIdsString = productIdsString.concat(produuctInfo.id, ",");
+                _.each(this.ProductsGridInfoData, function(productInfo, index) {
+                    productIdsString = productIdsString.concat(productInfo.id, ",");
                 });
 
                 const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString, 'groupByCompany': 0});
