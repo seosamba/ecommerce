@@ -1,5 +1,5 @@
 <template>
-    <div v-show="loadedScreen" id="assign-product-tag-dialog" style="width:960px;height:500px;">
+    <div v-show="loadedScreen" id="assign-product-tag-dialog">
       <div class="system-popup-header-block">
         <span class="system-popup-title">{{ucFirstAllText($t('message.massActionAssignTag'))}}</span>
         <span class="ticon-close" @click="closeMassAction"></span>
