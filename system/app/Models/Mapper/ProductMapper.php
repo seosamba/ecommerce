@@ -418,36 +418,9 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
     ) {
 
         $params = array(
-            'sp.id',
-            'sp.parent_id',
-            'sp.page_id',
+            'sp.*',
             'p.url',
-            'sp.enabled',
-            'sp.sku',
-            'sp.name',
-            'sp.mpn',
-            'sp.weight',
-            'sp.brand_id',
-            'brandName' => 'b.name',
-            'sp.photo',
-            'sp.short_description',
-            'sp.full_description',
-            'sp.price',
-            'sp.tax_class',
-            'sp.created_at',
-            'sp.updated_at',
-            'sp.base_price',
-            'sp.inventory',
-            'sp.free_shipping',
-            'sp.is_digital',
-            'sp.prod_length',
-            'sp.prod_depth',
-            'sp.prod_width',
-            'sp.gtin',
-            'sp.wishlist_qty',
-            'sp.minimum_order',
-            'sp.negative_stock',
-            'sp.condition'
+            'brandName' => 'sb.name'
         );
 
         $params = array_merge($additionalParamsForSelect, $params);
@@ -456,7 +429,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             ->from(array('sp' => 'shopping_product'),
                 $params
             )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array())
-             ->joinLeft(array('b' => 'shopping_brands'), 'b.id = sp.brand_id', array());
+             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array());
 
         if($includesTags) {
             if($useSearch) {
@@ -499,7 +472,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
             $select->from(array('sp' => 'shopping_product'), $count)
                 ->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array())
-                ->joinLeft(array('b' => 'shopping_brands'), 'b.id = sp.brand_id', array());
+                ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array());
 
             if($includesTags) {
                 if($useSearch) {

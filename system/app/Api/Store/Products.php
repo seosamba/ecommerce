@@ -165,7 +165,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                         $where .= ' (';
                     }
 
-                    $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('b.name in (?)', $filter['brands']) . ')';
+                    $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sb.name in (?)', $filter['brands']) . ')';
                 }
 
                 if((is_array($filter['inventory']) && !empty($filter['inventory']))) {
@@ -202,7 +202,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                         'sp.name LIKE ?',
                         'sp.sku LIKE ?',
                         'sp.mpn LIKE ?',
-                        'b.name LIKE ?',
+                        'sb.name LIKE ?',
                         't.name LIKE ?'
                     );
 
@@ -246,7 +246,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $whereSplitSearch .= ') OR ( ';
 
                     foreach ($attributeValues as $key => $attrVal) {
-                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('b.name LIKE ?',
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sb.name LIKE ?',
                             '%' . $attrVal . '%');
 
                         if (count($attributeValues) > $key + 1) {
