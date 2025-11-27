@@ -13,6 +13,7 @@ import massactiongridtoggleproduct from '../../massactiongridtoggleproduct';
 import massactiongridproductquantity from '../../massactiongridproductquantity';
 import massactiongridassignnegativestock from '../../massactiongridassignnegativestock';
 import massactiongridassignpromo from '../../massactiongridassignpromo';
+import massactiongridproductoptionprice from '../../massactiongridproductoptionprice';
 
 import { isProxy, toRaw } from 'vue';
 export default {
@@ -49,6 +50,7 @@ export default {
         massactiongridproductquantity:massactiongridproductquantity,
         massactiongridassignnegativestock:massactiongridassignnegativestock,
         massactiongridassignpromo:massactiongridassignpromo,
+        massactiongridproductoptionprice:massactiongridproductoptionprice,
 
     },
     computed: {

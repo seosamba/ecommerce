@@ -4,7 +4,6 @@ import localeMapping from '../../../localizationLanguages';
 import pagination from '../../pagination';
 import moment from 'moment';
 import { isProxy, toRaw } from 'vue';
-import {assignPromoMassAction} from "../../../config/store/actions";
 
 export default {
     data () {

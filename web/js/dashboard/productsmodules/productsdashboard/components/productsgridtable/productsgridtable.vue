@@ -101,6 +101,7 @@
       <massactiongridproductquantity v-if="activeMassAction === 'quantityProduct'"></massactiongridproductquantity>
       <massactiongridassignnegativestock v-if="activeMassAction === 'negativeStock'"></massactiongridassignnegativestock>
       <massactiongridassignpromo v-if="activeMassAction === 'assignPromo'"></massactiongridassignpromo>
+      <massactiongridproductoptionprice v-if="activeMassAction === 'assignProductOptionPrice'"></massactiongridproductoptionprice>
 
     </div>
 
@@ -120,6 +121,7 @@
           <option :selected="activeMassAction === 'quantityProduct'" value="quantityProduct">{{$t('message.massActionProductQuantity')}}</option>
           <option :selected="activeMassAction === 'negativeStock'" value="negativeStock">{{$t('message.massActionProductNegativeStock')}}</option>
           <option :selected="activeMassAction === 'assignPromo'" value="assignPromo">{{$t('message.massActionAssignPromo')}}</option>
+          <option :selected="activeMassAction === 'assignProductOptionPrice'" value="assignProductOptionPrice">{{$t('message.massActionAssignProductOptionPrice')}}</option>
 
         </select>
       </div>

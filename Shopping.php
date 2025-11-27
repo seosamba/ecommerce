@@ -3835,5 +3835,245 @@ class Shopping extends Tools_Plugins_Abstract {
 
     }
 
+    public function countAllProductsAction()
+    {
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+                $websiteUrl = $websiteHelper->getUrl();
+                $this->_responseHelper->fail($this->_translator->translate('Your session has timed-out. Please Log back in '.'<a href="'.$websiteUrl.'go">here</a>'));
+            }
+
+            $filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
+            $filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
+            $filter['inventory']  = filter_var_array((array)$this->_request->getParam('fqty'), FILTER_SANITIZE_STRING);
+
+            $gridFilter = $this->_request->getParam('filter', array());
+
+            if(!empty($gridFilter)) {
+                if(!empty($gridFilter['searchTerm'])) {
+                    $searchKey = $gridFilter['searchTerm'];
+                }
+
+                if(!empty($gridFilter['fbrand'])) {
+                    foreach ($gridFilter['fbrand'] as $fbrand) {
+                        array_push($filter['brands'], $fbrand['name']);
+                    }
+                }
+
+                if(!empty($gridFilter['ftag'])) {
+                    foreach ($gridFilter['ftag'] as $ftag) {
+                        array_push($filter['tags'], $ftag['id']);
+                    }
+                }
+
+                if(!empty($gridFilter['fqty'])) {
+                    foreach ($gridFilter['fqty'] as $fqty) {
+                        array_push($filter['inventory'], $fqty['id']);
+                    }
+                }
+            }
+
+            $products = Tools_ProductsTools::getSearchFilterData($filter, $searchKey, null, null, true);
+
+            if(!empty($products)) {
+                $filterProductIds = array();
+                foreach ($products as $product) {
+                    $filterProductIds[] = $product['id'];
+                }
+                $this->_responseHelper->success(array('quantity' => count($products), 'filteredProductIds' => $filterProductIds));
+            }
+
+            $this->_responseHelper->fail('');
+        }
+    }
+
+    public function processMassProductsPriceAction()
+    {
+        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('website');
+                $websiteUrl = $websiteHelper->getUrl();
+                $this->_responseHelper->fail($this->_translator->translate('Your session has timed-out. Please Log back in '.'<a href="'.$websiteUrl.'go">here</a>'));
+            }
+
+            $productMapper = Models_Mapper_ProductMapper::getInstance();
+            $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+            $productIds = explode(',', filter_var($this->_request->getParam('productIds'), FILTER_SANITIZE_STRING));
+            $matchingFilter = (bool) filter_var($this->_request->getParam('matchingFilter'), FILTER_SANITIZE_STRING);
+            $productOptionSwitcher = filter_var($this->_request->getParam('productOptionSwitcher'), FILTER_SANITIZE_STRING);
+            $minusOptionProcess = filter_var($this->_request->getParam('minusOptionProcess'), FILTER_SANITIZE_STRING);
+            $priceToChange = filter_var($this->_request->getParam('priceToChange'), FILTER_SANITIZE_STRING);
+            $selectedPriceSign = filter_var($this->_request->getParam('selectedPriceSign'), FILTER_SANITIZE_STRING);
+            $selectedPriceType = filter_var($this->_request->getParam('selectedPriceType'), FILTER_SANITIZE_STRING);
+            $filterQuantity = filter_var($this->_request->getParam('filterQuantity'), FILTER_SANITIZE_NUMBER_INT);
+            $step = filter_var($this->_request->getParam('step'), FILTER_SANITIZE_NUMBER_INT);
+            $limit = '10';
+
+            if (empty($productIds)) {
+                return $this->_responseHelper->fail($this->_translator->translate('Please specify at least one product id'));
+            }
+
+            if(empty($priceToChange)) {
+                return $this->_responseHelper->fail($this->_translator->translate('Your changing price is empty'));
+            }
+
+
+            $offset = null;
+            if (!empty($step)) {
+                $offset = $step*$limit;
+                $finalLimit = ($step+1)*$limit;
+                if ($filterQuantity < $finalLimit && empty($filterQuantity % $limit)) {
+                    $this->_responseHelper->fail(array('quantity' => 0, 'message' => $this->_translator->translate('All products have been processed')));
+                }
+            }
+
+            if (!empty($matchingFilter)) {
+                $filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
+                $filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
+                $filter['inventory']  = filter_var_array((array)$this->_request->getParam('fqty'), FILTER_SANITIZE_STRING);
+
+                $gridFilter = $this->_request->getParam('filter', array());
+
+                if(!empty($gridFilter)) {
+                    if(!empty($gridFilter['searchTerm'])) {
+                        $searchKey = $gridFilter['searchTerm'];
+                    }
+
+                    if(!empty($gridFilter['fbrand'])) {
+                        foreach ($gridFilter['fbrand'] as $fbrand) {
+                            array_push($filter['brands'], $fbrand['name']);
+                        }
+                    }
+
+                    if(!empty($gridFilter['ftag'])) {
+                        foreach ($gridFilter['ftag'] as $ftag) {
+                            array_push($filter['tags'], $ftag['id']);
+                        }
+                    }
+
+                    if(!empty($gridFilter['fqty'])) {
+                        foreach ($gridFilter['fqty'] as $fqty) {
+                            array_push($filter['inventory'], $fqty['id']);
+                        }
+                    }
+                }
+
+                $productsData = Tools_ProductsTools::getSearchFilterData($filter, $searchKey, $limit, $offset);
+                if (!empty($productsData)) {
+                    $productIds = array();
+                    foreach ($productsData['data'] as $product) {
+                        array_push($productIds, $product['id']);
+                    }
+                    $productIds = array_filter($productIds);
+                }
+            }
+
+            $productPrices = array();
+            if(!empty($productIds)) {
+                foreach ($productIds as $prodId) {
+                    $product = $productMapper->find($prodId);
+                    if($product instanceof Models_Model_Product) {
+                        if($productOptionSwitcher == 'product') {
+                            $productPrice = (float) $product->getPrice();
+                            if($selectedPriceType == 'unit') {
+                                if($selectedPriceSign == '-') {
+                                    $productPrice -= $priceToChange;
+                                } else {
+                                    $productPrice += $priceToChange;
+                                }
+                            } elseif ($selectedPriceType == 'percent') {
+                                if($selectedPriceSign == '-') {
+                                    $productPrice = Tools_ProductsTools::changePriceByPercent($productPrice, '-'.$priceToChange);
+                                } else {
+                                    $productPrice = Tools_ProductsTools::changePriceByPercent($productPrice, $priceToChange);
+                                }
+                            }
+
+                            if ($productPrice < 0) {
+                                $productPrice = 0;
+                            }
+
+                            $product->setPrice($productPrice);
+                            $productPrices[$prodId] = $productPrice;
+                        } elseif ($productOptionSwitcher == 'option') {
+                            $productOptions = $product->getDefaultOptions();
+
+                            if(!empty($productOptions)) {
+                                foreach ($productOptions as $optKey => $option) {
+                                    if($option['type'] == Models_Model_Option::TYPE_DROPDOWN || $option['type'] == Models_Model_Option::TYPE_RADIO) {
+                                        foreach ($option['selection'] as $optSelKey => $selection) {
+                                            $optionPriceValue = (float) $selection['priceValue'];
+
+                                            if(empty($optionPriceValue)) {
+                                                continue;
+                                            }
+
+                                            if($selection['priceSign'] == '-' && !empty($minusOptionProcess)) {
+                                                continue;
+                                            }
+
+                                            if($selectedPriceType == 'unit') {
+                                                if($selectedPriceSign == '-') {
+                                                    $optionPriceValue -= $priceToChange;
+                                                } else {
+                                                    $optionPriceValue += $priceToChange;
+                                                }
+                                            } elseif ($selectedPriceType == 'percent') {
+                                                if($selectedPriceSign == '-') {
+                                                    $optionPriceValue = Tools_ProductsTools::changePriceByPercent($optionPriceValue, '-'.$priceToChange);
+                                                } else {
+                                                    $optionPriceValue = Tools_ProductsTools::changePriceByPercent($optionPriceValue, $priceToChange);
+                                                }
+                                            }
+
+                                            if ($optionPriceValue < 0) {
+                                                $optionPriceValue = 0;
+                                            }
+
+                                            $productOptions[$optKey]['selection'][$optSelKey]['priceValue'] = $optionPriceValue;
+                                        }
+                                    }
+                                }
+
+                                $product->setDefaultOptions($productOptions);
+                            }
+                        }
+
+                        $savedCompanies = $companyProductsMapper->getColByProductIds(array($product->getId()));
+
+                        if(!empty($savedCompanies)) {
+                            $product->setCompanyProducts($savedCompanies);
+                        }
+
+                        $productMapper->save($product);
+                    }
+                }
+            }
+
+            if (empty($productsData) && !empty($matchingFilter)) {
+                $this->_responseHelper->fail($this->_translator->translate('Products have been processed'));
+            }
+
+            if (count($productIds) == $limit && !empty($matchingFilter)) {
+                $this->_responseHelper->success(array(
+                    'quantity' => count($productIds),
+                    'productPrices' => $productPrices,
+                    'message' => $this->_translator->translate('Products have been processed')
+                ));
+            } else {
+                $this->_responseHelper->fail(array(
+                    'quantity' => count($productIds),
+                    'productPrices' => $productPrices,
+                    'message' => $this->_translator->translate('Products have been processed')
+                ));
+            }
+        }
+    }
+
 
 }

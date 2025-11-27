@@ -250,5 +250,59 @@ export const assignPromoMassAction = ({commit, state, dispatch}, payload) => {
     });
 };
 
+export const countProductsMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'plugin/shopping/run/countAllProducts/',
+            'type': 'GET',
+            'dataType': 'json',
+            'data': {
+                'secureToken':$('#shopping-token').val(),
+                'filter': payload.filters,
+            }
+        }).done(async  function(response){
+            if (response.status !== 'error') {
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ name: 'login', 'message': 'Please re-login'});
+        });
+    });
+};
+
+//Process product price/option price mass-action
+export const processMassProductsPriceMassAction = ({commit, state, dispatch}, payload) => {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            'url': $('#website_url').val()+'plugin/shopping/run/processMassProductsPrice/',
+            'type': 'POST',
+            'dataType': 'json',
+            'data': {
+                'secureToken' :  $('#shopping-token').val(),
+                'productIds':payload.productIds,
+                'step':payload.step,
+                'filter':payload.filters,
+                'matchingFilter':payload.matchingFilter,
+                'filterQuantity':payload.filterQuantity,
+                'productOptionSwitcher':payload.productOptionSwitcher,
+                'minusOptionProcess':payload.minusOptionProcess,
+                'priceToChange':payload.priceToChange,
+                'selectedPriceSign':payload.selectedPriceSign,
+                'selectedPriceType':payload.selectedPriceType,
+            }
+        }).done(async  function(response){
+            if (response.status !== 'error') {
+                resolve(response);
+            } else {
+                resolve({ name: 'login', 'message': 'Please re-login'});
+            }
+        }).fail(async function(response){
+            resolve({ error: 1});
+        });
+    });
+};
+
 
 
