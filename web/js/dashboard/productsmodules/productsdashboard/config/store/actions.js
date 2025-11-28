@@ -148,18 +148,19 @@ export const getAssignTemplateMassAction = ({commit, state, dispatch}, payload) 
 export const assignProductParamsMassAction = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val()+'api/store/products/id/'+payload.productIds,
-            'type': 'PUT',
+            'url': $('#website_url').val()+'plugin/shopping/run/processMassProducts/',
+            'type': 'POST',
             'dataType': 'json',
-            'data': JSON.stringify({
+            'data': {
                 'secureToken' :  $('#shopping-token').val(),
                 'data': payload.data,
-                'id':payload.productIds,
-                'filters':payload.filters,
-                'filterAsArray':1,
-                'newGrid':1,
-
-            })
+                'productIds':payload.productIds,
+                'step':payload.step,
+                'filter':payload.filters,
+                'matchingFilter':payload.matchingFilter,
+                'filterQuantity':payload.filterQuantity,
+                'productChangedType':payload.productChangedType,
+            }
         }).done(async  function(response){
             if (response.status !== 'error') {
                 resolve(response);
@@ -194,7 +195,7 @@ export const getAllCompaniesDataMassAction = ({commit, state, dispatch}, payload
 export const changeProductSuppliersMassAction = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val()+'api/store/companyproducts/',
+            'url': $('#website_url').val()+'plugin/shopping/run/processMassProductsSuppliers/',
             'type': 'POST',
             'dataType': 'json',
             'data': {
@@ -202,6 +203,10 @@ export const changeProductSuppliersMassAction = ({commit, state, dispatch}, payl
                 'companies': payload.companies,
                 'productIds':payload.productIds,
                 'removeOldCompanies': '1',
+                'step':payload.step,
+                'filter':payload.filters,
+                'matchingFilter':payload.matchingFilter,
+                'filterQuantity':payload.filterQuantity,
             }
         }).done(async  function(response){
             resolve(response);
@@ -215,10 +220,16 @@ export const changeProductSuppliersMassAction = ({commit, state, dispatch}, payl
 export const deleteProductMassAction = ({commit, state, dispatch}, payload) => {
     return new Promise((resolve, reject) => {
         $.ajax({
-            'url': $('#website_url').val()+'api/store/products/id/'+payload.id,
-            'type': 'DELETE',
+            'url': $('#website_url').val()+'plugin/shopping/run/processMassProductsDelete/',
+            'type': 'POST',
             'dataType': 'json',
             'data': {
+                'secureToken':$('#shopping-token').val(),
+                'productIds':payload.productIds,
+                'step':payload.step,
+                'filter':payload.filters,
+                'matchingFilter':payload.matchingFilter,
+                'filterQuantity':payload.filterQuantity,
             }
         }).done(async  function(response){
             resolve(response);

@@ -17,6 +17,14 @@ export default {
             filter:'',
             itemsQuantity:0,
             checkedTags:[],
+            matchingFilter:false,
+            processedElBlock:false,
+            origProcessed:true,
+            endProcessed:false,
+            itemsProcessed:0,
+            allFilterProducts:0,
+            filteredProductIds:[],
+
         }
     },
     components: {
@@ -43,6 +51,38 @@ export default {
         closeMassAction() {
             this.$store.commit('setActiveMassAction', 0);
         },
+        async countProducts(event)
+        {
+            let isChecked = event.target.checked;
+
+            this.processedElBlock = false;
+
+            if (isChecked === true) {
+                this.allFilterProducts = 1;
+                let filters = toRaw(this.filterData);
+
+                if (Object.keys(filters).length === 0) {
+                    filters = {};
+                }
+
+                const result = await this.$store.dispatch('countProductsMassAction', {
+                    'router': this.$router,
+                    'filters': filters,
+                });
+
+                if(result.error != 1) {
+                    this.filteredProductIds = result.responseText.filteredProductIds;
+                    this.itemsQuantity = parseInt(result.responseText.quantity);
+                } else {
+                    this.allFilterProducts = 0;
+                    showMessage(this.$t('message.noProductsFound'), true, 5000);
+                }
+            } else {
+                this.allFilterProducts = 0;
+                this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
+            }
+
+        },
         async submitRegularForm()
         {
             let filters = toRaw(this.filterData);
@@ -52,32 +92,75 @@ export default {
                 filters = {};
             }
 
+            this.origProcessed = true;
+            this.endProcessed = false;
+            this.itemsProcessed = 0;
+
+            let productsLabel = this.$t('message.confirmProduct')+'?';
+            if(this.itemsQuantity > 1) {
+                productsLabel = this.$t('message.confirmProducts')+'?';
+            }
+
+            showConfirm(this.$t('message.areYouSureYouWantToProcess') + ' ' + this.itemsQuantity + ' ' + productsLabel, function(){
+                self.massProcessProductsRequest(0);
+            }, function () {
+                self.processedElBlock = false;
+            });
+        },
+        async massProcessProductsRequest(step)
+        {
+            let filters = toRaw(this.filterData),
+                matchingFilter = 0,
+                self = this;
+
+            if (Object.keys(filters).length === 0) {
+                filters = {};
+            }
+
+            if(this.matchingFilter) {
+                matchingFilter = 1;
+            }
+
             const result = await this.$store.dispatch('assignProductParamsMassAction', {
                 'router': this.$router,
                 'data': {'tags': this.checkedTags},
                 'productIds': Object.keys(this.checkedItemsData).join(','),
+                'step': step,
                 'filters': filters,
+                'matchingFilter': matchingFilter,
+                'filterQuantity': this.itemsQuantity,
+                'productChangedType': 'tags',
             });
 
-            if(result.error != 1) {
+            this.processedElBlock = true;
+            this.itemsProcessed = this.itemsProcessed + result.responseText.quantity;
+
+            if (result.error == 0) {
+                this.massProcessProductsRequest(step+1);
+            } else {
+                this.origProcessed = false;
+                this.endProcessed = true;
+
                 showMessage(this.$t('message.done'), false, 3000);
-                this.closeMassAction();
 
                 let productIds = Object.keys(this.checkedItemsData);
-                let data = toRaw(this.ProductsGridInfoData);
+                if(this.allFilterProducts) {
+                    productIds = this.filteredProductIds;
+                }
+                let data = structuredClone(toRaw(this.ProductsGridInfoData));
                 if(productIds) {
                     _.each(productIds, function(prodId, ind) {
                         _.each(data, function(prodData, index) {
                             if(prodData.id == prodId) {
                                 data[index]['tags'] = self.checkedTags;
+                                //data[index]['tags'] = result.responseText.productChangedParams[prodId];
                             }
                         });
                     });
                 }
 
                 this.$store.commit('setProductsGridInfo', data);
-            } else {
-                showMessage(this.$t('message.canNotAssignTemplate'), true, 5000);
+                //this.closeMassAction();
             }
         },
         async getProductTags()

@@ -20,6 +20,7 @@ export default {
             promoPrice: '',
             promoFrom:'',
             promoDue:'',
+            filteredProductIds:[],
         }
     },
     components: {
@@ -49,6 +50,38 @@ export default {
     methods: {
         closeMassAction() {
             this.$store.commit('setActiveMassAction', 0);
+        },
+        async countProducts(event)
+        {
+            let isChecked = event.target.checked;
+
+            this.processedElBlock = false;
+
+            if (isChecked === true) {
+                this.allFilterProducts = 1;
+                let filters = toRaw(this.filterData);
+
+                if (Object.keys(filters).length === 0) {
+                    filters = {};
+                }
+
+                const result = await this.$store.dispatch('countProductsMassAction', {
+                    'router': this.$router,
+                    'filters': filters,
+                });
+
+                if(result.error != 1) {
+                    this.filteredProductIds = result.responseText.filteredProductIds;
+                    this.itemsQuantity = parseInt(result.responseText.quantity);
+                } else {
+                    this.allFilterProducts = 0;
+                    showMessage(this.$t('message.noProductsFound'), true, 5000);
+                }
+            } else {
+                this.allFilterProducts = 0;
+                this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
+            }
+
         },
         selectedDatepickerPromoDate(selectedDate, datepickerType){
             if (datepickerType === 'promo-from') {
@@ -82,34 +115,25 @@ export default {
                 showMessage(this.$t('message.wrongDateFormat'), true, 3000);
             }
 
+            let checkedProductIds = Object.keys(this.checkedItemsData);
+            if(this.allFilterProducts) {
+                checkedProductIds = this.filteredProductIds;
+            }
+
             const result = await this.$store.dispatch('assignPromoMassAction', {
                 'router': this.$router,
                 'promoPrice': this.promoPrice,
                 'promoFrom':  promoFrom,
                 'promoDue':   promoDue,
-                'productIds': Object.keys(this.checkedItemsData),
+                'productIds': checkedProductIds,
                 'filters': filters,
             });
 
             if(result.error != 1) {
                 showMessage(this.$t('message.promoHasBeenAdded'), false, 3000);
-                this.closeMassAction();
-
-                let productIds = Object.keys(this.checkedItemsData);
-                let data = structuredClone(toRaw(this.ProductsGridInfoData));
-                if(productIds) {
-                    _.each(productIds, function(prodId, ind) {
-                        _.each(data, function(prodData, index) {
-                            if(prodData.id == prodId) {
-                                data[index]['negative_stock'] = self.selectedStock;
-                            }
-                        });
-                    });
-                }
-
-                this.$store.commit('setProductsGridInfo', data);
+                //this.closeMassAction();
             } else {
-                showMessage(this.$t('message.canNotAssignNegativeStock'), true, 5000);
+                showMessage(result.responseText, true, 5000);
             }
         },
         async getInitialData()

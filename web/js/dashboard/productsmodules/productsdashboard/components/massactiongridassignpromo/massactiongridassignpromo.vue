@@ -1,7 +1,10 @@
 <template>
     <div v-show="loadedScreen" id="assign-product-promo-dialog" style="width:540px;height:380px">
       <div class="system-popup-header-block">
-        <span class="system-popup-title">{{ucFirstAllText($t('message.massActionAssignPromo'))}}</span>
+        <span class="system-popup-title">{{ucFirstAllText($t('message.massActionAssignPromo'))}} ({{$t('message.dialogTitleTotal')}}
+          {{itemsQuantity}} <span v-if="itemsQuantity === 1">{{$t('message.titleRecord')}}</span>
+          <span v-if="itemsQuantity > 1">{{$t('message.titleRecords')}}</span>)
+        </span>
         <span class="ticon-close" @click="closeMassAction"></span>
       </div>
       <div class="system-popup-content-block">
@@ -39,6 +42,9 @@
             </p>
           </fieldset>
           <p class="grid_12">
+            <label class="fl-left mt10px pointer matching-filter">{{$t('message.dialogAllProductsMatchingFilter')}}
+              <input @change.prevent="countProducts($event)" id="assign-price-all-products-matching-filter" class="allPromoFilterProducts" type="checkbox" name="allPromoFilterProducts" value="0"/>
+            </label>
             <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6" :value="$t('message.apply')">
           </p>
         </form>
