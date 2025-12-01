@@ -517,6 +517,10 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $allowanceProductsMapper->deleteByProductId($productId);
                 }
 
+                if (!empty($srcData['tags']) && empty($srcData['tags'][0]['id'])) {
+                    unset($srcData['tags']);
+                }
+
 				$product->setOptions($srcData);
 
                 if($newGrid) {
