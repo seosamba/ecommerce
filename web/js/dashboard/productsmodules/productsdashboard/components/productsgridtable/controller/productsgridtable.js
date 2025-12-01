@@ -283,10 +283,10 @@ export default {
             let currencySymbol = this.currencyInfo.currencySymbol;
             let denyEdit = false;
 
-            if (elementName == 'inventory' && oldValue === newValue) {
+            if (elementName === 'inventory' && oldValue === newValue) {
                 denyEdit = true;
             } else {
-                if(elementName == 'price') {
+                if(elementName === 'price') {
                     newValue = newValue.replace(currencySymbol, '');
                 }
 

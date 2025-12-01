@@ -70,7 +70,7 @@ export default {
                     'filters': filters,
                 });
 
-                if(result.error != 1) {
+                if(parseInt(result.error) !== 1) {
                     this.filteredProductIds = result.responseText.filteredProductIds;
                     this.itemsQuantity = parseInt(result.responseText.quantity);
                 } else {
@@ -100,7 +100,7 @@ export default {
                 filters = {};
             }
 
-            if(this.promoPrice == '' || this.promoPrice == 0) {
+            if(this.promoPrice === '' || parseInt(this.promoPrice) === 0) {
                 showMessage(this.$t('message.enterCorrectPrice'), true, 3000);
             }
 
@@ -111,7 +111,7 @@ export default {
                 showMessage(this.$t('message.wrongDateFormat'), true, 3000);
             }
 
-            if(promoFrom == '' || promoDue == '') {
+            if(promoFrom === '' || promoDue === '') {
                 showMessage(this.$t('message.wrongDateFormat'), true, 3000);
             }
 
@@ -129,7 +129,7 @@ export default {
                 'filters': filters,
             });
 
-            if(result.error != 1) {
+            if(parseInt(result.error) !== 1) {
                 showMessage(this.$t('message.promoHasBeenAdded'), false, 3000);
                 //this.closeMassAction();
             } else {

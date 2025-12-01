@@ -67,7 +67,7 @@ export default {
                     'filters': filters,
                 });
 
-                if(result.error != 1) {
+                if(parseInt(result.error) !== 1) {
                     this.filteredProductIds = result.responseText.filteredProductIds;
                     this.itemsQuantity = parseInt(result.responseText.quantity);
                 } else {
@@ -140,7 +140,7 @@ export default {
             this.processedElBlock = true;
             this.itemsProcessed = this.itemsProcessed + result.responseText.quantity;
 
-            if (result.error == 0) {
+            if (parseInt(result.error) === 0) {
                 this.massProcessProductsRequest(step+1);
             } else {
                 this.origProcessed = false;
@@ -156,7 +156,7 @@ export default {
                 if(productIds) {
                     _.each(productIds, function(prodId, ind) {
                         _.each(data, function(prodData, index) {
-                            if(prodData.id == prodId) {
+                            if(parseInt(prodData.id) === parseInt(prodId)) {
                                 data[index]['inventory'] = self.inventory;
                                 //data[index]['inventory'] = result.responseText.productChangedParams[prodId];
                             }

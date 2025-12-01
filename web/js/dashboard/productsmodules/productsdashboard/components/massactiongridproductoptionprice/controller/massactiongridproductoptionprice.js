@@ -101,7 +101,7 @@ export default {
                 matchingFilter = 1;
             }
 
-            if(this.productOptionSwitcher == 'option' && this.minusOptionProcess) {
+            if (this.productOptionSwitcher === 'option' && this.minusOptionProcess) {
                 minusOptionProcess = 1;
             }
 
@@ -122,13 +122,13 @@ export default {
             this.processedElBlock = true;
             this.itemsProcessed = this.itemsProcessed + result.responseText.quantity;
 
-            if (result.error == 0) {
+            if (parseInt(result.error) === 0) {
                 this.massProcessProductsRequest(step+1);
             } else {
                 this.origProcessed = false;
                 this.endProcessed = true;
 
-                if(this.productOptionSwitcher == 'product') {
+                if(this.productOptionSwitcher === 'product') {
                     let productIds = Object.keys(this.checkedItemsData);
                     if(this.allFilterProducts) {
                         productIds = this.filteredProductIds;
@@ -138,7 +138,7 @@ export default {
                     if(productIds) {
                         _.each(productIds, function(prodId, ind) {
                             _.each(data, function(prodData, index) {
-                                if(prodData.id == prodId) {
+                                if(parseInt(prodData.id) === parseInt(prodId)) {
                                     data[index]['price'] = result.responseText.productPrices[prodId];
                                 }
                             });
@@ -168,7 +168,7 @@ export default {
                     'filters': filters,
                 });
 
-                if(result.error != 1) {
+                if(parseInt(result.error) !== 1) {
                     this.filteredProductIds = result.responseText.filteredProductIds;
                     this.itemsQuantity = parseInt(result.responseText.quantity);
                 } else {

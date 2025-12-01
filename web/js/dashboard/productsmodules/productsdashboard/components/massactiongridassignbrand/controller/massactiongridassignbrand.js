@@ -69,7 +69,7 @@ export default {
                     'filters': filters,
                 });
 
-                if(result.error != 1) {
+                if(parseInt(result.error) !== 1) {
                     this.filteredProductIds = result.responseText.filteredProductIds;
                     this.itemsQuantity = parseInt(result.responseText.quantity);
                 } else {
@@ -90,7 +90,7 @@ export default {
                 filters = {};
             }
 
-            if(this.selectedBrand == 0 && this.newBrand == '') {
+            if(parseInt(this.selectedBrand) === 0 && this.newBrand === '') {
                 showMessage(this.$t('message.pleaseChooseProductBrandOrAddNew'), true, 5000);
                 return false;
             }
@@ -109,7 +109,7 @@ export default {
                 showMessage(this.$t('message.notValidBrand'), true, 3000);
                 return false;
             } else {
-                if(requestedBrand == '' || requestedBrand == 0 || typeof requestedBrand === 'undefined') {
+                if(requestedBrand === '' || parseInt(requestedBrand) === 0 || typeof requestedBrand === 'undefined') {
                     showMessage(this.$t('message.pleaseChooseProductBrandOrAddNew'), true, 3000);
                     return false;
                 }
@@ -158,7 +158,7 @@ export default {
             this.processedElBlock = true;
             this.itemsProcessed = this.itemsProcessed + result.responseText.quantity;
 
-            if (result.error == 0) {
+            if (parseInt(result.error) === 0) {
                 this.massProcessProductsRequest(step+1, requestedParam);
             } else {
                 this.origProcessed = false;
@@ -174,7 +174,7 @@ export default {
                 if(productIds) {
                     _.each(productIds, function(prodId, ind) {
                         _.each(data, function(prodData, index) {
-                            if(prodData.id == prodId) {
+                            if (parseInt(prodData.id) === parseInt(prodId)) {
                                 data[index]['brandName'] = requestedParam;
                                 //data[index]['brandName'] = result.responseText.productChangedParams[prodId];
                             }
