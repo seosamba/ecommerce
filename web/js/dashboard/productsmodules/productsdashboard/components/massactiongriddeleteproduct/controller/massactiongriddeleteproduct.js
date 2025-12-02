@@ -21,6 +21,7 @@ export default {
             itemsProcessed:0,
             allFilterProducts:0,
             filteredProductIds:[],
+            filterUsed:false,
         }
     },
     components: {
@@ -101,34 +102,9 @@ export default {
             }, function () {
                 self.processedElBlock = false;
             });
-
-            // const result = await this.$store.dispatch('deleteProductMassAction', {
-            //     'router': this.$router,
-            //     'id': Object.keys(this.checkedItemsData).join(','),
-            //     'filters': filters,
-            // });
-            //
-            // if(result.error != 1) {
-            //     showMessage(this.$t('message.productHasBeenDeleted'), false, 3000);
-            //     this.closeMassAction();
-            //
-            //     const result = await this.$store.dispatch('getProductsGridData', {
-            //         'router': this.$router,
-            //         'searchData': this.filterData
-            //     });
-            //
-            //     if (result.status === 'error') {
-            //         showMessage('Please re-login', true, 3000);
-            //     } else {
-            //         this.$store.commit('setUpdateGridStats', Date.now());
-            //     }
-            // } else {
-            //     showMessage(this.$t('message.canNotDeleteProduct'), true, 5000);
-            // }
         },
         async massProcessProductsRequest(step)
         {
-            debugger;
             let filters = toRaw(this.filterData),
                 matchingFilter = 0,
                 self = this;
@@ -149,7 +125,6 @@ export default {
                 'matchingFilter': matchingFilter,
                 'filterQuantity': this.itemsQuantity,
             });
-            debugger;
 
             this.processedElBlock = true;
             this.itemsProcessed = this.itemsProcessed + result.responseText.quantity;
@@ -170,6 +145,8 @@ export default {
                 if (result.status === 'error') {
                     showMessage('Please re-login', true, 3000);
                 } else {
+                    this.$store.commit('setCheckedItems', {});
+                    this.$store.commit('setAllCheckedItemsTracking', {'items': {}});
                     this.$store.commit('setUpdateGridStats', Date.now());
                 }
                 //this.closeMassAction();
@@ -186,6 +163,35 @@ export default {
 
             if (this.itemsQuantity > 0) {
                 this.loadedScreen = true;
+
+                let filters = toRaw(this.filterData);
+
+                this.filterUsed = true;
+                if (Object.keys(filters).length === 0) {
+                    filters = {};
+                    this.filterUsed = false;
+                } else {
+                    let isEmptyFilter = true;
+                    if (typeof filters.fbrand !== 'undefined' && filters.fbrand.length !== 0) {
+                        isEmptyFilter = false;
+                    }
+
+                    if (typeof filters.fqty !== 'undefined' && filters.fqty.length !== 0) {
+                        isEmptyFilter = false;
+                    }
+
+                    if (typeof filters.ftag !== 'undefined' && filters.ftag.length !== 0) {
+                        isEmptyFilter = false;
+                    }
+
+                    if (typeof filters.searchTerm !== 'undefined' && filters.searchTerm !== '') {
+                        isEmptyFilter = false;
+                    }
+
+                    if(isEmptyFilter) {
+                        this.filterUsed = false;
+                    }
+                }
             }
         },
     },

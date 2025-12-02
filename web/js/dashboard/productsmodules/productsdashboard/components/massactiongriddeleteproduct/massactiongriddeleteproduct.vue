@@ -24,7 +24,8 @@
                 </span>
             </span>
             <label class="grid_12 alpha mt10px mb5px pointer matching-filter">{{$t('message.dialogAllProductsMatchingFilter')}}
-              <input v-model="matchingFilter" @change.prevent="countProducts($event)" id="assign-price-all-products-matching-filter" class="allDeleteFilterProducts" type="checkbox" name="allDeleteFilterProducts" value="0"/>
+              <input v-if="filterUsed === true" v-model="matchingFilter" @change.prevent="countProducts($event)" id="assign-price-all-products-matching-filter" class="allDeleteFilterProducts" type="checkbox" name="allDeleteFilterProducts" value="0"/>
+              <input v-else id="assign-price-all-products-matching-filter" class="allDeleteFilterProducts" disabled="disabled" type="checkbox" name="allDeleteFilterProducts" value="0"/>
             </label>
             <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6" :value="ucFirstAllText($t('message.yes'))">
             <input @click.prevent="closeMassAction" type="submit" class="btn grid_6" :value="ucFirstAllText($t('message.no'))">

@@ -170,7 +170,7 @@ export default {
                 if(this.allFilterProducts) {
                     productIds = this.filteredProductIds;
                 }
-                let data = structuredClone(toRaw(this.ProductsGridInfoData));
+                let data = toRaw(this.ProductsGridInfoData);
                 if(productIds) {
                     _.each(productIds, function(prodId, ind) {
                         _.each(data, function(prodData, index) {

@@ -4324,6 +4324,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $product = $productMapper->find($prodId);
                     if($product instanceof Models_Model_Product) {
                         if($productOptionSwitcher == 'product') {
+                            $productPriceCurrent = (float) $product->getPrice();
                             $productPrice = (float) $product->getPrice();
                             if($selectedPriceType == 'unit') {
                                 if($selectedPriceSign == '-') {
@@ -4343,8 +4344,12 @@ class Shopping extends Tools_Plugins_Abstract {
                                 $productPrice = 0;
                             }
 
-                            $product->setPrice($productPrice);
-                            $productPrices[$prodId] = $productPrice;
+                            if(!empty($productPriceCurrent)) {
+                                $product->setPrice($productPrice);
+                                $productPrices[$prodId] = $productPrice;
+                            } else {
+                                $productPrices[$prodId] = $productPriceCurrent;
+                            }
                         } elseif ($productOptionSwitcher == 'option') {
                             $productOptions = $product->getDefaultOptions();
 
@@ -4352,7 +4357,7 @@ class Shopping extends Tools_Plugins_Abstract {
                                 foreach ($productOptions as $optKey => $option) {
                                     if($option['type'] == Models_Model_Option::TYPE_DROPDOWN || $option['type'] == Models_Model_Option::TYPE_RADIO) {
                                         foreach ($option['selection'] as $optSelKey => $selection) {
-                                            $optionPriceValue = (float) $selection['priceValue'];
+                                            $optionPriceValue = abs((float)$selection['priceValue']);
 
                                             if(empty($optionPriceValue)) {
                                                 continue;

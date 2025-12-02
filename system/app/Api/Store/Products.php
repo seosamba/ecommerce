@@ -81,7 +81,6 @@ class Api_Store_Products extends Api_Service_Abstract {
 	 * @return JSON List of products
 	 */
 	public function getAction() {
-
 		$data = array();
 		$id = array_filter(filter_var_array(explode(',', $this->_request->getParam('id')), FILTER_VALIDATE_INT));
 		if (!empty($id)) {
@@ -515,10 +514,6 @@ class Api_Store_Products extends Api_Service_Abstract {
 
                 if($allowanceProduct instanceof Store_Model_AllowanceProducts && empty($srcData['allowance'])) {
                     $allowanceProductsMapper->deleteByProductId($productId);
-                }
-
-                if (!empty($srcData['tags']) && empty($srcData['tags'][0]['id'])) {
-                    unset($srcData['tags']);
                 }
 
 				$product->setOptions($srcData);

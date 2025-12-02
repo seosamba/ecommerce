@@ -37,6 +37,7 @@
               <p v-if="productOptionSwitcher === 'option'" class="grid_5 alpha omega mt35px">
                 <label for="minus-option-process">
                   {{$t('message.minusOptionProcess')}}
+                  <i class="tooltip info ticon-question-sign icon16 mb5px ml3" :title="$t('message.minusOptionSign')"></i>
                 <input v-model="minusOptionProcess" id="minus-option-process" type="checkbox" name="minus-option-process" value="0">
                 </label>
               </p>

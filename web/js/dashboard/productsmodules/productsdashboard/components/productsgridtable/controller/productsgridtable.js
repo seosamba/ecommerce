@@ -297,7 +297,7 @@ export default {
 
             if(denyEdit) {
                 this.ProductsGridInfoData[index][elementName] = oldValue;
-                data = structuredClone(toRaw(this.ProductsGridInfoData));
+                data = toRaw(this.ProductsGridInfoData);
                 this.$store.commit('setProductsGridInfo', data);
                 return false;
             }
@@ -315,7 +315,7 @@ export default {
                 showMessage(this.$t('message.updated'), false, 2000);
             }
 
-            data = structuredClone(toRaw(this.ProductsGridInfoData));
+            data = toRaw(this.ProductsGridInfoData);
             this.$store.commit('setProductsGridInfo', data);
         },
         changeMassAction: function(e) {

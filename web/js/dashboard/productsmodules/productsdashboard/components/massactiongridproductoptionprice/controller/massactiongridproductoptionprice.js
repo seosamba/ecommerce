@@ -134,12 +134,14 @@ export default {
                         productIds = this.filteredProductIds;
                     }
 
-                    let data = structuredClone(toRaw(this.ProductsGridInfoData));
+                    let data = toRaw(this.ProductsGridInfoData);
                     if(productIds) {
                         _.each(productIds, function(prodId, ind) {
                             _.each(data, function(prodData, index) {
                                 if(parseInt(prodData.id) === parseInt(prodId)) {
-                                    data[index]['price'] = result.responseText.productPrices[prodId];
+                                    if(typeof result.responseText.productPrices[prodId] !== 'undefined') {
+                                        data[index]['price'] = result.responseText.productPrices[prodId];
+                                    }
                                 }
                             });
                         });

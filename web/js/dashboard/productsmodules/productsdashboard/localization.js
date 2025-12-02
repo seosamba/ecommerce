@@ -150,6 +150,7 @@ const messages = {
             'areYouSureYouWantToDelete':'Are you sure you want to delete',
             'inventoryHasBeenChanged':'Quantity has been changed',
             'canNotAssignPromo':'Can not assign promo',
+            'minusOptionSign':'This means your product option has a price modifier sign with a "-" value.',
 
         }
     },
@@ -304,6 +305,7 @@ const messages = {
             'areYouSureYouWantToDelete':'Are you sure you want to delete',
             'inventoryHasBeenChanged':'Quantity has been changed',
             'canNotAssignPromo':'Can not assign promo',
+            'minusOptionSign':'This means your product option has a price modifier sign with a "-" value.',
 
         }
     },
@@ -458,6 +460,7 @@ const messages = {
             'areYouSureYouWantToDelete':'Are you sure you want to delete',
             'inventoryHasBeenChanged':'Quantity has been changed',
             'canNotAssignPromo':'Can not assign promo',
+            'minusOptionSign':'This means your product option has a price modifier sign with a "-" value.',
 
 
         }

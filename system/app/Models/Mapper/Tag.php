@@ -152,8 +152,8 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
             $where = $this->getDbTable()->getAdapter()->quoteInto('sp.id = ?', $productId);
 
             $select = $this->getDbTable()->select()->from(array('sp' => 'shopping_product'), $cols)
-                ->joinLeft(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
-                ->joinLeft(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
+                ->join(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
+                ->join(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
                 ->where($where);
             if($getName){
                 $data = $this->getDbTable()->getAdapter()->fetchAll($select);
