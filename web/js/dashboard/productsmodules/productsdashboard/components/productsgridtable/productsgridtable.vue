@@ -39,7 +39,7 @@
                   <a href="javascript:;" title="Click to open editor" class="tpopup" :data-url="websiteUrl+'plugin/shopping/run/product/id/'+productsGridInfo.id">{{productsGridInfo.name}}</a>
                 </span>
               </td>
-              <td>
+              <td class="product-inventory-col" width="80px">
                 <input @blur="updateProp($event, index, 'inventory')" :placeholder="(productsGridInfo.inventory === null || productsGridInfo.inventory === '') ? 'unlimited':''" type="text" :value="(productsGridInfo.inventory === null || productsGridInfo.inventory === '') ? '' : productsGridInfo.inventory">
               </td>
               <td>
@@ -65,10 +65,10 @@
                 <span v-if="productsGridInfo.free_shipping === null || productsGridInfo.free_shipping == '' || productsGridInfo.free_shipping == 0">{{$t('message.no')}}</span>
                 <span v-else-if="productsGridInfo.free_shipping == 1">{{$t('message.yes')}}</span>
               </td>
-              <td>
+              <td class="product-weight-col" width="85px">
                 <input @blur="updateProp($event, index, 'weight')" type="text" :value="productsGridInfo.weight">
               </td>
-              <td>
+              <td class="product-price-col" width="110px">
                 {{currencyOnly()}}<input @blur="updateProp($event, index, 'price')" type="text" :value="toCurrency(productsGridInfo.price, 2).replace(/[^0-9.]+/g, '').trim()">
               </td>
               <td class="textcentered">
@@ -89,7 +89,7 @@
         </table>
       </div>
     </div>
-    <div id="leads-mass-actions-block" :class="[{ hidden: (massActionActive === false)}, 'mass-actions-block-content']">
+    <div id="products-mass-actions-block" :class="[{ hidden: (massActionActive === false)}, 'mass-actions-block-content']">
       <massactiongridassignbrand v-if="activeMassAction === 'assignBrand'"></massactiongridassignbrand>
       <massactiongridassigntemplate v-if="activeMassAction === 'assignTemplate'"></massactiongridassigntemplate>
       <massactiongridassigntax v-if="activeMassAction === 'assignTax'"></massactiongridassigntax>
@@ -106,7 +106,7 @@
     </div>
 
     <div class="white-box omega p15px mb10px alpha tfoot-block">
-      <div class="grid_3 produsts-mass-action-block f-alpha">
+      <div class="grid_3 leads-mass-action-block f-alpha">
         <span class="mass-action-title">{{$t('message.withSelectedDo')}}</span>
         <select @change="changeMassAction" name="products-mass-action-selection" class="mass-action-selection">
           <option :selected="activeMassAction === 0" value="0">{{$t('message.noMassActions')}}</option>

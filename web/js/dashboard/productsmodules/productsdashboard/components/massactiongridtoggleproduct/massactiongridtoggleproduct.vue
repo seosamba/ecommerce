@@ -1,5 +1,5 @@
 <template>
-    <div v-show="loadedScreen" id="product-delete-dialog" style="width:25%;height:200px">
+    <div v-show="loadedScreen" id="product-delete-dialog" style="width:25%;">
       <div class="system-popup-header-block">
         <span class="system-popup-title">{{ucFirstAllText($t('message.massActionEnableDisableProducts'))}} ({{$t('message.dialogTitleTotal')}}
           {{itemsQuantity}} <span v-if="itemsQuantity === 1">{{$t('message.titleRecord')}}</span>

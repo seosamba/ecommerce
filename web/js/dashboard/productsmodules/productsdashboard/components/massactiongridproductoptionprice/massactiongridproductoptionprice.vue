@@ -1,5 +1,5 @@
 <template>
-    <div v-show="loadedScreen" id="product-price-dialog" style="width:730px;height:380px">
+    <div v-show="loadedScreen" id="product-price-dialog" style="width:730px;">
       <div class="system-popup-header-block">
         <span class="system-popup-title">{{ucFirstAllText($t('message.massActionAssignProductOptionPrice'))}} ({{$t('message.dialogTitleTotal')}}
           {{itemsQuantity}} <span v-if="itemsQuantity === 1">{{$t('message.titleRecord')}}</span>
@@ -20,7 +20,7 @@
               <p class="message info mt10px text-center larger">{{$t('message.attention')}}</p>
               <p :class="[productOptionSwitcher === 'option' ? 'grid_3' : 'grid_4', 'alpha']">
                 <label>{{$t('message.priceWillChangeTo')}}</label>
-                <input v-model="priceToChange" type="text" id="price-to-change" name="price-to-change" :placeholder="0"/>
+                <input v-model="priceToChange" autocomplete="off" type="text" id="price-to-change" name="price-to-change" :placeholder="0"/>
               </p>
               <p :class="[productOptionSwitcher === 'option' ? 'grid_2' : 'grid_4', 'alpha']">
                 <label>{{$t('message.priceSignModifier')}}</label>
