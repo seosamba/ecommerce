@@ -876,5 +876,6 @@
         'condition_used' => 'Used',
         'Group already exists' => 'Le groupe existe déjà',
         'Sorry, there are no products matching selected filters.' => 'Désolé, aucun produit ne correspond aux filtres sélectionnés.',
+        'Automatically disable out of stock products' => 'Désactivation automatique des produits en rupture de stock'
 
 );?>
