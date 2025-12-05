@@ -60,8 +60,8 @@ class Forms_BasicsSettings extends Zend_Form {
         ));
 
         $this->addElement('checkbox', 'disableOutOfStock', array(
-            'label' => $translator->translate('Automatically disable out of stock products'),
-            'class' => 'grid_6 alpha'
+            'label' => $translator->translate('Disable out of stock products'),
+            'class' => ''
         ));
 
     }
