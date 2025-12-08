@@ -36,22 +36,36 @@ class Api_Store_Companyproducts extends Api_Service_Abstract
     public function getAction()
     {
         $groupByCompany = filter_var($this->_request->getParam('groupByCompany', false), FILTER_SANITIZE_NUMBER_INT);
+        $isGrid = filter_var($this->_request->getParam('isGrid', false), FILTER_SANITIZE_NUMBER_INT);
         $productIds = array_unique(array_filter(explode(',', filter_var($this->_request->getParam('productIds', false), FILTER_SANITIZE_STRING))));
         $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
         $where = null;
         if (!empty($productIds)) {
             $where = $companyProductsMapper->getDbTable()->getAdapter()->quoteInto('product_id IN (?)', $productIds);
         }
-        if (!empty($groupByCompany)) {
-            $companyProductsData = $companyProductsMapper->fetchAllData($where, array(), array('ssp.company_id'));
-        } else {
-            $companyProductsData = $companyProductsMapper->fetchAll();
-        }
-        return array_map(function ($company) {
-            $item = $company->toArray();
 
-            return $item;
-        }, $companyProductsData);
+        if($isGrid) {
+            if (!empty($groupByCompany)) {
+                $companyProductsData = $companyProductsMapper->fetchAllDataArray($where, array(), array('ssp.company_id'));
+            } else {
+                $companyProductsData = $companyProductsMapper->fetchAllDataArray();
+            }
+
+            return $companyProductsData;
+
+        } else {
+            if (!empty($groupByCompany)) {
+                $companyProductsData = $companyProductsMapper->fetchAllData($where, array(), array('ssp.company_id'));
+            } else {
+                $companyProductsData = $companyProductsMapper->fetchAll();
+            }
+
+            return array_map(function ($company) {
+                $item = $company->toArray();
+
+                return $item;
+            }, $companyProductsData);
+        }
     }
 
     /**
