@@ -1168,14 +1168,6 @@ class Shopping extends Tools_Plugins_Abstract {
 		}
 	}
 
-    protected function _makeOptionProductsnew() {
-        if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)) {
-            return $this->_view->render('manage_products-new.phtml');
-        }
-
-        return '';
-    }
-
 	/**
 	 * Generates product grid for admins only
      *
@@ -1208,8 +1200,12 @@ class Shopping extends Tools_Plugins_Abstract {
 
             $this->_view->promoPlugin = $enablePromoPlugin;
 
+            if (!empty($shoppingConfig['productsGridOldUI'])) {
+                return $this->_view->render('manage_products.phtml');
+            } else {
+                return $this->_view->render('manage_products-new.phtml');
+            }
 
-			return $this->_view->render('manage_products.phtml');
 		}
 	}
 
