@@ -49,7 +49,7 @@ $this->headLink()
 			<?php foreach ($subform->getElements() as $elem):?>
 			<div>
                 <?php $elemName = $elem->getName();?>
-                <?php if ($elemName !== 'operationalHours' && $elemName !== 'useOperationalHoursForOrders' && $elemName !== 'useOperationalHoursForOrdersMessage') :?>
+                <?php if ($elemName !== 'operationalHours' && $elemName !== 'useOperationalHoursForOrders' && $elemName !== 'useOperationalHoursForOrdersMessage' && $elemName !== 'disableOutOfStock') :?>
                     <?php $labelText = $this->translate($elem->getLabel());?>
                     <?php $elem->setLabel($labelText);?>
 				    <?php echo $elem->renderLabel();?>
@@ -70,6 +70,20 @@ $this->headLink()
                     <?php endif;?>
                     <?php if($elemName === 'useOperationalHoursForOrdersMessage'):?>
                         <?php $useOperationalHoursForOrdersMessage = $elem->getValue();?>
+                    <?php endif;?>
+                    <?php if($elemName === 'disableOutOfStock'):?>
+                        <?php $labelText = $this->translate($elem->getLabel());?>
+                        <?php $elem->setLabel($labelText);?>
+                        <?php //echo $elem->renderLabel();?>
+                        <label for="disableOutOfStock" class="grid_6 optional"><?php echo $labelText;?>
+                            <i class="ticon-info tooltip icon18 mb10px" title="<?php echo $this->translate('Optimal schedule time - every 15 minutes');?>"></i>
+                        </label>
+                        <p class="grid_6 alpha">
+                            <?php echo $elem->renderViewHelper();?>
+                        </p>
+                        <p class="grid_12">
+                            <a href="javascript:;" data-path="<?php echo Zend_Registry::get('website')['path'];?>plugins/shopping/system/cronscript/processOutOfStockProducts.php" class="copy-path-link-information-info"><?php echo $this->translate('Copy file path');?></a>
+                        </p>
                     <?php endif;?>
                 <?php endif;?>
             </div>
@@ -338,6 +352,25 @@ $this->headLink()
     });
     $('a').not('.no-save-btn').on('click', function(){
         $('#save-btn').show();
+    });
+
+    $(document).on('click', '.copy-path-link-information-info', function(event)
+    {
+        event.preventDefault();
+
+        let path = $(event.currentTarget).data('path');
+
+        if (document.queryCommandSupported("copy")) {
+            let copyFromEl = $('<textarea/>');
+            copyFromEl.text(path);
+            $('body').append(copyFromEl);
+            copyFromEl.select();
+            document.execCommand('copy', true);
+            copyFromEl.remove();
+            showMessage('<?php echo $this->translate('Copy file path');?>', false, 2000);
+        }
+
+        return true;
     });
 
 <?php $this->jQuery()->onLoadCaptureEnd();?>

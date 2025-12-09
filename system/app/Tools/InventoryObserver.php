@@ -75,6 +75,7 @@ class Tools_InventoryObserver implements Interfaces_Observer {
                 break;
 		}
 		$this->_dbTable->getAdapter()->beginTransaction();
+        $productIds = array();
 		foreach ($this->_object->getCartContent() as $cartItem){
             $options = array();
             if (!empty($cartItem['options'])) {
@@ -83,6 +84,8 @@ class Tools_InventoryObserver implements Interfaces_Observer {
                 }
             }
             Tools_Misc::applyInventory($cartItem['product_id'], $options, $cartItem['qty'], Tools_InventoryObserver::INVENTORY_UPDATE_STOCK);
+
+            $productIds[$cartItem['product_id']] = $cartItem['product_id'];
 
             $inventory = $this->_dbTable->getAdapter()->quoteInto($sqlExpr, intval($cartItem['qty']));
 			$where = $this->_dbTable->getAdapter()->quoteInto('id = ? AND inventory IS NOT NULL', $cartItem['product_id']);
@@ -108,6 +111,17 @@ class Tools_InventoryObserver implements Interfaces_Observer {
 
 		try {
 			$this->_dbTable->getAdapter()->commit();
+            $disableOutOfStock = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('disableOutOfStock');
+            if (!empty($disableOutOfStock) && !empty($productIds)) {
+                $productMapper = Models_Mapper_ProductMapper::getInstance();
+                foreach ($productIds as $productId) {
+                    $productModel = $productMapper->find($productId);
+                    if ($productModel instanceof Models_Model_Product) {
+                        $productMapper->save($productModel);
+                    }
+                }
+            }
+
 			return true;
 		} catch (Exception $e){
 			Tools_System_Tools::debugMode() && error_log($e->getMessage());
