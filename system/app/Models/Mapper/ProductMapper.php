@@ -88,6 +88,7 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $disableOutOfStock = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('disableOutOfStock');
         if (is_numeric($inventory) && (int) $inventory === 0 && !empty($disableOutOfStock)) {
             $data['enabled'] = 0;
+            $model->setEnabled(0);
         }
 
 		if ($model->getId()){
