@@ -141,19 +141,45 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
      * @param $productId
      * @return array|false
      */
-    public function findTagsByProductId($productId)
+    public function findTagsByProductId($productId, $getName = false)
     {
+        $cols = array('st.id');
+
+        if($getName){
+            $cols = array('st.id', 'st.name');
+        }
         if(!empty($productId)) {
             $where = $this->getDbTable()->getAdapter()->quoteInto('sp.id = ?', $productId);
 
-            $select = $this->getDbTable()->select()->from(array('sp' => 'shopping_product'), array('st.id'))
-                ->joinLeft(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
-                ->joinLeft(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
+            $select = $this->getDbTable()->select()->from(array('sp' => 'shopping_product'), $cols)
+                ->join(array('spht' => 'shopping_product_has_tag'), 'spht.product_id = sp.id', array())
+                ->join(array('st' => 'shopping_tags'), 'spht.tag_id = st.id', array())
                 ->where($where);
-            $data = $this->getDbTable()->getAdapter()->fetchCol($select);
+            if($getName){
+                $data = $this->getDbTable()->getAdapter()->fetchAll($select);
+            } else {
+                $data = $this->getDbTable()->getAdapter()->fetchCol($select);
+            }
 
             return $data;
         }
         return false;
+    }
+
+    /**
+     * Get all tags pairs
+     * @param array $order
+     *
+     * @return array
+     */
+    public function getTags($order = array())
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_tags', array('id', 'name', 'label' => 'name'));
+
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
     }
 }

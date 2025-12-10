@@ -64,4 +64,21 @@ class Models_Mapper_Brand extends Application_Model_Mappers_Abstract {
             ->from(array('sb' => 'shopping_brands'), array('id', 'name'))->order('name ASC');
         return  $this->getDbTable()->getAdapter()->fetchPairs($select);
     }
+
+    /**
+     * Get all brands pairs
+     * @param array $order
+     *
+     * @return array
+     */
+    public function getBrands($order = array())
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_brands', array('id', 'name', 'label' => 'name'));
+
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
 }

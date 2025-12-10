@@ -999,6 +999,30 @@ class Tools_Misc
         return $timeOffsetInHours;
     }
 
+    /**
+     * Get currency info
+     *
+     * @param bool $jsFormat format locale flag
+     * @return array
+     */
+    public static function getCurrencyInfo($jsFormat = true)
+    {
+        $shoppingConfig = Models_Mapper_ShoppingConfig::getInstance()->getConfigParams();
+
+        $country = $shoppingConfig['country'];
+        if(!empty($shoppingConfig['currencyCountry'])) {
+            $country = $shoppingConfig['currencyCountry'];
+        }
+
+        $locale = Zend_Locale::getLocaleToTerritory($country);
+        $currency = $shoppingConfig['currency'];
+        if ($jsFormat === true) {
+            $locale = str_replace('_', '-', $locale);
+        }
+
+        return array('locale' => $locale, 'currency' => $currency);
+    }
+
     public static function getLocationsData($locationId = false)
     {
         $pluginExistsAndEnabled = false;
@@ -1023,7 +1047,6 @@ class Tools_Misc
         }
 
         return array();
-
     }
 
 }
