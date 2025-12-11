@@ -131,4 +131,29 @@ class Store_Mapper_CompanyProductsMapper extends Application_Model_Mappers_Abstr
 
     }
 
+    public function fetchAllDataArray($where = '', $order = array(), $groupBy = '')
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('ssp' => 'shopping_company_products'), array(
+            'ssp.product_id',
+            'ssp.company_id',
+            'sc.company_name',
+        ))
+            ->joinLeft(array('sc' => 'shopping_companies'), 'ssp.company_id = sc.id', array());
+        if (!empty($where)) {
+            $select->where($where);
+        }
+        if (!empty($order)) {
+            $select->order($order);
+        }
+        if (!empty($groupBy)) {
+            $select->group($groupBy);
+        }
+        $resultSet = $this->getDbTable()->getAdapter()->fetchAll($select);
+        if (empty($resultSet)) {
+            return array();
+        }
+
+        return $resultSet;
+    }
+
 }

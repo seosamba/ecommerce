@@ -101,6 +101,10 @@ class Api_Store_Products extends Api_Service_Abstract {
 			$limit  = filter_var($this->_request->getParam('limit', Shopping::PRODUCT_DEFAULT_LIMIT), FILTER_SANITIZE_NUMBER_INT);
             $key    = str_replace('*-amp-*', '&', filter_var($this->_request->getParam('key', null), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
             $count  = filter_var($this->_request->getParam('count', false), FILTER_VALIDATE_BOOLEAN);
+            $forGrid = (bool)filter_var($this->_request->getParam('isGrid', false), FILTER_SANITIZE_STRING);
+            $gridFilter = $this->_request->getParam('filter', array());
+            $includesTags = false;
+            $useSearch = false;
 
 			$filter['tags']       = array_filter(filter_var_array((array)$this->_request->getParam('ftag'), FILTER_SANITIZE_NUMBER_INT));
 			$filter['brands']     = array_filter(filter_var_array((array)$this->_request->getParam('fbrand'), FILTER_SANITIZE_STRING));
@@ -120,49 +124,228 @@ class Api_Store_Products extends Api_Service_Abstract {
             // if this set to true product mapper will search for products that have all the tags($filter['tags']) at the same time ('AND' logic)
             $strictTagsCount      = (boolean)filter_var($this->_request->getParam('stc', 0), FILTER_SANITIZE_NUMBER_INT);
 
-            $cacheKey             = 'get_product_'.md5(implode(',', $filter['tags']) . implode(',', $filter['brands']) . implode(',', $filter['inventory']) . implode(',', $filter['order']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
-			if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
+            if ($forGrid) {
+                if(!empty($gridFilter)) {
+                    if(!empty($gridFilter['searchTerm'])) {
+                        $key = $gridFilter['searchTerm'];
+                    }
 
-				$products = $this->_productMapper->logSelectResultLength($count)->fetchAll(
-				    null,
+                    if(!empty($gridFilter['fbrand'])) {
+                        foreach ($gridFilter['fbrand'] as $fbrand) {
+                            array_push($filter['brands'], $fbrand['name']);
+                        }
+                    }
+
+                    if(!empty($gridFilter['ftag'])) {
+                        foreach ($gridFilter['ftag'] as $ftag) {
+                            array_push($filter['tags'], $ftag['id']);
+                        }
+                    }
+
+                    if(!empty($gridFilter['fqty'])) {
+                        foreach ($gridFilter['fqty'] as $fqty) {
+                            array_push($filter['inventory'], $fqty['id']);
+                        }
+                    }
+
+                }
+
+                $where = '';
+
+                if((is_array($filter['tags']) && !empty($filter['tags']))) {
+                    $includesTags = true;
+                    $where .= '(' . $this->_productMapper->getDbTable()->getAdapter()->quoteInto('pt.tag_id IN (?)', $filter['tags']) . ')';
+                }
+
+                if((is_array($filter['brands']) && !empty($filter['brands']))) {
+                    if (!empty($where)) {
+                        $where .= ' AND (';
+                    } else {
+                        $where .= ' (';
+                    }
+
+                    $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sb.name in (?)', $filter['brands']) . ')';
+                }
+
+                if((is_array($filter['inventory']) && !empty($filter['inventory']))) {
+                    if (!empty($where)) {
+                        $where .= ' AND (';
+                    } else {
+                        $where .= ' (';
+                    }
+
+                    if(in_array('unlimited', $filter['inventory'])){
+                        $where .= new Zend_Db_Expr('sp.inventory IS NULL');
+                        $foundUnlimitedParam = array_search('unlimited', $filter['inventory']);
+                        unset($filter['inventory'][$foundUnlimitedParam]);
+                        if (!empty($filter['inventory'])) {
+                            $where .= ' OR ' . $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.inventory IN (?)', $filter['inventory']) . ')';
+                        } else {
+                            $where .= ')';
+                        }
+                    }else{
+                        $where .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.inventory IN (?)', $filter['inventory']) . ')';
+                    }
+                }
+
+                if(!empty($key)) {
+                    $includesTags = true;
+                    $useSearch = true;
+                    $search = $key;
+
+                    if (!empty($where)) {
+                        $where .= ' AND ';
+                    }
+
+                    $likeWhere = array(
+                        'sp.name LIKE ?',
+                        'sp.sku LIKE ?',
+                        'sp.mpn LIKE ?',
+                        'sb.name LIKE ?',
+                        't.name LIKE ?'
+                    );
+
+                    $attributeValues = explode(' ', $search);
+                    $whereSplitSearch = ' (';
+
+                    foreach ($attributeValues as $key => $attrVal) {
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.name LIKE ?',
+                            '%' . $attrVal . '%');
+
+                        if (count($attributeValues) > $key + 1) {
+                            $whereSplitSearch .= ' AND ';
+                        }
+
+                    }
+
+                    $whereSplitSearch .= ') OR ( ';
+
+                    foreach ($attributeValues as $key => $attrVal) {
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.sku LIKE ?',
+                            '%' . $attrVal . '%');
+
+                        if (count($attributeValues) > $key + 1) {
+                            $whereSplitSearch .= ' AND ';
+                        }
+
+                    }
+
+                    $whereSplitSearch .= ') OR ( ';
+
+                    foreach ($attributeValues as $key => $attrVal) {
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sp.mpn LIKE ?',
+                            '%' . $attrVal . '%');
+
+                        if (count($attributeValues) > $key + 1) {
+                            $whereSplitSearch .= ' AND ';
+                        }
+
+                    }
+
+                    $whereSplitSearch .= ') OR ( ';
+
+                    foreach ($attributeValues as $key => $attrVal) {
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('sb.name LIKE ?',
+                            '%' . $attrVal . '%');
+
+                        if (count($attributeValues) > $key + 1) {
+                            $whereSplitSearch .= ' AND ';
+                        }
+
+                    }
+
+                    $whereSplitSearch .= ') OR ( ';
+
+                    foreach ($attributeValues as $key => $attrVal) {
+                        $whereSplitSearch .= $this->_productMapper->getDbTable()->getAdapter()->quoteInto('t.name LIKE ?',
+                            '%' . $attrVal . '%');
+
+                        if (count($attributeValues) > $key + 1) {
+                            $whereSplitSearch .= ' AND ';
+                        }
+
+                    }
+
+                    $whereSplitSearch .= ')';
+
+                    $where .= $whereSplitSearch;
+                }
+
+                $products = $this->_productMapper->fetchAllData(
+                    $where,
                     $order,
-                    $offset,
                     $limit,
-                    (bool)$key?$key:null,
-					(is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
-					(is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
-                    $strictTagsCount,
-                    $organicSearch,
+                    $offset,
+                    false,
+                    false,
+                    '',
                     array(),
-                    array(),
-                    null,
-                    true,
-                    array(),
-                    (is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null
+                    $includesTags,
+                    $useSearch
                 );
 
-				$data = !is_null($products) ? array_map(function($prod){
-					//cleanup unnecessary values
-					if ($prod->getPage()){
-						$prod->setPage(array(
-                            'id'         => $prod->getPage()->getId(),
-                            'url'        => $prod->getPage()->getUrl(),
-                            'templateId' => $prod->getPage()->getTemplateId()
-                        ));
-					}
-					return $prod->toArray();
-				}, $products) : array();
+                $data['data'] = array();
+                if(!empty($products['data'])) {
+                    $tagsMapper = Models_Mapper_Tag::getInstance();
+                    foreach ($products['data'] as $pKey => $product) {
+                        $tags = $tagsMapper->findTagsByProductId($product['id'], true);
+                        if(!empty($tags)) {
+                            $products['data'][$pKey]['tags'] = $tags;
+                        }
+                    }
 
-				if ($count) {
-					$data = array(
-						'totalCount' => $this->_productMapper->lastSelectResultLength(),
-						'count'      => sizeof($data),
-						'data'       => $data
-					);
-				}
+                    $data['data'] = $products['data'];
+                }
 
-				$this->_cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
-			}
+                $data['totalRecords'] = $products['totalRecords'];
+                $data['offset'] = $offset;
+                $data['limit'] = $limit;
+
+            } else {
+                $cacheKey = 'get_product_'.md5(implode(',', $filter['tags']) . implode(',', $filter['brands']) . implode(',', $filter['inventory']) . implode(',', $filter['order']). $offset . $limit . (($organicSearch && is_array($key)) ? md5(implode(',', $key)) : $key) . $count . $strictTagsCount);
+                if(($data = $this->_cacheHelper->load($cacheKey, 'store_')) === null) {
+
+                    $products = $this->_productMapper->logSelectResultLength($count)->fetchAll(
+                        null,
+                        $order,
+                        $offset,
+                        $limit,
+                        (bool)$key?$key:null,
+                        (is_array($filter['tags']) && !empty($filter['tags'])) ? $filter['tags'] : null,
+                        (is_array($filter['brands']) && !empty($filter['brands'])) ? $filter['brands']: null,
+                        $strictTagsCount,
+                        $organicSearch,
+                        array(),
+                        array(),
+                        null,
+                        true,
+                        array(),
+                        (is_array($filter['inventory']) && !empty($filter['inventory'])) ? $filter['inventory']: null
+                    );
+
+                    $data = !is_null($products) ? array_map(function($prod){
+                        //cleanup unnecessary values
+                        if ($prod->getPage()){
+                            $prod->setPage(array(
+                                'id'         => $prod->getPage()->getId(),
+                                'url'        => $prod->getPage()->getUrl(),
+                                'templateId' => $prod->getPage()->getTemplateId()
+                            ));
+                        }
+                        return $prod->toArray();
+                    }, $products) : array();
+
+                    if ($count) {
+                        $data = array(
+                            'totalCount' => $this->_productMapper->lastSelectResultLength(),
+                            'count'      => sizeof($data),
+                            'data'       => $data
+                        );
+                    }
+
+                    $this->_cacheHelper->save($cacheKey, $data, 'store_', array('productlist'), Helpers_Action_Cache::CACHE_NORMAL);
+                }
+            }
 		}
 
 		return $data;
@@ -248,6 +431,12 @@ class Api_Store_Products extends Api_Service_Abstract {
         $productSizeMandatory = $configMapper->getConfigParam('productSizeMandatory');
         $productWeightMandatory = $configMapper->getConfigParam('productWeightMandatory');
 
+        $newGrid = false;
+        if(!empty($srcData['data']) && !empty($srcData['newGrid'])){
+            $newGrid = true;
+            $srcData = $srcData['data'];
+        }
+
         if (!empty($productSizeMandatory)) {
             if (empty($srcData['prodLength']) || !is_numeric($srcData['prodLength']) || $srcData['prodLength'] <= 0) {
                 $this->_error(htmlentities($this->_translator->translate('Product length is missing. Please check product dimensions tab.')), self::REST_STATUS_BAD_REQUEST);
@@ -268,7 +457,7 @@ class Api_Store_Products extends Api_Service_Abstract {
 
         if(empty($srcData['negativeStock'])) {
             if(gmp_sign((int)$srcData['inventory']) < 0) {
-                $this->_error(htmlentities($this->_translator->translate('You can\'t save product with negative qty, please enter positive qty of product or enable "Negative stock" checkbox')), self::REST_STATUS_BAD_REQUEST);
+                $this->_error(htmlentities($this->_translator->translate('You can\'t save product with negative qty, please enter positive qty of product or enable "Allow backorder" checkbox')), self::REST_STATUS_BAD_REQUEST);
             }
         }
 
@@ -328,6 +517,16 @@ class Api_Store_Products extends Api_Service_Abstract {
                 }
 
 				$product->setOptions($srcData);
+
+                if($newGrid) {
+                    $companyProductsMapper = Store_Mapper_CompanyProductsMapper::getInstance();
+                    $savedCompanies = $companyProductsMapper->getColByProductIds(array($product->getId()));
+
+                    if(!empty($savedCompanies)) {
+                        $product->setCompanyProducts($savedCompanies);
+                    }
+                }
+
                 $currentProductWithSkuModel = $this->_productMapper->findBySku($product->getSku());
                 if ($currentProductWithSkuModel instanceof Models_Model_Product) {
                     if ($productId != $currentProductWithSkuModel->getId()) {

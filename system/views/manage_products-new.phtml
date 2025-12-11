@@ -1,0 +1,21 @@
+<?php
+$this->headScript()
+        ->appendFile($this->websiteUrl . 'system/js/external/chosen/chosen.jquery.min.js')
+        ->appendFile($this->websiteUrl . 'plugins/shopping/web/js/libs/accounting.min.js');
+
+$this->headLink()
+        ->appendStylesheet($this->websiteUrl . 'system/js/external/chosen/chosen.css');
+?>
+
+
+<input type="hidden" id="dashboard-system-language" name="dashboard-system-language"
+       value="<?php echo Tools_CrmTools::getVueJsTranslationLanguage('shopping'); ?>"/>
+<input type="hidden" id="shopping-token" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>"
+       value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN); ?>"/>
+<div id="products-screen-config-block" style="min-height:800px;" class="flex_12 f-alpha f-omega"></div>
+<script>
+    $(function () {
+        $.getScript('<?php echo $this->websiteUrl . Tools_System_Tools::getBuildScriptFullPath("plugins/shopping/web/js/dashboard/productsmodules/build/", 'productsdashboard')?>', function (result) {
+        });
+    });
+</script>

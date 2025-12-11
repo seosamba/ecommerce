@@ -84,6 +84,13 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'condition'         => $model->getCondition(),
 		);
 
+        $inventory = $data['inventory'];
+        $disableOutOfStock = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('disableOutOfStock');
+        if (is_numeric($inventory) && (int) $inventory === 0 && !empty($disableOutOfStock)) {
+            $data['enabled'] = 0;
+            $model->setEnabled(0);
+        }
+
 		if ($model->getId()){
 			$data['updated_at'] = date(Tools_System_Tools::DATE_MYSQL);
 			$where = $this->getDbTable()->getAdapter()->quoteInto('id = ?', $model->getId());
@@ -411,15 +418,35 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
         $offset = null,
         $withoutCount = false,
         $singleRecord = false,
-        $having = ''
+        $having = '',
+        $additionalParamsForSelect = array(),
+        $includesTags = false,
+        $useSearch = false
     ) {
+
+        $params = array(
+            'sp.*',
+            'p.url',
+            'brandName' => 'sb.name'
+        );
+
+        $params = array_merge($additionalParamsForSelect, $params);
+
         $select = $this->getDbTable()->getAdapter()->select()
             ->from(array('sp' => 'shopping_product'),
-                array(
-                    'sp.*'
-                )
-            )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array('p.url'))
-             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array('brandName' => 'sb.name'));
+                $params
+            )->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array())
+             ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array());
+
+        if($includesTags) {
+            if($useSearch) {
+                $select->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = sp.id', array())
+                    ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
+            } else {
+                $select->from(array('t' => 'shopping_tags'), null)
+                    ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = sp.id', null);
+            }
+        }
 
         if (!empty($having)) {
             $select->having($having);
@@ -450,7 +477,19 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 
             $count = array('count' => new Zend_Db_Expr('COUNT(DISTINCT(sp.id))'));
 
-            $select->from(array('sp' => 'shopping_product'), $count);
+            $select->from(array('sp' => 'shopping_product'), $count)
+                ->joinLeft(array('p' => 'page'), 'p.id = sp.page_id', array())
+                ->joinLeft(array('sb' => 'shopping_brands'), 'sb.id = sp.brand_id', array());
+
+            if($includesTags) {
+                if($useSearch) {
+                    $select->joinLeft(array('pt' => 'shopping_product_has_tag'), 'pt.product_id = sp.id', array())
+                        ->joinLeft(array('t' => 'shopping_tags'), 'pt.tag_id = t.id', array());
+                } else {
+                    $select->from(array('t' => 'shopping_tags'), null)
+                        ->join(array('pt' => 'shopping_product_has_tag'), 'pt.tag_id = t.id AND pt.product_id = sp.id', null);
+                }
+            }
 
             $select =  $this->getDbTable()->getAdapter()->select()
                 ->from(
