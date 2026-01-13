@@ -37,6 +37,12 @@
     <td data-mobile-title="Status" class="status-change"><%= _.isUndefined(i18n[''+translatedStatus+''])?status:i18n[''+translatedStatus+''] %></td>
 <% } %>
 
+<td>
+    <span class="location-inventory-status-<%= id %> hide">
+        <i class="tooltip info ticon-question-sign icon16 mb5px ml3"
+           title="<%= _.isUndefined(i18n['You have unprocessed products in the locations with the status \'new\'. Please change this status in order details.']) ? 'You have unprocessed products in the locations with the status \'new\'. Please change this status in order details.':i18n['You have unprocessed products in the locations with the status \'new\'. Please change this status in order details.'] %>"></i>
+    </span>
+</td>
 <td data-mobile-title="Products in cart"><%= total_products %></td>
 <td data-mobile-title="Total price"><%= accounting.formatMoney(total, moneyFormat) %>
     <% if(status === 'partial') { %>
@@ -84,9 +90,9 @@
 <td data-mobile-title="Details" class="text-center">
     <a href="javascript:;" class="tpopup" data-pheight="560" data-url="<%= $('#website_url').val() %>plugin/shopping/run/order/id/<%= id %>"><%= _.isUndefined(i18n['view']) ? 'view':i18n['view'] %></a>
 </td>
-<% if(useInvoice == 'enabled') { %>
+<% if(useInvoice == 'enabled' || useSeosambaPos == 'enabled') { %>
     <td data-mobile-title="Invoice & packing slip" class="text-center">
-    <% if(_.isNull(recurring_id)) { %>
+    <% if(_.isNull(recurring_id) && useInvoice == 'enabled') { %>
         <a href="javascript:;" class="sendInvoice" title="<%= _.isUndefined(i18n['Send invoice to user via email']) ? 'Send invoice to user via email':i18n['Send invoice to user via email'] %>">
             <img src="<%= $('#website_url').val() %>plugins/shopping/web/images/send-invoice.png" />
         </a>
@@ -126,6 +132,14 @@
             <% } %>
         <% } %>
     <% } %>
+    <% if(_.isNull(recurring_id) && useSeosambaPos == 'enabled' && (status == 'completed' || status == 'shipped' || status == 'delivered')) { %>
+        <a target="_blank" href="<%= $('#website_url').val() %>plugin/seosambapos/run/createPdfReceipt/cartId/<%= id %>/dwn/0/">
+            <img src="<%= $('#website_url').val() %>plugins/seosambapos/web/images/view-pos-receipt.png" alt="<%= _.isUndefined(i18n['View POS receipt']) ? 'View POS receipt':i18n['View POS receipt'] %>" title="<%= _.isUndefined(i18n['View POS receipt']) ? 'View POS receipt':i18n['View POS receipt'] %>"/>
+        </a>
+        <a href="<%= $('#website_url').val() %>plugin/seosambapos/run/createPdfReceipt/cartId/<%= id %>/dwn/1/">
+            <img src="<%= $('#website_url').val() %>plugins/seosambapos/web/images/download-pos-receipt.png" alt="<%= _.isUndefined(i18n['Download POS receipt']) ? 'Download POS receipt':i18n['Download POS receipt'] %>" title="<%= _.isUndefined(i18n['Download POS receipt']) ? 'Download POS receipt':i18n['Download POS receipt'] %>"/>
+        </a>
+    <% } %>
     </td>
 <% } %>
   <td data-mobile-title="Order type"><% if(!_.isNull(real_order_id)) { %>
@@ -134,6 +148,8 @@
         <%= _.isUndefined(i18n['Recurring']) ? 'Recurring':i18n['Recurring'] %>
       <% } else if(!_.isNull(order_subtype) && order_subtype !== '') { %>
             <%= _.isUndefined(i18n[order_subtype]) ? order_subtype :i18n[order_subtype] %>
+      <% } else if(typeof sales_id !== 'undefined' && !_.isNull(sales_id) && sales_id !== '') { %>
+            <%= _.isUndefined(i18n['In store']) ? 'In store':i18n['In store'] %>
       <% } else { %>
         <%= _.isUndefined(i18n['Regular']) ? 'Regular':i18n['Regular'] %>
       <% } %>

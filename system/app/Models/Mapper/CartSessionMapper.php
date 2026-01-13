@@ -69,6 +69,10 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
             'second_payment_gateway'          => $model->getSecondPaymentGateway(),
             'is_pickup_notification_sent'     => $model->getIsPickupNotificationSent(),
             'pickup_notification_sent_on'     => $model->getPickupNotificationSentOn(),
+            'cashier_id'                      => $model->getCashierId(),
+            'cashier_label'                   => $model->getCashierLabel(),
+            'location_id'                     => $model->getLocationId(),
+            'sales_id'                        => $model->getSalesId(),
 		);
 
 		if(!$model->getId() || null === ($exists = $this->find($model->getId()))) {
@@ -312,6 +316,25 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
 
     }
 
+    public function findAllAddressesByCustomerIdAndAddressId($customerId, $addressId, $type = ''){
+        if(empty($type)){
+            $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $addressId);
+            $where .= ' OR '. $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $addressId);
+            $where .= ' AND ';
+        } elseif ($type == 'shipping') {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('shipping_address_id = ?', $addressId);
+            $where .= ' AND ';
+        } elseif ($type == 'billing') {
+            $where = $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $addressId);
+            $where .= ' AND ';
+        }
+
+        $where .= $this->getDbTable()->getAdapter()->quoteInto('user_id = ?', $customerId);
+
+        $select = $this->getDbTable()->getAdapter()->select()->from($this->getDbTable()->info('name'))->where($where);
+        return $this->getDbTable()->getAdapter()->fetchAll($select);
+    }
+
     /**
      * Fetch orders  by user id including recurring payments data
      *
@@ -452,5 +475,25 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
                 $where = $this->getDbTable()->getAdapter()->quoteInto('billing_address_id = ?', $oldTokenId);
             }
             return $this->getDbTable()->getAdapter()->update('shopping_cart_session', $data, $where);
+    }
+
+    /**
+     * @return bool
+     */
+    public function ifSuccessfulPurchaseExists(){
+
+        $statuses = array(Models_Model_CartSession::CART_STATUS_COMPLETED, Models_Model_CartSession::CART_STATUS_SHIPPED, Models_Model_CartSession::CART_STATUS_DELIVERED, Models_Model_CartSession::CART_STATUS_PARTIAL);
+        $where = $this->getDbTable()->getAdapter()->quoteInto('cart.status IN (?)', $statuses);
+
+        $select = $this->getDbTable()->select(Zend_Db_Table::SELECT_WITHOUT_FROM_PART)->setIntegrityCheck(false)
+            ->from(array('cart' => 'shopping_cart_session'))
+            ->where($where);
+        $result = $this->getDbTable()->fetchRow($select);
+
+        $existedPurchase = false;
+        if(sizeof($result)){
+            $existedPurchase = true;
+        }
+        return $existedPurchase;
     }
 }

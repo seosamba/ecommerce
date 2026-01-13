@@ -132,6 +132,13 @@ class Widgets_Store_Store extends Widgets_Abstract {
                 }
             }
 
+            $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+            if($enabledSeosambaPosPlugin != null){
+                if($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED){
+                    $this->_view->seosambaPosPlugin = 1;
+                }
+            }
+
             $ordersMapper = Models_Mapper_OrdersMapper::getInstance();
             $orderSubtypes = $ordersMapper->getUniqueSubtypes();
             $orderSubtypes = array_filter($orderSubtypes);
@@ -209,6 +216,33 @@ class Widgets_Store_Store extends Widgets_Abstract {
 
             $this->_view->countriesList = Tools_Geo::getCountries(true);
             $this->_view->customerGroups = $customerGroups;
+
+            $isPluginWithTagPosExist = false;
+            $availablePlugins = Tools_Plugins_Tools::getPluginsByTags(array('pos'));
+            if (!empty($availablePlugins)) {
+                $isPluginWithTagPosExist = true;
+            }
+            $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
+
+            $pickupLocations = array();
+
+            if($isPluginWithTagPosExist) {
+                $pickupLocations = Tools_Misc::getLocationsData();
+            }
+            $usedLocationIds = $ordersMapper->getLocationIds();
+
+            $locationIds = array();
+            if(!empty($pickupLocations)) {
+                foreach ($pickupLocations as $location) {
+                    if(in_array($location['id'], $usedLocationIds)) {
+                        $locationIds[$location['id']] = $location['name'];
+                    }
+                }
+            }
+
+            $this->_view->salesData = $ordersMapper->getSalesData();
+            $this->_view->locationIds = $locationIds;
+            $this->_view->cashierIds = $ordersMapper->getCashierIds();
 
 			return $this->_view->render('orders.phtml');
 		}

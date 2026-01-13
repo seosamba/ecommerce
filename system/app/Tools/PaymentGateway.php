@@ -91,10 +91,157 @@ class Tools_PaymentGateway extends Tools_Plugins_Abstract {
             }
 
 
-			Models_Mapper_CartSessionMapper::getInstance()->save($cart);
+            Models_Mapper_CartSessionMapper::getInstance()->save($cart);
+
+            if($status == Models_Model_CartSession::CART_STATUS_COMPLETED
+                || $status == Models_Model_CartSession::CART_STATUS_SHIPPED
+                || $status == Models_Model_CartSession::CART_STATUS_DELIVERED
+                || $status == Models_Model_CartSession::CART_STATUS_PARTIAL
+            ) {
+                self::processProductLocationInventory($cart);
+                self::productLocationInventoryNotification($cartId);
+            }
 		}
 
 		return $this;
 	}
+
+    public static function processProductLocationInventory($cartSessionModel)
+    {
+        $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+        $cartLocationInventoryMapper = Models_Mapper_CartLocationInventoryMapper::getInstance();
+
+        $cartId = $cartSessionModel->getId();
+        $cartContent = $cartSessionModel->getCartContent();
+
+        foreach ($cartContent as $cartItem) {
+            $priorityLocationsToCalculate = array();
+            $productId = $cartItem['product_id'];
+            $inventoriesAddedToCart = $cartItem['qty'];
+
+            $productLocationsAll = $productLocationsMapper->findLocationsByProductId($productId);
+
+            if(!empty($productLocationsAll)) {
+                $defaultLocation = '';
+                $locationsInventoryLimit = array();
+
+                foreach ($productLocationsAll as $key => $loc) {
+                    $locationsInventoryLimit[$loc['location_id']] = $loc['inventory'];
+                    if(!empty($loc['is_default_location'])) {
+                        $defaultLocation = $loc['location_id'];
+                    }
+                }
+
+                arsort($locationsInventoryLimit);
+
+                if(empty($defaultLocation)) {
+                    $defaultLocation = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('defaultLocationId');
+                }
+
+                //default location
+                if(!in_array($defaultLocation, $priorityLocationsToCalculate)) {
+                    $priorityLocationsToCalculate[] = $defaultLocation;
+                }
+
+                foreach ($locationsInventoryLimit as $id => $inventory) {
+                    if(!in_array($id, $priorityLocationsToCalculate)) {
+                        $priorityLocationsToCalculate[] = $id;
+                    }
+                }
+
+                $processingComplete = false;
+                foreach ($priorityLocationsToCalculate as $locationId) {
+                    $remainderOfValue = $locationsInventoryLimit[$locationId] - $inventoriesAddedToCart;
+
+                    $cartLocationInventory = new Models_Model_CartLocationInventoryModel();
+                    $cartLocationInventory->setCartId($cartId);
+                    $cartLocationInventory->setProductId($productId);
+                    $cartLocationInventory->setLocationId($locationId);
+                    $cartLocationInventory->setProductStatus('new');
+
+                    if($remainderOfValue >= 0) {
+                        //save $inventoriesAddedToCart
+                        $cartLocationInventory->setLocationInventory($inventoriesAddedToCart);
+
+                        if(!empty($inventoriesAddedToCart)) {
+                            $cartLocationInventoryMapper->save($cartLocationInventory);
+
+                            $existedProductLocation = $productLocationsMapper->findLocationByProductIdAndLocationId($productId, $locationId);
+                            $existedProductLocation['inventory'] -= $inventoriesAddedToCart;
+
+                            $productLocationsModel = new Models_Model_ProductLocationsModel();
+                            $productLocationsModel->setOptions($existedProductLocation);
+                            $productLocationsMapper->save($productLocationsModel);
+                        }
+
+                        $processingComplete = true;
+
+                        break;
+                    } elseif ($remainderOfValue < 0) {
+                        //save $locationsInventoryLimit[$locationId]
+                        $cartLocationInventory->setLocationInventory($locationsInventoryLimit[$locationId]);
+
+                        if(!empty($locationsInventoryLimit[$locationId])) {
+                            $cartLocationInventoryMapper->save($cartLocationInventory);
+
+                            $existedProductLocation = $productLocationsMapper->findLocationByProductIdAndLocationId($productId, $locationId);
+                            $existedProductLocation['inventory'] -= $locationsInventoryLimit[$locationId];
+
+                            $productLocationsModel = new Models_Model_ProductLocationsModel();
+                            $productLocationsModel->setOptions($existedProductLocation);
+                            $productLocationsMapper->save($productLocationsModel);
+                        }
+
+                        $inventoriesAddedToCart = abs($remainderOfValue);
+                    }
+                }
+
+                if(!empty($inventoriesAddedToCart) && !$processingComplete) {
+                    $cartLocationInventory = new Models_Model_CartLocationInventoryModel();
+                    $cartLocationInventory->setCartId($cartId);
+                    $cartLocationInventory->setProductId($productId);
+                    $cartLocationInventory->setLocationId('');
+                    $cartLocationInventory->setLocationInventory($inventoriesAddedToCart);
+                    $cartLocationInventory->setProductStatus('new');
+
+                    $cartLocationInventoryMapper->save($cartLocationInventory);
+                }
+            }
+        }
+
+    }
+
+    public static function productLocationInventoryNotification($cartId) {
+        $cartLocationInventoryMapper = Models_Mapper_CartLocationInventoryMapper::getInstance();
+        $cartLocationInventoryData = $cartLocationInventoryMapper->getLocationInventoryInfo($cartId);
+
+        $preparedLocationinventoryData = array();
+        if(!empty($cartLocationInventoryData)) {
+            foreach ($cartLocationInventoryData as $locationInventoryData) {
+                if(!empty($locationInventoryData['location_id']) && !empty($locationInventoryData['send_email_notification'])) {
+                    $preparedLocationinventoryData[$locationInventoryData['location_id']]['id'] = $locationInventoryData['id'];
+                    $preparedLocationinventoryData[$locationInventoryData['location_id']]['orderId'] = $cartId;
+                    $preparedLocationinventoryData[$locationInventoryData['location_id']]['locationEmail'] = $locationInventoryData['email'];
+                    $preparedLocationinventoryData[$locationInventoryData['location_id']]['locationName'] = $locationInventoryData['location_name'];
+                    $preparedLocationinventoryData[$locationInventoryData['location_id']]['products'][] = $locationInventoryData['product_name'] . ' - (' . $locationInventoryData['location_inventory'] . ')';
+                }
+            }
+        }
+
+        if(!empty($preparedLocationinventoryData)) {
+            foreach ($preparedLocationinventoryData as $locationInventoryData) {
+                $cartLocationInventory = $cartLocationInventoryMapper->find($locationInventoryData['id']);
+
+                if($cartLocationInventory instanceof Models_Model_CartLocationInventoryModel) {
+                    $cartLocationInventory->registerObserver(new Tools_Mail_Watchdog(array(
+                        'trigger' => Tools_StoreMailWatchdog::TRIGGER_LOCATION_INVENTORY_NOTIFICATION,
+                        'notificationData' => $locationInventoryData
+                    )));
+
+                    $cartLocationInventory->notifyObservers();
+                }
+            }
+        }
+    }
 
 }

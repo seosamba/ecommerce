@@ -325,6 +325,18 @@ class Store_Mapper_CouponMapper extends Application_Model_Mappers_Abstract {
        return $dbTable->getAdapter()->fetchRow($select);
      }
 
+    /**
+     * @param $cartId
+     * @return mixed
+     */
+    public function findSalesCouponsByCartId($cartId){
+        $dbTable = new Zend_Db_Table('shopping_coupon_sales');
+        $where = $dbTable->getAdapter()->quoteInto('cart_id = ?', $cartId);
+        $select =  $dbTable->getAdapter()->select()->from('shopping_coupon_sales', array('coupon_code'))->where($where);
+
+        return $dbTable->getAdapter()->fetchAll($select);
+    }
+
     public function getCouponCodes()
     {
         $dbTable = new Zend_Db_Table('shopping_coupon_sales');

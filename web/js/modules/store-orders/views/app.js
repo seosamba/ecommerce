@@ -77,6 +77,21 @@ define(['backbone',
                         withDetailedFilters = true;
                     }
 
+                    if (typeof options.filter_by_sales_id !== 'undefined') {
+                        $('#filter-by-sales-id').val(options.filter_by_sales_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_by_location_id !== 'undefined') {
+                        $('#filter-by-location-id').val(options.filter_by_location_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_by_cashier_id !== 'undefined') {
+                        $('#filter-by-cashier-id').val(options.filter_by_cashier_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (typeof options.filter_from_amount !== 'undefined') {
                         $('input[name=filter-from-amount]', '#store-orders form.filters').val(options.filter_from_amount);
                         withDetailedFilters = true;
@@ -138,6 +153,16 @@ define(['backbone',
                         $('input[name=user-name]').val(options.filter_by_user_name);
                     }
 
+                    if (typeof options.filter_by_sales_id !== 'undefined' && options.filter_by_sales_id != '-1') {
+                        $('#filter-by-sales-id').val(options.filter_by_sales_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
+                    if (typeof options.filter_by_location_id !== 'undefined') {
+                        $('#filter-by-location-id').val(options.filter_by_location_id.split(',')).trigger('chosen:updated');
+                        withDetailedFilters = true;
+                    }
+
                     if (withDetailedFilters === true) {
                         if ($('#extra-filters').hasClass('hidden')) {
                             $('#extra-filters').removeClass('hidden');
@@ -165,6 +190,9 @@ define(['backbone',
                         'filter-order-type': $('select[name=filter-order-type]', '#store-orders form.filters').val(),
                         'filter-recurring-order-type': $('select[name=filter-recurring-order-type]', '#store-orders form.filters').val(),
                         'filter-by-coupon': $('input[name=filter-by-coupon-code]', '#store-orders form.filters').val(),
+                        'filter-by-sales-id': $('#filter-by-sales-id', '#store-orders form.filters').val(),
+                        'filter-by-location-id': $('#filter-by-location-id', '#store-orders form.filters').val(),
+                        'filter-by-cashier-id': $('#filter-by-cashier-id', '#store-orders form.filters').val(),
                         'filter-exclude-quotes': function() { if($('#exclude-quotes-from-search').is(':checked')){ return '1' } else { return '0'}; },
                         'is_gift': function() { if($('#is-a-gift').is(':checked')){ return '1' } else { return '0'}; },
                         'filter-client-group': $('select[name=filter-client-group]', '#store-orders form.filters').val()
@@ -212,6 +240,9 @@ define(['backbone',
                     'filter_from_amount': $('#filter-from-amount').val(),
                     'filter_to_amount': $('#filter-to-amount').val(),
                     'filter_by_coupon_code': $('#filter-by-coupon-code').val(),
+                    'filter_by_sales_id': $('#filter-by-sales-id').val(),
+                    'filter_by_location_id': $('#filter-by-location-id').val(),
+                    'filter_by_cashier_id': $('#filter-by-cashier-id').val(),
                     'orders_filter_fromdate' : $('#orders-filter-fromdate').val() ? $.datepicker.formatDate('yy-mm-dd', new Date( $('#orders-filter-fromdate').val())): '',
                     'orders_filter_todate' : ($('#orders-filter-todate').val()) ? $.datepicker.formatDate('yy-mm-dd', new Date( $('#orders-filter-todate').val())): '',
                     'filter_status': $('#filter-status').val(),
@@ -305,6 +336,24 @@ define(['backbone',
                 $('#filter-from-amount').val(filtersData.filter_from_amount);
                 $('#filter-to-amount').val(filtersData.filter_to_amount);
                 $('#filter-by-coupon-code').val(filtersData.filter_by_coupon_code);
+
+                if (!_.isUndefined(filtersData.filter_by_sales_id) && !_.isEmpty(filtersData.filter_by_sales_id)) {
+                    $('#filter-by-sales-id').val(filtersData.filter_by_sales_id).trigger("chosen:updated");
+                } else {
+                    $('#filter-by-sales-id').val(0).trigger("chosen:updated");
+                }
+
+                if (!_.isUndefined(filtersData.filter_by_location_id) && !_.isEmpty(filtersData.filter_by_location_id)) {
+                    $('#filter-by-location-id').val(filtersData.filter_by_location_id).trigger("chosen:updated");
+                } else {
+                    $('#filter-by-location-id').val(0).trigger("chosen:updated");
+                }
+
+                if (!_.isUndefined(filtersData.filter_by_cashier_id) && !_.isEmpty(filtersData.filter_by_cashier_id)) {
+                    $('#filter-by-cashier-id').val(filtersData.filter_by_cashier_id).trigger("chosen:updated");
+                } else {
+                    $('#filter-by-cashier-id').val(0).trigger("chosen:updated");
+                }
 
                 if (filtersData.orders_filter_fromdate !== '' && !_.isUndefined(filtersData.orders_filter_fromdate)) {
                     ordersFilterFromdate = $.datepicker.formatDate('d-M-yy', new Date(filtersData.orders_filter_fromdate));
@@ -730,6 +779,7 @@ define(['backbone',
         render: function(){},
         renderOrder: function(order){
             order.set({useInvoice: $('#invoiceEnable').val()});
+            order.set({useSeosambaPos: $('#seosambaPosEnable').val()});
             order.set({i18n: i18n});
             var view = new OrdersView({model: order});
             this.$('#orders-list').append(view.render().el);
@@ -739,6 +789,8 @@ define(['backbone',
             this.orders.each(this.renderOrder.bind(this));
             this.orders.info()['i18n'] = i18n;
             this.$('td.paginator').html(this.templates.paginator(this.orders.information));
+            this.getOrdersLocationInventoryStatusGrid(this.orders.pluck("id"));
+            setInterval(() => {this.getOrdersLocationInventoryStatusGrid(this.orders.pluck("id"));}, 5000);
         },
         applyFilter: function(e) {
             if(typeof e !== 'undefined'){
@@ -1214,6 +1266,21 @@ define(['backbone',
                 }, 1000)
             }
         },
+        getOrdersLocationInventoryStatusGrid: function(orderIds) {
+            var self = this;
+
+            $.get($('#website_url').val()+'api/store/locationinventorygridstatus/', {'orderIds' : orderIds.join(',')}, function(response){
+                if (!_.isEmpty(response)) {
+                    _.each(response, function (statData, id) {
+                        if(statData != 'new') {
+                            self.$el.find('.location-inventory-status-' + id).addClass('hide');
+                        } else {
+                            self.$el.find('.location-inventory-status-' + id).removeClass('hide');
+                        }
+                    });
+                }
+            }, 'json');
+        }
     });
 
     return MainView;

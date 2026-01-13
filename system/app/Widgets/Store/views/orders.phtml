@@ -159,6 +159,42 @@ $this->headLink()
                         'data-placeholder' => $this->translate('show all')
                     ), $orderTypes); ?>
                 </p>
+                <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                    <p class="flex_2 f-omega t-grid_2">
+                        <label class="text-bold"><?php echo $this->translate('By sales person');?></label>
+                        <select class="filter" multiple id="filter-by-sales-id" name="filter-by-sales-id" data-placeholder="<?php echo $this->translate('show all');?>">
+                            <?php if (!empty($this->salesData)) : ?>
+                                <?php foreach ($this->salesData as $salesId => $salesName): ?>
+                                    <?php if(!is_null($salesName)):?>
+                                        <option value="<?php echo $salesId; ?>" <?php echo (!empty($this->presetConfig['filter_by_sales_id']) && in_array($salesId, $this->presetConfig['filter_by_sales_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($salesName);?></option>
+                                    <?php endif;?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </p>
+
+                    <p class="flex_2 f-omega t-grid_2">
+                        <label class="text-bold"><?php echo $this->translate('By location');?></label>
+                        <select class="filter" multiple id="filter-by-location-id" name="filter-by-location-id" data-placeholder="<?php echo $this->translate('show all');?>">
+                            <?php if (!empty($this->locationIds)) : ?>
+                                <?php foreach ($this->locationIds as $location => $locationName): ?>
+                                    <option value="<?php echo $location; ?>" <?php echo (!empty($this->presetConfig['filter_by_location_id']) && in_array($location, $this->presetConfig['filter_by_location_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($locationName);?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </p>
+
+                    <p class="flex_2 t-grid_2">
+                        <label class="text-bold"><?php echo $this->translate('By cashier');?></label>
+                        <select class="filter" multiple id="filter-by-cashier-id" name="filter-by-cashier-id" data-placeholder="<?php echo $this->translate('show all');?>">
+                            <?php if (!empty($this->cashierIds)) : ?>
+                                <?php foreach ($this->cashierIds as $cashier => $cashierName): ?>
+                                    <option value="<?php echo $cashier; ?>" <?php echo (!empty($this->presetConfig['filter_by_cashier_id']) && in_array($cashier, $this->presetConfig['filter_by_cashier_id'])) ? 'selected="selected"' : ''; ?>><?php echo $this->translate($cashierName);?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </p>
+                <?php endif;?>
                 <div class="flex_8 f-omega f-alpha">
                     <label class="text-bold"><?php echo $this->translate('By shipping destination');?></label>
                     <?php
@@ -205,6 +241,7 @@ $this->headLink()
                     <th class="sortable" data-sortkey="email"><?php echo $this->translate('Email');?></th>
                     <th class="sortable sortDown" data-sortkey="aggregatedPurchasedOn"><?php echo $this->translate('Purchased on');?></th>
                     <th class="sortable" data-sortkey="status" style="min-width: 180px;"><?php echo $this->translate('Status');?></th>
+                    <th></th>
                     <th class="sortable" data-sortkey="products"><?php echo $this->translate('Products in cart');?></th>
                     <th class="sortable" data-sortkey="total"><?php echo $this->translate('Total price');?></th>
                     <th class="sortable" data-sortkey="shipping_price"><?php echo $this->translate('Shipping price');?></th>
@@ -233,16 +270,20 @@ $this->headLink()
                     <option value="exportOrders"><?php echo $this->translate('Export orders');?></option>
                 </select>
             </td>
-            <?php if(isset($this->invoicePlugin)):?>
+
+            <?php if(isset($this->invoicePlugin) || isset($this->seosambaPosPlugin)):?>
+                    <td colspan="10" class="paginator text-right"></td>
+            <?php else:?>
                     <td colspan="9" class="paginator text-right"></td>
-                <?php else:?>
-                    <td colspan="8" class="paginator text-right"></td>
-                <?php endif;?>
+            <?php endif;?>
             </tfoot>
         </table>
         <input type="hidden" id="orders-secure-token" name="orders-secure-token" class="orders-secure-token" value="<?php echo Tools_System_Tools::initSecureToken(Shopping::SHOPPING_SECURE_TOKEN);?>" />
         <?php if(isset($this->invoicePlugin)):?>
             <input type="hidden" value="enabled" name="invoiceEnable" id="invoiceEnable"/>
+        <?php endif;?>
+        <?php if(isset($this->seosambaPosPlugin)):?>
+            <input type="hidden" value="enabled" name="seosambaPosEnable" id="seosambaPosEnable"/>
         <?php endif;?>
     </div>
 </div>

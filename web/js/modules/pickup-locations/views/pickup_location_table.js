@@ -2,10 +2,11 @@ define([
     'backbone',
     '../collections/pickup-location',
     'text!../templates/paginator.html',
+    'text!../templates/cash-register-ids.html',
     'i18n!../../../nls/'+$('input[name=system-language]').val()+'_ln',
     $('#website_url').val()+'system/js/external/jquery/plugins/DataTables/jquery.dataTables.min.js'
 ], function(Backbone,
-            PickupLocationCollection,PaginatorTmpl, i18n
+            PickupLocationCollection,PaginatorTmpl, cashRegisterIdsTmpl, i18n
     ){
 
     var PickupLocationTableView = Backbone.View.extend({
@@ -59,21 +60,86 @@ define([
         editLocation: function(e){
             var locationId = $(e.currentTarget).data('cid'),
                 model = this.pickupLocation.get(locationId),
-                workingHours = model.get('workingHours');
+                workingHours = model.get('workingHours'),
+                checkedCashRegisterId = model.get('cashRegisterId'),
+                checkedCashRegisterLabel = model.get('cashRegisterLabel'),
+                cashRegisterList = model.get('cashRegisterList'),
+                country = model.get('country'),
+                state = model.get('state'),
+                email = model.get('email'),
+                sendEmailNotification = model.get('send_email_notification');
 
+            $('.register-row').remove();
             $('.location-name').val(model.get('name'));
             $('.location-address1').val(model.get('address1'));
             $('.location-address2').val(model.get('address2'));
             $('.location-city').val(model.get('city'));
             $('.location-zip').val(model.get('zip'));
             $('.location-weight').val(model.get('weight'));
-            $('.location-country [value="'+model.get('country')+'"]').prop('selected', true);
+            $('.location-country [value="'+country+'"]').prop('selected', true);
+
+            $('.state-block').addClass('hide');
+            $('.cash-register-id-view').val('');
+
+            var states = '<option value="">'+ (_.isUndefined(i18n['Select state'])?'Select state':i18n['Select state']) +'</option>';
+            if(country == 'United States' || country == 'Canada' || country == 'Australia') {
+                $.ajax({
+                    url: $('#website_url').val()+'plugin/shopping/run/getStateListByCountry',
+                    type: 'POST',
+                    data:{country: country, secureToken: $('.secure-token-pickup-cat').val()},
+                    dataType: 'json',
+                    success: function(response) {
+                        if(!response.error) {
+                            var stateList = response.responseText.stateList;
+
+                            _.each(stateList, function(stateData, key ){
+                                states += '<option value="'+ stateData.state +'">'+ stateData.name +'</option>';
+                            });
+
+                            $('.state-block').removeClass('hide');
+                            $('.location-state').empty().append(states);
+
+                            $('.location-state [value="'+state+'"]').prop('selected', true);
+                        } else {
+                            $('.location-state').empty().append(states);
+                        }
+                    }
+                });
+            } else {
+                $('.state-block').addClass('hide');
+                $('.location-state').empty().append(states);
+            }
+
             $('.location-phone').val(model.get('phone'));
             $('#location-external-id').val(model.get('external_id'));
             $('#location-allowed-to-delete').val(model.get('allowed_to_delete'));
+            $('.location-email').val(model.get('email'));
+            $('#send-email-notification').val(model.get('send_email_notification')).prop('checked', true);
+
+            if(sendEmailNotification == 0) {
+                $('#send-email-notification').prop('checked', false);
+            }
+
+            var cashRegisterIdView = [];
+            if(typeof checkedCashRegisterId !== 'undefined' && checkedCashRegisterId.length && typeof checkedCashRegisterLabel !== 'undefined' && checkedCashRegisterLabel.length) {
+                _.each(checkedCashRegisterId, function(value, id){
+                    var cRow = checkedCashRegisterLabel[id] + ' (id: '+value+')';
+                    cashRegisterIdView.push(cRow);
+                });
+
+                if(cashRegisterIdView.length) {
+                    $('#cash-register-id-view').val(cashRegisterIdView.join(', '));
+                }
+            }
             _.each(workingHours, function(value, name){
                 $('input[name="working-hours-'+name+'"]').val(value);
             });
+
+            if(!$('.register-row').find('.cash-register-field-row').length) {
+                var rowsDiv = _.template(cashRegisterIdsTmpl, {'i18n':i18n, cashRegisterList, 'checkedCashRegisterIds':checkedCashRegisterId});
+                $('.cash-register-block').append(rowsDiv);
+            }
+
             $('#location-edit-id').val(locationId);
             $('#edit-pickup-location').attr('method', 'PUT');
         },
@@ -84,6 +150,19 @@ define([
             showConfirmCustom(_.isUndefined(i18n['Are you sure want to delete?'])?'Are you sure want to delete?':i18n['Are you sure want to delete?'], _.isUndefined(i18n['Yes'])?'Yes':i18n['Yes'], _.isUndefined(i18n['No'])?'No':i18n['No'], function(){
                 if (model){
                     model.destroy();
+                    $('.working-hours-list').find('input').val('');
+                    $('.register-row').remove();
+                    $('#location-edit-id').val('');
+                    $('.state-block').addClass('hide');
+                    $('.location-state').empty().append('<option value="">'+ (_.isUndefined(i18n['Select state'])?'Select state':i18n['Select state']) +'</option>');
+                    $('.location-name').val('');
+                    $('.location-address1').val('');
+                    $('.location-address2').val('');
+                    $('.location-city').val('');
+                    $('.location-zip').val('');
+                    $('.location-phone').val('');
+                    $('.location-weight').val('');
+                    $('#cash-register-id-view').val('');
                 }
             });
         },

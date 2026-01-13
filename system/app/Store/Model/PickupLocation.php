@@ -9,6 +9,8 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
 
     protected $_country;
 
+    protected $_state = '';
+
     protected $_city;
 
     protected $_address1;
@@ -34,6 +36,13 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     protected $_external_id = null;
 
     protected $_allowed_to_delete = 0;
+
+    protected $_cashRegisterId = '';
+
+    protected $_email = '';
+
+    protected $_sendEmailNotification = 1;
+
 
     public function setName($name)
     {
@@ -88,6 +97,23 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
     public function getCountry()
     {
         return $this->_country;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getState()
+    {
+        return $this->_state;
+    }
+
+    /**
+     * @param mixed $state
+     */
+    public function setState($state)
+    {
+        $this->_state = $state;
+        return $this;
     }
 
     public function setPhone($phone)
@@ -211,6 +237,49 @@ class Store_Model_PickupLocation extends Application_Model_Models_Abstract
         $this->_allowed_to_delete = $allowed_to_delete;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCashRegisterId()
+    {
+        return $this->_cashRegisterId;
+    }
+
+    /**
+     * @param string $cashRegisterId
+     */
+    public function setCashRegisterId($cashRegisterId)
+    {
+        $this->_cashRegisterId = $cashRegisterId;
+        return $this;
+    }
+
+    public function getEmail()
+    {
+        return $this->_email;
+    }
+
+    public function setEmail($email)
+    {
+        $this->_email = $email;
+        return $this;
+    }
+
+    public function getSendEmailNotification()
+    {
+        return $this->_sendEmailNotification;
+    }
+
+    public function setSendEmailNotification($sendEmailNotification)
+    {
+        $this->_sendEmailNotification = $sendEmailNotification;
+        return $this;
+    }
+
+
+
+
 
 
 }

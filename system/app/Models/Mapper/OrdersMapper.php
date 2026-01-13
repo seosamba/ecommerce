@@ -468,6 +468,42 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                             $select->where('shcoupon.coupon_code = ?', $val);
                         }
                         break;
+                    case 'filter-by-sales-id':
+                        $val = filter_var_array($val, FILTER_SANITIZE_STRING);
+                        if (!empty($val)) {
+                            $filterWhere = '(';
+                            foreach ($val as $sales) {
+                                $filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.sales_id = ?', $sales);
+                                $filterWhere .= ') OR (';
+                            }
+                            $filterWhere = rtrim($filterWhere, ' OR (');
+                            $select->where($filterWhere);
+                        }
+                        break;
+                    case 'filter-by-location-id':
+                        $val = filter_var_array($val, FILTER_SANITIZE_STRING);
+                        if (!empty($val)) {
+                            $filterWhere = '(';
+                            foreach ($val as $location) {
+                                $filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.location_id = ?', $location);
+                                $filterWhere .= ') OR (';
+                            }
+                            $filterWhere = rtrim($filterWhere, ' OR (');
+                            $select->where($filterWhere);
+                        }
+                        break;
+                    case 'filter-by-cashier-id':
+                        $val = filter_var_array($val, FILTER_SANITIZE_STRING);
+                        if (!empty($val)) {
+                            $filterWhere = '(';
+                            foreach ($val as $cashier) {
+                                $filterWhere .= $this->getDbTable()->getAdapter()->quoteInto('order.cashier_id = ?', $cashier);
+                                $filterWhere .= ') OR (';
+                            }
+                            $filterWhere = rtrim($filterWhere, ' OR (');
+                            $select->where($filterWhere);
+                        }
+                        break;
                     case 'filter-exclude-quotes':
                         $val = trim(filter_var($val, FILTER_SANITIZE_STRING));
                         if (!empty($val)) {
@@ -538,6 +574,52 @@ class Models_Mapper_OrdersMapper extends Application_Model_Mappers_Abstract {
                 $column
             );
 
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
+
+    /**
+     * Get sales person data for orders filter
+     *
+     * @return array
+     */
+    public function getSalesData()
+    {
+        $where = new Zend_Db_Expr('scs.sales_id IS NOT NULL');
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('scs' => 'shopping_cart_session'), array(
+            'scs.sales_id',
+            'u.full_name'
+
+        ))
+        ->joinLeft(array('u' => 'user'), 'scs.sales_id = u.id', array())
+        ->group('sales_id');
+        $select->where($where);
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
+
+    /**
+     * Get cashier register ids for orders filter
+     *
+     * @return array
+     */
+    public function getCashierIds()
+    {
+        $where = new Zend_Db_Expr('cashier_id IS NOT NULL');
+        $where .= ' AND ' . new Zend_Db_Expr('cashier_label IS NOT NULL');
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_cart_session', array('cashier_id', 'cashier_label'))->group('cashier_id');
+        $select->where($where);
+        return $this->getDbTable()->getAdapter()->fetchPairs($select);
+    }
+
+    /**
+     * Get location ids for orders filter
+     *
+     * @return array
+     */
+    public function getLocationIds()
+    {
+        $where = new Zend_Db_Expr('location_id IS NOT NULL');
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_cart_session', array('location_id'))->group('location_id');
+        $select->where($where);
         return $this->getDbTable()->getAdapter()->fetchCol($select);
     }
 

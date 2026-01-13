@@ -476,6 +476,36 @@ class Api_Store_Products extends Api_Service_Abstract {
                     }
 
                 }
+
+                //@todo compare product inventory with plugin seosambapos location inventories
+                if($srcData['inventory'] != '') {
+                    $seosambaposPlugin = Tools_Plugins_Tools::findPluginByName('seosambapos');
+
+                    if($seosambaposPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                        $prodId = $products->getId();
+
+                        $defaultProductSettingsMapper = Seosambapos_Models_Mappers_SeosambaposDefaultproductSettingMapper::getInstance();
+                        $defaultProductId = $defaultProductSettingsMapper->getConfigParam('defaultProductId');
+
+                        $locationInventories = 0;
+                        $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
+                        $productLocations = $productLocationsMapper->findLocationsByProductId($products->getId());
+
+                        if(!empty($productLocations)) {
+                            foreach ($productLocations as $pKey => $pLocation){
+                                $locationInventories += (int)$pLocation['inventory'];
+                            }
+                        }
+
+                        if(!empty($locationInventories) && $locationInventories > $srcData['inventory']) {
+                            $this->_error('you cannot set a smaller quantity than that specified for your locations in (POS location inventory) tab.');
+                        }
+
+                        if(!empty($defaultProductId) && $defaultProductId == $prodId) {
+                            $this->_error("This product is used as default in SeosambaPos plugin. You can set 'infinity' qty only.");
+                        }
+                    }
+                }
             }
 
 			!is_array($products) && $products = array($products);

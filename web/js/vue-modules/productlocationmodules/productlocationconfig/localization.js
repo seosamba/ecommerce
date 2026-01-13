@@ -1,0 +1,83 @@
+const messages = {
+    en: {
+        message: {
+            location: "Location",
+            inventory: "Product inventory",
+            defaultLocation: "Default location",
+            rowNotFound: 'Nothing to found',
+            action: 'Action',
+            selectLocation: 'Select location',
+            saveNew: 'Add new location',
+            notEmptyNewLocationId: 'Location can not be empty',
+            notEmptyNewInventory: 'Product inventory can not be empty',
+            locationAlreadyExists: 'This location already added in config',
+            areYouSureDelete: 'Are you sure want to delete location?',
+            areYouSureUpdateLocation: 'Are you sure want to change location?',
+            updated: 'Updated',
+            areYouSureEnabled: 'Are you sure want to use this location as default?',
+            areYouSureDisabled: 'Are you sure want to disable this default location?',
+            otherLocationChecked: ' location marked as default.',
+            pleaseUncheckDefaultLocationFirst: ' Uncheck this location first please.',
+            areYouSureUpdateInventory: 'Are you sure want to change inventory?',
+            productNotSaved:'Product is not saved!',
+            clickToSaveButton:'Click on SAVE button and then reopen this tab',
+            globalInventoryLess:'General product inventory totals less than you add',
+            defaultProduct:'You can not add locations inventories for default product!',
+        }
+    },
+    es: {
+        message: {
+            location: "Location",
+            inventory: "Product inventory",
+            defaultLocation: "Default location",
+            rowNotFound: 'Nothing to found',
+            action: 'Action',
+            selectLocation: 'Select location',
+            saveNew: 'Add new location',
+            notEmptyNewLocationId: 'Location can not be empty',
+            notEmptyNewInventory: 'Product inventory can not be empty',
+            locationAlreadyExists: 'This location already added in config',
+            areYouSureDelete: 'Are you sure want to delete location?',
+            areYouSureUpdateLocation: 'Are you sure want to change location?',
+            updated: 'Updated',
+            areYouSureEnabled: 'Are you sure want to use this location as default?',
+            areYouSureDisabled: 'Are you sure want to disable this default location?',
+            otherLocationChecked: ' location marked as default.',
+            pleaseUncheckDefaultLocationFirst: ' Uncheck this location first please.',
+            areYouSureUpdateInventory: 'Are you sure want to change inventory?',
+            productNotSaved:'Product is not saved!',
+            clickToSaveButton:'Click on SAVE button and then reopen this tab',
+            globalInventoryLess:'General product inventory totals less than you add',
+            defaultProduct:'You can not add locations inventories for default product!',
+        }
+    },
+    fr: {
+        message: {
+            location: "Location",
+            inventory: "Product inventory",
+            defaultLocation: "Default location",
+            rowNotFound: 'Nothing to found',
+            action: 'Action',
+            selectLocation: 'Select location',
+            saveNew: 'Add new location',
+            notEmptyNewLocationId: 'Location can not be empty',
+            notEmptyNewInventory: 'Product inventory can not be empty',
+            locationAlreadyExists: 'This location already added in config',
+            areYouSureDelete: 'Are you sure want to delete location?',
+            areYouSureUpdateLocation: 'Are you sure want to change location?',
+            updated: 'Updated',
+            areYouSureEnabled: 'Are you sure want to use this location as default?',
+            areYouSureDisabled: 'Are you sure want to disable this default location?',
+            otherLocationChecked: ' location marked as default.',
+            pleaseUncheckDefaultLocationFirst: ' Uncheck this location first please.',
+            areYouSureUpdateInventory: 'Are you sure want to change inventory?',
+            productNotSaved:'Product is not saved!',
+            clickToSaveButton:'Click on SAVE button and then reopen this tab',
+            globalInventoryLess:'General product inventory totals less than you add',
+            defaultProduct:'You can not add locations inventories for default product!',
+        }
+    }
+
+};
+
+export default messages;

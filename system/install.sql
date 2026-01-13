@@ -345,6 +345,10 @@ CREATE TABLE IF NOT EXISTS `shopping_cart_session` (
   `purchase_error_message` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_pickup_notification_sent` ENUM('0', '1') DEFAULT '0',
   `pickup_notification_sent_on` timestamp NULL,
+  `cashier_id` VARCHAR(25) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cashier_label` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `location_id` int(10) unsigned DEFAULT NULL,
+  `sales_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shipping_address_id` (`shipping_address_id`),
@@ -752,6 +756,7 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `address2` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `zip` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
   `country` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `state` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `city` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `working_hours` TEXT COLLATE utf8_unicode_ci NOT NULL,
   `phone` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -762,6 +767,9 @@ CREATE TABLE IF NOT EXISTS `shopping_pickup_location` (
   `weight` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `external_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `allowed_to_delete` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
+  `cash_register_id` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` TEXT COLLATE utf8_unicode_ci DEFAULT NULL,
+  `send_email_notification` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '1',
   PRIMARY KEY (`id`),
   INDEX `country` (`country`),
   INDEX `city` (`city`),
@@ -1045,7 +1053,8 @@ INSERT IGNORE INTO `email_triggers` (`enabled`, `trigger_name`, `observer`) VALU
 ('1', 'store_customernotification', 'Tools_StoreMailWatchdog'),
 ('1', 'store_partialpayment', 'Tools_StoreMailWatchdog'),
 ('1', 'store_partialpaymentnotif', 'Tools_StoreMailWatchdog'),
-('1', 'store_partialpaymentsecond', 'Tools_StoreMailWatchdog');
+('1', 'store_partialpaymentsecond', 'Tools_StoreMailWatchdog'),
+('1', 'store_locationinventorynotification', 'Tools_StoreMailWatchdog');
 
 CREATE TABLE IF NOT EXISTS `plugin_shopping_notification_partial_log` (
   `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
@@ -1130,6 +1139,37 @@ CREATE TABLE IF NOT EXISTS `shopping_gateway_label` (
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `shopping_product_locations` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `product_id` INT(10) UNSIGNED NOT NULL,
+    `location_id` INT(10) UNSIGNED NOT NULL,
+    `inventory` INT(10) UNSIGNED DEFAULT NULL,
+    `is_default_location` ENUM('0', '1') DEFAULT '0',
+    `is_quick_product` ENUM('0', '1') DEFAULT '0',
+    PRIMARY KEY(`id`),
+    UNIQUE (`product_id`, `location_id`),
+    FOREIGN KEY(`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (`location_id`) REFERENCES `shopping_pickup_location` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `shopping_cart_location_inventory` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    `cart_id` INT(10) UNSIGNED NOT NULL,
+    `product_id` INT(10) UNSIGNED NOT NULL,
+    `location_id` INT(10) UNSIGNED DEFAULT NULL COMMENT 'from which location added inventory',
+    `location_inventory` INT(10) UNSIGNED DEFAULT NULL COMMENT 'location inventory added to cart',
+    `product_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY(`product_id`) REFERENCES `shopping_product` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+    INDEX `cart_id` (`cart_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT IGNORE INTO `email_triggers` (`id`, `enabled`, `trigger_name`, `observer`)
+SELECT CONCAT(NULL), CONCAT('1'), CONCAT('store_locationinventorynotification'), CONCAT('Tools_StoreMailWatchdog') FROM email_triggers WHERE
+NOT EXISTS (SELECT `id`, `enabled`, `trigger_name`, `observer` FROM `email_triggers`
+WHERE `enabled` = '1' AND `trigger_name` = 'store_locationinventorynotification' AND `observer` = 'Tools_StoreMailWatchdog')
+AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
+
 UPDATE `plugin` SET `tags`='processphones,userupdate,crm' WHERE `name` = 'shopping';
-UPDATE `plugin` SET `version` = '3.0.6' WHERE `name` = 'shopping';
+UPDATE `plugin` SET `version` = '3.0.8' WHERE `name` = 'shopping';
 
