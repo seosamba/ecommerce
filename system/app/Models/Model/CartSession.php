@@ -172,6 +172,14 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
 
     protected $_isPickupNotificationSent = '0';
 
+    protected $_cashierId = '';
+
+    protected $_cashierLabel = '';
+
+    protected $_locationId = null;
+
+    protected $_salesId = null;
+
 	public function setCartContent($cartContent) {
 		$this->_cartContent = $cartContent;
 		return $this;
@@ -539,6 +547,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setShippingLabelLink($shippingLabelLink)
     {
         $this->_shippingLabelLink = $shippingLabelLink;
+
+        return $this;
     }
 
     public function getPurchasedOn()
@@ -741,6 +751,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     {
         $this->_partialNotificationDate = $partialNotificationDate;
 
+        return $this;
+
     }
 
     /**
@@ -871,6 +883,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setFirstPartialPaidAmount($firstPartialPaidAmount)
     {
         $this->_firstPartialPaidAmount = $firstPartialPaidAmount;
+
+        return $this;
     }
 
     /**
@@ -887,6 +901,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setSecondPartialPaidAmount($secondPartialPaidAmount)
     {
         $this->_secondPartialPaidAmount = $secondPartialPaidAmount;
+
+        return $this;
     }
 
     /**
@@ -903,6 +919,8 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setPickupNotificationSentOn($pickupNotificationSentOn)
     {
         $this->_pickupNotificationSentOn = $pickupNotificationSentOn;
+
+        return $this;
     }
 
     /**
@@ -919,6 +937,84 @@ class Models_Model_CartSession extends Application_Model_Models_Abstract {
     public function setIsPickupNotificationSent($isPickupNotificationSent)
     {
         $this->_isPickupNotificationSent = $isPickupNotificationSent;
+
+        return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getCashierId()
+    {
+        return $this->_cashierId;
+    }
+
+    /**
+     * @param string $cashierId
+     */
+    public function setCashierId($cashierId)
+    {
+        $this->_cashierId = $cashierId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCashierLabel()
+    {
+        return $this->_cashierLabel;
+    }
+
+    /**
+     * @param string $cashierLabel
+     */
+    public function setCashierLabel($cashierLabel)
+    {
+        $this->_cashierLabel = $cashierLabel;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLocationId()
+    {
+        return $this->_locationId;
+    }
+
+    /**
+     * @param null $locationId
+     */
+    public function setLocationId($locationId)
+    {
+        $this->_locationId = $locationId;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getSalesId()
+    {
+        return $this->_salesId;
+    }
+
+    /**
+     * @param null $salesId
+     */
+    public function setSalesId($salesId)
+    {
+        $this->_salesId = $salesId;
+
+        return $this;
+    }
+
+
+
+
 
 }

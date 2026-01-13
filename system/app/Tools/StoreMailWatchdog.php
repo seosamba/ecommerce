@@ -64,6 +64,11 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
      */
     const TRIGGER_STORE_PARTIALPAYMENT_NOTIFICATION = 'store_partialpaymentnotif';
 
+    /**
+     * Notify customer if qty of product was changed
+     */
+    const TRIGGER_LOCATION_INVENTORY_NOTIFICATION = 'store_locationinventorynotification';
+
     const SHIPPING_TYPE = 'shipping';
 
     const BILLING_TYPE = 'billing';
@@ -1011,6 +1016,67 @@ class Tools_StoreMailWatchdog implements Interfaces_Observer  {
         }
 
         return '';
+    }
+
+    /**
+     * Send location inventory email notification
+     *
+     * @return bool
+     * @throws Exceptions_SeotoasterException
+     */
+    private function _sendLocationinventorynotificationMail()
+    {
+        $bccArray = array();
+        switch ($this->_options['recipient']) {
+            case Tools_Security_Acl::ROLE_SUPERADMIN:
+            case self::RECIPIENT_ADMIN:
+            case self::RECIPIENT_SALESPERSON:
+            case self::RECIPIENT_CUSTOMER:
+            case Tools_Security_Acl::ROLE_MEMBER:
+                $locationEmails = $this->_options['notificationData']['locationEmail'];
+                if(!empty($locationEmails)){
+                    $locationEmails = explode(',', $locationEmails);
+                    $firstEmail = array_shift($locationEmails);
+
+                    $this->_mailer->setMailToLabel('Notified user')->setMailTo($firstEmail);
+                    if(!empty($locationEmails)){
+                        foreach ($locationEmails as $locationEmail) {
+                            array_push($bccArray, $locationEmail);
+                        }
+                    }
+                    break;
+                } else {
+                    return false;
+                }
+            default:
+                error_log('Unsupported recipient '.$this->_options['recipient'].' given');
+                return false;
+                break;
+        }
+
+        if(!empty($bccArray)){
+            $this->_mailer->setMailBcc($bccArray);
+        }
+
+        $preparedProducts = '';
+        $products = $this->_options['notificationData']['products'];
+
+        if(!empty($products)){
+            foreach ($products as $product) {
+                $preparedProducts .= $product . '</br>';
+            }
+        }
+
+        $this->_entityParser->addToDictionary(
+            array(
+                'order:id' => $this->_options['notificationData']['orderId'],
+                'location:name' => $this->_options['notificationData']['locationName'],
+                'location:products' => $preparedProducts,
+            )
+        );
+
+        $status = $this->_send();
+        return $status;
     }
 
 }

@@ -32,21 +32,25 @@ class Store_Mapper_PickupLocationMapper extends Application_Model_Mappers_Abstra
             $model = new $this->_model($model);
         }
         $data = array(
-            'address1'             => $model->getAddress1(),
-            'address2'             => $model->getAddress2(),
-            'zip'                  => $model->getZip(),
-            'country'              => $model->getCountry(),
-            'city'                 => $model->getCity(),
-            'working_hours'        => $model->getWorkingHours(),
-            'phone'                => $model->getPhone(),
-            'location_category_id' => $model->getLocationCategoryId(),
-            'name'                 => $model->getName(),
-            'lat'                  => $model->getLat(),
-            'lng'                  => $model->getLng(),
-            'notes'                => $model->getNotes(),
-            'weight'               => $model->getWeight(),
-            'external_id'          => $model->getExternalId(),
-            'allowed_to_delete'    => $model->getAllowedToDelete()
+            'address1'                => $model->getAddress1(),
+            'address2'                => $model->getAddress2(),
+            'zip'                     => $model->getZip(),
+            'country'                 => $model->getCountry(),
+            'state'                   => $model->getState(),
+            'city'                    => $model->getCity(),
+            'working_hours'           => $model->getWorkingHours(),
+            'phone'                   => $model->getPhone(),
+            'location_category_id'    => $model->getLocationCategoryId(),
+            'name'                    => $model->getName(),
+            'lat'                     => $model->getLat(),
+            'lng'                     => $model->getLng(),
+            'notes'                   => $model->getNotes(),
+            'weight'                  => $model->getWeight(),
+            'external_id'             => $model->getExternalId(),
+            'allowed_to_delete'       => $model->getAllowedToDelete(),
+            'cash_register_id'        => $model->getCashRegisterId(),
+            'email'                   => $model->getEmail(),
+            'send_email_notification' => $model->getSendEmailNotification(),
         );
         if ($model->getId() === null) {
             $result = $this->getDbTable()->insert($data);

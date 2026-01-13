@@ -22,7 +22,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     ?>
 </div>
 <input type="hidden" name="system-language" value="<?php echo Tools_Misc::getJsTranslationLanguage(); ?>"/>
-<div id="manage-pickup-locations">
+<div id="manage-pickup-locations" class="seotoaster f-container">
     <?php
     echo $this->partial(
         'admin' . DIRECTORY_SEPARATOR . '_header.phtml',
@@ -49,7 +49,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
     <?php if (empty($this->pickupLocationsCategories)): ?>
         <?php $hidden = 'hidden'; ?>
     <?php endif; ?>
-    <div id="pickup-location-config" class="content <?php echo $hidden; ?>">
+    <div id="pickup-location-config" class="<?php echo $hidden; ?>">
         <label class="category-label grid_3 mt10px"><?php echo $this->translate('Change category name'); ?></label>
         <input class="change-category-label grid_3 mt5px" name="change-category-label"/>
         <div class="grid_2 mt10px"><span class="imported-category"></span></div>
@@ -66,16 +66,17 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <img src="'<?php echo $this->websiteUrl; ?>system/images/noimage.png'" width="50"/>
             <?php endif; ?>
         </div>
-        <form id="edit-pickup-location" class="grid_12 background mt10px mb15px" method="POST">
-            <fieldset class="column_4 full-width">
-                <p>
+        <form id="edit-pickup-location" class="grid_12 background mt10px mb10px" method="POST">
+            <fieldset class="column_4">
+                <legend class="large mb5px"><?php echo $this->translate('Location information');?></legend>
+                <p class="mt0px">
                     <label><?php echo $this->translate('Name'); ?></label>
-                    <input type="text" name="location-name" class="location-name"/>
+                    <input type="text" required name="location-name" class="location-name"/>
                 </p>
 
                 <p class="mt0px">
                     <label><?php echo $this->translate('Address 1'); ?></label>
-                    <input type="text" name="address1" class="location-address1"/>
+                    <input type="text" required name="address1" class="location-address1"/>
                 </p>
 
                 <p class="mt0px">
@@ -85,20 +86,26 @@ $this->headScript()->setAllowArbitraryAttributes(true)
 
                 <p class="mt0px">
                     <label><?php echo $this->translate('City'); ?></label>
-                    <input type="text" name="city" class="location-city"/>
+                    <input type="text" required name="city" class="location-city"/>
                 </p>
 
                 <p>
                     <label><?php echo $this->translate('Zip'); ?></label>
-                    <input type="text" name="zip" class="location-zip"/>
+                    <input type="text" required name="zip" class="location-zip"/>
                 </p>
 
                 <p>
                     <label><?php echo $this->translate('Country'); ?></label>
-                    <select name="country" class="location-country">
+                    <select name="country" required class="location-country">
                         <?php foreach ($this->countries as $countryCode => $country): ?>
                             <option value="<?php echo $this->defaultCountries[$countryCode]; ?>"><?php echo $country; ?></option>
                         <?php endforeach; ?>
+                    </select>
+                </p>
+                <p class="state-block hide">
+                    <label><?php echo $this->translate('State'); ?></label>
+                    <select name="state" class="location-state">
+                        <option value=""><?php echo $this->translate('Select state'); ?></option>
                     </select>
                 </p>
                 <p>
@@ -110,15 +117,33 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                     <label><?php echo $this->translate('Weight limit'); ?></label>
                     <input type="text" name="weight" class="location-weight"/>
                 </p>
+                <p>
+                    <label><?php echo $this->translate('Email'); ?></label>
+                    <input type="text" name="email" class="location-email" placeholder="first email,second email,..."/>
+                </p>
+                <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                    <p class="grid_6 omega">
+                        <label><?php echo $this->translate('Cash registers info'); ?></label>
+                        <textarea id="cash-register-id-view" disabled name="cash-register-id-view" class="cash-register-id-view"></textarea>
+                    </p>
+                <?php endif;?>
             </fieldset>
-
-            <p class="grid_3 mt15px text-center" id="working_hours">
+            <p class="grid_3 mt15px text-center alpha" id="working_hours">
                 <a class="working-hours-dialog" href="javascript:;">[ <?php
                     echo $this->translate(
                         'Working hours'
                     );
                 ?> ]</a>
             </p>
+            <?php if(!empty($this->isPluginWithTagPosExist)):?>
+                <p class="grid_3 mt15px text-center alpha" id="cash-register-id-block">
+                    <a class="cash-register-id-dialog" href="javascript:;">[ <?php echo $this->translate('Cash register ids');?> ]</a>
+                </p>
+            <?php endif;?>
+            <label class="grid_3 omega mt15px mb0px "><?php echo $this->translate('Send email notification'); ?>
+                <input id="send-email-notification" class="send-email-notification" type="checkbox" name="sendEmailNotification" value="1"/>
+            </label>
+
             <input type="hidden" name="id" id="location-edit-id"/>
             <input type="hidden" name="locationExternalId" id="location-external-id" value="" />
             <input type="hidden" name="locationAllowedToDelete" id="location-allowed-to-delete" value="" />
@@ -163,8 +188,15 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 <input type="text" name="working-hours-saturday"/>
             </p>
         </div>
+        <?php if(!empty($this->isPluginWithTagPosExist)):?>
+            <div class="cash-register-id-list pt10px hide" title="<?php echo $this->translate('Cash register ids'); ?>">
+                <div class="f-scroll cash-register-block h450px" style="height: 100%;">
+
+                </div>
+            </div>
+        <?php endif;?>
         <div class="grid_12 location-table">
-            <table id="pickup-locations-table" class="table-striped table-hover small mb10px">
+            <table id="pickup-locations-table" class="table-striped table-hover small">
                 <thead class="header-inner">
                 <tr>
                     <th><?php echo $this->translate('Name'); ?></th>
@@ -183,7 +215,7 @@ $this->headScript()->setAllowArbitraryAttributes(true)
                 </tfoot>
             </table>
         </div>
-        <footer class="grid_12">
+        <footer class="grid_12 mt0px">
             <a id="delete-pickup-location-category" class="delete-selected-category error"
                href="javascript:;">[ <?php echo $this->translate('Delete location category'); ?> ]</a>
         </footer>
