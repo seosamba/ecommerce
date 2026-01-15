@@ -303,7 +303,13 @@ define([
                 buttons: supplierButtons,
                 close: function (event, ui) {
                     $(this).dialog('destroy');
-                }
+                },
+                open: function () {
+                    $(this)
+                        .parent()
+                        .find('.ui-dialog-buttonpane button:contains("' + applyButton + '")')
+                        .addClass('btn green');
+                },
             });
             return false;
 
@@ -382,6 +388,12 @@ define([
                             resizable:false,
                             buttons: assignEmailService,
                             open: function(event, ui) {
+
+                                $(this)
+                                    .parent()
+                                    .find('.ui-dialog-buttonpane button:contains("' + applyButton + '")')
+                                    .addClass('btn green');
+
                                 $('#marketing-services').on('change',  function(){
                                     if($("#marketing-services option:selected").val() != 'select'){
                                         $.ajax({
