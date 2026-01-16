@@ -9,7 +9,7 @@ require.config({
         'backbone.paginator'  : '../../libs/backbone/backbone.paginator.min',
         'text'      : '../../libs/require/text',
         'i18n'  : '../../libs/require/i18n',
-        'tinyMCE':'../../../../../../system/js/external/tinymce/tinymce.min'
+        'tinyMCE':'../../../../../../system/js/external/tinymce5/tinymce.min'
     },
     shim: {
         underscore: {exports: '_'},
