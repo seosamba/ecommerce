@@ -43,7 +43,7 @@ $this->headScript()
             </div>
          	<div class="grid_12 alpha client-email client-info">
                 <b class="grid_3 mt5px"><?php echo $this->translate('Email');?>:</b>
-                <div class="grid_9 omega">
+                <div class="grid_9 omega alpha">
                     <a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data edit-client-email"><?php echo $this->customer->getEmail();?></span></a>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                         <input class="edit-client-email-input edit-client-profile grid_7 alpha" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
