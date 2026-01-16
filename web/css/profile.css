@@ -42,25 +42,25 @@ table#orders-table td.shipping-data p { margin:0; }
 	cursor: pointer;
 }
 #profile .profile-header ul.stats li.total {
-	background-color: #87ceeb;
+	background-color: #2A7396;
 }
 #profile .profile-header ul.stats li.new {
-	background-color: #32cd32;
+	background-color: #2C9CA0;
 }
 #profile .profile-header ul.stats li.completed {
-	background-color: #666666;
+	background-color: #25A98C;
 }
 #profile .profile-header ul.stats li.pending {
-	background-color: #ff7f50;
+	background-color: #D99A3B;
 }
 #profile .profile-header ul.stats li.shipped {
-	background-color: #9FC569;
+	background-color: #1E7F6B;
 }
 #profile .profile-header ul.stats li.delivered {
-	background-color: #32cd32;
+	background-color: #0F5C50;
 }
 #profile .profile-header ul.stats li.recurring_orders {
-    background-color: #32cd32;
+    background-color: #3399CC;
 }
 
 /* Profile address */
