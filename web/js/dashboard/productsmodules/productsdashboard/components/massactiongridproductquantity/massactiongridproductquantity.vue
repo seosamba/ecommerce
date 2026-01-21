@@ -31,7 +31,7 @@
             <label class="fl-left mt10px pointer matching-filter">{{$t('message.dialogAllProductsMatchingFilter')}}
               <input v-model="matchingFilter" @change.prevent="countProducts($event)" id="assign-price-all-products-matching-filter" class="allInventoryFilterProducts" type="checkbox" name="allInventoryFilterProducts" value="0"/>
             </label>
-            <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6" :value="ucFirstAllText($t('message.apply'))">
+            <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6 green" :value="ucFirstAllText($t('message.apply'))">
           </p>
         </form>
       </div>

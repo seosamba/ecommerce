@@ -29,7 +29,7 @@
             <label class="fl-left mt10px pointer matching-filter">{{$t('message.dialogAllProductsMatchingFilter')}}
               <input v-model="matchingFilter" @change.prevent="countProducts($event)" id="assign-price-all-products-matching-filter" class="allTemplateFilterProducts" type="checkbox" name="allTemplateFilterProducts" value="0"/>
             </label>
-            <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6" :value="$t('message.apply')">
+            <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6 green" :value="$t('message.apply')">
           </p>
         </form>
       </div>

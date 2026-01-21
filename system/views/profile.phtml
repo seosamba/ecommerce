@@ -18,7 +18,7 @@ $this->headScript()
             <div class="grid_12 alpha client-prefix client-info">
                 <b class="grid_3 mt10px"><?php echo $this->translate('Prefix');?>:</b>
                 <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
-                    <select class="edit-client-prefix grid_5" data-client-param="prefix" name="edit-client-prefix" >
+                    <select class="edit-client-prefix grid_5 alpha" data-client-param="prefix" name="edit-client-prefix" >
                         <option value=""><?php echo $this->translate('Select'); ?></option>
                         <?php $prefix = $this->customer->getPrefix();?>
                         <?php foreach ($this->userPrefixes as $userPrefixKey => $userPrefixVal): ?>
@@ -30,24 +30,24 @@ $this->headScript()
             </div>
 			<div class="grid_12 alpha client-fullname client-info">
                 <b class="grid_3"><?php echo $this->translate('Full name');?>:</b>
-                <div class="grid_9 omega">
+                <div class="grid_9 omega alpha">
                     <span class="edit-client-fullname inline-data"><?php echo $this->customer->getFullName();?></span>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                         <input class="edit-client-fullname-input edit-client-profile grid_7 alpha" style="display:none;" type="text" data-client-param="fullname" name="edit-client-fullname-input" />
-                        <img data-client-param="client-fullname" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <img data-client-param="client-fullname" class="edit-inline-profile icon-pencil" src="" />
                     <?php endif;?>
                     <?php if(!empty($this->leadLink)) :?>
-                        <div class="fl-right grid_5 omega"><a target="_blank" class="lead-link btn" title="<?php echo $this->translate('Go to CRM Record'); ?>" href="<?php echo $this->leadLink;?>"><?php echo $this->translate('Go to CRM Record'); ?></a></div>
+                        <div class="fl-right grid_5 omega"><a target="_blank" class="lead-link" title="<?php echo $this->translate('Go to CRM Record'); ?>" href="<?php echo $this->leadLink;?>"><?php echo $this->translate('Go to CRM Record'); ?></a></div>
                     <?php endif;?>
                 </div>
             </div>
          	<div class="grid_12 alpha client-email client-info">
-                <b class="grid_3"><?php echo $this->translate('Email');?>:</b>
-                <div class="grid_9 omega">
+                <b class="grid_3 mt5px"><?php echo $this->translate('Email');?>:</b>
+                <div class="grid_9 omega alpha">
                     <a href="mailto:<?php echo $this->customer->getEmail();?>" class="email"><span class="inline-data edit-client-email"><?php echo $this->customer->getEmail();?></span></a>
                     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>
                         <input class="edit-client-email-input edit-client-profile grid_7 alpha" style="display:none;" type="text" data-client-param="email" name="edit-client-email" />
-                        <img data-client-param="client-email" class="edit-inline-profile" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <img data-client-param="client-email" class="edit-inline-profile icon-pencil" src="" />
                         <input class="secure-token-user" type="hidden" name="<?php echo Tools_System_Tools::CSRF_SECURE_TOKEN;?>" value="<?php echo $this->secureToken;?>" />
                     <?php endif;?>
                     <?php if(!empty($this->allGroups)) :?>
@@ -64,8 +64,8 @@ $this->headScript()
             </div>
 			<div class="grid_12 alpha client-info">
                 <b class="grid_3"><?php echo $this->translate('Info');?>:</b>
-                <div class="grid_9">
-                    <?php echo $this->translate($this->customer->getRoleId()) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?>
+                <div class="grid_9 alpha">
+                    <?php echo trim($this->translate($this->customer->getRoleId())) . ' ' . $this->translate('since') . ' ' . date('jS F, Y', strtotime($this->customer->getRegDate()));?>
                 </div>
             </div>
 			<div class="grid_12 alpha client-info">
@@ -90,10 +90,11 @@ $this->headScript()
                 <div class="grid_12 alpha client-info client-notes">
                     <b class="grid_3 omega" for="client-notes"><?php echo $this->translate('Account notes');?>:</b>
                     <div class="grid_9">
-                        <img data-client-param="client-notes" class="edit-inline-profile ml0px" src="<?php echo $this->websiteUrl; ?>system/images/edit.png" />
+                        <img data-client-param="client-notes" class="edit-inline-profile ml0px icon-pencil" src="" />
                     </div>
-                    <span class="grid_12 mt5px inline-data edit-client-notes"><?php echo $this->customer->getNotes();?></span>
-                    <textarea id="client-notes" class="grid_12 edit-client-profile edit-client-notes-input" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
+                    <div class="grid_3">&nbsp;</div>
+                    <span class="grid_9 mt5px mb10px inline-data edit-client-notes"><?php echo $this->customer->getNotes();?></span>
+                    <textarea id="client-notes" class="grid_12 edit-client-profile edit-client-notes-input mt5px mb10px" style="display:none;" data-client-param="notes" name="edit-client-notes"><?php echo $this->customer->getNotes();?></textarea>
                 </div>
             <?php endif;?>
             <?php if (Tools_Security_Acl::isAllowed(Tools_Security_Acl::RESOURCE_PLUGINS)):?>
@@ -146,13 +147,13 @@ $this->headScript()
 
 <?php if(empty($this->supplier)):?>
 <div id="profile-content" class="mt30px">
-	<ul class="profile-nav">
-		<li><a href="#profile-orders-list"><?php echo $this->translate('Orders');?></a></li>
-		<li><a href="#profile-address-list"><?php echo $this->translate('Addresses');?></a></li>
-		<li><a href="#profile-user-attributes-list"><?php echo $this->translate('User attributes');?></a></li>
+	<ul class="profile-nav detailed-view-statistics-tabs-tab tabs-block">
+		<li data-tab-name="profile-orders-list" class="profile-sub-tab-navigation current"><?php echo $this->translate('Orders');?></li>
+		<li data-tab-name="profile-address-list" class="profile-sub-tab-navigation"><?php echo $this->translate('Addresses');?></li>
+		<li data-tab-name="profile-user-attributes-list" class="profile-sub-tab-navigation"><?php echo $this->translate('User attributes');?></li>
 	</ul>
 
-	<div id="profile-orders-list" class="clearfix">
+	<div id="profile-orders-list" class="clearfix tab-content-block">
 		<table id="orders-table" class="widget">
 			<thead>
 				<tr class="title-table">
@@ -237,7 +238,7 @@ $this->headScript()
                             <?php if(!$order->getRecurringId()):?>
                                 <?php if($order->getStatus() == Models_Model_CartSession::CART_STATUS_COMPLETED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_SHIPPED || $order->getStatus() == Models_Model_CartSession::CART_STATUS_DELIVERED):?>
                                     <a target="_blank" href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/0/">
-                                        <img src="<?php echo $this->websiteUrl;?>system/images/widgets/search.png" alt="<?php echo $this->translate('View invoice');?>" title="<?php echo $this->translate('View invoice');?>"/>
+                                        <i class="ticon-eye large" title="<?php echo $this->translate('View invoice');?>"></i>
                                     </a>
                                     <a href="<?php echo $this->websiteUrl;?>plugin/invoicetopdf/run/createPdfInvoice/cartId/<?php echo $order->getId();?>/dwn/1/">
                                         <img src="<?php echo $this->websiteUrl;?>system/images/download.png" alt="<?php echo $this->translate('Download invoice');?>" title="<?php echo $this->translate('Download invoice');?>"/>
@@ -252,7 +253,7 @@ $this->headScript()
 			</tbody>
 		</table>
 	</div>
-	<div id="profile-address-list" class="clearfix">
+	<div id="profile-address-list" class="clearfix tab-content-block hidden">
     <?php $addressList = $this->customerAddress; ?>
 	<?php if (!empty($addressList)): ?>
 	<?php foreach ($addressList as $billingAddress): ?>
@@ -391,7 +392,7 @@ $this->headScript()
         <p><?php echo $this->translate("You don't have any saved addresses");?></p>
     <?php endif;?>
     </div>
-    <div id="profile-user-attributes-list" class="clearfix">
+    <div id="profile-user-attributes-list" class="clearfix tab-content-block hidden">
         <?php if(!empty($this->userAttributes)):?>
         <span class="grid_6 text-center"><?php echo $this->translate('Attribute name');?></span>
         <span class="grid_6 text-center"><?php echo $this->translate('Attribute value');?></span>
@@ -412,9 +413,9 @@ $this->headScript()
 </div>
 <?php endif;?>
 <script>
-    $('#profile-content').tabs();
-    $('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
-    $('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
+    //$('#profile-content').tabs();
+    //$('div#profile-content > *').removeClass('ui-widget-content ui-corner-bottom');
+    //$('div#profile-content .ui-tabs-nav, div#profile-content .ui-tabs-nav > *').removeClass( "ui-widget-header  ui-corner-top" );
     $(function(){
         var oTable = $('#orders-table').dataTable({
             bPaginate: false,
@@ -435,6 +436,15 @@ $this->headScript()
             if (filter === 'Recurring Orders') filter = 'Recurring order';
             oTable.fnFilter(filter);
         });
+    });
+
+
+    $(document).on('click', '.profile-sub-tab-navigation', function(){
+        $('.profile-sub-tab-navigation').removeClass('current');
+        $(this).addClass('current');
+        var tabElId = $(this).data('tab-name');
+        $('.tab-content-block').addClass('hidden');
+        $('#'+tabElId).removeClass('hidden');
     });
 
     <?php if (Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT)):?>

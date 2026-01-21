@@ -55,39 +55,55 @@ define([
             var self = this;
 
             tinymce.init({
-                script_url: $('#website_url').val() + 'system/js/external/tinymce/tinymce.gzip.php',
                 selector: '#signature',
-                skin: 'seotoaster',
+                skin: 'oxide',
+                promotion: false,
+                branding: false,
+                statusbar: false,
                 menubar: false,
                 resize: false,
-                convert_urls: false,
+
+                forced_root_block: 'p',
                 browser_spellcheck: true,
-                relative_urls: false,
-                statusbar: false,
-                allow_script_urls: true,
-                force_p_newlines: true,
-                forced_root_block: false,
+                convert_urls: false,
+                paste_as_text: true, // forces plain-text paste
                 entity_encoding: "raw",
+
                 plugins: [
-                    "advlist lists link anchor image charmap visualblocks code media table paste textcolor fullscreen"
+                    'advlist autolink link image lists charmap preview code fullscreen hr paste'
                 ],
-                toolbar1: 'link unlink | image | hr | bold italic | fontsizeselect | pastetext | forecolor backcolor | formatselect | code | fullscreen |',
-                fontsize_formats: "8px 10px 12px 14px 16px 18px 24px 36px",
-                block_formats: "Block=div;Paragraph=p;Block Quote=blockquote;Cite=cite;Address=address;Code=code;Preformatted=pre;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6",
-                extended_valid_elements: "a[*],input[*],select[*],textarea[*]",
-                image_advtab: true,
+
+                toolbar: [
+                    'link unlink | image | hr | bold italic | fontsizeselect', // row 1
+                    'forecolor backcolor | styleselect | pastetext | code | fullscreen' // row 2
+                ],
+
+                formats: {
+                    cite: { block: 'cite', wrapper: false },
+                    address: { block: 'address', wrapper: false },
+                    codeblock: { block: 'code', wrapper: false }
+                },
+
+                style_formats: [
+                    { title: 'Paragraph', block: 'p' },
+                    { title: 'Heading 2', block: 'h2' },
+                    { title: 'Heading 3', block: 'h3' },
+                    { title: 'Block Quote', block: 'blockquote' },
+                    { title: 'Cite', format: 'cite' },
+                    { title: 'Address', format: 'address' },
+                    { title: 'Code Block', format: 'codeblock' }
+                ],
+
                 setup: function (ed) {
                     var keyTime = null;
-                    ed.on('change keyup', function (ed, e) {
-                        //@see content.js for this function
+                    ed.on('change blur keyup', function (ed, e) {
                         self.dispatchEditorKeyup(ed, e, keyTime);
-                        this.save();
                     });
-                    ed.on('blur', function (ed, e) {
+                    ed.on('blur', function () {
                         editUserProfileSendAjax('signature', tinymce.activeEditor.getContent());
                     });
                 }
-            })
+            });
         }
     });
 

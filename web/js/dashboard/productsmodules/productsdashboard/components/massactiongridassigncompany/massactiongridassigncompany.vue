@@ -35,7 +35,7 @@
         </label>
       </p>
       <p class="grid_3 fl-right mt10px">
-        <input @click.prevent="submitRegularForm" type="submit" class="btn grid_12" :value="$t('message.apply')">
+        <input @click.prevent="submitRegularForm" type="submit" class="btn grid_12 green" :value="$t('message.apply')">
       </p>
     </div>
 </template>
