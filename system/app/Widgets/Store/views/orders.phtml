@@ -226,7 +226,7 @@ $this->headLink()
                 <label><input type="checkbox" id="is-a-gift" name="is-a-gift" <?php echo ((!empty($this->presetConfig['is_a_gift']))) ? "checked" : ''; ?>> <?php echo $this->translate('Is a gift');?></label>
             </div>
             <div class="flex_12 f-alpha f-omega text-right">
-                <button class="btn green ticon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
+                <button class="btn ticon-checkmark" name="filter-apply" id="orders-filter-apply-btn"><?php echo $this->translate('Apply filter');?></button>
                 <button class="btn red ticon-reload" name="filter-reset" id="orders-filter-reset-btn"><?php echo $this->translate('Reset all filters');?></button>
             </div>
         </div>
