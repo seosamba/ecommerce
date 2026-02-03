@@ -51,7 +51,7 @@
               <td>
                 <span>
                   <select @change="updateProp($event, index, 'pageTemplate')" name="product-list-templates">
-                    <option v-for="prodTemplate in gridInfo.productTemplatesList" :checked="prodTemplate === productsGridInfo.pageTemplate" :value="prodTemplate">{{prodTemplate}}</option>
+                    <option v-for="prodTemplate in gridInfo.productTemplatesList" :selected="prodTemplate === productsGridInfo.pageTemplate" :value="prodTemplate">{{prodTemplate}}</option>
                   </select>
                 </span>
               </td>
