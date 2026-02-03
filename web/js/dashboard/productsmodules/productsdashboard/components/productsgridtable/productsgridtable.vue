@@ -14,6 +14,7 @@
             <th>{{$t('message.name')}}</th>
             <th>{{$t('message.stock')}}</th>
             <th>{{$t('message.brand')}}</th>
+            <th>{{$t('message.productTemplate')}}</th>
             <th>{{$t('message.suppliers')}}</th>
             <th>{{$t('message.sku')}}</th>
             <th>{{$t('message.mpn')}}</th>
@@ -45,6 +46,13 @@
               <td>
                 <span>
                   {{productsGridInfo.brandName}}
+                </span>
+              </td>
+              <td>
+                <span>
+                  <select @change="updateProp($event, index, 'pageTemplate')" name="product-list-templates">
+                    <option v-for="prodTemplate in gridInfo.productTemplatesList" :selected="prodTemplate === productsGridInfo.pageTemplate" :value="prodTemplate">{{prodTemplate}}</option>
+                  </select>
                 </span>
               </td>
               <td>

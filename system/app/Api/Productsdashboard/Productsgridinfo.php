@@ -66,12 +66,24 @@ class Api_Productsdashboard_Productsgridinfo extends Api_Service_Abstract
             }
         }
 
+        $templateMapper = Application_Model_Mappers_TemplateMapper::getInstance();
+        $productTemplatesList = array();
+        $productTemplates = $templateMapper->findByType(Application_Model_Models_Template::TYPE_PRODUCT);
+        if (!empty($productTemplates)) {
+            foreach ($productTemplates as $template) {
+                $productTemplatesList[] = $template->getName();
+            }
+
+            asort($productTemplatesList);
+        }
+
         $data = array();
         $data['data'] = array();
         $data['gridInfo'] = array(
             'brands' => $brands,
             'tags' => $tags,
             'inventory' => $inventoryData,
+            'productTemplatesList' => $productTemplatesList
         );
 
         $data['currencyInfo'] = Tools_Misc::getCurrencyInfo();
