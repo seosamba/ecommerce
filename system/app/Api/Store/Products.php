@@ -271,6 +271,8 @@ class Api_Store_Products extends Api_Service_Abstract {
                     $where .= $whereSplitSearch;
                 }
 
+                $additionalParams = array( 'pageTemplate' => 'p.template_id');
+
                 $products = $this->_productMapper->fetchAllData(
                     $where,
                     $order,
@@ -279,7 +281,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                     false,
                     false,
                     '',
-                    array(),
+                    $additionalParams,
                     $includesTags,
                     $useSearch
                 );

@@ -491,7 +491,7 @@ class Models_Mapper_CartSessionMapper extends Application_Model_Mappers_Abstract
         $result = $this->getDbTable()->fetchRow($select);
 
         $existedPurchase = false;
-        if(sizeof($result)){
+        if(!empty($result)){
             $existedPurchase = true;
         }
         return $existedPurchase;

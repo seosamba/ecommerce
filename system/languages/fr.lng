@@ -876,6 +876,7 @@
         'condition_used' => 'Used',
         'Group already exists' => 'Le groupe existe déjà',
         'Sorry, there are no products matching selected filters.' => 'Désolé, aucun produit ne correspond aux filtres sélectionnés.',
-        'Disable backorder products' => 'Désactiver les produits en rupture de stock'
+        'Disable backorder products' => 'Désactiver les produits en rupture de stock',
+        'shopping_Copy file path' => 'Copy file path'
 
 );?>

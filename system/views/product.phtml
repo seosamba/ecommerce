@@ -292,6 +292,7 @@ $this->headLink()
                                 $uploader = $this->toasterUploader(array('id' => 'product-teaser-uploader','caller' => 'media', 'noMultiupload' => true, 'filters' => array("imageWithWebpSupport"), 'caption' => " "));
                                 echo $uploader;
                             ?>
+                            <input class="convert-preview-to-webp" style="display: none" type="checkbox" checked>
                         </div>
                     </div>
                     <div class="grid_9 alpha omega mt0px">
@@ -300,7 +301,7 @@ $this->headLink()
                             <?php echo $this->translate('Digital product'); ?>
                             <input type="checkbox" id="digital-product"/>
                         </label>
-                        <label class="grid_4 omega fs12 text-right pointer mt5px">
+                        <label class="grid_4 omega fs12 text-right pointer mt5px mb15px">
                             <?php echo $this->translate('Product enabled'); ?>
                             <input type="checkbox" id="product-enabled"/>
                         </label>
@@ -603,3 +604,10 @@ $this->headLink()
 		});
 	});
 </script>
+
+<style>
+    .textarea-bg.error{
+        border-color: #E74C3C!important;
+        color: #E74C3C!important;
+    }
+</style>

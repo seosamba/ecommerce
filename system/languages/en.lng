@@ -71,5 +71,6 @@
     'Condition'     => 'Condition',
     'condition_new' => 'New',
     'condition_refurbished' => 'Refurbished',
-    'condition_used'        => 'Used'
+    'condition_used'        => 'Used',
+    'shopping_Copy file path' => 'Copy file path'
 );

@@ -887,10 +887,10 @@ define([
             }
 
             if (!this.model.has('shortDescription') || $.trim(this.model.get('shortDescription')) === ''){
-                this.$('#product-shortDescription').addClass('error');
+                this.$('#product-shortDescription').closest('div').addClass('error');
                 error = true || error;
             } else {
-                this.$('#product-shortDescription').removeClass('error');
+                this.$('#product-shortDescription').closest('div').removeClass('error');
             }
 
             return !error;
