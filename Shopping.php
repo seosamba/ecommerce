@@ -286,12 +286,13 @@ class Shopping extends Tools_Plugins_Abstract {
 		$acl->allow(self::ROLE_SALESPERSON, self::RESOURCE_STORE_MANAGEMENT);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_ADMINPANEL);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_MEDIA);
-		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PAGES);
+		//$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PAGES);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS_MENU);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PLUGINS);
 		$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_THEMES);
-        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
+        //$acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_CONFIG);
         $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_USERS);
+        $acl->allow(self::ROLE_SALESPERSON, Tools_Security_Acl::RESOURCE_PANEL_LOGO);
 
 		Zend_Registry::set('acl', $acl);
         Tools_System_Tools::firePluginMethodByTagName('salespermission', 'extendPermission');
