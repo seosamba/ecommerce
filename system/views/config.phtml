@@ -49,7 +49,7 @@ $this->headLink()
 			<?php foreach ($subform->getElements() as $elem):?>
 			<div>
                 <?php $elemName = $elem->getName();?>
-                <?php if ($elemName !== 'operationalHours' && $elemName !== 'useOperationalHoursForOrders' && $elemName !== 'useOperationalHoursForOrdersMessage' && $elemName !== 'disableOutOfStock') :?>
+                <?php if ($elemName !== 'operationalHours' && $elemName !== 'useOperationalHoursForOrders' && $elemName !== 'useOperationalHoursForOrdersMessage' && $elemName !== 'disableOutOfStock' && $elemName !== 'pickupSlaGa' && $elemName !== 'pickupMethodGa') :?>
                     <?php $labelText = $this->translate($elem->getLabel());?>
                     <?php $elem->setLabel($labelText);?>
 				    <?php echo $elem->renderLabel();?>
@@ -212,6 +212,25 @@ $this->headLink()
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
+
+                <div class="grid_12 omega alpha">
+                    <fieldset class="background">
+                        <legend class="background p5px"><?php echo $this->translate('Pickup Settings (Google Merchant)');?></legend>
+                        <p class="grid_6">
+                            <label for="pickupMethodGa" class="mt10px"><?php echo $this->translate('Pickup Method');?></label>
+                            <?php $pickupMethodGaEl = $subform->getElement('pickupMethodGa');?>
+                            <?php echo $pickupMethodGaEl->renderViewHelper();?>
+                        </p>
+                        <p class="grid_6">
+                            <label for="pickupSlaGa" class="mt10px"><?php echo $this->translate('Pickup SLA');?></label>
+                            <?php $pickupSlaGaEl = $subform->getElement('pickupSlaGa');?>
+                            <?php echo $pickupSlaGaEl->renderViewHelper();?>
+                        </p>
+
+                        <small class="grid_6 prefix_6"><?php echo $this->translate('Pickup SLA requires Pickup Method.');?></small>
+                    </fieldset>
+                </div>
+
                 <div class="grid_12">
                     <a href="<?php echo $this->websiteUrl; ?>sitemapproducts.xml" target="_blank">
                         <?php echo $this->translate('Your Google products XML feed'); ?>
@@ -371,6 +390,43 @@ $this->headLink()
         }
 
         return true;
+    });
+
+    $(document).ready(function () {
+
+        function togglePickupSla() {
+            var method = $('#pickupMethodGa').val();
+
+            if (method === "0") {
+                $('#pickupSlaGa').val("0").prop('disabled', true);
+            } else {
+                $('#pickupSlaGa').prop('disabled', false);
+            }
+        }
+
+        function validatePickup() {
+            var method = $('#pickupMethodGa').val();
+            var sla = $('#pickupSlaGa').val();
+
+            if (method === "0" && sla !== "0") {
+                showMessage('<?php echo $this->translate('Pickup SLA requires Pickup Method.');?>', true, 5000);
+                $('#pickupSlaGa').val("0").prop('disabled', true);
+            }
+        }
+
+        // Initial state on page load
+        togglePickupSla();
+
+        // When Method changes
+        $(document).on('change', '#pickupMethodGa', function () {
+            togglePickupSla();
+        });
+
+        // When SLA changes
+        $(document).on('change', '#pickupSlaGa', function () {
+            validatePickup();
+        });
+
     });
 
 <?php $this->jQuery()->onLoadCaptureEnd();?>

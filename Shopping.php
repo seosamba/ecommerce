@@ -361,6 +361,10 @@ class Shopping extends Tools_Plugins_Abstract {
                         $subFormValues['limitQty'] = strip_tags($subFormValues['limitQty'], '<br><a><hr>');
                     }
 
+                    if (isset($subFormValues['pickupMethodGa']) && empty($subFormValues['pickupMethodGa'])){
+                        $subFormValues['pickupSlaGa'] = '0';
+                    }
+
 					$this->_configMapper->save($subFormValues);
 				}
 				$this->_jsonHelper->direct($form->getValues());

@@ -38,6 +38,30 @@ class Forms_OperationsSettings extends Zend_Form {
             'class' => 'grid_6 alpha'
         ));
 
+        $pickupSlaGaOptions = Tools_Misc::$_pickupSlaGm;
+        $pickupSlaGaOptions = array_merge(array('0' => $translator->translate('-- Not Set --')), $pickupSlaGaOptions);
+        foreach ($pickupSlaGaOptions as $key => $pickupSlaGaOption) {
+            $pickupSlaGaOptions[$key] = $translator->translate($pickupSlaGaOption);
+        }
+
+        $this->addElement('select', 'pickupSlaGa', array(
+            'label'             => 'Pickup Sla',
+            'class'             => '',
+            'disableTranslator' => 'true',
+            'multiOptions'      => $pickupSlaGaOptions
+        ));
+
+        $pickupMethodGmOptions = Tools_Misc::$_pickupMethodGm;
+        foreach ($pickupMethodGmOptions as $key => $pickupMethodGmOption) {
+            $pickupMethodGmOptions[$key] = $translator->translate($pickupMethodGmOption);
+        }
+        $pickupMethodGmOptions = array_merge(array('0' => $translator->translate('-- Not Set --')), $pickupMethodGmOptions);
+        $this->addElement('select', 'pickupMethodGa', array(
+            'label'             => 'Pickup method',
+            'class'             => '',
+            'disableTranslator' => 'true',
+            'multiOptions'      => $pickupMethodGmOptions
+        ));
 
         $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
         array_pop($timezones);
