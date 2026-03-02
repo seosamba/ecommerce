@@ -12,7 +12,12 @@ $this->headScript()
 <div class="clearfix profile-header">
 	<div class="grid_5 wrap block-wrap alpha omega t-grid_2">
 		<div class="grid_2 alpha text-center profile-picture">
-			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
+            <?php $profileImageLink = Tools_System_UserTools::getFullProfileImageLink($this->customer->getId());?>
+            <?php if (empty($profileImageLink)):?>
+			    <?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
+            <?php else:?>
+                <img width="80" height="80" class="photo" src="<?php echo $profileImageLink;?>" alt="<?php echo $this->customer->getFullName();?>">
+            <?php endif;?>
 		</div>
 		<div class="grid_10 omega profile-main-info vcard">
             <div class="grid_12 alpha client-prefix client-info">
