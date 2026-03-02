@@ -85,6 +85,10 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
 
     protected $_condition = 'new';
 
+    protected $_pickupMethodProductGa = '';
+
+    protected $_pickupSlaProductGa = '';
+
 
     public function  __construct(array $options = null) {
         parent::__construct($options);
@@ -805,6 +809,38 @@ class Models_Model_Product extends Application_Model_Models_Abstract {
     {
         $this->_condition = $condition;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPickupMethodProductGa()
+    {
+        return $this->_pickupMethodProductGa;
+    }
+
+    /**
+     * @param string $pickupMethodProductGa
+     */
+    public function setPickupMethodProductGa($pickupMethodProductGa)
+    {
+        $this->_pickupMethodProductGa = $pickupMethodProductGa;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPickupSlaProductGa()
+    {
+        return $this->_pickupSlaProductGa;
+    }
+
+    /**
+     * @param string $pickupSlaProductGa
+     */
+    public function setPickupSlaProductGa($pickupSlaProductGa)
+    {
+        $this->_pickupSlaProductGa = $pickupSlaProductGa;
     }
 
 

@@ -798,7 +798,12 @@ AND EXISTS (SELECT name FROM `plugin` where `name` = 'shopping') LIMIT 1;
 
 ALTER TABLE `shopping_cart_session` ADD COLUMN `sales_id` int(10) unsigned DEFAULT NULL;
 
+-- 02/03/2026
+-- version: 3.0.8
+ALTER TABLE `shopping_product` ADD COLUMN `pickup_method_product_ga` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+ALTER TABLE `shopping_product` ADD COLUMN `pickup_sla_product_ga` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL;
+
 -- These alters are always the latest and updated version of the database
-UPDATE `plugin` SET `version`='3.0.8' WHERE `name`='shopping';
+UPDATE `plugin` SET `version`='3.0.9' WHERE `name`='shopping';
 SELECT version FROM `plugin` WHERE `name` = 'shopping';
 
