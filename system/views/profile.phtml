@@ -17,7 +17,12 @@ $this->headScript()
 			    <?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
             <?php else:?>
                 <img id="profile-image" width="80" height="80" class="photo" src="<?php echo $profileImageLink;?>" alt="<?php echo $this->customer->getFullName();?>">
-                <a class="error ml-grid" id="delete-profile-image" href="javascript:;"><?php echo $this->translate('delete');?></a>
+                <?php
+                    $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+                ?>
+                <?php if ($currentUser->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $currentUser->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN):?>
+                    <a class="error ml-grid" id="delete-profile-image" href="javascript:;"><?php echo $this->translate('delete');?></a>
+                <?php endif;?>
             <?php endif;?>
 		</div>
 		<div class="grid_10 omega profile-main-info vcard">
