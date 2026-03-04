@@ -60,6 +60,8 @@ define([
             'click #generate-ai-product-description':'generateAIDescription',
             'click #generate-ai-product-full-description':'generateAIDescription',
             'click #generate-ai-price-suggestion':'generateAIPriceSuggestion',
+            'change #pickup_method_product_ga':'syncPickupFields',
+            'change #pickup_sla_product_ga':'validateConsistency',
 		},
         products: null,
         tags: null,
@@ -219,6 +221,44 @@ define([
                 }
 
             });
+        },
+        syncPickupFields: function(e) {
+            var $method = $('#pickup_method_product_ga');
+            var $sla    = $('#pickup_sla_product_ga');
+
+            var methodVal = $method.val();
+            var slaVal    = $sla.val();
+
+            if (methodVal === '') {
+                $sla.val('').prop('disabled', true);
+                return;
+            }
+
+            if (methodVal === 'exclude') {
+                $sla.val('exclude').prop('disabled', true);
+                return;
+            }
+
+            $sla.prop('disabled', false);
+
+
+            if (slaVal === 'exclude') {
+                $sla.val('');
+            }
+        },
+        validateConsistency: function(e) {
+            var $method = $('#pickup_method_product_ga');
+            var $sla    = $('#pickup_sla_product_ga');
+		    var methodVal = $method.val();
+            var slaVal    = $sla.val();
+
+            if (methodVal === '' && slaVal !== '') {
+                $sla.val('').prop('disabled', true);
+            }
+
+            if (slaVal === 'exclude' && methodVal !== 'exclude') {
+                $sla.val('');
+            }
         },
         newProduct: function(e) {
             e.preventDefault();
@@ -533,12 +573,17 @@ define([
                 this.$('#negative-stock').prop('checked', false);
             }
 
+            this.$('#pickup_method_product_ga').val(this.model.get('pickupMethodProductGa'));
+            this.$('#pickup_sla_product_ga').val(this.model.get('pickupSlaProductGa'));
+
             if(this.model.isNew()){
                 this.$('#product-price').val('');
                 this.$('#product-weight').val('');
                 this.$('#product-width').val('');
                 this.$('#product-length').val('');
                 this.$('#product-depth').val('');
+                this.$('#pickup_method_product_ga').val('');
+                this.$('#pickup_sla_product_ga').val('');
             }
             if (!this.model.isNew()){
                 $('#quick-preview').html(this.quickPreviewTmpl({
@@ -550,6 +595,8 @@ define([
             }
 
             $('#product-supplier').trigger('change');
+
+            this.syncPickupFields();
 
 			hideSpinner();
 		},
@@ -784,6 +831,9 @@ define([
 
             this.model.set({allowance: productAllowanceDate});
             this.model.set({customParams: productCustomParams});
+
+            this.model.set({pickupMethodProductGa :$('#pickup_method_product_ga').val()});
+            this.model.set({pickupSlaProductGa :$('#pickup_sla_product_ga').val()});
 
             var companyProducts = $('#product-supplier').val();
             this.model.set({companyProducts: companyProducts});

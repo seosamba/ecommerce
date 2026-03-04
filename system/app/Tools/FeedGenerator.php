@@ -60,6 +60,11 @@ class Tools_FeedGenerator {
 		if (empty($products)){
 			return false;
 		}
+
+        $configMapper = Models_Mapper_ShoppingConfig::getInstance();
+        $pickupMethodGaGlobal = $configMapper->getConfigParam('pickupMethodGa');
+        $pickupSlaGaGlobal = $configMapper->getConfigParam('pickupSlaGa');
+
 		foreach ($products as $product) {
             $productPage = $product->getPage();
             if(!$productPage instanceof Application_Model_Models_Page) {
@@ -98,6 +103,52 @@ class Tools_FeedGenerator {
                 $item->appendChild($feed->createElement('g:condition', $condition));
             } else {
                 $item->appendChild($feed->createElement('g:condition', 'new'));
+            }
+
+            $addPickupMethodProductGa = false;
+            $addPickupMethodProductGaGlobal = false;
+            $addPickupSlaProductGa = false;
+            $addPickupSlaProductGaGlobal = false;
+            $pickupMethodProductGa = $product->getPickupMethodProductGa();
+            $pickupSlaProductGa = $product->getPickupSlaProductGa();
+            if (!empty($pickupMethodProductGa) && $pickupMethodProductGa === 'exclude') {
+                $addPickupMethodProductGa = false;
+            } elseif (!empty($pickupMethodProductGa)) {
+                $addPickupMethodProductGaGlobal = false;
+                $addPickupMethodProductGa = true;
+            } else {
+                $addPickupMethodProductGaGlobal = true;
+            }
+
+            if (!empty($pickupSlaProductGa) && $pickupSlaProductGa === 'exclude') {
+                $addPickupSlaProductGa = false;
+            } elseif (!empty($pickupSlaProductGa)) {
+                $addPickupSlaProductGaGlobal = false;
+                $addPickupSlaProductGa = true;
+            } else {
+                $addPickupSlaProductGaGlobal = true;
+            }
+
+            if ($addPickupMethodProductGa === true) {
+                $item->appendChild($feed->createElement('g:pickup_method', $pickupMethodProductGa));
+            }
+
+            if ($addPickupSlaProductGa === true) {
+                if (!empty($pickupMethodProductGa) || !empty($pickupMethodGaGlobal)) {
+                    $item->appendChild($feed->createElement('g:pickup_sla', $pickupSlaProductGa));
+                }
+            }
+
+            if ($addPickupMethodProductGaGlobal === true) {
+                if (!empty($pickupMethodGaGlobal)) {
+                    $item->appendChild($feed->createElement('g:pickup_method', $pickupMethodGaGlobal));
+                }
+            }
+
+            if ($addPickupSlaProductGaGlobal === true) {
+                if (!empty($pickupSlaGaGlobal) && (!empty($pickupMethodGaGlobal) || !empty($pickupMethodProductGa))) {
+                    $item->appendChild($feed->createElement('g:pickup_sla', $pickupSlaGaGlobal));
+                }
             }
 
 			$tags = $product->getTags();
