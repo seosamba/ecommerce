@@ -82,6 +82,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
             'minimum_order'     => $model->getMinimumOrder(),
             'negative_stock'    => $model->getNegativeStock(),
             'condition'         => $model->getCondition(),
+            'pickup_method_product_ga' => $model->getPickupMethodProductGa(),
+            'pickup_sla_product_ga'    => $model->getPickupSlaProductGa(),
 		);
 
         $inventory = $data['inventory'];

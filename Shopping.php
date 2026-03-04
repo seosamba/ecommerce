@@ -361,8 +361,16 @@ class Shopping extends Tools_Plugins_Abstract {
                         $subFormValues['limitQty'] = strip_tags($subFormValues['limitQty'], '<br><a><hr>');
                     }
 
+                    if (isset($subFormValues['pickupMethodGa']) && empty($subFormValues['pickupMethodGa'])){
+                        $subFormValues['pickupSlaGa'] = '0';
+                    }
+
 					$this->_configMapper->save($subFormValues);
 				}
+
+                $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+                $cacheHelper->clean('products', Helpers_Action_Cache::PREFIX_SITEMAPS);
+
 				$this->_jsonHelper->direct($form->getValues());
 			} else {
 				$this->_jsonHelper->direct($form->getMessages());
