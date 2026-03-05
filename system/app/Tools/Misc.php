@@ -306,6 +306,30 @@ class Tools_Misc
         "ZWL" => "Zimbabwean Dollar"
     );
 
+    /**
+     * @var string[] Pickup SLA google merchant
+     */
+    public static $_pickupSlaGm = array(
+        'same_day' => 'Same day',
+        'next_day' => 'Next day',
+        '2-day' => '2 Days',
+        '3-day' => '3 Days',
+        '4-day' => '4 Days',
+        '5-day' => '5 Days',
+        '6-day' => '6 Days',
+        'multi-week' => 'Multi-week',
+    );
+
+    /**
+     * @var string[] Pickup method google merchant
+     */
+    public static $_pickupMethodGm = array(
+        'buy' => 'Buy',
+        'reserve' => 'Reserve',
+        'ship to store' => 'Ship to store',
+        'not supported' => 'Not supported',
+    );
+
     public static function getShippingPluginContent($shippingPlugin)
     {
         $className = ucfirst($shippingPlugin);

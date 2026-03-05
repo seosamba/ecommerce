@@ -361,8 +361,16 @@ class Shopping extends Tools_Plugins_Abstract {
                         $subFormValues['limitQty'] = strip_tags($subFormValues['limitQty'], '<br><a><hr>');
                     }
 
+                    if (isset($subFormValues['pickupMethodGa']) && empty($subFormValues['pickupMethodGa'])){
+                        $subFormValues['pickupSlaGa'] = '0';
+                    }
+
 					$this->_configMapper->save($subFormValues);
 				}
+
+                $cacheHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('cache');
+                $cacheHelper->clean('products', Helpers_Action_Cache::PREFIX_SITEMAPS);
+
 				$this->_jsonHelper->direct($form->getValues());
 			} else {
 				$this->_jsonHelper->direct($form->getMessages());
@@ -2676,6 +2684,30 @@ class Shopping extends Tools_Plugins_Abstract {
 
         }
         $this->_responseHelper->fail($this->_translator->translate('Order id missing'));
+    }
+
+    public function deleteProfilePictureAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            if (empty($data['userId'])) {
+                $this->_responseHelper->fail('missing user id');
+            }
+
+            $result = Tools_System_UserTools::deleteProfilePicture($data['userId']);
+            if (!empty($result['error'])) {
+                $this->_responseHelper->fail($result['error']);
+            }
+
+            $this->_responseHelper->success($this->_translator->translate('Profile picture has been deleted'));
+
+        }
     }
 
     public function editUserProfileAddressAction(){

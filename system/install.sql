@@ -193,6 +193,8 @@ CREATE TABLE IF NOT EXISTS `shopping_product` (
   `minimum_order` int(3) unsigned DEFAULT '0',
   `negative_stock` enum('0','1') COLLATE utf8_unicode_ci DEFAULT '0',
   `condition` ENUM('new','refurbished', 'used') DEFAULT 'new',
+  `pickup_method_product_ga` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pickup_sla_product_ga` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `page_id` (`page_id`),

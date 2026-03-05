@@ -362,12 +362,14 @@ $this->headLink()
                             $lexemFullDescription = $this->translate('Full description');
                             $lexemDimensions = $this->translate('Dimensions');
                             $lexemCustomAttributes = $this->translate('Custom attributes');
+                            $lexemPickupOptions = $this->translate('Pickup Options (GM)');
                         ?>
                         <ul>
                             <li><a href="#short-description-tab"><?php echo $lexemShortDescription; ?></a></li>
                             <li><a href="#full-description-tab"><?php echo $lexemFullDescription; ?></a></li>
                             <li><a href="#product-dimensions-tab"><?php echo $lexemDimensions; ?></a></li>
                             <li><a href="#product-custom-attributes-tab"><?php echo $lexemCustomAttributes; ?></a></li>
+                            <li><a href="#product-pickup-method-ga-tab"><?php echo $lexemPickupOptions; ?></a></li>
                         </ul>
                         <div id="short-description-tab">
                             <div class="textarea-bg">
@@ -423,6 +425,54 @@ $this->headLink()
                                     <?php endif;?>
                                 </div>
                             <?php endforeach;?>
+                        </div>
+                        <?php
+                            $pickupSlaGaOptions = Tools_Misc::$_pickupSlaGm;
+                            $pickupSlaGaOptions = array_merge(array(
+                                    '' => $this->translate('-- Inherit global settings --'),
+                                    'exclude' => $this->translate('-- Exclude --')
+                                ), $pickupSlaGaOptions
+                            );
+                            foreach ($pickupSlaGaOptions as $key => $pickupSlaGaOption) {
+                                $pickupSlaGaOptions[$key] = $this->translate($pickupSlaGaOption);
+                            }
+
+                            $pickupMethodGmOptions = Tools_Misc::$_pickupMethodGm;
+                            foreach ($pickupMethodGmOptions as $key => $pickupMethodGmOption) {
+                                $pickupMethodGmOptions[$key] = $this->translate($pickupMethodGmOption);
+                            }
+                            $pickupMethodGmOptions = array_merge(
+                                    array('' => $this->translate('-- Inherit global settings --'),
+                                          'exclude' => $this->translate('-- Exclude --')
+                                    ), $pickupMethodGmOptions
+                            );
+                         ?>
+
+                        <div id="product-pickup-method-ga-tab">
+                            <fieldset class="background">
+                                <legend class="background p5px"><?php echo $this->translate('Pickup Settings (Google Merchant)');?></legend>
+                                <div id="pickup_override_fields">
+                                    <!-- Pickup Method -->
+                                    <p class="grid_6">
+                                        <label for="pickup_method_product_ga"><?php echo $this->translate('Pickup Method');?></label>
+                                        <select name="pickupMethodProductGa" id="pickup_method_product_ga">
+                                            <?php foreach ($pickupMethodGmOptions as $key => $label): ?>
+                                                <option value="<?php echo $key; ?>"><?php echo $label; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </p>
+                                    <!-- Pickup SLA -->
+                                    <p class="grid_6">
+                                        <label for="pickup_sla_product_ga"><?php echo $this->translate('Pickup SLA');?></label>
+                                        <select name="pickupSlaProductGa" id="pickup_sla_product_ga">
+                                            <?php foreach ($pickupSlaGaOptions as $key => $label): ?>
+                                                <option value="<?php echo $key; ?>"><?php echo $label; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </p>
+                                    <small class="grid_6 prefix_6 mb20px"><?php echo $this->translate('Pickup SLA requires Pickup Method.');?></small>
+                                </div>
+                            </fieldset>
                         </div>
                     </div>
                 </div>
