@@ -449,7 +449,10 @@ $this->headScript()
         });
     });
 
-    $(document).on('click', '#delete-profile-image', function(){
+    $(document)
+        .off('click.deleteProfileImage', '#delete-profile-image')
+        .on('click.deleteProfileImage', '#delete-profile-image', function(e){
+
         showConfirmCustom('<?php echo $this->translate("Are you sure you would like to delete profile image?"); ?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>',
             function (){
                 $.ajax({
