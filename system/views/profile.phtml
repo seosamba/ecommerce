@@ -12,7 +12,18 @@ $this->headScript()
 <div class="clearfix profile-header">
 	<div class="grid_5 wrap block-wrap alpha omega t-grid_2">
 		<div class="grid_2 alpha text-center profile-picture">
-			<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
+            <?php $profileImageLink = Tools_System_UserTools::getFullProfileImageLink($this->customer->getId());?>
+            <?php if (empty($profileImageLink)):?>
+			    <?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>
+            <?php else:?>
+                <img id="profile-image" width="80" height="80" class="photo" src="<?php echo $profileImageLink;?>" alt="<?php echo $this->customer->getFullName();?>">
+                <?php
+                    $currentUser = Zend_Controller_Action_HelperBroker::getStaticHelper('session')->getCurrentUser();
+                ?>
+                <?php if ($currentUser->getRoleId() === Tools_Security_Acl::ROLE_ADMIN || $currentUser->getRoleId() === Tools_Security_Acl::ROLE_SUPERADMIN):?>
+                    <a class="error ml-grid" id="delete-profile-image" href="javascript:;"><?php echo $this->translate('delete');?></a>
+                <?php endif;?>
+            <?php endif;?>
 		</div>
 		<div class="grid_10 omega profile-main-info vcard">
             <div class="grid_12 alpha client-prefix client-info">
@@ -438,6 +449,32 @@ $this->headScript()
         });
     });
 
+    $(document)
+        .off('click.deleteProfileImage', '#delete-profile-image')
+        .on('click.deleteProfileImage', '#delete-profile-image', function(e){
+
+        showConfirmCustom('<?php echo $this->translate("Are you sure you would like to delete profile image?"); ?>', '<?php echo $this->translate("Yes"); ?>', '<?php echo $this->translate("No"); ?>',
+            function (){
+                $.ajax({
+                    type: "POST",
+                    url: $('#website_url').val() + 'plugin/shopping/run/deleteProfilePicture/',
+                    dataType: "json",
+                    data: {
+                        userId:         $('#userId').val(),
+                        secureToken:    $('.secure-token-user').val(),
+                    }
+                }).done(function (response) {
+                    if (response.error == 1) {
+                        showMessage(response.responseText, true, 5000);
+                    } else {
+                        showMessage(response.responseText, false, 3000);
+                        $('.profile-picture').html('<?php echo $this->gravatar($this->customer->getEmail(), array('secure'=>true), array('class' => 'photo') ); ?>');
+                    }
+                });
+            }, function () {
+
+            });
+    });
 
     $(document).on('click', '.profile-sub-tab-navigation', function(){
         $('.profile-sub-tab-navigation').removeClass('current');

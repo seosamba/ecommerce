@@ -2686,6 +2686,30 @@ class Shopping extends Tools_Plugins_Abstract {
         $this->_responseHelper->fail($this->_translator->translate('Order id missing'));
     }
 
+    public function deleteProfilePictureAction(){
+        if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
+            $data = $this->_request->getParams();
+
+            $tokenToValidate = $this->_request->getParam(Tools_System_Tools::CSRF_SECURE_TOKEN, false);
+            $valid = Tools_System_Tools::validateToken($tokenToValidate, self::SHOPPING_SECURE_TOKEN);
+            if (!$valid) {
+                exit;
+            }
+
+            if (empty($data['userId'])) {
+                $this->_responseHelper->fail('missing user id');
+            }
+
+            $result = Tools_System_UserTools::deleteProfilePicture($data['userId']);
+            if (!empty($result['error'])) {
+                $this->_responseHelper->fail($result['error']);
+            }
+
+            $this->_responseHelper->success($this->_translator->translate('Profile picture has been deleted'));
+
+        }
+    }
+
     public function editUserProfileAddressAction(){
         if (Tools_Security_Acl::isAllowed(self::RESOURCE_STORE_MANAGEMENT) && $this->_request->isPost()) {
             $data = $this->_request->getParams();
