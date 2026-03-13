@@ -72,9 +72,16 @@ $(document).one('zones:loaded', function () {
         height    : 310,
         width     : 500,
         create    : function () {
-            app.views.countryList.collection = _(app.countries.toJSON()).sortBy(function (c) {
-                return c.name.toLowerCase()
-            });
+            // app.views.countryList.collection = _(app.countries.toJSON()).sortBy(function (c) {
+            //     return c.name.toLowerCase()
+            // });
+
+            app.views.countryList.collection = app.countries
+                .toJSON()
+                .sort(function(a, b) {
+                    return a.name.localeCompare(b.name, '<?php echo $this->locale;?>', { sensitivity: 'base' });
+                });
+
             app.views.countryList.render();
         },
         close     : function (event, ui) {
