@@ -803,6 +803,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->states = Tools_Geo::getState();
 		$this->_view->countries = Tools_Geo::getCountries();
         $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGEZONES;
+        $translator = Zend_Registry::get('Zend_Translate');
+        $locale = $translator->getLocale();
+        $this->_view->locale = $locale;
         $this->_layout->content = $this->_view->render('zones.phtml');
 		echo $this->_layout->render();
 	}
