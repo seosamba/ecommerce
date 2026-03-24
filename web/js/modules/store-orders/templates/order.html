@@ -132,7 +132,7 @@
             <% } %>
         <% } %>
     <% } %>
-    <% if(_.isNull(recurring_id) && useSeosambaPos == 'enabled' && (status == 'completed' || status == 'shipped' || status == 'delivered')) { %>
+    <% if(_.isNull(recurring_id) && useSeosambaPos == 'enabled' && (status == 'completed' || status == 'shipped' || status == 'delivered' || status == 'refunded')) { %>
         <a target="_blank" href="<%= $('#website_url').val() %>plugin/seosambapos/run/createPdfReceipt/cartId/<%= id %>/dwn/0/">
             <img src="<%= $('#website_url').val() %>plugins/seosambapos/web/images/view-pos-receipt.png" alt="<%= _.isUndefined(i18n['View POS receipt']) ? 'View POS receipt':i18n['View POS receipt'] %>" title="<%= _.isUndefined(i18n['View POS receipt']) ? 'View POS receipt':i18n['View POS receipt'] %>"/>
         </a>
