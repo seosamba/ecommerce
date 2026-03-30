@@ -803,6 +803,9 @@ class Shopping extends Tools_Plugins_Abstract {
 		$this->_view->states = Tools_Geo::getState();
 		$this->_view->countries = Tools_Geo::getCountries();
         $this->_view->helpSection = Tools_Misc::SECTION_STORE_MANAGEZONES;
+        $translator = Zend_Registry::get('Zend_Translate');
+        $locale = $translator->getLocale();
+        $this->_view->locale = $locale;
         $this->_layout->content = $this->_view->render('zones.phtml');
 		echo $this->_layout->render();
 	}
@@ -2576,6 +2579,7 @@ class Shopping extends Tools_Plugins_Abstract {
             exit;
         }
         if ($this->_request->isPost() && Tools_Security_Acl::isAllowed(Shopping::RESOURCE_STORE_MANAGEMENT) && $orderId) {
+            $currency = Zend_Registry::get('Zend_Currency');
             $orderModel = Models_Mapper_CartSessionMapper::getInstance()->find($orderId);
             if ($orderModel instanceof Models_Model_CartSession) {
                 $orderStatus = $orderModel->getStatus();
@@ -2654,7 +2658,6 @@ class Shopping extends Tools_Plugins_Abstract {
                         } else {
                             $this->_responseHelper->fail($this->_translator->translate('Payment plugin doesn\'t exists'));
                         }
-                        $currency = Zend_Registry::get('Zend_Currency');
                         $refundSuccessMessage = $this->_translator->translate('You\'ve successfully refunded');
                         $refundSuccessMessage .= ' ' . $currency->toCurrency($refundAmount);
                         $refundSuccessMessage .= ' '. $this->_translator->translate('to your client’s credit card');
@@ -2668,7 +2671,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     $orderModel->registerObserver(new Tools_Mail_Watchdog(array(
                         'trigger' => Tools_StoreMailWatchdog::TRIGGER_REFUND,
                         'refundNotes' => $refundNotes,
-                        'refundAmount' => $refundAmount
+                        'refundAmount' => $currency->toCurrency($refundAmount)
                     )));
                     $orderModel->notifyObservers();
 

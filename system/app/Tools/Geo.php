@@ -36,7 +36,13 @@ class Tools_Geo {
 	            array_push($data, $country);
             }
         }
-        asort($data);
+
+        if ($pairs === true) {
+            $data = Tools_System_Tools::multiLanguageSort($data);
+        } else {
+            asort($data);
+        }
+
 		return $data;
 	}
 	
