@@ -17,7 +17,7 @@
     "@vuepic/vue-datepicker": "^5.1.2",
     "babel-plugin-transform-react-constant-elements": "^6.23.0",
     "babel-preset-react": "^6.24.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "moment": "^2.29.4",
     "c3": "^0.4.24",
     "d3": "^7.8.4",
