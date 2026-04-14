@@ -1404,6 +1404,9 @@ class Shopping extends Tools_Plugins_Abstract {
                 $order->registerObserver(new Tools_InventoryObserver($order->getStatus()));
                 $order->registerObserver(new Tools_SupplierObserver($order->getStatus()));
                 $params = filter_var_array($this->_request->getPost(), FILTER_SANITIZE_STRING);
+                if (!empty($params['status']) && $params['status'] === Models_Model_CartSession::CART_STATUS_COMPLETED) {
+                    $order->setPurchasedOn(Tools_System_Tools::convertDateFromTimezone('now'));
+                }
                 if (isset($params['shippingTrackingId'])) {
                     $shippingUrlMapper = Models_Mapper_ShoppingShippingUrlMapper::getInstance();
                     $selectedName = '';
