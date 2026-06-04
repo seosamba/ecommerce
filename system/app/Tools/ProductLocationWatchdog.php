@@ -3,6 +3,11 @@ class Tools_ProductLocationWatchdog implements Interfaces_Observer
 {
 
     /**
+     * Use this value if global product inventory is infinity
+     */
+    const DEFAULT_LOCATION_INVENTORY = 1000;
+
+    /**
      * Add current product inventory to location inventory if store have only one location with cash register
      * @param $object
      */
@@ -34,6 +39,10 @@ class Tools_ProductLocationWatchdog implements Interfaces_Observer
 
                             if($prodInventory < 0) {
                                 $prodInventory = 0;
+                            }
+
+                            if($prodInventory != "0" && empty($prodInventory)) {
+                                $prodInventory = self::DEFAULT_LOCATION_INVENTORY;
                             }
 
                             if(empty($existedProductLocation) && empty($productLocationsAll)) {
