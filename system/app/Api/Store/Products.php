@@ -499,8 +499,14 @@ class Api_Store_Products extends Api_Service_Abstract {
                             }
                         }
 
-                        if(!empty($locationInventories) && $locationInventories > $srcData['inventory']) {
-                            $this->_error('you cannot set a smaller quantity than that specified for your locations in (POS location inventory) tab.');
+                        $pickupLocations = Tools_Misc::getLocationsData();
+                        $skipAutoUpdateLocationInventory = false;
+                        if(!empty($pickupLocations) && count($pickupLocations) === 1)  {
+                            $skipAutoUpdateLocationInventory = true;
+                        }
+
+                        if(!empty($locationInventories) && $locationInventories > $srcData['inventory'] && !$skipAutoUpdateLocationInventory) {
+                            $this->_error('You cannot set a smaller quantity than that specified for your locations in (POS location inventory) tab.');
                         }
 
                         if(!empty($defaultProductId) && $defaultProductId == $prodId) {
