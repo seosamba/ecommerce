@@ -22,7 +22,7 @@ class Tools_ProductLocationWatchdog implements Interfaces_Observer
                 $defaultLocationId = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('defaultLocationId');
                 $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
 
-                if(!empty($defaultLocationId) && !is_null($prodInventory)) {
+                if(!empty($defaultLocationId)) {
                     $pickupLocations = Tools_Misc::getLocationsData();
 
                     if(!empty($pickupLocations) && count($pickupLocations) === 1)  {
