@@ -133,7 +133,7 @@ class Widgets_Store_Store extends Widgets_Abstract {
             }
 
             $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
-            if($enabledSeosambaPosPlugin != null){
+            if($enabledSeosambaPosPlugin instanceof Application_Model_Models_Plugin){
                 if($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED){
                     $this->_view->seosambaPosPlugin = 1;
                 }

@@ -4624,7 +4624,7 @@ class Shopping extends Tools_Plugins_Abstract {
                 $enableSeosambaPosPlugin = false;
 
                 $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
-                if ($enabledSeosambaPosPlugin != null) {
+                if ($enabledSeosambaPosPlugin instanceof Application_Model_Models_Plugin) {
                     if ($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
                         $enableSeosambaPosPlugin = true;
                     }

@@ -18,7 +18,7 @@ class Tools_ProductLocationWatchdog implements Interfaces_Observer
 
         if(!empty($prodId)) {
             $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
-            if ($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+            if ($enabledSeosambaPosPlugin instanceof Application_Model_Models_Plugin && $enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
                 $defaultLocationId = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('defaultLocationId');
                 $productLocationsMapper = Models_Mapper_ProductLocationsMapper::getInstance();
 
