@@ -482,8 +482,7 @@ class Api_Store_Products extends Api_Service_Abstract {
                 //@todo compare product inventory with plugin seosambapos location inventories
                 if($srcData['inventory'] != '') {
                     $seosambaposPlugin = Tools_Plugins_Tools::findPluginByName('seosambapos');
-
-                    if($seosambaposPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                    if ($seosambaposPlugin instanceof Application_Model_Models_Plugin && $seosambaposPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
                         $prodId = $products->getId();
 
                         $defaultProductSettingsMapper = Seosambapos_Models_Mappers_SeosambaposDefaultproductSettingMapper::getInstance();
