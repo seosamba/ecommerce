@@ -127,9 +127,18 @@ export default {
             }
         },
         async deleteConfigItem(configId){
-            let self = this;
+            let self = this,
+                areYouSure = this.$t('message.areYouSure');
 
-            showConfirm(this.$t('message.areYouSure'), async () => {
+            if(typeof this.additionalInfo.alredayUsedGroupList !== 'undefined') {
+                _.each(this.additionalInfo.alredayUsedGroupList, function (usedGroup, key) {
+                    if(configId == usedGroup.groupId) {
+                        areYouSure = self.$t('message.areYouSureUsedGroup')
+                    }
+                });
+            }
+
+            showConfirm(areYouSure, async () => {
                 const result = await this.$store.dispatch('deleteConfigRecord', {'id': configId});
 
                 if (result.status === 'error') {

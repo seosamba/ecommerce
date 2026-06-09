@@ -1,12 +1,6 @@
 /*!
-  * devtools-if v9.3.0
-  * (c) 2023 kazuya kawaguchi
-  * Released under the MIT License.
-  */
-
-/*!
-  * vue-devtools v9.3.0
-  * (c) 2023 kazuya kawaguchi
+  * shared v9.14.5
+  * (c) 2025 kazuya kawaguchi
   * Released under the MIT License.
   */
 
@@ -16,4 +10,4 @@
   * @license MIT
   */
 
-/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */
