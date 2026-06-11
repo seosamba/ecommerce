@@ -25,7 +25,10 @@ const messages = {
             yes:'yes',
             no:'no',
             changed:'Changed',
-            editGroup:'Edit group'
+            editGroup:'Edit group',
+            areYouSureUsedGroup:'Warning: This customer group is currently assigned to one or more leads. Before deleting it, reassign the affected leads to a different group/type to avoid losing those associations.\n' +
+                'Are you sure you want to proceed?',
+
 
         }
     },
@@ -55,7 +58,10 @@ const messages = {
             yes:'oui',
             no:'non',
             changed:'Modifié',
-            editGroup:'Modifier le groupe'
+            editGroup:'Modifier le groupe',
+            areYouSureUsedGroup:'Attention : ce groupe de clients est actuellement associé à un ou plusieurs prospects. Avant de le supprimer, veuillez réaffecter les prospects concernés à un autre groupe/type afin d’éviter la perte de ces associations.\n' +
+                'Êtes-vous sûr de vouloir poursuivre ?',
+
         }
     }
 

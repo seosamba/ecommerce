@@ -526,4 +526,16 @@ class Models_Mapper_CustomerMapper extends Application_Model_Mappers_Abstract {
 
         return $this->getDbTable()->getAdapter()->fetchAssoc($select);
     }
+
+    public function getCustomerInfoByGroupId($groupId)
+    {
+        $where = $this->getDbTable()->getAdapter()->quoteInto('group_id = ?', $groupId);
+
+        $select = $this->getDbTable()->getAdapter()->select()->from(array('sci' => 'shopping_customer_info'), array(
+            'groupId' => 'group_id'
+        ))->group('sci.group_id')->where($where);
+
+        return $this->getDbTable()->getAdapter()->fetchRow($select);
+    }
+
 }
