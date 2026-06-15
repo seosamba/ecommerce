@@ -74,13 +74,22 @@ class Api_Store_Groupconfig extends Api_Service_Abstract
             $data = $groupMapper->fetchAllData($where, $order, $limit, $offset, false, false);
             $groups = Store_Mapper_GroupMapper::getInstance()->fetchGroupList();
             $groupsList = array();
+            $alredayUsedGroupList = array();
+            $customerMapper = Models_Mapper_CustomerMapper::getInstance();
+
             if (!empty($groups)) {
                 foreach ($groups as $key => $group) {
                     $groupsList[$key] = $group;
+
+                    $groupExist = $customerMapper->getCustomerInfoByGroupId($key);
+                    if(!empty($groupExist)) {
+                        $alredayUsedGroupList[] = $groupExist;
+                    }
                 }
             }
 
             $data['additionalInfo']['groupsList'] = $groupsList;
+            $data['additionalInfo']['alredayUsedGroupList'] = $alredayUsedGroupList;
         }
 
         $data['additionalInfo']['currencyAbbr'] = Models_Mapper_ShoppingConfig::getInstance()->getConfigParam('currency');

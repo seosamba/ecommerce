@@ -52,7 +52,13 @@ $this->headLink()
                 <?php if ($elemName !== 'operationalHours' && $elemName !== 'useOperationalHoursForOrders' && $elemName !== 'useOperationalHoursForOrdersMessage' && $elemName !== 'disableOutOfStock' && $elemName !== 'pickupSlaGa' && $elemName !== 'pickupMethodGa') :?>
                     <?php $labelText = $this->translate($elem->getLabel());?>
                     <?php $elem->setLabel($labelText);?>
-				    <?php echo $elem->renderLabel();?>
+                    <?php if($elem->getId() == 'default-location-id'):?>
+                        <label for="default-location-id" class="grid_6 optional"><?php echo $labelText;?>
+                            <i class="ticon-info tooltip icon18 mb10px" title="<?php echo $this->translate('Used as the default location for inventory deduction when products are purchased through the website. If only one location has connected cash registers, product inventory will be automatically updated for that location when the product inventory changes.');?>"></i>
+                        </label>
+                    <?php else:?>
+                        <?php echo $elem->renderLabel();?>
+                    <?php endif;?>
                     <?php echo $elem->renderViewHelper();?>
                 <?php else: ?>
                     <?php if($elemName === 'operationalHours'):?>

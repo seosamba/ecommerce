@@ -100,6 +100,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$model->registerObserver(new Tools_ProductWatchdog(array(
 				'action' => Tools_Cache_GarbageCollector::CLEAN_ONUPDATE
 			)));
+
+            $model->registerObserver(new Tools_ProductLocationWatchdog());
 		} else {
 			$data['created_at'] = date(Tools_System_Tools::DATE_MYSQL);
 			$id = $this->getDbTable()->insert($data);
@@ -109,6 +111,8 @@ class Models_Mapper_ProductMapper extends Application_Model_Mappers_Abstract {
 			$model->registerObserver(new Tools_ProductWatchdog(array(
 				'action' => Tools_Cache_GarbageCollector::CLEAN_ONCREATE
 			)));
+
+            $model->registerObserver(new Tools_ProductLocationWatchdog());
 		}
 
 		if (!is_null($model->getTags())) {
