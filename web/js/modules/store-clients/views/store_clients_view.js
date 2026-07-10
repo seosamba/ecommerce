@@ -383,6 +383,7 @@ define([
         emailMarketing: function(e){
             var checkedCustomers = this.customers.checked();
             var customerIds = [];
+            var self = this;
 
             if(checkedCustomers.length == 0){
                 return false;
@@ -398,30 +399,39 @@ define([
                 dataType: 'json'
 
             }).done(function(response) {
-                    if(response.error == 1){
-                        showMessage(_.isUndefined(i18n['No available services'])?'No available services':i18n['No available services']);
-                        return false;
-                    }else{
-                        var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
-                        var assignEmailService = {};
-                        var customerIds = response.responseText.clients;
-                        var customerIds = customerIds.split(',');
+                if (response.error == 1) {
+                    showMessage(_.isUndefined(i18n['No available services']) ? 'No available services' : i18n['No available services']);
+                    return false;
+                }
 
+                var applyButton = _.isUndefined(i18n['Apply']) ? 'Apply' : i18n['Apply'];
+                var customerIds = response.responseText.clients.split(',');
 
-                        var enabledServices = response.responseText.enabledServices,
-                            enabledServicesLabels = response.responseText.enabledServicesLabels;
+                var enabledServices = response.responseText.enabledServices,
+                    enabledServicesLabels = response.responseText.enabledServicesLabels;
 
-                        assignEmailService[applyButton] = function() {
+                var assignEmailService = [
+                    {
+                        text: applyButton,
+                        id: 'email-marketing-apply-button',
+                        click: function() {
 
-                            if($("#marketing-services option:selected").val() == 'select'){
-                                showMessage(_.isUndefined(i18n['Please choose service'])?'Please choose service':i18n['Please choose service']);
+                            if (typeof self.formProcessingEmailMarketing !== 'undefined' && self.formProcessingEmailMarketing === true) {
                                 return false;
                             }
 
-                            if($("input:checkbox[name=list]:checked").length == 0){
-                                showMessage(_.isUndefined(i18n['Please choose list'])?'Please choose list':i18n['Please choose list']);
+                            if ($("#marketing-services option:selected").val() == 'select') {
+                                showMessage(_.isUndefined(i18n['Please choose service']) ? 'Please choose service' : i18n['Please choose service']);
                                 return false;
                             }
+
+                            if ($("input:checkbox[name=list]:checked").length == 0) {
+                                showMessage(_.isUndefined(i18n['Please choose list']) ? 'Please choose list' : i18n['Please choose list']);
+                                return false;
+                            }
+
+                            self.formProcessingEmailMarketing = true;
+                            $('#email-marketing-apply-button').prop('disabled', true);
 
                             var lists = [];
                             $("input:checkbox[name=list]:checked").each(function() {
@@ -429,68 +439,75 @@ define([
                             });
 
                             $.ajax({
-                                url: $('#website_url').val()+'plugin/apps/run/sendServicesDashboard/customers/'+customerIds+'/service/'+$("#marketing-services option:selected").val()+'/lists/'+lists,
+                                url: $('#website_url').val() +
+                                    'plugin/apps/run/sendServicesDashboard/customers/' + customerIds +
+                                    '/service/' + $("#marketing-services option:selected").val() +
+                                    '/lists/' + lists,
                                 type: 'POST',
                                 dataType: 'json'
+                            }).done(function(response) {
+                                if (response.error == 0) {
+                                    showMessage(_.isUndefined(i18n['Emails added']) ? 'Emails added' : i18n['Emails added']);
+                                } else {
+                                    showMessage(_.isUndefined(i18n['Something went wrong']) ? 'Something went wrong' : i18n['Something went wrong']);
+                                }
+                            }).always(function() {
+                                self.formProcessingEmailMarketing = false;
+                                $('#email-marketing-apply-button').prop('disabled', false);
+                            });
+                        }
+                    }
+                ];
+
+                var dialog = _.template(EmailServiceDialogTmpl, {
+                    enabledServices: enabledServices,
+                    customerIds: customerIds,
+                    i18n: i18n,
+                    enabledServicesLabels: enabledServicesLabels
+                });
+
+                $(dialog).dialog({
+                    width: 600,
+                    dialogClass: 'seotoaster',
+                    resizable: false,
+                    buttons: assignEmailService,
+                    open: function(event, ui) {
+                        $('#marketing-services').on('change', function(){
+                            if ($("#marketing-services option:selected").val() != 'select') {
+                                $.ajax({
+                                    url: $('#website_url').val() + 'plugin/apps/run/getService/serviceName/' + $("#marketing-services option:selected").val(),
+                                    type: 'GET',
+                                    dataType: 'json'
                                 }).done(function(response) {
-                                    if(response.error == 0){
-                                        showMessage(_.isUndefined(i18n['Emails added'])?'Emails added':i18n['Emails added']);
-                                    }else{
-                                        showMessage(_.isUndefined(i18n['Something went wrong'])?'Something went wrong':i18n['Something went wrong']);
-                                    }
-                                })
-                        };
-
-                        var dialog = _.template(EmailServiceDialogTmpl, {
-                            enabledServices:enabledServices,
-                            customerIds:customerIds,
-                            i18n:i18n,
-                            enabledServicesLabels:enabledServicesLabels
-                        });
-
-                        $(dialog).dialog({
-                            width: 600,
-                            dialogClass: 'seotoaster',
-                            resizable:false,
-                            buttons: assignEmailService,
-                            open: function(event, ui) {
-                                $('#marketing-services').on('change',  function(){
-                                    if($("#marketing-services option:selected").val() != 'select'){
-                                        $.ajax({
-                                            url: $('#website_url').val()+'plugin/apps/run/getService/serviceName/'+$("#marketing-services option:selected").val(),
-                                            type: 'GET',
-                                            dataType: 'json'
-
-                                        }).done(function(response) {
-                                            if(response.error == 1){
-                                                showMessage(_.isUndefined(i18n['No available lists'])?'No available lists':i18n['No available lists']);
-                                                $('#subscribe-list').remove();
-                                                return false;
-                                            }else{
-                                                $('#subscribe-list').remove();
-                                                var subscribeList = '<div class="mt10px" id="subscribe-list">';
-                                                $.each(response.responseText.list, function(value, listName){
-                                                    subscribeList += '<label class="fl-left mr30px pointer">'+listName+' <input type="checkbox" name="list" value="'+value+'"/></label>'
-                                                })
-                                                subscribeList += '</div>';
-                                                $('#marketing-services').after(subscribeList);
-
-                                            }
-
-                                        });
-                                    }else{
+                                    if (response.error == 1) {
+                                        showMessage(_.isUndefined(i18n['No available lists']) ? 'No available lists' : i18n['No available lists']);
                                         $('#subscribe-list').remove();
+                                        return false;
                                     }
-                                })
 
-                            },
-                            close: function(event, ui){
-                                $(this).dialog('close').remove();
+                                    $('#subscribe-list').remove();
+
+                                    var subscribeList = '<div class="mt10px" id="subscribe-list">';
+                                    $.each(response.responseText.list, function(value, listName){
+                                        subscribeList += '<label class="fl-left mr30px pointer">' +
+                                            listName +
+                                            ' <input type="checkbox" name="list" value="' + value + '"/></label>';
+                                    });
+                                    subscribeList += '</div>';
+
+                                    $('#marketing-services').after(subscribeList);
+                                });
+                            } else {
+                                $('#subscribe-list').remove();
                             }
                         });
-                        return false;
+                    },
+                    close: function(event, ui){
+                        $(this).dialog('close').remove();
                     }
+                });
 
+                return false;
             });
         },
         crmMarketing: function(e){

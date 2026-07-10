@@ -236,6 +236,14 @@ define(['backbone',
                     requestType = 'PUT';
                 }
 
+                if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
+                    return false;
+                }
+
+                self.formProcessingAddPreset = true;
+                self.$el.find('#save-filter-preset').prop('disabled', true);
+                self.$el.find('#delete-filter-preset').prop('disabled', true);
+
                 filterPresetData = {
                     'filter_from_amount': $('#filter-from-amount').val(),
                     'filter_to_amount': $('#filter-to-amount').val(),
@@ -285,15 +293,21 @@ define(['backbone',
 
                     showMessage(response.responseText.message, false, 3000);
                     $('#orders-filter-reset-btn').trigger('click');
+                    self.formProcessingAddPreset = false;
+                    self.$el.find('#save-filter-preset').prop('disabled', false);
+                    self.$el.find('#delete-filter-preset').prop('disabled', false);
                 }).fail(function(response) {
                     showMessage(response.responseJSON, true, 3000);
+                    self.formProcessingAddPreset = false;
+                    self.$el.find('#save-filter-preset').prop('disabled', false);
+                    self.$el.find('#delete-filter-preset').prop('disabled', false);
                 });
             }
         },
         changeFilterPreset:function(e)
         {
             var presetId = $(e.currentTarget).val();
-            self = this;
+            var self = this;
             if (_.isEmpty(presetId)) {
                 return false;
             }
@@ -306,6 +320,9 @@ define(['backbone',
                 $('.recurring-filters').addClass('hidden');
                 $('#filter-preset-default').prop('checked', false);
                 $('#filter-preset-allow').prop('checked', false);
+                this.formProcessingFilters = false;
+                this.$el.find('#orders-filter-apply-btn').prop('disabled', false);
+                this.$el.find('#orders-filter-reset-btn').prop('disabled', false);
                 return false;
             }
 
@@ -440,11 +457,21 @@ define(['backbone',
         },
         deleteFilterPreset: function(e) {
             e.preventDefault();
-            var presetId = $('#predefined-filter-list').val();
+            var presetId = $('#predefined-filter-list').val(),
+                self = this;
 
             if (_.isEmpty(presetId)) {
                 return false;
             }
+
+            if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
+                return false;
+            }
+
+            self.formProcessingAddPreset = true;
+            self.$el.find('#save-filter-preset').prop('disabled', true);
+            self.$el.find('#delete-filter-preset').prop('disabled', true);
+
 
             showConfirm(_.isUndefined(i18n['Are you sure want to delete'])?'Are you sure want to delete':i18n['Are you sure want to delete'], function(){
                 $.ajax({
@@ -464,8 +491,15 @@ define(['backbone',
 
                         showMessage(response.responseText, false, 3000);
                         $('#orders-filter-reset-btn').trigger('click');
+                        self.formProcessingAddPreset = false;
+                        self.$el.find('#save-filter-preset').prop('disabled', false);
+                        self.$el.find('#delete-filter-preset').prop('disabled', false);
                     }
                 });
+            }, function(){
+                self.formProcessingAddPreset = false;
+                self.$el.find('#save-filter-preset').prop('disabled', false);
+                self.$el.find('#delete-filter-preset').prop('disabled', false);
             });
         },
         setStateOptions : function() {
@@ -791,17 +825,39 @@ define(['backbone',
             this.$('td.paginator').html(this.templates.paginator(this.orders.information));
             this.getOrdersLocationInventoryStatusGrid(this.orders.pluck("id"));
             setInterval(() => {this.getOrdersLocationInventoryStatusGrid(this.orders.pluck("id"));}, 5000);
+
+            this.formProcessingFilters = false;
+            this.$el.find('#orders-filter-apply-btn').prop('disabled', false);
+            this.$el.find('#orders-filter-reset-btn').prop('disabled', false);
         },
         applyFilter: function(e) {
             if(typeof e !== 'undefined'){
                 e.preventDefault();
             }
+
+            if (typeof this.formProcessingFilters !== 'undefined' && self.formProcessingFilters === true) {
+                return false;
+            }
+
+            this.formProcessingFilters = true;
+            this.$el.find('#orders-filter-apply-btn').prop('disabled', true);
+            this.$el.find('#orders-filter-reset-btn').prop('disabled', true);
+
             this.orders.ordersChecked = [];
             this.orders.currentPage = 0;
             this.orders.pager();
         },
         resetFilter: function(e){
             e.preventDefault();
+
+            if (typeof this.formProcessingFilters !== 'undefined' && self.formProcessingFilters === true) {
+                return false;
+            }
+
+            this.formProcessingFilters = true;
+            this.$el.find('#orders-filter-apply-btn').prop('disabled', true);
+            this.$el.find('#orders-filter-reset-btn').prop('disabled', true);
+
             var $form = $(e.currentTarget).closest('form');
             $form.find('input:text').val('').end()
                  .find('select.filter').val('0').trigger('chosen:updated');
