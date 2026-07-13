@@ -862,6 +862,10 @@ define(['backbone',
             $form.find('input:text').val('').end()
                  .find('select.filter').val('0').trigger('chosen:updated');
 
+            $('#predefined-filter-list').val(0);
+            $('#filter-preset-default').prop('checked', false);
+            $('#filter-preset-allow').prop('checked', false);
+
             $('#exclude-quotes-from-search').prop('checked', false);
             $('#is-a-gift').prop('checked', false);
             $('.clear-input').addClass('hidden');
