@@ -236,9 +236,9 @@ define(['backbone',
                     requestType = 'PUT';
                 }
 
-                if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
-                    return false;
-                }
+                // if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
+                //     return false;
+                // }
 
                 self.formProcessingAddPreset = true;
                 self.$el.find('#save-filter-preset').prop('disabled', true);
@@ -464,9 +464,9 @@ define(['backbone',
                 return false;
             }
 
-            if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
-                return false;
-            }
+            // if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
+            //     return false;
+            // }
 
             self.formProcessingAddPreset = true;
             self.$el.find('#save-filter-preset').prop('disabled', true);
