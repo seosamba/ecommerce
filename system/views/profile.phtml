@@ -533,6 +533,13 @@ $this->headScript()
                                 id:id
                             };
 
+                        if (typeof self.formProcessingTracking !== 'undefined' && self.formProcessingTracking === true) {
+                            return false;
+                        }
+
+                        self.formProcessingTracking = true;
+                        $(document).find('.save-data-' + id).prop('disabled', true);
+
                         $.ajax({
                             url: $('#website_url').val()+'plugin/shopping/run/order',
                             data: data,
@@ -558,6 +565,9 @@ $this->headScript()
                                         el.closest('td').append(trackingLink);
                                     }
                                 }
+
+                                self.formProcessingTracking = false;
+                                $(document).find('.save-data-' + id).prop('disabled', false);
 
                                 $('#dialog-block-' + id).dialog('close');
                             }

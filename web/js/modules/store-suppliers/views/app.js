@@ -153,7 +153,7 @@ define([
                                        model.set('checked', true);
                                    }
                                }else{
-                                   $('#supplier-list input[value='+id+']').closest('td').remove();
+                                   $('#supplier-list input[value='+id+']').closest('tr').remove();
                                }
                             });
                             if (msg.length) {
@@ -264,7 +264,7 @@ define([
             var applyButton  = _.isUndefined(i18n['Apply']) ? 'Apply':i18n['Apply'];
             var supplierButtons = {};
 
-            supplierButtons[applyButton] = function() {
+            supplierButtons[applyButton] = function(e) {
 
                 var companyName = $('input[name=newCompany]').val();
 
@@ -274,6 +274,11 @@ define([
                 if (!userIds.length){
                     return false;
                 }
+
+                var button = $(e.currentTarget);
+
+                button.prop('disabled', true);
+
                 $.ajax({
                     url: $('#website_url').val() + 'api/store/companysuppliers/',
                     type: 'POST',
@@ -283,8 +288,10 @@ define([
                     success: function(response){
                         if (response.error == '1') {
                             showMessage(response.responseText, true, 5000);
+                            button.prop('disabled', false);
                             return false;
                         } else {
+                            button.prop('disabled', false);
                             showMessage(_.isUndefined(i18n['Saved. To see the changes please reload the screen.']) ? 'Saved. To see the changes please reload the screen.':i18n['Saved. To see the changes please reload the screen.'], false, 5000);
                             $(this).dialog('close');
                         }
@@ -345,7 +352,7 @@ define([
                         var enabledServices = response.responseText.enabledServices,
                             enabledServicesLabels = response.responseText.enabledServicesLabels;
 
-                        assignEmailService[applyButton] = function() {
+                        assignEmailService[applyButton] = function(e) {
 
                             if($("#marketing-services option:selected").val() == 'select'){
                                 showMessage(_.isUndefined(i18n['Please choose service'])?'Please choose service':i18n['Please choose service']);
@@ -362,6 +369,10 @@ define([
                                 lists.push($(this).val());
                             });
 
+                            var button = $(e.currentTarget);
+
+                            button.prop('disabled', true);
+
                             $.ajax({
                                 url: $('#website_url').val()+'plugin/apps/run/sendServicesDashboard/customers/'+customerIds+'/service/'+$("#marketing-services option:selected").val()+'/lists/'+lists,
                                 type: 'POST',
@@ -369,8 +380,10 @@ define([
                                 }).done(function(response) {
                                     if(response.error == 0){
                                         showMessage(_.isUndefined(i18n['Emails added'])?'Emails added':i18n['Emails added']);
+                                        button.prop('disabled', false);
                                     }else{
                                         showMessage(_.isUndefined(i18n['Something went wrong'])?'Something went wrong':i18n['Something went wrong']);
+                                        button.prop('disabled', false);
                                     }
                                 })
                         };
@@ -464,7 +477,7 @@ define([
                     var enabledServices = response.responseText.enabledServices,
                         enabledServicesLabels = response.responseText.enabledServicesLabels;
 
-                    assignCrmService[applyButton] = function() {
+                    assignCrmService[applyButton] = function(e) {
 
                         if($("#crm-services option:selected").val() == 'select'){
                             showMessage(_.isUndefined(i18n['Please choose service'])?'Please choose service':i18n['Please choose service']);
@@ -481,6 +494,10 @@ define([
                             lists.push($(this).val());
                         });
 
+                        var button = $(e.currentTarget);
+
+                        button.prop('disabled', true);
+
                         $.ajax({
                             url: $('#website_url').val()+'plugin/apps/run/sendServicesDashboard/customers/'+customerIds+'/service/'+$("#crm-services option:selected").val()+'/lists/'+lists,
                             type: 'POST',
@@ -488,8 +505,10 @@ define([
                         }).done(function(response) {
                             if(response.error == 0){
                                 showMessage(_.isUndefined(i18n['Added'])?'Added':i18n['Added']);
+                                button.prop('disabled', false);
                             }else{
                                 showMessage(_.isUndefined(i18n[response.responseText])?response.responseText:i18n[response.responseText], false, 5000);
+                                button.prop('disabled', false);
                             }
                         })
                     };

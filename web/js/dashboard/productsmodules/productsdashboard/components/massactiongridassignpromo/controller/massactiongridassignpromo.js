@@ -21,6 +21,7 @@ export default {
             promoFrom:'',
             promoDue:'',
             filteredProductIds:[],
+            formProcessing:false
         }
     },
     components: {
@@ -100,8 +101,16 @@ export default {
                 filters = {};
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             if(this.promoPrice === '' || parseInt(this.promoPrice) === 0) {
                 showMessage(this.$t('message.enterCorrectPrice'), true, 3000);
+                this.formProcessing = false;
+                return false;
             }
 
             let promoFrom = moment(this.promoFrom).format('DD-MMM-yyyy');
@@ -109,10 +118,14 @@ export default {
 
             if (promoFrom === 'Invalid date' || promoDue === 'Invalid date') {
                 showMessage(this.$t('message.wrongDateFormat'), true, 3000);
+                this.formProcessing = false;
+                return false;
             }
 
             if(promoFrom === '' || promoDue === '') {
                 showMessage(this.$t('message.wrongDateFormat'), true, 3000);
+                this.formProcessing = false;
+                return false;
             }
 
             let checkedProductIds = Object.keys(this.checkedItemsData);
@@ -131,9 +144,11 @@ export default {
 
             if(parseInt(result.error) !== 1) {
                 showMessage(this.$t('message.promoHasBeenAdded'), false, 3000);
+                self.formProcessing = false;
                 //this.closeMassAction();
             } else {
                 showMessage(result.responseText, true, 5000);
+                self.formProcessing = false;
             }
         },
         async getInitialData()

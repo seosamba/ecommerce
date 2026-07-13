@@ -27,7 +27,7 @@
               <input v-if="filterUsed === true" v-model="matchingFilter" @change.prevent="countProducts($event)" id="assign-price-all-products-matching-filter" class="allDeleteFilterProducts" type="checkbox" name="allDeleteFilterProducts" value="0"/>
               <input v-else id="assign-price-all-products-matching-filter" class="allDeleteFilterProducts" disabled="disabled" type="checkbox" name="allDeleteFilterProducts" value="0"/>
             </label>
-            <input @click.prevent="submitRegularForm" type="submit" class="btn grid_6 red" :value="ucFirstAllText($t('message.yes'))">
+            <input :disabled="formProcessing === true" @click.prevent="submitRegularForm" type="submit" class="btn grid_6 red" :value="ucFirstAllText($t('message.yes'))">
             <input @click.prevent="closeMassAction" type="submit" class="btn grid_6 outline" :value="ucFirstAllText($t('message.no'))">
           </p>
         </form>

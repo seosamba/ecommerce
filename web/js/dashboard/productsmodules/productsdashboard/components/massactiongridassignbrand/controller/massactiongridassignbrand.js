@@ -24,6 +24,7 @@ export default {
             itemsProcessed:0,
             allFilterProducts:0,
             filteredProductIds:[],
+            formProcessing:false
         }
     },
     components: {
@@ -90,8 +91,15 @@ export default {
                 filters = {};
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             if(parseInt(this.selectedBrand) === 0 && this.newBrand === '') {
                 showMessage(this.$t('message.pleaseChooseProductBrandOrAddNew'), true, 5000);
+                this.formProcessing = false;
                 return false;
             }
             let requestedBrand = '';
@@ -107,10 +115,12 @@ export default {
 
             if(brandValidation.test(requestedBrand)){
                 showMessage(this.$t('message.notValidBrand'), true, 3000);
+                this.formProcessing = false;
                 return false;
             } else {
                 if(requestedBrand === '' || parseInt(requestedBrand) === 0 || typeof requestedBrand === 'undefined') {
                     showMessage(this.$t('message.pleaseChooseProductBrandOrAddNew'), true, 3000);
+                    this.formProcessing = false;
                     return false;
                 }
 
@@ -128,6 +138,7 @@ export default {
                     self.massProcessProductsRequest(0, requestedBrand);
                 }, function () {
                     self.processedElBlock = false;
+                    self.formProcessing = false;
                 });
             }
         },
@@ -182,6 +193,7 @@ export default {
                     });
                 }
 
+                this.formProcessing = false;
                 this.$store.commit('setProductsGridInfo', data);
                 //this.closeMassAction();
             }

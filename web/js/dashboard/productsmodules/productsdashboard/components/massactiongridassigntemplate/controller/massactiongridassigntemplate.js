@@ -23,6 +23,7 @@ export default {
             itemsProcessed:0,
             allFilterProducts:0,
             filteredProductIds:[],
+            formProcessing:false
         }
     },
     components: {
@@ -89,8 +90,15 @@ export default {
                 filters = {};
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             if(parseInt(this.selectedTemplate) === 0) {
                 showMessage(this.$t('message.pleaseChooseProductTemplate'), true, 5000);
+                this.formProcessing = false;
                 return false;
             }
 
@@ -107,6 +115,7 @@ export default {
                 self.massProcessProductsRequest(0);
             }, function () {
                 self.processedElBlock = false;
+                self.formProcessing = false;
             });
         },
         async massProcessProductsRequest(step)
@@ -161,6 +170,7 @@ export default {
                 }
 
                 this.$store.commit('setProductsGridInfo', data);
+                this.formProcessing = false;
                 //this.closeMassAction();
             }
         },

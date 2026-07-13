@@ -22,6 +22,7 @@ export default {
             allFilterProducts:0,
             filteredProductIds:[],
             filterUsed:false,
+            formProcessing:false
         }
     },
     components: {
@@ -88,6 +89,12 @@ export default {
                 filters = {};
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             this.origProcessed = true;
             this.endProcessed = false;
             this.itemsProcessed = 0;
@@ -101,6 +108,7 @@ export default {
                 self.massProcessProductsRequest(0);
             }, function () {
                 self.processedElBlock = false;
+                self.formProcessing = false;
             });
         },
         async massProcessProductsRequest(step)
@@ -143,8 +151,10 @@ export default {
                 });
 
                 if (result.status === 'error') {
+                    this.formProcessing = false;
                     showMessage('Please re-login', true, 3000);
                 } else {
+                    this.formProcessing = false;
                     this.$store.commit('setCheckedItems', {});
                     this.$store.commit('setAllCheckedItemsTracking', {'items': {}});
                     this.$store.commit('setUpdateGridStats', Date.now());

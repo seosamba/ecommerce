@@ -24,6 +24,7 @@ export default {
             itemsProcessed:0,
             allFilterProducts:0,
             filteredProductIds:[],
+            formProcessing:false
         }
     },
     components: {
@@ -90,6 +91,12 @@ export default {
                 filters = {};
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             this.origProcessed = true;
             this.endProcessed = false;
             this.itemsProcessed = 0;
@@ -103,6 +110,7 @@ export default {
                 self.massProcessProductsRequest(0);
             }, function () {
                 self.processedElBlock = false;
+                self.formProcessing = false;
             });
         },
         async massProcessProductsRequest(step)
@@ -149,6 +157,7 @@ export default {
                     productIdsString = productIdsString.concat(productInfo.id, ",");
                 });
                 const resultSuppliersCompanies = await this.$store.dispatch('getSuppliersCompaniesGridData', {'router':this.$router, 'productIdsString' : productIdsString, 'groupByCompany': 0});
+                this.formProcessing = false;
             }
         },
         async getProductCompanies()
