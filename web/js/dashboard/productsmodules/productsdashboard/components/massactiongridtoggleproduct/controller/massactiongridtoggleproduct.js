@@ -21,6 +21,7 @@ export default {
             itemsProcessed:0,
             allFilterProducts:0,
             filteredProductIds:[],
+            formProcessing:false
         }
     },
     components: {
@@ -87,6 +88,12 @@ export default {
                 filters = {};
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             let productStatus = 0;
             if(param === 'enable') {
                 productStatus = 1;
@@ -105,6 +112,7 @@ export default {
                 self.massProcessProductsRequest(0, productStatus);
             }, function () {
                 self.processedElBlock = false;
+                self.formProcessing = false;
             });
         },
         async massProcessProductsRequest(step, param)
@@ -163,6 +171,7 @@ export default {
                     });
                 }
 
+                this.formProcessing = false;
                 this.$store.commit('setProductsGridInfo', data);
                 //this.closeMassAction();
             }
