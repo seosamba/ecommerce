@@ -236,9 +236,9 @@ define(['backbone',
                     requestType = 'PUT';
                 }
 
-                // if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
-                //     return false;
-                // }
+                if (typeof self.formProcessingAddPreset !== 'undefined' && self.formProcessingAddPreset === true) {
+                    return false;
+                }
 
                 self.formProcessingAddPreset = true;
                 self.$el.find('#save-filter-preset').prop('disabled', true);
@@ -850,9 +850,9 @@ define(['backbone',
         resetFilter: function(e){
             e.preventDefault();
 
-            // if (typeof this.formProcessingFilters !== 'undefined' && self.formProcessingFilters === true) {
-            //     return false;
-            // }
+            if (typeof this.formProcessingFilters !== 'undefined' && self.formProcessingFilters === true) {
+                return false;
+            }
 
             this.formProcessingFilters = true;
             this.$el.find('#orders-filter-apply-btn').prop('disabled', true);
