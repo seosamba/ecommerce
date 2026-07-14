@@ -25,8 +25,8 @@
             </label>
           </p>
           <p class="grid_12">
-            <input @click.prevent="submitRegularForm('enable')" type="submit" class="btn grid_6 green" :value="ucFirstAllText($t('message.enable'))">
-            <input @click.prevent="submitRegularForm('disable')" type="submit" class="btn grid_6 red" :value="ucFirstAllText($t('message.disable'))">
+            <input :disabled="formProcessing === true" @click.prevent="submitRegularForm('enable')" type="submit" class="btn grid_6 green" :value="ucFirstAllText($t('message.enable'))">
+            <input :disabled="formProcessing === true" @click.prevent="submitRegularForm('disable')" type="submit" class="btn grid_6 red" :value="ucFirstAllText($t('message.disable'))">
           </p>
         </form>
       </div>

@@ -31,6 +31,7 @@ export default {
             origProcessed:true,
             endProcessed:false,
             itemsProcessed:0,
+            formProcessing:false
 
         }
     },
@@ -67,7 +68,7 @@ export default {
             }
 
             let price = Number(this.priceToChange);
-            if (typeof price !== 'number' || isNaN(price)) {
+            if (typeof price !== 'number' || isNaN(price) || price === 0) {
                 if(price == '') {
                     showMessage(this.$t('message.priceEmpty'), true, 5000);
                 } else {
@@ -77,6 +78,12 @@ export default {
                 return false;
             }
 
+            if (this.formProcessing === true) {
+                return false;
+            }
+
+            this.formProcessing = true;
+
             this.origProcessed = true;
             this.endProcessed = false;
             this.itemsProcessed = 0;
@@ -85,6 +92,7 @@ export default {
                 self.massProcessProductsRequest(0);
             }, function () {
                 self.processedElBlock = false;
+                self.formProcessing = false;
             });
         },
         async massProcessProductsRequest(step)
@@ -121,6 +129,9 @@ export default {
 
             this.processedElBlock = true;
             this.itemsProcessed = this.itemsProcessed + result.responseText.quantity;
+            if (isNaN(this.itemsProcessed)) {
+                this.itemsProcessed = 0;
+            }
 
             if (parseInt(result.error) === 0) {
                 this.massProcessProductsRequest(step+1);
@@ -134,8 +145,14 @@ export default {
                         productIds = this.filteredProductIds;
                     }
 
+                    if (typeof result.responseText.message !== 'undefined'){
+                        showMessage(result.responseText.message, false, 5000);
+                    } else {
+                        showMessage(result.responseText, true, 5000);
+                    }
+
                     let data = toRaw(this.ProductsGridInfoData);
-                    if(productIds) {
+                    if(productIds && typeof result.responseText.productPrices !== 'undefined') {
                         _.each(productIds, function(prodId, ind) {
                             _.each(data, function(prodData, index) {
                                 if(parseInt(prodData.id) === parseInt(prodId)) {
@@ -147,6 +164,7 @@ export default {
                         });
                     }
 
+                    this.formProcessing = false;
                     this.$store.commit('setProductsGridInfo', data);
                 }
             }
