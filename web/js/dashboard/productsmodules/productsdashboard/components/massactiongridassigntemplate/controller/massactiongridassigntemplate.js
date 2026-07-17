@@ -121,7 +121,8 @@ export default {
         async massProcessProductsRequest(step)
         {
             let filters = toRaw(this.filterData),
-                matchingFilter = 0;
+                matchingFilter = 0,
+                self = this;
 
             if (Object.keys(filters).length === 0) {
                 filters = {};
