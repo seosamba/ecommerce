@@ -176,6 +176,11 @@ export default {
 
                 this.formProcessing = false;
                 this.$store.commit('setProductsGridInfo', data);
+
+                const productsGridDataResult = await this.$store.dispatch('getProductsGridData', {
+                    'router': this.$router,
+                    'searchData': filters
+                });
                 //this.closeMassAction();
             }
         },

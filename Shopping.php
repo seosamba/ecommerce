@@ -4011,7 +4011,7 @@ class Shopping extends Tools_Plugins_Abstract {
             }
 
             if (empty($data)) {
-                return $this->_responseHelper->fail($this->_translator->translate('Nothing to change!'));
+                $data['tags'] = array();
             }
 
             $offset = null;

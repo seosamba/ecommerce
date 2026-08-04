@@ -15,7 +15,7 @@
           </label>
           <div v-show="inventoryEl" class="custom-quantity-block grid_9">
             <span class="grid_2 omega mt10px">{{$t('message.or')}}</span>
-            <input v-model="inventory" class="custom-quantity grid_10 alpha omega" name="custom-quantity" type="text" :title="$t('message.specifyInventoryStockLevel')" :placeholder="$t('message.specifyInventoryStockLevel')" />
+            <input v-model="inventory" class="custom-quantity grid_10 alpha omega" autocomplete="off" name="custom-quantity" type="text" :title="$t('message.specifyInventoryStockLevel')" :placeholder="$t('message.specifyInventoryStockLevel')" />
           </div>
           <p class="grid_12 mt15px">
             <span v-if="processedElBlock === true" id="mass-process-products-quantity-block" class="grid_12 alpha mt20px">

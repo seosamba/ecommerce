@@ -194,12 +194,15 @@ export default {
                 }
 
                 this.formProcessing = false;
+                this.$store.commit('setUpdateGridStats', Date.now());
                 this.$store.commit('setProductsGridInfo', data);
                 //this.closeMassAction();
             }
         },
         async getProductBrands()
         {
+            const productsScreenDataResult = await this.$store.dispatch('getGeneralProductsScreenData', {'router':this.$router});
+
             let gridInfoBrands = structuredClone(toRaw(this.gridInfo.brands));
             this.productBrands = gridInfoBrands;
             this.itemsQuantity = parseInt(Object.keys(this.checkedItemsData).length);
