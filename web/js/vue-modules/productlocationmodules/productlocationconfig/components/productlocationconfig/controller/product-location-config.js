@@ -15,6 +15,7 @@ export default {
             newInventory: '',
             productInventory: null,
             isDefaultProduct: false,
+            isDefaultTipProduct: false,
         }
     },
     components: {},
@@ -269,9 +270,14 @@ export default {
                     this.productInventory = null;
                 }
 
-                if(this.productId == result.defaultProductId) {
+                if(this.productId == result.defaultProductId || this.productId == result.defaultTipProductId) {
                     this.showLocationsBlock = false;
-                    this.isDefaultProduct = true;
+                    if(this.productId == result.defaultProductId) {
+                        this.isDefaultProduct = true;
+                    } else if(this.productId == result.defaultTipProductId) {
+                        this.isDefaultTipProduct = true;
+                    }
+
                 }
             }
         }
@@ -290,6 +296,7 @@ export default {
             this.showLocationsBlock = false;
             this.selectedLocations = [];
             this.isDefaultProduct = false;
+            this.isDefaultTipProduct = false;
         }
 
     },

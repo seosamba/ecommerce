@@ -23,6 +23,7 @@ const messages = {
             clickToSaveButton:'Click on SAVE button and then reopen this tab',
             globalInventoryLess:'General product inventory totals less than you add',
             defaultProduct:'You can not add locations inventories for default product!',
+            tipProduct:'You can not add locations inventories for default tip product!',
         }
     },
     es: {
@@ -49,6 +50,7 @@ const messages = {
             clickToSaveButton:'Click on SAVE button and then reopen this tab',
             globalInventoryLess:'General product inventory totals less than you add',
             defaultProduct:'You can not add locations inventories for default product!',
+            tipProduct:'You can not add locations inventories for default tip product!',
         }
     },
     fr: {
@@ -75,6 +77,7 @@ const messages = {
             clickToSaveButton:'Click on SAVE button and then reopen this tab',
             globalInventoryLess:'General product inventory totals less than you add',
             defaultProduct:'You can not add locations inventories for default product!',
+            tipProduct:'You can not add locations inventories for default tip product!',
         }
     }
 

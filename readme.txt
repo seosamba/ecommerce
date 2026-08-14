@@ -138,6 +138,7 @@ Plugin widgets.
     {$postpurchase:quotetitle} -> show quote title.
     {$postpurchase:quotecreatedat[:Y-m-d]} -> show quote created at.
     {$postpurchase:signatureinfo} -> show signature info
+    {$postpurchase:tip[:clean]} -> show tip value if the tip product was added by the POS app or the POS customer screen.
 
     ######### Billing information #############
     {$postpurchase:billing:prefix} -> billing prefix
@@ -213,6 +214,9 @@ Magic spaces:
     be displayed information about each element of purchase. You should provide optional name if you want use several magicspaces on one page.
     If you want to use it with action email system add param 'email' for magic space {postpurchasecartcontent:email}
     somename - You should provide optional name if you want use several magicspaces on one page.
+
+    MAGICSPACE: postpurchasetip
+        {postpurchasetip} ... {/postpurchasetip} - Postpurchasetip magic space is used to specify where tip-related information will be displayed when a tip product is added through the POS app or the POS customer screen.
 
 8. Product params widgets:
       {$productparams:titleoption:{$product:id}:SIZE} - Displays option title selected by default. Where "SIZE" - option name. Used only for dropdown and radio options.

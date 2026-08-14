@@ -1579,6 +1579,36 @@ class Shopping extends Tools_Plugins_Abstract {
             $this->_view->isPluginWithTagPosExist = $isPluginWithTagPosExist;
             $this->_view->salesName = $salesName;
 
+            $enableSeosambaPosPlugin = false;
+            $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+            if ($enabledSeosambaPosPlugin instanceof Application_Model_Models_Plugin) {
+                if ($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                    $enableSeosambaPosPlugin = true;
+                }
+            }
+
+            $tipVal = 0;
+            if($enableSeosambaPosPlugin) {
+                $defaultProductSettingsMapper = Seosambapos_Models_Mappers_SeosambaposDefaultproductSettingMapper::getInstance();
+                $defaultTipProductId = $defaultProductSettingsMapper->getConfigParam('defaultTipProductId');
+
+                $cartContent = $order->getCartContent();
+                if (!empty($cartContent)) {
+                    $tipVal = 0;
+                    if(!empty($defaultTipProductId)) {
+                        if(!empty($cartContent)) {
+                            foreach ($cartContent as $cartItem) {
+                                if($cartItem['product_id'] == $defaultTipProductId) {
+                                    $tipVal = round($cartItem['price'], 2);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $this->_view->tip = $tipVal;
+
 			$this->_layout->content = $this->_view->render('order.phtml');
 
 			echo $this->_layout->render();
@@ -4631,13 +4661,19 @@ class Shopping extends Tools_Plugins_Abstract {
                 }
 
                 $defProductId = '';
+                $defTipProductId = '';
 
                 if($enableSeosambaPosPlugin){
                     $defaultProductSettingsMapper = Seosambapos_Models_Mappers_SeosambaposDefaultproductSettingMapper::getInstance();
                     $defaultProductId = $defaultProductSettingsMapper->getConfigParam('defaultProductId');
+                    $defaultTipProductId = $defaultProductSettingsMapper->getConfigParam('defaultTipProductId');
 
                     if(!empty($defaultProductId)) {
                         $defProductId = $defaultProductId;
+                    }
+
+                    if(!empty($defaultTipProductId)) {
+                        $defTipProductId = $defaultTipProductId;
                     }
                 }
 
@@ -4647,6 +4683,7 @@ class Shopping extends Tools_Plugins_Abstract {
                     'selectedLocationsData' => $selectedLocationsData,
                     'productInventory' => $productInventory,
                     'defaultProductId' => $defProductId,
+                    'defaultTipProductId' => $defTipProductId,
                     'status' => 'ok'
                 ));
             }
