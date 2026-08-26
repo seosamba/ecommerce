@@ -181,6 +181,13 @@ export default {
         },
         async getProductTags()
         {
+            let filters = toRaw(this.filterData);
+
+            const result = await this.$store.dispatch('getProductsGridData', {
+                'router': this.$router,
+                'searchData': filters
+            });
+
             let checkedProductsIds = Object.keys(this.checkedItemsData);
             let data = toRaw(this.ProductsGridInfoData);
             let gridInfoTags = toRaw(this.gridInfo.tags);
