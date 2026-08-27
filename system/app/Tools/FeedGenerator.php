@@ -158,10 +158,31 @@ class Tools_FeedGenerator {
 			}
 			unset($tags);
 
+            $photoSrc = $product->getPhoto();
+
+            $imageUrl = Tools_Misc::prepareProductImage(
+                $photoSrc,
+                'large'
+            );
+
+            if (!$this->_isProductImageSizeValid(
+                $photoSrc,
+                'large',
+                500,
+                500
+            )) {
+                $originalImageUrl = Tools_Misc::prepareProductImage(
+                    $photoSrc,
+                    'original'
+                );
+
+                $imageUrl = $originalImageUrl;
+            }
+
             $item->appendChild(
                 $feed->createElement(
                     'g:image_link',
-                    Tools_Misc::prepareProductImage($product->getPhoto(), 'small')
+                    $imageUrl
                 )
             );
 
@@ -217,4 +238,104 @@ class Tools_FeedGenerator {
 		}
 		return $pairs;
 	}
+
+    private function _isProductImageSizeValid(
+        $photoSrc,
+        $newSize,
+        $minWidth,
+        $minHeight
+    ) {
+        static $imageSizeCache = array();
+
+        $photoSrc = (string) $photoSrc;
+        $newSize = (string) $newSize;
+        $cacheKey = sha1($newSize . '|' . $photoSrc);
+
+        if (!array_key_exists($cacheKey, $imageSizeCache)) {
+            $websiteHelper = Zend_Controller_Action_HelperBroker::getStaticHelper(
+                'website'
+            );
+
+            $websiteConfig = Zend_Registry::get('website');
+
+            $websitePath = rtrim(
+                (string) $websiteConfig['path'],
+                '/\\'
+            );
+
+            if (preg_match('~^https?://.*~', $photoSrc)) {
+                $parsedUrl = parse_url($photoSrc);
+
+                if (
+                    $parsedUrl === false ||
+                    empty($parsedUrl['path'])
+                ) {
+                    $imageSizeCache[$cacheKey] = false;
+                } else {
+                    $path = explode(
+                        '/',
+                        trim(
+                            rawurldecode($parsedUrl['path']),
+                            '/'
+                        )
+                    );
+
+                    $imgName = array_pop($path);
+                    $guessSize = array_pop($path);
+
+                    if (
+                        in_array(
+                            $guessSize,
+                            array(
+                                'small',
+                                'medium',
+                                'large',
+                                'original'
+                            ),
+                            true
+                        ) &&
+                        $guessSize !== $newSize
+                    ) {
+                        $guessSize = $newSize;
+                    }
+
+                    $path[] = $guessSize;
+                    $path[] = $imgName;
+
+                    $imagePath = $websitePath .
+                        DIRECTORY_SEPARATOR .
+                        implode(DIRECTORY_SEPARATOR, $path);
+
+                    $imageSizeCache[$cacheKey] = is_file($imagePath)
+                        ? @getimagesize($imagePath)
+                        : false;
+                }
+            } else {
+                $photoSrc = str_replace(
+                    '/',
+                    '/' . $newSize . '/',
+                    $photoSrc
+                );
+
+                $imagePath = $websitePath .
+                    DIRECTORY_SEPARATOR .
+                    trim(
+                        $websiteHelper->getMedia(),
+                        '/\\'
+                    ) .
+                    DIRECTORY_SEPARATOR .
+                    ltrim($photoSrc, '/\\');
+
+                $imageSizeCache[$cacheKey] = is_file($imagePath)
+                    ? @getimagesize($imagePath)
+                    : false;
+            }
+        }
+
+        $imageSize = $imageSizeCache[$cacheKey];
+
+        return $imageSize !== false &&
+            $imageSize[0] >= $minWidth &&
+            $imageSize[1] >= $minHeight;
+    }
 }
