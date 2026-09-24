@@ -522,6 +522,51 @@ class Widgets_Postpurchase_Postpurchase extends Widgets_Abstract
         return $discount;
     }
 
+    /**
+     * Return cart tip. If tip product added by POS app.
+     *
+     * @return mixed
+     */
+    protected function _renderTip()
+    {
+        $enableSeosambaPosPlugin = false;
+
+        $enabledSeosambaPosPlugin = Application_Model_Mappers_PluginMapper::getInstance()->findByName('seosambapos');
+        if ($enabledSeosambaPosPlugin instanceof Application_Model_Models_Plugin) {
+            if ($enabledSeosambaPosPlugin->getStatus() == Application_Model_Models_Plugin::ENABLED) {
+                $enableSeosambaPosPlugin = true;
+            }
+        }
+
+        if($enableSeosambaPosPlugin) {
+            $defaultProductSettingsMapper = Seosambapos_Models_Mappers_SeosambaposDefaultproductSettingMapper::getInstance();
+            $defaultTipProductId = $defaultProductSettingsMapper->getConfigParam('defaultTipProductId');
+
+            $tip = 0;
+            if(!empty($defaultTipProductId)) {
+                $cartContent = $this->_cart->getCartContent();
+
+                if(!empty($cartContent)) {
+                    foreach ($cartContent as $cartItem) {
+                        if($cartItem['product_id'] == $defaultTipProductId) {
+                            $tip = round($cartItem['price'], 2);
+                        }
+                    }
+                }
+            }
+
+            if (in_array(self::CLEAN_CART_PARAM, $this->_options)) {
+                return $tip;
+            }
+
+            $tip = $this->_currency->toCurrency($tip);
+
+            return $tip;
+        }
+
+        return '';
+    }
+
 
     /**
      * Return cart shipping tax

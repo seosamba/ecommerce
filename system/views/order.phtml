@@ -422,6 +422,12 @@
                             <td class="text-right"><?php echo $this->currency($subTotal);?></td>
                         <?php endif;?>
                     </tr>
+                    <?php if ($this->tip > 0): ?>
+                        <tr>
+                            <td><?php echo $this->translate('Tip');?>:</td>
+                            <td class="text-right"><?php echo $this->currency($this->tip);?></td>
+                        </tr>
+                    <?php endif; ?>
                     <?php if ($this->order->getDiscount() > 0): ?>
                         <tr>
                             <td><?php echo $this->translate('Discount');?>:</td>
