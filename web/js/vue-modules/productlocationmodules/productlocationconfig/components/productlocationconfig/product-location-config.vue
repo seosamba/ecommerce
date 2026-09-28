@@ -49,6 +49,9 @@
           <div v-if="isDefaultProduct">
             <h1 class="error">{{ $t('message.defaultProduct') }}</h1>
           </div>
+          <div v-else-if="isDefaultTipProduct">
+            <h1 class="error">{{ $t('message.tipProduct') }}</h1>
+          </div>
           <div v-else>
             <h1 class="error">{{ $t('message.productNotSaved') }}</h1>
             <p>{{ $t('message.clickToSaveButton') }}</p>
