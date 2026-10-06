@@ -170,6 +170,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             }
         }
 
+        if (empty($options['tagnames'] && empty($options['brands']))) {
+            $options['tagnames'] = Models_Mapper_Tag::getInstance()->getTagNames();
+        }
+
         if (empty($options['tagnames'])) {
             throw new Exceptions_SeotoasterWidgetException('Filter widget: at least one tag name should be provided');
         }

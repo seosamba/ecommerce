@@ -749,6 +749,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $filters['tagnames'] = $urlFilter['category'];
             unset($urlFilter['category']);
         }
+
+        if(empty($filters['tagnames']) && empty($filters['brands'])) {
+            $filters['tagnames'] = Models_Mapper_Tag::getInstance()->getTagNames();
+        }
+
 		if (isset($filters['tagnames']) && !empty($filters['tagnames'])) {
 			$tags = Models_Mapper_Tag::getInstance()->findByName($filters['tagnames'], true);
 			if ($tags){
