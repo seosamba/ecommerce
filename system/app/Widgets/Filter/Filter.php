@@ -50,10 +50,10 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
     protected function _load()
     {
-        if (empty($this->_options)) {
-            throw new Exceptions_SeotoasterWidgetException('No options provided. Usage: '
-                . implode(', ', $this->_allowedOptions));
-        }
+//        if (empty($this->_options)) {
+//            throw new Exceptions_SeotoasterWidgetException('No options provided. Usage: '
+//                . implode(', ', $this->_allowedOptions));
+//        }
 
         // check if first option is allowed method
         if (in_array($this->_options[0], $this->_allowedOptions)) {
@@ -130,9 +130,9 @@ class Widgets_Filter_Filter extends Widgets_Abstract
 
     private function _renderProduct()
     {
-        if (empty($this->_options)) {
-            throw new Exceptions_SeotoasterWidgetException('Filter widget: no options provided');
-        }
+//        if (empty($this->_options)) {
+//            throw new Exceptions_SeotoasterWidgetException('Filter widget: no options provided');
+//        }
 
         $options = array();
         $priceTax = '';
