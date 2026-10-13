@@ -170,7 +170,7 @@ class Widgets_Filter_Filter extends Widgets_Abstract
             }
         }
 
-        if (empty($options['tagnames'] && empty($options['brands']))) {
+        if (empty($options['tagnames'])) {
             $options['tagnames'] = Models_Mapper_Tag::getInstance()->getTagNames();
         }
 

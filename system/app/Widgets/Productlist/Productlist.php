@@ -750,7 +750,7 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             unset($urlFilter['category']);
         }
 
-        if(empty($filters['tagnames']) && empty($filters['brands'])) {
+        if(empty($filters['tagnames']) && empty($filters['brands']) && !in_array('brand', $this->_options)) {
             $filters['tagnames'] = Models_Mapper_Tag::getInstance()->getTagNames();
         }
 
@@ -769,6 +769,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				array_push($this->_cacheTags, 'prodtag_' . $tagId);
 			}
 		}
+
+        if(in_array('brand', $this->_options)) {
+            $filters['brands'] = Models_Mapper_Brand::getInstance()->getBrandNames();
+        }
 
         if (!empty($urlFilter['brand'])) {
             $filters['brands'] = $urlFilter['brand'];

@@ -72,6 +72,7 @@ Plugin widgets.
     template_name - template name for the product list
     tagnames-tag1,tag2,...,tagN - filtering by product tags (if you did not provide tagnames or brands option, widget will get all tags in system automatically)
     brands-brand1,brand2,...,brandN - filtering by product brands
+    brand - when this option is passed, product list rendering by all product brands. (Do not use this option if you want use {$filter} for this product list)
     order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
     desc - when option order-* is set the sorting of the list by desc. By default sorting by asc
     unwrap - remowed the <div class="product-list"></div> HTML element
@@ -225,7 +226,6 @@ Magic spaces:
 9. Product filters widget:
 {$filter:tagnames-tag1,tag2,...,tagN[:brands-brand1,brand2,...,brandN[:order-name,price,brand,date,sku[:productsqft[:allitems[:usesort]]]]]}
  tagnames-tag1,tag2,...,tagN - filtering by product tags (if you did not provide tagnames, widget will get all tags in system automatically)
- brands-brand1,brand2,...,brandN - filtering by product brands
  order-name,price,brand,date,sku - sorting of the list by: name, price, brand, date and sku
  productsqft - special option (special option for surfacecalc plugin)
  allitems - Show all filter values without All others group

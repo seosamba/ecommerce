@@ -81,4 +81,19 @@ class Models_Mapper_Brand extends Application_Model_Mappers_Abstract {
 
         return $this->getDbTable()->getAdapter()->fetchAll($select);
     }
+
+    /**
+     * @param $order
+     * @return array
+     */
+    public function getBrandNames($order = array())
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_brands', array('name'));
+
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
 }
