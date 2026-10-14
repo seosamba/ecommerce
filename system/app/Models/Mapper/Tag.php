@@ -182,4 +182,19 @@ class Models_Mapper_Tag extends Application_Model_Mappers_Abstract {
 
         return $this->getDbTable()->getAdapter()->fetchAll($select);
     }
+
+    /**
+     * @param $order
+     * @return array
+     */
+    public function getTagNames($order = array())
+    {
+        $select = $this->getDbTable()->getAdapter()->select()->from('shopping_tags', array('name'));
+
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        return $this->getDbTable()->getAdapter()->fetchCol($select);
+    }
 }

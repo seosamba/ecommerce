@@ -749,6 +749,11 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
             $filters['tagnames'] = $urlFilter['category'];
             unset($urlFilter['category']);
         }
+
+        if(empty($filters['tagnames']) && empty($filters['brands']) && !in_array('brand', $this->_options)) {
+            $filters['tagnames'] = Models_Mapper_Tag::getInstance()->getTagNames();
+        }
+
 		if (isset($filters['tagnames']) && !empty($filters['tagnames'])) {
 			$tags = Models_Mapper_Tag::getInstance()->findByName($filters['tagnames'], true);
 			if ($tags){
@@ -764,6 +769,10 @@ class Widgets_Productlist_Productlist extends Widgets_Abstract {
 				array_push($this->_cacheTags, 'prodtag_' . $tagId);
 			}
 		}
+
+        if(in_array('brand', $this->_options)) {
+            $filters['brands'] = Models_Mapper_Brand::getInstance()->getBrandNames();
+        }
 
         if (!empty($urlFilter['brand'])) {
             $filters['brands'] = $urlFilter['brand'];
